@@ -70,4 +70,10 @@ void processOptions(const Json::Value& section,
                     const std::function<int(const std::string&)>& valueConversion,
                     const std::function<void(int, int)>& optionAction);
 
+void loadTags(const Json::Value& section,
+              const std::function<void(const std::string&, const std::string&)>& tagAction);
+
+void loadTags(const toml::value& section,
+              const std::function<void(const std::string&, const std::string&)>& tagAction);
+
 }  // namespace helics

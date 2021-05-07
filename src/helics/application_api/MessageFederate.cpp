@@ -152,15 +152,17 @@ void MessageFederate::registerMessageInterfaces(const std::string& configString)
 
 static const std::string emptyStr;
 template<class Inp>
-static void loadOptions(const Inp& data, Endpoint& ept)
+static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 {
     using fileops::getOrDefault;
-    addTargets(data, "flags", [&ept](const std::string& target) {
-        if (target.front() != '-') {
-            ept.setOption(getOptionIndex(target), true);
-        } else {
-            ept.setOption(getOptionIndex(target.substr(2)), false);
+    addTargets(data, "flags", [&ept, fed](const std::string& target) {
+        auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
+        int val = (target.front() != '-') ? 1 : 0;
+        if (oindex == HELICS_INVALID_OPTION_INDEX) {
+            fed->logWarningMessage(target + " is not a recognized flag");
+            return;
         }
+        ept.setOption(oindex, val);
     });
     processOptions(
         data,
@@ -172,6 +174,9 @@ static void loadOptions(const Inp& data, Endpoint& ept)
     if (!info.empty()) {
         ept.setInfo(info);
     }
+    loadTags(data, [&ept](const std::string& tagname, const std::string& tagvalue) {
+        ept.setTag(tagname, tagvalue);
+    });
     addTargets(data, "subscriptions", [&ept](const std::string& sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
     addTargets(data, "sourceFilters", [&ept](const std::string& filt) {
@@ -201,7 +206,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(eptName, type) : registerEndpoint(eptName, type);
 
-            loadOptions(ept, epObj);
+            loadOptions(this, ept, epObj);
         }
     }
 }
@@ -231,7 +236,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
 
-            loadOptions(ept, epObj);
+            loadOptions(this, ept, epObj);
         }
     }
 }

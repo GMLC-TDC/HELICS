@@ -126,6 +126,7 @@ across different compilers*/
         cmd_broker_configure = 211,  //!< command to update the configuration of a broker
         cmd_base_configure = 213,  //!< command to update the configuration of a broker/core base
 
+        cmd_interface_tag = 218,  //!< command to update a tag on an interface
         cmd_update_filter_op =
             10427,  //!< command to update a filter op [should only used internal to a core]
         null_info_command =
@@ -317,6 +318,7 @@ across different compilers*/
 #define CMD_CORE_CONFIGURE action_message_def::action_t::cmd_core_configure
 #define CMD_BROKER_CONFIGURE action_message_def::action_t::cmd_broker_configure
 #define CMD_BASE_CONFIGURE action_message_def::action_t::cmd_base_configure
+#define CMD_INTERFACE_TAG action_message_def::action_t::cmd_interface_tag
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack
