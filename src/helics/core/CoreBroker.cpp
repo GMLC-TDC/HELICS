@@ -1021,7 +1021,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else {
@@ -1043,7 +1043,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 LOG_TIMING(global_broker_id_local,
                            getIdentifier(),
                            fmt::format("time request update {}", prettyPrintString(command)));
-                for (auto dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else if (command.dest_id == global_broker_id_local) {
@@ -1169,6 +1169,9 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_QUERY_ORDERED:
         case CMD_QUERY_REPLY_ORDERED:
             processQueryCommand(command);
+            break;
+        case CMD_SEND_COMMAND_ORDERED:
+            processCommandInstruction(command);
             break;
         default:
             if (command.dest_id != global_broker_id_local) {
@@ -2047,7 +2050,7 @@ void CoreBroker::executeInitializationOperations()
 void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 {
     auto Handles = unknownHandles.checkForInputs(handleInfo.key);
-    for (auto target : Handles) {
+    for (auto& target : Handles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
 
@@ -2545,9 +2548,12 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     transmitToParent(std::move(querycmd));
 }
 
-void CoreBroker::sendCommand(const std::string& target, const std::string& commandStr)
+void CoreBroker::sendCommand(const std::string& target,
+                             const std::string& commandStr,
+                             HelicsSequencingModes mode)
 {
-    ActionMessage cmdcmd(CMD_SEND_COMMAND);
+    ActionMessage cmdcmd(mode == HELICS_SEQUENCING_MODE_ORDERED ? CMD_SEND_COMMAND_ORDERED :
+                                                                  CMD_SEND_COMMAND);
     cmdcmd.source_id = global_id.load();
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
@@ -2803,7 +2809,7 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
         state = "init_requested";
     }
     for (auto& cr : builder.getJValue()["cores"]) {
-        for (auto fed : cr["federates"]) {
+        for (auto& fed : cr["federates"]) {
             auto dv = fed["granted_time"].asDouble();
             if (dv < mv) {
                 mv = dv;
@@ -2860,7 +2866,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                                       bool force_ordering)
 {
     if (!isValidIndex(index, mapBuilders)) {
-        mapBuilders.resize(index + 1);
+        mapBuilders.resize(static_cast<size_t>(index) + 1);
     }
     std::get<2>(mapBuilders[index]) = reset;
     auto& builder = std::get<0>(mapBuilders[index]);
@@ -3242,6 +3248,10 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
         m.setString(targetStringLoc, m.getString(sourceStringLoc));
         m.setString(sourceStringLoc, getIdentifier());
         addActionMessage(m);
+    } else if (cmd.compare(0, 4, "log ") == 0) {
+        LOG_SUMMARY(global_broker_id_local,
+                    m.getString(sourceStringLoc),
+                    m.payload.to_string().substr(4));
     } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
@@ -3325,7 +3335,7 @@ void CoreBroker::checkDependencies()
         }
 
         if (timeCoord->getDependents().size() == 1) {  // if there is just one dependency remove it
-            auto depid = timeCoord->getDependents()[0];
+            auto depid{timeCoord->getDependents()[0]};
             auto dependencies = timeCoord->getDependencies();
             if (dependencies.size() == 1) {
                 if (dependencies.front() != depid) {

@@ -66,7 +66,7 @@ TEST(logging_tests, file_logging)
 
     Fed->enterExecutingMode();
     Fed->finalize();
-    auto cr = Fed->getCorePointer();
+    auto cr{Fed->getCorePointer()};
     Fed.reset();
 
     EXPECT_TRUE(ghc::filesystem::exists(lfilename));
@@ -129,6 +129,35 @@ TEST(logging_tests, check_log_message)
 
     Fed->enterExecutingMode();
     Fed->logInfoMessage("test MEXAGE");
+    Fed->requestNextStep();
+    Fed->finalize();
+
+    auto llock = mlog.lock();
+    bool found = false;
+    for (auto& m : llock) {
+        if (m.second.find("MEXAGE") != std::string::npos) {
+            found = true;
+        }
+    }
+    EXPECT_TRUE(found);
+}
+
+TEST(logging_tests, check_log_message_command)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+
+    Fed->enterExecutingMode();
+    Fed->sendCommand("test1", "log test MEXAGE");
     Fed->requestNextStep();
     Fed->finalize();
 

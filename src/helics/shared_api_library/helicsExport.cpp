@@ -478,7 +478,16 @@ void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char
     if (brk == nullptr) {
         return;
     }
-    brk->sendCommand(AS_STRING(target), AS_STRING(command));
+    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_FAST);
+}
+
+void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err)
@@ -616,7 +625,16 @@ void helicsCoreSendCommand(HelicsCore core, const char* target, const char* comm
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{});
+    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_FAST);
+}
+
+void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
+{
+    auto* cr = getCore(core, err);
+    if (cr == nullptr) {
+        return;
+    }
+    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err)

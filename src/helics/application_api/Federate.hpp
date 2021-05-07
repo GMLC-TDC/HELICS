@@ -397,7 +397,10 @@ class HELICS_CXX_EXPORT Federate {
   @param commandStr a string with the command instructions, see other documentation for specific
   properties to command, can be defined by a federate
   */
-    void sendCommand(const std::string& target, const std::string& commandStr);
+    void sendCommand(
+        const std::string& target,
+        const std::string& commandStr,
+        HelicsSequencingModes mode = HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
 
     /** get a command for the Federate
  @return a pair of strings <command,source> with the command instructions for the federate; the

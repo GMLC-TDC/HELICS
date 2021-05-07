@@ -47,6 +47,8 @@ across different compilers*/
 
         cmd_send_command = -95,  //!< command to send a command to a command interface
         cmd_command_response = -98,  //!< command containing a response to a command
+        cmd_send_command_ordered = 95,  //!< command to send a command to a command interface
+        cmd_command_response_ordered = 98,  //!< command containing a response to a command
         cmd_broker_setup = -1,  //!< command to load the setup information for a broker
         cmd_ignore = 0,  //!< null command
         cmd_tick = 1,  //!< command for a timer tick
@@ -331,7 +333,9 @@ across different compilers*/
 #define CMD_SET_GLOBAL action_message_def::action_t::cmd_set_global
 
 #define CMD_SEND_COMMAND action_message_def::action_t::cmd_send_command
-#define CMD_COMMAND_STATUS action_message_def::action_t::cmd_command_status
+#define CMD_SEND_COMMAND_ORDERED action_message_def::action_t::cmd_send_command_ordered
+#define CMD_COMMAND_RESPONSE action_message_def::action_t::cmd_command_response
+#define CMD_COMMAND_RESPONSE_ORDERED action_message_def::action_t::cmd_command_response_ordered
 
 #define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
 

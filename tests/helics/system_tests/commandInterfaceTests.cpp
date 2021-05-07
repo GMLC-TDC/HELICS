@@ -100,7 +100,31 @@ TEST_F(command_tests, core_federate_command)
     vFed2->registerSubscription("pub1");
     auto cr = vFed1->getCorePointer();
 
-    cr->sendCommand(vFed2->getName(), "test", "");
+    cr->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_FAST);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto cmd2 = vFed2->getCommand();
+    EXPECT_EQ(cmd2.first, "test");
+    cmd2 = vFed2->getCommand();
+    EXPECT_TRUE(cmd2.first.empty());
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(command_tests, core_federate_command_ordered)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+    auto cr = vFed1->getCorePointer();
+
+    cr->sendCommand(vFed2->getName(), "test", "", HELICS_SEQUENCING_MODE_ORDERED);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
@@ -146,6 +170,27 @@ TEST_F(command_tests, broker_federate_command)
     vFed2->registerSubscription("pub1");
 
     brokers[0]->sendCommand(vFed2->getName(), "test");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto cmd2 = vFed2->getCommand();
+    EXPECT_EQ(cmd2.first, "test");
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(command_tests, broker_federate_command_ordered)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+
+    brokers[0]->sendCommand(vFed2->getName(), "test", HELICS_SEQUENCING_MODE_ORDERED);
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();

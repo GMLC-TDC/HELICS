@@ -773,10 +773,12 @@ class Core {
   @param target the specific target of the command
   @param commandStr the actual command
   @param source the designated source of the command, for return values or indication
+  @param mode the sequencing mode for the command, fast or ordered
   */
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,
-                             const std::string& source) = 0;
+                             const std::string& source,
+                             HelicsSequencingModes mode) = 0;
 
     /** get a command for a specific federate
      */
@@ -793,7 +795,7 @@ class Core {
     get a json structure with the name and value
     @param target the specific target of the query
     @param queryStr the actual query
-    @param mode the synchronization mode for the query
+    @param mode the sequencing mode for the query, fast or ordered
     @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */

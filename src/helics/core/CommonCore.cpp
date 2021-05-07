@@ -1554,7 +1554,7 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
     }
     auto fid = filterFedID.load();
 
-    auto handle = createBasicHandle(
+    const auto& handle = createBasicHandle(
         fid, LocalFederateId(), InterfaceType::FILTER, filterName, type_in, type_out);
     auto id = handle.getInterfaceHandle();
 
@@ -2225,7 +2225,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                                       bool force_ordering) const
 {
     if (!isValidIndex(index, mapBuilders)) {
-        mapBuilders.resize(index + 1);
+        mapBuilders.resize(static_cast<size_t>(index) + 1);
     }
     std::get<2>(mapBuilders[index]) = reset;
     auto& builder = std::get<0>(mapBuilders[index]);
@@ -2315,6 +2315,11 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         command.setString(targetStringLoc, command.getString(sourceStringLoc));
         command.setString(sourceStringLoc, getIdentifier());
         addActionMessage(command);
+    } else if (cmd.compare(0, 4, "log ") == 0) {
+        LOG_SUMMARY(global_broker_id_local,
+                    command.getString(sourceStringLoc),
+                    command.payload.to_string().substr(4));
+
     } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
@@ -2555,9 +2560,12 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
 
 void CommonCore::sendCommand(const std::string& target,
                              const std::string& commandStr,
-                             const std::string& source)
+                             const std::string& source,
+                             HelicsSequencingModes mode)
 {
-    ActionMessage cmdcmd(CMD_SEND_COMMAND);
+    ActionMessage cmdcmd(mode == HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED ?
+                             CMD_SEND_COMMAND_ORDERED :
+                             CMD_SEND_COMMAND);
     cmdcmd.dest_id = parent_broker_id;
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
@@ -2957,7 +2965,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto dep : timeCoord->getDependents()) {
+                for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
             } else {
@@ -3026,6 +3034,32 @@ void CommonCore::processCommand(ActionMessage&& command)
                 }
                 addActionMessage(CMD_STOP);
             }
+            break;
+        case CMD_SEND_COMMAND_ORDERED:
+            if (command.dest_id == global_broker_id_local) {
+                processCommandInstruction(command);
+                break;
+            }
+            if (command.dest_id == parent_broker_id) {
+                const auto& target = command.getString(targetStringLoc);
+                if (target == "core" || target == getIdentifier()) {
+                    processCommandInstruction(command);
+                    break;
+                }
+                auto* fed = getFederateCore(target);
+                if (fed != nullptr) {
+                    fed->sendCommand(command);
+                    break;
+                }
+            }
+            if (isLocal(command.dest_id)) {
+                auto* fed = getFederateCore(command.dest_id);
+                if (fed != nullptr) {
+                    fed->sendCommand(command);
+                    break;
+                }
+            }
+            routeMessage(std::move(command));
             break;
         case CMD_SEARCH_DEPENDENCY: {
             auto* fed = getFederateCore(std::string(command.name()));
@@ -3445,7 +3479,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                 }
                 command.setAction(CMD_ADD_SUBSCRIBER);
                 command.setDestination(pub->handle);
-                auto name = std::move(command.payload);
+                auto name{std::move(command.payload)};
                 command.payload.clear();
 
                 addTargetToInterface(command);
@@ -4256,7 +4290,7 @@ void CommonCore::routeMessage(const ActionMessage& cmd)
     } else if (cmd.dest_id == global_broker_id_local) {
         processCommandsForCore(cmd);
     } else if (cmd.dest_id == filterFedID) {
-        auto ncmd = cmd;
+        auto ncmd{cmd};
         filterFed->handleMessage(ncmd);
     } else if (isLocal(cmd.dest_id)) {
         auto* fed = getFederateCore(cmd.dest_id);
