@@ -402,7 +402,7 @@ HELICS_EXPORT const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
 
 /**
- * Get the data in the "info" tag of an endpoint.
+ * Get the local information field of an endpoint.
  *
  * @param end The endpoint to query.
  *
