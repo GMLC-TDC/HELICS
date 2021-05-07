@@ -465,6 +465,14 @@ operation_state CommonCore::minFederateState() const
     return op;
 }
 
+double CommonCore::getSimulationTime() const
+{
+    if (loopFederates.size() == 1U) {
+        return static_cast<double>(loopFederates[0]->grantedTime());
+    }
+    return BrokerBase::mInvalidSimulationTime;
+}
+
 void CommonCore::setCoreReadyToInit()
 {
     // use the flag mechanics that do the same thing
