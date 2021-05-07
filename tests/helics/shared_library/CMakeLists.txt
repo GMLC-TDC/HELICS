@@ -24,6 +24,7 @@ set(c_shared_library_test_sources
     loggingTests.cpp
     PropertyIndexTests.cpp
     commandInterfaceTests.cpp
+    miscApiTests.cpp
 )
 
 set(cpp_shared_library_test_sources

@@ -107,6 +107,21 @@ class Publication {
     {
         helicsPublicationSetInfo(pub, info.c_str(), HELICS_IGNORE_ERROR);
     }
+    /** get the value of a tag for the publication*/
+    const char* getTag(const std::string& tagname) const
+    {
+        return helicsPublicationGetTag(pub, tagname.c_str());
+    }
+    /** set the value of a tag for the publication*/
+    void setTag(const std::string& tagname, const std::string& tagvalue)
+    {
+        helicsPublicationSetTag(pub, tagname.c_str(), tagvalue.c_str(), HELICS_IGNORE_ERROR);
+    }
+    void setOption(int32_t option, int32_t value = 1)
+    {
+        helicsPublicationSetOption(pub, option, value, HELICS_IGNORE_ERROR);
+    }
+    int32_t getOption(int32_t option) { return helicsPublicationGetOption(pub, option); }
 
   private:
     HelicsPublication pub;  //!< the reference to the underlying publication

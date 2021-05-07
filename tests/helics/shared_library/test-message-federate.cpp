@@ -71,6 +71,9 @@ TEST_P(mfed_simple_type_tests, endpoint_registration)
     name = helicsEndpointGetName(epid_c);
     EXPECT_STREQ(name, "fed0/ep1");
 
+    CE(helicsEndpointSetTag(epid_b, "tag1", "tagvalue", &err));
+    EXPECT_STREQ(helicsEndpointGetTag(epid_b, "tag1"), "tagvalue");
+
     CE(helicsFederateFinalize(mFed1, &err));
 
     CE(mFed1State = helicsFederateGetState(mFed1, &err));

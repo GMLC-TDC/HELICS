@@ -402,24 +402,45 @@ HELICS_EXPORT const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
 
 /**
- * Get the data in the info field of a filter.
+ * Get the local information field of an endpoint.
  *
- * @param end The filter to query.
+ * @param end The endpoint to query.
  *
  * @return A string with the info field string.
  */
 HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 
 /**
- * Set the data in the info field for a filter.
+ * Set the data in the interface information field for an endpoint.
  *
- * @param endpoint The endpoint to query.
- * @param info The string to set.
+ * @param endpoint The endpoint to set the information for
+ * @param info The string to store in the field
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
+
+/**
+ * Get the data in a specified tag of an endpoint
+ *
+ * @param endpoint The endpoint to query.
+ *
+ * @return A string with the tag data.
+ */
+HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname);
+
+/**
+ * Set the data in a specific tag for an endpoint.
+ *
+ * @param endpoint The endpoint to query.
+ * @param tagname The string to set.
+ * @param tagvalue The string value to associate with a tag.
+ * @forcpponly
+ * @param[in,out] err An error object to fill out in case of an error.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tagname, const char* tagvalue, HelicsError* err);
 
 /**
  * Set a handle option on an endpoint.
