@@ -313,6 +313,27 @@ void BrokerBase::configureBase()
     brokerState = broker_state_t::configured;
 }
 
+static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
+{
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE || helicsLogLevel == -10) {
+        // dumplog == -10
+        return spdlog::level::trace;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TIMING) {
+        return spdlog::level::debug;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+       return spdlog::level::info;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
+        return spdlog::level::warn;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
+        return spdlog::level::err;
+    }
+    return spdlog::level::critical;
+}
+
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
@@ -328,62 +349,62 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             // check the logging level
             return true;
         }
+        double currentTime = getSimulationTime();
+        bool useTime = (currentTime != mInvalidSimulationTime);
         if (loggerFunction) {
-            loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
+            if (useTime) {
+                loggerFunction(
+                    logLevel,
+                               fmt::format("{} ({})[{}]", name, federateID.baseValue(),currentTime),
+                               message);
+            } else {
+                loggerFunction(logLevel,
+                               fmt::format("{} ({})", name, federateID.baseValue()),
+                               message);
+            }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
-                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
-                    consoleLogger->log(
-                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
-                    consoleLogger->log(
-                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-                    consoleLogger->log(
-                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
-                    consoleLogger->log(
-                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
-                    consoleLogger->log(
-                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel == -10) {  // dumplog
+                if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    consoleLogger->log(spdlog::level::critical,
-                                       "{} ({})::{}",
-                                       name,
-                                       federateID.baseValue(),
-                                       message);
+                    if (useTime) {
+                        consoleLogger->log(getSpdLogLevel(logLevel),
+                                           "{} ({})[{}]::{}",
+                                           name,
+                                           federateID.baseValue(),
+                                           currentTime,
+                                           message);
+                    } else {
+                        consoleLogger->log(getSpdLogLevel(logLevel),
+                                           "{} ({})::{}",
+                                           name,
+                                           federateID.baseValue(),
+                                           message);
+                    }
                 }
+               
                 if (forceLoggingFlush) {
                     consoleLogger->flush();
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
-                    fileLogger->log(
-                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
-                    fileLogger->log(
-                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-                    fileLogger->log(
-                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
-                    fileLogger->log(
-                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
-                    fileLogger->log(
-                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel == -10) {  // dumplog
-                    fileLogger->log(spdlog::level::trace, message);
+                if (logLevel == -10) {  // dumplog
+                    fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    fileLogger->log(spdlog::level::critical,
-                                    "{} ({})::{}",
-                                    name,
-                                    federateID.baseValue(),
-                                    message);
+                    if (useTime) {
+                        fileLogger->log(getSpdLogLevel(logLevel),
+                                        "{} ({})[{}]::{}",
+                                        name,
+                                        federateID.baseValue(),
+                                        currentTime,
+                                        message);
+                    } else {
+                        fileLogger->log(getSpdLogLevel(logLevel),
+                                        "{} ({})::{}",
+                                        name,
+                                        federateID.baseValue(),
+                                        message);
+                    }
                 }
 
                 if (forceLoggingFlush) {
