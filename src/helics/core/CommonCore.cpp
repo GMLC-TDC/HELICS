@@ -4410,7 +4410,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
-        return handleInfo->getTag("info");
+        return handleInfo->getTag("local_info_");
     }
     return emptyStr;
 }
@@ -4418,7 +4418,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
 void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string info)
 {
     handles.modify(
-        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("info", info); });
+        [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("local_info_", info); });
 }
 
 const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string& tag) const
