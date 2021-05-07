@@ -17,11 +17,7 @@ static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
         Json::Value tagBlock = Json::objectValue;
         for (size_t ii = 0; ii < bhi.tagCount(); ++ii) {
             const auto& tg = bhi.getTagByIndex(ii);
-            if (tg.second != "true") {
-                tagBlock[tg.first] = tg.second;
-            } else {
-                tagBlock[tg.first] = true;
-            }
+            tagBlock[tg.first] = tg.second;
         }
         v["tags"] = tagBlock;
     }
