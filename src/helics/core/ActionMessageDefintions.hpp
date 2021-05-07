@@ -334,8 +334,8 @@ across different compilers*/
 
 #define CMD_SEND_COMMAND action_message_def::action_t::cmd_send_command
 #define CMD_SEND_COMMAND_ORDERED action_message_def::action_t::cmd_send_command_ordered
-#define CMD_COMMAND_STATUS action_message_def::action_t::cmd_command_status
-#define CMD_COMMAND_STATUS_ORDERED action_message_def::action_t::cmd_command_status
+#define CMD_COMMAND_RESPONSE action_message_def::action_t::cmd_command_response
+#define CMD_COMMAND_RESPONSE_ORDERED action_message_def::action_t::cmd_command_response_ordered
 
 #define CMD_MULTI_MESSAGE action_message_def::action_t::cmd_multi_message
 
