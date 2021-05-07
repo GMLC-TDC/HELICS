@@ -320,6 +320,7 @@ class CommonCore: public Core, public BrokerBase {
     /** get the minimum operating state of the connected federates*/
     operation_state minFederateState() const;
 
+    virtual double getSimulationTime() const override;
   private:
     /** get the federate Information from the federateID*/
     FederateState* getFederateCore(GlobalFederateId federateID);

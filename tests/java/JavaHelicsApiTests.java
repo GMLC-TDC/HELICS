@@ -429,6 +429,11 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("ep2HasMsg != 1");
             }
             SWIGTYPE_p_void msg2 = helics.helicsEndpointGetMessage(ep2);
+            String msg2Source = helics.helicsMessageGetSource(msg2);
+            if (!"fed1/Ep1".equals(msg2Source))
+            {
+                msg2 = helics.helicsEndpointGetMessage(ep2);
+            }
             double msg2Time = helics.helicsMessageGetTime(msg2);
             if (msg2Time != 0.0) {
                System.out.println(msg2Time);
@@ -447,7 +452,7 @@ public class JavaHelicsApiTests {
             if (!"fed1/Ep1".equals(msg2OriginalSource)) {
                 javaHelicsApiTests.helicsAssert("!msg2OriginalSource.equals(\"fed1/Ep1\")");
             }
-            String msg2Source = helics.helicsMessageGetSource(msg2);
+            msg2Source = helics.helicsMessageGetSource(msg2);
             if (!"fed1/Ep1".equals(msg2Source)) {
                 javaHelicsApiTests.helicsAssert("!msg2Source.equals(\"fed1/Ep1\")");
             }
