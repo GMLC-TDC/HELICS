@@ -532,7 +532,7 @@ const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 int helicsFederateGetEndpointCount(HelicsFederate fed);
 const char* helicsEndpointGetInfo(HelicsEndpoint end);
 void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
-const char* helicsEndpointGetTag(HelicsEndpoint end, const char* tagname);
+const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname);
 void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tagname, const char* tagvalue, HelicsError* err);
 void helicsEndpointSetOption(HelicsEndpoint endpoint, int option, int value, HelicsError* err);
 int helicsEndpointGetOption(HelicsEndpoint endpoint, int option);

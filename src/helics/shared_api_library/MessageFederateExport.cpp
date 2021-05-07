@@ -662,9 +662,9 @@ void helicsEndpointSetInfo(HelicsEndpoint end, const char* info, HelicsError* er
     // LCOV_EXCL_STOP
 }
 
-const char* helicsEndpointGetTag(HelicsEndpoint end, const char* tagname)
+const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname)
 {
-    auto* endObj = verifyEndpoint(end, nullptr);
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return emptyStr.c_str();
     }

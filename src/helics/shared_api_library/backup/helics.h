@@ -3533,10 +3533,10 @@ HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
 HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 
 /**
- * Set the data in the info field for a filter.
+ * Set the data in the interface information field for an endpoint.
  *
- * @param endpoint The endpoint to query.
- * @param info The string to set.
+ * @param endpoint The endpoint to set the information for
+ * @param info The string to store in the field
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
@@ -3546,11 +3546,11 @@ HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* in
 /**
  * Get the data in a specified tag of an endpoint
  *
- * @param end The endpoint to query.
+ * @param endpoint The endpoint to query.
  *
  * @return A string with the tag data.
  */
-HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint end, const char* tagname);
+HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname);
 
 /**
  * Set the data in a specific tag for an endpoint.
