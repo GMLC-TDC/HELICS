@@ -240,6 +240,8 @@ typedef enum {
     HELICS_OK = 0
 } HelicsErrorTypes;
 
+const int HELICS_INVALID_OPTION_INDEX = -101;
+
 /** enumeration of properties that apply to federates*/
 typedef enum {
     /** the property controlling the minimum time delta for a federate*/
@@ -356,7 +358,10 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
+typedef enum {
+    HELICS_SEQUENCING_MODE_FAST = 0,
+    HELICS_SEQUENCING_MODE_ORDERED = 1
+} HelicsSequencingModes;
 
 /**
  * @file
@@ -3519,7 +3524,7 @@ HELICS_EXPORT const char* helicsEndpointGetName(HelicsEndpoint endpoint);
 HELICS_EXPORT int helicsFederateGetEndpointCount(HelicsFederate fed);
 
 /**
- * Get the data in the info field of an endpoint.
+ * Get the data in the "info" tag of an endpoint.
  *
  * @param end The endpoint to query.
  *
@@ -3539,7 +3544,7 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
 HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
 
 /**
- * Get the data in a specified tag of an endpoint.
+ * Get the data in a specified tag of an endpoint
  *
  * @param end The endpoint to query.
  *
@@ -4227,7 +4232,7 @@ HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagn
  *
  * @param filter The filter object to set the tag for.
  * @param tagname The string to set.
- * @param tagvalue The string value to associate with a tag.
+ * @param tagvalue the string value to associate with a tag.
  * @forcpponly
  * @param[in,out] err An error object to fill out in case of an error.
  * @endforcpponly
