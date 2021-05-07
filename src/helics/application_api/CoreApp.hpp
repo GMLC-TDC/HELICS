@@ -130,8 +130,8 @@ class HELICS_CXX_EXPORT CoreApp {
    "federation",  "broker", "core", or the name of a specific object/core/broker
    @param target the specific target of the command
    @param commandStr the actual command
-    @param mode defaults to fast (asynchronous) meaning the query goes into priority channels,
-    ordered (synchronous) means slower queries but has more ordering guarantees
+    @param mode defaults to fast (asynchronous) meaning the command goes into priority channels,
+    ordered (synchronous) means slower commands but has more ordering guarantees
    */
     void sendCommand(const std::string& target,
                      const std::string& commandStr,

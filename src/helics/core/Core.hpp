@@ -773,7 +773,7 @@ class Core {
   @param target the specific target of the command
   @param commandStr the actual command
   @param source the designated source of the command, for return values or indication
-  @param mode the sequencing mode for the query, fast or ordered
+  @param mode the sequencing mode for the command, fast or ordered
   */
     virtual void sendCommand(const std::string& target,
                              const std::string& commandStr,

@@ -129,7 +129,7 @@ class HELICS_CXX_EXPORT BrokerApp {
    @param target the specific target of the command
    @param commandStr the actual command
    @param mode the ordering mode to use (fast for asynchronous priority channels, and ordered for
-    slower but well ordered queries)
+    slower but well ordered commands)
    */
     void sendCommand(const std::string& target,
                      const std::string& commandStr,
