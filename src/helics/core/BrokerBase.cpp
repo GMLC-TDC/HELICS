@@ -313,7 +313,8 @@ void BrokerBase::configureBase()
     brokerState = broker_state_t::configured;
 }
 
-static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel) {
+static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
+{
     if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE || helicsLogLevel == -10) {
         // dumplog == -10
         return spdlog::level::trace;
@@ -352,7 +353,8 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         bool useTime = (currentTime != mInvalidSimulationTime);
         if (loggerFunction) {
             if (useTime) {
-                loggerFunction(logLevel,
+                loggerFunction(
+                    logLevel,
                                fmt::format("{} ({})[{}]", name, federateID.baseValue(),currentTime),
                                message);
             } else {
@@ -362,7 +364,6 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
-
                 if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
@@ -370,7 +371,8 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                         consoleLogger->log(getSpdLogLevel(logLevel),
                                            "{} ({})[{}]::{}",
                                            name,
-                                           federateID.baseValue(),currentTime,
+                                           federateID.baseValue(),
+                                           currentTime,
                                            message);
                     } else {
                         consoleLogger->log(getSpdLogLevel(logLevel),
@@ -386,7 +388,6 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-
                 if (logLevel == -10) {  // dumplog
                     fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
@@ -394,7 +395,8 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                         fileLogger->log(getSpdLogLevel(logLevel),
                                         "{} ({})[{}]::{}",
                                         name,
-                                        federateID.baseValue(),currentTime,
+                                        federateID.baseValue(),
+                                        currentTime,
                                         message);
                     } else {
                         fileLogger->log(getSpdLogLevel(logLevel),
