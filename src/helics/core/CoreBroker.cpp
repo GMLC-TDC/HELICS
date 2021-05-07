@@ -2562,29 +2562,29 @@ void CoreBroker::sendCommand(const std::string& target,
 }
 
 // enumeration of subqueries that cascade and need multiple levels of processing
-enum subqueries : std::uint16_t {
-    general_query = 0,
+enum Subqueries : std::uint16_t {
+    GENERAL_QUERY = 0,
     federate_map = 1,
-    current_time_map = 2,
-    dependency_graph = 3,
-    data_flow_graph = 4,
+    CURRENT_TIME_MAP = 2,
+    DEPENDENCY_GRAPH = 3,
+    DATA_FLOW_GRAPH = 4,
     version_all = 5,
-    global_state = 6,
-    global_time_debugging = 7,
-    global_flush = 8,
-    global_status = 9
+    GLOBAL_STATE = 6,
+    GLOBAL_TIME_DEBUGGING = 7,
+    GLOBAL_FLUSH = 8,
+    GLOBAL_STATUS = 9
 };
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
-    {"global_time", {current_time_map, true}},
+    {"global_time", {CURRENT_TIME_MAP, true}},
     {"federate_map", {federate_map, false}},
-    {"dependency_graph", {dependency_graph, false}},
-    {"data_flow_graph", {data_flow_graph, false}},
+    {"dependency_graph", {DEPENDENCY_GRAPH, false}},
+    {"data_flow_graph", {DATA_FLOW_GRAPH, false}},
     {"version_all", {version_all, false}},
-    {"global_state", {global_state, true}},
-    {"global_time_debugging", {global_time_debugging, true}},
-    {"global_status", {global_status, true}},
-    {"global_flush", {global_flush, true}}};
+    {"global_state", {GLOBAL_STATE, true}},
+    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, true}},
+    {"global_status", {GLOBAL_STATUS, true}},
+    {"global_flush", {GLOBAL_FLUSH, true}}};
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
@@ -2721,7 +2721,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
                 auto center = generateMapObjectCounter();
                 std::get<0>(mapBuilders[index]).setCounterCode(center);
             }
-            if (index == global_status) {
+            if (index == GLOBAL_STATUS) {
                 return generateGlobalStatus(std::get<0>(mapBuilders[index]));
             }
             return std::get<0>(mapBuilders[index]).generate();
@@ -2882,7 +2882,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     }
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
-    if (index == global_flush) {
+    if (index == GLOBAL_FLUSH) {
         queryReq.setAction(CMD_BROKER_QUERY_ORDERED);
     }
     queryReq.payload = request;
@@ -2919,7 +2919,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                 case connection_state::error:
                 case connection_state::disconnected:
                 case connection_state::request_disconnect:
-                    if (index == global_state) {
+                    if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
                         brkstate["name"] = broker.name;
@@ -2944,13 +2944,13 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     }
     switch (index) {
         case federate_map:
-        case current_time_map:
-        case global_status:
-        case data_flow_graph:
-        case global_flush:
+        case CURRENT_TIME_MAP:
+        case GLOBAL_STATUS:
+        case DATA_FLOW_GRAPH:
+        case GLOBAL_FLUSH:
         default:
             break;
-        case dependency_graph: {
+        case DEPENDENCY_GRAPH: {
             base["dependents"] = Json::arrayValue;
             for (const auto& dep : timeCoord->getDependents()) {
                 base["dependents"].append(dep.baseValue());
@@ -2963,11 +2963,11 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
         case version_all:
             base["version"] = versionString;
             break;
-        case global_state:
+        case GLOBAL_STATE:
             base["state"] = brokerStateName(brokerState.load());
             base["status"] = isConnected();
             break;
-        case global_time_debugging:
+        case GLOBAL_TIME_DEBUGGING:
             base["state"] = brokerStateName(brokerState.load());
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
@@ -3183,7 +3183,7 @@ void CoreBroker::processQuery(ActionMessage& m)
 
 void CoreBroker::processQueryResponse(const ActionMessage& m)
 {
-    if (m.counter == general_query) {
+    if (m.counter == GENERAL_QUERY) {
         activeQueries.setDelayedValue(m.messageID, std::string(m.payload.to_string()));
         return;
     }
@@ -3193,10 +3193,10 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
         if (builder.addComponent(std::string(m.payload.to_string()), m.messageID)) {
             std::string str;
             switch (m.counter) {
-                case global_status:
+                case GLOBAL_STATUS:
                     str = generateGlobalStatus(builder);
                     break;
-                case global_flush:
+                case GLOBAL_FLUSH:
                     str = "{\"status\":true}";
                     break;
                 default:

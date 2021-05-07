@@ -314,21 +314,23 @@ void BrokerBase::configureBase()
 }
 
 static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel) {
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE) {
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE || helicsLogLevel == -10) {
+        // dumplog == -10
         return spdlog::level::trace;
-    } else if (helicsLogLevel >= HELICS_LOG_LEVEL_TIMING) {
-        return spdlog::level::debug;
-    } else if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-       return spdlog::level::info;
-    } else if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
-        return spdlog::level::warn;
-    } else if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
-        return spdlog::level::err;
-    } else if (helicsLogLevel == -10) {  // dumplog
-        return spdlog::level::trace;
-    } else {
-        return spdlog::level::critical;
     }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TIMING) {
+        return spdlog::level::debug;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+       return spdlog::level::info;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
+        return spdlog::level::warn;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
+        return spdlog::level::err;
+    }
+    return spdlog::level::critical;
 }
 
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
