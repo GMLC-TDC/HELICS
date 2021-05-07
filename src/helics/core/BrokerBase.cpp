@@ -323,7 +323,7 @@ static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
         return spdlog::level::debug;
     }
     if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-       return spdlog::level::info;
+        return spdlog::level::info;
     }
     if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
         return spdlog::level::warn;
@@ -355,8 +355,8 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             if (useTime) {
                 loggerFunction(
                     logLevel,
-                               fmt::format("{} ({})[{}]", name, federateID.baseValue(),currentTime),
-                               message);
+                    fmt::format("{} ({})[{}]", name, federateID.baseValue(), currentTime),
+                    message);
             } else {
                 loggerFunction(logLevel,
                                fmt::format("{} ({})", name, federateID.baseValue()),
@@ -382,7 +382,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                                            message);
                     }
                 }
-               
+
                 if (forceLoggingFlush) {
                     consoleLogger->flush();
                 }
