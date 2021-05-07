@@ -32,6 +32,8 @@ set(SRC_FILES
     helicsCLI11JsonConfig.cpp
     FilterFederate.cpp
     TimeCoordinatorProcessing.cpp
+    BasicHandleInfo.cpp
+    queryHelpers.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES

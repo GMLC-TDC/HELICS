@@ -822,14 +822,16 @@ static Filter& generateFilter(Federate* fed,
 const std::string emptyStr;
 
 template<class Inp>
-static void loadOptions(const Inp& data, Filter& filt)
+static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
 {
-    addTargets(data, "flags", [&filt](const std::string& target) {
-        if (target.front() != '-') {
-            filt.setOption(getOptionIndex(target), true);
-        } else {
-            filt.setOption(getOptionIndex(target.substr(2)), false);
+    addTargets(data, "flags", [&filt, fed](const std::string& target) {
+        auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
+        int val = (target.front() != '-') ? 1 : 0;
+        if (oindex == HELICS_INVALID_OPTION_INDEX) {
+            fed->logWarningMessage(target + " is not a recognized flag");
+            return;
         }
+        filt.setOption(oindex, val);
     });
     processOptions(
         data,
@@ -841,6 +843,9 @@ static void loadOptions(const Inp& data, Filter& filt)
     if (!info.empty()) {
         filt.setInfo(info);
     }
+    loadTags(data, [&filt](const std::string& tagname, const std::string& tagvalue) {
+        filt.setTag(tagname, tagvalue);
+    });
     auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
     auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
     addTargets(data, "sourcetargets", asrc);
@@ -894,7 +899,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             }
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
-            loadOptions(filt, filter);
+            loadOptions(this, filt, filter);
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
@@ -1015,7 +1020,7 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             auto& filter =
                 generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
 
-            loadOptions(filt, filter);
+            loadOptions(this, filt, filter);
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
@@ -1399,6 +1404,21 @@ void Interface::setInfo(const std::string& info)
     } else {
         throw(
             InvalidFunctionCall("cannot call set info on uninitialized or disconnected interface"));
+    }
+}
+
+const std::string& Interface::getTag(const std::string& tag) const
+{
+    return (cr != nullptr) ? cr->getTag(handle, tag) : emptyStr;
+}
+
+void Interface::setTag(const std::string& tag, const std::string& value)
+{
+    if (cr != nullptr) {
+        cr->setTag(handle, tag, value);
+    } else {
+        throw(
+            InvalidFunctionCall("cannot call set tag on uninitialized or disconnected interface"));
     }
 }
 

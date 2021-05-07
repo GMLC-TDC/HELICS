@@ -56,6 +56,9 @@ TEST_P(filter_simple_type_tests, registration)
     tmp = helicsFilterGetName(f1_b);
     EXPECT_STREQ(tmp, "filter0/filter1");
 
+    CE(helicsFilterSetTag(f1_b, "tag1", "tagvalue", &err));
+    EXPECT_STREQ(helicsFilterGetTag(f1_b, "tag1"), "tagvalue");
+
     auto f1_c = helicsFederateGetFilterByIndex(fFed, 2, &err);
     tmp = helicsFilterGetName(f1_c);
     EXPECT_STREQ(tmp, "filter0/c4");

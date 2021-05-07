@@ -662,6 +662,39 @@ void helicsEndpointSetInfo(HelicsEndpoint end, const char* info, HelicsError* er
     // LCOV_EXCL_STOP
 }
 
+const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname)
+{
+    auto* endObj = verifyEndpoint(endpoint, nullptr);
+    if (endObj == nullptr) {
+        return emptyStr.c_str();
+    }
+    try {
+        const std::string& info = endObj->endPtr->getTag(AS_STRING(tagname));
+        return info.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        return emptyStr.c_str();
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsEndpointSetTag(HelicsEndpoint end, const char* tagname, const char* tagvalue, HelicsError* err)
+{
+    auto* endObj = verifyEndpoint(end, err);
+    if (endObj == nullptr) {
+        return;
+    }
+    try {
+        endObj->endPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
 int helicsEndpointGetOption(HelicsEndpoint end, int option)
 {
     auto* endObj = verifyEndpoint(end, nullptr);
