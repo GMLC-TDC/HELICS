@@ -31,6 +31,7 @@ class helicsCLI11App;
  */
 class BrokerBase {
   protected:
+    static constexpr double mInvalidSimulationTime{-98763.2};
     std::atomic<GlobalBrokerId> global_id{
         parent_broker_id};  //!< the unique identifier for the broker(core or broker)
     GlobalBrokerId global_broker_id_local{};  //!< meant to be the same as global_id but not
@@ -219,6 +220,8 @@ class BrokerBase {
     void setLoggingFile(const std::string& lfile);
     /** get the value of a particular flag*/
     bool getFlagValue(int32_t flag) const;
+    /** virtual function to return the current simulation time*/
+    virtual double getSimulationTime() const { return mInvalidSimulationTime; }
 
   public:
     /** generate a callback function for the logging purposes*/
