@@ -24,7 +24,7 @@ static const std::string emptyStr;
 
 const std::string& BasicHandleInfo::getTag(const std::string& tag) const
 {
-    for (auto& tg : tags) {
+    for (const auto& tg : tags) {
         if (tg.first == tag) {
             return tg.second;
         }

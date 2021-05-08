@@ -2564,11 +2564,11 @@ void CoreBroker::sendCommand(const std::string& target,
 // enumeration of subqueries that cascade and need multiple levels of processing
 enum Subqueries : std::uint16_t {
     GENERAL_QUERY = 0,
-    federate_map = 1,
+    FEDERATE_MAP = 1,
     CURRENT_TIME_MAP = 2,
     DEPENDENCY_GRAPH = 3,
     DATA_FLOW_GRAPH = 4,
-    version_all = 5,
+    VERSION_ALL = 5,
     GLOBAL_STATE = 6,
     GLOBAL_TIME_DEBUGGING = 7,
     GLOBAL_FLUSH = 8,
@@ -2577,10 +2577,10 @@ enum Subqueries : std::uint16_t {
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
-    {"federate_map", {federate_map, false}},
+    {"federate_map", {FEDERATE_MAP, false}},
     {"dependency_graph", {DEPENDENCY_GRAPH, false}},
     {"data_flow_graph", {DATA_FLOW_GRAPH, false}},
-    {"version_all", {version_all, false}},
+    {"version_all", {VERSION_ALL, false}},
     {"global_state", {GLOBAL_STATE, true}},
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, true}},
     {"global_status", {GLOBAL_STATUS, true}},
@@ -2943,7 +2943,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
         }
     }
     switch (index) {
-        case federate_map:
+        case FEDERATE_MAP:
         case CURRENT_TIME_MAP:
         case GLOBAL_STATUS:
         case DATA_FLOW_GRAPH:
@@ -2960,7 +2960,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                 base["dependencies"].append(dep.baseValue());
             }
         } break;
-        case version_all:
+        case VERSION_ALL:
             base["version"] = versionString;
             break;
         case GLOBAL_STATE:

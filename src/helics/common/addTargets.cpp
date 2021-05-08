@@ -85,8 +85,8 @@ void loadTags(const Json::Value& section,
     if (section.isMember("tags")) {
         auto tv = section["tags"];
         if (tv.isArray()) {
-            for (decltype(tv.size()) ii = 0; ii < tv.size(); ++ii) {
-                auto pv = getTagPair(tv[ii]);
+            for (auto & tp:tv) {
+                auto pv = getTagPair(tp);
                 if (!pv.first.empty()) {
                     tagAction(pv.first, pv.second);
                 }

@@ -148,14 +148,14 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     auto fed1res = std::async(std::launch::async, rfed1);
 
     fed1res.get();
+    vFed1->finalize();
     auto rvec = fed2res.get();
     EXPECT_EQ(rvec.front(), 5.0);
-    EXPECT_EQ(rvec.size(), 20u);
+    EXPECT_EQ(rvec.size(), 20U);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    vFed1->finalize();
-    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
-                        // it will time out.
+    
+    vFed2->finalize();
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_option)
@@ -173,18 +173,22 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     IP2.setOption(helics::defs::Options::IGNORE_INTERRUPTS);
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        for (helics::Time t = 1.0; t <= 100.0; t += 1.0) {
+        helics::Time t{1.0};
+        while (t <= 100.0) {
             pub.publish(t);
             vFed1->requestTime(t);
+            t += 1.0;
         }
     };
 
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        for (double ii = 5.0; ii <= 100.0; ii += 5.0) {
-            auto T2 = vFed2->requestTime(ii);
+        double time{5.0};
+        while (time <= 100.0) {
+            auto T2 = vFed2->requestTime(time);
             res.push_back(T2);
+            time += 5.0;
         }
         return res;
     };
@@ -196,12 +200,11 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     vFed1->finalize();
     auto rvec = fed2res.get();
     EXPECT_EQ(rvec.front(), 5.0);
-    EXPECT_EQ(rvec.size(), 20u);
+    EXPECT_EQ(rvec.size(), 20U);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
 
-    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
-                        // it will time out.
+    vFed2->finalize();
 }
 
 TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
@@ -223,19 +226,23 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
 
     auto rfed1 = [&]() {
         vFed1->enterExecutingMode();
-        for (double ii = 1.0; ii <= 100.0; ii += 1.0) {
-            pub1.publish(ii);
-            vFed1->requestTime(ii);
+        double t{1.0};
+        while (t <= 100.0) {
+            pub1.publish(t);
+            vFed1->requestTime(t);
+            t += 1.0;
         }
     };
 
     auto rfed2 = [&]() {
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
-        for (double ii = 5.0; ii <= 100.0; ii += 5.0) {
-            pub2.publish(ii);
-            auto T2 = vFed2->requestTime(ii);
+        double t{5.0};
+        while ( t <= 100.0) {
+            pub2.publish(t);
+            auto T2 = vFed2->requestTime(t);
             res.push_back(T2);
+            t += 5.0;
         }
         return res;
     };
@@ -244,14 +251,14 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     auto fed1res = std::async(std::launch::async, rfed1);
 
     fed1res.get();
+    vFed1->finalize();
     auto rvec = fed2res.get();
     EXPECT_EQ(rvec.front(), 5.0);
-    EXPECT_EQ(rvec.size(), 20u);
+    EXPECT_EQ(rvec.size(), 20U);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    vFed1->finalize();
-    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
-                        // it will time out.
+    
+    vFed2->finalize();
 }
 
 TEST_F(timing_tests, timing_with_input_delay)
@@ -285,8 +292,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
     vFed1->finalize();
-    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
-                        // it will time out.
+    vFed2->finalize(); 
 }
 
 TEST_F(timing_tests, timing_with_minDelta_change)
