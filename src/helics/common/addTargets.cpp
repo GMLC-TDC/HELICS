@@ -113,7 +113,7 @@ void loadTags(const toml::value& section,
     if (section.contains("tags")) {
         auto tv = section.at("tags");
         if (tv.is_array()) {
-            for (int ii = 0; ii < tv.size(); ++ii) {
+            for (std::size_t ii = 0; ii < tv.size(); ++ii) {
                 auto pv = getTagPair(tv[ii]);
                 if (!pv.first.empty()) {
                     tagAction(pv.first, pv.second);

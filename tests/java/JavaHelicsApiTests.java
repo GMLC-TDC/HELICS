@@ -421,8 +421,8 @@ public class JavaHelicsApiTests {
                 javaHelicsApiTests.helicsAssert("returnTime[0] != 1.0");
             }
             int ep2MsgCount = helics.helicsEndpointPendingMessagesCount(ep2);
-            if (ep2MsgCount != 2) {
-                javaHelicsApiTests.helicsAssert("ep2MsgCount != 2");
+            if (ep2MsgCount != 3) {
+                javaHelicsApiTests.helicsAssert("ep2MsgCount != 3");
             }
             int ep2HasMsg = helics.helicsEndpointHasMessage(ep2);
             if (ep2HasMsg != 1) {
