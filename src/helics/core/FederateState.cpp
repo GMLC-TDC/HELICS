@@ -1614,11 +1614,11 @@ void FederateState::logMessage(int level,
     if ((loggerFunction) && (level <= logLevel)) {
         loggerFunction(level,
                        (logMessageSource.empty()) ?
-                           fmt::format("{} ({})[{}]",
+                           fmt::format("{} ({})[t={}]",
                                        name,
                                        global_id.load().baseValue(),
                                        static_cast<double>(grantedTime())) :
-                           fmt::format("{}[{}]",
+                           fmt::format("{}[t={}]",
                                        logMessageSource,
                                        static_cast<double>(grantedTime())),
                        message);

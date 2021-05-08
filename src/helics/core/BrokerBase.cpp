@@ -350,37 +350,24 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             return true;
         }
         double currentTime = getSimulationTime();
-        bool useTime = (currentTime != mInvalidSimulationTime);
         if (loggerFunction) {
-            if (useTime) {
                 loggerFunction(
                     logLevel,
-                    fmt::format("{} ({})[{}]", name, federateID.baseValue(), currentTime),
+                    fmt::format("{} ({})[t={}]", name, federateID.baseValue(), currentTime),
                     message);
-            } else {
-                loggerFunction(logLevel,
-                               fmt::format("{} ({})", name, federateID.baseValue()),
-                               message);
-            }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
                 if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    if (useTime) {
+                    
                         consoleLogger->log(getSpdLogLevel(logLevel),
-                                           "{} ({})[{}]::{}",
+                                           "{} ({})[t={}]::{}",
                                            name,
                                            federateID.baseValue(),
                                            currentTime,
                                            message);
-                    } else {
-                        consoleLogger->log(getSpdLogLevel(logLevel),
-                                           "{} ({})::{}",
-                                           name,
-                                           federateID.baseValue(),
-                                           message);
-                    }
+                    
                 }
 
                 if (forceLoggingFlush) {
@@ -391,20 +378,12 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 if (logLevel == -10) {  // dumplog
                     fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    if (useTime) {
                         fileLogger->log(getSpdLogLevel(logLevel),
-                                        "{} ({})[{}]::{}",
+                                        "{} ({})[t={}]::{}",
                                         name,
                                         federateID.baseValue(),
                                         currentTime,
                                         message);
-                    } else {
-                        fileLogger->log(getSpdLogLevel(logLevel),
-                                        "{} ({})::{}",
-                                        name,
-                                        federateID.baseValue(),
-                                        message);
-                    }
                 }
 
                 if (forceLoggingFlush) {

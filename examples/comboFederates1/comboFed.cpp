@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     if (app["--startbroker"]->count() > 0) {
         brk = helics::BrokerApp(fi.coreType, brokerArgs);
     }
@@ -74,8 +74,11 @@ int main(int argc, char* argv[])
     cFed->enterExecutingMode();
     std::cout << "entered exec State\n";
     for (int i = 1; i < 10; ++i) {
-        std::string message = std::string("message sent from ") + name + " to " + etarget +
-            " at time " + std::to_string(i);
+        std::string message = std::string("message sent from ") + name;
+        message.append(" to ");
+        message.append(etarget);
+        message.append(" at time ");
+        message.append(std::to_string(i));
         id.sendTo(message.data(), message.size(), etarget);
         pubid.publish(i);
         std::cout << message << std::endl;

@@ -33,7 +33,7 @@ int main(int /*argc*/, char** /*argv*/)
 
     fi.setProperty(HELICS_PROPERTY_INT_MAX_ITERATIONS, 100);
 
-    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, 1);
+    fi.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_WARNING);
 
     /* Create value federate */
     helicscpp::ValueFederate* vfed = new helicscpp::ValueFederate("TestB Federate", fi);

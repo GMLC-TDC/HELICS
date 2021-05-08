@@ -82,7 +82,7 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     std::atomic<int> warnCounter{0};
     fed->setLoggingCallback(
         [&warnCounter](int logLevel, std::string_view /*unused*/, std::string_view /*unused*/) {
-            if (logLevel == 1) {
+            if (logLevel == HELICS_LOG_LEVEL_WARNING) {
                 ++warnCounter;
             }
         });
@@ -125,7 +125,7 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
     fi.setProperty(helics::defs::Properties::RT_LAG, 0.1);
     fi.setProperty(helics::defs::Properties::RT_LEAD, 0.1);
     fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 0);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
 
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
     fi.setFlagOption(helics::defs::Flags::REALTIME, false);

@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     if (app["--startbroker"]->count() > 0) {
         brk = helics::BrokerApp(fi.coreType, brokerArgs);
     }

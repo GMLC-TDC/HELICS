@@ -113,7 +113,7 @@ std::shared_ptr<helics::Broker>
     } else {
         broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
     }
-    broker->setLoggingLevel(0);
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_ERROR);
     brokers.push_back(broker);
     return broker;
 }

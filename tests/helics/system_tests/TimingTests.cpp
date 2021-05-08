@@ -176,7 +176,10 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
         helics::Time t{1.0};
         while (t <= 100.0) {
             pub.publish(t);
-            vFed1->requestTime(t);
+            auto tr = vFed1->requestTime(t);
+            if (tr == helics::Time::maxVal()) {
+                break;
+            }
             t += 1.0;
         }
     };

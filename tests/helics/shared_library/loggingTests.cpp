@@ -23,7 +23,7 @@ TEST(logging_tests, check_log_message)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TIMING, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -61,7 +61,7 @@ TEST(logging_tests, check_log_message_levels)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TIMING, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -108,7 +108,7 @@ TEST(logging_tests, check_log_message_levels_high)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 9, &err);
+    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TRACE+6, &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
