@@ -319,7 +319,7 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     helics::ValueFederate V2("", config);
     V2.enterExecutingMode();
     auto val = V2.getIntegerProperty(helics::defs::Properties::LOG_LEVEL);
-    EXPECT_EQ(val, -1);
+    EXPECT_EQ(val, HELICS_LOG_LEVEL_NO_PRINT);
     EXPECT_EQ(V2.getName(), "test_bes");
     bool result = V2.getFlagOption(HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE);
     EXPECT_TRUE(result);

@@ -168,23 +168,23 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option_function<int>(
             "--loglevel",
             [this](int val) { setLogLevel(val); },
-            "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+            "the level which to log; the higher this is set; the more logs set to \"no_print\" for no logging")
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group
         ->add_option("--fileloglevel",
                      fileLogLevel,
                      "the level at which messages get sent to the file")
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
         ->add_option("--consoleloglevel",
                      consoleLogLevel,
                      "the level at which messages get sent to the file")
 
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group->add_flag(
         "--dumplog",
         dumplog,
@@ -349,24 +349,39 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             // check the logging level
             return true;
         }
+        bool noID =
+            (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
         double currentTime = getSimulationTime();
         if (loggerFunction) {
+            if (noID) {
+                loggerFunction(
+                    logLevel,
+                    name,
+                    message);
+            } else {
                 loggerFunction(
                     logLevel,
                     fmt::format("{} ({})[t={}]", name, federateID.baseValue(), currentTime),
                     message);
+            }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
                 if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    
+                    if (noID) {
+                        consoleLogger->log(getSpdLogLevel(logLevel),
+                                           "{}::{}",
+                                           name,
+                                           message);
+                    } else {
                         consoleLogger->log(getSpdLogLevel(logLevel),
                                            "{} ({})[t={}]::{}",
                                            name,
                                            federateID.baseValue(),
                                            currentTime,
                                            message);
+                    }
                     
                 }
 
@@ -378,12 +393,19 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                 if (logLevel == -10) {  // dumplog
                     fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
+                    if (noID) {
+                        fileLogger->log(getSpdLogLevel(logLevel),
+                                        "{}::{}",
+                                        name,
+                                        message);
+                    } else {
                         fileLogger->log(getSpdLogLevel(logLevel),
                                         "{} ({})[t={}]::{}",
                                         name,
                                         federateID.baseValue(),
                                         currentTime,
                                         message);
+                    }
                 }
 
                 if (forceLoggingFlush) {
