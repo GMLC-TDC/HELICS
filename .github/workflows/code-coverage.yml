@@ -25,6 +25,7 @@ jobs:
       CMAKE_GENERATOR: Unix Makefiles
       MAKEFLAGS: '-j 4'
       CI_TEST_FLAGS: ""
+      DISABLE_INTERFACES: "Java"
       
     steps:
     - uses: actions/checkout@v2
