@@ -78,8 +78,8 @@ TEST(logging_tests, check_log_message_levels)
     EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
-    helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
-    helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TIMING, "test MEXAGE1", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE+3, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);
