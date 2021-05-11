@@ -43,6 +43,7 @@ TEST(misc_tests, misc_tests)
     helicsFederateInfoSetTimeProperty(fedInfo2, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
     auto fed1 = helicsCreateCombinationFederate("fed1", fedInfo2, nullptr);
     auto fed2 = helicsFederateClone(fed1, nullptr);
+    helicsFederateInfoFree(fedInfo2);
     helicsGetFederateByName("fed1", nullptr);
     helicsFederateSetFlagOption(fed2, 1, HELICS_FALSE, nullptr);
 

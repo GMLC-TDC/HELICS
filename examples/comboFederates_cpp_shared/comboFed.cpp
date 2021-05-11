@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
                       << cFed->getTarget(subid) << '\n';
         }
     }
-    cFed->logMessage(7, "Process Complete.");
-    cFed->logMessage(1, "Reached End of application.");
+    cFed->logMessage(HELICS_LOG_LEVEL_TRACE, "Process Complete.");
+    cFed->logMessage(HELICS_LOG_LEVEL_WARNING, "Reached End of application.");
     cFed->logInfoMessage("Calling Finalize.");
     cFed->finalize();
     return 0;

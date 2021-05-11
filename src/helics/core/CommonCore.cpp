@@ -467,18 +467,7 @@ operation_state CommonCore::minFederateState() const
 
 double CommonCore::getSimulationTime() const
 {
-    auto lk = federates.try_lock_shared();
-    if (!lk || lk->size()==0U) {
-        return BrokerBase::mInvalidSimulationTime;
-    }
-    Time minVal{Time::maxVal()};
-    for (const auto &fed:lk) {
-        auto tm = fed->grantedTime();
-        if (tm<minVal) {
-            minVal = tm;
-        }
-    }
-    return static_cast<double>(minVal);
+    return simTime.load();
 }
 
 void CommonCore::setCoreReadyToInit()
@@ -2719,6 +2708,10 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 } else {
                     fed->global_id = command.dest_id;
                     loopFederates.addSearchTerm(command.dest_id, std::string(command.name()));
+                    if (!keyFed.isValid())
+                    {
+                        keyFed = fed->global_id;
+                    }
                 }
 
                 // push the command to the local queue
@@ -2979,6 +2972,10 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
 
         case CMD_EXEC_GRANT:
+            if (command.source_id == keyFed) {
+                simTime.store(0.0);
+            }
+            [[fallthrough]];
         case CMD_EXEC_REQUEST:
             if (isLocal(GlobalBrokerId(command.source_id))) {
                 if (hasTimeBlock(command.source_id)) {
@@ -3003,6 +3000,11 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_TIME_GRANT:
+            if (command.source_id == keyFed)
+            {
+                simTime.store(static_cast<double>(command.actionTime));
+            }
+            [[fallthrough]];
         case CMD_TIME_REQUEST:
             if (isLocal(command.source_id)) {
                 if (hasTimeBlock(command.source_id)) {

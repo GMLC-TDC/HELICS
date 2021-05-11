@@ -333,6 +333,8 @@ class CommonCore: public Core, public BrokerBase {
     FederateState* getHandleFederateCore(InterfaceHandle handle);
 
   private:
+    std::atomic<double> simTime{BrokerBase::mInvalidSimulationTime};
+    GlobalFederateId keyFed{};
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     std::map<GlobalFederateId, route_id>
         routing_table;  //!< map for external routes  <global federate id, route id>
