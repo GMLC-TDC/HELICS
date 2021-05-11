@@ -467,10 +467,18 @@ operation_state CommonCore::minFederateState() const
 
 double CommonCore::getSimulationTime() const
 {
-    if (loopFederates.size() == 1U) {
-        return static_cast<double>(loopFederates[0]->grantedTime());
+    auto lk = federates.try_lock_shared();
+    if (!lk || lk->size()==0U) {
+        return BrokerBase::mInvalidSimulationTime;
     }
-    return BrokerBase::mInvalidSimulationTime;
+    Time minVal{Time::maxVal()};
+    for (const auto &fed:lk) {
+        auto tm = fed->grantedTime();
+        if (tm<minVal) {
+            minVal = tm;
+        }
+    }
+    return static_cast<double>(minVal);
 }
 
 void CommonCore::setCoreReadyToInit()

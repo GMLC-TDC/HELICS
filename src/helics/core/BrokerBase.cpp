@@ -351,7 +351,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         bool noID =
             (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
-        double currentTime = getSimulationTime();
+        double currentTime = (noID)?mInvalidSimulationTime:getSimulationTime();
         if (loggerFunction) {
             if (noID) {
                 loggerFunction(
