@@ -273,7 +273,7 @@ TEST_P(tracer_message_file_tests, test_message_files)
     trace1.finalize();
 }
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 TEST_P(tracer_message_file_tests, test_message_files_cmd)
 {
     std::this_thread::sleep_for(300ms);
@@ -665,7 +665,7 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
                          tracer_clone_file_tests,
                          ::testing::ValuesIn(simple_clone_test_files));
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS
 TEST_P(tracer_message_file_tests, test_message_files_exe)
 {

@@ -497,7 +497,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     vFed2->finalize();
 }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
 {
     SetupTest<helics::ValueFederate>("zmq_2", 2);

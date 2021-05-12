@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 #    include "../network/tcp/TcpHelperClasses.h"
 #endif
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 #    include <asio/ip/udp.hpp>
 #endif
 
@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
@@ -91,7 +91,7 @@ namespace udp {
 #endif
 
 namespace apps {
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
     std::size_t AsioBrokerServer::tcpDataReceive(std::shared_ptr<tcp::TcpConnection> connection,
                                                  const char* data,
                                                  std::size_t bytes_received)
@@ -144,9 +144,9 @@ namespace apps {
             pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
         }
     }
-#endif  // ENABLE_TCP_CORE
+#endif  // HELICS_ENABLE_TCP_CORE
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
     bool AsioBrokerServer::udpDataReceive(std::shared_ptr<udp::UdpServer> server,
                                           const char* data,
                                           size_t bytes_received)
@@ -194,7 +194,7 @@ namespace apps {
         }
     }
 
-#endif  // ENABLE_UDP_CORE
+#endif  // HELICS_ENABLE_UDP_CORE
 
     static const Json::Value null;
 
@@ -216,13 +216,13 @@ namespace apps {
     {
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (tcp_enabled_) {
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
             logMessage("stopping tcp broker server");
             tcpserver->close();
 #endif
         }
         if (udp_enabled_) {
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
             logMessage("stopping udp broker server");
             udpserver->stop_receive();
 #endif
@@ -233,7 +233,7 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
@@ -245,7 +245,7 @@ namespace apps {
             tcpserver->start();
         }
 #endif
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
         if (udp_enabled_) {
             udpserver = loadUDPserver(ioctx->getBaseContext());
             udpserver->setDataCall(

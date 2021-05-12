@@ -351,7 +351,7 @@ thread which allows the destructor to fire if need be without issue*/
             std::cout << "All core types have similar options\n";
             auto cr = makeCore(CoreType::DEFAULT, gEmptyString);
             cr->configure(helpStr);
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
             cr = makeCore(CoreType::TCP_SS, gEmptyString);
             cr->configure(helpStr);
 #endif

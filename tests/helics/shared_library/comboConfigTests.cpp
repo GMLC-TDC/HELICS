@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 struct config_tests: public FederateTestFixture, public ::testing::Test {
 };
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 /** test simple creation and destruction*/
 TEST_F(config_tests, control_file_test)
 {
