@@ -2708,8 +2708,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 } else {
                     fed->global_id = command.dest_id;
                     loopFederates.addSearchTerm(command.dest_id, std::string(command.name()));
-                    if (!keyFed.isValid())
-                    {
+                    if (!keyFed.isValid()) {
                         keyFed = fed->global_id;
                     }
                 }
@@ -3000,8 +2999,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_TIME_GRANT:
-            if (command.source_id == keyFed)
-            {
+            if (command.source_id == keyFed) {
                 simTime.store(static_cast<double>(command.actionTime));
             }
             [[fallthrough]];

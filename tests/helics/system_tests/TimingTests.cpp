@@ -155,7 +155,7 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     EXPECT_EQ(rvec.size(), 20U);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    
+
     vFed2->finalize();
 }
 
@@ -176,7 +176,6 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
         vFed1->enterExecutingMode();
         helics::Time t{1.0};
         while (t <= 100.0) {
-
             pub.publish(t);
             auto tr = vFed1->requestTime(t);
             if (tr == helics::Time::maxVal()) {
@@ -236,12 +235,12 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
             try {
                 pub1.publish(t);
             }
-            catch (const helics::HelicsException &) {
+            catch (const helics::HelicsException&) {
                 std::cerr << "error in fed 1 publication at time " << t << std::endl;
                 break;
             }
-            
-            auto T2=vFed1->requestTime(t);
+
+            auto T2 = vFed1->requestTime(t);
             if (T2 == helics::Time::maxVal()) {
                 break;
             }
@@ -253,12 +252,12 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
         vFed2->enterExecutingMode();
         std::vector<helics::Time> res;
         double t{5.0};
-        while ( t <= 100.0) {
+        while (t <= 100.0) {
             try {
                 pub2.publish(t);
             }
             catch (const helics::HelicsException&) {
-                std::cerr << "error in fed 2 publication at time " <<t<< std::endl;
+                std::cerr << "error in fed 2 publication at time " << t << std::endl;
                 break;
             }
             auto T2 = vFed2->requestTime(t);
@@ -281,7 +280,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
     EXPECT_EQ(rvec.size(), 20U);
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
-    
+
     vFed2->finalize();
 }
 
@@ -316,7 +315,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     res = vFed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
     vFed1->finalize();
-    vFed2->finalize(); 
+    vFed2->finalize();
 }
 
 TEST_F(timing_tests, timing_with_minDelta_change)

@@ -43,7 +43,10 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &mfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();
@@ -152,7 +155,10 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &mfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();

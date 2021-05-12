@@ -416,11 +416,9 @@ class CommonCore: public Core, public BrokerBase {
                                                //!< initialization Mode was explicitly delayed
     bool filterTiming{false};  //!< if there are filters needing a time connection
     /** threadsafe local federate information list for external functions */
-    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
-        federates;
+    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;
     /** federate pointers stored for the core loop */
-    gmlc::containers::DualMappedVector<FedInfo, std::string, GlobalFederateId>
-        loopFederates;  
+    gmlc::containers::DualMappedVector<FedInfo, std::string, GlobalFederateId> loopFederates;
 
     /** counter for the number of messages that have been sent, nothing magical about 54 just a
      * number bigger than 1 to prevent confusion */

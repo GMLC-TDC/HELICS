@@ -169,22 +169,19 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             "--loglevel",
             [this](int val) { setLogLevel(val); },
             "the level which to log; the higher this is set; the more logs set to \"no_print\" for no logging")
-        ->transform(
-            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group
         ->add_option("--fileloglevel",
                      fileLogLevel,
                      "the level at which messages get sent to the file")
-        ->transform(
-            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
         ->add_option("--consoleloglevel",
                      consoleLogLevel,
                      "the level at which messages get sent to the file")
 
-        ->transform(
-            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group->add_flag(
         "--dumplog",
         dumplog,
@@ -331,8 +328,8 @@ static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
     if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
         return spdlog::level::err;
     }
-        return spdlog::level::critical;
-    }
+    return spdlog::level::critical;
+}
 
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
@@ -351,13 +348,10 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         bool noID =
             (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
-        double currentTime = (noID)?mInvalidSimulationTime:getSimulationTime();
+        double currentTime = (noID) ? mInvalidSimulationTime : getSimulationTime();
         if (loggerFunction) {
             if (noID) {
-                loggerFunction(
-                    logLevel,
-                    name,
-                    message);
+                loggerFunction(logLevel, name, message);
             } else {
                 loggerFunction(
                     logLevel,
@@ -370,10 +364,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
                     if (noID) {
-                        consoleLogger->log(getSpdLogLevel(logLevel),
-                                           "{}::{}",
-                                           name,
-                                           message);
+                        consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
                     } else {
                         consoleLogger->log(getSpdLogLevel(logLevel),
                                            "{} ({})[t={}]::{}",
@@ -382,7 +373,6 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                                            currentTime,
                                            message);
                     }
-                    
                 }
 
                 if (forceLoggingFlush) {
@@ -394,10 +384,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                     fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
                     if (noID) {
-                        fileLogger->log(getSpdLogLevel(logLevel),
-                                        "{}::{}",
-                                        name,
-                                        message);
+                        fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
                     } else {
                         fileLogger->log(getSpdLogLevel(logLevel),
                                         "{} ({})[t={}]::{}",

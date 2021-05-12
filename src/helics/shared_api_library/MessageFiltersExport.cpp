@@ -149,8 +149,8 @@ HelicsFilter helicsFederateRegisterGlobalCloningFilter(HelicsFederate fed, const
 
     try {
         auto filt = std::make_unique<helics::FilterObject>();
-        filt->filtPtr =
-            &helics::make_cloning_filter(helics::InterfaceVisibility::GLOBAL, helics::FilterTypes::CLONE, fedObj.get(), std::string{}, AS_STRING(name));
+        filt->filtPtr = &helics::make_cloning_filter(
+            helics::InterfaceVisibility::GLOBAL, helics::FilterTypes::CLONE, fedObj.get(), std::string{}, AS_STRING(name));
         filt->fedptr = std::move(fedObj);
         filt->cloning = true;
         return federateAddFilter(fed, std::move(filt));
