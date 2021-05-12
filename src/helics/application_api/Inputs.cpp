@@ -46,14 +46,14 @@ Input::Input(ValueFederate* valueFed,
     }
 }
 
-Input::Input(interface_visibility locality,
+Input::Input(InterfaceVisibility locality,
              ValueFederate* valueFed,
              const std::string& key,
              const std::string& defaultType,
              const std::string& units)
 {
     try {
-        if (locality == interface_visibility::global) {
+        if (locality == InterfaceVisibility::GLOBAL) {
             operator=(valueFed->registerGlobalInput(key, defaultType, units));
         } else {
             operator=(valueFed->registerInput(key, defaultType, units));

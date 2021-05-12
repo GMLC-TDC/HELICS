@@ -737,13 +737,14 @@ namespace apps {
             std::cerr << "publication already exists\n";
         }
         if (!useLocal) {
-            publications.emplace_back(GLOBAL, fed.get(), name, type, pubUnits);
+            publications.emplace_back(helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
         } else {
             auto kp = name.find_first_of("./");
             if (kp == std::string::npos) {
                 publications.emplace_back(fed.get(), name, type, pubUnits);
             } else {
-                publications.emplace_back(GLOBAL, fed.get(), name, type, pubUnits);
+                publications.emplace_back(
+                    helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
             }
         }
         pubids[name] = static_cast<int>(publications.size()) - 1;
@@ -756,13 +757,19 @@ namespace apps {
             std::cerr << "Endpoint already exists\n";
         }
         if (!useLocal) {
-            endpoints.emplace_back(GLOBAL, fed.get(), endpointName, endpointType);
+            endpoints.emplace_back(helics::InterfaceVisibility::GLOBAL,
+                                   fed.get(),
+                                   endpointName,
+                                   endpointType);
         } else {
             auto kp = endpointName.find_first_of("./");
             if (kp == std::string::npos) {
                 endpoints.emplace_back(fed.get(), endpointName, endpointType);
             } else {
-                endpoints.emplace_back(GLOBAL, fed.get(), endpointName, endpointType);
+                endpoints.emplace_back(helics::InterfaceVisibility::GLOBAL,
+                                       fed.get(),
+                                       endpointName,
+                                       endpointType);
             }
         }
         eptids[endpointName] = static_cast<int>(endpoints.size()) - 1;

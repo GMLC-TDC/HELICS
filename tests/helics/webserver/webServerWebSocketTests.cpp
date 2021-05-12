@@ -57,11 +57,11 @@ class webTest: public ::testing::Test {
         webs->startServer(&config);
 
         // These objects perform our I/O
-        tcp::resolver resolver(ioc);
+        tcp::resolver resolverObj(ioc);
         stream = std::make_unique<websocket::stream<tcp::socket>>(ioc);  // NOLINT
 
         // Look up the domain name
-        auto const results = resolver.resolve(localhost, "26247");
+        auto const results = resolverObj.resolve(localhost, "26247");
 
         // Make the connection on the IP address we get from a lookup
         net::connect(stream->next_layer(), results.begin(), results.end());

@@ -103,7 +103,7 @@ end
 %!
 %!   publication_name = helicsPublicationGetName(pubid1);
 %!   assert(publication_name,'fed1/pub1');
-%!   publication_namey = helicsPublicationGetName(pubid2);
+%!   publication_name = helicsPublicationGetName(pubid2);
 %!   assert(publication_name,'pub2');
 %!   publication_name = helicsPublicationGetName(pubid3);
 %!   assert(publication_name,'fed1/pub3');
@@ -266,7 +266,7 @@ end
 %! assert(publication_type,'string');
 %! publication_name = helicsPublicationGetName(pubid2);
 %!
-%! assert(publication_name,'fed1/pub2');
+%! assert(publication_name,'pub2');
 %! publication_type = helicsPublicationGetType(pubid2);
 %!
 %! assert(publication_type,'int64');

@@ -520,7 +520,7 @@ namespace apps {
     {
         auto res = eptNames.find(endpoint);
         if ((res == eptNames.end()) || (res->second == -1)) {
-            endpoints.emplace_back(GLOBAL, fed.get(), endpoint);
+            endpoints.emplace_back(InterfaceVisibility::GLOBAL, fed.get(), endpoint);
             auto index = static_cast<int>(endpoints.size()) - 1;
             auto id = endpoints.back().getHandle();
             eptids.emplace(id, index);  // this is a new element

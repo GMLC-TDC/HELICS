@@ -25,10 +25,10 @@ TEST_F(timing_tests2, small_time_test)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    // auto& pub1_a = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_a");
-    // auto& pub1_b = helics::make_publication<double>(helics::GLOBAL, vFed1, "pub1_b");
-    // auto& pub2_a = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_a");
-    // auto& pub2_b = helics::make_publication<double>(helics::GLOBAL, vFed2, "pub2_b");
+    // auto& pub1_a = helics::make_publication<double>(helics::InterfaceVisibility::GLOBAL, vFed1, "pub1_a");
+    // auto& pub1_b = helics::make_publication<double>(helics::InterfaceVisibility::GLOBAL, vFed1, "pub1_b");
+    // auto& pub2_a = helics::make_publication<double>(helics::InterfaceVisibility::GLOBAL, vFed2, "pub2_a");
+    // auto& pub2_b = helics::make_publication<double>(helics::InterfaceVisibility::GLOBAL, vFed2, "pub2_b");
 
     auto& pub1_a = vFed1->registerGlobalPublication<double>("pub1_a");
     auto& pub1_b = vFed1->registerGlobalPublication<double>("pub1_b");

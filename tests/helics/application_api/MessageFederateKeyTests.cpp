@@ -87,7 +87,7 @@ TEST_P(mfed_single_type_tests, send_receive_obj)
 
     Endpoint epid(mFed1.get(), "ep1");
 
-    Endpoint epid2(GLOBAL, mFed1.get(), "ep2", "random");
+    Endpoint epid2(helics::InterfaceVisibility::GLOBAL, mFed1.get(), "ep2", "random");
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
@@ -235,7 +235,7 @@ TEST_P(mfed_type_tests, send_receive_2fed_obj)
 
     Endpoint epid(mFed1, "ep1");
 
-    Endpoint epid2(GLOBAL, mFed2.get(), "ep2", "random");
+    Endpoint epid2(helics::InterfaceVisibility::GLOBAL, mFed2.get(), "ep2", "random");
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);

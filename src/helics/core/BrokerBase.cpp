@@ -168,23 +168,23 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option_function<int>(
             "--loglevel",
             [this](int val) { setLogLevel(val); },
-            "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+            "the level which to log; the higher this is set; the more logs set to \"no_print\" for no logging")
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group
         ->add_option("--fileloglevel",
                      fileLogLevel,
                      "the level at which messages get sent to the file")
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
         ->add_option("--consoleloglevel",
                      consoleLogLevel,
                      "the level at which messages get sent to the file")
 
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group->add_flag(
         "--dumplog",
         dumplog,
@@ -313,6 +313,27 @@ void BrokerBase::configureBase()
     brokerState = broker_state_t::configured;
 }
 
+static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
+{
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE || helicsLogLevel == -10) {
+        // dumplog == -10
+        return spdlog::level::trace;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_TIMING) {
+        return spdlog::level::debug;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+        return spdlog::level::info;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
+        return spdlog::level::warn;
+    }
+    if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
+        return spdlog::level::err;
+    }
+        return spdlog::level::critical;
+    }
+
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
@@ -328,62 +349,63 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             // check the logging level
             return true;
         }
+        bool noID =
+            (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
+        double currentTime = (noID)?mInvalidSimulationTime:getSimulationTime();
         if (loggerFunction) {
-            loggerFunction(logLevel, fmt::format("{} ({})", name, federateID.baseValue()), message);
+            if (noID) {
+                loggerFunction(
+                    logLevel,
+                    name,
+                    message);
+            } else {
+                loggerFunction(
+                    logLevel,
+                    fmt::format("{} ({})[t={}]", name, federateID.baseValue(), currentTime),
+                    message);
+            }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
-                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
-                    consoleLogger->log(
-                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
-                    consoleLogger->log(
-                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-                    consoleLogger->log(
-                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
-                    consoleLogger->log(
-                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
-                    consoleLogger->log(
-                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel == -10) {  // dumplog
+                if (logLevel == -10) {  // dumplog
                     consoleLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    consoleLogger->log(spdlog::level::critical,
-                                       "{} ({})::{}",
-                                       name,
-                                       federateID.baseValue(),
-                                       message);
+                    if (noID) {
+                        consoleLogger->log(getSpdLogLevel(logLevel),
+                                           "{}::{}",
+                                           name,
+                                           message);
+                    } else {
+                        consoleLogger->log(getSpdLogLevel(logLevel),
+                                           "{} ({})[t={}]::{}",
+                                           name,
+                                           federateID.baseValue(),
+                                           currentTime,
+                                           message);
+                    }
+                    
                 }
+
                 if (forceLoggingFlush) {
                     consoleLogger->flush();
                 }
             }
             if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {
-                    fileLogger->log(
-                        spdlog::level::trace, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_TIMING) {
-                    fileLogger->log(
-                        spdlog::level::debug, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {
-                    fileLogger->log(
-                        spdlog::level::info, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_WARNING) {
-                    fileLogger->log(
-                        spdlog::level::warn, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel >= HELICS_LOG_LEVEL_ERROR) {
-                    fileLogger->log(
-                        spdlog::level::err, "{} ({})::{}", name, federateID.baseValue(), message);
-                } else if (logLevel == -10) {  // dumplog
-                    fileLogger->log(spdlog::level::trace, message);
+                if (logLevel == -10) {  // dumplog
+                    fileLogger->log(spdlog::level::trace, "{}", message);
                 } else {
-                    fileLogger->log(spdlog::level::critical,
-                                    "{} ({})::{}",
-                                    name,
-                                    federateID.baseValue(),
-                                    message);
+                    if (noID) {
+                        fileLogger->log(getSpdLogLevel(logLevel),
+                                        "{}::{}",
+                                        name,
+                                        message);
+                    } else {
+                        fileLogger->log(getSpdLogLevel(logLevel),
+                                        "{} ({})[t={}]::{}",
+                                        name,
+                                        federateID.baseValue(),
+                                        currentTime,
+                                        message);
+                    }
                 }
 
                 if (forceLoggingFlush) {

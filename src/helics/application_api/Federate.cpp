@@ -813,10 +813,11 @@ static Filter& generateFilter(Federate* fed,
                           fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        return (global) ? make_cloning_filter(GLOBAL, operation, fed, name) :
+        return (global) ? make_cloning_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
                           make_cloning_filter(operation, fed, name);
     }
-    return (global) ? make_filter(GLOBAL, operation, fed, name) : make_filter(operation, fed, name);
+    return (global) ? make_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
+                      make_filter(operation, fed, name);
 }
 
 const std::string emptyStr;

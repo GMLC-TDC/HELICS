@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param key the identifier for the publication
     @param type the type of the publication
     @param units an optional string defining the units*/
-    Publication(interface_visibility locality,
+    Publication(InterfaceVisibility locality,
                 ValueFederate* valueFed,
                 const std::string& key,
                 const std::string& type,
@@ -101,7 +101,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param type the type of the publication
     @param units an optional string defining the units*/
     template<class FedPtr>
-    Publication(interface_visibility locality,
+    Publication(InterfaceVisibility locality,
                 FedPtr& valueFed,
                 const std::string& key,
                 const std::string& type,
@@ -147,7 +147,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param type the defined type of the publication
     @param units the units associated with a Federate
     */
-    Publication(interface_visibility locality,
+    Publication(InterfaceVisibility locality,
                 ValueFederate* valueFed,
                 const std::string& key,
                 DataType type,
@@ -164,7 +164,7 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param units the units associated with a Federate
     */
     template<class FedPtr>
-    Publication(interface_visibility locality,
+    Publication(InterfaceVisibility locality,
                 FedPtr& valueFed,
                 const std::string& key,
                 DataType type,

@@ -99,14 +99,14 @@ class HELICS_CXX_EXPORT Input: public Interface {
             "first argument must be a pointer to a ValueFederate");
     }
 
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
           const std::string& key,
           const std::string& defaultType = "def",
           const std::string& units = std::string{});
 
     template<class FedPtr>
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           FedPtr& valueFed,
           const std::string& key,
           const std::string& defaultType = "def",
@@ -135,7 +135,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     {
     }
 
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
           const std::string& key,
           const std::string& units = std::string{}):
@@ -144,7 +144,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     }
 
     template<class FedPtr>
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           FedPtr& valueFed,
           const std::string& key,
           const std::string& units = std::string{}):
@@ -152,7 +152,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     {
     }
 
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
           const std::string& key,
           DataType defType,
@@ -162,7 +162,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     }
 
     template<class FedPtr>
-    Input(interface_visibility locality,
+    Input(InterfaceVisibility locality,
           FedPtr& valueFed,
           const std::string& key,
           DataType defType,

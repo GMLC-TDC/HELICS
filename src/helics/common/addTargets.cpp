@@ -85,8 +85,8 @@ void loadTags(const Json::Value& section,
     if (section.isMember("tags")) {
         auto tv = section["tags"];
         if (tv.isArray()) {
-            for (decltype(tv.size()) ii = 0; ii < tv.size(); ++ii) {
-                auto pv = getTagPair(tv[ii]);
+            for (auto & tp:tv) {
+                auto pv = getTagPair(tp);
                 if (!pv.first.empty()) {
                     tagAction(pv.first, pv.second);
                 }
@@ -113,7 +113,7 @@ void loadTags(const toml::value& section,
     if (section.contains("tags")) {
         auto tv = section.at("tags");
         if (tv.is_array()) {
-            for (int ii = 0; ii < tv.size(); ++ii) {
+            for (std::size_t ii = 0; ii < tv.size(); ++ii) {
                 auto pv = getTagPair(tv[ii]);
                 if (!pv.first.empty()) {
                     tagAction(pv.first, pv.second);

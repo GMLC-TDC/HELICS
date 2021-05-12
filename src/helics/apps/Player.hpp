@@ -113,7 +113,7 @@ external protection, that will result in undefined behavior
         {
             if (!useLocal) {
                 publications.push_back(
-                    Publication(GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
+                    Publication(InterfaceVisibility::GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
             } else {
                 publications.push_back(
                     Publication(fed.get(), key, helicsType<valType>(), pubUnits));

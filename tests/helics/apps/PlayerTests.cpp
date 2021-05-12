@@ -461,7 +461,7 @@ TEST(player_tests, player_test_message)
     helics::apps::Player play1("player1", fi);
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a message");
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
@@ -489,7 +489,7 @@ TEST(player_tests, player_test_message2)
     helics::apps::Player play1("player1", fi);
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
     play1.addMessage(2.0, "src", "dest", "this is test message2");
@@ -539,7 +539,7 @@ TEST(player_tests, player_test_message3)
     helics::apps::Player play1("player1", fi);
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
 
     play1.addMessage(1.0, "src", "dest", "this is a test message");
     play1.addMessage(1.0, 2.0, "src", "dest", "this is test message2");
@@ -599,7 +599,7 @@ TEST_P(player_message_file_tests, message_test_files)
     helics::apps::Player play1("player1", fi);
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "dest");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "dest");
     play1.loadFile(std::string(TEST_DIR) + GetParam());
     auto fut = std::async(std::launch::async, [&play1]() { play1.run(); });
     mfed.enterExecutingMode();

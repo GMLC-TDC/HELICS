@@ -186,24 +186,24 @@ typedef enum {
  */
 typedef enum {
     /** don't print anything except a few catastrophic errors*/
-    HELICS_LOG_LEVEL_NO_PRINT = -1,
+    HELICS_LOG_LEVEL_NO_PRINT = -4,
     /** only print error level indicators*/
     HELICS_LOG_LEVEL_ERROR = 0,
     /** only print warnings and errors*/
-    HELICS_LOG_LEVEL_WARNING = 1,
+    HELICS_LOG_LEVEL_WARNING = 3,
     /** warning errors and summary level information*/
-    HELICS_LOG_LEVEL_SUMMARY = 2,
+    HELICS_LOG_LEVEL_SUMMARY = 6,
     /** summary+ notices about federate and broker connections +messages about network
        connections*/
-    HELICS_LOG_LEVEL_CONNECTIONS = 3,
+    HELICS_LOG_LEVEL_CONNECTIONS = 9,
     /** connections+ interface definitions*/
-    HELICS_LOG_LEVEL_INTERFACES = 4,
+    HELICS_LOG_LEVEL_INTERFACES = 12,
     /** interfaces + timing message*/
-    HELICS_LOG_LEVEL_TIMING = 5,
+    HELICS_LOG_LEVEL_TIMING = 15,
     /** timing+ data transfer notices*/
-    HELICS_LOG_LEVEL_DATA = 6,
+    HELICS_LOG_LEVEL_DATA = 18,
     /** all internal messages*/
-    HELICS_LOG_LEVEL_TRACE = 7
+    HELICS_LOG_LEVEL_TRACE = 21
 } HelicsLogLevels;
 
 /** enumeration of return values from the C interface functions
@@ -358,7 +358,10 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
+typedef enum {
+    HELICS_SEQUENCING_MODE_FAST = 0,
+    HELICS_SEQUENCING_MODE_ORDERED = 1
+} HelicsSequencingModes;
 
 /**
  * @file

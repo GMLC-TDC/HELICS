@@ -40,7 +40,7 @@ TEST(tracer_tests, simple_tracer_test)
     trace1.addSubscription("pub1");
     trace1.setValueCallback(cb);
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -86,7 +86,7 @@ TEST(tracer_tests, tracer_test_message)
     };
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
 
     trace1.addEndpoint("src1");
     trace1.setEndpointMessageCallback(cb);
@@ -161,8 +161,8 @@ TEST_P(tracer_file_tests, simple_tracer_test_files)
     trace1.loadFile(std::string(TEST_DIR) + GetParam());
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &vfed, "pub2", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(4); });
     vfed.enterExecutingMode();
@@ -224,9 +224,9 @@ TEST_P(tracer_message_file_tests, test_message_files)
     trace1.setEndpointMessageCallback(cbm);
 
     helics::CombinationFederate cfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutingMode();
@@ -284,9 +284,9 @@ TEST_P(tracer_message_file_tests, test_message_files_cmd)
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed("obj", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&trace1]() { trace1.runTo(5); });
     cfed.enterExecutingMode();
@@ -341,8 +341,8 @@ TEST(tracer_tests, tracer_test_destendpoint_clone)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     trace1.addDestEndpointClone("d1");
     trace1.addDestEndpointClone("d2");
@@ -419,8 +419,8 @@ TEST(tracer_tests, srcendpoint_clone)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     trace1.addSourceEndpointClone("d1");
     trace1.addSourceEndpointClone("d2");
@@ -660,8 +660,8 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     fi.coreInitString = "";
 
     helics::CombinationFederate cfed("obj", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
     helics::Endpoint& e1 = cfed.registerGlobalEndpoint("d1");
 
     cfed.enterExecutingMode();
