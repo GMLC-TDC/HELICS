@@ -9,5 +9,3 @@
     advanced_topics/advanced_topics_index
 
 ```
-
-text about what to find on each track
