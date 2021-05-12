@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqCommsCommon.h"
 #    include "../network/zmq/ZmqContextManager.h"
 #    include "cppzmq/zmq.hpp"
@@ -29,7 +29,7 @@ namespace apps {
     void zmqBrokerServer::startServer(const Json::Value* val)
     {
         config_ = (val != nullptr) ? val : &null;
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
         if (zmq_enabled_) {
             logMessage("starting zmq broker server");
         }
@@ -44,7 +44,7 @@ namespace apps {
     void zmqBrokerServer::stopServer()
     {
         exitAll.store(true);
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
         if (!zmq_enabled_ && !zmqss_enabled_) {
             return;
         }
@@ -87,7 +87,7 @@ namespace apps {
 #endif
     }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 
     std::pair<std::unique_ptr<zmq::socket_t>, int>
         zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
@@ -174,7 +174,7 @@ namespace apps {
 
     void zmqBrokerServer::mainLoop()
     {
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
         std::vector<std::unique_ptr<zmq::socket_t>> sockets;
         std::vector<zmqServerData> data;
         std::vector<std::function<void(zmq::socket_t*, portData&)>> handleMessage;

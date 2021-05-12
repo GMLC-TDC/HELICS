@@ -132,7 +132,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/inprocCore, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime();
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqCore, CoreType::ZMQ)
@@ -157,7 +157,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/zmqssCore, CoreType::ZMQ_SS)
 
 #endif
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 // Register the IPC benchmarks
 // clang-format off
 BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, CoreType::IPC)
@@ -174,7 +174,7 @@ BENCHMARK_CAPTURE (BMsendMessage, multiCore/ipcCore, CoreType::IPC)
 
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 // Register the TCP benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpCore, CoreType::TCP)
@@ -201,7 +201,7 @@ BENCHMARK_CAPTURE(BMsendMessage, multiCore/tcpssCore, CoreType::TCP_SS)
 
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 // Register the UDP benchmarks
 // clang-format off
 BENCHMARK_CAPTURE(BMsendMessage, multiCore/udpCore, CoreType::UDP)

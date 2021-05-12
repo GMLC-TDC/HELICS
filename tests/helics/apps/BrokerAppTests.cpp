@@ -170,7 +170,7 @@ TEST(BrokerAppTests, constructor12)
 {
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::NULLCORE, "brk12", std::vector<std::string>{}),
                  helics::HelicsException);
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
     EXPECT_THROW(helics::BrokerApp(helics::CoreType::ZMQ,
                                    "brk12",
                                    std::vector<std::string>{"10.7.5.5", "--local_interface"}),

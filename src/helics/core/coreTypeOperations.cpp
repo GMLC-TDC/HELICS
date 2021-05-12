@@ -164,43 +164,43 @@ namespace core {
         return CoreType::UNRECOGNIZED;
     }
 
-#ifndef ENABLE_ZMQ_CORE
+#ifndef HELICS_ENABLE_ZMQ_CORE
     static bool constexpr zmq_availability{false};
 #else
     static bool constexpr zmq_availability{true};
 #endif
 
-#ifndef ENABLE_MPI_CORE
+#ifndef HELICS_ENABLE_MPI_CORE
     static bool constexpr mpi_availability{false};
 #else
     static bool constexpr mpi_availability{true};
 #endif
 
-#ifndef ENABLE_TCP_CORE
+#ifndef HELICS_ENABLE_TCP_CORE
     static bool constexpr tcp_availability{false};
 #else
     static bool constexpr tcp_availability{true};
 #endif
 
-#ifndef ENABLE_UDP_CORE
+#ifndef HELICS_ENABLE_UDP_CORE
     static bool constexpr udp_availability{false};
 #else
     static bool constexpr udp_availability{true};
 #endif
 
-#ifndef ENABLE_IPC_CORE
+#ifndef HELICS_ENABLE_IPC_CORE
     static bool constexpr ipc_availability{false};
 #else
     static bool constexpr ipc_availability{true};
 #endif
 
-#ifndef ENABLE_TEST_CORE
+#ifndef HELICS_ENABLE_TEST_CORE
     static bool constexpr test_availability{false};
 #else
     static bool constexpr test_availability{true};
 #endif
 
-#ifndef ENABLE_INPROC_CORE
+#ifndef HELICS_ENABLE_INPROC_CORE
     static bool constexpr inproc_availability{false};
 #else
     static bool constexpr inproc_availability{true};
