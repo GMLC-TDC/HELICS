@@ -239,7 +239,7 @@ Filter& make_filter(InterfaceVisibility locality,
         return dfilt;
     }
     auto& dfilt = (locality == InterfaceVisibility::GLOBAL) ? mFed->registerGlobalFilter(name) :
-                                                               mFed->registerFilter(name);
+                                                              mFed->registerFilter(name);
     addOperations(&dfilt, type, nullptr);
     return dfilt;
 }

@@ -308,8 +308,10 @@ TEST_F(iteration_tests, test2fed_withSubPub)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     // register the publications
-    auto pub1 =
-        helics::Publication(helics::InterfaceVisibility::GLOBAL, vFed1.get(), "pub1", helics::DataType::HELICS_DOUBLE);
+    auto pub1 = helics::Publication(helics::InterfaceVisibility::GLOBAL,
+                                    vFed1.get(),
+                                    "pub1",
+                                    helics::DataType::HELICS_DOUBLE);
 
     auto& sub1 = vFed2->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);

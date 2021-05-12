@@ -235,7 +235,7 @@ TEST(logging_tests, check_log_message_levels)
 
     Fed->enterExecutingMode();
     Fed->logMessage(HELICS_LOG_LEVEL_CONNECTIONS, "test MEXAGE1");
-    Fed->logMessage(HELICS_LOG_LEVEL_TRACE+1, "test MEXAGE2");
+    Fed->logMessage(HELICS_LOG_LEVEL_TRACE + 1, "test MEXAGE2");
     Fed->requestNextStep();
     Fed->finalize();
 
@@ -257,7 +257,7 @@ TEST(logging_tests, check_log_message_levels_high)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE+2);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TRACE + 2);
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -269,7 +269,7 @@ TEST(logging_tests, check_log_message_levels_high)
 
     Fed->enterExecutingMode();
     Fed->logMessage(HELICS_LOG_LEVEL_SUMMARY, "test MEXAGE1");
-    Fed->logMessage(HELICS_LOG_LEVEL_TRACE+1, "test MEXAGE2");
+    Fed->logMessage(HELICS_LOG_LEVEL_TRACE + 1, "test MEXAGE2");
     Fed->requestNextStep();
     Fed->finalize();
 

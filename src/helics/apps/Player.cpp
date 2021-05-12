@@ -737,7 +737,8 @@ namespace apps {
             std::cerr << "publication already exists\n";
         }
         if (!useLocal) {
-            publications.emplace_back(helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
+            publications.emplace_back(
+                helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
         } else {
             auto kp = name.find_first_of("./");
             if (kp == std::string::npos) {

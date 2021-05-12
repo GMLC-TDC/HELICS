@@ -24,7 +24,10 @@ TEST(logging_tests, check_log_message)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TIMING, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TIMING,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -69,7 +72,10 @@ TEST(logging_tests, check_log_message_levels)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TIMING, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TIMING,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -87,7 +93,7 @@ TEST(logging_tests, check_log_message_levels)
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TIMING, "test MEXAGE1", &err);
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE+3, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE + 3, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);
@@ -116,7 +122,10 @@ TEST(logging_tests, check_log_message_levels_high)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_TRACE+6, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TRACE + 6,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -133,7 +142,7 @@ TEST(logging_tests, check_log_message_levels_high)
 
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_CONNECTIONS, "test MEXAGE1", &err);
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE+3, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE + 3, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);

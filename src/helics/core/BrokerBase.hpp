@@ -33,18 +33,18 @@ class BrokerBase {
   protected:
     static constexpr double mInvalidSimulationTime{-98763.2};
     /** the unique identifier for the broker(core or broker) */
-    std::atomic<GlobalBrokerId> global_id{parent_broker_id};  
+    std::atomic<GlobalBrokerId> global_id{parent_broker_id};
     GlobalBrokerId global_broker_id_local{};  //!< meant to be the same as global_id but not
                                               //!< atomically protected
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     /**the logging level to use levels >=this will be ignored*/
-    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};  
+    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
     int32_t consoleLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for console display
     int32_t fileLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for logging to a file
     /** the minimum number of federates that must connect before entering init mode */
     int32_t minFederateCount{1};
     /** the minimum number of brokers that must connect before entering init mode */
-    int32_t minBrokerCount{0};  
+    int32_t minBrokerCount{0};
     int32_t maxIterationCount{10000};  //!< the maximum number of iterative loops that are allowed
     Time tickTimer{5.0};  //!< the length of each heartbeat tick
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
