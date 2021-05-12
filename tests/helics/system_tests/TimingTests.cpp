@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <complex>
 #include <future>
+#include <iostream>
 
 /** these test cases test out the value converters
  */
@@ -175,6 +176,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
         vFed1->enterExecutingMode();
         helics::Time t{1.0};
         while (t <= 100.0) {
+
             pub.publish(t);
             auto tr = vFed1->requestTime(t);
             if (tr == helics::Time::maxVal()) {
@@ -231,8 +233,18 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
         vFed1->enterExecutingMode();
         double t{1.0};
         while (t <= 100.0) {
-            pub1.publish(t);
-            vFed1->requestTime(t);
+            try {
+                pub1.publish(t);
+            }
+            catch (const helics::HelicsException &) {
+                std::cerr << "error in fed 1 publication at time " << t << std::endl;
+                break;
+            }
+            
+            auto T2=vFed1->requestTime(t);
+            if (T2 == helics::Time::maxVal()) {
+                break;
+            }
             t += 1.0;
         }
     };
@@ -242,10 +254,19 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
         std::vector<helics::Time> res;
         double t{5.0};
         while ( t <= 100.0) {
-            pub2.publish(t);
+            try {
+                pub2.publish(t);
+            }
+            catch (const helics::HelicsException&) {
+                std::cerr << "error in fed 2 publication at time " <<t<< std::endl;
+                break;
+            }
             auto T2 = vFed2->requestTime(t);
             res.push_back(T2);
             t += 5.0;
+            if (T2 == helics::Time::maxVal()) {
+                break;
+            }
         }
         return res;
     };
@@ -348,7 +369,7 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(helics::interface_visibility::global,
+    helics::Publication sender(helics::InterfaceVisibility::GLOBAL,
                                vFed1,
                                "pub",
                                helics::DataType::HELICS_DOUBLE);
@@ -413,7 +434,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(helics::interface_visibility::global,
+    helics::Publication sender(helics::InterfaceVisibility::GLOBAL,
                                vFed1,
                                "pub",
                                helics::DataType::HELICS_DOUBLE);
@@ -484,7 +505,7 @@ TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    helics::Publication sender(helics::interface_visibility::global,
+    helics::Publication sender(helics::InterfaceVisibility::GLOBAL,
                                vFed1,
                                "pub",
                                helics::DataType::HELICS_DOUBLE);
@@ -517,12 +538,12 @@ TEST_F(timing_tests, dual_fast_sender_tests_ci_skip)  // ci_skip
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-    helics::Publication sender1(helics::interface_visibility::global,
+    helics::Publication sender1(helics::InterfaceVisibility::GLOBAL,
                                 vFed1,
                                 "pub1",
                                 helics::DataType::HELICS_DOUBLE);
     auto& receiver1 = vFed2->registerSubscription("pub1");
-    helics::Publication sender2(helics::interface_visibility::global,
+    helics::Publication sender2(helics::InterfaceVisibility::GLOBAL,
                                 vFed3,
                                 "pub2",
                                 helics::DataType::HELICS_DOUBLE);

@@ -47,14 +47,14 @@ Publication::Publication(ValueFederate* valueFed,
     }
 }
 
-Publication::Publication(interface_visibility locality,
+Publication::Publication(InterfaceVisibility locality,
                          ValueFederate* valueFed,
                          const std::string& key,
                          const std::string& type,
                          const std::string& units)
 {
     try {
-        if (locality == interface_visibility::global) {
+        if (locality == InterfaceVisibility::GLOBAL) {
             operator=(valueFed->registerGlobalPublication(key, type, units));
         } else {
             operator=(valueFed->registerPublication(key, type, units));

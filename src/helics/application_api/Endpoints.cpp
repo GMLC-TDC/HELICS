@@ -23,12 +23,12 @@ Endpoint::Endpoint(MessageFederate* mFed, const std::string& name, const std::st
 {
 }
 
-Endpoint::Endpoint(interface_visibility locality,
+Endpoint::Endpoint(InterfaceVisibility locality,
                    MessageFederate* mFed,
                    const std::string& name,
                    const std::string& type)
 {
-    if (locality == interface_visibility::global) {
+    if (locality == InterfaceVisibility::GLOBAL) {
         operator=(mFed->registerGlobalEndpoint(name, type));
     } else {
         operator=(mFed->registerEndpoint(name, type));

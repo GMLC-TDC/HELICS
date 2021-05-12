@@ -34,7 +34,7 @@ TEST(recorder_tests, simple_recorder_test)
     rec1.addSubscription("pub1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -64,7 +64,7 @@ TEST(recorder_tests, simple_recorder_test2)
     rec1.addSubscription("pub1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -105,7 +105,7 @@ TEST(recorder_tests, recorder_test_message)
     helics::apps::Recorder rec1("rec1", fi);
 
     helics::MessageFederate mfed("block1", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
 
     rec1.addEndpoint("src1");
 
@@ -140,8 +140,8 @@ TEST_P(recorder_file_tests, test_files)
     rec1.loadFile(std::string(TEST_DIR) + GetParam());
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &vfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &vfed, "pub2", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(4); });
     vfed.enterExecutingMode();
@@ -210,9 +210,9 @@ TEST_P(recorder_message_file_tests, test_message_files)
     rec1.loadFile(std::string(TEST_DIR) + GetParam());
 
     helics::CombinationFederate cfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5); });
     cfed.enterExecutingMode();
@@ -286,9 +286,12 @@ TEST_P(recorder_message_file_tests, test_message_files_cmd)
     fi.coreInitString = "-f 1 --broker=ipc_broker";
 
     helics::CombinationFederate cfed("obj", fi);
-    helics::Publication pub1(helics::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
-    helics::Publication pub2(helics::GLOBAL, &cfed, "pub2", helics::DataType::HELICS_DOUBLE);
-    helics::Endpoint e1(helics::GLOBAL, &cfed, "d1");
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &cfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub2(helics::InterfaceVisibility::GLOBAL,
+                             &cfed,
+                             "pub2",
+                             helics::DataType::HELICS_DOUBLE);
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &cfed, "d1");
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5); });
     cfed.enterExecutingMode();
@@ -357,8 +360,8 @@ TEST(recorder_tests, recorder_test_destendpoint_clone)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addDestEndpointClone("d1");
     rec1.addDestEndpointClone("d2");
@@ -406,8 +409,8 @@ TEST(recorder_tests, recorder_test_srcendpoint_clone)
     helics::MessageFederate mfed("block1", fi);
     helics::MessageFederate mfed2("block2", fi);
 
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addSourceEndpointClone("d1");
     rec1.addSourceEndpointClone("d2");
@@ -452,8 +455,8 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addDestEndpointClone("d1");
     rec1.addSourceEndpointClone("d1");
@@ -508,8 +511,8 @@ TEST_P(recorder_clone_file_tests, simple_clone_test_file)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.loadFile(std::string(TEST_DIR) + GetParam());
 
@@ -568,8 +571,8 @@ TEST(recorder_tests, recorder_test_saveFile1)
     helics::MessageFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addDestEndpointClone("d1");
     rec1.addSourceEndpointClone("d1");
@@ -621,7 +624,7 @@ TEST(recorder_tests, recorder_test_saveFile2)
     rec1.addSubscription("pub1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -665,14 +668,14 @@ TEST(recorder_tests, recorder_test_saveFile3)
     helics::CombinationFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addDestEndpointClone("d1");
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));

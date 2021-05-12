@@ -36,7 +36,10 @@ TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)
     fi.setProperty(helics::defs::Properties::PERIOD, 0.5);
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
 
-    helics::Publication pubid(helics::GLOBAL, fed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+                              fed,
+                              "pub1",
+                              helics::DataType::HELICS_DOUBLE);
 
     fed->registerSubscription("pub1");
     fed->enterExecutingMode();
@@ -78,7 +81,10 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_adelay_ci_skip)
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
     fi.setFlagOption(helics::defs::Flags::REALTIME, false);
     auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
-    helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+                              fed2,
+                              "pub1",
+                              helics::DataType::HELICS_DOUBLE);
     std::atomic<int> warnCounter{0};
     fed->setLoggingCallback(
         [&warnCounter](int logLevel, std::string_view /*unused*/, std::string_view /*unused*/) {
@@ -130,7 +136,10 @@ TEST_F(federate_realtime_tests, federate_trigger_tests_ci_skip)
     auto fed = std::make_shared<helics::ValueFederate>("test1", fi);
     fi.setFlagOption(helics::defs::Flags::REALTIME, false);
     auto fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
-    helics::Publication pubid(helics::GLOBAL, fed2, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+                              fed2,
+                              "pub1",
+                              helics::DataType::HELICS_DOUBLE);
 
     fed->registerSubscription("pub1");
     fed2->enterExecutingModeAsync();

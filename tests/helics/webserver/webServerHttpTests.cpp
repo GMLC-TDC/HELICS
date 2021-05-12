@@ -57,11 +57,11 @@ class httpTest: public ::testing::Test {
         webs->startServer(&config);
 
         // These objects perform our I/O
-        tcp::resolver resolver(ioc);
+        tcp::resolver resolverObj(ioc);
         stream = std::make_unique<beast::tcp_stream>(ioc);  // NOLINT
 
         // Look up the domain name
-        auto const results = resolver.resolve(localhost, "26242");
+        auto const results = resolverObj.resolve(localhost, "26242");
 
         // Make the connection on the IP address we get from a lookup
         stream->connect(results);
