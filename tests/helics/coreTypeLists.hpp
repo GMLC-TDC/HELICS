@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/helics-config.h"
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 #    define ZMQTEST "zmq",
 #    define ZMQTEST2 "zmq_2",
 #    define ZMQTEST3 "zmq_3",
@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define ZMQSSTEST2
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 #    define TCPTEST "tcp",
 #    define TCPTEST2 "tcp_2",
 #    define TCPTEST3 "tcp_3",
@@ -44,7 +44,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define TCPSSTEST2
 #endif
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 #    define IPCTEST "ipc",
 #    define IPCTEST2 "ipc_2",
 
@@ -53,7 +53,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define IPCTEST2
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 #    define UDPTEST "udp",
 #    define UDPTEST2 "udp_2",
 #    define UDPTEST3 "udp_3",
@@ -67,7 +67,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #endif
 
-#ifdef ENABLE_INPROC_CORE
+#ifdef HELICS_ENABLE_INPROC_CORE
 #    define INPROCTEST "inproc",
 #    define INPROCTEST2 "inproc_2",
 #    define INPROCTEST3 "inproc_3",
@@ -80,7 +80,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    define INPROCTEST4 "test_4"
 #endif
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 constexpr const char* ztypes[] = {ZMQTEST ZMQSSTEST ZMQTEST2 ZMQTEST3 ZMQSSTEST2 ZMQTEST4};
 #endif
 

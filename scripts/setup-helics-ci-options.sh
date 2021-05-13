@@ -29,7 +29,7 @@ fi
 
 # Options to control building swig interfaces
 if [[ "${DISABLE_INTERFACES}" != *"Java"* ]]; then
-    OPTION_FLAGS_ARR+=("-DBUILD_JAVA_INTERFACE=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_JAVA_INTERFACE=ON")
 fi
 
 if [[ "$USE_SWIG" == 'true' ]]; then
@@ -64,7 +64,7 @@ fi
 
 # MPI options
 if [[ "$USE_MPI" ]]; then
-    OPTION_FLAGS_ARR+=("-DENABLE_MPI_CORE=ON")
+    OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_MPI_CORE=ON")
     CC=mpicc
     export CC
     CXX=mpic++

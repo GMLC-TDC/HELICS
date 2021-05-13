@@ -53,7 +53,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, initialize)
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 
 class valuefed_add_ztype_tests:
     public ::testing::TestWithParam<const char*>,
@@ -1101,7 +1101,7 @@ TEST(valuefederate, indexed_targets)
     Fed1->finalize();
 }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 /** test out register interfaces after configuration make sure that doesn't cause issues*/
 TEST(valuefederate, file_and_config)
 {

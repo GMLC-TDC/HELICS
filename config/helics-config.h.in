@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#cmakedefine ENABLE_MPI_CORE
-#cmakedefine ENABLE_ZMQ_CORE
-#cmakedefine ENABLE_TCP_CORE
-#cmakedefine ENABLE_IPC_CORE
-#cmakedefine ENABLE_UDP_CORE
-#cmakedefine ENABLE_TEST_CORE
-#cmakedefine ENABLE_INPROC_CORE
+#cmakedefine HELICS_ENABLE_MPI_CORE
+#cmakedefine HELICS_ENABLE_ZMQ_CORE
+#cmakedefine HELICS_ENABLE_TCP_CORE
+#cmakedefine HELICS_ENABLE_IPC_CORE
+#cmakedefine HELICS_ENABLE_UDP_CORE
+#cmakedefine HELICS_ENABLE_TEST_CORE
+#cmakedefine HELICS_ENABLE_INPROC_CORE
 
 
 #cmakedefine HELICS_ENABLE_LOGGING
