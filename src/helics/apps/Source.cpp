@@ -264,8 +264,8 @@ namespace apps {
             std::cerr << "publication already exists\n";
             return;
         }
-        SourceObject newObj(Publication(useLocal ? interface_visibility::local :
-                                                   interface_visibility::global,
+        SourceObject newObj(Publication(useLocal ? InterfaceVisibility::LOCAL :
+                                                   InterfaceVisibility::GLOBAL,
                                         fed,
                                         key,
                                         typeNameStringRef(type),

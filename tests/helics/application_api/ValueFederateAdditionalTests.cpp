@@ -101,7 +101,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, publisher_registration)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     helics::Publication pubid(vFed1.get(), "pub1", helics::helicsType<std::string>());
-    helics::Publication pubid2(helics::GLOBAL, vFed1.get(), "pub2", helics::DataType::HELICS_INT);
+    helics::Publication pubid2(helics::InterfaceVisibility::GLOBAL,
+                               vFed1.get(),
+                               "pub2",
+                               helics::DataType::HELICS_INT);
 
     vFed1->setSeparator('-');
     helics::Publication pubid3(vFed1.get(), "pub3", helics::helicsType<double>(), "V");

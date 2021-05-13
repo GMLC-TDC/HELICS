@@ -320,6 +320,8 @@ class CommonCore: public Core, public BrokerBase {
     /** get the minimum operating state of the connected federates*/
     operation_state minFederateState() const;
 
+    virtual double getSimulationTime() const override;
+
   private:
     /** get the federate Information from the federateID*/
     FederateState* getFederateCore(GlobalFederateId federateID);
@@ -331,6 +333,8 @@ class CommonCore: public Core, public BrokerBase {
     FederateState* getHandleFederateCore(InterfaceHandle handle);
 
   private:
+    std::atomic<double> simTime{BrokerBase::mInvalidSimulationTime};
+    GlobalFederateId keyFed{};
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     std::map<GlobalFederateId, route_id>
         routing_table;  //!< map for external routes  <global federate id, route id>
@@ -411,10 +415,10 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to
                                                //!< initialization Mode was explicitly delayed
     bool filterTiming{false};  //!< if there are filters needing a time connection
-    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
-        federates;  //!< threadsafe local federate information list for external functions
-    gmlc::containers::DualMappedVector<FedInfo, std::string, GlobalFederateId>
-        loopFederates;  // federate pointers stored for the core loop
+    /** threadsafe local federate information list for external functions */
+    shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;
+    /** federate pointers stored for the core loop */
+    gmlc::containers::DualMappedVector<FedInfo, std::string, GlobalFederateId> loopFederates;
 
     /** counter for the number of messages that have been sent, nothing magical about 54 just a
      * number bigger than 1 to prevent confusion */

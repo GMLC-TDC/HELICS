@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <complex>
 #include <gtest/gtest.h>
+#include <thread>
 
 /** these test cases test out the value converters
  */
@@ -23,7 +24,10 @@ TEST(logging_tests, check_log_message)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TIMING,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -37,11 +41,13 @@ TEST(logging_tests, check_log_message)
     helicsFederateSetLoggingCallback(fed, logg, &mlog, &err);
 
     EXPECT_EQ(err.error_code, 0);
-
+    auto loglevel = helicsFederateGetIntegerProperty(fed, HELICS_PROPERTY_INT_LOG_LEVEL, &err);
+    EXPECT_EQ(loglevel, HELICS_LOG_LEVEL_TIMING);
     helicsFederateEnterExecutingMode(fed, &err);
     helicsFederateLogInfoMessage(fed, "test MEXAGE", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_EQ(err.error_code, 0);
     auto llock = mlog.lock();
     bool found = false;
@@ -51,6 +57,11 @@ TEST(logging_tests, check_log_message)
         }
     }
     EXPECT_TRUE(found);
+    if (!found) {
+        for (auto& m : llock) {
+            std::cout << "message (" << m.first << ") ::" << m.second << std::endl;
+        }
+    }
     helicsFederateFree(fed);
     helicsFederateInfoFree(fi);
 }
@@ -61,7 +72,10 @@ TEST(logging_tests, check_log_message_levels)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 5, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TIMING,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -78,8 +92,8 @@ TEST(logging_tests, check_log_message_levels)
     EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
-    helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
-    helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TIMING, "test MEXAGE1", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE + 3, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);
@@ -108,7 +122,10 @@ TEST(logging_tests, check_log_message_levels_high)
     auto err = helicsErrorInitialize();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, &err);
     helicsFederateInfoSetCoreInitString(fi, "--autobroker", &err);
-    helicsFederateInfoSetIntegerProperty(fi, HELICS_PROPERTY_INT_LOG_LEVEL, 9, &err);
+    helicsFederateInfoSetIntegerProperty(fi,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_TRACE + 6,
+                                         &err);
 
     auto fed = helicsCreateValueFederate("test1", fi, &err);
 
@@ -124,8 +141,8 @@ TEST(logging_tests, check_log_message_levels_high)
     EXPECT_EQ(err.error_code, 0);
 
     helicsFederateEnterExecutingMode(fed, &err);
-    helicsFederateLogLevelMessage(fed, 3, "test MEXAGE1", &err);
-    helicsFederateLogLevelMessage(fed, 8, "test MEXAGE2", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_CONNECTIONS, "test MEXAGE1", &err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_TRACE + 3, "test MEXAGE2", &err);
     helicsFederateRequestNextStep(fed, &err);
     helicsFederateFinalize(fed, &err);
     EXPECT_EQ(err.error_code, 0);

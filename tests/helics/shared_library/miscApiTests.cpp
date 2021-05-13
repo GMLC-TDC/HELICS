@@ -22,7 +22,10 @@ TEST(misc_tests, misc_tests)
     helicsFederateInfoSetCoreTypeFromString(fedInfo1, "zmq", nullptr);
     helicsFederateInfoSetFlagOption(fedInfo1, 1, HELICS_TRUE, nullptr);
     helicsFederateInfoSetTimeProperty(fedInfo1, HELICS_PROPERTY_TIME_INPUT_DELAY, 1.0, nullptr);
-    helicsFederateInfoSetIntegerProperty(fedInfo1, HELICS_PROPERTY_INT_LOG_LEVEL, 1, nullptr);
+    helicsFederateInfoSetIntegerProperty(fedInfo1,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_WARNING,
+                                         nullptr);
     helicsFederateInfoSetIntegerProperty(fedInfo1,
                                          HELICS_PROPERTY_INT_MAX_ITERATIONS,
                                          100,
@@ -33,21 +36,29 @@ TEST(misc_tests, misc_tests)
     helicsFederateInfoSetTimeProperty(fedInfo1, HELICS_PROPERTY_TIME_OFFSET, 0.1, nullptr);
     helicsFederateInfoFree(fedInfo1);
 
-    auto broker3 = helicsCreateBroker("zmq", "broker3", "--federates 1 --loglevel 1", nullptr);
+    auto broker3 =
+        helicsCreateBroker("zmq", "broker3", "--federates 1 --loglevel warning", nullptr);
     EXPECT_STREQ(helicsBrokerGetIdentifier(broker3), "broker3");
     auto fedInfo2 = helicsCreateFederateInfo();
     const char* coreInitString = "--federates 1";
     helicsFederateInfoSetCoreInitString(fedInfo2, coreInitString, nullptr);
     helicsFederateInfoSetCoreTypeFromString(fedInfo2, "zmq", nullptr);
-    helicsFederateInfoSetIntegerProperty(fedInfo2, HELICS_PROPERTY_INT_LOG_LEVEL, 1, nullptr);
+    helicsFederateInfoSetIntegerProperty(fedInfo2,
+                                         HELICS_PROPERTY_INT_LOG_LEVEL,
+                                         HELICS_LOG_LEVEL_WARNING,
+                                         nullptr);
     helicsFederateInfoSetTimeProperty(fedInfo2, HELICS_PROPERTY_TIME_DELTA, 1.0, nullptr);
     auto fed1 = helicsCreateCombinationFederate("fed1", fedInfo2, nullptr);
     auto fed2 = helicsFederateClone(fed1, nullptr);
+    helicsFederateInfoFree(fedInfo2);
     helicsGetFederateByName("fed1", nullptr);
     helicsFederateSetFlagOption(fed2, 1, HELICS_FALSE, nullptr);
 
     helicsFederateSetTimeProperty(fed2, HELICS_PROPERTY_TIME_INPUT_DELAY, 1.0, nullptr);
-    helicsFederateSetIntegerProperty(fed1, HELICS_PROPERTY_INT_LOG_LEVEL, 1, nullptr);
+    helicsFederateSetIntegerProperty(fed1,
+                                     HELICS_PROPERTY_INT_LOG_LEVEL,
+                                     HELICS_LOG_LEVEL_WARNING,
+                                     nullptr);
     helicsFederateSetIntegerProperty(fed2, HELICS_PROPERTY_INT_MAX_ITERATIONS, 100, nullptr);
     helicsFederateSetTimeProperty(fed2, HELICS_PROPERTY_TIME_OUTPUT_DELAY, 1.0, nullptr);
     helicsFederateSetTimeProperty(fed2, HELICS_PROPERTY_TIME_PERIOD, 0.0, nullptr);

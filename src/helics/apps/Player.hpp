@@ -112,8 +112,8 @@ external protection, that will result in undefined behavior
             addPublication(const std::string& key, const std::string& pubUnits = std::string())
         {
             if (!useLocal) {
-                publications.push_back(
-                    Publication(GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
+                publications.push_back(Publication(
+                    InterfaceVisibility::GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
             } else {
                 publications.push_back(
                     Publication(fed.get(), key, helicsType<valType>(), pubUnits));

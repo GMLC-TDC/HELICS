@@ -50,7 +50,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param name the name of the endpoint
     @param type a named type associated with the endpoint
     */
-    Endpoint(interface_visibility locality,
+    Endpoint(InterfaceVisibility locality,
              MessageFederate* mFed,
              const std::string& name,
              const std::string& type = std::string());
@@ -61,7 +61,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     @param type a named type associated with the endpoint
     */
     template<class FedPtr>
-    Endpoint(interface_visibility locality,
+    Endpoint(InterfaceVisibility locality,
              FedPtr& mFed,
              const std::string& name,
              const std::string& type = std::string()):

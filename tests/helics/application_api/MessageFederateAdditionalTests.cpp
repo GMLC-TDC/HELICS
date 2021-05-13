@@ -91,7 +91,7 @@ TEST_P(mfed_add_single_type_tests, endpoint_registration_objs)
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     helics::Endpoint epid(mFed1.get(), "ep1");
-    helics::Endpoint epid2(helics::GLOBAL, mFed1.get(), "ep2", "random");
+    helics::Endpoint epid2(helics::InterfaceVisibility::GLOBAL, mFed1.get(), "ep2", "random");
     mFed1->enterExecutingMode();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
@@ -165,7 +165,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     helics::Endpoint ep1(mFed1, "ep1");
-    helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
+    helics::Endpoint ep2(helics::InterfaceVisibility::GLOBAL, mFed1, "ep2", "random");
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
@@ -211,7 +211,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
     helics::Endpoint ep1(mFed1, "ep1");
-    helics::Endpoint ep2(helics::GLOBAL, mFed1, "ep2", "random");
+    helics::Endpoint ep2(helics::InterfaceVisibility::GLOBAL, mFed1, "ep2", "random");
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;

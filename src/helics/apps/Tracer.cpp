@@ -404,7 +404,7 @@ namespace apps {
     {
         auto res = eptNames.find(endpoint);
         if ((res == eptNames.end()) || (res->second == -1)) {
-            endpoints.emplace_back(GLOBAL, fed, endpoint);
+            endpoints.emplace_back(InterfaceVisibility::GLOBAL, fed, endpoint);
             auto index = static_cast<int>(endpoints.size()) - 1;
             eptNames[endpoint] = index;  // this is a potential replacement
         }

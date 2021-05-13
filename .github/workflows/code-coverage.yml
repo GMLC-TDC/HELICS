@@ -24,6 +24,8 @@ jobs:
       GCOV_TOOL: gcov
       CMAKE_GENERATOR: Unix Makefiles
       MAKEFLAGS: '-j 4'
+      DISABLE_INTERFACES: 'Java'
+      DISABLE_EXAMPLES: 'true'
       CI_TEST_FLAGS: ""
       DISABLE_INTERFACES: "Java"
       

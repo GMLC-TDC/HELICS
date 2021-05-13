@@ -31,7 +31,10 @@ TEST(clone_tests, simple_clone_test_pub)
     c1.setFederateToClone("block1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &vfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
     auto fut = std::async(std::launch::async, [&c1]() { c1.runTo(4); });
     vfed.enterExecutingMode();
     auto retTime = vfed.requestTime(1);
@@ -62,7 +65,10 @@ TEST(clone_tests, simple_clone_test_pub2)
     c1.setFederateToClone("block1");
 
     helics::ValueFederate vfed("block1", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &vfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = vfed.registerPublication("pub2", "double", "m");
 
@@ -169,7 +175,10 @@ TEST(clone_tests, simple_clone_test_combo)
     auto& ept2 = mfed.registerGlobalEndpoint("ept3");
     mfed.registerEndpoint("e3");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &mfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = mfed.registerPublication("pub2", "double", "m");
 
@@ -242,7 +251,10 @@ TEST(clone_tests, simple_clone_test_sub)
 
     helics::ValueFederate vfed("block1", fi);
     helics::ValueFederate vfed2("block2", fi);
-    helics::Publication pub1(helics::GLOBAL, &vfed, "pub1", helics::DataType::HELICS_DOUBLE);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &vfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto& pub2 = vfed.registerPublication("pub2", "double", "m");
 

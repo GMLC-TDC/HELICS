@@ -50,7 +50,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 
     // register the publications
     Publication pubid(vFed1.get(), "pub1", helicsType<std::string>());
-    Publication pubid2(GLOBAL, vFed1, "pub2", helicsType<double>());
+    Publication pubid2(helics::InterfaceVisibility::GLOBAL, vFed1, "pub2", helicsType<double>());
 
     Publication pubid3(vFed1, "pub3", helicsType<double>(), "V");
 
@@ -104,7 +104,10 @@ TEST_P(valuefed_single_type, single_transfer_publisher)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     ASSERT_TRUE(vFed1);
     // register the publications
-    helics::Publication pubid(helics::GLOBAL, vFed1.get(), "pub1", helics::DataType::HELICS_STRING);
+    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+                              vFed1.get(),
+                              "pub1",
+                              helics::DataType::HELICS_STRING);
 
     auto& subid = vFed1->registerSubscription("pub1");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -319,7 +322,7 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     helics::ValueFederate V2("", config);
     V2.enterExecutingMode();
     auto val = V2.getIntegerProperty(helics::defs::Properties::LOG_LEVEL);
-    EXPECT_EQ(val, -1);
+    EXPECT_EQ(val, HELICS_LOG_LEVEL_NO_PRINT);
     EXPECT_EQ(V2.getName(), "test_bes");
     bool result = V2.getFlagOption(HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE);
     EXPECT_TRUE(result);

@@ -100,7 +100,7 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
-    int logLevel{1};  //!< the level of logging used in the federate
+    int logLevel{HELICS_LOG_LEVEL_WARNING};  //!< the level of logging used in the federate
 
     //   std::vector<ActionMessage> messLog;
   private:

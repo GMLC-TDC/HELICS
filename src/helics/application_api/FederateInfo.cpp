@@ -514,8 +514,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--loglevel",
            [this](int val) { setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, val); },
            "the logging level of a federate")
-        ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     app->add_option("--separator", separator, "separator character for local federates")
         ->default_str(std::string(1, separator));

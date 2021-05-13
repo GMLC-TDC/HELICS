@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 
     std::string etarget = mtarget + "/" + targetEndpoint;
 
-    fi.setProperty(helics::defs::Properties::LOG_LEVEL, 5);
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_TIMING);
     if (app["--startbroker"]->count() > 0) {
         brk = helics::BrokerApp(fi.coreType, brokerArgs);
     }
@@ -93,8 +93,8 @@ int main(int argc, char* argv[])
                       << cFed->getTarget(subid) << '\n';
         }
     }
-    cFed->logMessage(7, "Process Complete.");
-    cFed->logMessage(1, "Reached End of application.");
+    cFed->logMessage(HELICS_LOG_LEVEL_TRACE, "Process Complete.");
+    cFed->logMessage(HELICS_LOG_LEVEL_WARNING, "Reached End of application.");
     cFed->logInfoMessage("Calling Finalize.");
     cFed->finalize();
     return 0;

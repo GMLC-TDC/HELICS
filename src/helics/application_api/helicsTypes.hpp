@@ -36,13 +36,10 @@ enum class identifiers : char {
 };
 
 /** enumeration of locality namespaces*/
-enum class interface_visibility {
-    local,
-    global,
+enum class InterfaceVisibility {
+    LOCAL,
+    GLOBAL,
 };
-
-constexpr interface_visibility GLOBAL = interface_visibility::global;
-constexpr interface_visibility LOCAL = interface_visibility::local;
 
 /** class defining an  identifier type
 @details  the intent of this class is to limit the operations available on an identifier
