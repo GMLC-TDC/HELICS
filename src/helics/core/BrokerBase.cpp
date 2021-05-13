@@ -168,7 +168,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option_function<int>(
             "--loglevel",
             [this](int val) { setLogLevel(val); },
-            "the level which to log; the higher this is set; the more logs set to \"no_print\" for no logging")
+            "the level at which to log, the higher this is set the more gets logged; set to \"no_print\" for no logging")
         ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group

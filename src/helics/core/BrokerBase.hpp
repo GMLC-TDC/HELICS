@@ -37,7 +37,7 @@ class BrokerBase {
     GlobalBrokerId global_broker_id_local{};  //!< meant to be the same as global_id but not
                                               //!< atomically protected
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
-    /**the logging level to use levels >=this will be ignored*/
+    /**the logging level to use,  levels >= this will be ignored*/
     std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
     int32_t consoleLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for console display
     int32_t fileLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for logging to a file
