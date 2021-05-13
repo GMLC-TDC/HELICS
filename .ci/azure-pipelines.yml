@@ -161,7 +161,7 @@ jobs:
 
       #  - task: CMake@1
       #    inputs:
-      #      cmakeArgs: -DBUILD_JAVA_INTERFACE=ON .
+      #      cmakeArgs: -DHELICS_BUILD_JAVA_INTERFACE=ON .
       #    displayName: 'Configure Java interface'
       #    condition: eq( variables['langArch'], 'x64' )
 

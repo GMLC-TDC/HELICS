@@ -281,7 +281,7 @@ TEST_P(recorder_message_file_tests, test_message_files)
     EXPECT_EQ(m->data.to_string(), "this is a test message2");
 }
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 TEST_P(recorder_message_file_tests, test_message_files_cmd)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(600));

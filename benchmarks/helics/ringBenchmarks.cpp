@@ -124,7 +124,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, inprocCore, CoreType::INPROC)
     ->Arg(20)
     ->UseRealTime();
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
 BENCHMARK_CAPTURE(BMring_multiCore, zmqCore, CoreType::ZMQ)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -146,7 +146,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, zmqssCore, CoreType::ZMQ_SS)
     ->UseRealTime();
 #endif
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 // Register the IPC benchmarks
 BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, CoreType::IPC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -156,7 +156,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, ipcCore, CoreType::IPC)
     ->UseRealTime();
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 // Register the TCP benchmarks
 BENCHMARK_CAPTURE(BMring_multiCore, tcpCore, CoreType::TCP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
@@ -179,7 +179,7 @@ BENCHMARK_CAPTURE(BMring_multiCore, tcpssCore, CoreType::TCP_SS)
 
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 // Register the UDP benchmarks
 BENCHMARK_CAPTURE(BMring_multiCore, udpCore, CoreType::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)

@@ -289,7 +289,7 @@ TEST(player_tests, simple_player_mlinecomment)
     EXPECT_EQ(play1.publicationCount(), 2U);
 }
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 TEST_P(player_file_tests, test_files_cmd)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
@@ -349,7 +349,7 @@ TEST_P(player_file_tests, test_files_cmd)
 }
 #endif
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS
 TEST_P(player_file_tests, test_files_exe)
 {

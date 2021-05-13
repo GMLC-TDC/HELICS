@@ -305,7 +305,7 @@ thread which allows the destructor to fire if need be without issue*/
             std::cout << "All core types have similar options\n";
             auto brk = makeBroker(CoreType::DEFAULT, std::string{});
             brk->configure(helpStr);
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
             brk = makeBroker(CoreType::TCP_SS, std::string{});
             brk->configure(helpStr);
 #endif

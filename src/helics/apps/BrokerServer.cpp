@@ -124,19 +124,19 @@ namespace apps {
         auto app = std::make_unique<helicsCLI11App>(
             "The Broker server is a helics broker coordinator that can generate brokers on request",
             "broker_server");
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
         app->add_flag("--zmq,-z", zmq_server, "start a broker-server for the zmq comms in helics");
         app->add_flag("--zmqss",
                       zmq_ss_server,
                       "start a broker-server for the zmq single socket comms in helics");
 #endif
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
         app->add_flag("--tcp,-t", tcp_server, "start a broker-server for the tcp comms in helics");
 #endif
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
         app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
 #endif
-#ifdef ENABLE_MPI_CORE
+#ifdef HELICS_ENABLE_MPI_CORE
         // app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
 #endif
 #ifdef HELICS_ENABLE_WEBSERVER
