@@ -263,8 +263,16 @@ namespace apps {
                     message["dest"] = mess->original_dest;
                 }
                 if (isBinaryData(mess->data)) {
-                    message["encoding"] = "base64";
-                    message["message"] = encode(mess->data.to_string());
+                    if (isEscapableData(mess->data))
+                    {
+                        message["message"] = mess->data.to_string();
+                    }
+                    else
+                    {
+                        message["encoding"] = "base64";
+                        message["message"] = encode(mess->data.to_string());
+                    }
+                    
                 } else {
                     message["message"] = mess->data.to_string();
                 }
@@ -280,13 +288,13 @@ namespace apps {
     {
         std::ofstream outFile(filename.empty() ? outFileName : filename);
         if (!points.empty()) {
-            outFile << "#time \ttag\t value\t type*\n";
+            outFile << "#time \ttag\t type*\t value\n";
         }
         for (auto& v : points) {
             if (v.first) {
                 outFile << static_cast<double>(v.time) << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t' << v.value << '\t'
-                        << subscriptions[v.index].getPublicationType() << '\n';
+                        << subscriptions[v.index].getTarget() << '\t'
+                        << subscriptions[v.index].getPublicationType() << '\t' << v.value << '\n';
             } else {
                 if (v.iteration > 0) {
                     outFile << static_cast<double>(v.time) << ':' << v.iteration << "\t\t"
@@ -308,7 +316,12 @@ namespace apps {
                 outFile << m->original_dest;
             }
             if (isBinaryData(m->data)) {
-                outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                if (isEscapableData(m->data)) {
+                    outFile << "\t" << escapeString(m->data.to_string()) << "\n";
+                } else {
+                    outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                }
+                
             } else {
                 outFile << "\t\"" << m->data.to_string() << "\"\n";
             }

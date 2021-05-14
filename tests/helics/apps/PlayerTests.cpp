@@ -242,6 +242,63 @@ TEST_P(player_file_tests, test_files)
     fut.get();
 }
 
+
+TEST(player_tests, bigfile)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.coreName = "pcorebig";
+    fi.coreInitString = "-f 2 --autobroker";
+    helics::apps::Player play1("player1", fi);
+
+    play1.loadFile(std::string(TEST_DIR) + "bigtest.txt");
+    fi.setProperty(helics_property_time_period, 60.0);
+    helics::ValueFederate vfed("charger", fi);
+    auto& sub1 = vfed.registerSubscription("Battery/EV1_current");
+    auto& sub2 = vfed.registerSubscription("Battery/EV2_current");
+    auto& sub3 = vfed.registerSubscription("Battery/EV3_current");
+    auto& sub4 = vfed.registerSubscription("Battery/EV4_current");
+    auto& sub5 = vfed.registerSubscription("Battery/EV5_current");
+
+    sub1.setDefault(1.0);
+    sub2.setDefault(1.0);
+    sub3.setDefault(1.0);
+    sub4.setDefault(1.0);
+    sub5.setDefault(1.0);
+
+    auto fut = std::async(std::launch::async, [&play1]() { play1.runTo(500.0); });
+    vfed.enterExecutingMode();
+    helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
+    helics::Time period = 60.0;
+    auto retTime = vfed.requestTime(60.0);
+    double val1;
+    double val2;
+    double val3;
+    double val4;
+    double val5;
+    while (retTime <= 200.0)
+    {
+        EXPECT_NO_THROW(val1 = sub1.getValue<double>());
+        EXPECT_NO_THROW(val2 = sub2.getValue<double>());
+        EXPECT_NO_THROW(val3 = sub3.getValue<double>());
+        EXPECT_NO_THROW(val4 = sub4.getValue<double>());
+        EXPECT_NO_THROW(val5 = sub5.getValue<double>());
+        EXPECT_GE(val1, 0.0001);
+        EXPECT_LT(val1, 1000.0);
+        EXPECT_GE(val2, 0.0001);
+        EXPECT_LT(val2, 1000.0);
+        EXPECT_GE(val3, 0.0001);
+        EXPECT_LT(val3, 1000.0);
+        EXPECT_GE(val4, 0.0001);
+        EXPECT_LT(val4, 1000.0);
+        EXPECT_GE(val5, 0.0001);
+        EXPECT_LT(val5, 1000.0);
+        retTime = vfed.requestTimeAdvance(period);
+    }
+    
+    vfed.finalize();
+    fut.get();
+}
+
 TEST(player_tests, simple_player_mlinecomment)
 {
     static char indx = 'a';

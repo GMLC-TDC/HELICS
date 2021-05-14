@@ -79,3 +79,69 @@ bool isBinaryData(helics::data_block& data)
         return ((c < 32) || (c == 34) || (c > 126));
     });
 }
+
+bool isEscapableData(helics::data_block& data)
+{
+    return std::all_of(data.begin(), data.end(), [](const auto& c) {
+        return ((c>=32 && c<=126)|| (c=='\t')||(c=='\n'));
+    });
+}
+
+
+std::string escapeString(const std::string& string)
+{
+    std::string newString("raw(\"");
+    newString.reserve(string.size() + 10);
+    for (char c : string)
+    {
+        switch (c)
+        {
+            case '\n':
+                newString.push_back('\\');
+                newString.push_back('n');
+                break;
+            case '\t':
+                newString.push_back('\\');
+                newString.push_back('t');
+                break;
+            case '"':
+                newString.push_back('\\');
+                newString.push_back('"');
+                break;
+            default:
+                newString.push_back(c);
+        }
+    }
+    newString.push_back('"');
+    newString.push_back(')');
+    return newString;
+}
+
+std::string normalizeString(std::string str)
+{
+    if (str.compare(0, 5, "raw(\"") != 0)
+    {
+        return str;
+    }
+
+    auto loc = str.find("\\n");
+    while (loc != std::string::npos)
+    {
+        str.replace(loc, 2, 1, '\n');
+        loc = str.find("\\n");
+    }
+    loc = str.find("\\t");
+    while (loc != std::string::npos) {
+        str.replace(loc, 2, 1, '\t');
+        loc = str.find("\\t");
+    }
+    loc = str.find("\\\"");
+    while (loc != std::string::npos) {
+        str.replace(loc, 2, 1, '"');
+        loc = str.find("\\\"");
+    }
+    str.pop_back();
+    str.pop_back();
+    str.erase(0, 5);
+    return str;
+}
