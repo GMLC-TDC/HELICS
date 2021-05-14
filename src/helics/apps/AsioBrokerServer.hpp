@@ -52,7 +52,7 @@ namespace apps {
 #    ifdef HELICS_ENABLE_TCP_CORE
         std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
         static void loadTCPServerData(portData& pdata);
-        std::size_t tcpDataReceive(const std::shared_ptr<tcp::TcpConnection> &connection,
+        std::size_t tcpDataReceive(const std::shared_ptr<tcp::TcpConnection>& connection,
                                    const char* data,
                                    size_t bytes_received);
         std::shared_ptr<tcp::TcpServer> tcpserver;
@@ -62,7 +62,7 @@ namespace apps {
         std::shared_ptr<udp::UdpServer> loadUDPserver(asio::io_context& ioctx);
         static void loadUDPServerData(portData& pdata);
 
-        bool udpDataReceive(const std::shared_ptr<udp::UdpServer> &server,
+        bool udpDataReceive(const std::shared_ptr<udp::UdpServer>& server,
                             const char* data,
                             size_t bytes_received);
         std::shared_ptr<udp::UdpServer> udpserver;
