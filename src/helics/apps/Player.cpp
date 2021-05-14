@@ -171,7 +171,7 @@ namespace apps {
         try {
             if (units == time_units::ns)  // ns
             {
-                return helics::Time(std::stoll(str), time_units::ns);
+                return {std::stoll(str), time_units::ns};
             }
             return loadTimeFromString(str, units);
         }
@@ -596,7 +596,7 @@ namespace apps {
     /** helper function to generate the publications*/
     void Player::generateEndpoints()
     {
-        for (auto& ename : epts) {
+        for (const auto& ename : epts) {
             if (eptids.find(ename) == eptids.end()) {
                 addEndpoint(ename);
             }
