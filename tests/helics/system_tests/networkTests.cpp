@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 struct network_tests: public FederateTestFixture, public ::testing::Test {
 };
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 /** test simple creation and destruction*/
 TEST_F(network_tests, test_external_tcp)
 {
@@ -85,7 +85,7 @@ TEST_F(network_tests, test_external_tcpss_ipv4)
 
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 /** test simple creation and destruction*/
 TEST_F(network_tests, test_external_udp)
 {
@@ -120,7 +120,7 @@ TEST_F(network_tests, test_external_udp_ipv4)
 }
 #endif
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 TEST_F(network_tests, test_otherport)
 {
     const std::string brokerArgs = "--local_interface=tcp://127.0.0.1:33200";

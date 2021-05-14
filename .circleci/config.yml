@@ -53,7 +53,7 @@ jobs:
       - image: helics/buildenv:octave
     environment:
       OCTAVETEST: '/root/project/tests/octave'
-      CMAKE_FLAGS: '-DBUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON'
+      CMAKE_FLAGS: '-DHELICS_BUILD_OCTAVE_INTERFACE=ON -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics
@@ -109,7 +109,7 @@ jobs:
     docker:
       - image: helics/buildenv:gcc8-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DENABLE_ZMQ_CORE=OFF -DENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
     steps:
       - checkout
       - run: *setup_helics
@@ -119,7 +119,7 @@ jobs:
     docker:
       - image: helics/buildenv:tumbleweed-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DENABLE_ZMQ_CORE=OFF -DENABLE_IPC_CORE=OFF -DENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_ENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
     steps:
       - checkout
       - run: *setup_helics

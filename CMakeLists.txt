@@ -19,9 +19,9 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD "alpha.2")
+set(HELICS_VERSION_BUILD "beta")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2020-11-08")
+set(HELICS_DATE "2021-05-18")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -420,30 +420,30 @@ add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
 # options for enabling specific core communication types
 # -------------------------------------------------------------
 
-option(ENABLE_MPI_CORE "Enable MPI networking library" OFF)
+option(HELICS_ENABLE_MPI_CORE "Enable MPI networking library" OFF)
 cmake_dependent_advanced_option(
-    ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
+    HELICS_ENABLE_TCP_CORE "Enable TCP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
 )
 cmake_dependent_advanced_option(
-    ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
+    HELICS_ENABLE_UDP_CORE "Enable UDP core types" ON "NOT HELICS_DISABLE_ASIO" OFF
 )
 if("${CMAKE_SYSTEM_NAME}" MATCHES ".*BSD")
     set(SYSTEM_IS_BSD ON)
 endif()
 
 cmake_dependent_advanced_option(
-    ENABLE_IPC_CORE "Enable Interprocess communication types" ON
+    HELICS_ENABLE_IPC_CORE "Enable Interprocess communication types" ON
     "NOT HELICS_DISABLE_BOOST;NOT SYSTEM_IS_BSD" OFF
 )
 cmake_dependent_advanced_option(
-    ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON
+    HELICS_ENABLE_TEST_CORE "Enable test inprocess core type" OFF "NOT HELICS_BUILD_TESTS" ON
 )
 cmake_dependent_advanced_option(
-    ENABLE_INPROC_CORE "Enable inprocess core type" ON "NOT HELICS_BUILD_BENCHMARKS" ON
+    HELICS_ENABLE_INPROC_CORE "Enable inprocess core type" ON "NOT HELICS_BUILD_BENCHMARKS" ON
 )
-option(ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
+option(HELICS_ENABLE_ZMQ_CORE "Enable ZeroMQ networking library" ON)
 
-mark_as_advanced(ENABLE_MPI_CORE ENABLE_ZMQ_CORE)
+mark_as_advanced(HELICS_ENABLE_MPI_CORE HELICS_ENABLE_ZMQ_CORE)
 
 # -------------------------------------------------------------
 # Some specialized configurations
@@ -472,7 +472,7 @@ endif()
 # finding MPI
 # -------------------------------------------------------------
 
-if(ENABLE_MPI_CORE)
+if(HELICS_ENABLE_MPI_CORE)
     include(addMPI)
     if(MPI_C_FOUND)
         target_link_libraries(helics_base INTERFACE MPI::MPI_C)
@@ -482,7 +482,7 @@ if(ENABLE_MPI_CORE)
     else()
         message(FATAL_ERROR "MPI not found")
     endif(MPI_C_FOUND)
-endif(ENABLE_MPI_CORE)
+endif(HELICS_ENABLE_MPI_CORE)
 
 # -------------------------------------------------------------
 # add threading support
@@ -529,7 +529,7 @@ endif()
 
 # If ZeroMQ library is enabled try to locate it and link against it
 add_library(zmq INTERFACE)
-if(ENABLE_ZMQ_CORE)
+if(HELICS_ENABLE_ZMQ_CORE)
     include(addZeroMQ)
 
     if(NOT ZeroMQ_FOUND)
@@ -632,7 +632,7 @@ if(isSystemDir STREQUAL "-1")
 endif()
 
 if(NOT WIN32)
-    if(ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
+    if(HELICS_ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
         if(NOT zmqlibfile)
             get_target_property(zmqlibfile libzmq IMPORTED_LOCATION_RELEASE)
@@ -717,7 +717,7 @@ add_subdirectory(src)
 # -----------------------------------------------------------------------------
 
 if(HELICS_BUILD_TESTS AND BUILD_TESTING)
-    if(NOT ENABLE_TEST_CORE)
+    if(NOT HELICS_ENABLE_TEST_CORE)
         message(FATAL_ERROR "TEST CORE must be enabled to build the HELICS tests")
     endif()
     mark_as_advanced(BUILD_TESTING)
@@ -725,7 +725,7 @@ if(HELICS_BUILD_TESTS AND BUILD_TESTING)
 endif()
 
 if(HELICS_BUILD_BENCHMARKS)
-    if(NOT ENABLE_INPROC_CORE)
+    if(NOT HELICS_ENABLE_INPROC_CORE)
         message(FATAL_ERROR "INPROC CORE must be enabled to build the HELICS Benchmarks")
     endif()
     add_subdirectory(benchmarks)
@@ -870,7 +870,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND ENABLE_ZMQ_CORE)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
     endif()
 
@@ -885,7 +885,7 @@ else()
         )
     endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND ENABLE_ZMQ_CORE)
+    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND HELICS_ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
     endif()
 endif()
