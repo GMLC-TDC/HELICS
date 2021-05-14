@@ -20,7 +20,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
 - The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 - All HELICS specific CMake variables start with `HELICS_`
-- the format for log messages now include a simulation time stamp `[t=xxxx]`
+- The format for log messages now includes a simulation time stamp `[t=xxxx]`
 
 ### Fixed
 
