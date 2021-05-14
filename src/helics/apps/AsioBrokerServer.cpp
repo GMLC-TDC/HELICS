@@ -43,8 +43,7 @@ namespace udp {
             try {
                 stop_receive();
             }
-            catch (const asio::error_code &) {
-
+            catch (const asio::error_code&) {
             }
             asio::error_code ec;
             mSocket.close(ec);
@@ -98,9 +97,10 @@ namespace udp {
 
 namespace apps {
 #ifdef HELICS_ENABLE_TCP_CORE
-    std::size_t AsioBrokerServer::tcpDataReceive(const std::shared_ptr<tcp::TcpConnection> &connection,
-                                                 const char* data,
-                                                 std::size_t bytes_received)
+    std::size_t
+        AsioBrokerServer::tcpDataReceive(const std::shared_ptr<tcp::TcpConnection>& connection,
+                                         const char* data,
+                                         std::size_t bytes_received)
     {
         std::size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -153,7 +153,7 @@ namespace apps {
 #endif  // HELICS_ENABLE_TCP_CORE
 
 #ifdef HELICS_ENABLE_UDP_CORE
-    bool AsioBrokerServer::udpDataReceive(const std::shared_ptr<udp::UdpServer> &server,
+    bool AsioBrokerServer::udpDataReceive(const std::shared_ptr<udp::UdpServer>& server,
                                           const char* data,
                                           size_t bytes_received)
     {
