@@ -42,7 +42,6 @@ namespace udp {
         {
             try {
                 stop_receive();
-                
             }
             catch (...) {
             }
@@ -52,7 +51,6 @@ namespace udp {
             }
             catch (...) {
             }
-            
         }
 
         void start_receive()
