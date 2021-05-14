@@ -211,9 +211,8 @@ static void useFile2(const std::string& corename, const std::string& file)
     EXPECT_EQ(play1.publicationCount(), 1U);
     EXPECT_EQ(play1.messageCount(), 2U);
     EXPECT_EQ(play1.endpointCount(), 2U);
-    if (play1.messageCount() == 2U)
-    {
-        EXPECT_EQ(play1.getMessage(0).mess.data.to_string(),Message1);
+    if (play1.messageCount() == 2U) {
+        EXPECT_EQ(play1.getMessage(0).mess.data.to_string(), Message1);
         EXPECT_EQ(play1.getMessage(1).mess.data.to_string(), Message2);
     }
 
@@ -250,7 +249,6 @@ TEST(combo_tests, save_load_file2)
     useFile2("ccore4b", filename1.string());
     useFile2("ccore5b", filename2.string());
 }
-
 
 static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
 {

@@ -22,5 +22,5 @@ bool isBinaryData(helics::data_block& data);
 
 bool isEscapableData(helics::data_block& data);
 
-std::string escapeString(const std::string &string);
+std::string escapeString(const std::string& string);
 std::string normalizeString(std::string str);
