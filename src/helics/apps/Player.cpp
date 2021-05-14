@@ -806,8 +806,7 @@ static std::string decode(std::string&& stringToDecode)
         stringToDecode.pop_back();
         return gmlc::utilities::base64_decode_to_string(stringToDecode, offset);
     }
-    if (stringToDecode.compare(0, 5, "raw(\"") == 0)
-    {
+    if (stringToDecode.compare(0, 5, "raw(\"") == 0) {
         return normalizeString(stringToDecode);
     }
     if ((stringToDecode.front() == '"') || (stringToDecode.front() == '\'')) {

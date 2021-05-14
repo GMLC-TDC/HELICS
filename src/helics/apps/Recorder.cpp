@@ -263,16 +263,13 @@ namespace apps {
                     message["dest"] = mess->original_dest;
                 }
                 if (isBinaryData(mess->data)) {
-                    if (isEscapableData(mess->data))
-                    {
+                    if (isEscapableData(mess->data)) {
                         message["message"] = mess->data.to_string();
-                    }
-                    else
-                    {
+                    } else {
                         message["encoding"] = "base64";
                         message["message"] = encode(mess->data.to_string());
                     }
-                    
+
                 } else {
                     message["message"] = mess->data.to_string();
                 }
@@ -321,7 +318,7 @@ namespace apps {
                 } else {
                     outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
                 }
-                
+
             } else {
                 outFile << "\t\"" << m->data.to_string() << "\"\n";
             }

@@ -83,19 +83,16 @@ bool isBinaryData(helics::data_block& data)
 bool isEscapableData(helics::data_block& data)
 {
     return std::all_of(data.begin(), data.end(), [](const auto& c) {
-        return ((c>=32 && c<=126)|| (c=='\t')||(c=='\n'));
+        return ((c >= 32 && c <= 126) || (c == '\t') || (c == '\n'));
     });
 }
-
 
 std::string escapeString(const std::string& string)
 {
     std::string newString("raw(\"");
     newString.reserve(string.size() + 10);
-    for (char c : string)
-    {
-        switch (c)
-        {
+    for (char c : string) {
+        switch (c) {
             case '\n':
                 newString.push_back('\\');
                 newString.push_back('n');
@@ -119,14 +116,12 @@ std::string escapeString(const std::string& string)
 
 std::string normalizeString(std::string str)
 {
-    if (str.compare(0, 5, "raw(\"") != 0)
-    {
+    if (str.compare(0, 5, "raw(\"") != 0) {
         return str;
     }
 
     auto loc = str.find("\\n");
-    while (loc != std::string::npos)
-    {
+    while (loc != std::string::npos) {
         str.replace(loc, 2, 1, '\n');
         loc = str.find("\\n");
     }

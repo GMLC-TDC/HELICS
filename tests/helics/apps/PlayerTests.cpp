@@ -242,7 +242,6 @@ TEST_P(player_file_tests, test_files)
     fut.get();
 }
 
-
 TEST(player_tests, bigfile)
 {
     helics::FederateInfo fi(helics::core_type::TEST);
@@ -275,8 +274,7 @@ TEST(player_tests, bigfile)
     double val3;
     double val4;
     double val5;
-    while (retTime <= 200.0)
-    {
+    while (retTime <= 200.0) {
         EXPECT_NO_THROW(val1 = sub1.getValue<double>());
         EXPECT_NO_THROW(val2 = sub2.getValue<double>());
         EXPECT_NO_THROW(val3 = sub3.getValue<double>());
@@ -294,7 +292,7 @@ TEST(player_tests, bigfile)
         EXPECT_LT(val5, 1000.0);
         retTime = vfed.requestTimeAdvance(period);
     }
-    
+
     vfed.finalize();
     fut.get();
 }
