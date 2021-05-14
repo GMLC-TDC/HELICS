@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -8,18 +8,20 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 cmake_dependent_option(
-    BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
+    HELICS_BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
 )
 cmake_dependent_option(
-    BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
+    HELICS_BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
+    OFF
 )
 cmake_dependent_option(
-    BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
+    HELICS_BUILD_JAVA_INTERFACE "Build Java extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB" OFF
 )
 
 # cmake projects are only available for csharp from 3.8 onward
 cmake_dependent_option(
-    BUILD_CSHARP_INTERFACE "Build C# extension" OFF
+    HELICS_BUILD_CSHARP_INTERFACE "Build C# extension" OFF
     "NOT HELICS_DISABLE_C_SHARED_LIB;CMAKE_VERSION VERSION_GREATER 3.8" OFF
 )
 
@@ -34,7 +36,9 @@ option(HELICS_OVERWRITE_INTERFACE_FILES
 )
 hide_variable(HELICS_OVERWRITE_INTERFACE_FILES)
 
-if(BUILD_CSHARP_INTERFACE OR BUILD_OCTAVE_INTERFACE OR SWIG_GENERATE_INTERFACE_FILES_ONLY)
+if(HELICS_BUILD_CSHARP_INTERFACE OR HELICS_BUILD_OCTAVE_INTERFACE
+   OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY
+)
     set(swig_required ON)
 else()
     set(swig_required OFF)
@@ -46,7 +50,7 @@ cmake_dependent_option(
     HELICS_ENABLE_SWIG
     "use swig to generate the interface files"
     OFF
-    "BUILD_MATLAB_INTERFACE OR BUILD_JAVA_INTERFACE;NOT swig_required"
+    "HELICS_BUILD_MATLAB_INTERFACE OR HELICS_BUILD_JAVA_INTERFACE;NOT swig_required"
     ${swig_required}
 )
 # cmake-format: on
@@ -93,18 +97,18 @@ set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}
 # TODO: remove this after all of the interfaces work as standalone builds
 include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
-if(BUILD_JAVA_INTERFACE)
+if(HELICS_BUILD_JAVA_INTERFACE)
     add_subdirectory(java)
 endif()
 
-if(BUILD_MATLAB_INTERFACE)
+if(HELICS_BUILD_MATLAB_INTERFACE)
     add_subdirectory(matlab)
 endif()
 
-if(BUILD_OCTAVE_INTERFACE)
+if(HELICS_BUILD_OCTAVE_INTERFACE)
     add_subdirectory(octave)
 endif()
 
-if(BUILD_CSHARP_INTERFACE)
+if(HELICS_BUILD_CSHARP_INTERFACE)
     add_subdirectory(csharp)
 endif()

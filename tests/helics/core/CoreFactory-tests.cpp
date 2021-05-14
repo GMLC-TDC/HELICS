@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static const bool ld = helics::loadCores();
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::ZMQ), true);
@@ -24,15 +24,15 @@ TEST(CoreFactory_tests, ZmqCore_test)
     core->disconnect();
     core = nullptr;
 }
-#else  // ENABLE_ZMQ_CORE
+#else  // HELICS_ENABLE_ZMQ_CORE
 TEST(CoreFactory_tests, ZmqCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::ZMQ), false);
 }
-#endif  // ENABLE_ZMQ_CORE
+#endif  // HELICS_ENABLE_ZMQ_CORE
 
 /*
-#ifdef ENABLE_MPI_CORE
+#ifdef HELICS_ENABLE_MPI_CORE
 
 TEST(CoreFactory_tests,MpiCore_test)
 {
@@ -47,7 +47,7 @@ TEST(CoreFactory_tests,MpiCore_test)
 {
     EXPECT_EQ (helics::isCoreTypeAvailable (helics::CoreType::MPI), false);
 }
-#endif  // ENABLE_MPI_CORE
+#endif  // HELICS_ENABLE_MPI_CORE
 */
 
 TEST(CoreFactory_tests, TestCore_test)
@@ -59,7 +59,7 @@ TEST(CoreFactory_tests, TestCore_test)
     core->disconnect();
     core = nullptr;
 }
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 TEST(CoreFactory_tests, InterprocessCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::INTERPROCESS), true);
@@ -83,7 +83,7 @@ TEST(CoreFactory_tests, InterprocessCore_test)
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::IPC), false);
 }
 #endif
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 TEST(CoreFactory_tests, tcpCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TCP), true);
@@ -113,7 +113,7 @@ TEST(CoreFactory_tests, tcpSSCore_test)
 }
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 TEST(CoreFactory_tests, udpCore_test)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::UDP), true);

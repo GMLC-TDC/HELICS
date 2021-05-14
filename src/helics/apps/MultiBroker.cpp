@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 #    include "../network/tcp/TcpCommsSS.h"
 #endif
 
@@ -44,7 +44,7 @@ static void loadTypeSpecificArgs(
     (void)args;
     switch (ctype) {
         case CoreType::TCP_SS:
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
         {
             auto* cm = dynamic_cast<tcp::TcpCommsSS*>(comm);
             helicsCLI11App tsparse;

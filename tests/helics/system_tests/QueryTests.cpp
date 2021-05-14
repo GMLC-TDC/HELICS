@@ -874,7 +874,7 @@ TEST_F(query, global_flush)
     EXPECT_TRUE(val["status"].asBool());
 }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 TEST_F(query, query_subscriptions)
 {
     SetupTest<helics::ValueFederate>("zmq2", 2);

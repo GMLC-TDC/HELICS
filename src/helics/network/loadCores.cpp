@@ -12,45 +12,45 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommsInterface.hpp"
 #include "helics/helics-config.h"
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 #    include "ipc/IpcBroker.h"
 #    include "ipc/IpcComms.h"
 #    include "ipc/IpcCore.h"
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 #    include "udp/UdpBroker.h"
 #    include "udp/UdpComms.h"
 #    include "udp/UdpCore.h"
 #endif
 
-#ifdef ENABLE_TEST_CORE
+#ifdef HELICS_ENABLE_TEST_CORE
 #    include "test/TestBroker.h"
 #    include "test/TestComms.h"
 #    include "test/TestCore.h"
 #endif
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "zmq/ZmqBroker.h"
 #    include "zmq/ZmqComms.h"
 #    include "zmq/ZmqCommsSS.h"
 #    include "zmq/ZmqCore.h"
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 #    include "tcp/TcpBroker.h"
 #    include "tcp/TcpComms.h"
 #    include "tcp/TcpCommsSS.h"
 #    include "tcp/TcpCore.h"
 #endif
 
-#ifdef ENABLE_INPROC_CORE
+#ifdef HELICS_ENABLE_INPROC_CORE
 #    include "inproc/InprocBroker.h"
 #    include "inproc/InprocComms.h"
 #    include "inproc/InprocCore.h"
 #endif
 
-#ifdef ENABLE_MPI_CORE
+#ifdef HELICS_ENABLE_MPI_CORE
 #    include "mpi/MpiBroker.h"
 #    include "mpi/MpiComms.h"
 #    include "mpi/MpiCore.h"
@@ -60,7 +60,7 @@ namespace helics {
 
 // order determines priority here
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 static auto zmqc =
     CoreFactory::addCoreType<zeromq::ZmqCore>("zmq", static_cast<int>(CoreType::ZMQ));
 static auto zmqb =
@@ -75,7 +75,7 @@ static auto zmqcommss =
     CommFactory::addCommType<zeromq::ZmqCommsSS>("zmqss", static_cast<int>(CoreType::ZMQ_SS));
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 static auto tcpc = CoreFactory::addCoreType<tcp::TcpCore>("tcp", static_cast<int>(CoreType::TCP));
 static auto tcpb =
     BrokerFactory::addBrokerType<tcp::TcpBroker>("tcp", static_cast<int>(CoreType::TCP));
@@ -89,7 +89,7 @@ static auto tcpcommss =
     CommFactory::addCommType<tcp::TcpCommsSS>("tcpss", static_cast<int>(CoreType::TCP_SS));
 #endif
 
-#ifdef ENABLE_MPI_CORE
+#ifdef HELICS_ENABLE_MPI_CORE
 static auto mpic = CoreFactory::addCoreType<mpi::MpiCore>("mpi", static_cast<int>(CoreType::MPI));
 static auto mpib =
     BrokerFactory::addBrokerType<mpi::MpiBroker>("mpi", static_cast<int>(CoreType::MPI));
@@ -97,7 +97,7 @@ static auto mpocomm =
     CommFactory::addCommType<mpi::MpiComms>("mpi", static_cast<int>(CoreType::MPI));
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 static auto udpc = CoreFactory::addCoreType<udp::UdpCore>("udp", static_cast<int>(CoreType::UDP));
 static auto udpb =
     BrokerFactory::addBrokerType<udp::UdpBroker>("udp", static_cast<int>(CoreType::UDP));
@@ -105,7 +105,7 @@ static auto udpcomm =
     CommFactory::addCommType<udp::UdpComms>("udp", static_cast<int>(CoreType::UDP));
 #endif
 
-#ifdef ENABLE_IPC_CORE
+#ifdef HELICS_ENABLE_IPC_CORE
 static auto ipcc = CoreFactory::addCoreType<ipc::IpcCore>("ipc", static_cast<int>(CoreType::IPC));
 static auto ipcb =
     BrokerFactory::addBrokerType<ipc::IpcBroker>("ipc", static_cast<int>(CoreType::IPC));
@@ -123,7 +123,7 @@ static auto ipccomm2 =
 
 #endif
 
-#ifdef ENABLE_INPROC_CORE
+#ifdef HELICS_ENABLE_INPROC_CORE
 static auto iprcc =
     CoreFactory::addCoreType<inproc::InprocCore>("inproc", static_cast<int>(CoreType::INPROC));
 static auto iprcb =
@@ -135,7 +135,7 @@ static auto inproccomm =
 
 #endif
 
-#ifdef ENABLE_TEST_CORE
+#ifdef HELICS_ENABLE_TEST_CORE
 static auto testc =
     CoreFactory::addCoreType<testcore::TestCore>("test", static_cast<int>(CoreType::TEST));
 static auto testb =
