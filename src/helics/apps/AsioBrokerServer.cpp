@@ -42,11 +42,17 @@ namespace udp {
         {
             try {
                 stop_receive();
+                
             }
-            catch (const asio::error_code&) {
+            catch (...) {
             }
-            asio::error_code ec;
-            mSocket.close(ec);
+            try {
+                asio::error_code ec;
+                mSocket.close(ec);
+            }
+            catch (...) {
+            }
+            
         }
 
         void start_receive()
