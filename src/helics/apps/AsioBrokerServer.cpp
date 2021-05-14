@@ -31,50 +31,56 @@ namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
         UdpServer(asio::io_context& io_context, std::string& interface, std::uint16_t portNum):
-            socket_(io_context)
+            mSocket(io_context)
         {
-            socket_.open(asio::ip::udp::v4());
-            socket_.bind(
+            mSocket.open(asio::ip::udp::v4());
+            mSocket.bind(
                 asio::ip::udp::endpoint(asio::ip::address::from_string(interface), portNum));
         }
 
         ~UdpServer()
         {
-            stop_receive();
-            socket_.close();
+            try {
+                stop_receive();
+            }
+            catch (const asio::error_code &) {
+
+            }
+            asio::error_code ec;
+            mSocket.close(ec);
         }
 
         void start_receive()
         {
-            socket_.async_receive_from(asio::buffer(recv_buffer_),
-                                       remote_endpoint_,
+            mSocket.async_receive_from(asio::buffer(mRecvBuffer),
+                                       mRemoteEndpoint,
                                        [this](const asio::error_code& error, std::size_t bytes) {
                                            handle_receive(error, bytes);
                                        });
         }
-        void stop_receive() { socket_.cancel(); }
+        void stop_receive() { mSocket.cancel(); }
         /** set the callback for the data object*/
         void setDataCall(
             std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataFunc)
         {
-            dataCall = std::move(dataFunc);
+            mDataCall = std::move(dataFunc);
         }
 
-        void send_to(const std::string& message, asio::ip::udp::endpoint ept)
+        void send_to(const std::string& message, const asio::ip::udp::endpoint& ept)
         {
-            socket_.send_to(asio::buffer(message), ept);
+            mSocket.send_to(asio::buffer(message), ept);
         }
         void reply(const std::string& message)
         {
-            socket_.send_to(asio::buffer(message), remote_endpoint_);
+            mSocket.send_to(asio::buffer(message), mRemoteEndpoint);
         }
 
       private:
         void handle_receive(const asio::error_code& error, std::size_t bytes_transferred)
         {
             if (!error) {
-                if (dataCall) {
-                    bool ret = dataCall(shared_from_this(), recv_buffer_.data(), bytes_transferred);
+                if (mDataCall) {
+                    bool ret = mDataCall(shared_from_this(), mRecvBuffer.data(), bytes_transferred);
                     if (ret) {
                         start_receive();
                     }
@@ -82,17 +88,17 @@ namespace udp {
             }
         }
 
-        asio::ip::udp::socket socket_;
-        asio::ip::udp::endpoint remote_endpoint_;
-        std::array<char, 1024> recv_buffer_;
-        std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataCall;
+        asio::ip::udp::socket mSocket;
+        asio::ip::udp::endpoint mRemoteEndpoint;
+        std::array<char, 1024> mRecvBuffer{0};
+        std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> mDataCall;
     };
 }  // namespace udp
 #endif
 
 namespace apps {
 #ifdef HELICS_ENABLE_TCP_CORE
-    std::size_t AsioBrokerServer::tcpDataReceive(std::shared_ptr<tcp::TcpConnection> connection,
+    std::size_t AsioBrokerServer::tcpDataReceive(const std::shared_ptr<tcp::TcpConnection> &connection,
                                                  const char* data,
                                                  std::size_t bytes_received)
     {
@@ -147,7 +153,7 @@ namespace apps {
 #endif  // HELICS_ENABLE_TCP_CORE
 
 #ifdef HELICS_ENABLE_UDP_CORE
-    bool AsioBrokerServer::udpDataReceive(std::shared_ptr<udp::UdpServer> server,
+    bool AsioBrokerServer::udpDataReceive(const std::shared_ptr<udp::UdpServer> &server,
                                           const char* data,
                                           size_t bytes_received)
     {

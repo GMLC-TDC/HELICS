@@ -16,264 +16,258 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <unordered_map>
 
-namespace helics {
-namespace core {
-    std::string to_string(CoreType type)
-    {
-        switch (type) {
-            case CoreType::MPI:
-                return "mpi_";
-            case CoreType::TEST:
-                return "test_";
-            case CoreType::ZMQ:
-                return "zmq_";
-            case CoreType::ZMQ_SS:
-                return "zmqss_";
-            case CoreType::INTERPROCESS:
-            case CoreType::IPC:
-                return "ipc_";
-            case CoreType::TCP:
-                return "tcp_";
-            case CoreType::TCP_SS:
-                return "tcpss_";
-            case CoreType::HTTP:
-                return "http_";
-            case CoreType::UDP:
-                return "udp_";
-            case CoreType::NNG:
-                return "nng_";
-            case CoreType::INPROC:
-                return "inproc_";
-            case CoreType::WEBSOCKET:
-                return "websocket_";
-            case CoreType::NULLCORE:
-                return "null_";
-            default:
-                return std::string();
-        }
+namespace helics::core {
+std::string to_string(CoreType type)
+{
+    switch (type) {
+        case CoreType::MPI:
+            return "mpi_";
+        case CoreType::TEST:
+            return "test_";
+        case CoreType::ZMQ:
+            return "zmq_";
+        case CoreType::ZMQ_SS:
+            return "zmqss_";
+        case CoreType::INTERPROCESS:
+        case CoreType::IPC:
+            return "ipc_";
+        case CoreType::TCP:
+            return "tcp_";
+        case CoreType::TCP_SS:
+            return "tcpss_";
+        case CoreType::HTTP:
+            return "http_";
+        case CoreType::UDP:
+            return "udp_";
+        case CoreType::NNG:
+            return "nng_";
+        case CoreType::INPROC:
+            return "inproc_";
+        case CoreType::WEBSOCKET:
+            return "websocket_";
+        case CoreType::NULLCORE:
+            return "null_";
+        default:
+            return std::string();
     }
+}
 
-    static const std::unordered_map<std::string, CoreType> coreTypes{
-        {"default", CoreType::DEFAULT},
-        {"def", CoreType::DEFAULT},
-        {"mpi", CoreType::MPI},
-        {"message_passing_interface", CoreType::MPI},
-        {"MPI", CoreType::MPI},
-        {"ZMQ", CoreType::ZMQ},
-        {"0mq", CoreType::ZMQ},
-        {"zmq", CoreType::ZMQ},
-        {"zeromq", CoreType::ZMQ},
-        {"zeromq_ss", CoreType::ZMQ_SS},
-        {"zmq_ss", CoreType::ZMQ_SS},
-        {"ZMQ_SS", CoreType::ZMQ_SS},
-        {"zeromq2", CoreType::ZMQ_SS},
-        {"zmq2", CoreType::ZMQ_SS},
-        {"ZMQ2", CoreType::ZMQ_SS},
-        {"interprocess", CoreType::INTERPROCESS},
-        {"ZeroMQ", CoreType::ZMQ},
-        {"ZeroMQ2", CoreType::ZMQ_SS},
-        {"ipc", CoreType::INTERPROCESS},
-        {"interproc", CoreType::INTERPROCESS},
-        {"IPC", CoreType::INTERPROCESS},
-        {"tcp", CoreType::TCP},
-        {"tcpip", CoreType::TCP},
-        {"TCP", CoreType::TCP},
-        {"TCPIP", CoreType::TCP},
-        {"tcpss", CoreType::TCP_SS},
-        {"tcpipss", CoreType::TCP_SS},
-        {"TCPSS", CoreType::TCP_SS},
-        {"TCPIPSS", CoreType::TCP_SS},
-        {"tcp_ss", CoreType::TCP_SS},
-        {"tcpip_ss", CoreType::TCP_SS},
-        {"TCP_SS", CoreType::TCP_SS},
-        {"TCPIP_SS", CoreType::TCP_SS},
-        {"single_socket", CoreType::TCP_SS},
-        {"single socket", CoreType::TCP_SS},
-        {"ss", CoreType::TCP_SS},
-        {"udp", CoreType::UDP},
-        {"test", CoreType::TEST},
-        {"UDP", CoreType::UDP},
-        {"local", CoreType::TEST},
-        {"inprocess", CoreType::INPROC},
-        {"websocket", CoreType::WEBSOCKET},
-        {"web", CoreType::WEBSOCKET},
-        {"inproc", CoreType::INPROC},
-        {"nng", CoreType::NNG},
-        {"null", CoreType::NULLCORE},
-        {"nullcore", CoreType::NULLCORE},
-        {"none", CoreType::NULLCORE},
-        {"http", CoreType::HTTP},
-        {"HTTP", CoreType::HTTP},
-        {"web", CoreType::HTTP},
-        {"test1", CoreType::TEST},
-        {"multi", CoreType::MULTI}};
+static const std::unordered_map<std::string, CoreType> coreTypes{
+    {"default", CoreType::DEFAULT},
+    {"def", CoreType::DEFAULT},
+    {"mpi", CoreType::MPI},
+    {"message_passing_interface", CoreType::MPI},
+    {"MPI", CoreType::MPI},
+    {"ZMQ", CoreType::ZMQ},
+    {"0mq", CoreType::ZMQ},
+    {"zmq", CoreType::ZMQ},
+    {"zeromq", CoreType::ZMQ},
+    {"zeromq_ss", CoreType::ZMQ_SS},
+    {"zmq_ss", CoreType::ZMQ_SS},
+    {"ZMQ_SS", CoreType::ZMQ_SS},
+    {"zeromq2", CoreType::ZMQ_SS},
+    {"zmq2", CoreType::ZMQ_SS},
+    {"ZMQ2", CoreType::ZMQ_SS},
+    {"interprocess", CoreType::INTERPROCESS},
+    {"ZeroMQ", CoreType::ZMQ},
+    {"ZeroMQ2", CoreType::ZMQ_SS},
+    {"ipc", CoreType::INTERPROCESS},
+    {"interproc", CoreType::INTERPROCESS},
+    {"IPC", CoreType::INTERPROCESS},
+    {"tcp", CoreType::TCP},
+    {"tcpip", CoreType::TCP},
+    {"TCP", CoreType::TCP},
+    {"TCPIP", CoreType::TCP},
+    {"tcpss", CoreType::TCP_SS},
+    {"tcpipss", CoreType::TCP_SS},
+    {"TCPSS", CoreType::TCP_SS},
+    {"TCPIPSS", CoreType::TCP_SS},
+    {"tcp_ss", CoreType::TCP_SS},
+    {"tcpip_ss", CoreType::TCP_SS},
+    {"TCP_SS", CoreType::TCP_SS},
+    {"TCPIP_SS", CoreType::TCP_SS},
+    {"single_socket", CoreType::TCP_SS},
+    {"single socket", CoreType::TCP_SS},
+    {"ss", CoreType::TCP_SS},
+    {"udp", CoreType::UDP},
+    {"test", CoreType::TEST},
+    {"UDP", CoreType::UDP},
+    {"local", CoreType::TEST},
+    {"inprocess", CoreType::INPROC},
+    {"websocket", CoreType::WEBSOCKET},
+    {"web", CoreType::WEBSOCKET},
+    {"inproc", CoreType::INPROC},
+    {"nng", CoreType::NNG},
+    {"null", CoreType::NULLCORE},
+    {"nullcore", CoreType::NULLCORE},
+    {"none", CoreType::NULLCORE},
+    {"http", CoreType::HTTP},
+    {"HTTP", CoreType::HTTP},
+    {"web", CoreType::HTTP},
+    {"test1", CoreType::TEST},
+    {"multi", CoreType::MULTI}};
 
-    CoreType coreTypeFromString(std::string type) noexcept
-    {
-        if (type.empty()) {
-            return CoreType::DEFAULT;
-        }
-        auto fnd = coreTypes.find(type);
-        if (fnd != coreTypes.end()) {
-            return fnd->second;
-        }
-        std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
-        fnd = coreTypes.find(type);
-        if (fnd != coreTypes.end()) {
-            return fnd->second;
-        }
-        if ((type.front() == '=') || (type.front() == '-')) {
-            return coreTypeFromString(type.substr(1));
-        }
-        if (type.compare(0, 4, "zmq2") == 0) {
-            return CoreType::ZMQ_SS;
-        }
-        if (type.compare(0, 3, "zmq") == 0) {
-            return CoreType::ZMQ;
-        }
-        if (type.compare(0, 3, "ipc") == 0) {
-            return CoreType::INTERPROCESS;
-        }
-        if (type.compare(0, 4, "test") == 0) {
-            return CoreType::TEST;
-        }
-        if (type.compare(0, 5, "tcpss") == 0) {
-            return CoreType::TCP_SS;
-        }
-        if (type.compare(0, 3, "tcp") == 0) {
-            return CoreType::TCP;
-        }
-        if (type.compare(0, 3, "udp") == 0) {
-            return CoreType::UDP;
-        }
-        if (type.compare(0, 4, "http") == 0) {
-            return CoreType::HTTP;
-        }
-        if (type.compare(0, 3, "mpi") == 0) {
-            return CoreType::MPI;
-        }
-        if (type.compare(0, 6, "inproc") == 0) {
-            return CoreType::INPROC;
-        }
-        if (type.compare(0, 3, "web") == 0) {
-            return CoreType::WEBSOCKET;
-        }
-        if (type.compare(0, 4, "null") == 0) {
-            return CoreType::NULLCORE;
-        }
-        return CoreType::UNRECOGNIZED;
+CoreType coreTypeFromString(std::string type) noexcept
+{
+    if (type.empty()) {
+        return CoreType::DEFAULT;
     }
+    auto fnd = coreTypes.find(type);
+    if (fnd != coreTypes.end()) {
+        return fnd->second;
+    }
+    std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
+    fnd = coreTypes.find(type);
+    if (fnd != coreTypes.end()) {
+        return fnd->second;
+    }
+    if ((type.front() == '=') || (type.front() == '-')) {
+        return coreTypeFromString(type.substr(1));
+    }
+    if (type.compare(0, 4, "zmq2") == 0) {
+        return CoreType::ZMQ_SS;
+    }
+    if (type.compare(0, 3, "zmq") == 0) {
+        return CoreType::ZMQ;
+    }
+    if (type.compare(0, 3, "ipc") == 0) {
+        return CoreType::INTERPROCESS;
+    }
+    if (type.compare(0, 4, "test") == 0) {
+        return CoreType::TEST;
+    }
+    if (type.compare(0, 5, "tcpss") == 0) {
+        return CoreType::TCP_SS;
+    }
+    if (type.compare(0, 3, "tcp") == 0) {
+        return CoreType::TCP;
+    }
+    if (type.compare(0, 3, "udp") == 0) {
+        return CoreType::UDP;
+    }
+    if (type.compare(0, 4, "http") == 0) {
+        return CoreType::HTTP;
+    }
+    if (type.compare(0, 3, "mpi") == 0) {
+        return CoreType::MPI;
+    }
+    if (type.compare(0, 6, "inproc") == 0) {
+        return CoreType::INPROC;
+    }
+    if (type.compare(0, 3, "web") == 0) {
+        return CoreType::WEBSOCKET;
+    }
+    if (type.compare(0, 4, "null") == 0) {
+        return CoreType::NULLCORE;
+    }
+    return CoreType::UNRECOGNIZED;
+}
 
 #ifndef HELICS_ENABLE_ZMQ_CORE
-    static bool constexpr zmq_availability{false};
+static bool constexpr zmq_availability{false};
 #else
-    static bool constexpr zmq_availability{true};
+static bool constexpr zmq_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_MPI_CORE
-    static bool constexpr mpi_availability{false};
+static bool constexpr mpi_availability{false};
 #else
-    static bool constexpr mpi_availability{true};
+static bool constexpr mpi_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_TCP_CORE
-    static bool constexpr tcp_availability{false};
+static bool constexpr tcp_availability{false};
 #else
-    static bool constexpr tcp_availability{true};
+static bool constexpr tcp_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_UDP_CORE
-    static bool constexpr udp_availability{false};
+static bool constexpr udp_availability{false};
 #else
-    static bool constexpr udp_availability{true};
+static bool constexpr udp_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_IPC_CORE
-    static bool constexpr ipc_availability{false};
+static bool constexpr ipc_availability{false};
 #else
-    static bool constexpr ipc_availability{true};
+static bool constexpr ipc_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_TEST_CORE
-    static bool constexpr test_availability{false};
+static bool constexpr test_availability{false};
 #else
-    static bool constexpr test_availability{true};
+static bool constexpr test_availability{true};
 #endif
 
 #ifndef HELICS_ENABLE_INPROC_CORE
-    static bool constexpr inproc_availability{false};
+static bool constexpr inproc_availability{false};
 #else
-    static bool constexpr inproc_availability{true};
+static bool constexpr inproc_availability{true};
 #endif
 
-    bool isCoreTypeAvailable(CoreType type) noexcept
-    {
-        bool available = false;
+bool isCoreTypeAvailable(CoreType type) noexcept
+{
+    bool available = false;
 
-        switch (type) {
-            case CoreType::ZMQ:
-            case CoreType::ZMQ_SS:
-                available = zmq_availability;
-                break;
-            case CoreType::MPI:
-                available = mpi_availability;
-                break;
-            case CoreType::TEST:
-                available = test_availability;
-                break;
-            case CoreType::INTERPROCESS:
-            case CoreType::IPC:
-                available = ipc_availability;
-                break;
-            case CoreType::UDP:
-                available = udp_availability;
-                break;
-            case CoreType::TCP:
-            case CoreType::TCP_SS:
-                available = tcp_availability;
-                break;
-            case CoreType::DEFAULT:  // default should always be available
-                available = true;
-                break;
-            case CoreType::INPROC:
-                available = inproc_availability;
-                break;
-            case CoreType::HTTP:
-            case CoreType::WEBSOCKET:
-            case CoreType::NULLCORE:
-                available = false;
-                break;
-            default:
-                break;
-        }
-
-        return available;
+    switch (type) {
+        case CoreType::ZMQ:
+        case CoreType::ZMQ_SS:
+            available = zmq_availability;
+            break;
+        case CoreType::MPI:
+            available = mpi_availability;
+            break;
+        case CoreType::TEST:
+            available = test_availability;
+            break;
+        case CoreType::INTERPROCESS:
+        case CoreType::IPC:
+            available = ipc_availability;
+            break;
+        case CoreType::UDP:
+            available = udp_availability;
+            break;
+        case CoreType::TCP:
+        case CoreType::TCP_SS:
+            available = tcp_availability;
+            break;
+        case CoreType::DEFAULT:  // default should always be available
+            available = true;
+            break;
+        case CoreType::INPROC:
+            available = inproc_availability;
+            break;
+        case CoreType::HTTP:
+        case CoreType::WEBSOCKET:
+        case CoreType::NULLCORE:
+            available = false;
+            break;
+        default:
+            break;
     }
 
-    static const std::set<std::string> global_match_strings{"any",
-                                                            "all",
-                                                            "data",
-                                                            "string",
-                                                            "block"};
+    return available;
+}
 
-    bool matchingTypes(const std::string& type1, const std::string& type2)
-    {
-        if (type1 == type2) {
-            return true;
-        }
-        if ((type1.empty()) || (type2.empty())) {
-            return true;
-        }
-        if ((type1.compare(0, 3, "def") == 0) || (type2.compare(0, 3, "def") == 0)) {
-            return true;
-        }
-        auto res = global_match_strings.find(type1);
-        if (res != global_match_strings.end()) {
-            return true;
-        }
-        res = global_match_strings.find(type2);
-        return (res != global_match_strings.end());
+static const std::set<std::string> global_match_strings{"any", "all", "data", "string", "block"};
+
+bool matchingTypes(const std::string& type1, const std::string& type2)
+{
+    if (type1 == type2) {
+        return true;
     }
+    if ((type1.empty()) || (type2.empty())) {
+        return true;
+    }
+    if ((type1.compare(0, 3, "def") == 0) || (type2.compare(0, 3, "def") == 0)) {
+        return true;
+    }
+    auto res = global_match_strings.find(type1);
+    if (res != global_match_strings.end()) {
+        return true;
+    }
+    res = global_match_strings.find(type2);
+    return (res != global_match_strings.end());
+}
 
-}  // namespace core
-}  // namespace helics
+}  // namespace helics::core
