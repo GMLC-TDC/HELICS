@@ -133,7 +133,7 @@ m <sendtime> <deliverytime> <source> <dest> <time> <data>
 ```
 
 the second option allows sending events at a different time than they are triggered
-the data portion of messages can be encoded in base64 by marking as b64[<data>] or base64[X] all data between the brackets will be converted to raw binary. A ']' must be last
+the data portion of messages can be encoded in base64 by marking as b64[<data>] or base64[X] all data between the brackets will be converted to raw binary. A ']' must be last.  The string interpreter can also handle some messages with escapable characters including tab ("\t"), newline ("\n"), and quote ("\""), this can be marked by `raw("<message>")`  In JSON this is handled automatically as part of the JSON interpretation and no further markers are needed.  
 
 ### JSON configuration
 
