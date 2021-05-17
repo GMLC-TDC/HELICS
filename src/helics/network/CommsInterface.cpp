@@ -124,6 +124,19 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             case NetworkBrokerData::server_mode_options::unspecified:
                 break;
         }
+        if (clientMode)
+        {
+            if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty())
+            {
+                brokerTargetAddress = netInfo.connectionAddress;
+            }
+        }
+        else
+        {
+            if (localTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
+                localTargetAddress = netInfo.connectionAddress;
+            }
+        }
         propertyUnLock();
     }
 }
@@ -349,6 +362,13 @@ bool CommsInterface::connect()
         return false;
     }
     return true;
+}
+
+void CommsInterface::setClientMode(bool clientModeSet)
+{
+    if (propertyLock()) {
+        clientMode = clientModeSet;
+    }
 }
 
 void CommsInterface::setName(const std::string& commName)
