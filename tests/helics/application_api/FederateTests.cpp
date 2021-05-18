@@ -104,7 +104,7 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::FINISHED);
 }
 
-#ifdef ENABLE_ZMQ_CORE
+#ifdef HELICS_ENABLE_ZMQ_CORE
 // TODO(PT): make this work for all test types
 TEST(federate_tests, bad_broker_error_zmq_ci_skip)
 {

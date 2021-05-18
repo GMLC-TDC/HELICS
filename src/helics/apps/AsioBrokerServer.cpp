@@ -11,10 +11,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 #    include "../network/tcp/TcpHelperClasses.h"
 #endif
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 #    include <asio/ip/udp.hpp>
 #endif
 
@@ -26,55 +26,64 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
         UdpServer(asio::io_context& io_context, std::string& interface, std::uint16_t portNum):
-            socket_(io_context)
+            mSocket(io_context)
         {
-            socket_.open(asio::ip::udp::v4());
-            socket_.bind(
+            mSocket.open(asio::ip::udp::v4());
+            mSocket.bind(
                 asio::ip::udp::endpoint(asio::ip::address::from_string(interface), portNum));
         }
 
         ~UdpServer()
         {
-            stop_receive();
-            socket_.close();
+            try {
+                stop_receive();
+            }
+            catch (...) {
+            }
+            try {
+                asio::error_code ec;
+                mSocket.close(ec);
+            }
+            catch (...) {
+            }
         }
 
         void start_receive()
         {
-            socket_.async_receive_from(asio::buffer(recv_buffer_),
-                                       remote_endpoint_,
+            mSocket.async_receive_from(asio::buffer(mRecvBuffer),
+                                       mRemoteEndpoint,
                                        [this](const asio::error_code& error, std::size_t bytes) {
                                            handle_receive(error, bytes);
                                        });
         }
-        void stop_receive() { socket_.cancel(); }
+        void stop_receive() { mSocket.cancel(); }
         /** set the callback for the data object*/
         void setDataCall(
             std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataFunc)
         {
-            dataCall = std::move(dataFunc);
+            mDataCall = std::move(dataFunc);
         }
 
-        void send_to(const std::string& message, asio::ip::udp::endpoint ept)
+        void send_to(const std::string& message, const asio::ip::udp::endpoint& ept)
         {
-            socket_.send_to(asio::buffer(message), ept);
+            mSocket.send_to(asio::buffer(message), ept);
         }
         void reply(const std::string& message)
         {
-            socket_.send_to(asio::buffer(message), remote_endpoint_);
+            mSocket.send_to(asio::buffer(message), mRemoteEndpoint);
         }
 
       private:
         void handle_receive(const asio::error_code& error, std::size_t bytes_transferred)
         {
             if (!error) {
-                if (dataCall) {
-                    bool ret = dataCall(shared_from_this(), recv_buffer_.data(), bytes_transferred);
+                if (mDataCall) {
+                    bool ret = mDataCall(shared_from_this(), mRecvBuffer.data(), bytes_transferred);
                     if (ret) {
                         start_receive();
                     }
@@ -82,19 +91,20 @@ namespace udp {
             }
         }
 
-        asio::ip::udp::socket socket_;
-        asio::ip::udp::endpoint remote_endpoint_;
-        std::array<char, 1024> recv_buffer_;
-        std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> dataCall;
+        asio::ip::udp::socket mSocket;
+        asio::ip::udp::endpoint mRemoteEndpoint;
+        std::array<char, 1024> mRecvBuffer{0};
+        std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> mDataCall;
     };
 }  // namespace udp
 #endif
 
 namespace apps {
-#ifdef ENABLE_TCP_CORE
-    std::size_t AsioBrokerServer::tcpDataReceive(std::shared_ptr<tcp::TcpConnection> connection,
-                                                 const char* data,
-                                                 std::size_t bytes_received)
+#ifdef HELICS_ENABLE_TCP_CORE
+    std::size_t
+        AsioBrokerServer::tcpDataReceive(const std::shared_ptr<tcp::TcpConnection>& connection,
+                                         const char* data,
+                                         std::size_t bytes_received)
     {
         std::size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -144,10 +154,10 @@ namespace apps {
             pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
         }
     }
-#endif  // ENABLE_TCP_CORE
+#endif  // HELICS_ENABLE_TCP_CORE
 
-#ifdef ENABLE_UDP_CORE
-    bool AsioBrokerServer::udpDataReceive(std::shared_ptr<udp::UdpServer> server,
+#ifdef HELICS_ENABLE_UDP_CORE
+    bool AsioBrokerServer::udpDataReceive(const std::shared_ptr<udp::UdpServer>& server,
                                           const char* data,
                                           size_t bytes_received)
     {
@@ -194,7 +204,7 @@ namespace apps {
         }
     }
 
-#endif  // ENABLE_UDP_CORE
+#endif  // HELICS_ENABLE_UDP_CORE
 
     static const Json::Value null;
 
@@ -216,13 +226,13 @@ namespace apps {
     {
         std::lock_guard<std::mutex> tlock(threadGuard);
         if (tcp_enabled_) {
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
             logMessage("stopping tcp broker server");
             tcpserver->close();
 #endif
         }
         if (udp_enabled_) {
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
             logMessage("stopping udp broker server");
             udpserver->stop_receive();
 #endif
@@ -233,7 +243,7 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
@@ -245,7 +255,7 @@ namespace apps {
             tcpserver->start();
         }
 #endif
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
         if (udp_enabled_) {
             udpserver = loadUDPserver(ioctx->getBaseContext());
             udpserver->setDataCall(
