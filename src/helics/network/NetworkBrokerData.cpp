@@ -140,6 +140,11 @@ std::shared_ptr<helicsCLI11App>
                      "The port number to use to connect a co-simulation")
         ->envname("HELICS_CONNECTION_PORT");
     nbparser
+        ->add_option("--connectionaddress",
+                     connectionAddress,
+                     "The network address to use to connect a co-simulation")
+        ->envname("HELICS_CONNECTION_ADDRESS");
+    nbparser
         ->add_option_function<int>(
             "--localport,--interfaceport",
             [this](int port) {
