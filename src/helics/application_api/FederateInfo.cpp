@@ -23,6 +23,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
+    FederateInfo::FederateInfo()
+{
+    loadInfoFromArgsIgnoreOutput("");
+
+    }
+
+        FederateInfo::FederateInfo(core_type cType)
+        {
+            loadInfoFromArgsIgnoreOutput("");
+            coreType = cType;
+        }
+
 FederateInfo::FederateInfo(int argc, char* argv[])
 {
     loadInfoFromArgsIgnoreOutput(argc, argv);

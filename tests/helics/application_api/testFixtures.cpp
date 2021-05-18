@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <cstdlib>
 
 bool hasIndexCode(const std::string& type_name)
 {
@@ -116,4 +117,22 @@ std::shared_ptr<helics::Broker>
     broker->setLoggingLevel(0);
     brokers.push_back(broker);
     return broker;
+}
+
+void setEnvironmentalVariable(const std::string &name, const std::string &value)
+{
+#ifdef _WIN32
+    _putenv_s(name.c_str(), value.c_str());
+#else
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+}
+
+void clearEnvironmentalVariable(const std::string& name)
+{
+#ifdef _WIN32
+    _putenv_s(name.c_str(), "");
+#else
+    unsetenv(name.c_str());
+#endif
 }
