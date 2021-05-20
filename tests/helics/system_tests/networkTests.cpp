@@ -169,13 +169,12 @@ TEST_F(network_tests, test_otherport_fail)
     }
 }
 
-
 TEST_F(network_tests, test_otherport_env)
 {
     setEnvironmentalVariable("HELICS_CONNECTION_PORT", "33102");
     const std::string brokerArgs = "-f 2";
     auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
-    
+
     EXPECT_TRUE(broker->isConnected());
     helics::FederateInfo fi("--core_type=ZMQ --corename=c1");
     helics::ValueFederate fed1("fed1", fi);
@@ -199,7 +198,6 @@ TEST_F(network_tests, test_otherport_env)
     clearEnvironmentalVariable("HELICS_CONNECTION_PORT");
 }
 
-
 TEST_F(network_tests, test_otherport_broker_local_env)
 {
     setEnvironmentalVariable("HELICS_LOCAL_PORT", "33104");
@@ -219,19 +217,17 @@ TEST_F(network_tests, test_otherport_broker_local_env)
     fed2.enterExecutingModeAsync();
     fed1.enterExecutingMode();
     fed2.enterExecutingModeComplete();
-    const auto &address = broker->getAddress();
-    EXPECT_NE(address.find("33104"),std::string::npos);
+    const auto& address = broker->getAddress();
+    EXPECT_NE(address.find("33104"), std::string::npos);
     fed1.finalize();
     fed2.finalize();
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
     if (broker->isConnected()) {
         broker->disconnect();
     }
-
 }
 
 #endif
-
 
 #ifdef ENABLE_TCP_CORE
 TEST_F(network_tests, test_core_type_env)

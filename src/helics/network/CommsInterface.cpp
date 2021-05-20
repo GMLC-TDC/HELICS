@@ -124,15 +124,11 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             case NetworkBrokerData::server_mode_options::unspecified:
                 break;
         }
-        if (clientMode)
-        {
-            if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty())
-            {
+        if (clientMode) {
+            if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
                 brokerTargetAddress = netInfo.connectionAddress;
             }
-        }
-        else
-        {
+        } else {
             if (localTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
                 localTargetAddress = netInfo.connectionAddress;
             }
