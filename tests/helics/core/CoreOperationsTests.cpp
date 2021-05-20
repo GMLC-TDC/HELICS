@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/CoreFederateInfo.hpp"
 #include "helics/core/core-exceptions.hpp"
+
 #include "gtest/gtest.h"
 #include <memory>
-
 
 TEST(federate_tests, fail_max_federates)
 {
@@ -18,9 +18,9 @@ TEST(federate_tests, fail_max_federates)
                                             "--name=core_0 --maxfederates 0 --autobroker");
 
     helics::CoreFederateInfo cfi;
-    
-   EXPECT_THROW(core->registerFederate("fed1_name", cfi), helics::RegistrationFailure);
 
-   EXPECT_FALSE(core->isOpenToNewFederates());
+    EXPECT_THROW(core->registerFederate("fed1_name", cfi), helics::RegistrationFailure);
+
+    EXPECT_FALSE(core->isOpenToNewFederates());
     core->disconnect();
 }
