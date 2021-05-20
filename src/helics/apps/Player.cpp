@@ -773,7 +773,6 @@ namespace apps {
 
 static int hasB64Wrapper(const std::string& str)
 {
-    
     if (str.front() == '\"') {
         if (str.size() < 8) {
             return 0;
@@ -819,14 +818,12 @@ static std::string decode(std::string&& stringToDecode)
         stringToDecode.pop_back();
         return gmlc::utilities::base64_decode_to_string(stringToDecode, offset);
     }
-    
+
     if ((stringToDecode.front() == '"') || (stringToDecode.front() == '\'')) {
-        try
-        {
+        try {
             return JsonAsString(loadJsonStr(stringToDecode));
         }
-        catch (const Json::Exception &)
-        {
+        catch (const Json::Exception&) {
             return gmlc::utilities::stringOps::removeQuotes(stringToDecode);
         }
     }
