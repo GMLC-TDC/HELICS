@@ -66,6 +66,7 @@ static void signalHandler(int signum)
     helicsAbort(helics_error_user_abort, "user abort");
     //add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::cout << std::endl;
     exit(signum);
 }
 
