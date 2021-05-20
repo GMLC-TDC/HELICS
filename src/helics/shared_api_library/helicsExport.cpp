@@ -555,7 +555,7 @@ void helicsCoreGlobalError(helics_core core, int errorCode, const char* errorStr
     if (cr == nullptr) {
         return;
     }
-    cr->globalError(helics::local_core_id,errorCode, AS_STRING(errorString));
+    cr->globalError(helics::local_core_id, errorCode, AS_STRING(errorString));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err)
@@ -1171,8 +1171,7 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
 {
     static bool abortCalled{false};
 
-    if (abortCalled)
-    {
+    if (abortCalled) {
         return;
     }
     abortCalled = true;
@@ -1196,7 +1195,7 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
         auto coreHandle = cores.lock();
         for (auto& cr : coreHandle) {
             if ((cr) && (cr->coreptr)) {
-                cr->coreptr->globalError(helics::local_core_id,code, error);
+                cr->coreptr->globalError(helics::local_core_id, code, error);
             }
         }
     }
