@@ -57,7 +57,7 @@ inline void loadSignalHandler()
     helicsLoadSignalHandler();
 }
 
-inline void loadSignalHandler(void(*handler)(int))
+inline void loadSignalHandler(void (*handler)(int))
 {
     helicsLoadSignalHandlerCallback(handler);
 }
