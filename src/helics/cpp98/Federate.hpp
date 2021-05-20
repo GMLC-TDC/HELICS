@@ -612,20 +612,20 @@ class Federate {
 
     /** generate a local federate error
     @param error_code an error code to give to the error
-    @param error_string a string message associated with the error
+    @param errorString a string message associated with the error
     */
-    void localError(int error_code, const std::string& error_string)
+    void localError(int error_code, const std::string& errorString)
     {
-        helicsFederateLocalError(fed, error_code, error_string.c_str());
+        helicsFederateLocalError(fed, error_code, errorString.c_str());
     }
 
     /** generate a global error to terminate the federation
     @param error_code an error code to give to the error
-    @param error_string a string message associated with the error
+    @param errorString a string message associated with the error
     */
-    void globalError(int error_code, const std::string& error_string)
+    void globalError(int error_code, const std::string& errorString)
     {
-        helicsFederateGlobalError(fed, error_code, error_string.c_str());
+        helicsFederateGlobalError(fed, error_code, errorString.c_str());
     }
 
     /** log an error message*/

@@ -137,14 +137,14 @@ class Core {
     */
     virtual void globalError(local_federate_id federateID,
                              int32_t errorCode,
-                             const std::string& error_string) = 0;
+                             const std::string& errorString) = 0;
 
     /**
      * Federate has encountered a local error and should be disconnected.
      */
     virtual void localError(local_federate_id federateID,
                             int32_t errorCode,
-                            const std::string& error_string) = 0;
+                            const std::string& errorString) = 0;
 
     /**
      * Federate has encountered an unrecoverable error.
