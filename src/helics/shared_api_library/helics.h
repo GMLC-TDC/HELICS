@@ -818,9 +818,9 @@ HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const c
  *
  * @param fed The federate to create an error in.
  * @param error_code The integer code for the error.
- * @param error_string A string describing the error.
+ * @param errorString A string describing the error.
  */
-HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* errorString);
 
 /**
  * Generate a local error in a federate.
@@ -829,9 +829,9 @@ HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code
  * but does allow some interaction with a core for a brief time.
  * @param fed The federate to create an error in.
  * @param error_code The integer code for the error.
- * @param error_string A string describing the error.
+ * @param errorString A string describing the error.
  */
-HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* errorString);
 
 /**
  * Finalize the federate. This function halts all communication in the federate and disconnects it from the core.
