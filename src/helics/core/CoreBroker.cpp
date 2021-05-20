@@ -211,7 +211,8 @@ bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = brokerState.load();
     return ((cstate != broker_state_t::created) && (cstate < broker_state_t::operating) &&
-            (!haltOperations) && maxFederateCount!=(std::numeric_limits<int32_t>::max)() && getCountableFederates()<maxFederateCount);
+            (!haltOperations) && maxFederateCount != (std::numeric_limits<int32_t>::max)() &&
+            getCountableFederates() < maxFederateCount);
 }
 
 void CoreBroker::processPriorityCommand(ActionMessage&& command)
@@ -256,8 +257,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 break;
             }
             if (!checkActionFlag(command, non_counting_flag) &&
-                    getCountableFederates() >= maxFederateCount)
-            {
+                getCountableFederates() >= maxFederateCount) {
                 ActionMessage badInit(CMD_FED_ACK);
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;

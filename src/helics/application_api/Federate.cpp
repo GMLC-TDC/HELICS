@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreApp.hpp"
 #include "FilterFederateManager.hpp"
 #include "Filters.hpp"
-#include "helics/helics-config.h"
 #include "gmlc/utilities/stringOps.h"
+#include "helics/helics-config.h"
 
 #include <cassert>
 #include <iostream>
@@ -46,15 +46,13 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
         name = fi.defName;
     }
     if (fi.coreName.empty()) {
-        if (!fi.forceNewCore)
-        {
+        if (!fi.forceNewCore) {
             coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
         }
         if (!coreObject) {
             if (!name.empty()) {
-                
                 std::string cname = fedName + "_core_" + gmlc::utilities::randomString(6);
-                
+
                 try {
                     coreObject =
                         CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
@@ -70,8 +68,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
             }
         }
     } else {
-        if (!fi.forceNewCore)
-        {
+        if (!fi.forceNewCore) {
             coreObject =
                 CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
             if (!coreObject->isOpenToNewFederates()) {
@@ -86,13 +83,10 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
                         "Unable to connect to specified core: core is not open to new Federates"));
                 }
             }
-        }
-        else
-        {
+        } else {
             coreObject =
                 CoreFactory::create(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
         }
-        
     }
     /** make sure the core is connected */
     if (!coreObject->isConnected()) {
