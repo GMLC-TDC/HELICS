@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 
 #include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
-#include <cstdlib>
 
 bool hasIndexCode(const std::string& type_name)
 {
@@ -119,7 +119,7 @@ std::shared_ptr<helics::Broker>
     return broker;
 }
 
-void setEnvironmentalVariable(const std::string &name, const std::string &value)
+void setEnvironmentalVariable(const std::string& name, const std::string& value)
 {
 #ifdef _WIN32
     _putenv_s(name.c_str(), value.c_str());

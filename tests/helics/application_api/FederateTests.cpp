@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "testFixtures.hpp"
+
 #include <future>
 #include <gtest/gtest.h>
 /** these test cases test out the value converters
@@ -46,7 +47,6 @@ TEST(federate_tests, federate_initialize_tests)
     Fed = nullptr;  // force the destructor
 }
 
-
 TEST(federate_tests, federate_initialize_tests_env)
 {
     setEnvironmentalVariable("HELICS_LOG_LEVEL", "connections");
@@ -58,9 +58,9 @@ TEST(federate_tests, federate_initialize_tests_env)
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
 
-    auto cloglevel=core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
+    auto cloglevel = core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
     EXPECT_EQ(cloglevel, helics_log_level_connections);
-    
+
     Fed->enterExecutingMode();
     EXPECT_EQ(Fed->getIntegerProperty(helics_property_int_log_level), helics_log_level_connections);
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
@@ -73,7 +73,6 @@ TEST(federate_tests, federate_initialize_tests_env)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
-
 
 TEST(federate_tests, federate_initialize_tests_env2)
 {
