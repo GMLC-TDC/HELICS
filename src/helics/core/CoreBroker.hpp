@@ -216,6 +216,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void clearTimeBarrier() override final;
 
     virtual void globalError(int32_t errorCode, const std::string& errorString) override final;
+
   private:
     /** implementation details of the connection process
      */

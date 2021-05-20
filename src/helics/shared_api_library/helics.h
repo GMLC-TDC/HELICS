@@ -66,8 +66,7 @@ but it is possible*/
 HELICS_EXPORT void helicsLoadSignalHandlerCallback(void (*handler)(int));
 
 /** execute a global abort by sending an error code */
-HELICS_EXPORT void helicsAbort(int errorCode, const char *errorString);
-
+HELICS_EXPORT void helicsAbort(int errorCode, const char* errorString);
 
 /**
  * Returns true if core/broker type specified is available in current compilation.
@@ -1420,8 +1419,7 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char *errorString, helics_error* err);
-
+HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err);
 
 /**
  * generate a global error through a broker  this will terminate the federation

@@ -174,6 +174,7 @@ class Broker {
     {
         helicsBrokerGlobalError(broker, errorCode, errorString.c_str(), HELICS_IGNORE_ERROR);
     }
+
   protected:
     helics_broker broker;  //!< underlying broker information
 };

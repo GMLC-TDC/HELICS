@@ -147,6 +147,7 @@ class HELICS_CXX_EXPORT CoreApp {
     void reset();
     /** generate a global error on a core*/
     void globalError(int32_t errorCode, const std::string& errorString);
+
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);
     std::unique_ptr<helicsCLI11App> generateParser();

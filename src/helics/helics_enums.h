@@ -176,7 +176,7 @@ typedef enum {
     helics_error_external_type = -203, /*!< an unknown non-helics error was produced */
     helics_error_other = -101, /*!< the function produced a helics error of some other type */
     /** user system abort*/
-    helics_error_user_abort = -27, 
+    helics_error_user_abort = -27,
     helics_error_insufficient_space =
         -18, /*!< insufficient space is available to store requested data */
     helics_error_execution_failure = -14, /*!< the function execution has failed */
