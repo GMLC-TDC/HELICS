@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>

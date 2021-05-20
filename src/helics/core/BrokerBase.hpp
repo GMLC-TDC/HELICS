@@ -16,6 +16,7 @@ and some common methods used cores and brokers
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 
 #include <atomic>
+#include <limits>
 #include <memory>
 #include <string>
 #include <thread>

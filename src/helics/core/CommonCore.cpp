@@ -35,6 +35,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
