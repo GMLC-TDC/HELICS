@@ -1751,6 +1751,15 @@ void CoreBroker::clearTimeBarrier()
     addActionMessage(tbarrier);
 }
 
+void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
+{
+    ActionMessage m(CMD_GLOBAL_ERROR);
+    m.source_id = getGlobalId();
+    m.messageID = errorCode;
+    m.payload = errorString;
+    addActionMessage(m);
+}
+
 bool CoreBroker::isConnected() const
 {
     auto state = brokerState.load(std::memory_order_acquire);
