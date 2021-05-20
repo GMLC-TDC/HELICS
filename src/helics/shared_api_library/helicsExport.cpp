@@ -64,7 +64,7 @@ void helicsErrorClear(helics_error* err)
 static void signalHandler(int signum)
 {
     helicsAbort(helics_error_user_abort, "user abort");
-    //add a sleep to give the abort a chance to propagate to other federates
+    // add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     std::cout << std::endl;
     exit(signum);
@@ -93,12 +93,9 @@ static void signalHandlerCallback(int signum)
 void helicsLoadSignalHandlerCallback(void (*handler)(int))
 {
     keyHandler = handler;
-    if (handler != nullptr)
-    {
+    if (handler != nullptr) {
         signal(SIGINT, signalHandlerCallback);
-    }
-    else
-    {
+    } else {
         helicsLoadSignalHandler();
     }
 }
@@ -541,6 +538,15 @@ void helicsBrokerClearTimeBarrier(helics_broker broker)
         return;
     }
     brk->clearTimeBarrier();
+}
+
+void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->globalError(errorCode, AS_STRING(errorString));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err)
@@ -1154,6 +1160,13 @@ void MasterObjectHolder::clearFed(int index)
 
 void MasterObjectHolder::abortAll(int code, const std::string& error)
 {
+    static bool abortCalled{false};
+
+    if (abortCalled)
+    {
+        return;
+    }
+    abortCalled = true;
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
@@ -1161,7 +1174,22 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
                 fed->fedptr->globalError(code, error);
             }
         }
-        fedHandle->clear();
+    }
+    {
+        auto brokerHandle = brokers.lock();
+        for (auto& brk : brokerHandle) {
+            if ((brk) && (brk->brokerptr)) {
+                brk->brokerptr->globalError(code, error);
+            }
+        }
+    }
+    {
+        auto coreHandle = cores.lock();
+        for (auto& cr : coreHandle) {
+            if ((cr) && (cr->coreptr)) {
+                cr->coreptr->globalError(helics::local_core_id,code, error);
+            }
+        }
     }
 }
 

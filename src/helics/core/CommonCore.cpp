@@ -368,6 +368,15 @@ void CommonCore::globalError(local_federate_id federateID,
                              int errorCode,
                              const std::string& errorString)
 {
+    if (federateID == local_core_id)
+    {
+        ActionMessage m(CMD_GLOBAL_ERROR);
+        m.source_id = getGlobalId();
+        m.messageID = errorCode;
+        m.payload = errorString;
+        addActionMessage(m);
+        return;
+    }
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid error"));

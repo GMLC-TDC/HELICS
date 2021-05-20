@@ -1411,6 +1411,18 @@ HELICS_EXPORT void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time 
 HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
 
 /**
+ * generate a global error through a broker  this will terminate the federation
+ *
+ * @param broker The broker to set the time barrier for.
+ * @param errorCode the error code to associate with the global error
+ * @param errorString an error message to associate with the error
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char *errorString, helics_error* err);
+
+/**
  * Create a query object.
  *
  * @details A query object consists of a target and query string.
