@@ -222,6 +222,7 @@ class MasterObjectHolder {
     void clearCore(int index);
     void clearFed(int index);
     void deleteAll();
+    void abortAll(int errorCode, const std::string& error);
     /** store an error string to a string buffer
     @return a pointer to the memory location*/
     const char* addErrorString(std::string newError);
