@@ -86,4 +86,3 @@ bool isEscapableData(helics::data_block& data)
         return ((c >= 32 && c <= 126) || (c == '\t') || (c == '\n'));
     });
 }
-
