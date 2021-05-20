@@ -116,7 +116,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     }
 
     if (clientMode) {
-        if (brokerPort<0 && netInfo.connectionPort>=0) {
+        if (brokerPort < 0 && netInfo.connectionPort >= 0) {
             brokerPort = netInfo.connectionPort;
         }
     } else {
