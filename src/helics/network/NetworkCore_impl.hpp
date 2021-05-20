@@ -51,6 +51,7 @@ bool NetworkCore<COMMS, baseline>::brokerConnect()
     {
         netInfo.brokerAddress = defBrokerInterface[static_cast<int>(baseline)];
     }
+    CommsBroker<COMMS, CommonCore>::comms->setClientMode(true);
     CommsBroker<COMMS, CommonCore>::comms->setName(CommonCore::getIdentifier());
     CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo(netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setTimeout(BrokerBase::networkTimeout.to_ms());
