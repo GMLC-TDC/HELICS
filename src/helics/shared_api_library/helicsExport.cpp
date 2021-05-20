@@ -549,6 +549,15 @@ void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* er
     brk->globalError(errorCode, AS_STRING(errorString));
 }
 
+void helicsCoreGlobalError(helics_core core, int errorCode, const char* errorString, helics_error* err)
+{
+    auto* cr = getCore(core, err);
+    if (cr == nullptr) {
+        return;
+    }
+    cr->globalError(helics::local_core_id,errorCode, AS_STRING(errorString));
+}
+
 void helicsBrokerAddSourceFilterToEndpoint(helics_broker broker, const char* filter, const char* endpoint, helics_error* err)
 {
     auto* brk = getBroker(broker, err);
