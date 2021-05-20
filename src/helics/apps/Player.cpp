@@ -331,7 +331,7 @@ namespace apps {
                             << "lines without publication name but follow one with a publication line "
                             << lcount << '\n';
                     }
-                    points[pIndex].value = blk[1];
+                    points[pIndex].value = decode(std::move(blk[1]));
                     ++pIndex;
                 } else if (blk.size() == 3) {
                     auto cloc = blk[0].find_last_of(':');
@@ -353,7 +353,7 @@ namespace apps {
                         points[pIndex].pubName = blk[1];
                     }
 
-                    points[pIndex].value = blk[2];
+                    points[pIndex].value = decode(std::move(blk[2]));
                     ++pIndex;
                 } else if (blk.size() == 4) {
                     auto cloc = blk[0].find_last_of(':');
@@ -375,7 +375,7 @@ namespace apps {
                         points[pIndex].pubName = blk[1];
                     }
                     points[pIndex].type = blk[2];
-                    points[pIndex].value = blk[3];
+                    points[pIndex].value = decode(std::move(blk[3]));
                     ++pIndex;
                 } else {
                     std::cerr << "unknown publish format line " << lcount << '\n';
@@ -773,16 +773,29 @@ namespace apps {
 
 static int hasB64Wrapper(const std::string& str)
 {
+    
     if (str.front() == '\"') {
+        if (str.size() < 8) {
+            return 0;
+        }
         if ((str.compare(2, 3, "64[") == 0) && (str[str.size() - 2] == ']')) {
             return 5;
+        }
+        if (str.size() < 11) {
+            return 0;
         }
         if ((str.compare(5, 3, "64[") == 0) && (str[str.size() - 2] == ']')) {
             return 8;
         }
     } else {
+        if (str.size() < 6) {
+            return 0;
+        }
         if ((str.compare(1, 3, "64[") == 0) && (str.back() == ']')) {
             return 4;
+        }
+        if (str.size() < 9) {
+            return 0;
         }
         if ((str.compare(4, 3, "64[") == 0) && (str.back() == ']')) {
             return 7;
@@ -806,11 +819,16 @@ static std::string decode(std::string&& stringToDecode)
         stringToDecode.pop_back();
         return gmlc::utilities::base64_decode_to_string(stringToDecode, offset);
     }
-    if (stringToDecode.compare(0, 5, "raw(\"") == 0) {
-        return normalizeString(stringToDecode);
-    }
+    
     if ((stringToDecode.front() == '"') || (stringToDecode.front() == '\'')) {
-        return gmlc::utilities::stringOps::removeQuotes(stringToDecode);
+        try
+        {
+            return JsonAsString(loadJsonStr(stringToDecode));
+        }
+        catch (const Json::Exception &)
+        {
+            return gmlc::utilities::stringOps::removeQuotes(stringToDecode);
+        }
     }
     // move is required since you are returning the rvalue and we want to move from the rvalue input
     return std::move(stringToDecode);

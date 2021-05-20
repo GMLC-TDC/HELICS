@@ -291,14 +291,16 @@ namespace apps {
             if (v.first) {
                 outFile << static_cast<double>(v.time) << "\t\t"
                         << subscriptions[v.index].getTarget() << '\t'
-                        << subscriptions[v.index].getPublicationType() << '\t' << v.value << '\n';
+                        << subscriptions[v.index].getPublicationType() << '\t' << Json::valueToQuotedString(v.value.c_str()) << '\n';
             } else {
                 if (v.iteration > 0) {
                     outFile << static_cast<double>(v.time) << ':' << v.iteration << "\t\t"
-                            << subscriptions[v.index].getTarget() << '\t' << v.value << '\n';
+                            << subscriptions[v.index].getTarget() << '\t'
+                            << Json::valueToQuotedString(v.value.c_str()) << '\n';
                 } else {
                     outFile << static_cast<double>(v.time) << "\t\t"
-                            << subscriptions[v.index].getTarget() << '\t' << v.value << '\n';
+                            << subscriptions[v.index].getTarget() << '\t'
+                            << Json::valueToQuotedString(v.value.c_str()) << '\n';
                 }
             }
         }
@@ -314,7 +316,7 @@ namespace apps {
             }
             if (isBinaryData(m->data)) {
                 if (isEscapableData(m->data)) {
-                    outFile << "\t" << escapeString(m->data.to_string()) << "\n";
+                    outFile << "\t" << Json::valueToQuotedString(m->data.to_string().c_str()) << "\n";
                 } else {
                     outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
                 }

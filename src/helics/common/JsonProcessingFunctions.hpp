@@ -38,12 +38,16 @@ std::string getKey(const Json::Value& element);
 /** generate a Json String*/
 std::string generateJsonString(const Json::Value& block);
 
+
+inline std::string JsonAsString(const Json::Value &element)
+{
+    return (element.isString()) ? element.asString() : generateJsonString(element);
+}
+
 inline std::string
     getOrDefault(const Json::Value& element, const std::string& key, const std::string& defVal)
 {
-    return (element.isMember(key)) ?
-        ((element[key].isString()) ? element[key].asString() : generateJsonString(element[key])) :
-        defVal;
+    return (element.isMember(key)) ?JsonAsString(element[key]):defVal;
 }
 
 inline double getOrDefault(const Json::Value& element, const std::string& key, double defVal)
