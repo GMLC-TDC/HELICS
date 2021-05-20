@@ -2503,11 +2503,11 @@ void CommonCore::errorRespondDelayedMessages(const std::string& estring)
     }
 }
 
-void CommonCore::sendErrorToFederates(int error_code, const std::string& message)
+void CommonCore::sendErrorToFederates(int errorCode, const std::string& message)
 {
     ActionMessage errorCom(CMD_LOCAL_ERROR);
     errorCom.source_id = global_broker_id_local;
-    errorCom.messageID = error_code;
+    errorCom.messageID = errorCode;
     errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
         if ((fed) && (fed.state == operation_state::operating)) {

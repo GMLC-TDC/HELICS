@@ -733,10 +733,10 @@ void CoreBroker::sendDisconnect()
     }
 }
 
-void CoreBroker::sendErrorToImmediateBrokers(int error_code)
+void CoreBroker::sendErrorToImmediateBrokers(int errorCode)
 {
     ActionMessage errorCom(CMD_ERROR);
-    errorCom.messageID = error_code;
+    errorCom.messageID = errorCode;
     broadcast(errorCom);
 }
 
