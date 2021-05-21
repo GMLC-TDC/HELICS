@@ -1173,36 +1173,16 @@ void MasterObjectHolder::clearFed(int index)
 
 void MasterObjectHolder::abortAll(int code, const std::string& error)
 {
-    static bool abortCalled{false};
-
-    if (abortCalled) {
-        return;
-    }
-    abortCalled = true;
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, error);
+                fed->fedptr->globalError(code, fed->fedptr->getName()+" sending->"+error);
             }
         }
     }
-    {
-        auto brokerHandle = brokers.lock();
-        for (auto& brk : brokerHandle) {
-            if ((brk) && (brk->brokerptr)) {
-                brk->brokerptr->globalError(code, error);
-            }
-        }
-    }
-    {
-        auto coreHandle = cores.lock();
-        for (auto& cr : coreHandle) {
-            if ((cr) && (cr->coreptr)) {
-                cr->coreptr->globalError(helics::local_core_id, code, error);
-            }
-        }
-    }
+    helics::BrokerFactory::abortAllBrokers(code, error);
+    helics::CoreFactory::abortAllCores(code, error);
 }
 
 void MasterObjectHolder::deleteAll()

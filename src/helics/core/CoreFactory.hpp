@@ -183,6 +183,8 @@ Core is registered or when the clean up function is called this prevents some od
 
     /** terminate All existing cores */
     void terminateAllCores();
+    /** abort all cores */
+    void abortAllCores(int errorCode, const std::string& errorString);
 }  // namespace CoreFactory
 
 }  // namespace helics

@@ -372,7 +372,7 @@ static std::atomic<int> handlerCount{0};
 static bool testHandler(int /*unused*/)
 {
     ++handlerCount;
-    return true;
+    return false;
 }
 /** test the signal handler callback*/
 TEST(other_tests, signal_handler_callback)
