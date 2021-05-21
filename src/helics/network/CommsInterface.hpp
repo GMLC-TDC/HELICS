@@ -135,7 +135,8 @@ class CommsInterface {
     const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
-    bool mRequireBrokerConnection{false};  //!< specify that the comms should assume we have a broker
+    bool mRequireBrokerConnection{
+        false};  //!< specify that the comms should assume we have a broker
     bool serverMode{true};  //!< some comms have a server mode and non-server mode
     bool autoBroker{false};  //!< the broker should be automatically generated if needed
     std::chrono::milliseconds connectionTimeout{
