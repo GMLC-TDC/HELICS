@@ -124,7 +124,7 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             case NetworkBrokerData::server_mode_options::unspecified:
                 break;
         }
-        if (clientMode) {
+        if (requireBrokerConnection) {
             if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
                 brokerTargetAddress = netInfo.connectionAddress;
             }
@@ -360,10 +360,10 @@ bool CommsInterface::connect()
     return true;
 }
 
-void CommsInterface::setClientMode(bool clientModeSet)
+void CommsInterface::setRequireBrokerConnection(bool clientModeSet)
 {
     if (propertyLock()) {
-        clientMode = clientModeSet;
+        requireBrokerConnection = clientModeSet;
     }
 }
 

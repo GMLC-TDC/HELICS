@@ -67,8 +67,9 @@ class CommsInterface {
     /** set the name of the communicator*/
     void setName(const std::string& commName);
 
-    /** set whether the communicator should operate in client mode*/
-    void setClientMode(bool clientModeSet);
+    /** set a flag indicating that a broker connection is required and all Connection
+    fields are targeted at a broker*/
+    void setRequireBrokerConnection(bool requireBrokerConnection);
 
     /** set the callback for processing the messages
      */
@@ -134,7 +135,7 @@ class CommsInterface {
     const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
-    bool clientMode{false};  //!< specify that the comms should assume we have a broker
+    bool requireBrokerConnection{false};  //!< specify that the comms should assume we have a broker
     bool serverMode{true};  //!< some comms have a server mode and non-server mode
     bool autoBroker{false};  //!< the broker should be automatically generated if needed
     std::chrono::milliseconds connectionTimeout{
