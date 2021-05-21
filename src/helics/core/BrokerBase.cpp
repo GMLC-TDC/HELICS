@@ -137,7 +137,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
     hApp->add_option("--key,--broker_key",
                      brokerKey,
-                     "specify a key to use for all connections to/from a broker");
+                     "specify a key to use for all connections to/from a broker")
+        ->envname("HELICS_BROKER_KEY");
     hApp->add_flag(
         "--no_ping,--slow_responding",
         no_ping,
@@ -168,7 +169,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option_function<int>(
             "--loglevel,--log-level",
             [this](int val) { setLogLevel(val); },
-            "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+            "the level at which to log; the higher this is set to the more gets logged,  use -1 for no logging")
+        ->envname("HELICS_BROKER_LOG_LEVEL")
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 

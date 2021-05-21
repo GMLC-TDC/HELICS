@@ -138,19 +138,23 @@ class helicsCLI11App: public CLI::App {
         cbacks.push_back(std::move(cback));
     }
 
-    void addTypeOption()
+    void addTypeOption(bool includeEnvironmentVariable = true)
     {
         auto* og = add_option_group("network type")->immediate_callback();
-        og->add_option_function<std::string>(
-              "--coretype,-t,--type,--core",
-              [this](const std::string& val) {
-                  coreType = coreTypeFromString(val);
-                  if (coreType == core_type::UNRECOGNIZED) {
-                      throw CLI::ValidationError(val + " is NOT a recognized core type");
-                  }
-              },
-              "type of the core to connect to")
-            ->default_str("(" + to_string(coreType) + ")");
+        auto* typeOption =
+            og->add_option_function<std::string>(
+                  "--coretype,-t,--type,--core",
+                  [this](const std::string& val) {
+                      coreType = coreTypeFromString(val);
+                      if (coreType == core_type::UNRECOGNIZED) {
+                          throw CLI::ValidationError(val + " is NOT a recognized core type");
+                      }
+                  },
+                  "type of the core to connect to")
+                ->default_str("(" + to_string(coreType) + ")");
+        if (includeEnvironmentVariable) {
+            typeOption->envname("HELICS_CORE_TYPE");
+        }
     }
     core_type getCoreType() const { return coreType; }
     /** set default core type*/
