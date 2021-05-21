@@ -236,7 +236,7 @@ TEST_F(network_tests, test_core_type_env)
     const std::string brokerArgs = "-f 2";
     auto broker = helics::BrokerFactory::create(helics::core_type::TCP, brokerArgs);
     EXPECT_TRUE(broker->isConnected());
-    
+
     helics::FederateInfo fi("--corename=c1bt");
     helics::ValueFederate fed1("fed1", fi);
 
