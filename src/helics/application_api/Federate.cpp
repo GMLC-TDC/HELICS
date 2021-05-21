@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreApp.hpp"
 #include "FilterFederateManager.hpp"
 #include "Filters.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
 #include <cassert>
@@ -45,26 +46,20 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
         name = fi.defName;
     }
     if (fi.coreName.empty()) {
-        coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
+        if (!fi.forceNewCore) {
+            coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
+        }
         if (!coreObject) {
             if (!name.empty()) {
-                // we need to create a core here so loop until we find a number that is not already
-                // occupied
-                int cnt{0};
-                std::string cname = fedName + "_core";
-                auto cobj = CoreFactory::findCore(cname);
-                while (cobj) {
-                    ++cnt;
-                    cname = fedName + "_core" + std::to_string(cnt);
-                    cobj = CoreFactory::findCore(cname);
-                }
+                std::string cname = fedName + "_core_" + gmlc::utilities::randomString(6);
+
                 try {
                     coreObject =
                         CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
                 }
                 catch (const helics::RegistrationFailure&) {
                     // there is a possibility of race condition here in the naming resulting a
-                    // failure this catches and reverts to previous naming which is randomly
+                    // failure this catches and reverts to previous naming which is fully randomly
                     // generated
                     coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
                 }
@@ -73,18 +68,24 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): name(fed
             }
         }
     } else {
-        coreObject =
-            CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
-        if (!coreObject->isOpenToNewFederates()) {
-            coreObject = nullptr;
-            logWarningMessage("found core object is not open");
-            CoreFactory::cleanUpCores(200ms);
+        if (!fi.forceNewCore) {
             coreObject =
                 CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
             if (!coreObject->isOpenToNewFederates()) {
-                throw(RegistrationFailure(
-                    "Unable to connect to specified core: core is not open to new Federates"));
+                coreObject = nullptr;
+                logWarningMessage("found core object is not open");
+                CoreFactory::cleanUpCores(200ms);
+                coreObject = CoreFactory::FindOrCreate(fi.coreType,
+                                                       fi.coreName,
+                                                       generateFullCoreInitString(fi));
+                if (!coreObject->isOpenToNewFederates()) {
+                    throw(RegistrationFailure(
+                        "Unable to connect to specified core: core is not open to new Federates"));
+                }
             }
+        } else {
+            coreObject =
+                CoreFactory::create(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
         }
     }
     /** make sure the core is connected */

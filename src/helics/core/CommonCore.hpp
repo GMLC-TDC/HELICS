@@ -382,7 +382,7 @@ class CommonCore: public Core, public BrokerBase {
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>>
         federates;  //!< threadsafe local federate information list for external functions
     gmlc::containers::DualMappedVector<FedInfo, std::string, global_federate_id>
-        loopFederates;  // federate pointers stored for the core loop
+        loopFederates;  //!< federate pointers stored for the core loop
 
     /** counter for the number of messages that have been sent, nothing magical about 54 just a
      * number bigger than 1 to prevent confusion */
