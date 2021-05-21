@@ -212,8 +212,9 @@ bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = brokerState.load();
     return (cstate != broker_state_t::created && cstate < broker_state_t::operating &&
-            !haltOperations && (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
-            getCountableFederates() < maxFederateCount));
+            !haltOperations &&
+            (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
+             getCountableFederates() < maxFederateCount));
 }
 
 void CoreBroker::processPriorityCommand(ActionMessage&& command)
