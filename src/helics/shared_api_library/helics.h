@@ -52,7 +52,8 @@ HELICS_EXPORT helics_error helicsErrorInitialize(void);
  */
 HELICS_EXPORT void helicsErrorClear(helics_error* err);
 
-/** load a signal handler that handles Ctrl-C and shuts down the library*/
+/** load a signal handler that handles Ctrl-C and shuts down all helics brokers, cores,
+and federates then exits the process*/
 HELICS_EXPORT void helicsLoadSignalHandler();
 
 /** clear HELICS based signal Handlers*/
@@ -62,10 +63,13 @@ HELICS_EXPORT void helicsClearSignalHandler();
 @details  This function is not 100% reliable it will most likely work but uses some functions and
 techniques that are not 100% guaranteed to work in a signal handler
 in worst case it could deadlock.  That is somewhat unlikely given usage patterns
-but it is possible*/
-HELICS_EXPORT void helicsLoadSignalHandlerCallback(void (*handler)(int));
+but it is possible.  The callback has signature bool(*handler)(int)  it will take the SIG_INT as an argument
+and return a boolean.  If the boolean return value is true the default signal handler is skipped, if it is false or the callback is null
+the default signal handler is executed.*/
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(bool (*handler)(int));
 
-/** execute a global abort by sending an error code */
+/** execute a global abort by sending an error code to all cores, brokers,
+federates that were created through the current library instance*/
 HELICS_EXPORT void helicsAbort(int errorCode, const char* errorString);
 
 /**

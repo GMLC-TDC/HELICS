@@ -61,13 +61,13 @@ void helicsErrorClear(helics_error* err)
 }
 
 #include <csignal>
-static void signalHandler(int signum)
+static void signalHandler(int /*signum*/)
 {
     helicsAbort(helics_error_user_abort, "user abort");
     // add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     std::cout << std::endl;
-    exit(signum);
+    exit(helics_error_user_abort);
 }
 
 void helicsLoadSignalHandler()
@@ -80,17 +80,21 @@ void helicsClearSignalHandler()
     signal(SIGINT, SIG_DFL);
 }
 
-static void (*keyHandler)(int) = nullptr;
+static bool (*keyHandler)(int) = nullptr;
 
 static void signalHandlerCallback(int signum)
 {
+    bool skipDefaultSignalHandler{false};
     if (keyHandler != nullptr) {
-        keyHandler(signum);
+        skipDefaultSignalHandler=keyHandler(signum);
     }
-    signalHandler(signum);
+    if (!skipDefaultSignalHandler)
+    {
+        signalHandler(signum);
+    }
 }
 
-void helicsLoadSignalHandlerCallback(void (*handler)(int))
+void helicsLoadSignalHandlerCallback(bool (*handler)(int))
 {
     keyHandler = handler;
     if (handler != nullptr) {
