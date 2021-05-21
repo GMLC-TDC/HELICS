@@ -138,7 +138,7 @@ class helicsCLI11App: public CLI::App {
         cbacks.push_back(std::move(cback));
     }
 
-    void addTypeOption(bool includeEnvironmentalVariable = true)
+    void addTypeOption(bool includeEnvironmentVariable = true)
     {
         auto* og = add_option_group("network type")->immediate_callback();
         auto* typeOption =
@@ -152,7 +152,7 @@ class helicsCLI11App: public CLI::App {
                   },
                   "type of the core to connect to")
                 ->default_str("(" + to_string(coreType) + ")");
-        if (includeEnvironmentalVariable) {
+        if (includeEnvironmentVariable) {
             typeOption->envname("HELICS_CORE_TYPE");
         }
     }

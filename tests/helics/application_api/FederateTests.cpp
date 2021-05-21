@@ -49,7 +49,7 @@ TEST(federate_tests, federate_initialize_tests)
 
 TEST(federate_tests, federate_initialize_tests_env)
 {
-    setEnvironmentalVariable("HELICS_LOG_LEVEL", "connections");
+    setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
 
@@ -66,8 +66,7 @@ TEST(federate_tests, federate_initialize_tests_env)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
 
     Fed->finalize();
-    clearEnvironmentalVariable("HELICS_LOG_LEVEL");
-    clearEnvironmentalVariable("HELICS_BROKER_LOG_LEVEL");
+    clearEnvironmentVariable("HELICS_LOG_LEVEL");
     // const auto& coreName = core->getIdentifier();
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);
@@ -76,7 +75,7 @@ TEST(federate_tests, federate_initialize_tests_env)
 
 TEST(federate_tests, federate_initialize_tests_env2)
 {
-    setEnvironmentalVariable("HELICS_BROKER_LOG_LEVEL", "3");
+    setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", "3");
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
 
@@ -92,7 +91,7 @@ TEST(federate_tests, federate_initialize_tests_env2)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
 
     Fed->finalize();
-    clearEnvironmentalVariable("HELICS_BROKER_LOG_LEVEL");
+    clearEnvironmentVariable("HELICS_BROKER_LOG_LEVEL");
     // const auto& coreName = core->getIdentifier();
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);
