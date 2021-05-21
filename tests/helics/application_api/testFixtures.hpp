@@ -222,7 +222,7 @@ struct FederateTestFixture {
     std::string ctype;
 };
 
-/** set an environmental variable to a specific value */
-void setEnvironmentalVariable(const std::string& name, const std::string& value);
-/** clear an environmental variable */
-void clearEnvironmentalVariable(const std::string& name);
+/** set an environment variable to a specific value */
+void setEnvironmentVariable(const std::string& name, const std::string& value);
+/** clear an environment variable */
+void clearEnvironmentVariable(const std::string& name);

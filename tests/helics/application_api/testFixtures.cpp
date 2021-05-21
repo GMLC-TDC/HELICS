@@ -119,7 +119,7 @@ std::shared_ptr<helics::Broker>
     return broker;
 }
 
-void setEnvironmentalVariable(const std::string& name, const std::string& value)
+void setEnvironmentVariable(const std::string& name, const std::string& value)
 {
 #ifdef _WIN32
     _putenv_s(name.c_str(), value.c_str());
@@ -128,7 +128,7 @@ void setEnvironmentalVariable(const std::string& name, const std::string& value)
 #endif
 }
 
-void clearEnvironmentalVariable(const std::string& name)
+void clearEnvironmentVariable(const std::string& name)
 {
 #ifdef _WIN32
     _putenv_s(name.c_str(), "");

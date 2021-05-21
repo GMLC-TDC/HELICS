@@ -49,7 +49,7 @@ std::shared_ptr<helicsCLI11App>
                 brokerPort = brkprt.second;
                 checkAndUpdateBrokerAddress(localAddress);
             },
-            "location of the broker i.e network address")
+            "location of the broker i.e. network address")
         ->envname("HELICS_BROKER_ADDRESS");
     nbparser->add_flag("--reuse_address",
                        reuse_address,
@@ -131,18 +131,18 @@ std::shared_ptr<helicsCLI11App>
     nbparser
         ->add_option("--brokerport",
                      brokerPort,
-                     "The port number to use to connect with the broker")
+                     "the port number to use to connect with the broker")
         ->envname("HELICS_BROKER_PORT");
 
     nbparser
         ->add_option("--connectionport",
                      connectionPort,
-                     "The port number to use to connect a co-simulation")
+                     "the port number to use to connect a co-simulation")
         ->envname("HELICS_CONNECTION_PORT");
     nbparser
         ->add_option("--connectionaddress",
                      connectionAddress,
-                     "The network address to use to connect a co-simulation")
+                     "the network address to use to connect a co-simulation")
         ->envname("HELICS_CONNECTION_ADDRESS");
     nbparser
         ->add_option_function<int>(
