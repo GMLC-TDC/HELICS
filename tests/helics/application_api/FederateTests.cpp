@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
+#include "testFixtures.hpp"
 
 #include <future>
 #include <gtest/gtest.h>
@@ -40,6 +41,57 @@ TEST(federate_tests, federate_initialize_tests)
     Fed->enterExecutingMode();
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
 
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+    Fed = nullptr;  // force the destructor
+}
+
+TEST(federate_tests, federate_initialize_tests_env)
+{
+    setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto cloglevel = core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
+    EXPECT_EQ(cloglevel, helics_log_level_connections);
+
+    Fed->enterExecutingMode();
+    EXPECT_EQ(Fed->getIntegerProperty(helics_property_int_log_level), helics_log_level_connections);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+
+    Fed->finalize();
+    clearEnvironmentVariable("HELICS_LOG_LEVEL");
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+    Fed = nullptr;  // force the destructor
+}
+
+TEST(federate_tests, federate_initialize_tests_env2)
+{
+    setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", "3");
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto cloglevel = core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
+    EXPECT_EQ(cloglevel, helics_log_level_connections);
+
+    Fed->enterExecutingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+
+    Fed->finalize();
+    clearEnvironmentVariable("HELICS_BROKER_LOG_LEVEL");
     // const auto& coreName = core->getIdentifier();
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);

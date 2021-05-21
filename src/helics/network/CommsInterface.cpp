@@ -124,6 +124,15 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             case NetworkBrokerData::server_mode_options::unspecified:
                 break;
         }
+        if (mRequireBrokerConnection) {
+            if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
+                brokerTargetAddress = netInfo.connectionAddress;
+            }
+        } else {
+            if (localTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
+                localTargetAddress = netInfo.connectionAddress;
+            }
+        }
         propertyUnLock();
     }
 }
@@ -351,6 +360,14 @@ bool CommsInterface::connect()
     return true;
 }
 
+void CommsInterface::setRequireBrokerConnection(bool requireBrokerConnection)
+{
+    if (propertyLock()) {
+        mRequireBrokerConnection = requireBrokerConnection;
+        propertyUnLock();
+    }
+}
+
 void CommsInterface::setName(const std::string& commName)
 {
     if (propertyLock()) {
@@ -365,6 +382,7 @@ void CommsInterface::disconnect()
         if (propertyLock()) {
             setRxStatus(connection_status::terminated);
             setTxStatus(connection_status::terminated);
+            propertyUnLock();
             join_tx_rx_thread();
             return;
         }

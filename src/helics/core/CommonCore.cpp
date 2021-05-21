@@ -817,7 +817,13 @@ Time CommonCore::getTimeProperty(local_federate_id federateID, int32_t property)
 int16_t CommonCore::getIntegerProperty(local_federate_id federateID, int32_t property) const
 {
     if (federateID == local_core_id) {
-        // TODO(PT): add some code to actually get the properties from the core if appropriate
+        if (property == helics_property_int_log_level ||
+            property == helics_property_int_console_log_level) {
+            return consoleLogLevel;
+        }
+        if (property == helics_property_int_file_log_level) {
+            return fileLogLevel;
+        }
         return 0;
     }
     auto* fed = getFederateAt(federateID);
