@@ -116,6 +116,9 @@ class Core {
      * disconnect the core from its broker
      */
     virtual void disconnect() = 0;
+
+    /*return true if the core has an error*/
+    virtual bool hasError() const = 0;
     /** waits in the current thread until the core is disconnected
     @return true if the disconnect was successful
      */
@@ -153,7 +156,10 @@ class Core {
     {
         globalError(federateID, errorCode, "");
     }
-
+    /** get the last error code from a core*/
+    virtual int getErrorCode() const = 0;
+    /** get the last error message*/
+    virtual std::string getErrorMessage() const = 0;
     /**
      * Federate has completed.
      *

@@ -84,11 +84,11 @@ static bool (*keyHandler)(int) = nullptr;
 
 static void signalHandlerCallback(int signum)
 {
-    bool skipDefaultSignalHandler{false};
+    bool runDefaultSignalHandler{true};
     if (keyHandler != nullptr) {
-        skipDefaultSignalHandler=keyHandler(signum);
+        runDefaultSignalHandler=keyHandler(signum);
     }
-    if (!skipDefaultSignalHandler)
+    if (runDefaultSignalHandler)
     {
         signalHandler(signum);
     }
