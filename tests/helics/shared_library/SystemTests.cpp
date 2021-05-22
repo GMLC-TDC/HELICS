@@ -374,13 +374,19 @@ static helics_bool testHandler(int /*unused*/)
     ++handlerCount;
     return helics_false;
 }
-/** test the signal handler callback*/
+
 TEST(other_tests, signal_handler_callback)
 {
     helicsLoadSignalHandlerCallback(testHandler);
     raise(SIGINT);
     EXPECT_EQ(handlerCount.load(), 1);
     helicsClearSignalHandler();
+}
+
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_death)
+{
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(helics_error_user_abort),"");
+    helicsClearSignalHandler();
 }
