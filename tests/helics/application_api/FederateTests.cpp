@@ -180,14 +180,14 @@ TEST(federate_tests, timeout_abort)
     auto call = []() {
 
     helics::FederateInfo fi(helics::core_type::ZMQ);
-
+        fi.coreInitString = "";
     auto fed = std::make_shared<helics::Federate>("test1", fi);
             return fed;
     };
 
     auto cret = std::async(std::launch::async, call);
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     helics::CoreFactory::abortAllCores(helics_error_user_abort,"aborting55");
     try
     {

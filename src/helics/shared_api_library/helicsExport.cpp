@@ -80,21 +80,21 @@ void helicsClearSignalHandler()
     signal(SIGINT, SIG_DFL);
 }
 
-static bool (*keyHandler)(int) = nullptr;
+static helics_bool (*keyHandler)(int) = nullptr;
 
 static void signalHandlerCallback(int signum)
 {
-    bool runDefaultSignalHandler{true};
+    helics_bool runDefaultSignalHandler{helics_true};
     if (keyHandler != nullptr) {
         runDefaultSignalHandler=keyHandler(signum);
     }
-    if (runDefaultSignalHandler)
+    if (runDefaultSignalHandler!=helics_false)
     {
         signalHandler(signum);
     }
 }
 
-void helicsLoadSignalHandlerCallback(bool (*handler)(int))
+void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int))
 {
     keyHandler = handler;
     if (handler != nullptr) {

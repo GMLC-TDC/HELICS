@@ -369,10 +369,10 @@ TEST(other_tests, broker_after_close)
 
 static std::atomic<int> handlerCount{0};
 
-static bool testHandler(int /*unused*/)
+static helics_bool testHandler(int /*unused*/)
 {
     ++handlerCount;
-    return false;
+    return helics_false;
 }
 /** test the signal handler callback*/
 TEST(other_tests, signal_handler_callback)

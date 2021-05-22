@@ -63,10 +63,10 @@ HELICS_EXPORT void helicsClearSignalHandler();
 @details  This function is not 100% reliable it will most likely work but uses some functions and
 techniques that are not 100% guaranteed to work in a signal handler
 in worst case it could deadlock.  That is somewhat unlikely given usage patterns
-but it is possible.  The callback has signature bool(*handler)(int)  it will take the SIG_INT as an argument
-and return a boolean.  If the boolean return value is true the default signal handler is skipped, if it is false or the callback is null
+but it is possible.  The callback has signature helics_bool(*handler)(int)  it will take the SIG_INT as an argument
+and return a boolean.  If the boolean return value is helics_true(or the callback is null) the default signal handler is run after the callback finishes, if it is helics_false the default callback is not run
 the default signal handler is executed.*/
-HELICS_EXPORT void helicsLoadSignalHandlerCallback(bool (*handler)(int));
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int));
 
 /** execute a global abort by sending an error code to all cores, brokers,
 federates that were created through the current library instance*/
