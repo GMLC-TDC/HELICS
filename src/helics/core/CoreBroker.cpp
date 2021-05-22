@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include <iostream>
+#include <limits>
 #include <string>
 #include <utility>
 #include <vector>
@@ -211,8 +212,10 @@ route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = brokerState.load();
-    return ((cstate != broker_state_t::created) && (cstate < broker_state_t::operating) &&
-            (!haltOperations));
+    return (cstate != broker_state_t::created && cstate < broker_state_t::operating &&
+            !haltOperations &&
+            (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
+             getCountableFederates() < maxFederateCount));
 }
 
 void CoreBroker::processPriorityCommand(ActionMessage&& command)
@@ -255,6 +258,16 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             if (!connectionEstablished) {
                 earlyMessages.push_back(std::move(command));
                 break;
+            }
+            if (!checkActionFlag(command, non_counting_flag) &&
+                getCountableFederates() >= maxFederateCount) {
+                ActionMessage badInit(CMD_FED_ACK);
+                setActionFlag(badInit, error_flag);
+                badInit.source_id = global_broker_id_local;
+                badInit.messageID = max_federate_count_exceeded;
+                badInit.name = command.name;
+                transmit(getRoute(command.source_id), badInit);
+                return;
             }
             if (brokerState != broker_state_t::operating) {
                 if (allInitReady()) {
@@ -358,6 +371,28 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     transmit(brk->route, brokerReply);
                     return;
                 }
+            }
+            if (_brokers.size() >= maxBrokerCount) {
+                route_id newroute;
+                bool route_created = false;
+                if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+                    newroute = route_id(routeCount++);
+                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+                    route_created = true;
+                } else {
+                    newroute = getRoute(command.source_id);
+                }
+                ActionMessage badInit(CMD_BROKER_ACK);
+                setActionFlag(badInit, error_flag);
+                badInit.source_id = global_broker_id_local;
+                badInit.name = command.name;
+                badInit.messageID = max_broker_count_exceeded;
+                transmit(newroute, badInit);
+
+                if (route_created) {
+                    removeRoute(newroute);
+                }
+                return;
             }
             if (brokerState != broker_state_t::operating) {
                 if (allInitReady()) {
@@ -2637,6 +2672,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         base["brokers"] = static_cast<int>(_brokers.size());
         base["federates"] = static_cast<int>(_federates.size());
+        base["countable_federates"] = getCountableFederates();
         base["handles"] = static_cast<int>(handles.size());
         return fileops::generateJsonString(base);
     }
@@ -3421,6 +3457,17 @@ connection_state CoreBroker::getAllConnectionState() const
     return (cnt > 0) ? res : connection_state::connected;
 }
 
+int CoreBroker::getCountableFederates() const
+{
+    int cnt{0};
+    for (const auto& fed : _federates) {
+        if (!fed.nonCounting) {
+            ++cnt;
+        }
+    }
+    return cnt;
+}
+
 bool CoreBroker::allInitReady() const
 {
     // the federate count must be greater than the min size
@@ -3433,14 +3480,8 @@ bool CoreBroker::allInitReady() const
     bool initReady = (getAllConnectionState() >= connection_state::init_requested);
     if (initReady) {
         // now do a more formal count of federates as there may be non-counting ones
-        int cnt{0};
-        for (const auto& fed : _federates) {
-            if (!fed.nonCounting) {
-                ++cnt;
+        return (getCountableFederates() >= minFederateCount);
             }
-        }
-        return (cnt >= minFederateCount);
-    }
     return false;
     // return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
     //   return ((brk._nonLocal) || (brk.state==connection_state::init_requested));

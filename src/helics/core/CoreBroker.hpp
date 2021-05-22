@@ -304,6 +304,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
   private:
+    int getCountableFederates() const;
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** find any existing publishers for a subscription*/

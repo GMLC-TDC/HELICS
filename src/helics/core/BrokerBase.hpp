@@ -16,6 +16,7 @@ and some common methods used cores and brokers
 #include "gmlc/containers/BlockingPriorityQueue.hpp"
 
 #include <atomic>
+#include <limits>
 #include <memory>
 #include <string>
 #include <thread>
@@ -45,6 +46,8 @@ class BrokerBase {
     int32_t minFederateCount{1};
     /** the minimum number of brokers that must connect before entering init mode */
     int32_t minBrokerCount{0};
+    int32_t maxFederateCount{(std::numeric_limits<int32_t>::max)()};
+    int32_t maxBrokerCount{(std::numeric_limits<int32_t>::max)()};
     int32_t maxIterationCount{10000};  //!< the maximum number of iterative loops that are allowed
     Time tickTimer{5.0};  //!< the length of each heartbeat tick
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up

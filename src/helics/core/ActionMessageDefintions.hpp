@@ -389,6 +389,8 @@ enum cmd_error_codes : int {
     duplicate_federate_name_error_code = 6,
     duplicate_broker_name_error_code = 7,
     mismatch_broker_key_error_code = 9,
+    max_federate_count_exceeded = 11,
+    max_broker_count_exceeded = 13
 };
 
 /** return a string associated with a particular error code

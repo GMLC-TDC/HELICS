@@ -36,6 +36,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -360,7 +361,9 @@ bool CommonCore::isConfigured() const
 
 bool CommonCore::isOpenToNewFederates() const
 {
-    return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating));
+    return ((brokerState != broker_state_t::created) && (brokerState < broker_state_t::operating) &&
+            (maxFederateCount == std::numeric_limits<int32_t>::max() ||
+             (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
 void CommonCore::globalError(LocalFederateId federateID,
                              int errorCode,
@@ -582,6 +585,9 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     LocalFederateId local_id;
     {
         auto feds = federates.lock();
+        if (feds->size() >= maxFederateCount) {
+            throw(RegistrationFailure("maximum number of federates in the core has been reached"));
+        }
         auto id = feds->insert(name, name, info);
         if (id) {
             local_id = LocalFederateId(static_cast<int32_t>(*id));

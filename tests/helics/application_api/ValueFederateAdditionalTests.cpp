@@ -1150,6 +1150,25 @@ TEST(valuefederate, file_and_config)
     Fed2->finalize();
     broker->disconnect();
 }
+
+// test out some potential bugs in the name handling for cores
+TEST(valuefederate, file_name_config)
+{
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, "-f 2");
+
+    auto file1 = std::string(TEST_DIR) + "name_config1.json";
+    auto file2 = std::string(TEST_DIR) + "name_config2.json";
+    auto Fed1 = std::make_shared<helics::ValueFederate>(file1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>(file2);
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    Fed1->finalize();
+    Fed2->finalize();
+    broker->disconnect();
+}
 #endif
 
 TEST(valuefederate, duplicate_targets)

@@ -402,6 +402,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
           },
           "type or name of the core to connect to")
         ->default_str("(" + to_string(coreType) + ")");
+    og->add_flag("--force_new_core",
+                 forceNewCore,
+                 "if set to true will force the federate to generate a new core");
     og->add_option_function<std::string>(
           "--coretype,-t",
           [this](const std::string& val) {
