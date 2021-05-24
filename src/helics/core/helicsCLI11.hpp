@@ -138,9 +138,10 @@ class helicsCLI11App: public CLI::App {
         cbacks.push_back(std::move(cback));
     }
 
-    void addTypeOption()
+    void addTypeOption(bool includeEnvironmentVariable = true)
     {
         auto* og = add_option_group("network type")->immediate_callback();
+        auto* typeOption =
         og->add_option_function<std::string>(
               "--coretype,-t",
               [this](const std::string& val) {
@@ -153,6 +154,8 @@ class helicsCLI11App: public CLI::App {
             ->default_str("(" + to_string(coreType) + ")")
             ->ignore_case()
             ->ignore_underscore();
+        if (includeEnvironmentVariable) {
+            typeOption->envname("HELICS_CORE_TYPE");
     }
     CoreType getCoreType() const { return coreType; }
     /** set default core type*/

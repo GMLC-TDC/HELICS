@@ -40,7 +40,8 @@ std::shared_ptr<helicsCLI11App>
                    interfaceNetwork,
                    "specify external interface to use, default is --local")
         ->disable_flag_override();
-    nbparser->add_option_function<std::string>(
+    nbparser
+        ->add_option_function<std::string>(
         "--broker_address",
         [this, localAddress](const std::string& addr) {
             auto brkprt = extractInterfaceandPort(addr);
@@ -48,7 +49,8 @@ std::shared_ptr<helicsCLI11App>
             brokerPort = brkprt.second;
             checkAndUpdateBrokerAddress(localAddress);
         },
-        "location of the broker i.e network address");
+            "location of the broker i.e. network address")
+        ->envname("HELICS_BROKER_ADDRESS");
     nbparser->add_flag("--reuse_address",
                        reuse_address,
                        "allow the server to reuse a bound address, mostly useful for tcp cores");
@@ -76,6 +78,7 @@ std::shared_ptr<helicsCLI11App>
         },
         "identifier for the broker, this is either the name or network address use --broker_address or --brokername "
         "to explicitly set the network address or name the search for the broker is first by name");
+
     nbparser->add_option("--brokername", brokerName, "the name of the broker");
     nbparser->add_option("--maxsize", maxMessageSize, "The message buffer size")
         ->capture_default_str()
@@ -97,6 +100,9 @@ std::shared_ptr<helicsCLI11App>
     nbparser->add_option("--brokerinitstring",
                          brokerInitString,
                          "the initialization string for the broker");
+    nbparser
+        ->add_option("--brokerinit", brokerInitString, "the initialization string for the broker")
+        ->envname("HELICS_BROKER_INIT");
     nbparser
         ->add_flag_function(
             "--client{0},--server{1}",
@@ -125,9 +131,22 @@ std::shared_ptr<helicsCLI11App>
         "the local interface to use for the receive ports");
     nbparser->add_option("--port,-p", portNumber, "port number to use")
         ->transform(CLI::Transformer({{"auto", "-1"}}, CLI::ignore_case));
-    nbparser->add_option("--brokerport",
+    nbparser
+        ->add_option("--brokerport",
                          brokerPort,
-                         "The port number to use to connect with the broker");
+                     "the port number to use to connect with the broker")
+        ->envname("HELICS_BROKER_PORT");
+
+    nbparser
+        ->add_option("--connectionport",
+                     connectionPort,
+                     "the port number to use to connect a co-simulation")
+        ->envname("HELICS_CONNECTION_PORT");
+    nbparser
+        ->add_option("--connectionaddress",
+                     connectionAddress,
+                     "the network address to use to connect a co-simulation")
+        ->envname("HELICS_CONNECTION_ADDRESS");
     nbparser
         ->add_option_function<int>(
             "--localport",
@@ -139,7 +158,8 @@ std::shared_ptr<helicsCLI11App>
                 }
             },
             "port number for the local receive port")
-        ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case));
+        ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case))
+        ->envname("HELICS_LOCAL_PORT");
     nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
 
     nbparser->add_callback([this]() {

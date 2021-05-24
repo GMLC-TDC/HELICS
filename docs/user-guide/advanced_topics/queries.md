@@ -244,7 +244,7 @@ The following queries will be answered by a broker:
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``global_flush``         | a query that just flushes the current system and returns the id's [JSON]            |
 +--------------------------+-------------------------------------------------------------------------------------+
-| ``global_status``        | an aggregate query that returns a combo of global_time and current state [JSON]     |
+| ``global_status``        | an aggregate query that returns a combo of global_time and current_state [JSON]     |
 +--------------------------+-------------------------------------------------------------------------------------+
 ```
 

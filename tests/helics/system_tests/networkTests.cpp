@@ -169,4 +169,90 @@ TEST_F(network_tests, test_otherport_fail)
     }
 }
 
+TEST_F(network_tests, test_otherport_env)
+{
+    setEnvironmentVariable("HELICS_CONNECTION_PORT", "33102");
+    const std::string brokerArgs = "-f 2";
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+
+    EXPECT_TRUE(broker->isConnected());
+    helics::FederateInfo fi("--core_type=ZMQ --corename=c1");
+    helics::ValueFederate fed1("fed1", fi);
+
+    helics::FederateInfo fi2("--core_type=ZMQ --broker=tcp://127.0.0.1:33102 --corename=c2");
+    helics::ValueFederate fed2("fed2", fi2);
+
+    fed2.enterExecutingModeAsync();
+    fed1.enterExecutingMode();
+    fed2.enterExecutingModeComplete();
+    const auto& address = broker->getAddress();
+    EXPECT_NE(address.find("33102"), std::string::npos);
+    fed1.finalize();
+    fed2.finalize();
+
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+
+    clearEnvironmentVariable("HELICS_CONNECTION_PORT");
+}
+
+TEST_F(network_tests, test_otherport_broker_local_env)
+{
+    setEnvironmentVariable("HELICS_LOCAL_PORT", "33104");
+    const std::string brokerArgs = "-f 2";
+    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    clearEnvironmentVariable("HELICS_LOCAL_PORT");
+    EXPECT_TRUE(broker->isConnected());
+
+    setEnvironmentVariable("HELICS_BROKER_PORT", "33104");
+    helics::FederateInfo fi("--core_type=ZMQ --corename=c1b");
+    helics::ValueFederate fed1("fed1", fi);
+    clearEnvironmentVariable("HELICS_BROKER_PORT");
+
+    helics::FederateInfo fi2("--core_type=ZMQ --broker=tcp://127.0.0.1:33104 --corename=c2b");
+    helics::ValueFederate fed2("fed2", fi2);
+
+    fed2.enterExecutingModeAsync();
+    fed1.enterExecutingMode();
+    fed2.enterExecutingModeComplete();
+    const auto& address = broker->getAddress();
+    EXPECT_NE(address.find("33104"), std::string::npos);
+    fed1.finalize();
+    fed2.finalize();
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+}
+
+#endif
+
+#ifdef ENABLE_TCP_CORE
+TEST_F(network_tests, test_core_type_env)
+{
+    setEnvironmentVariable("HELICS_CORE_TYPE", "TCP");
+    const std::string brokerArgs = "-f 2";
+    auto broker = helics::BrokerFactory::create(helics::core_type::TCP, brokerArgs);
+    EXPECT_TRUE(broker->isConnected());
+
+    helics::FederateInfo fi("--corename=c1bt");
+    helics::ValueFederate fed1("fed1", fi);
+
+    helics::FederateInfo fi2("--core_type=TCP --corename=c2bt");
+    helics::ValueFederate fed2("fed2", fi2);
+
+    clearEnvironmentVariable("HELICS_CORE_TYPE");
+    fed2.enterExecutingModeAsync();
+    fed1.enterExecutingMode();
+    fed2.enterExecutingModeComplete();
+
+    fed1.finalize();
+    fed2.finalize();
+    EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(400)));
+    if (broker->isConnected()) {
+        broker->disconnect();
+    }
+}
 #endif
