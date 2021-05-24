@@ -334,6 +334,7 @@ thread which allows the destructor to fire if need be without issue*/
                             errorCode,
                             cr->getIdentifier() + " sending-> "+
                             errorString);
+            cr->disconnect();
         }
         cleanUpCores(std::chrono::milliseconds(250));
     }

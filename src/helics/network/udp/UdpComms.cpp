@@ -195,7 +195,18 @@ namespace udp {
                 if (PortNumber.load() > 0 && NetworkCommsInterface::noAckConnection) {
                     connectionEstablished = true;
                 }
+                const decltype(std::chrono::steady_clock::now()) startTime{
+                    std::chrono::steady_clock::now()};
+                int errorCount{0};
                 while (!connectionEstablished) {
+                    if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                        if (PortNumber.load() <= 0) {
+                            PortNumber = -1;
+                            promisePort.set_value(-1);
+                        }
+                        setTxStatus(connection_status::terminated);
+                        return;
+                    }
                     ActionMessage m(CMD_PROTOCOL_PRIORITY);
                     m.messageID = (PortNumber <= 0) ? REQUEST_PORTS : CONNECTION_REQUEST;
                     m.setStringData(brokerName, brokerInitString);
@@ -211,10 +222,8 @@ namespace udp {
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    const decltype(std::chrono::steady_clock::now()) startTime{
-                        std::chrono::steady_clock::now()};
+                    
                     bool timeout{false};
-                    std::this_thread::yield();
                     std::vector<char> rx(128);
                     udp::endpoint brk;
 
@@ -222,7 +231,15 @@ namespace udp {
                         if (std::chrono::steady_clock::now() - startTime > connectionTimeout) {
                             timeout = true;
                         }
-                        std::this_thread::yield();
+                        if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                            if (PortNumber.load() <= 0) {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
+                            setTxStatus(connection_status::terminated);
+                            return;
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
                     }
                     if (timeout) {
                         ++retries;
@@ -239,14 +256,23 @@ namespace udp {
                     }
                     auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
                     if (error) {
-                        logError(
-                            fmt::format("error in initial receive broker {}", error.message()));
-                        if (PortNumber.load() <= 0) {
-                            PortNumber = -1;
-                            promisePort.set_value(-1);
+                        if (errorCount++ == 0)
+                        {
+                            logError(
+                                fmt::format("error in initial receive broker {}", error.message()));
                         }
-                        setTxStatus(connection_status::error);
-                        return;
+                        if (std::chrono::steady_clock::now() - startTime > connectionTimeout) {
+                            if (PortNumber.load() <= 0) {
+                                PortNumber = -1;
+                                promisePort.set_value(-1);
+                            }
+                            setTxStatus(connection_status::error);
+                            logError(
+                                fmt::format("timeerror in broker receive {}", error.message()));
+                            return;
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                        continue;
                     }
                     m = ActionMessage(rx.data(), len);
                     if (isProtocolCommand(m)) {

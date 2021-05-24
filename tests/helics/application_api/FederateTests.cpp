@@ -227,6 +227,53 @@ TEST(federate_tests, timeout_abort_tcp)
     }
 }
 
+TEST(federate_tests, timeout_abort_tcpss)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::core_type::TCP_SS);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
+}
+#endif
+
+#ifdef ENABLE_UDP_CORE
+TEST(federate_tests, timeout_abort_udp)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::core_type::UDP);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
+}
+
 #endif
 
 TEST(federate_tests, federate_multiple_federates)
