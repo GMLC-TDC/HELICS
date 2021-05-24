@@ -47,8 +47,11 @@ class NetworkBrokerData {
     std::string brokerAddress;  //!< the address or domain name of the broker
     std::string localInterface;  //!< the interface to use for the local connection
     std::string brokerInitString;  //!< a string containing arguments for the broker initialization
+    std::string connectionAddress;  //!< the address for connecting
     int portNumber{-1};  //!< the port number for the local interface
     int brokerPort{-1};  //!< the port number to use for the main broker interface
+    int connectionPort{-1};  //!< the port number for connecting
+
     int portStart{-1};  //!< the starting port for automatic port definitions
     int maxMessageSize{16 * 256};  //!< maximum message size
     int maxMessageCount{256};  //!< maximum message count

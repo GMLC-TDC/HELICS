@@ -66,6 +66,11 @@ class CommsInterface {
     bool reconnect();
     /** set the name of the communicator*/
     void setName(const std::string& commName);
+
+    /** set a flag indicating that a broker connection is required and all Connection
+    fields are targeted at a broker*/
+    void setRequireBrokerConnection(bool requireBrokerConnection);
+
     /** set the callback for processing the messages
      */
     void setCallback(std::function<void(ActionMessage&&)> callback);
@@ -130,8 +135,10 @@ class CommsInterface {
     const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
-    bool serverMode = true;  //!< some comms have a server mode and non-server mode
-    bool autoBroker = false;  //!< the broker should be automatically generated if needed
+    bool mRequireBrokerConnection{
+        false};  //!< specify that the comms should assume we have a broker
+    bool serverMode{true};  //!< some comms have a server mode and non-server mode
+    bool autoBroker{false};  //!< the broker should be automatically generated if needed
     std::chrono::milliseconds connectionTimeout{
         4000};  // timeout for the initial connection to a broker or to bind a broker port(in ms)
     int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)
