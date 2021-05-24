@@ -215,6 +215,8 @@ class CoreBroker: public Broker, public BrokerBase {
 
     virtual void clearTimeBarrier() override final;
 
+    virtual void globalError(int32_t errorCode, const std::string& errorString) override final;
+
   private:
     /** implementation details of the connection process
      */
@@ -362,7 +364,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::string generateGlobalStatus(JsonMapBuilder& builder);
 
     /** send an error code to all direct cores*/
-    void sendErrorToImmediateBrokers(int error_code);
+    void sendErrorToImmediateBrokers(int errorCode);
     /** send a disconnect message to time dependencies and child brokers*/
     void sendDisconnect();
     /** generate a string about the federation summarizing connections*/

@@ -134,5 +134,12 @@ class Broker {
 
     /** update a time barrier with a new time*/
     virtual void clearTimeBarrier() = 0;
+
+    /**
+    * generate a global error and halt the federation.
+    @param errorCode the code to use for the error
+    @param errorString the error message to associate with the error
+    */
+    virtual void globalError(int32_t errorCode, const std::string& errorString) = 0;
 };
 }  // namespace helics

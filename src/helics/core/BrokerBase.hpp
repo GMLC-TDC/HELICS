@@ -105,10 +105,7 @@ class BrokerBase {
         terminated = 3,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
-    std::atomic<broker_state_t> brokerState{
-        broker_state_t::created};  //!< flag indicating that the structure is past the
-    //!< initialization stage indicating that no more changes
-    //!< can be made to the number of federates or handles
+
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode{
@@ -123,8 +120,11 @@ class BrokerBase {
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
-
-  public:
+  private:
+    /** storage for the current state of the system */
+    std::atomic<broker_state_t> brokerState{
+        broker_state_t::created};  
+public:
     explicit BrokerBase(bool DisableQueue = false) noexcept;
     explicit BrokerBase(const std::string& broker_name, bool DisableQueue = false);
 
@@ -186,6 +186,9 @@ class BrokerBase {
     void baseConfigure(ActionMessage& command);
 
   protected:
+    broker_state_t getBrokerState() const { return brokerState.load(); }
+    bool setBrokerState(broker_state_t newState);
+    bool transitionBrokerState(broker_state_t expectedState, broker_state_t newState);
     /** process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;
     /** in the case of connection failure with a broker this function will try a reconnect procedure
