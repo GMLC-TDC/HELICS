@@ -122,9 +122,9 @@ class BrokerBase {
     std::string lastErrorString;  //!< storage for last error string
   private:
     /** storage for the current state of the system */
-    std::atomic<broker_state_t> brokerState{
-        broker_state_t::created};  
-public:
+    std::atomic<broker_state_t> brokerState{broker_state_t::created};
+
+  public:
     explicit BrokerBase(bool DisableQueue = false) noexcept;
     explicit BrokerBase(const std::string& broker_name, bool DisableQueue = false);
 

@@ -313,11 +313,10 @@ bool CommsInterface::connect()
     txTrigger.waitActivation();
     rxTrigger.waitActivation();
     if (rx_status != connection_status::connected) {
-        if (!requestDisconnect.load())
-        {
+        if (!requestDisconnect.load()) {
             logError("receiver connection failure");
         }
-        
+
         if (tx_status == connection_status::connected) {
             syncLock.lock();
             if (queue_transmitter.joinable()) {
