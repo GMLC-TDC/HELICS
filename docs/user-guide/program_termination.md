@@ -1,6 +1,6 @@
 # Terminating HELICS
 
-If executing from a C or C++ based program.  Ctrl-C should do the right thing.  And terminate the local program.  If the co-simulation is running across multiple machines then the remaining programs won't terminate properly and will either timeout or if that was disabled potentially deadlock.  
+If executing from a C or C++ based program.  Ctrl-C should do the right thing, and terminate the local program. If the co-simulation is running across multiple machines then the remaining programs won't terminate properly and will either timeout or if that was disabled potentially deadlock.
 
 
 ## Signal handler facilities
@@ -39,7 +39,7 @@ facilities for signal handling in C++ were not put in place since it is easy eno
 
 A global error generated anywhere in a federation will terminate the co-simulation.  
 
-``` c
+```c
 /**
  * generate a global error through a broker  this will terminate the federation
  *
