@@ -776,13 +776,13 @@ void BrokerBase::queueProcessingLoop()
     }
 }
 
-bool BrokerBase::setBrokerState(broker_state_t newState) {
-    if (brokerState.load()==broker_state_t::errored)
-        {
+bool BrokerBase::setBrokerState(broker_state_t newState)
+{
+    if (brokerState.load() == broker_state_t::errored) {
         return false;
-        }
+    }
     brokerState.store(newState);
-        return true;
+    return true;
 }
 
 bool BrokerBase::transitionBrokerState(broker_state_t expectedState, broker_state_t newState)

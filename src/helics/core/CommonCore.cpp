@@ -121,8 +121,7 @@ void CommonCore::configureFromVector(std::vector<std::string> args)
 bool CommonCore::connect()
 {
     auto cBrokerState = getBrokerState();
-    if (cBrokerState == broker_state_t::errored)
-    {
+    if (cBrokerState == broker_state_t::errored) {
         return false;
     }
     if (cBrokerState >= broker_state_t::configured) {
@@ -150,7 +149,6 @@ bool CommonCore::connect()
                 disconnection.activate();
             } else {
                 setBrokerState(broker_state_t::configured);
-
             }
             return res;
         }
@@ -370,7 +368,8 @@ bool CommonCore::isOpenToNewFederates() const
              (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
 
-bool CommonCore::hasError() const {
+bool CommonCore::hasError() const
+{
     return getBrokerState() == broker_state_t::errored;
 }
 void CommonCore::globalError(local_federate_id federateID,
@@ -2427,7 +2426,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (delayInitCounter < 0 && minFederateCount == 0) {
                     if (allInitReady()) {
                         if (transitionBrokerState(broker_state_t::connected,
-                                                                broker_state_t::initializing)) {
+                                                  broker_state_t::initializing)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
                             checkDependencies();
@@ -2641,7 +2640,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -2669,7 +2668,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -2987,8 +2986,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                 fed->init_transmitted = true;
                 if (allInitReady()) {
                     if (transitionBrokerState(
-                            broker_state_t::connected, broker_state_t::initializing)) {  // make sure we only do
-                                                                   // this once
+                            broker_state_t::connected,
+                            broker_state_t::initializing)) {  // make sure we only do
+                        // this once
                         checkDependencies();
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
@@ -2997,7 +2997,8 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_INIT_GRANT:
-            if (transitionBrokerState(broker_state_t::initializing,
+            if (transitionBrokerState(
+                    broker_state_t::initializing,
                     broker_state_t::operating)) {  // forward the grant to all federates
                 if (filterFed != nullptr) {
                     filterFed->organizeFilterOperations();
@@ -3016,7 +3017,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                     timeCoord->disconnect();
                 }
             }
-         break;
+            break;
 
         case CMD_SEND_MESSAGE:
             if ((command.dest_id == parent_broker_id) && (isLocal(command.source_id))) {
@@ -3568,7 +3569,8 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             --delayInitCounter;
             if (delayInitCounter <= 0) {
                 if (allInitReady()) {
-                    if (transitionBrokerState(broker_state_t::connected,
+                    if (transitionBrokerState(
+                            broker_state_t::connected,
                             broker_state_t::initializing)) {  // make sure we only do this once
                         checkDependencies();
                         cmd.setAction(CMD_INIT);

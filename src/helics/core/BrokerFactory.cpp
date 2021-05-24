@@ -282,9 +282,7 @@ thread which allows the destructor to fire if need be without issue*/
     {
         auto brokers = getAllBrokers();
         for (auto& brk : brokers) {
-            brk->globalError(
-                            errorCode,
-                            brk->getIdentifier() + " sending-> " + errorString);
+            brk->globalError(errorCode, brk->getIdentifier() + " sending-> " + errorString);
             brk->disconnect();
         }
         cleanUpBrokers(std::chrono::milliseconds(250));

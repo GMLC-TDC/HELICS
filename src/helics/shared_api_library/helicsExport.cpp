@@ -86,10 +86,9 @@ static void signalHandlerCallback(int signum)
 {
     helics_bool runDefaultSignalHandler{helics_true};
     if (keyHandler != nullptr) {
-        runDefaultSignalHandler=keyHandler(signum);
+        runDefaultSignalHandler = keyHandler(signum);
     }
-    if (runDefaultSignalHandler!=helics_false)
-    {
+    if (runDefaultSignalHandler != helics_false) {
         signalHandler(signum);
     }
 }
@@ -1177,7 +1176,7 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, fed->fedptr->getName()+" sending->"+error);
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sending->" + error);
             }
         }
     }

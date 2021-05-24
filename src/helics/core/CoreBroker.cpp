@@ -1689,7 +1689,7 @@ void CoreBroker::configureFromArgs(int argc, char* argv[])
 
 void CoreBroker::configureFromVector(std::vector<std::string> args)
 {
-    if (transitionBrokerState(broker_state_t::created,broker_state_t::configuring)) {
+    if (transitionBrokerState(broker_state_t::created, broker_state_t::configuring)) {
         auto result = parseArgs(std::move(args));
         if (result != 0) {
             setBrokerState(broker_state_t::created);
@@ -2560,7 +2560,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
 {
     if (request == "isinit") {
         return (getBrokerState() >= broker_state_t::operating) ? std::string("true") :
-                                                            std::string("false");
+                                                                 std::string("false");
     }
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");

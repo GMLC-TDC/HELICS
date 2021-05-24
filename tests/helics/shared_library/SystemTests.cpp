@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ctestFixtures.hpp"
 
-#include <thread>
-#include <csignal>
 #include <atomic>
+#include <csignal>
+#include <thread>
 
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
@@ -387,6 +387,6 @@ TEST(other_tests, signal_handler_callback)
 TEST(other_tests, signal_handler_death)
 {
     helicsLoadSignalHandler();
-    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(helics_error_user_abort),"");
+    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(helics_error_user_abort), "");
     helicsClearSignalHandler();
 }

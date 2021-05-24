@@ -222,7 +222,7 @@ namespace udp {
                         setTxStatus(connection_status::error);
                         return;
                     }
-                    
+
                     bool timeout{false};
                     std::vector<char> rx(128);
                     udp::endpoint brk;
@@ -256,8 +256,7 @@ namespace udp {
                     }
                     auto len = transmitSocket.receive_from(asio::buffer(rx), brk, 0, error);
                     if (error) {
-                        if (errorCount++ == 0)
-                        {
+                        if (errorCount++ == 0) {
                             logError(
                                 fmt::format("error in initial receive broker {}", error.message()));
                         }
