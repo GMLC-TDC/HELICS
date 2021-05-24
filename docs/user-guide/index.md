@@ -16,6 +16,7 @@ There are a number of classes of HELICS users:
 - [**Co-Simulation Overview**](./co-simulation_overview.md) - A more detailed discussion of what co-simulation is and how it is used
 - [**HELICS Key Concepts**](./helics_key_concepts) - Key terms and concepts to understand before running co-simulations with HELICS
 - [**HELICS Co-Simulation Walk-through**](./helics_co-sim_sequence.md) - A notional walk-through of a simple transmission and distribution HELICS co-simulation to show the basic steps the software runs through
+- [**environment variables**](./environment_variables.md) - A discussion of HELICS supported environment variables for use in setting up a co-simulation
 - [**Federates**](./federates.md) - Discussion of the different types of federates in HELICS ([value federates](./value_federates.md) and [message federates](./message_federates.md)) and how configure them
 - [**Message Filters**](./filters) - How HELICS message filters can be implemented natively in HELICS or as stand-alone federates
 - [**Co-Simulation Timing**](./timing.md) - How HELICS coordinates the simulation time of all the federates in the federation
