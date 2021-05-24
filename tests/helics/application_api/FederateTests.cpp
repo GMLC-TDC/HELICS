@@ -174,7 +174,7 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
 }
 
 
-TEST(federate_tests, timeout_abort)
+TEST(federate_tests, timeout_abort_zmq)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -188,6 +188,10 @@ TEST(federate_tests, timeout_abort)
     auto cret = std::async(std::launch::async, call);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     helics::CoreFactory::abortAllCores(helics_error_user_abort,"aborting55");
     try
     {
@@ -217,6 +221,9 @@ TEST(federate_tests, timeout_abort_tcp)
     auto cret = std::async(std::launch::async, call);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
     try {
         cret.get();
@@ -240,6 +247,9 @@ TEST(federate_tests, timeout_abort_tcpss)
     auto cret = std::async(std::launch::async, call);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
     try {
         cret.get();
@@ -264,6 +274,9 @@ TEST(federate_tests, timeout_abort_udp)
 
     auto cret = std::async(std::launch::async, call);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
     helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
     try {
         cret.get();

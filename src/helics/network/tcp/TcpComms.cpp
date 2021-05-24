@@ -233,7 +233,15 @@ namespace tcp {
                         "initial connection to broker timed out exceeding max number of retries ");
                     return terminate(connection_status::error);
                 }
-                std::this_thread::yield();
+                if (retries % 2 == 1)
+                {
+                    std::this_thread::yield();
+                }
+                else
+                {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+                
                 if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                     return terminate(connection_status::terminated);
                 }

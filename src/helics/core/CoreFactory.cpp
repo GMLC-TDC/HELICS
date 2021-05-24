@@ -339,6 +339,9 @@ thread which allows the destructor to fire if need be without issue*/
         cleanUpCores(std::chrono::milliseconds(250));
     }
 
+    size_t getCoreCount() {
+        return searchableCores.getObjects().size();
+    }
     bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
     {
         return searchableCores.copyObject(copyFromName, copyToName);

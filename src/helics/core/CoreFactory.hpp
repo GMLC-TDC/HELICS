@@ -185,6 +185,9 @@ Core is registered or when the clean up function is called this prevents some od
     void terminateAllCores();
     /** abort all cores */
     void abortAllCores(int errorCode, const std::string& errorString);
+
+    /** get the current number of cores */
+    size_t getCoreCount();
 }  // namespace CoreFactory
 
 }  // namespace helics
