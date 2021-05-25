@@ -608,7 +608,7 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
     local_federate_id local_id;
     {
         auto feds = federates.lock();
-        if (feds->size() >= maxFederateCount) {
+        if (static_cast<decltype(maxFederateCount)>(feds->size()) >= maxFederateCount) {
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
         auto id = feds->insert(name, name, info);
@@ -3728,6 +3728,8 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             } else {
                 transmit(getRoute(cmd.dest_id), cmd);
             }
+            break;
+        default:
             break;
     }
 }

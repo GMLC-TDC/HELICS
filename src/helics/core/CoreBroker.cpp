@@ -371,7 +371,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     return;
                 }
             }
-            if (_brokers.size() >= maxBrokerCount) {
+            if (static_cast<decltype(maxBrokerCount)>(_brokers.size()) >= maxBrokerCount) {
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
@@ -3050,6 +3050,8 @@ void CoreBroker::processQueryCommand(ActionMessage& cmd)
                     delayTransmitQueue.push(cmd);
                 }
             }
+            break;
+        default:
             break;
     }
 }

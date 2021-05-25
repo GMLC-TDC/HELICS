@@ -125,7 +125,7 @@ typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     helics_flag_delay_init_entry = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    helics_flag_enable_init_entry = 47,
+    helics_flag_enable_init_entry = 47
 } helics_core_flags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */

@@ -384,7 +384,7 @@ TEST(other_tests, signal_handler_callback)
 }
 
 /** test the default signal handler*/
-TEST(other_tests, signal_handler_death)
+TEST(other_tests, signal_handler_death_ci_skip)
 {
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(helics_error_user_abort), "");
