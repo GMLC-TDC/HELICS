@@ -121,6 +121,10 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    void globalError(int errorCode, const std::string& errorString)
+    {
+        helicsCoreGlobalError(core, errorCode, errorString.c_str(), HELICS_IGNORE_ERROR);
+    }
     /** make a query of the core
 @details this call is blocking until the value is returned which may take some time depending
 on the size of the federation and the specific string being queried
