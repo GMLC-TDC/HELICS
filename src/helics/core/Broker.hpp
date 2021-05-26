@@ -136,7 +136,7 @@ class Broker {
     virtual void clearTimeBarrier() = 0;
 
     /**
-    * generate a global error and halt the federation.
+    * generate a global error and halt the federation
     @param errorCode the code to use for the error
     @param errorString the error message to associate with the error
     */

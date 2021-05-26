@@ -23,17 +23,17 @@ This function will insert a signal handler that generates a global error on know
 /** load a custom signal handler to execute prior to the abort signal handler
 @details  This function is not 100% reliable it will most likely work but uses some functions and
 techniques that are not 100% guaranteed to work in a signal handler
-in worst case it could deadlock.  That is somewhat unlikely given usage patterns
+and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
 but it is possible*/
 void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int));
 
 ```
 
-It is also possible to insert a custom callback into the signal handler chain. Again this is not 100% reliable. But is useful for some language API's that do other things to signals. This allows for inserting a custom operation that do some other cleanup. The callback has a helics_boolean return value. If the value is set to `helics_true`(or any positive value) then the normal Signal handler is called which aborts ongoing federations and exits. If it is set to `helics_false` then the default callback is not executed.
+It is also possible to insert a custom callback into the signal handler chain. Again this is not 100% reliable. But is useful for some language API's that do other things to signals. This allows for inserting a custom operation that does some other cleanup. The callback has a helics_boolean return value. If the value is set to `helics_true`(or any positive value) then the normal Signal handler is called which aborts ongoing federations and exits. If it is set to `helics_false` then the default callback is not executed.
 
 ### Signal handlers in C++
 
-facilities for signal handling in C++ were not put in place since it is easy enough for a user to place there own handlers which would like do a better job than any built in ones, so a default one was not put in place at present though may be at a later time.
+Facilities for signal handling in C++ were not put in place since it is easy enough for a user to place their own handlers which would likely do a better job than any built in ones, so a default one was not put in place at present though may be at a later time.
 
 ## Generating an error
 
@@ -69,7 +69,7 @@ Corresponding functions are available in the C++ API as well. Any global error w
 
 ### Some modifying flags
 
-Setting the `helics_terminate_on_error` flag to true will escalate any local error into global one and terminate the co-simulation. This includes any mismatched configuration or other local issues.
+Setting the `helics_terminate_on_error` flag to true will escalate any local error into a global one and terminate the co-simulation. This includes any mismatched configuration or other local issues.
 
 ## Comments
 

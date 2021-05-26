@@ -52,24 +52,24 @@ HELICS_EXPORT helics_error helicsErrorInitialize(void);
  */
 HELICS_EXPORT void helicsErrorClear(helics_error* err);
 
-/** load a signal handler that handles Ctrl-C and shuts down all helics brokers, cores,
-and federates then exits the process*/
+/** Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,
+and federates then exits the process.*/
 HELICS_EXPORT void helicsLoadSignalHandler();
 
-/** clear HELICS based signal Handlers*/
+/** Clear HELICS based signal handlers.*/
 HELICS_EXPORT void helicsClearSignalHandler();
 
-/** load a custom signal handler to execute prior to the abort signal handler
+/** Load a custom signal handler to execute prior to the abort signal handler.
 @details  This function is not 100% reliable it will most likely work but uses some functions and
 techniques that are not 100% guaranteed to work in a signal handler
-in worst case it could deadlock.  That is somewhat unlikely given usage patterns
-but it is possible.  The callback has signature helics_bool(*handler)(int)  it will take the SIG_INT as an argument
-and return a boolean.  If the boolean return value is helics_true(or the callback is null) the default signal handler is run after the
-callback finishes, if it is helics_false the default callback is not run the default signal handler is executed.*/
+and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
+but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument
+and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the
+callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.*/
 HELICS_EXPORT void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int));
 
-/** execute a global abort by sending an error code to all cores, brokers,
-federates that were created through the current library instance*/
+/** Execute a global abort by sending an error code to all cores, brokers,
+and federates that were created through the current library instance.*/
 HELICS_EXPORT void helicsAbort(int errorCode, const char* errorString);
 
 /**
@@ -1414,11 +1414,11 @@ HELICS_EXPORT void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time 
 HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
 
 /**
- * generate a global error through a broker  this will terminate the federation
+ * Generate a global error through a broker. This will terminate the federation.
  *
- * @param broker The broker to generate the globalError on
- * @param errorCode the error code to associate with the global error
- * @param errorString an error message to associate with the error
+ * @param broker The broker to generate the global error on.
+ * @param errorCode The error code to associate with the global error.
+ * @param errorString An error message to associate with the global error.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
@@ -1426,11 +1426,11 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
 HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err);
 
 /**
- * generate a global error through a broker  this will terminate the federation
+ * Generate a global error through a broker. This will terminate the federation.
  *
- * @param core The core to generate the global error
- * @param errorCode the error code to associate with the global error
- * @param errorString an error message to associate with the error
+ * @param core The core to generate the global error.
+ * @param errorCode The error code to associate with the global error.
+ * @param errorString An error message to associate with the global error.
  * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
