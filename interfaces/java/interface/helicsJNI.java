@@ -70,6 +70,7 @@ public class helicsJNI {
   public final static native int helics_error_fatal_get();
   public final static native int helics_error_external_type_get();
   public final static native int helics_error_other_get();
+  public final static native int helics_error_user_abort_get();
   public final static native int helics_error_insufficient_space_get();
   public final static native int helics_error_execution_failure_get();
   public final static native int helics_error_invalid_function_call_get();
@@ -179,6 +180,10 @@ public class helicsJNI {
   public final static native String helicsGetVersion();
   public final static native String helicsGetBuildFlags();
   public final static native String helicsGetCompilerVersion();
+  public final static native void helicsLoadSignalHandler();
+  public final static native void helicsClearSignalHandler();
+  public final static native void helicsLoadSignalHandlerCallback(long jarg1);
+  public final static native void helicsAbort(int jarg1, String jarg2);
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);
   public final static native long helicsCreateCoreFromArgs(String jarg1, String jarg2, String[] jarg3);
@@ -294,6 +299,8 @@ public class helicsJNI {
   public final static native void helicsBrokerSetLogFile(long jarg1, String jarg2);
   public final static native void helicsBrokerSetTimeBarrier(long jarg1, double jarg2);
   public final static native void helicsBrokerClearTimeBarrier(long jarg1);
+  public final static native void helicsBrokerGlobalError(long jarg1, int jarg2, String jarg3);
+  public final static native void helicsCoreGlobalError(long jarg1, int jarg2, String jarg3);
   public final static native long helicsCreateQuery(String jarg1, String jarg2);
   public final static native String helicsQueryExecute(long jarg1, long jarg2);
   public final static native String helicsQueryCoreExecute(long jarg1, long jarg2);
