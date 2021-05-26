@@ -433,6 +433,7 @@ int CommonCore::getErrorCode() const
 
 std::string CommonCore::getErrorMessage() const
 {
+    // used to sync threads and ensure a string is available
     lastErrorCode.load();
     return lastErrorString;
 }
