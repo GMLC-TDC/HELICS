@@ -423,7 +423,7 @@ void BrokerBase::generateNewIdentifier()
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
     lastErrorString = std::string(estring);
-    lastErrorCode = eCode;
+    lastErrorCode.store(eCode);
     if (brokerState.load() != broker_state_t::errored) {
         brokerState.store(broker_state_t::errored);
         if (errorDelay <= timeZero) {
@@ -784,6 +784,20 @@ void BrokerBase::queueProcessingLoop()
                 return;
         }
     }
+}
+
+bool BrokerBase::setBrokerState(broker_state_t newState)
+{
+    if (brokerState.load() == broker_state_t::errored) {
+        return false;
+    }
+    brokerState.store(newState);
+    return true;
+}
+
+bool BrokerBase::transitionBrokerState(broker_state_t expectedState, broker_state_t newState)
+{
+    return brokerState.compare_exchange_strong(expectedState, newState);
 }
 
 void BrokerBase::baseConfigure(ActionMessage& command)

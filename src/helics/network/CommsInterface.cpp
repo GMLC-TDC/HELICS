@@ -313,7 +313,10 @@ bool CommsInterface::connect()
     txTrigger.waitActivation();
     rxTrigger.waitActivation();
     if (rx_status != connection_status::connected) {
-        logError("receiver connection failure");
+        if (!requestDisconnect.load()) {
+            logError("receiver connection failure");
+        }
+
         if (tx_status == connection_status::connected) {
             syncLock.lock();
             if (queue_transmitter.joinable()) {
@@ -336,7 +339,9 @@ bool CommsInterface::connect()
     }
 
     if (tx_status != connection_status::connected) {
-        logError("transmitter connection failure");
+        if (!requestDisconnect.load()) {
+            logError("transmitter connection failure");
+        }
         if (!singleThread) {
             if (rx_status == connection_status::connected) {
                 syncLock.lock();

@@ -120,6 +120,10 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    void globalError(int errorCode, const std::string& errorString)
+    {
+        helicsCoreGlobalError(core, errorCode, errorString.c_str(), HELICS_IGNORE_ERROR);
+    }
     /** send an asynchronous command to another object
     @param target the name of the target of the command
     @param command the command message to send

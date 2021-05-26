@@ -84,12 +84,15 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
+    virtual bool hasError() const override final;
     virtual void globalError(LocalFederateId federateID,
                              int errorCode,
                              const std::string& errorString) override final;
     virtual void localError(LocalFederateId federateID,
                             int errorCode,
                             const std::string& errorString) override final;
+    virtual int getErrorCode() const override final;
+    virtual std::string getErrorMessage() const override final;
     virtual void finalize(LocalFederateId federateID) override final;
     virtual void enterInitializingMode(LocalFederateId federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -511,7 +514,7 @@ class CommonCore: public Core, public BrokerBase {
                               bool force_ordering) const;
 
     /** send an error code and message to all the federates*/
-    void sendErrorToFederates(int error_code, std::string_view message);
+    void sendErrorToFederates(int errorCode, std::string_view message);
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/

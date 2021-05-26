@@ -93,6 +93,11 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     if (!coreObject->isConnected()) {
         coreObject->connect();
         if (!coreObject->isConnected()) {
+            if (coreObject->hasError()) {
+                auto message = coreObject->getErrorMessage();
+                coreObject->disconnect();
+                throw(RegistrationFailure(message));
+            }
             coreObject->disconnect();
             throw(RegistrationFailure("Unable to connect to broker->unable to register federate"));
         }

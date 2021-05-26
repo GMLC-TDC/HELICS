@@ -256,6 +256,13 @@ void BrokerApp::clearTimeBarrier()
     }
 }
 
+void BrokerApp::globalError(int32_t errorCode, const std::string& errorString)
+{
+    if (broker) {
+        broker->globalError(errorCode, errorString);
+    }
+}
+
 /** set the log file to use for the broker*/
 void BrokerApp::setLogFile(const std::string& logFile)
 {

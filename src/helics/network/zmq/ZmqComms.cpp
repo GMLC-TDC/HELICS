@@ -145,7 +145,7 @@ namespace zeromq {
                     disconnecting = true;
                     setRxStatus(connection_status::error);
                     return;
-                } else if (M.messageID == DISCONNECT) {
+                } else if (M.messageID == DISCONNECT || M.messageID == CLOSE_RECEIVER) {
                     disconnecting = true;
                     setRxStatus(connection_status::terminated);
                     return;
@@ -265,6 +265,12 @@ namespace zeromq {
 
                 int cnt2 = 0;
                 while (PortNumber < 0) {
+                    if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                        ActionMessage M(CMD_PROTOCOL);
+                        M.messageID = DISCONNECT;
+                        controlSocket.send(M.to_string());
+                        return (-3);
+                    }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
                     auto str = getPorts.to_string();
 
@@ -282,6 +288,9 @@ namespace zeromq {
                         }
                         if (rc == 0) {
                             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                                ActionMessage M(CMD_PROTOCOL);
+                                M.messageID = DISCONNECT;
+                                controlSocket.send(M.to_string());
                                 return (-3);
                             }
                             if (cnt2 == 1) {

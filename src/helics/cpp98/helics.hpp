@@ -52,5 +52,20 @@ inline void closeLibrary()
     helicsCloseLibrary();
 }
 
+inline void loadSignalHandler()
+{
+    helicsLoadSignalHandler();
+}
+
+inline void loadSignalHandler(helics_bool (*handler)(int))
+{
+    helicsLoadSignalHandlerCallback(handler);
+}
+
+inline void clearSignalHandler()
+{
+    helicsClearSignalHandler();
+}
+
 }  // namespace helicscpp
 #endif
