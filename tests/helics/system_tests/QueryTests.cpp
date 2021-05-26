@@ -976,3 +976,27 @@ TEST_F(query, queries_disconnected)
     EXPECT_EQ(res, "#disconnected");
     vFed1->finalize();
 }
+
+
+TEST_F(query, queries_disconnected_global)
+{
+    SetupTest<helics::ValueFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+    vFed1->enterExecutingModeAsync();
+    vFed3->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed3->enterExecutingModeComplete();
+
+    auto res = brokers[0]->query("root", "global_time");
+    vFed2->finalize();
+    vFed1->requestTime(3.0);
+    res = brokers[0]->query("root", "global_time");
+    vFed2->finalize();
+    res = brokers[0]->query("root", "global_time");
+    vFed3->finalize();
+    res = brokers[0]->query("root", "global_time");
+    
+}

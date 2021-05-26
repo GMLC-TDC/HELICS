@@ -73,6 +73,12 @@ bool JsonMapBuilder::clearComponents(int32_t code)
     return false;
 }
 
+bool JsonMapBuilder::clearComponents()
+{
+    missing_components.clear();
+    return static_cast<bool>(jMap);
+}
+
 std::string JsonMapBuilder::generate()
 {
     if (jMap) {

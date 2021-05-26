@@ -220,6 +220,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--querytimeout",
+        queryTimeout,
+        "time to wait for a query to be answered default unit is in  ms default 15s(can also be entered as a time "
+        "like '10s' or '45ms') ");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
@@ -687,7 +692,7 @@ void BrokerBase::queueProcessingLoop()
                     }
                     break;
                 }
-                if (messagesSinceLastTick == 0 || forwardTick) {
+                if (messagesSinceLastTick == 0 || forwardTick>0U) {
 #ifndef DISABLE_TICK
                     processCommand(std::move(command));
 #endif

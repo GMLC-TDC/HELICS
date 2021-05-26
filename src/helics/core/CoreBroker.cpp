@@ -1245,7 +1245,10 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
             }
             break;
         case REQUEST_TICK_FORWARDING:
-            forwardTick = checkActionFlag(cmd, indicator_flag);
+            if (checkActionFlag(cmd, indicator_flag))
+            {
+                ++forwardTick;
+            }
         default:
             break;
     }
@@ -2276,12 +2279,12 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                     }
                 }
             } else if (command.dest_id == parent_broker_id) {
-                if (!isRootc)  // we got a disconnect from up above
+                if (!isRootc)
                 {
-                    LOG_CONNECTIONS(parent_broker_id,
-                                    getIdentifier(),
-                                    "got disconnect from parent");
                     if (command.source_id == higher_broker_id) {
+                        LOG_CONNECTIONS(parent_broker_id,
+                                        getIdentifier(),
+                                        "got disconnect from parent");
                         sendDisconnect();
                         addActionMessage(CMD_STOP);
                         return;
