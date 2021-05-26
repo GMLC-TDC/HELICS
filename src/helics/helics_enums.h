@@ -125,7 +125,7 @@ typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     helics_flag_delay_init_entry = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    helics_flag_enable_init_entry = 47,
+    helics_flag_enable_init_entry = 47
 } helics_core_flags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
@@ -175,6 +175,8 @@ typedef enum {
     helics_error_fatal = -404, /*!< global fatal error for federation */
     helics_error_external_type = -203, /*!< an unknown non-helics error was produced */
     helics_error_other = -101, /*!< the function produced a helics error of some other type */
+    /** user system abort*/
+    helics_error_user_abort = -27,
     helics_error_insufficient_space =
         -18, /*!< insufficient space is available to store requested data */
     helics_error_execution_failure = -14, /*!< the function execution has failed */

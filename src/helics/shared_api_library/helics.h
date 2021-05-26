@@ -52,6 +52,26 @@ HELICS_EXPORT helics_error helicsErrorInitialize(void);
  */
 HELICS_EXPORT void helicsErrorClear(helics_error* err);
 
+/** Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,
+and federates then exits the process.*/
+HELICS_EXPORT void helicsLoadSignalHandler();
+
+/** Clear HELICS based signal handlers.*/
+HELICS_EXPORT void helicsClearSignalHandler();
+
+/** Load a custom signal handler to execute prior to the abort signal handler.
+@details  This function is not 100% reliable it will most likely work but uses some functions and
+techniques that are not 100% guaranteed to work in a signal handler
+and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
+but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument
+and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the
+callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.*/
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int));
+
+/** Execute a global abort by sending an error code to all cores, brokers,
+and federates that were created through the current library instance.*/
+HELICS_EXPORT void helicsAbort(int errorCode, const char* errorString);
+
 /**
  * Returns true if core/broker type specified is available in current compilation.
  *
@@ -800,10 +820,10 @@ HELICS_EXPORT void helicsFederateRegisterInterfaces(helics_federate fed, const c
  * @details A global error halts the co-simulation completely.
  *
  * @param fed The federate to create an error in.
- * @param error_code The integer code for the error.
- * @param error_string A string describing the error.
+ * @param errorCode The integer code for the error.
+ * @param errorString A string describing the error.
  */
-HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int errorCode, const char* errorString);
 
 /**
  * Generate a local error in a federate.
@@ -811,10 +831,10 @@ HELICS_EXPORT void helicsFederateGlobalError(helics_federate fed, int error_code
  * @details This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize
  * but does allow some interaction with a core for a brief time.
  * @param fed The federate to create an error in.
- * @param error_code The integer code for the error.
- * @param error_string A string describing the error.
+ * @param errorCode The integer code for the error.
+ * @param errorString A string describing the error.
  */
-HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int error_code, const char* error_string);
+HELICS_EXPORT void helicsFederateLocalError(helics_federate fed, int errorCode, const char* errorString);
 
 /**
  * Finalize the federate. This function halts all communication in the federate and disconnects it from the core.
@@ -1393,6 +1413,29 @@ HELICS_EXPORT void helicsBrokerSetTimeBarrier(helics_broker broker, helics_time 
  */
 HELICS_EXPORT void helicsBrokerClearTimeBarrier(helics_broker broker);
 
+/**
+ * Generate a global error through a broker. This will terminate the federation.
+ *
+ * @param broker The broker to generate the global error on.
+ * @param errorCode The error code to associate with the global error.
+ * @param errorString An error message to associate with the global error.
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err);
+
+/**
+ * Generate a global error through a broker. This will terminate the federation.
+ *
+ * @param core The core to generate the global error.
+ * @param errorCode The error code to associate with the global error.
+ * @param errorString An error message to associate with the global error.
+ * @forcpponly
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * @endforcpponly
+ */
+HELICS_EXPORT void helicsCoreGlobalError(helics_core core, int errorCode, const char* errorString, helics_error* err);
 /**
  * Create a query object.
  *
