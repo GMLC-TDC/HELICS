@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "json/forwards.h"
 #include <array>
 #include <atomic>
+#include <chrono>
 #include <map>
 #include <memory>
 #include <set>
@@ -239,6 +240,10 @@ class CommonCore: public Core, public BrokerBase {
      * may need a helper class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
+    /** check to make sure there are no inflight queries that need to be resolved before
+     * disconnect*/
+    void checkInFlightQueriesForDisconnect();
+
     virtual void setInterfaceInfo(interface_handle handle, std::string info) override final;
     virtual const std::string& getInterfaceInfo(interface_handle handle) const override final;
 
@@ -341,7 +346,8 @@ class CommonCore: public Core, public BrokerBase {
     void checkDependencies();
     /** deal with a query response addressed to this core*/
     void processQueryResponse(const ActionMessage& m);
-
+    /** manage query timeouts*/
+    void checkQueryTimeouts();
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore(const ActionMessage& cmd);
     /** process configure commands for the core*/
@@ -403,6 +409,8 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<int> queryCounter{1};
     /// holder for active queries
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;
+    /// timeout manager for queries
+    std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
     /// holder for the query map builder information
     mutable std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
 
