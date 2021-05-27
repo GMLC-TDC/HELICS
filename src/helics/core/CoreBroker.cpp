@@ -1246,8 +1246,7 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
             }
             break;
         case REQUEST_TICK_FORWARDING:
-            if (checkActionFlag(cmd, indicator_flag))
-            {
+            if (checkActionFlag(cmd, indicator_flag)) {
                 setTickForwarding(TickForwardingReasons::ping_response, true);
             }
             break;
@@ -2281,8 +2280,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                     }
                 }
             } else if (command.dest_id == parent_broker_id) {
-                if (!isRootc)
-                {
+                if (!isRootc) {
                     if (command.source_id == higher_broker_id) {
                         LOG_CONNECTIONS(parent_broker_id,
                                         getIdentifier(),

@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
-#include "gmock/gmock.h"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
@@ -15,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <thread>
 
@@ -1021,7 +1021,6 @@ TEST_F(query, queries_timeout_ci_skip)
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(query, broker_queries_timeout_ci_skip)
 {
