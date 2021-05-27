@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <array>
 #include <atomic>
 #include <chrono>
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
