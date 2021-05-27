@@ -218,6 +218,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--querytimeout",
+        queryTimeout,
+        "time to wait for a query to be answered default unit is in  ms default 15s(can also be entered as a time "
+        "like '10s' or '45ms') ");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
@@ -697,11 +702,15 @@ void BrokerBase::queueProcessingLoop()
                     }
                     break;
                 }
-                if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
+                if (messagesSinceLastTick == 0) {
+                    command.messageID =
+                        forwardingReasons | static_cast<uint32_t>(TickForwardingReasons::no_comms);
                     processCommand(std::move(command));
-#endif
+                } else if (forwardTick) {
+                    command.messageID = forwardingReasons;
                 }
+#endif
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
@@ -784,6 +793,16 @@ void BrokerBase::queueProcessingLoop()
                 return;
         }
     }
+}
+
+void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
+{
+    if (value) {
+        forwardingReasons |= static_cast<std::uint32_t>(reason);
+    } else {
+        forwardingReasons &= ~static_cast<std::uint32_t>(reason);
+    }
+    forwardTick = (forwardingReasons != 0);
 }
 
 bool BrokerBase::setBrokerState(broker_state_t newState)

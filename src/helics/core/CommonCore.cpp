@@ -2300,9 +2300,13 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
+                if (fed->getState() <= federate_state::HELICS_EXECUTING) {
                 queryReq.messageID = brkindex;
                 queryReq.dest_id = fed.fed->global_id;
                 fed.fed->addAction(queryReq);
+            } else {
+                    builder.addComponent("", brkindex);
+                }
             } else {
                 builder.addComponent(ret, brkindex);
             }
@@ -2812,9 +2816,6 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 processCommand(std::move(command));
             }
         }
-
-            // case CMD_DISCONNECT_ACK:
-            //    break;
     }
 }
 
@@ -2906,10 +2907,17 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_IGNORE:
             break;
         case CMD_TICK:
+            if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response) ||
+                isReasonForTick(command.messageID, TickForwardingReasons::no_comms)) {
             if (getBrokerState() == broker_state_t::operating) {
                 timeoutMon->tick(this);
                 LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
             }
+            }
+            if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout)) {
+                checkQueryTimeouts();
+            }
+
             break;
         case CMD_PING:
         case CMD_BROKER_PING:  // broker ping for core is the same as core
@@ -3351,10 +3359,9 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (fed != nullptr) {
                 fed->init_transmitted = true;
                 if (allInitReady()) {
-                    if (transitionBrokerState(
-                            broker_state_t::connected,
-                            broker_state_t::initializing)) {  // make sure we only do
-                                                                   // this once
+                    if (transitionBrokerState(broker_state_t::connected,
+                                              broker_state_t::initializing)) {  // make sure we only
+                                                                                // do this once
                         checkDependencies();
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
@@ -3797,6 +3804,27 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
     }
 }
 
+void CommonCore::checkQueryTimeouts()
+{
+    if (!queryTimeouts.empty()) {
+        auto ctime = std::chrono::steady_clock::now();
+        for (auto& qt : queryTimeouts) {
+            if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
+                if (Time(ctime - qt.second) > queryTimeout) {
+                    activeQueries.setDelayedValue(qt.first, "#timeout");
+                    qt.first = 0;
+                }
+            }
+        }
+        while (!queryTimeouts.empty() && queryTimeouts.front().first == 0) {
+            queryTimeouts.pop_front();
+        }
+        if (queryTimeouts.empty()) {
+            setTickForwarding(TickForwardingReasons::query_timeout, false);
+        }
+    }
+}
+
 void CommonCore::processQueryResponse(const ActionMessage& m)
 {
     if (m.counter == GENERAL_QUERY) {
@@ -4040,6 +4068,12 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                         transmit(getRoute(queryResp.dest_id), queryResp);
                     }
                 } else {
+                    if (cmd.source_id == direct_core_id) {
+                        if (queryTimeouts.empty()) {
+                            setTickForwarding(TickForwardingReasons::query_timeout, true);
+                        }
+                        queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
+                    }
                     ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :
                                                             CMD_QUERY_REPLY);
                     queryResp.dest_id = cmd.source_id;
@@ -4060,6 +4094,12 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             // FALLTHROUGH
         case CMD_QUERY:
             if (cmd.dest_id == parent_broker_id) {
+                if (cmd.source_id == direct_core_id) {
+                    if (queryTimeouts.empty()) {
+                        setTickForwarding(TickForwardingReasons::query_timeout, true);
+                    }
+                    queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
+                }
                 const auto& target = cmd.getString(targetStringLoc);
                 if (target == "root" || target == "federation") {
                     cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
@@ -4253,6 +4293,7 @@ bool CommonCore::checkAndProcessDisconnect()
         return true;
     }
     if (allDisconnected()) {
+        checkInFlightQueriesForDisconnect();
         setBrokerState(broker_state_t::terminating);
         timeCoord->disconnect();
         ActionMessage dis(CMD_DISCONNECT);
@@ -4283,9 +4324,44 @@ int CommonCore::generateMapObjectCounter() const
     return result;
 }
 
+void CommonCore::checkInFlightQueriesForDisconnect()
+{
+    for (auto& mb : mapBuilders) {
+        auto& builder = std::get<0>(mb);
+        auto& requestors = std::get<1>(mb);
+        if (builder.isCompleted()) {
+            return;
+        }
+        if (builder.clearComponents()) {
+            auto str = builder.generate();
+            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
+                if (requestors[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
+                } else {
+                    requestors[ii].payload = str;
+                    routeMessage(std::move(requestors[ii]));
+                }
+            }
+            if (requestors.back().dest_id == global_broker_id_local) {
+                // TODO(PT) add rvalue reference method
+                activeQueries.setDelayedValue(requestors.back().messageID, str);
+            } else {
+                requestors.back().payload = std::move(str);
+                routeMessage(std::move(requestors.back()));
+            }
+
+            requestors.clear();
+            if (std::get<2>(mb)) {
+                builder.reset();
+            }
+        }
+    }
+}
+
 void CommonCore::sendDisconnect()
 {
     LOG_CONNECTIONS(global_broker_id_local, "core", "sending disconnect");
+    checkInFlightQueriesForDisconnect();
     ActionMessage bye(CMD_STOP);
     bye.source_id = global_broker_id_local;
     for (auto fed : loopFederates) {
