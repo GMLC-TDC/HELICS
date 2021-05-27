@@ -51,7 +51,8 @@ class BrokerBase {
     Time tickTimer{5.0};  //!< the length of each heartbeat tick
     Time timeout{30.0};  //!< timeout to wait to establish a broker connection before giving up
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
-    Time queryTimeout{15.0}; //!< timeout for queries, if the query isn't answered within this time period respond with timeout error
+    Time queryTimeout{15.0};  //!< timeout for queries, if the query isn't answered within this time
+                              //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
@@ -107,14 +108,20 @@ class BrokerBase {
         errored = 7,  //!< an error was encountered
     };
 
+    enum class TickForwardingReasons:uint32_t
+    {
+        none=0,
+        no_comms=0x01,
+        ping_response = 0x02,
+        query_timeout=0x04
+    };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
     bool enteredExecutionMode{
         false};  //!< flag indicating that the broker has entered execution mode
     bool waitingForBrokerPingReply{false};  //!< flag indicating we are waiting for a ping reply
     bool hasFilters{false};  //!< flag indicating filters come through the broker
-    uint8_t forwardTick{
-        0U};  //!< indicator that ticks should be forwarded to the command processor regardless
+
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
     bool uuid_like{false};  //!< will be set to true if the name looks like a uuid
     decltype(std::chrono::steady_clock::now())
@@ -122,6 +129,10 @@ class BrokerBase {
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
+    /** indicator that ticks should be forwarded to the command processor regardless */
+    bool forwardTick{false};
+    /** reasons ticks might be forwarded*/
+    uint32_t forwardingReasons{0U};
     /** storage for the current state of the system */
     std::atomic<broker_state_t> brokerState{broker_state_t::created};
 
@@ -187,6 +198,13 @@ class BrokerBase {
     void baseConfigure(ActionMessage& command);
 
   protected:
+    /** check whether a code contains a specific reason*/
+    static bool isReasonForTick(std::uint32_t code, TickForwardingReasons reason)
+    {
+        return ((static_cast<std::uint32_t>(reason) & code) != 0);
+    }
+    /** set tick forwarding for a specific reason*/
+    void setTickForwarding(TickForwardingReasons reason, bool value = true);
     broker_state_t getBrokerState() const { return brokerState.load(); }
     bool setBrokerState(broker_state_t newState);
     bool transitionBrokerState(broker_state_t expectedState, broker_state_t newState);

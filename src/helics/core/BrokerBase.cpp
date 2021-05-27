@@ -692,11 +692,15 @@ void BrokerBase::queueProcessingLoop()
                     }
                     break;
                 }
-                if (messagesSinceLastTick == 0 || forwardTick>0U) {
 #ifndef DISABLE_TICK
+                if (messagesSinceLastTick == 0) {
+                    command.messageID =
+                        forwardingReasons | static_cast<uint32_t>(TickForwardingReasons::no_comms);
                     processCommand(std::move(command));
-#endif
+                } else if (forwardTick) {
+                    command.messageID = forwardingReasons;
                 }
+#endif
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
@@ -779,6 +783,16 @@ void BrokerBase::queueProcessingLoop()
                 return;
         }
     }
+}
+
+void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
+{
+    if (value) {
+        forwardingReasons |= static_cast<std::uint32_t>(reason);
+    } else {
+        forwardingReasons &= ~static_cast<std::uint32_t>(reason);
+    }
+    forwardTick = (forwardingReasons != 0);
 }
 
 bool BrokerBase::setBrokerState(broker_state_t newState)

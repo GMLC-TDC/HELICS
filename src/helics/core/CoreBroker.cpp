@@ -758,6 +758,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 timeoutMon->tick(this);
                 LOG_SUMMARY(global_broker_id_local, getIdentifier(), " broker tick");
             }
+            checkQueryTimeouts();
             break;
         case CMD_PING:
             if (command.dest_id == global_broker_id_local) {
@@ -1247,8 +1248,9 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
         case REQUEST_TICK_FORWARDING:
             if (checkActionFlag(cmd, indicator_flag))
             {
-                ++forwardTick;
+                setTickForwarding(TickForwardingReasons::ping_response, true);
             }
+            break;
         default:
             break;
     }
@@ -2962,6 +2964,12 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     queryRep.payload = generateQueryAnswer(m.payload, force_ordered);
     queryRep.counter = m.counter;
     if (queryRep.payload == "#wait") {
+        if (queryRep.dest_id == global_broker_id_local) {
+            if (queryTimeouts.empty()) {
+                setTickForwarding(TickForwardingReasons::query_timeout, true);
+            }
+            queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
+        }
         std::get<1>(mapBuilders[mapIndex.at(m.payload).first]).push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(m.messageID, queryRep.payload);
@@ -3167,7 +3175,34 @@ void CoreBroker::processQuery(ActionMessage& m)
                 transmit(getRoute(queryResp.dest_id), queryResp);
             }
         } else {
+            if (m.source_id == global_broker_id_local) {
+                if (queryTimeouts.empty()) {
+                    setTickForwarding(TickForwardingReasons::query_timeout, true);
+                }
+                queryTimeouts.emplace_back(m.messageID, std::chrono::steady_clock::now());
+            }
             transmit(route, m);
+        }
+    }
+}
+
+void CoreBroker::checkQueryTimeouts()
+{
+    if (!queryTimeouts.empty()) {
+        auto ctime = std::chrono::steady_clock::now();
+        for (auto& qt : queryTimeouts) {
+            if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
+                if (Time(ctime - qt.second) > queryTimeout) {
+                    activeQueries.setDelayedValue(qt.first, "#timeout");
+                    qt.first = 0;
+                }
+            }
+        }
+        while (!queryTimeouts.empty() && queryTimeouts.front().first == 0) {
+            queryTimeouts.pop_front();
+        }
+        if (queryTimeouts.empty()) {
+            setTickForwarding(TickForwardingReasons::query_timeout, false);
         }
     }
 }

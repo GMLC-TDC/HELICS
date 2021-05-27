@@ -2587,11 +2587,18 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_IGNORE:
             break;
         case CMD_TICK:
-            if (getBrokerState() == broker_state_t::operating) {
-                timeoutMon->tick(this);
-                LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
+            if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response)||isReasonForTick(command.messageID,TickForwardingReasons::no_comms))
+            {
+                if (getBrokerState() == broker_state_t::operating) {
+                    timeoutMon->tick(this);
+                    LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
+                }
             }
-            checkQueryTimeouts();
+            if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout))
+            {
+                checkQueryTimeouts();
+            }
+            
             break;
         case CMD_PING:
         case CMD_BROKER_PING:  // broker ping for core is the same as core
@@ -3431,12 +3438,20 @@ void CommonCore::checkQueryTimeouts()
             {
                 if (Time(ctime - qt.second) > queryTimeout) {
                     activeQueries.setDelayedValue(qt.first, "#timeout");
+                    qt.first = 0;
                 }
             }
-            
         }
+        while (!queryTimeouts.empty()  && queryTimeouts.front().first == 0)
+        {
+            queryTimeouts.pop_front();
+        }
+        if (queryTimeouts.empty())
+        {
+            setTickForwarding(TickForwardingReasons::query_timeout, false);
         }
     }
+}
 
 void CommonCore::processQueryResponse(const ActionMessage& m)
 {
@@ -3679,7 +3694,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     {
                         if (queryTimeouts.empty())
                         {
-                            ++forwardTick;
+                            setTickForwarding(TickForwardingReasons::query_timeout, true);
                         }
                         queryTimeouts.emplace_back(cmd.messageID,std::chrono::steady_clock::now());
                         
@@ -3702,6 +3717,12 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             // FALLTHROUGH
         case CMD_QUERY:
             if (cmd.dest_id == parent_broker_id) {
+                if (cmd.source_id == direct_core_id) {
+                    if (queryTimeouts.empty()) {
+                        setTickForwarding(TickForwardingReasons::query_timeout, true);
+                    }
+                    queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
+                }
                 const auto& target = cmd.getString(targetStringLoc);
                 if (target == "root" || target == "federation") {
                     cmd.setAction(force_ordered ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);

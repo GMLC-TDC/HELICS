@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <array>
 #include <atomic>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
@@ -122,6 +123,8 @@ class CoreBroker: public Broker, public BrokerBase {
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
     std::vector<std::tuple<JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    /// timeout manager for queries
+    std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
 
     std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
@@ -331,6 +334,8 @@ class CoreBroker: public Broker, public BrokerBase {
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
 
+    /** manage query timeouts*/
+    void checkQueryTimeouts();
     /** answer a query or route the message the appropriate location*/
     void processQueryResponse(const ActionMessage& m);
     /** generate an answer to a local query*/
