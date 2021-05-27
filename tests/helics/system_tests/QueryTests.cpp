@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
 
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <thread>
 
@@ -974,5 +975,67 @@ TEST_F(query, queries_disconnected)
     EXPECT_EQ(res, "disconnected");
     res = vFed1->query(vFed2->getName(), "dependency_graph");
     EXPECT_EQ(res, "#disconnected");
+    vFed1->finalize();
+}
+
+TEST_F(query, queries_disconnected_global)
+{
+    SetupTest<helics::ValueFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+    vFed1->enterExecutingModeAsync();
+    vFed3->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed3->enterExecutingModeComplete();
+
+    auto res = brokers[0]->query("root", "global_time");
+    vFed2->finalize();
+    vFed1->requestTime(3.0);
+    res = brokers[0]->query("root", "global_time");
+    vFed2->finalize();
+    res = brokers[0]->query("root", "global_time");
+    vFed3->finalize();
+    res = brokers[0]->query("root", "global_time");
+}
+
+TEST_F(query, queries_timeout_ci_skip)
+{
+    extraCoreArgs = "--querytimeout=100ms --tick=100ms";
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->setQueryCallback([](const std::string& queryStr) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    auto res = vFed2->query(vFed1->getName(), "abc");
+    EXPECT_THAT(res, ::testing::HasSubstr("timeout"));
+
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+    vFed2->enterExecutingModeComplete();
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(query, broker_queries_timeout_ci_skip)
+{
+    extraBrokerArgs = "--querytimeout=100ms --tick=100ms";
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    vFed1->setQueryCallback([](const std::string& queryStr) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
+    });
+
+    auto res = brokers[0]->query(vFed1->getName(), "abc");
+    EXPECT_THAT(res, ::testing::HasSubstr("timeout"));
+
+    vFed1->enterExecutingMode();
     vFed1->finalize();
 }

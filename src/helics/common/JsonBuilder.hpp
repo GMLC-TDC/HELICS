@@ -42,8 +42,13 @@ class JsonMapBuilder {
     /** generate a new location to fill in later
     @return the index value of the location for use in addComponent*/
     int generatePlaceHolder(const std::string& location, int32_t code);
-    /** generate the JSON value*/
+    /** clear components with a specific code
+    return true if the map is now complete*/
     bool clearComponents(int32_t code);
+    /** clear all remaining components
+    return true if the builder can be generated*/
+    bool clearComponents();
+    /** generate the JSON value*/
     std::string generate();
     /** reset the builder*/
     void reset();

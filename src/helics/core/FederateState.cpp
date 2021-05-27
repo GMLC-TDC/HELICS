@@ -437,7 +437,7 @@ iteration_result FederateState::enterInitializingMode()
         return static_cast<iteration_result>(ret);
     }
 
-    std::lock_guard<FederateState> fedlock(*this);
+    sleeplock();
     iteration_result ret;
     switch (getState()) {
         case HELICS_ERROR:
@@ -446,13 +446,14 @@ iteration_result FederateState::enterInitializingMode()
         case HELICS_FINISHED:
             ret = iteration_result::halted;
             break;
-        case HELICS_CREATED: {
+        case HELICS_CREATED:
+            unlock();
             return enterInitializingMode();
-        }
         default:  // everything >= HELICS_INITIALIZING
             ret = iteration_result::next_step;
             break;
     }
+    unlock();
     return ret;
 }
 
