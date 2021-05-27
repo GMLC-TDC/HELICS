@@ -241,9 +241,7 @@ class FederateState {
     /** tries to lock the processing return true if successful and false if not*/
     bool try_lock() const { return !processing.test_and_set(); }
     /** unlocks the processing*/
-    void unlock() const {
-        processing.clear();
-    }
+    void unlock() const { processing.clear(); }
     /** get the current logging level*/
     int loggingLevel() const { return logLevel; }
 

@@ -2070,14 +2070,11 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
-                if (fed->getState() <= federate_state::HELICS_EXECUTING)
-                {
+                if (fed->getState() <= federate_state::HELICS_EXECUTING) {
                     queryReq.messageID = brkindex;
                     queryReq.dest_id = fed.fed->global_id;
                     fed.fed->addAction(queryReq);
-                }
-                else
-                {
+                } else {
                     builder.addComponent("", brkindex);
                 }
             } else {
@@ -2434,7 +2431,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (delayInitCounter < 0 && minFederateCount == 0) {
                     if (allInitReady()) {
                         if (transitionBrokerState(broker_state_t::connected,
-                                                                broker_state_t::initializing)) {
+                                                  broker_state_t::initializing)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
                             checkDependencies();
@@ -2587,18 +2584,17 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_IGNORE:
             break;
         case CMD_TICK:
-            if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response)||isReasonForTick(command.messageID,TickForwardingReasons::no_comms))
-            {
+            if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response) ||
+                isReasonForTick(command.messageID, TickForwardingReasons::no_comms)) {
                 if (getBrokerState() == broker_state_t::operating) {
                     timeoutMon->tick(this);
                     LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
                 }
             }
-            if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout))
-            {
+            if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout)) {
                 checkQueryTimeouts();
             }
-            
+
             break;
         case CMD_PING:
         case CMD_BROKER_PING:  // broker ping for core is the same as core
@@ -2653,7 +2649,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -2681,7 +2677,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -2998,10 +2994,9 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (fed != nullptr) {
                 fed->init_transmitted = true;
                 if (allInitReady()) {
-                    if (transitionBrokerState(
-                            broker_state_t::connected,
-                            broker_state_t::initializing)) {  // make sure we only do
-                                                                   // this once
+                    if (transitionBrokerState(broker_state_t::connected,
+                                              broker_state_t::initializing)) {  // make sure we only
+                                                                                // do this once
                         checkDependencies();
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
@@ -3432,22 +3427,18 @@ void CommonCore::checkQueryTimeouts()
 {
     if (!queryTimeouts.empty()) {
         auto ctime = std::chrono::steady_clock::now();
-        for (auto &qt : queryTimeouts)
-        {
-            if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first))
-            {
+        for (auto& qt : queryTimeouts) {
+            if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
                     activeQueries.setDelayedValue(qt.first, "#timeout");
                     qt.first = 0;
                 }
             }
         }
-        while (!queryTimeouts.empty()  && queryTimeouts.front().first == 0)
-        {
+        while (!queryTimeouts.empty() && queryTimeouts.front().first == 0) {
             queryTimeouts.pop_front();
         }
-        if (queryTimeouts.empty())
-        {
+        if (queryTimeouts.empty()) {
             setTickForwarding(TickForwardingReasons::query_timeout, false);
         }
     }
@@ -3690,14 +3681,11 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                         transmit(getRoute(queryResp.dest_id), queryResp);
                     }
                 } else {
-                    if (cmd.source_id == direct_core_id)
-                    {
-                        if (queryTimeouts.empty())
-                        {
+                    if (cmd.source_id == direct_core_id) {
+                        if (queryTimeouts.empty()) {
                             setTickForwarding(TickForwardingReasons::query_timeout, true);
                         }
-                        queryTimeouts.emplace_back(cmd.messageID,std::chrono::steady_clock::now());
-                        
+                        queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
                     }
                     ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :
                                                             CMD_QUERY_REPLY);

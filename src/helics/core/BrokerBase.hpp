@@ -108,12 +108,11 @@ class BrokerBase {
         errored = 7,  //!< an error was encountered
     };
 
-    enum class TickForwardingReasons:uint32_t
-    {
-        none=0,
-        no_comms=0x01,
+    enum class TickForwardingReasons : uint32_t {
+        none = 0,
+        no_comms = 0x01,
         ping_response = 0x02,
-        query_timeout=0x04
+        query_timeout = 0x04
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
