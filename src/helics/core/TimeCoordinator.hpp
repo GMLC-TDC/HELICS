@@ -246,6 +246,5 @@ class TimeCoordinator {
     int dependencyCount() const;
     /** get a count of the active dependencies*/
     global_federate_id getMinDependency() const;
-
 };
 }  // namespace helics
