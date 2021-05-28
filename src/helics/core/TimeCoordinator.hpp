@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
 /** enumeration of possible processing results*/
 enum class message_process_result {
     no_effect = 0,  //!< the message did not result in an update
@@ -52,7 +53,7 @@ the time coordinator manages dependencies and computes whether time can advance 
 mode
 */
 class TimeCoordinator {
-  private:
+  protected:
     /// the variables for time coordination
     TimeData upstream;
     TimeData total;
@@ -93,7 +94,7 @@ class TimeCoordinator {
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     bool hasInitUpdates{false};  //!< flag indicating that a value or message was received during
                                  //!< initialization stage
-  private:
+  protected:
     std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};
     bool nonGranting{false};  // specify that the timeCoordinator should not grant times and
@@ -245,5 +246,6 @@ class TimeCoordinator {
     int dependencyCount() const;
     /** get a count of the active dependencies*/
     global_federate_id getMinDependency() const;
+
 };
 }  // namespace helics
