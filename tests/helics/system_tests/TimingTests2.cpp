@@ -338,16 +338,16 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     vFed1->registerSubscription("pub2_1");
 
     vFed2->registerGlobalPublication<double>("pub2_1");
-    
+
     auto& sub2_1 = vFed2->registerSubscription("pub1_1");
     auto& sub2_2 = vFed2->registerSubscription("pub1_2");
     sub2_1.setDefault(9.9);
     sub2_2.setDefault(10.5);
-    
+
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-    
+
     pub1_1.publish(3.5);
 
     vFed2->requestTimeAsync(5.0);
@@ -360,11 +360,11 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     pub1_2.publish(8.8);
 
     vFed1->requestTimeAsync(3.0);
-    auto retTime=vFed2->requestTimeComplete();
+    auto retTime = vFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
     EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
     EXPECT_EQ(sub2_2.getValue<double>(), 8.8);
-   
+
     vFed2->requestTimeAsync(7.0);
     retTime = vFed1->requestTimeComplete();
     EXPECT_EQ(retTime, 3.0);
@@ -373,10 +373,10 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     broker.reset();
     vFed1->finalize();
 
-    retTime=vFed2->requestTimeComplete();
+    retTime = vFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 3.0);
 
-    retTime=vFed2->requestTime(7.0);
+    retTime = vFed2->requestTime(7.0);
     EXPECT_EQ(retTime, 7.0);
     vFed2->finalize();
 }
