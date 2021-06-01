@@ -478,8 +478,9 @@ message_processing_result TimeCoordinator::checkTimeGrant()
             return message_processing_result::next_step;
         }
         if (time_allow == time_exec) {
-            if (time_requested > time_exec || !info.wait_for_current_time_updates) {
+            if (!info.wait_for_current_time_updates) {
                 if (time_requested <= time_exec) {
+                    // this is the non interrupted case
                     updateTimeGrant();
                     return message_processing_result::next_step;
                 }
@@ -487,6 +488,9 @@ message_processing_result TimeCoordinator::checkTimeGrant()
                     updateTimeGrant();
                     return message_processing_result::next_step;
                 }
+            } else {
+                // if the wait_for_current_time_updates flag is set then time_allow must be greater
+                // than time_exec
             }
         }
     } else {
