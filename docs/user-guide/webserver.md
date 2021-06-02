@@ -136,8 +136,6 @@ For queries that did not result in a valid response the response will be:
 As a demo case there is a `brokerServerTestCase` executable built as part of the HELICS_EXAMPLES.
 Running this example starts a webserver on the localhost using port 80.
 
-Currently only queries are supported, though eventually the plan is to support other debugging and control actions via a similar interface.
-
 The response to queries is a string either in plain text or json.
 For example:
 

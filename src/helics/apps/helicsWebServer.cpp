@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../utilities/timeStringOps.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>
@@ -66,10 +67,37 @@ namespace apps {
 }  // namespace apps
 }  // namespace helics
 
-static std::string loadFile(const std::string& fileName)
+static std::string generateIndexPage()
 {
-    std::ifstream t(fileName);
-    return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+    std::string index = R"(<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>HELICS Web server interface</title>
+  </head>
+
+  <body>
+    <h1>HELICS web server interface</h1>
+    <h2>
+        <img src="https://github.com/GMLC-TDC/HELICS/blob/master/docs/img/HELICS_48x48.png" alt="Helics logo">
+        <br>
+      <a href="https://github.com/GMLC-TDC/HELICS">Source</a><br>
+      <a href="https://docs.helics.org/en/latest/index.html"
+        >Documentation</a
+      ><br>
+
+<a href="https://docs.helics.org/en/latest/user-guide/webserver.html"
+        >Using the web server</a
+      ><br>
+
+<a href="https://docs.helics.org/en/latest/user-guide/queries.html"
+        >Available queries</a
+      ><br>
+    </h2>
+  </body>
+</html>
+)";
+
+    return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
 static std::string uriDecode(beast::string_view str)
@@ -409,10 +437,15 @@ std::pair<return_val, std::string>
     if (!brkr) {
         brkr = helics::BrokerFactory::getConnectedBroker();
         if (!brkr) {
-            return {return_val::not_found, brokerName + " not found"};
+            return {return_val::not_found, brokerName + " not found and no valid brokers"};
         }
-        query = target;
-        target = brokerName;
+        if (target.empty()) {
+            query = brokerName;
+        } else {
+            query = target;
+            target = brokerName;
+        }
+
     } else if (query.empty() && !target.empty()) {
         query = target;
         autoquery = true;
@@ -580,7 +613,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 template<class Body, class Allocator, class Send>
 void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send)
 {
-    static const std::string index_page = loadFile("index.html");
+    static const std::string index_page = generateIndexPage();
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::bad_request, req.version()};
@@ -638,7 +671,8 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
 
     beast::string_view target(req.target());
-    if (target == "/index.html" || (target == "/" && !(req.payload_size()))) {
+    auto psize = req.payload_size();
+    if (target == "/index.html" || (target == "/" && (!psize || *psize < 4))) {
         return send(response_ok(index_page, "text/html"));
     }
 
@@ -870,6 +904,33 @@ static const Json::Value null;
 
 namespace helics {
 namespace apps {
+
+    void WebServer::processArgs(const std::string& args)
+
+    {
+        CLI::App parser("http web server parser");
+        parser.allow_extras();
+        parser.add_option("--http_port", httpPort_, "specify the http port to use")
+            ->envname("HELICS_HTTP_PORT");
+        parser.add_option("--http_interface",
+                          httpAddress_,
+                          "specify the interface to use for connecting an http server");
+
+        parser.add_option("--websocket_port", websocketPort_, "specify the websocket port to use")
+            ->envname("HELICS_WEBSOCKET_PORT");
+        parser.add_option("--websocket_interface",
+                          websocketAddress_,
+                          "specify the interface to use for connecting a we server");
+
+        try {
+            parser.parse(args);
+        }
+        catch (const CLI::Error& ce) {
+            logMessage(std::string("error processing command line arguments for weberver :") +
+                       ce.what());
+        }
+    }
+
     void WebServer::startServer(const Json::Value* val)
     {
         logMessage("starting broker web server");

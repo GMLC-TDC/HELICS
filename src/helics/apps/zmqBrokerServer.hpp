@@ -38,6 +38,8 @@ namespace apps {
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
+
+        virtual void processArgs(const std::string& args) override;
         void enableZmqServer(bool enabled) { zmq_enabled_ = enabled; }
         void enableZmqSsServer(bool enabled) { zmqss_enabled_ = enabled; }
 
@@ -63,6 +65,8 @@ namespace apps {
         bool zmq_enabled_{false};
         bool zmqss_enabled_{false};
         std::atomic_bool exitAll{false};
+        int mZmqPort{0};
+        std::string mZmqInterface{"tcp://127.0.0.1"};
     };
 }  // namespace apps
 }  // namespace helics
