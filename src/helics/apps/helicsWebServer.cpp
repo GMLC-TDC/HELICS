@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsWebServer.hpp"
 
+#include "indexPage.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
@@ -69,34 +70,10 @@ namespace apps {
 
 static std::string generateIndexPage()
 {
-    std::string index = R"(<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>HELICS Web server interface</title>
-  </head>
-
-  <body>
-    <h1>HELICS web server interface</h1>
-    <h2>
-        <img src="https://github.com/GMLC-TDC/HELICS/blob/master/docs/img/HELICS_48x48.png" alt="Helics logo">
-        <br>
-      <a href="https://github.com/GMLC-TDC/HELICS">Source</a><br>
-      <a href="https://docs.helics.org/en/latest/index.html"
-        >Documentation</a
-      ><br>
-
-<a href="https://docs.helics.org/en/latest/user-guide/webserver.html"
-        >Using the web server</a
-      ><br>
-
-<a href="https://docs.helics.org/en/latest/user-guide/queries.html"
-        >Available queries</a
-      ><br>
-    </h2>
-  </body>
-</html>
-)";
-
+    std::string index = helics::webserver::indexPage1;
+    index.append(helics::webserver::svg1);
+    index.append(helics::webserver::svg2);
+    index.append(helics::webserver::indexPage2);
     return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
