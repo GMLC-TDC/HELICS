@@ -373,11 +373,11 @@ bool CommonCore::hasError() const
 {
     return getBrokerState() == broker_state_t::errored;
 }
-void CommonCore::globalError(local_federate_id federateID,
+void CommonCore::globalError(LocalFederateId federateID,
                              int errorCode,
                              const std::string& errorString)
 {
-    if (federateID == local_core_id) {
+    if (federateID == gLocalCoreId) {
         ActionMessage m(CMD_GLOBAL_ERROR);
         m.source_id = getGlobalId();
         m.messageID = errorCode;
@@ -435,7 +435,7 @@ int CommonCore::getErrorCode() const
 std::string CommonCore::getErrorMessage() const
 {
     // used to sync threads and ensure a string is available
-    lastErrorCode.load();
+    (void)lastErrorCode.load();
     return lastErrorString;
 }
 
@@ -853,11 +853,11 @@ Time CommonCore::getTimeProperty(LocalFederateId federateID, int32_t property) c
 int16_t CommonCore::getIntegerProperty(LocalFederateId federateID, int32_t property) const
 {
     if (federateID == gLocalCoreId) {
-        if (property == helics_property_int_log_level ||
-            property == helics_property_int_console_log_level) {
+        if (property == HELICS_PROPERTY_INT_LOG_LEVEL ||
+            property == HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL) {
             return consoleLogLevel;
         }
-        if (property == helics_property_int_file_log_level) {
+        if (property == HELICS_PROPERTY_INT_FILE_LOG_LEVEL) {
             return fileLogLevel;
         }
         return 0;
@@ -2300,7 +2300,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
-                if (fed->getState() <= federate_state::HELICS_EXECUTING) {
+                if (fed->getState() <= FederateStates::HELICS_EXECUTING) {
                 queryReq.messageID = brkindex;
                 queryReq.dest_id = fed.fed->global_id;
                 fed.fed->addAction(queryReq);

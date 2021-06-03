@@ -329,7 +329,7 @@ void terminateAllCores()
     {
         auto cores = searchableCores.getObjects();
         for (auto& cr : cores) {
-            cr->globalError(local_core_id,
+            cr->globalError(gLocalCoreId,
                             errorCode,
                             cr->getIdentifier() + " sending-> " + errorString);
             cr->disconnect();

@@ -265,7 +265,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
                 badInit.messageID = max_federate_count_exceeded;
-                badInit.name = command.name;
+                badInit.name(command.name());
                 transmit(getRoute(command.source_id), badInit);
                 return;
             }
@@ -385,7 +385,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 ActionMessage badInit(CMD_BROKER_ACK);
                 setActionFlag(badInit, error_flag);
                 badInit.source_id = global_broker_id_local;
-                badInit.name = command.name;
+                badInit.name(command.name());
                 badInit.messageID = max_broker_count_exceeded;
                 transmit(newroute, badInit);
 
@@ -3039,7 +3039,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(m.payload).first]).push_back(queryRep);
+        std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first]).push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(m.messageID, std::string(queryRep.payload.to_string()));
     } else {

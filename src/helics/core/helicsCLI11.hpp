@@ -156,6 +156,7 @@ class helicsCLI11App: public CLI::App {
             ->ignore_underscore();
         if (includeEnvironmentVariable) {
             typeOption->envname("HELICS_CORE_TYPE");
+}
     }
     CoreType getCoreType() const { return coreType; }
     /** set default core type*/
