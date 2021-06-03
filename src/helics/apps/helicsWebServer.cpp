@@ -496,7 +496,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     void on_accept(beast::error_code ec)
     {
         if (ec) {
-            return fail(ec, "accept");
+            return fail(ec, "helics websocket accept");
         }
 
         // Read a message
@@ -520,7 +520,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         if (ec) {
-            fail(ec, "read");
+            return fail(ec, "helics webserver read");
         }
 
         beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
@@ -572,7 +572,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            return fail(ec, "write");
+            return fail(ec, "helics socket write");
         }
 
         // Clear the buffer
@@ -762,7 +762,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
 
         if (ec) {
             if (beast::error::timeout != ec) {
-                fail(ec, "read");
+                fail(ec, "helics webserver read");
             }
             return;
         }
@@ -776,7 +776,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            return fail(ec, "write");
+            return fail(ec, "helics webserver write");
         }
 
         if (close) {
@@ -819,28 +819,28 @@ class Listener: public std::enable_shared_from_this<Listener> {
         // Open the acceptor
         acceptor.open(endpoint.protocol(), ec);
         if (ec) {
-            fail(ec, "open");
+            fail(ec, "helics acceptor open");
             return;
         }
 
         // Allow address reuse
         acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
-            fail(ec, "set_option");
+            fail(ec, "helics acceptor set_option");
             return;
         }
 
         // Bind to the server address
         acceptor.bind(endpoint, ec);
         if (ec) {
-            fail(ec, "bind");
+            fail(ec, "helics acceptor bind");
             return;
         }
 
         // Start listening for connections
         acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
-            fail(ec, "listen");
+            fail(ec, "helics acceptor listen");
             return;
         }
     }
@@ -859,7 +859,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
     void on_accept(beast::error_code ec, tcp::socket socket)
     {
         if (ec) {
-            fail(ec, "accept");
+            return fail(ec, "helics accept connections");
         } else {
             if (websocket) {
                 // Create the session and run it
