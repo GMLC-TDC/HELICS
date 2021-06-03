@@ -197,35 +197,33 @@ namespace apps {
 
 #endif  // ENABLE_UDP_CORE
 
-   
-
-   void AsioBrokerServer::processArgs(const std::string& args)
+    void AsioBrokerServer::processArgs(const std::string& args)
 
     {
-       /*
-        CLI::App parser("Asio broker server CLI parser");
-        parser.allow_extras();
-        parser.add_option("--tcp_port", tcpPort_, "specify the tcp port to use");
-        parser.add_option("--tcp_interface",
-                          tcpAddress_,
-                          "specify the interface to use for connecting the tcp server");
+        /*
+         CLI::App parser("Asio broker server CLI parser");
+         parser.allow_extras();
+         parser.add_option("--tcp_port", tcpPort_, "specify the tcp port to use");
+         parser.add_option("--tcp_interface",
+                           tcpAddress_,
+                           "specify the interface to use for connecting the tcp server");
 
-        parser.add_option("--udp_port", udpPort_, "specify the udp port to use");
-        parser.add_option("--udp_interface",
-                          udpAddress_,
-                          "specify the interface to use for connecting a udp server");
+         parser.add_option("--udp_port", udpPort_, "specify the udp port to use");
+         parser.add_option("--udp_interface",
+                           udpAddress_,
+                           "specify the interface to use for connecting a udp server");
 
-        try {
-            parser.parse(args);
-        }
-        catch (const CLI::Error& ce) {
-            logMessage(std::string("error processing command line arguments for asio broker server :") +
-                       ce.what());
-        }
-        */
+         try {
+             parser.parse(args);
+         }
+         catch (const CLI::Error& ce) {
+             logMessage(std::string("error processing command line arguments for asio broker server
+         :") + ce.what());
+         }
+         */
     }
 
-     static const Json::Value null;
+    static const Json::Value null;
 
     void AsioBrokerServer::startServer(const Json::Value* val)
     {
