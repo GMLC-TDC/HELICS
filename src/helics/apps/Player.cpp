@@ -829,7 +829,7 @@ static std::string decode(std::string&& stringToDecode)
 
     if ((stringToDecode.front() == '"') || (stringToDecode.front() == '\'')) {
         try {
-            return JsonAsString(loadJsonStr(stringToDecode));
+            return helics::fileops::JsonAsString(helics::fileops::loadJsonStr(stringToDecode));
         }
         catch (const Json::Exception&) {
             return gmlc::utilities::stringOps::removeQuotes(stringToDecode);

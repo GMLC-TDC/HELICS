@@ -244,13 +244,13 @@ TEST_P(player_file_tests, test_files)
 
 TEST(player_tests, bigfile)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "pcorebig";
     fi.coreInitString = "-f 2 --autobroker";
     helics::apps::Player play1("player1", fi);
 
     play1.loadFile(std::string(TEST_DIR) + "bigtest.txt");
-    fi.setProperty(helics_property_time_period, 60.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 60.0);
     helics::ValueFederate vfed("charger", fi);
     auto& sub1 = vfed.registerSubscription("Battery/EV1_current");
     auto& sub2 = vfed.registerSubscription("Battery/EV2_current");

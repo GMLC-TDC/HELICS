@@ -1085,7 +1085,7 @@ TEST_F(query, queries_timeout_ci_skip)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    vFed1->setQueryCallback([](const std::string& queryStr) {
+    vFed1->setQueryCallback([](std::string_view queryStr) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
     });
@@ -1106,7 +1106,7 @@ TEST_F(query, broker_queries_timeout_ci_skip)
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
-    vFed1->setQueryCallback([](const std::string& queryStr) {
+    vFed1->setQueryCallback([](std::string_view queryStr) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         return (queryStr == "abc") ? std::string("AAAA") : std::string("BBBB");
     });

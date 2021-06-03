@@ -419,8 +419,8 @@ std::pair<return_val, std::string>
         if (target.empty()) {
             query = brokerName;
         } else {
-        query = target;
-        target = brokerName;
+            query = target;
+            target = brokerName;
         }
 
     } else if (query.empty() && !target.empty()) {
@@ -881,31 +881,31 @@ static const Json::Value null;
 
 namespace helics::apps {
 
-    void WebServer::processArgs(const std::string& args)
+void WebServer::processArgs(const std::string& args)
 
-    {
-        CLI::App parser("http web server parser");
-        parser.allow_extras();
-        parser.add_option("--http_port", httpPort_, "specify the http port to use")
-            ->envname("HELICS_HTTP_PORT");
-        parser.add_option("--http_interface",
-                          httpAddress_,
-                          "specify the interface to use for connecting an http server");
+{
+    CLI::App parser("http web server parser");
+    parser.allow_extras();
+    parser.add_option("--http_port", httpPort_, "specify the http port to use")
+        ->envname("HELICS_HTTP_PORT");
+    parser.add_option("--http_interface",
+                      httpAddress_,
+                      "specify the interface to use for connecting an http server");
 
-        parser.add_option("--websocket_port", websocketPort_, "specify the websocket port to use")
-            ->envname("HELICS_WEBSOCKET_PORT");
-        parser.add_option("--websocket_interface",
-                          websocketAddress_,
-                          "specify the interface to use for connecting a web server");
+    parser.add_option("--websocket_port", websocketPort_, "specify the websocket port to use")
+        ->envname("HELICS_WEBSOCKET_PORT");
+    parser.add_option("--websocket_interface",
+                      websocketAddress_,
+                      "specify the interface to use for connecting a web server");
 
-        try {
-            parser.parse(args);
-        }
-        catch (const CLI::Error& ce) {
-            logMessage(std::string("error processing command line arguments for web server :") +
-                       ce.what());
-        }
+    try {
+        parser.parse(args);
     }
+    catch (const CLI::Error& ce) {
+        logMessage(std::string("error processing command line arguments for web server :") +
+                   ce.what());
+    }
+}
 
 void WebServer::startServer(const Json::Value* val)
 {

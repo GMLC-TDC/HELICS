@@ -66,7 +66,7 @@ and in worst case it could deadlock.  That is somewhat unlikely given usage patt
 but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument
 and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the
 callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.*/
-HELICS_EXPORT void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int));
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int));
 
 /** Execute a global abort by sending an error code to all cores, brokers,
 and federates that were created through the current library instance.*/
@@ -1492,7 +1492,7 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(HelicsBroker broker);
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err);
+HELICS_EXPORT void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err);
 
 /**
  * Generate a global error through a broker. This will terminate the federation.
@@ -1504,7 +1504,7 @@ HELICS_EXPORT void helicsBrokerGlobalError(helics_broker broker, int errorCode, 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * @endforcpponly
  */
-HELICS_EXPORT void helicsCoreGlobalError(helics_core core, int errorCode, const char* errorString, helics_error* err);
+HELICS_EXPORT void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err);
 /**
  * Create a query object.
  *

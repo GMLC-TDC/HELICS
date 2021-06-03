@@ -63,12 +63,12 @@ TEST(federate_tests, federate_initialize_tests_env)
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
 
-    auto cloglevel = core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
-    EXPECT_EQ(cloglevel, helics_log_level_connections);
+    auto cloglevel = core->getIntegerProperty(helics::gLocalCoreId, HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(cloglevel, HELICS_LOG_LEVEL_CONNECTIONS);
 
     Fed->enterExecutingMode();
-    EXPECT_EQ(Fed->getIntegerProperty(helics_property_int_log_level), helics_log_level_connections);
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_EQ(Fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL), HELICS_LOG_LEVEL_CONNECTIONS);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     Fed->finalize();
     clearEnvironmentVariable("HELICS_LOG_LEVEL");
@@ -80,7 +80,7 @@ TEST(federate_tests, federate_initialize_tests_env)
 
 TEST(federate_tests, federate_initialize_tests_env2)
 {
-    setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", "3");
+    setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", std::to_string(HELICS_LOG_LEVEL_CONNECTIONS));
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker";
 
@@ -89,11 +89,11 @@ TEST(federate_tests, federate_initialize_tests_env2)
     auto core = Fed->getCorePointer();
     ASSERT_TRUE((core));
 
-    auto cloglevel = core->getIntegerProperty(helics::local_core_id, helics_property_int_log_level);
-    EXPECT_EQ(cloglevel, helics_log_level_connections);
+    auto cloglevel = core->getIntegerProperty(helics::gLocalCoreId, HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(cloglevel, HELICS_LOG_LEVEL_CONNECTIONS);
 
     Fed->enterExecutingMode();
-    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::modes::executing);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     Fed->finalize();
     clearEnvironmentVariable("HELICS_BROKER_LOG_LEVEL");
@@ -181,7 +181,7 @@ TEST(federate_tests, timeout_abort_zmq)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::core_type::ZMQ);
+        helics::FederateInfo fi(helics::CoreType::ZMQ);
         fi.coreInitString = "";
         auto fed = std::make_shared<helics::Federate>("test1", fi);
         return fed;
@@ -193,7 +193,7 @@ TEST(federate_tests, timeout_abort_zmq)
     while (helics::CoreFactory::getCoreCount() == 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    helics::CoreFactory::abortAllCores(HELICS_ERROR_USER_ABORT, "aborting55");
     try {
         cret.get();
         EXPECT_TRUE(false);

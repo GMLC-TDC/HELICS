@@ -369,10 +369,10 @@ TEST(other_tests, broker_after_close)
 
 static std::atomic<int> handlerCount{0};
 
-static helics_bool testHandler(int /*unused*/)
+static HelicsBool testHandler(int /*unused*/)
 {
     ++handlerCount;
-    return helics_false;
+    return HELICS_FALSE;
 }
 
 TEST(other_tests, signal_handler_callback)
@@ -387,6 +387,6 @@ TEST(other_tests, signal_handler_callback)
 TEST(other_tests, signal_handler_death_ci_skip)
 {
     helicsLoadSignalHandler();
-    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(helics_error_user_abort), "");
+    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
     helicsClearSignalHandler();
 }

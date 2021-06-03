@@ -373,11 +373,11 @@ bool CommonCore::hasError() const
 {
     return getBrokerState() == broker_state_t::errored;
 }
-void CommonCore::globalError(local_federate_id federateID,
+void CommonCore::globalError(LocalFederateId federateID,
                              int errorCode,
                              const std::string& errorString)
 {
-    if (federateID == local_core_id) {
+    if (federateID == gLocalCoreId) {
         ActionMessage m(CMD_GLOBAL_ERROR);
         m.source_id = getGlobalId();
         m.messageID = errorCode;
@@ -435,7 +435,7 @@ int CommonCore::getErrorCode() const
 std::string CommonCore::getErrorMessage() const
 {
     // used to sync threads and ensure a string is available
-    lastErrorCode.load();
+    (void)lastErrorCode.load();
     return lastErrorString;
 }
 
@@ -853,11 +853,11 @@ Time CommonCore::getTimeProperty(LocalFederateId federateID, int32_t property) c
 int16_t CommonCore::getIntegerProperty(LocalFederateId federateID, int32_t property) const
 {
     if (federateID == gLocalCoreId) {
-        if (property == helics_property_int_log_level ||
-            property == helics_property_int_console_log_level) {
+        if (property == HELICS_PROPERTY_INT_LOG_LEVEL ||
+            property == HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL) {
             return consoleLogLevel;
         }
-        if (property == helics_property_int_file_log_level) {
+        if (property == HELICS_PROPERTY_INT_FILE_LOG_LEVEL) {
             return fileLogLevel;
         }
         return 0;
@@ -2300,11 +2300,11 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                 builder.generatePlaceHolder("federates", fed->global_id.load().baseValue());
             std::string ret = federateQuery(fed.fed, request, force_ordering);
             if (ret == "#wait") {
-                if (fed->getState() <= federate_state::HELICS_EXECUTING) {
-                queryReq.messageID = brkindex;
-                queryReq.dest_id = fed.fed->global_id;
-                fed.fed->addAction(queryReq);
-            } else {
+                if (fed->getState() <= FederateStates::HELICS_EXECUTING) {
+                    queryReq.messageID = brkindex;
+                    queryReq.dest_id = fed.fed->global_id;
+                    fed.fed->addAction(queryReq);
+                } else {
                     builder.addComponent("", brkindex);
                 }
             } else {
@@ -2725,7 +2725,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (delayInitCounter < 0 && minFederateCount == 0) {
                     if (allInitReady()) {
                         if (transitionBrokerState(broker_state_t::connected,
-                                                                broker_state_t::initializing)) {
+                                                  broker_state_t::initializing)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
                             checkDependencies();
@@ -2909,10 +2909,10 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_TICK:
             if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response) ||
                 isReasonForTick(command.messageID, TickForwardingReasons::no_comms)) {
-            if (getBrokerState() == broker_state_t::operating) {
-                timeoutMon->tick(this);
-                LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
-            }
+                if (getBrokerState() == broker_state_t::operating) {
+                    timeoutMon->tick(this);
+                    LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
+                }
             }
             if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout)) {
                 checkQueryTimeouts();
@@ -2972,7 +2972,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -3000,7 +3000,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
-                                                                  // if we haven't done so already
+                                                    // if we haven't done so already
                     setBrokerState(broker_state_t::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);

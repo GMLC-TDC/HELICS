@@ -255,7 +255,7 @@ size_t TcpConnection::send(const void* buffer, size_t dataLength)
         }
     }
 
-        size_t sz{0};
+    size_t sz{0};
     size_t sent_size{dataLength};
     size_t p{0};
     int count{0};

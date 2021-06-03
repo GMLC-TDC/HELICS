@@ -28,7 +28,7 @@ FederateInfo::FederateInfo()
     loadInfoFromArgsIgnoreOutput("");
 }
 
-FederateInfo::FederateInfo(core_type cType)
+FederateInfo::FederateInfo(CoreType cType)
 {
     loadInfoFromArgsIgnoreOutput("");
     coreType = cType;

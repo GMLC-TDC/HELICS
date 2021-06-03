@@ -127,23 +127,26 @@ static const std::string Message2(55, 17);
 
 static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore2b";
     fi.coreInitString = "-f 3 --autobroker";
     helics::apps::Recorder rec1("rec1", fi);
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::CombinationFederate mfed("block1", fi);
 
     helics::MessageFederate mfed2("block2", fi);
-    helics::Endpoint e1(helics::GLOBAL, &mfed, "d1");
-    helics::Endpoint e2(helics::GLOBAL, &mfed2, "d2");
+    helics::Endpoint e1(helics::InterfaceVisibility::GLOBAL, &mfed, "d1");
+    helics::Endpoint e2(helics::InterfaceVisibility::GLOBAL, &mfed2, "d2");
 
     rec1.addDestEndpointClone("d1");
     rec1.addSourceEndpointClone("d1");
     rec1.addSubscription("pub1");
 
-    helics::Publication pub1(helics::GLOBAL, &mfed, "pub1", helics::data_type::helics_double);
+    helics::Publication pub1(helics::InterfaceVisibility::GLOBAL,
+                             &mfed,
+                             "pub1",
+                             helics::DataType::HELICS_DOUBLE);
 
     auto fut = std::async(std::launch::async, [&rec1]() { rec1.runTo(5.0); });
     mfed2.enterExecutingModeAsync();
@@ -155,11 +158,11 @@ static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesyste
     auto retTime = mfed.requestTime(1.0);
     mfed2.requestTimeComplete();
 
-    e1.send("d2", Message1);
+    e1.sendTo(Message1, "d2");
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
 
-    e2.send("d1", Message2);
+    e2.sendTo(Message2, "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);
@@ -201,10 +204,10 @@ static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesyste
 
 static void useFile2(const std::string& corename, const std::string& file)
 {
-    helics::FederateInfo fi(helics::core_type::TEST);
+    helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = corename;
     fi.coreInitString = "-f 1 --autobroker";
-    fi.setProperty(helics_property_time_period, 1.0);
+    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     helics::apps::Player play1("play1", fi);
     play1.loadFile(file);

@@ -207,7 +207,7 @@ namespace apps {
 
 #endif  // HELICS_ENABLE_UDP_CORE
 
-    void AsioBrokerServer::processArgs(const std::string& args)
+    void AsioBrokerServer::processArgs(const std::string& /*unused*/)
 
     {
         /*

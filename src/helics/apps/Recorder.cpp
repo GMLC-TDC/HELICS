@@ -265,10 +265,10 @@ namespace apps {
                 }
                 if (isBinaryData(mess->data)) {
                     if (isEscapableData(mess->data)) {
-                        message["message"] = mess->data.to_string();
+                        message["message"] = std::string(mess->data.to_string());
                     } else {
-                    message["encoding"] = "base64";
-                    message["message"] = encode(std::string(mess->data.to_string()));
+                        message["encoding"] = "base64";
+                        message["message"] = encode(std::string(mess->data.to_string()));
                     }
 
                 } else {
@@ -318,10 +318,11 @@ namespace apps {
             }
             if (isBinaryData(m->data)) {
                 if (isEscapableData(m->data)) {
-                    outFile << "\t" << Json::valueToQuotedString(m->data.to_string().c_str())
+                    outFile << "\t"
+                            << Json::valueToQuotedString(std::string(m->data.to_string()).c_str())
                             << "\n";
                 } else {
-                outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                    outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
                 }
 
             } else {

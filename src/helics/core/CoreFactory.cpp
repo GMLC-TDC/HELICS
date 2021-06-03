@@ -325,19 +325,20 @@ void terminateAllCores()
     cleanUpCores(std::chrono::milliseconds(250));
 }
 
-    void abortAllCores(int errorCode, const std::string& errorString)
-    {
-        auto cores = searchableCores.getObjects();
-        for (auto& cr : cores) {
-            cr->globalError(local_core_id,
-                            errorCode,
-                            cr->getIdentifier() + " sending-> " + errorString);
-            cr->disconnect();
-        }
-        cleanUpCores(std::chrono::milliseconds(250));
+void abortAllCores(int errorCode, const std::string& errorString)
+{
+    auto cores = searchableCores.getObjects();
+    for (auto& cr : cores) {
+        cr->globalError(gLocalCoreId, errorCode, cr->getIdentifier() + " sending-> " + errorString);
+        cr->disconnect();
     }
+    cleanUpCores(std::chrono::milliseconds(250));
+}
 
-    size_t getCoreCount() { return searchableCores.getObjects().size(); }
+size_t getCoreCount()
+{
+    return searchableCores.getObjects().size();
+}
 bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
 {
     return searchableCores.copyObject(copyFromName, copyToName);
