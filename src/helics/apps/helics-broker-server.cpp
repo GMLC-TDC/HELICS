@@ -74,8 +74,11 @@ int main(int argc, char* argv[])
             brokerServer->startServers();
             std::cout << "servers started\n";
             std::this_thread::sleep_for(opTime.to_ms());
+            std::cout
+                << "Helics broker server time limit reached, servers closing (to change duration use `--duration=X`)"
+                << std::endl;
             brokerServer->closeServers();
-
+            std::cout << "waiting for brokers to close" << std::endl;
             // once we have closed the servers now wait for the active brokers to finish
             auto brokers = helics::BrokerFactory::getAllBrokers();
             for (auto& broker : brokers) {
