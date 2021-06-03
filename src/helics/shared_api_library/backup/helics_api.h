@@ -87,6 +87,7 @@ typedef enum {
     HELICS_ERROR_FATAL = -404,
     HELICS_ERROR_EXTERNAL_TYPE = -203,
     HELICS_ERROR_OTHER = -101,
+    HELICS_ERROR_USER_ABORT = -27,
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
     HELICS_ERROR_EXECUTION_FAILURE = -14,
 
@@ -237,6 +238,10 @@ const char* helicsGetBuildFlags(void);
 const char* helicsGetCompilerVersion(void);
 HelicsError helicsErrorInitialize(void);
 void helicsErrorClear(HelicsError* err);
+void helicsLoadSignalHandler();
+void helicsClearSignalHandler();
+void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int));
+void helicsAbort(int errorCode, const char* errorString);
 HelicsBool helicsIsCoreTypeAvailable(const char* type);
 HelicsCore helicsCreateCore(const char* type, const char* name, const char* initString, HelicsError* err);
 HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc, const char* const* argv, HelicsError* err);
@@ -303,8 +308,8 @@ void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, Helic
 void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
 void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, HelicsError* err);
-void helicsFederateGlobalError(HelicsFederate fed, int error_code, const char* error_string);
-void helicsFederateLocalError(HelicsFederate fed, int error_code, const char* error_string);
+void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string);
+void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string);
 void helicsFederateFinalize(HelicsFederate fed, HelicsError* err);
 void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err);
 void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err);
@@ -364,6 +369,8 @@ void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError*
 void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err);
 void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err);
 void helicsBrokerClearTimeBarrier(HelicsBroker broker);
+void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err);
+void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err);
 HelicsQuery helicsCreateQuery(const char* target, const char* query);
 const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);

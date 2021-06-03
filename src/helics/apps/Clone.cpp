@@ -152,10 +152,10 @@ namespace apps {
                 }
                 if (isBinaryData(mess->data)) {
                     if (isEscapableData(mess->data)) {
-                        message["message"] = mess->data.to_string();
+                        message["message"] = std::string(mess->data.to_string());
                     } else {
-                    message["encoding"] = "base64";
-                    message["message"] = encode(std::string(mess->data.to_string()));
+                        message["encoding"] = "base64";
+                        message["message"] = encode(std::string(mess->data.to_string()));
                     }
 
                 } else {

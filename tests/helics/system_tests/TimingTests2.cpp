@@ -338,7 +338,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
 
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
 
     auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
     auto& pub1_2 = vFed1->registerGlobalPublication<double>("pub1_2");

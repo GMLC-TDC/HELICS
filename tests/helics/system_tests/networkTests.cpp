@@ -173,7 +173,7 @@ TEST_F(network_tests, test_otherport_env)
 {
     setEnvironmentVariable("HELICS_CONNECTION_PORT", "33102");
     const std::string brokerArgs = "-f 2";
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
 
     EXPECT_TRUE(broker->isConnected());
     helics::FederateInfo fi("--core_type=ZMQ --corename=c1");
@@ -202,7 +202,7 @@ TEST_F(network_tests, test_otherport_broker_local_env)
 {
     setEnvironmentVariable("HELICS_LOCAL_PORT", "33104");
     const std::string brokerArgs = "-f 2";
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ, brokerArgs);
     clearEnvironmentVariable("HELICS_LOCAL_PORT");
     EXPECT_TRUE(broker->isConnected());
 

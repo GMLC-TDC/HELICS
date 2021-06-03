@@ -27,24 +27,24 @@ static const Json::Value null;
 
 namespace helics::apps {
 
-    void zmqBrokerServer::processArgs(const std::string& args)
+void zmqBrokerServer::processArgs(const std::string& args)
 
-    {
-        CLI::App parser("zmq broker server parser");
-        parser.allow_extras();
-        parser.add_option("--zmq_port", mZmqPort, "specify the zmq port to use");
-        parser.add_option("--zmq_interface",
-                          mZmqInterface,
-                          "specify the interface to use for connecting the zmq broker server");
+{
+    CLI::App parser("zmq broker server parser");
+    parser.allow_extras();
+    parser.add_option("--zmq_port", mZmqPort, "specify the zmq port to use");
+    parser.add_option("--zmq_interface",
+                      mZmqInterface,
+                      "specify the interface to use for connecting the zmq broker server");
 
-        try {
-            parser.parse(args);
-        }
-        catch (const CLI::Error& ce) {
-            logMessage(std::string("error processing command line arguments for web server :") +
-                       ce.what());
-        }
+    try {
+        parser.parse(args);
     }
+    catch (const CLI::Error& ce) {
+        logMessage(std::string("error processing command line arguments for web server :") +
+                   ce.what());
+    }
+}
 
 void zmqBrokerServer::startServer(const Json::Value* val)
 {
@@ -71,25 +71,25 @@ void zmqBrokerServer::stopServer()
     auto ctx = ZmqContextManager::getContextPointer();
     zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
     reqSocket.setsockopt(ZMQ_LINGER, 300);
-        int port = (mZmqPort != 0) ? mZmqPort :
-                                     ((zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 :
-                                                       DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    int port = (mZmqPort != 0) ?
+        mZmqPort :
+        ((zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 : DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
     if (zmq_enabled_) {
         if (config_->isMember("zmq")) {
             auto V = (*config_)["zmq"];
-                fileops::replaceIfMember(V, "interface", mZmqInterface);
-                fileops::replaceIfMember(V, "port", port);
+            fileops::replaceIfMember(V, "interface", mZmqInterface);
+            fileops::replaceIfMember(V, "port", port);
         }
     } else {
         if (config_->isMember("zmqss")) {
             auto V = (*config_)["zmqss"];
-                fileops::replaceIfMember(V, "interface", mZmqInterface);
-                fileops::replaceIfMember(V, "port", port);
+            fileops::replaceIfMember(V, "interface", mZmqInterface);
+            fileops::replaceIfMember(V, "port", port);
         }
     }
 
     try {
-            reqSocket.connect(helics::makePortAddress(mZmqInterface, port));
+        reqSocket.connect(helics::makePortAddress(mZmqInterface, port));
         reqSocket.send(std::string("close_server:") + name_);
         reqSocket.close();
     }

@@ -572,7 +572,7 @@ void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, Heli
     }
 }
 
-void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string)
+void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* errorString)
 {
     auto* fedObj = getFed(fed, nullptr);
     if (fedObj == nullptr) {
@@ -587,7 +587,7 @@ void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* er
     // LCOV_EXCL_STOP
 }
 
-void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string)
+void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* errorString)
 {
     auto* fedObj = getFed(fed, nullptr);
     if (fedObj == nullptr) {

@@ -268,7 +268,7 @@ void CoreApp::reset()
 void CoreApp::globalError(int32_t errorCode, const std::string& errorString)
 {
     if (core) {
-        core->globalError(local_core_id, errorCode, errorString);
+        core->globalError(gLocalCoreId, errorCode, errorString);
     }
 }
 

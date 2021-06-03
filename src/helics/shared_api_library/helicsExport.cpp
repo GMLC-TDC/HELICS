@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "internal/api_objects.h"
 
 #include <atomic>
+#include <csignal>
 #include <future>
 #include <iostream>
 #include <memory>
@@ -60,14 +61,13 @@ void helicsErrorClear(HelicsError* err)
     }
 }
 
-#include <csignal>
 static void signalHandler(int /*signum*/)
 {
-    helicsAbort(helics_error_user_abort, "user abort");
+    helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
     // add a sleep to give the abort a chance to propagate to other federates
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     std::cout << std::endl;
-    exit(helics_error_user_abort);
+    exit(HELICS_ERROR_USER_ABORT);
 }
 
 void helicsLoadSignalHandler()
@@ -80,20 +80,20 @@ void helicsClearSignalHandler()
     signal(SIGINT, SIG_DFL);
 }
 
-static helics_bool (*keyHandler)(int) = nullptr;
+static HelicsBool (*keyHandler)(int) = nullptr;
 
 static void signalHandlerCallback(int signum)
 {
-    helics_bool runDefaultSignalHandler{helics_true};
+    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
     if (keyHandler != nullptr) {
         runDefaultSignalHandler = keyHandler(signum);
     }
-    if (runDefaultSignalHandler != helics_false) {
+    if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandler(signum);
     }
 }
 
-void helicsLoadSignalHandlerCallback(helics_bool (*handler)(int))
+void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int))
 {
     keyHandler = handler;
     if (handler != nullptr) {
@@ -561,7 +561,7 @@ void helicsBrokerClearTimeBarrier(HelicsBroker broker)
     brk->clearTimeBarrier();
 }
 
-void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* errorString, helics_error* err)
+void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err)
 {
     auto* brk = getBroker(broker, err);
     if (brk == nullptr) {
@@ -570,16 +570,16 @@ void helicsBrokerGlobalError(helics_broker broker, int errorCode, const char* er
     brk->globalError(errorCode, AS_STRING(errorString));
 }
 
-void helicsCoreGlobalError(helics_core core, int errorCode, const char* errorString, helics_error* err)
+void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err)
 {
     auto* cr = getCore(core, err);
     if (cr == nullptr) {
         return;
     }
-    cr->globalError(helics::local_core_id, errorCode, AS_STRING(errorString));
+    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING(errorString));
 }
 
-void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, helics_error* err)
+void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err)
 {
     auto* brk = getBroker(broker, err);
     if (brk == nullptr) {

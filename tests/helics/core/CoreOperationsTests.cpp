@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(federate_tests, fail_max_federates)
 {
-    auto core = helics::CoreFactory::create(helics::core_type::TEST,
+    auto core = helics::CoreFactory::create(helics::CoreType::TEST,
                                             "--name=core_0 --maxfederates 0 --autobroker");
 
     helics::CoreFederateInfo cfi;
