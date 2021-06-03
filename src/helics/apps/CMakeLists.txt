@@ -30,7 +30,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    AsioBrokerServer.hpp TypedBrokerServer.hpp
     )
 
-    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
+    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp )
 
     set(helics_apps_library_files
         Player.cpp
@@ -57,7 +57,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     )
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp)
-        list(APPEND helics_apps_broker_headers helicsWebServer.hpp)
+        list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp)
     endif()
 
     add_library(

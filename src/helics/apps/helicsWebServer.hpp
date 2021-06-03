@@ -30,6 +30,8 @@ namespace apps {
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
+        /** process any command line arguments*/
+         virtual void processArgs(const std::string& args) override;
         /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
         /** enable the websocket server*/
@@ -45,10 +47,11 @@ namespace apps {
 
         const Json::Value* config{nullptr};
         const std::string name_;
+        std::string mArgs;
         std::string httpAddress_{"127.0.0.1"};
-        int httpPort_{80};
+        int httpPort_{8080};
         std::string websocketAddress_{"127.0.0.1"};
-        int websocketPort_{80};
+        int websocketPort_{8080};
         bool http_enabled_{false};
         bool websocket_enabled_{false};
         std::atomic<bool> executing{false};
