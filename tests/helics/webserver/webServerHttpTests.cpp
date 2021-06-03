@@ -238,15 +238,13 @@ TEST_F(httpTest, single_info)
 
 TEST_F(httpTest, get_global_time)
 {
+    // test to make sure the default target to root is working
     auto result = sendGet("global_time");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 0U);
-    EXPECT_EQ(val["cores"].size(), 0U);
-    EXPECT_EQ(val["federates"].size(), 0U);
-    EXPECT_STREQ(val["name"].asCString(), "brk1");
-    EXPECT_STREQ(val["state"].asCString(), "connected");
+   
 }
 
 TEST_F(httpTest, singleNonJson)
