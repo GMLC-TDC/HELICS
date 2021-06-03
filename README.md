@@ -69,7 +69,7 @@ HELICS is also highly scalable, enabling everything from simple connections betw
 
 ## Getting Started
 
-The users guide has been completely redone for the upcoming HELICS 3.  This version is not released yet but it is close, and the [docs](https://docs.helics.org/en/helics3/) are mostly done.  We suggest you check it out if you are looking for more documentation.  
+The users guide has been completely redone for the upcoming HELICS 3. This version is not released yet but it is close, and the [docs](https://docs.helics.org/en/helics3/) are mostly done. We suggest you check it out if you are looking for more documentation.
 
 We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).
 

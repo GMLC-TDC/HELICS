@@ -6,15 +6,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.
-Everything within a major version number should be code compatible (with the exception of experimental interfaces).  Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
+Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
 ## [2.7.1][] - 2021-06-03
 
-There were several bug fixes in this patch release.  Some of them related to changes in [2.7.0][] and some new ones that came up from bug reports.  Some new enhancements are experimental signal handlers in the C-api, which will be used in the python interface to provide a little better user experience when trying to kill a co-simulation.  
+There were several bug fixes in this patch release. Some of them related to changes in [2.7.0][] and some new ones that came up from bug reports. Some new enhancements are experimental signal handlers in the C-api, which will be used in the python interface to provide a little better user experience when trying to kill a co-simulation.
 
 ### Changed
 
-- String output on recorders is now always JSON compatible and allows escaped characters.  This allows some additional values to be displayed in ascii format vs base 64 encoding. #1910
+- String output on recorders is now always JSON compatible and allows escaped characters. This allows some additional values to be displayed in ascii format vs base 64 encoding. #1910
 - Players read the string fields through JSON parser unless marked with b64\[\] to match the string output on recorders #1910
 - the default webserver port is now 8080 to allow user space execution on non windows platforms #1936
 
@@ -22,7 +22,7 @@ There were several bug fixes in this patch release.  Some of them related to cha
 
 - An issue with recorders writing text fields in the incorrect order which could result in incorrect playback #1910
 - Fix an issue with core naming that occasionally resulted in same broker name errors when using default names on federates #1919
-- Fix an issue where queries were not being resolved when a core disconnects which could result in deadlock.  #1931
+- Fix an issue where queries were not being resolved when a core disconnects which could result in deadlock. #1931
 - the `wait_for_current_time` flag was not working properly in some cases where time interruption was also taking place #1933
 - Fixed issue with the webserver not responding with the index page when requested or detecting the correct broker for certain trivial requests #1936
 
@@ -32,7 +32,6 @@ There were several bug fixes in this patch release.  Some of them related to cha
 - Added support for environmental variables for setting some network connection and other information #1921
 - Queries now have timeouts #1931
 - command line and environmental variable options for setting the webserver port numbers #1936
-
 
 ## [2.7.0][] - 2021-04-28
 

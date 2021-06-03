@@ -286,4 +286,5 @@ A query must be freed after use.
 The interface api's (python, matlab, octave, Java, etc) will work similarly.
 
 ## Timeouts
-As long as timeouts are enabled in the library itself.  Queries have a timeout system so they don't block forever if a federate fails or some other condition occurs.  The current default is 15 seconds.  It can be changed by using command line option `--querytimeout`  on cores or brokers (or in ``--coreinitstring` on cores).   In a later version an ability to set this and some other time out value through properties will likely be added (HELICS 3.1).  If the query times out a value of #timeout will be returned in the string.  
+
+As long as timeouts are enabled in the library itself. Queries have a timeout system so they don't block forever if a federate fails or some other condition occurs. The current default is 15 seconds. It can be changed by using command line option `--querytimeout` on cores or brokers (or in ``--coreinitstring` on cores). In a later version an ability to set this and some other time out value through properties will likely be added (HELICS 3.1). If the query times out a value of #timeout will be returned in the string.
