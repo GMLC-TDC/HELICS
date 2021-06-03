@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
 #ifdef HELICS_ENABLE_TCP_CORE
 #    include "../network/tcp/TcpHelperClasses.h"
 #endif
@@ -205,6 +206,32 @@ namespace apps {
     }
 
 #endif  // HELICS_ENABLE_UDP_CORE
+
+    void AsioBrokerServer::processArgs(const std::string& args)
+
+    {
+        /*
+         CLI::App parser("Asio broker server CLI parser");
+         parser.allow_extras();
+         parser.add_option("--tcp_port", tcpPort_, "specify the tcp port to use");
+         parser.add_option("--tcp_interface",
+                           tcpAddress_,
+                           "specify the interface to use for connecting the tcp server");
+
+         parser.add_option("--udp_port", udpPort_, "specify the udp port to use");
+         parser.add_option("--udp_interface",
+                           udpAddress_,
+                           "specify the interface to use for connecting a udp server");
+
+         try {
+             parser.parse(args);
+         }
+         catch (const CLI::Error& ce) {
+             logMessage(std::string("error processing command line arguments for asio broker server
+         :") + ce.what());
+         }
+         */
+    }
 
     static const Json::Value null;
 

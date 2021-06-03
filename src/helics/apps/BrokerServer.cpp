@@ -64,16 +64,25 @@ void BrokerServer::startServers()
         if (zmq_ss_server) {
             zmqs->enableZmqSsServer(true);
         }
+            if (!mZmqArgs.empty()) {
+                zmqs->processArgs(mZmqArgs);
+            }
         servers.push_back(std::move(zmqs));
     }
     if (tcp_server || udp_server) {
         auto asios = std::make_unique<AsioBrokerServer>(server_name_);
         if (tcp_server) {
             asios->enableTcpServer(true);
-        }
+                if (!mTcpArgs.empty()) {
+                    asios->processArgs(mTcpArgs);
+                }
+            }
         if (udp_server) {
             asios->enableUdpServer(true);
-        }
+                if (!mUdpArgs.empty()) {
+                    asios->processArgs(mUdpArgs);
+                }
+            }
         servers.push_back(std::move(asios));
     }
 
@@ -82,10 +91,16 @@ void BrokerServer::startServers()
         auto webs = std::make_unique<WebServer>(server_name_);
         if (http_server) {
             webs->enableHttpServer(true);
-        }
+                if (!mHttpArgs.empty()) {
+                    webs->processArgs(mHttpArgs);
+                }
+            }
         if (websocket_server) {
             webs->enableWebSocketServer(true);
-        }
+                if (!mWebSocketArgs.empty()) {
+                    webs->processArgs(mWebSocketArgs);
+                }
+            }
         servers.push_back(std::move(webs));
 #else
         std::cout << "Webserver not enabled" << std::endl;
@@ -133,12 +148,18 @@ std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing()
     app->add_flag("--zmqss",
                   zmq_ss_server,
                   "start a broker-server for the zmq single socket comms in helics");
+        app->add_option("--zmq_server_args",
+                        mZmqArgs,
+                        "command line arguments for the zmq servers");
+
 #endif
 #ifdef HELICS_ENABLE_TCP_CORE
     app->add_flag("--tcp,-t", tcp_server, "start a broker-server for the tcp comms in helics");
+        app->add_option("--tcp_server_args", mTcpArgs, "command line arguments for the tcp server");
 #endif
 #ifdef HELICS_ENABLE_UDP_CORE
     app->add_flag("--udp,-u", udp_server, "start a broker-server for the udp comms in helics");
+        app->add_option("--udp_server_args", mUdpArgs, "command line arguments for the udp server");
 #endif
 #ifdef HELICS_ENABLE_MPI_CORE
     // app->add_flag("--mpi", mpi_server, "start a broker-server for the mpi comms in helics");
@@ -148,6 +169,12 @@ std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing()
                   http_server,
                   "start a webserver to respond to http rest api requests");
     app->add_flag("--websocket", websocket_server, "start a websocket to respond to api requests");
+        app->add_option("--http_server_args",
+                        mHttpArgs,
+                        "command line arguments for the http server");
+        app->add_option("--websocket_server_args",
+                        mWebSocketArgs,
+                        "command line arguments for the websocket server");
 #endif
     app->set_config();
     app->add_option("config,--config,--server-config",
