@@ -71,9 +71,11 @@ namespace apps {
 static std::string generateIndexPage()
 {
     std::string index = helics::webserver::indexPage1;
+    index.append(helics::webserver::style);
+    index.append(helics::webserver::indexPage2);
     index.append(helics::webserver::svg1);
     index.append(helics::webserver::svg2);
-    index.append(helics::webserver::indexPage2);
+    index.append(helics::webserver::indexPage3);
     return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
