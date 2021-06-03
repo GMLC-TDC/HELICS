@@ -31,7 +31,7 @@ namespace apps {
         /** stop the server*/
         virtual void stopServer() override;
         /** process any command line arguments*/
-         virtual void processArgs(const std::string& args) override;
+        virtual void processArgs(const std::string& args) override;
         /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
         /** enable the websocket server*/

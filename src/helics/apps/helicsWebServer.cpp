@@ -22,12 +22,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsWebServer.hpp"
 
-#include "indexPage.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../utilities/timeStringOps.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
+#include "indexPage.hpp"
 
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>

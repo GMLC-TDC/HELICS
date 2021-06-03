@@ -78,9 +78,7 @@ int main(int argc, char* argv[])
                 << "Helics broker server time limit reached servers closing (to change duration use `--duration=X`)"
                 << std::endl;
             brokerServer->closeServers();
-            std::cout
-                << "waiting for brokers to close"
-                << std::endl;
+            std::cout << "waiting for brokers to close" << std::endl;
             // once we have closed the servers now wait for the active brokers to finish
             auto brokers = helics::BrokerFactory::getAllBrokers();
             for (auto& broker : brokers) {

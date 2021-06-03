@@ -244,7 +244,6 @@ TEST_F(httpTest, get_global_time)
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     EXPECT_EQ(val["brokers"].size(), 0U);
-   
 }
 
 TEST_F(httpTest, singleNonJson)
