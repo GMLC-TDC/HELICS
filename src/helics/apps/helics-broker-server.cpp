@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
             std::cout << "servers started\n";
             std::this_thread::sleep_for(opTime.to_ms());
             std::cout
-                << "Helics broker server time limit reached servers closing (to change duration use `--duration=X`)"
+                << "Helics broker server time limit reached, servers closing (to change duration use `--duration=X`)"
                 << std::endl;
             brokerServer->closeServers();
             std::cout << "waiting for brokers to close" << std::endl;

@@ -342,7 +342,7 @@ table td {
         R"raw(<html>
   <head>
     <meta charset="utf-8" />
-    <title>HELICS Web server interface</title>
+    <title>HELICS web server interface</title>
     )raw";
 
     static const char* indexPage2 =

@@ -42,7 +42,7 @@ namespace apps {
             parser.parse(args);
         }
         catch (const CLI::Error& ce) {
-            logMessage(std::string("error processing command line arguments for weberver :") +
+            logMessage(std::string("error processing command line arguments for web server :") +
                        ce.what());
         }
     }

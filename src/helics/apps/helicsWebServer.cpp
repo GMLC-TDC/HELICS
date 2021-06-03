@@ -522,7 +522,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         if (ec) {
-            return fail(ec, "helics webserver read");
+            return fail(ec, "helics web server read");
         }
 
         beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
@@ -764,7 +764,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
 
         if (ec) {
             if (beast::error::timeout != ec) {
-                fail(ec, "helics webserver read");
+                fail(ec, "helics web server read");
             }
             return;
         }
@@ -778,7 +778,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            return fail(ec, "helics webserver write");
+            return fail(ec, "helics web server write");
         }
 
         if (close) {
@@ -899,13 +899,13 @@ namespace apps {
             ->envname("HELICS_WEBSOCKET_PORT");
         parser.add_option("--websocket_interface",
                           websocketAddress_,
-                          "specify the interface to use for connecting a we server");
+                          "specify the interface to use for connecting a web server");
 
         try {
             parser.parse(args);
         }
         catch (const CLI::Error& ce) {
-            logMessage(std::string("error processing command line arguments for weberver :") +
+            logMessage(std::string("error processing command line arguments for web server :") +
                        ce.what());
         }
     }

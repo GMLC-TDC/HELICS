@@ -172,7 +172,7 @@ namespace apps {
                         "command line arguments for the http server");
         app->add_option("--websocket_server_args",
                         mWebSocketArgs,
-                        "command line arguments for the web socket server");
+                        "command line arguments for the websocket server");
 #endif
         app->set_config();
         app->add_option("config,--config,--server-config",
