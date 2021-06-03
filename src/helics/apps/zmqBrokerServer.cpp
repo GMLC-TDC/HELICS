@@ -28,7 +28,7 @@ static const Json::Value null;
 namespace helics {
 namespace apps {
 
-     void zmqBrokerServer::processArgs(const std::string& args)
+    void zmqBrokerServer::processArgs(const std::string& args)
 
     {
         CLI::App parser("zmq broker server parser");
@@ -62,7 +62,6 @@ namespace apps {
 #endif
     }
 
-
     void zmqBrokerServer::stopServer()
     {
         exitAll.store(true);
@@ -73,8 +72,9 @@ namespace apps {
         auto ctx = ZmqContextManager::getContextPointer();
         zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
         reqSocket.setsockopt(ZMQ_LINGER, 300);
-        int port = (mZmqPort!=0)?mZmqPort:(
-            (zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 : DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+        int port = (mZmqPort != 0) ? mZmqPort :
+                                     ((zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 :
+                                                       DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
         if (zmq_enabled_) {
             if (config_->isMember("zmq")) {
                 auto V = (*config_)["zmq"];
