@@ -7,12 +7,20 @@ Index of functions available in the C and by extension the language API's
  \section general General Functions
  in the HELICS C library
  - \ref helicsGetVersion
+ - \ref helicsGetBuildFlags
+ - \ref helicsGetCompilerVersion
  - \ref helicsErrorInitialize
  - \ref helicsErrorClear
+ - \ref helicsLoadSignalHandler
+ - \ref helicsClearSignalHandler
+ - \ref helicsLoadSignalHandlerCallback
+ - \ref helicsAbort
  - \ref helicsIsCoreTypeAvailable
  - \ref helicsGetFederateByName
  - \ref helicsGetPropertyIndex
+ - \ref helicsGetFlagIndex
  - \ref helicsGetOptionIndex
+ - \ref helicsGetOptionValue
  - \ref helicsCloseLibrary
  - \ref helicsCleanupLibrary
 
@@ -49,6 +57,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreFree
  - \ref helicsCoreSetGlobal
  - \ref helicsCoreSetLogFile
+ - \ref helicsCoreGlobalError
  - \ref helicsCoreSetLoggingCallback
  - \ref helicsCoreRegisterFilter
  - \ref helicsCoreRegisterCloningFilter
@@ -70,6 +79,9 @@ Functions applying to a \ref helics_broker object
  - \ref helicsBrokerFree
  - \ref helicsBrokerSetGlobal
  - \ref helicsBrokerSetLogFile
+ - \ref helicsBrokerSetTimeBarrier
+ - \ref helicsBrokerClearTimeBarrier
+ - \ref helicsBrokerGlobalError
  - \ref helicsBrokerSetLoggingCallback
 
  \section fedinfo Federate Info Functions
@@ -141,6 +153,7 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateLogDebugMessage
  - \ref helicsFederateLogLevelMessage
  - \ref helicsFederateSetLoggingCallback
+ - \ref helicsFederateSetQueryCallback
 
  \section vfederate Value Federate Functions
 functions applying to federates created as a value or combination federate \ref helics_federate objects
@@ -271,6 +284,9 @@ functions applying to a \ref helics_message_object
  - \ref helicsMessageSetData
  - \ref helicsMessageAppendData
  - \ref helicsMessageCopy
+ - \ref helicsMessageClone
+ - \ref helicsMessageFree
+ - \ref helicsMessageClear
 
  \section endpoint Endpoint interface Functions
 functions applying to a \ref helics_endpoint object
@@ -285,6 +301,7 @@ functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointHasMessage
  - \ref helicsEndpointPendingMessages
  - \ref helicsEndpointGetMessageObject
+ - \ref helicsEndpointCreateMessageObject
  - \ref helicsEndpointGetType
  - \ref helicsEndpointGetName
  - \ref helicsEndpointGetInfo
@@ -327,5 +344,9 @@ functions applying to a \ref helics_query object
  - \ref helicsQueryExecuteAsync
  - \ref helicsQueryExecuteComplete
  - \ref helicsQueryIsCompleted
+ - \ref helicsQuerySetTarget
+ - \ref helicsQuerySetQueryString
+ - \ref helicsQuerySetOrdering
  - \ref helicsQueryFree
+ - \ref helicsQueryBufferFill
 */
