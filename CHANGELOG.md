@@ -15,23 +15,23 @@ There were several bug fixes in this patch release. Some of them related to chan
 ### Changed
 
 - String output on recorders is now always JSON compatible and allows escaped characters. This allows some additional values to be displayed in ascii format vs base 64 encoding. #1910
-- Players read the string fields through JSON parser unless marked with b64\[\] to match the string output on recorders #1910
-- the default webserver port is now 8080 to allow user space execution on non windows platforms #1936
+- Players read the string fields through a JSON parser unless marked with b64\[\] to match the string output on recorders #1910
+- The default webserver port is now 8080 to allow user space execution on non-Windows platforms #1936
 
 ### Fixed
 
 - An issue with recorders writing text fields in the incorrect order which could result in incorrect playback #1910
 - Fix an issue with core naming that occasionally resulted in same broker name errors when using default names on federates #1919
 - Fix an issue where queries were not being resolved when a core disconnects which could result in deadlock. #1931
-- the `wait_for_current_time` flag was not working properly in some cases where time interruption was also taking place #1933
+- The `wait_for_current_time` flag was not working properly in some cases where time interruption was also taking place #1933
 - Fixed issue with the webserver not responding with the index page when requested or detecting the correct broker for certain trivial requests #1936
 
 ### Added
 
 - Signal handlers for catching SIGINT and optional user callback are available in the C shared API #1915
-- Added support for environmental variables for setting some network connection and other information #1921
+- Added support for environment variables for setting some network connection settings and other information #1921
 - Queries now have timeouts #1931
-- command line and environmental variable options for setting the webserver port numbers #1936
+- Command line and environment variable options for setting the webserver port numbers #1936
 
 ## [2.7.0][] - 2021-04-28
 
