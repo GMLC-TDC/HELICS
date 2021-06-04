@@ -265,4 +265,11 @@ void CoreApp::reset()
     name.clear();
 }
 
+void CoreApp::globalError(int32_t errorCode, const std::string& errorString)
+{
+    if (core) {
+        core->globalError(gLocalCoreId, errorCode, errorString);
+    }
+}
+
 }  // namespace helics

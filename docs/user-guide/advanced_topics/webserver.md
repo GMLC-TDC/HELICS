@@ -35,10 +35,16 @@ The format is json.
 Then it can be specified on the command line like so:
 
 ```sh
-helics_broker_server --http --web --zmq --config broker_server_config.json
+helics_broker_server --web --zmq --config broker_server_config.json
 ```
 
-The configuration will then make the REST webserver accessible on any interface on port 8080 and a websocket server on port 8008.
+The configuration will then make the REST web server accessible on any interface on port 8080 and a WebSocket server on port 8080. The port in use can be specified in a configuration file, or via command line such as
+
+```sh
+helics_broker_server --web --zmq --http_server_args="--http_port=80"
+```
+
+Arguments are passed to servers using an option in the form `--<server>_server_args`, and in that arg field `--<server>_port` and `--<server>_interface` are valid arguments. Valid server names are `http`, `websocket`, `zmq`, 'tcp', and `udp`, and eventually `mpi`. The http web server also acknowledges `HELICS_HTTP_PORT` as an environment variable. The websocket server acknowledges `HELICS_WEBSOCKET_PORT` for the port numbers of the respective servers.
 
 ## REST API
 
@@ -131,8 +137,6 @@ For queries that did not result in a valid response the response will be:
 
 As a demo case there is a `brokerServerTestCase` executable built as part of the HELICS_EXAMPLES.
 Running this example starts a webserver on the localhost using port 80.
-
-Currently only queries are supported, though eventually the plan is to support other debugging and control actions via a similar interface.
 
 The response to queries is a string either in plain text or json.
 For example:

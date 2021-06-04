@@ -1,0 +1,6 @@
+{
+  "name": "gld_federate",
+  "period": 60.0,
+  "force_new_core": true,
+  "coretype": "zmq"
+}

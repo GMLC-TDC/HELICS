@@ -284,6 +284,15 @@ void terminateAllBrokers()
     cleanUpBrokers(std::chrono::milliseconds(250));
 }
 
+void abortAllBrokers(int errorCode, const std::string& errorString)
+{
+    auto brokers = getAllBrokers();
+    for (auto& brk : brokers) {
+        brk->globalError(errorCode, brk->getIdentifier() + " sending-> " + errorString);
+        brk->disconnect();
+    }
+    cleanUpBrokers(std::chrono::milliseconds(250));
+}
 bool copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName)
 {
     return searchableBrokers.copyObject(copyFromName, copyToName);

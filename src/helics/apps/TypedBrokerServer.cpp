@@ -95,6 +95,9 @@ ActionMessage TypedBrokerServer::generateMessageResponse(const ActionMessage& rx
     }
     return CMD_IGNORE;
 }
+
+void TypedBrokerServer::processArgs(const std::string& /*unused*/) {}
+
 /** get an open port for broker to start*/
 int TypedBrokerServer::getOpenPort(portData& pd)
 {

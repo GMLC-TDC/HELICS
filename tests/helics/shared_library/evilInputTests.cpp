@@ -1123,7 +1123,7 @@ TEST(evil_federate_test, helicsFederateRegisterInterfaces)
 
 TEST(evil_federate_test, helicsFederateLocalError)
 {
-    // void helicsFederateLocalError(HelicsFederate fed, int error_code, const char
+    // void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char
     // *error_message);
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
@@ -1135,7 +1135,7 @@ TEST(evil_federate_test, helicsFederateLocalError)
 
 TEST(evil_federate_test, helicsFederateGlobalError)
 {
-    // void helicsFederateLocalError(HelicsFederate fed, int error_code, const char
+    // void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char
     // *error_message);
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);

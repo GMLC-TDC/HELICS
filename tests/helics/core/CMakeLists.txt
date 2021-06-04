@@ -21,6 +21,7 @@ set(core_test_sources
     CoreConfigureTests.cpp
     FilterFederateTests.cpp
     TimeDependenciesTests.cpp
+    CoreOperationsTests.cpp
 )
 
 if(NOT HELICS_DISABLE_ASIO)

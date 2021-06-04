@@ -75,6 +75,12 @@ communication methods*/
         std::string configFile_;
         std::string server_name_;
         std::unique_ptr<Json::Value> config_;
+        std::string mHttpArgs;
+        std::string mWebSocketArgs;
+        std::string mZmqArgs;
+        std::string mTcpArgs;
+        std::string mUdpArgs;
+        std::string mMpiArgs;
 
       public:
     };

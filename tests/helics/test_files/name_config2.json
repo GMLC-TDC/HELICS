@@ -1,0 +1,6 @@
+{
+  "name": "tap_controller",
+  "period": 60.0,
+  "coretype": "zmq",
+  "force_new_core": true
+}
