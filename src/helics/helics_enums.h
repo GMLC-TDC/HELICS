@@ -189,6 +189,8 @@ typedef enum {
     HELICS_ERROR_EXTERNAL_TYPE = -203,
     /** the function produced a helics error of some other type */
     HELICS_ERROR_OTHER = -101,
+    /** user system abort*/
+    HELICS_ERROR_USER_ABORT = -27,
     /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
     HELICS_ERROR_EXECUTION_FAILURE = -14, /*!< the function execution has failed */

@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../utilities/timeStringOps.hpp"
+#include "helics/external/CLI11/CLI11.hpp"
+#include "indexPage.hpp"
 
 #include <algorithm>
 #include <boost/asio/dispatch.hpp>
@@ -64,10 +66,15 @@ class IocWrapper {
 };
 }  // namespace helics::apps
 
-static std::string loadFile(const std::string& fileName)
+static std::string generateIndexPage()
 {
-    std::ifstream t(fileName);
-    return std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>());
+    std::string index = helics::webserver::indexPage1;
+    index.append(helics::webserver::style);
+    index.append(helics::webserver::indexPage2);
+    index.append(helics::webserver::svg1);
+    index.append(helics::webserver::svg2);
+    index.append(helics::webserver::indexPage3);
+    return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
 static std::string uriDecode(beast::string_view str)
@@ -407,10 +414,15 @@ std::pair<return_val, std::string>
     if (!brkr) {
         brkr = helics::BrokerFactory::getConnectedBroker();
         if (!brkr) {
-            return {return_val::not_found, brokerName + " not found"};
+            return {return_val::not_found, brokerName + " not found and no valid brokers"};
         }
-        query = target;
-        target = brokerName;
+        if (target.empty()) {
+            query = brokerName;
+        } else {
+            query = target;
+            target = brokerName;
+        }
+
     } else if (query.empty() && !target.empty()) {
         query = target;
         autoquery = true;
@@ -484,7 +496,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
     void on_accept(beast::error_code ec)
     {
         if (ec) {
-            return fail(ec, "accept");
+            return fail(ec, "helics websocket accept");
         }
 
         // Read a message
@@ -508,7 +520,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         if (ec) {
-            fail(ec, "read");
+            return fail(ec, "helics web server read");
         }
 
         beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
@@ -560,7 +572,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            return fail(ec, "write");
+            return fail(ec, "helics socket write");
         }
 
         // Clear the buffer
@@ -578,7 +590,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
 template<class Body, class Allocator, class Send>
 void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Send&& send)
 {
-    static const std::string index_page = loadFile("index.html");
+    static const std::string index_page = generateIndexPage();
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::bad_request, req.version()};
@@ -636,7 +648,8 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     }
 
     beast::string_view target(req.target());
-    if (target == "/index.html" || (target == "/" && !(req.payload_size()))) {
+    auto psize = req.payload_size();
+    if (target == "/index.html" || (target == "/" && (!psize || *psize < 4))) {
         return send(response_ok(index_page, "text/html"));
     }
 
@@ -749,7 +762,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
 
         if (ec) {
             if (beast::error::timeout != ec) {
-                fail(ec, "read");
+                fail(ec, "helics web server read");
             }
             return;
         }
@@ -763,7 +776,7 @@ class HttpSession: public std::enable_shared_from_this<HttpSession> {
         boost::ignore_unused(bytes_transferred);
 
         if (ec) {
-            return fail(ec, "write");
+            return fail(ec, "helics web server write");
         }
 
         if (close) {
@@ -806,28 +819,28 @@ class Listener: public std::enable_shared_from_this<Listener> {
         // Open the acceptor
         acceptor.open(endpoint.protocol(), ec);
         if (ec) {
-            fail(ec, "open");
+            fail(ec, "helics acceptor open");
             return;
         }
 
         // Allow address reuse
         acceptor.set_option(net::socket_base::reuse_address(true), ec);
         if (ec) {
-            fail(ec, "set_option");
+            fail(ec, "helics acceptor set_option");
             return;
         }
 
         // Bind to the server address
         acceptor.bind(endpoint, ec);
         if (ec) {
-            fail(ec, "bind");
+            fail(ec, "helics acceptor bind");
             return;
         }
 
         // Start listening for connections
         acceptor.listen(net::socket_base::max_listen_connections, ec);
         if (ec) {
-            fail(ec, "listen");
+            fail(ec, "helics acceptor listen");
             return;
         }
     }
@@ -846,7 +859,7 @@ class Listener: public std::enable_shared_from_this<Listener> {
     void on_accept(beast::error_code ec, tcp::socket socket)
     {
         if (ec) {
-            fail(ec, "accept");
+            return fail(ec, "helics accept connections");
         } else {
             if (websocket) {
                 // Create the session and run it
@@ -867,6 +880,33 @@ class Listener: public std::enable_shared_from_this<Listener> {
 static const Json::Value null;
 
 namespace helics::apps {
+
+void WebServer::processArgs(const std::string& args)
+
+{
+    CLI::App parser("http web server parser");
+    parser.allow_extras();
+    parser.add_option("--http_port", httpPort_, "specify the http port to use")
+        ->envname("HELICS_HTTP_PORT");
+    parser.add_option("--http_interface",
+                      httpAddress_,
+                      "specify the interface to use for connecting an http server");
+
+    parser.add_option("--websocket_port", websocketPort_, "specify the websocket port to use")
+        ->envname("HELICS_WEBSOCKET_PORT");
+    parser.add_option("--websocket_interface",
+                      websocketAddress_,
+                      "specify the interface to use for connecting a web server");
+
+    try {
+        parser.parse(args);
+    }
+    catch (const CLI::Error& ce) {
+        logMessage(std::string("error processing command line arguments for web server :") +
+                   ce.what());
+    }
+}
+
 void WebServer::startServer(const Json::Value* val)
 {
     logMessage("starting broker web server");

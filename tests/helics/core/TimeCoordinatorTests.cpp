@@ -138,3 +138,28 @@ TEST(timeCoord_tests, dependent_test_message)
     EXPECT_EQ(deps.size(), 1U);
     EXPECT_TRUE(deps[0] == fed3);
 }
+
+class TimeCoordinatorTester1: public ::testing::Test, helics::TimeCoordinator {
+  public:
+    void setup1()
+    {
+        info.timeDelta = 1.0;
+        info.wait_for_current_time_updates = true;
+        executionMode = true;
+        time_granted = timeZero;
+        ActionMessage addDep(CMD_ADD_DEPENDENT);
+        addDep.source_id = fed2;
+
+        processDependencyUpdateMessage(addDep);
+    }
+
+    helics::TimeCoordinator* getCoordinator()
+    {
+        return static_cast<helics::TimeCoordinator*>(this);
+    }
+};
+
+TEST_F(TimeCoordinatorTester1, wait_for_current_time)
+{
+    setup1();
+}

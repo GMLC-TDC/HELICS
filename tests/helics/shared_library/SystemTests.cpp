@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ctestFixtures.hpp"
 
+#include <atomic>
+#include <csignal>
 #include <thread>
 
 // test generating a global from a broker and some of its error pathways
@@ -363,4 +365,28 @@ TEST(other_tests, broker_after_close)
     EXPECT_EQ(helicsBrokerIsValid(brk), HELICS_FALSE);
     helicsBrokerFree(brk);
     EXPECT_EQ(helicsBrokerIsValid(brk), HELICS_FALSE);
+}
+
+static std::atomic<int> handlerCount{0};
+
+static HelicsBool testHandler(int /*unused*/)
+{
+    ++handlerCount;
+    return HELICS_FALSE;
+}
+
+TEST(other_tests, signal_handler_callback)
+{
+    helicsLoadSignalHandlerCallback(testHandler);
+    raise(SIGINT);
+    EXPECT_EQ(handlerCount.load(), 1);
+    helicsClearSignalHandler();
+}
+
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_death_ci_skip)
+{
+    helicsLoadSignalHandler();
+    EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
+    helicsClearSignalHandler();
 }

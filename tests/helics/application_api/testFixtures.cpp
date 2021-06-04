@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 
 #include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include <string>
@@ -116,4 +117,22 @@ std::shared_ptr<helics::Broker>
     broker->setLoggingLevel(HELICS_LOG_LEVEL_ERROR);
     brokers.push_back(broker);
     return broker;
+}
+
+void setEnvironmentVariable(const std::string& name, const std::string& value)
+{
+#ifdef _WIN32
+    _putenv_s(name.c_str(), value.c_str());
+#else
+    setenv(name.c_str(), value.c_str(), 1);
+#endif
+}
+
+void clearEnvironmentVariable(const std::string& name)
+{
+#ifdef _WIN32
+    _putenv_s(name.c_str(), "");
+#else
+    unsetenv(name.c_str());
+#endif
 }

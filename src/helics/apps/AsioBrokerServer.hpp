@@ -44,6 +44,7 @@ namespace apps {
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
+        virtual void processArgs(const std::string& args) override;
         void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
         void enableUdpServer(bool enabled) { udp_enabled_ = enabled; }
 

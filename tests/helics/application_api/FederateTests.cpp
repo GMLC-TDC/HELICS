@@ -13,7 +13,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
+#include "testFixtures.hpp"
 
+#include "gmock/gmock.h"
 #include <future>
 #include <gtest/gtest.h>
 /** these test cases test out the value converters
@@ -44,6 +46,57 @@ TEST(federate_tests, federate_initialize_tests)
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);
 
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+    Fed = nullptr;  // force the destructor
+}
+
+TEST(federate_tests, federate_initialize_tests_env)
+{
+    setEnvironmentVariable("HELICS_LOG_LEVEL", "connections");
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto cloglevel = core->getIntegerProperty(helics::gLocalCoreId, HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(cloglevel, HELICS_LOG_LEVEL_CONNECTIONS);
+
+    Fed->enterExecutingMode();
+    EXPECT_EQ(Fed->getIntegerProperty(HELICS_PROPERTY_INT_LOG_LEVEL), HELICS_LOG_LEVEL_CONNECTIONS);
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    Fed->finalize();
+    clearEnvironmentVariable("HELICS_LOG_LEVEL");
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+    Fed = nullptr;  // force the destructor
+}
+
+TEST(federate_tests, federate_initialize_tests_env2)
+{
+    setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", std::to_string(HELICS_LOG_LEVEL_CONNECTIONS));
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto cloglevel = core->getIntegerProperty(helics::gLocalCoreId, HELICS_PROPERTY_INT_LOG_LEVEL);
+    EXPECT_EQ(cloglevel, HELICS_LOG_LEVEL_CONNECTIONS);
+
+    Fed->enterExecutingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    Fed->finalize();
+    clearEnvironmentVariable("HELICS_BROKER_LOG_LEVEL");
     // const auto& coreName = core->getIdentifier();
     // const auto& fedName = Fed->getName();
     // EXPECT_EQ(fedName+"_core", coreName);
@@ -122,6 +175,114 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
 
     EXPECT_THROW(auto fed = std::make_shared<helics::Federate>("test1", fi),
                  helics::RegistrationFailure);
+}
+
+TEST(federate_tests, timeout_abort_zmq)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::CoreType::ZMQ);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    helics::CoreFactory::abortAllCores(HELICS_ERROR_USER_ABORT, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
+}
+
+#endif
+
+#ifdef ENABLE_TCP_CORE
+TEST(federate_tests, timeout_abort_tcp)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::core_type::TCP);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
+}
+
+TEST(federate_tests, timeout_abort_tcpss)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::core_type::TCP_SS);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
+}
+#endif
+
+#ifdef ENABLE_UDP_CORE
+TEST(federate_tests, timeout_abort_udp)
+{
+    std::future<std::shared_ptr<helics::Federate>> fut;
+    auto call = []() {
+        helics::FederateInfo fi(helics::core_type::UDP);
+        fi.coreInitString = "";
+        auto fed = std::make_shared<helics::Federate>("test1", fi);
+        return fed;
+    };
+
+    auto cret = std::async(std::launch::async, call);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    while (helics::CoreFactory::getCoreCount() == 0) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    try {
+        cret.get();
+        EXPECT_TRUE(false);
+    }
+    catch (const helics::HelicsException& he) {
+        EXPECT_THAT(he.what(), ::testing::HasSubstr("aborting55"));
+    }
 }
 
 #endif

@@ -221,3 +221,8 @@ struct FederateTestFixture {
     std::string extraBrokerArgs;
     std::string ctype;
 };
+
+/** set an environment variable to a specific value */
+void setEnvironmentVariable(const std::string& name, const std::string& value);
+/** clear an environment variable */
+void clearEnvironmentVariable(const std::string& name);

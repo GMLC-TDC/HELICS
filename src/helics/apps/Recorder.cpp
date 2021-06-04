@@ -264,8 +264,13 @@ namespace apps {
                     message["dest"] = mess->original_dest;
                 }
                 if (isBinaryData(mess->data)) {
-                    message["encoding"] = "base64";
-                    message["message"] = encode(std::string(mess->data.to_string()));
+                    if (isEscapableData(mess->data)) {
+                        message["message"] = std::string(mess->data.to_string());
+                    } else {
+                        message["encoding"] = "base64";
+                        message["message"] = encode(std::string(mess->data.to_string()));
+                    }
+
                 } else {
                     message["message"] = std::string(mess->data.to_string());
                 }
@@ -281,20 +286,23 @@ namespace apps {
     {
         std::ofstream outFile(filename.empty() ? outFileName : filename);
         if (!points.empty()) {
-            outFile << "#time \ttag\t value\t type*\n";
+            outFile << "#time \ttag\t type*\t value\n";
         }
         for (auto& v : points) {
             if (v.first) {
                 outFile << static_cast<double>(v.time) << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t' << v.value << '\t'
-                        << subscriptions[v.index].getPublicationType() << '\n';
+                        << subscriptions[v.index].getTarget() << '\t'
+                        << subscriptions[v.index].getPublicationType() << '\t'
+                        << Json::valueToQuotedString(v.value.c_str()) << '\n';
             } else {
                 if (v.iteration > 0) {
                     outFile << static_cast<double>(v.time) << ':' << v.iteration << "\t\t"
-                            << subscriptions[v.index].getTarget() << '\t' << v.value << '\n';
+                            << subscriptions[v.index].getTarget() << '\t'
+                            << Json::valueToQuotedString(v.value.c_str()) << '\n';
                 } else {
                     outFile << static_cast<double>(v.time) << "\t\t"
-                            << subscriptions[v.index].getTarget() << '\t' << v.value << '\n';
+                            << subscriptions[v.index].getTarget() << '\t'
+                            << Json::valueToQuotedString(v.value.c_str()) << '\n';
                 }
             }
         }
@@ -309,7 +317,14 @@ namespace apps {
                 outFile << m->original_dest;
             }
             if (isBinaryData(m->data)) {
-                outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                if (isEscapableData(m->data)) {
+                    outFile << "\t"
+                            << Json::valueToQuotedString(std::string(m->data.to_string()).c_str())
+                            << "\n";
+                } else {
+                    outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                }
+
             } else {
                 outFile << "\t\"" << m->data.to_string() << "\"\n";
             }
