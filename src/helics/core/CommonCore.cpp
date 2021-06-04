@@ -3811,7 +3811,8 @@ void CommonCore::checkQueryTimeouts()
         for (auto& qt : queryTimeouts) {
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
-                    activeQueries.setDelayedValue(qt.first, "#timeout");
+                    activeQueries.setDelayedValue(qt.first,
+                                                  generateJsonErrorResponse(504, "query timeout"));
                     qt.first = 0;
                 }
             }

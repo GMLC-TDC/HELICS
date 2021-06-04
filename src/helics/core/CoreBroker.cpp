@@ -2453,14 +2453,12 @@ void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
 
 void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
 {
-    bool isCore{false};
     // using regular loop here since dual mapped vector shouldn't produce a modifiable lvalue
     for (size_t ii = 0; ii < _brokers.size(); ++ii) {  // NOLINT
         auto& brk = _brokers[ii];
         if (brk.global_id == brkid) {
             if (brk.state != connection_state::error) {
                 brk.state = connection_state::disconnected;
-                isCore = brk._core;
             }
         }
         if (brk.parent == brkid) {
@@ -2470,7 +2468,6 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
             }
         }
     }
-    if (isCore) {
         for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
             auto& fed = _federates[ii];
 
@@ -2480,7 +2477,6 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
                 }
             }
         }
-    }
 }
 
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
@@ -3200,12 +3196,40 @@ void CoreBroker::processQuery(ActionMessage& m)
             route = fed->route;
             m.dest_id = fed->parent;
             response = checkFedQuery(*fed, m.payload.to_string());
+            if (response.empty() && fed->state >= connection_state::error) {
+                route = parent_route_id;
+                switch (fed->state) {
+                    case connection_state::error:
+                        response = generateJsonErrorResponse(503, "federate is in error state");
+                        break;
+                    case connection_state::disconnected:
+                    case connection_state::request_disconnect:
+                        response = generateJsonErrorResponse(503, "federate is disconnected");
+                        break;
+                    default:
+                        break;
+                }
+            }
         } else {
             auto broker = _brokers.find(target);
             if (broker != _brokers.end()) {
                 route = broker->route;
                 m.dest_id = broker->global_id;
                 response = checkBrokerQuery(*broker, m.payload.to_string());
+                if (response.empty() && broker->state >= connection_state::error) {
+                    route = parent_route_id;
+                    switch (broker->state) {
+                        case connection_state::error:
+                            response = generateJsonErrorResponse(503, "target broker is in error state");
+                            break;
+                        case connection_state::disconnected:
+                        case connection_state::request_disconnect:
+                            response = generateJsonErrorResponse(503, "federate is disconnected");
+                            break;
+                        default:
+                            break;
+                    }
+                }
             } else if (isRootc && m.payload.to_string() == "exists") {
                 response = "false";
             }
@@ -3245,7 +3269,8 @@ void CoreBroker::checkQueryTimeouts()
         for (auto& qt : queryTimeouts) {
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
-                    activeQueries.setDelayedValue(qt.first, "#timeout");
+                    activeQueries.setDelayedValue(
+                        qt.first, generateJsonErrorResponse(504, "query timeout"));
                     qt.first = 0;
                 }
             }
