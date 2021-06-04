@@ -145,6 +145,8 @@ class HELICS_CXX_EXPORT CoreApp {
 
     /** reset the app to default state*/
     void reset();
+    /** generate a global error on a core*/
+    void globalError(int32_t errorCode, const std::string& errorString);
 
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);

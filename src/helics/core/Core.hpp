@@ -116,6 +116,9 @@ class Core {
      * disconnect the core from its broker
      */
     virtual void disconnect() = 0;
+
+    /*return true if the core has an error*/
+    virtual bool hasError() const = 0;
     /** waits in the current thread until the core is disconnected
     @return true if the disconnect was successful
      */
@@ -137,14 +140,14 @@ class Core {
     */
     virtual void globalError(local_federate_id federateID,
                              int32_t errorCode,
-                             const std::string& error_string) = 0;
+                             const std::string& errorString) = 0;
 
     /**
      * Federate has encountered a local error and should be disconnected.
      */
     virtual void localError(local_federate_id federateID,
                             int32_t errorCode,
-                            const std::string& error_string) = 0;
+                            const std::string& errorString) = 0;
 
     /**
      * Federate has encountered an unrecoverable error.
@@ -153,7 +156,10 @@ class Core {
     {
         globalError(federateID, errorCode, "");
     }
-
+    /** get the last error code from a core*/
+    virtual int getErrorCode() const = 0;
+    /** get the last error message*/
+    virtual std::string getErrorMessage() const = 0;
     /**
      * Federate has completed.
      *

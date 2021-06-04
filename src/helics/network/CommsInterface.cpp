@@ -124,6 +124,15 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             case NetworkBrokerData::server_mode_options::unspecified:
                 break;
         }
+        if (mRequireBrokerConnection) {
+            if (brokerTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
+                brokerTargetAddress = netInfo.connectionAddress;
+            }
+        } else {
+            if (localTargetAddress.empty() && !netInfo.connectionAddress.empty()) {
+                localTargetAddress = netInfo.connectionAddress;
+            }
+        }
         propertyUnLock();
     }
 }
@@ -304,7 +313,10 @@ bool CommsInterface::connect()
     txTrigger.waitActivation();
     rxTrigger.waitActivation();
     if (rx_status != connection_status::connected) {
-        logError("receiver connection failure");
+        if (!requestDisconnect.load()) {
+            logError("receiver connection failure");
+        }
+
         if (tx_status == connection_status::connected) {
             syncLock.lock();
             if (queue_transmitter.joinable()) {
@@ -327,7 +339,9 @@ bool CommsInterface::connect()
     }
 
     if (tx_status != connection_status::connected) {
-        logError("transmitter connection failure");
+        if (!requestDisconnect.load()) {
+            logError("transmitter connection failure");
+        }
         if (!singleThread) {
             if (rx_status == connection_status::connected) {
                 syncLock.lock();
@@ -351,6 +365,14 @@ bool CommsInterface::connect()
     return true;
 }
 
+void CommsInterface::setRequireBrokerConnection(bool requireBrokerConnection)
+{
+    if (propertyLock()) {
+        mRequireBrokerConnection = requireBrokerConnection;
+        propertyUnLock();
+    }
+}
+
 void CommsInterface::setName(const std::string& commName)
 {
     if (propertyLock()) {
@@ -365,6 +387,7 @@ void CommsInterface::disconnect()
         if (propertyLock()) {
             setRxStatus(connection_status::terminated);
             setTxStatus(connection_status::terminated);
+            propertyUnLock();
             join_tx_rx_thread();
             return;
         }

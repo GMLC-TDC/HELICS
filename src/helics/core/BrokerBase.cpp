@@ -126,6 +126,9 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_option("--federates,-f,--minfederates,--minfed,-m",
                      minFederateCount,
                      "the minimum number of federates that will be connecting");
+    hApp->add_option("--maxfederates",
+                     maxFederateCount,
+                     "the maximum number of federates that will be connecting");
     hApp->add_option("--name,-n,--identifier,--uuid", identifier, "the name of the broker/core");
     hApp->add_option("--maxiter,--maxiterations",
                      maxIterationCount,
@@ -135,9 +138,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
+    hApp->add_option("--maxbrokers",
+                     maxBrokerCount,
+                     "the maximum number of brokers that will be connecting (ignored in cores)");
     hApp->add_option("--key,--broker_key",
                      brokerKey,
-                     "specify a key to use for all connections to/from a broker");
+                     "specify a key to use for all connections to/from a broker")
+        ->envname("HELICS_BROKER_KEY");
     hApp->add_flag(
         "--no_ping,--slow_responding",
         no_ping,
@@ -168,7 +175,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option_function<int>(
             "--loglevel,--log-level",
             [this](int val) { setLogLevel(val); },
-            "the level which to log the higher this is set to the more gets logs(-1) for no logging")
+            "the level at which to log; the higher this is set to the more gets logged,  use -1 for no logging")
+        ->envname("HELICS_BROKER_LOG_LEVEL")
         ->transform(
             CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
@@ -211,6 +219,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--networktimeout",
         networkTimeout,
         "time to wait for a broker connection default unit is in ms(can also be entered as a time "
+        "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--querytimeout",
+        queryTimeout,
+        "time to wait for a query to be answered default unit is in  ms default 15s(can also be entered as a time "
         "like '10s' or '45ms') ");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
@@ -405,7 +418,7 @@ void BrokerBase::generateNewIdentifier()
 void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {
     lastErrorString = estring;
-    lastErrorCode = eCode;
+    lastErrorCode.store(eCode);
     if (brokerState.load() != broker_state_t::errored) {
         brokerState.store(broker_state_t::errored);
         if (errorDelay <= timeZero) {
@@ -679,11 +692,15 @@ void BrokerBase::queueProcessingLoop()
                     }
                     break;
                 }
-                if (messagesSinceLastTick == 0 || forwardTick) {
 #ifndef DISABLE_TICK
+                if (messagesSinceLastTick == 0) {
+                    command.messageID =
+                        forwardingReasons | static_cast<uint32_t>(TickForwardingReasons::no_comms);
                     processCommand(std::move(command));
-#endif
+                } else if (forwardTick) {
+                    command.messageID = forwardingReasons;
                 }
+#endif
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
@@ -766,6 +783,30 @@ void BrokerBase::queueProcessingLoop()
                 return;
         }
     }
+}
+
+void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
+{
+    if (value) {
+        forwardingReasons |= static_cast<std::uint32_t>(reason);
+    } else {
+        forwardingReasons &= ~static_cast<std::uint32_t>(reason);
+    }
+    forwardTick = (forwardingReasons != 0);
+}
+
+bool BrokerBase::setBrokerState(broker_state_t newState)
+{
+    if (brokerState.load() == broker_state_t::errored) {
+        return false;
+    }
+    brokerState.store(newState);
+    return true;
+}
+
+bool BrokerBase::transitionBrokerState(broker_state_t expectedState, broker_state_t newState)
+{
+    return brokerState.compare_exchange_strong(expectedState, newState);
 }
 
 void BrokerBase::baseConfigure(ActionMessage& command)

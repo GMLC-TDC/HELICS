@@ -74,6 +74,42 @@ public class helics {
   }
 
   /**
+   *  Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,<br>
+   * and federates then exits the process.
+   */
+  public static void helicsLoadSignalHandler() {
+    helicsJNI.helicsLoadSignalHandler();
+  }
+
+  /**
+   *  Clear HELICS based signal handlers.
+   */
+  public static void helicsClearSignalHandler() {
+    helicsJNI.helicsClearSignalHandler();
+  }
+
+  /**
+   *  Load a custom signal handler to execute prior to the abort signal handler.<br>
+   * This function is not 100% reliable it will most likely work but uses some functions and<br>
+   * techniques that are not 100% guaranteed to work in a signal handler<br>
+   * and in worst case it could deadlock.  That is somewhat unlikely given usage patterns<br>
+   * but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument<br>
+   * and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the<br>
+   * callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.
+   */
+  public static void helicsLoadSignalHandlerCallback(SWIGTYPE_p_f_int__int handler) {
+    helicsJNI.helicsLoadSignalHandlerCallback(SWIGTYPE_p_f_int__int.getCPtr(handler));
+  }
+
+  /**
+   *  Execute a global abort by sending an error code to all cores, brokers,<br>
+   * and federates that were created through the current library instance.
+   */
+  public static void helicsAbort(int errorCode, String errorString) {
+    helicsJNI.helicsAbort(errorCode, errorString);
+  }
+
+  /**
    * Returns true if core/broker type specified is available in current compilation.<br>
    * <br>
    * @param type A string representing a core type.<br>
@@ -833,11 +869,11 @@ public class helics {
    * A global error halts the co-simulation completely.<br>
    * <br>
    * @param fed The federate to create an error in.<br>
-   * @param error_code The integer code for the error.<br>
-   * @param error_string A string describing the error.
+   * @param errorCode The integer code for the error.<br>
+   * @param errorString A string describing the error.
    */
-  public static void helicsFederateGlobalError(SWIGTYPE_p_void fed, int error_code, String error_string) {
-    helicsJNI.helicsFederateGlobalError(SWIGTYPE_p_void.getCPtr(fed), error_code, error_string);
+  public static void helicsFederateGlobalError(SWIGTYPE_p_void fed, int errorCode, String errorString) {
+    helicsJNI.helicsFederateGlobalError(SWIGTYPE_p_void.getCPtr(fed), errorCode, errorString);
   }
 
   /**
@@ -846,11 +882,11 @@ public class helics {
    * This will propagate through the co-simulation but not necessarily halt the co-simulation, it has a similar effect to finalize<br>
    * but does allow some interaction with a core for a brief time.<br>
    * @param fed The federate to create an error in.<br>
-   * @param error_code The integer code for the error.<br>
-   * @param error_string A string describing the error.
+   * @param errorCode The integer code for the error.<br>
+   * @param errorString A string describing the error.
    */
-  public static void helicsFederateLocalError(SWIGTYPE_p_void fed, int error_code, String error_string) {
-    helicsJNI.helicsFederateLocalError(SWIGTYPE_p_void.getCPtr(fed), error_code, error_string);
+  public static void helicsFederateLocalError(SWIGTYPE_p_void fed, int errorCode, String errorString) {
+    helicsJNI.helicsFederateLocalError(SWIGTYPE_p_void.getCPtr(fed), errorCode, errorString);
   }
 
   /**
@@ -1396,6 +1432,28 @@ public class helics {
    */
   public static void helicsBrokerClearTimeBarrier(SWIGTYPE_p_void broker) {
     helicsJNI.helicsBrokerClearTimeBarrier(SWIGTYPE_p_void.getCPtr(broker));
+  }
+
+  /**
+   * Generate a global error through a broker. This will terminate the federation.<br>
+   * <br>
+   * @param broker The broker to generate the global error on.<br>
+   * @param errorCode The error code to associate with the global error.<br>
+   * @param errorString An error message to associate with the global error.
+   */
+  public static void helicsBrokerGlobalError(SWIGTYPE_p_void broker, int errorCode, String errorString) {
+    helicsJNI.helicsBrokerGlobalError(SWIGTYPE_p_void.getCPtr(broker), errorCode, errorString);
+  }
+
+  /**
+   * Generate a global error through a broker. This will terminate the federation.<br>
+   * <br>
+   * @param core The core to generate the global error.<br>
+   * @param errorCode The error code to associate with the global error.<br>
+   * @param errorString An error message to associate with the global error.
+   */
+  public static void helicsCoreGlobalError(SWIGTYPE_p_void core, int errorCode, String errorString) {
+    helicsJNI.helicsCoreGlobalError(SWIGTYPE_p_void.getCPtr(core), errorCode, errorString);
   }
 
   /**

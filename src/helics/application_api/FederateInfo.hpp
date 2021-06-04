@@ -28,6 +28,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     core_type coreType{core_type::DEFAULT};  //!< the type of the core
     int brokerPort{-1};  //!< broker port information
 
+    bool forceNewCore{false};  //!< indicator that the federate should not use an existing core
     std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -38,10 +39,10 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
                             //!< other strings are possible
     std::string fileInUse;  //!< string containing a configuration file that was used
     /** default constructor*/
-    FederateInfo() = default;
+    FederateInfo();
     /** construct from a type
     @param cType the type of core to use for the federate*/
-    explicit FederateInfo(core_type cType): coreType(cType) {}
+    explicit FederateInfo(core_type cType);
     /** load a federateInfo object from command line arguments in a string
     @details calls /ref loadInfoFromArgs in the constructor
     @param args a string containing the command line arguments

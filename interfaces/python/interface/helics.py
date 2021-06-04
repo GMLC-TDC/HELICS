@@ -226,6 +226,8 @@ helics_error_external_type = _helics.helics_error_external_type
 r""" an unknown non-helics error was produced"""
 helics_error_other = _helics.helics_error_other
 r""" the function produced a helics error of some other type"""
+helics_error_user_abort = _helics.helics_error_user_abort
+r""" user system abort"""
 helics_error_insufficient_space = _helics.helics_error_insufficient_space
 r""" insufficient space is available to store requested data"""
 helics_error_execution_failure = _helics.helics_error_execution_failure
@@ -465,6 +467,36 @@ def helicsGetBuildFlags() -> "char const *":
 def helicsGetCompilerVersion() -> "char const *":
     r"""Get the compiler version used to compile HELICS."""
     return _helics.helicsGetCompilerVersion()
+
+def helicsLoadSignalHandler() -> "void":
+    r"""
+     Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,
+    and federates then exits the process.
+    """
+    return _helics.helicsLoadSignalHandler()
+
+def helicsClearSignalHandler() -> "void":
+    r""" Clear HELICS based signal handlers."""
+    return _helics.helicsClearSignalHandler()
+
+def helicsLoadSignalHandlerCallback(handler: "helics_bool (*)(int)") -> "void":
+    r"""
+     Load a custom signal handler to execute prior to the abort signal handler.
+    This function is not 100% reliable it will most likely work but uses some functions and
+    techniques that are not 100% guaranteed to work in a signal handler
+    and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
+    but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument
+    and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the
+    callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.
+    """
+    return _helics.helicsLoadSignalHandlerCallback(handler)
+
+def helicsAbort(errorCode: "int", errorString: "char const *") -> "void":
+    r"""
+     Execute a global abort by sending an error code to all cores, brokers,
+    and federates that were created through the current library instance.
+    """
+    return _helics.helicsAbort(errorCode, errorString)
 
 def helicsIsCoreTypeAvailable(type: "char const *") -> "helics_bool":
     r"""
@@ -1258,7 +1290,7 @@ def helicsFederateRegisterInterfaces(fed: "helics_federate", file: "char const *
     """
     return _helics.helicsFederateRegisterInterfaces(fed, file)
 
-def helicsFederateGlobalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
+def helicsFederateGlobalError(fed: "helics_federate", errorCode: "int", errorString: "char const *") -> "void":
     r"""
     Generate a global error from a federate.
 
@@ -1266,14 +1298,14 @@ def helicsFederateGlobalError(fed: "helics_federate", error_code: "int", error_s
 
     :type fed: void
     :param fed: The federate to create an error in.
-    :type error_code: int
-    :param error_code: The integer code for the error.
-    :type error_string: string
-    :param error_string: A string describing the error.
+    :type errorCode: int
+    :param errorCode: The integer code for the error.
+    :type errorString: string
+    :param errorString: A string describing the error.
     """
-    return _helics.helicsFederateGlobalError(fed, error_code, error_string)
+    return _helics.helicsFederateGlobalError(fed, errorCode, errorString)
 
-def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_string: "char const *") -> "void":
+def helicsFederateLocalError(fed: "helics_federate", errorCode: "int", errorString: "char const *") -> "void":
     r"""
     Generate a local error in a federate.
 
@@ -1281,12 +1313,12 @@ def helicsFederateLocalError(fed: "helics_federate", error_code: "int", error_st
     but does allow some interaction with a core for a brief time.
     :type fed: void
     :param fed: The federate to create an error in.
-    :type error_code: int
-    :param error_code: The integer code for the error.
-    :type error_string: string
-    :param error_string: A string describing the error.
+    :type errorCode: int
+    :param errorCode: The integer code for the error.
+    :type errorString: string
+    :param errorString: A string describing the error.
     """
-    return _helics.helicsFederateLocalError(fed, error_code, error_string)
+    return _helics.helicsFederateLocalError(fed, errorCode, errorString)
 
 def helicsFederateFinalize(fed: "helics_federate") -> "void":
     r"""Finalize the federate. This function halts all communication in the federate and disconnects it from the core."""
@@ -1869,6 +1901,32 @@ def helicsBrokerClearTimeBarrier(broker: "helics_broker") -> "void":
     :param broker: The broker to clear the barriers on.
     """
     return _helics.helicsBrokerClearTimeBarrier(broker)
+
+def helicsBrokerGlobalError(broker: "helics_broker", errorCode: "int", errorString: "char const *") -> "void":
+    r"""
+    Generate a global error through a broker. This will terminate the federation.
+
+    :type broker: void
+    :param broker: The broker to generate the global error on.
+    :type errorCode: int
+    :param errorCode: The error code to associate with the global error.
+    :type errorString: string
+    :param errorString: An error message to associate with the global error.
+    """
+    return _helics.helicsBrokerGlobalError(broker, errorCode, errorString)
+
+def helicsCoreGlobalError(core: "helics_core", errorCode: "int", errorString: "char const *") -> "void":
+    r"""
+    Generate a global error through a broker. This will terminate the federation.
+
+    :type core: void
+    :param core: The core to generate the global error.
+    :type errorCode: int
+    :param errorCode: The error code to associate with the global error.
+    :type errorString: string
+    :param errorString: An error message to associate with the global error.
+    """
+    return _helics.helicsCoreGlobalError(core, errorCode, errorString)
 
 def helicsCreateQuery(target: "char const *", query: "char const *") -> "helics_query":
     r"""

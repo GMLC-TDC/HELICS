@@ -713,6 +713,8 @@ static constexpr std::pair<int, const char*> errorStrings[] = {
     {already_init_error_code, "already in initialization mode"},
     {duplicate_federate_name_error_code, "duplicate federate name detected"},
     {duplicate_broker_name_error_code, "duplicate broker name detected"},
+    {max_federate_count_exceeded, "the maximum number of federates has been reached"},
+    {max_broker_count_exceeded, "the maximum number of brokers or cores has been reached"},
     {mismatch_broker_key_error_code, "Broker key does not match"}};
 
 using errorPair = std::pair<int, const char*>;
