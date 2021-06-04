@@ -28,6 +28,8 @@ namespace apps {
         virtual void startServer(const Json::Value* val) = 0;
         /** stop the server*/
         virtual void stopServer() = 0;
+        /** process some potential command line arguments for the typed server*/
+        virtual void processArgs(const std::string& args);
 
       protected:
         /** generate a reply to a message*/

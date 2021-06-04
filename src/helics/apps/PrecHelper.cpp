@@ -80,3 +80,11 @@ bool isBinaryData(helics::SmallBuffer& data)
         return ((c < 32) || (c == 34) || (c > 126));
     });
 }
+
+bool isEscapableData(helics::SmallBuffer& data)
+{
+    auto str = data.to_string();
+    return std::all_of(str.begin(), str.end(), [](const auto& c) {
+        return ((c >= 32 && c <= 126) || (c == '\t') || (c == '\n'));
+    });
+}

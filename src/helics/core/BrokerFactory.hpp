@@ -137,5 +137,7 @@ issues
 
     /** terminate all running Brokers*/
     void terminateAllBrokers();
+    /** abort all brokers */
+    void abortAllBrokers(int errorCode, const std::string& errorString);
 }  // namespace BrokerFactory
 }  // namespace helics

@@ -156,6 +156,8 @@ class HELICS_CXX_EXPORT BrokerApp {
     void setTimeBarrier(Time barrierTime);
     /** clear a global time Barrier*/
     void clearTimeBarrier();
+    /** generate a global error that will halt a co-simulation*/
+    void globalError(int32_t errorCode, const std::string& errorString);
 
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);

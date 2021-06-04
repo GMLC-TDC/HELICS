@@ -328,6 +328,66 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->finalize();
 }
 
+TEST_F(timing_tests2, wait_for_current_time_flag2)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
+    auto& pub1_2 = vFed1->registerGlobalPublication<double>("pub1_2");
+    vFed1->registerSubscription("pub2_1");
+
+    vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    auto& sub2_2 = vFed2->registerSubscription("pub1_2");
+    sub2_1.setDefault(9.9);
+    sub2_2.setDefault(10.5);
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    pub1_1.publish(3.5);
+
+    vFed2->requestTimeAsync(5.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->requestTime(1.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    pub1_2.publish(8.8);
+
+    vFed1->requestTimeAsync(3.0);
+    auto retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+    EXPECT_EQ(sub2_2.getValue<double>(), 8.8);
+
+    vFed2->requestTimeAsync(7.0);
+    retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+    pub1_1.publish(5.4);
+
+    broker.reset();
+    vFed1->finalize();
+
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+
+    retTime = vFed2->requestTime(7.0);
+    EXPECT_EQ(retTime, 7.0);
+    vFed2->finalize();
+}
+
 TEST_F(timing_tests2, offset_timing)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);

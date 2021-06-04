@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <any>
 #include <array>
 #include <atomic>
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
@@ -122,6 +123,8 @@ class CoreBroker: public Broker, public BrokerBase {
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
     std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    /// timeout manager for queries
+    std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
 
     std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
@@ -215,6 +218,8 @@ class CoreBroker: public Broker, public BrokerBase {
 
     virtual void clearTimeBarrier() override final;
 
+    virtual void globalError(int32_t errorCode, const std::string& errorString) override final;
+
   private:
     /** implementation details of the connection process
      */
@@ -304,6 +309,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
   private:
+    int getCountableFederates() const;
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** find any existing publishers for a subscription*/
@@ -330,6 +336,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void processQueryCommand(ActionMessage& cmd);
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
+    /** manage query timeouts*/
+    void checkQueryTimeouts();
     /** answer a query or route the message the appropriate location*/
     void processQueryResponse(const ActionMessage& m);
     /** generate an answer to a local query*/
@@ -367,7 +375,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::string generateGlobalStatus(fileops::JsonMapBuilder& builder);
 
     /** send an error code to all direct cores*/
-    void sendErrorToImmediateBrokers(int error_code);
+    void sendErrorToImmediateBrokers(int errorCode);
     /** send a disconnect message to time dependencies and child brokers*/
     void sendDisconnect();
     /** generate a string about the federation summarizing connections*/

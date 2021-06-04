@@ -16,9 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <future>
+#include <iostream>
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <csignal>
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"
 #endif
@@ -56,6 +58,49 @@ void helicsErrorClear(HelicsError* err)
     if (err != nullptr) {
         err->error_code = 0;
         err->message = nullstrPtr;
+    }
+}
+
+#include <csignal>
+static void signalHandler(int /*signum*/)
+{
+    helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
+    // add a sleep to give the abort a chance to propagate to other federates
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::cout << std::endl;
+    exit(HELICS_ERROR_USER_ABORT);
+}
+
+void helicsLoadSignalHandler()
+{
+    signal(SIGINT, signalHandler);
+}
+
+void helicsClearSignalHandler()
+{
+    signal(SIGINT, SIG_DFL);
+}
+
+static HelicsBool (*keyHandler)(int) = nullptr;
+
+static void signalHandlerCallback(int signum)
+{
+    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
+    if (keyHandler != nullptr) {
+        runDefaultSignalHandler = keyHandler(signum);
+    }
+    if (runDefaultSignalHandler != HELICS_FALSE) {
+        signalHandler(signum);
+    }
+}
+
+void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int))
+{
+    keyHandler = handler;
+    if (handler != nullptr) {
+        signal(SIGINT, signalHandlerCallback);
+    } else {
+        helicsLoadSignalHandler();
     }
 }
 
@@ -517,6 +562,24 @@ void helicsBrokerClearTimeBarrier(HelicsBroker broker)
     brk->clearTimeBarrier();
 }
 
+void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    brk->globalError(errorCode, AS_STRING(errorString));
+}
+
+void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err)
+{
+    auto* cr = getCore(core, err);
+    if (cr == nullptr) {
+        return;
+    }
+    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING(errorString));
+}
+
 void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err)
 {
     auto* brk = getBroker(broker, err);
@@ -846,6 +909,14 @@ void helicsCloseLibrary(void)
     // helics::cleanupHelicsLibrary();
 }
 
+void helicsAbort(int errorCode, const char* message)
+{
+    auto v = getMasterHolder();
+    if (v) {
+        v->abortAll(errorCode, message);
+    }
+}
+
 static const char* invalidQueryString = "Query object is invalid";
 
 static const int validQueryIdentifier = 0x2706'3885;
@@ -1135,6 +1206,20 @@ void MasterObjectHolder::clearFed(int index)
             }
         }
     }
+}
+
+void MasterObjectHolder::abortAll(int code, const std::string& error)
+{
+    {
+        auto fedHandle = feds.lock();
+        for (auto& fed : fedHandle) {
+            if ((fed) && (fed->fedptr)) {
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sending->" + error);
+            }
+        }
+    }
+    helics::BrokerFactory::abortAllBrokers(code, error);
+    helics::CoreFactory::abortAllCores(code, error);
 }
 
 void MasterObjectHolder::deleteAll()

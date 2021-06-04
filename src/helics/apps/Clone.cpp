@@ -151,8 +151,13 @@ namespace apps {
                     message["dest"] = mess->original_dest;
                 }
                 if (isBinaryData(mess->data)) {
+                    if (isEscapableData(mess->data)) {
+                        message["message"] = std::string(mess->data.to_string());
+                    } else {
                     message["encoding"] = "base64";
                     message["message"] = encode(std::string(mess->data.to_string()));
+                    }
+
                 } else {
                     message["message"] = std::string(mess->data.to_string());
                 }

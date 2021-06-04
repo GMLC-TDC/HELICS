@@ -182,6 +182,11 @@ class Broker {
 
     void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
 
+    void globalError(int errorCode, const std::string& errorString)
+    {
+        helicsBrokerGlobalError(broker, errorCode, errorString.c_str(), HELICS_IGNORE_ERROR);
+    }
+
   protected:
     HelicsBroker broker;  //!< underlying broker information
 };

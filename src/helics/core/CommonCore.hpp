@@ -26,6 +26,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <any>
 #include <array>
 #include <atomic>
+#include <chrono>
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
@@ -84,12 +86,15 @@ class CommonCore: public Core, public BrokerBase {
     virtual void configureFromVector(std::vector<std::string> args) override final;
     virtual bool isConfigured() const override final;
     virtual bool isOpenToNewFederates() const override final;
+    virtual bool hasError() const override final;
     virtual void globalError(LocalFederateId federateID,
                              int errorCode,
                              const std::string& errorString) override final;
     virtual void localError(LocalFederateId federateID,
                             int errorCode,
                             const std::string& errorString) override final;
+    virtual int getErrorCode() const override final;
+    virtual std::string getErrorMessage() const override final;
     virtual void finalize(LocalFederateId federateID) override final;
     virtual void enterInitializingMode(LocalFederateId federateID) override final;
     virtual void setCoreReadyToInit() override final;
@@ -258,6 +263,10 @@ class CommonCore: public Core, public BrokerBase {
      * may need a helper class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
+    /** check to make sure there are no inflight queries that need to be resolved before
+     * disconnect*/
+    void checkInFlightQueriesForDisconnect();
+
     /** set the local information field of the interface*/
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override final;
     /** get the local information field of the interface*/
@@ -372,7 +381,8 @@ class CommonCore: public Core, public BrokerBase {
     void checkDependencies();
     /** deal with a query response addressed to this core*/
     void processQueryResponse(const ActionMessage& m);
-
+    /** manage query timeouts*/
+    void checkQueryTimeouts();
     /** handle command with the core itself as a destination at the core*/
     void processCommandsForCore(const ActionMessage& cmd);
     /** process configure commands for the core*/
@@ -436,6 +446,8 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<int> queryCounter{1};
     /// holder for active queries
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;
+    /// timeout manager for queries
+    std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
     /// holder for the query map builder information
     mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>>
         mapBuilders;
@@ -511,7 +523,7 @@ class CommonCore: public Core, public BrokerBase {
                               bool force_ordering) const;
 
     /** send an error code and message to all the federates*/
-    void sendErrorToFederates(int error_code, std::string_view message);
+    void sendErrorToFederates(int errorCode, std::string_view message);
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/

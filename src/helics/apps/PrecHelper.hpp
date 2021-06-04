@@ -19,3 +19,6 @@ helics::DataType getType(const std::string& typeString);
 char typeCharacter(helics::DataType type);
 
 bool isBinaryData(helics::SmallBuffer& data);
+/**Returns true if the data is escapable per json.  Ie. a normal character string with a few
+ * escapable characters*/
+bool isEscapableData(helics::SmallBuffer& data);
