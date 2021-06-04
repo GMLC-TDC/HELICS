@@ -48,7 +48,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     }
     if (fi.coreName.empty()) {
         if (!fi.forceNewCore) {
-        coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
+            coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
         }
         if (!coreObject) {
             if (!mName.empty()) {
@@ -70,24 +70,24 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
         }
     } else {
         if (!fi.forceNewCore) {
-        coreObject =
-            CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
-        if (!coreObject->isOpenToNewFederates()) {
-            coreObject = nullptr;
-            logWarningMessage("found core object is not open");
-            CoreFactory::cleanUpCores(200ms);
+            coreObject =
+                CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
+            if (!coreObject->isOpenToNewFederates()) {
+                coreObject = nullptr;
+                logWarningMessage("found core object is not open");
+                CoreFactory::cleanUpCores(200ms);
                 coreObject = CoreFactory::FindOrCreate(fi.coreType,
                                                        fi.coreName,
                                                        generateFullCoreInitString(fi));
-            if (!coreObject->isOpenToNewFederates()) {
-                throw(RegistrationFailure(
-                    "Unable to connect to specified core: core is not open to new Federates"));
+                if (!coreObject->isOpenToNewFederates()) {
+                    throw(RegistrationFailure(
+                        "Unable to connect to specified core: core is not open to new Federates"));
+                }
             }
-        }
         } else {
             coreObject =
                 CoreFactory::create(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
-    }
+        }
     }
     /** make sure the core is connected */
     if (!coreObject->isConnected()) {

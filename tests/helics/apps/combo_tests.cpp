@@ -162,7 +162,7 @@ static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesyste
     pub1.publish(4.7);
     EXPECT_EQ(retTime, 1.0);
 
-    e2.sendTo(Message2,"d1");
+    e2.sendTo(Message2, "d1");
 
     mfed2.requestTimeAsync(2.0);
     retTime = mfed.requestTime(2.0);

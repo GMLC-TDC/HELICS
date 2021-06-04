@@ -2335,9 +2335,9 @@ void CoreBroker::processDisconnect(ActionMessage& command)
             } else if (command.dest_id == parent_broker_id) {
                 if (!isRootc) {
                     if (command.source_id == higher_broker_id) {
-                    LOG_CONNECTIONS(parent_broker_id,
-                                    getIdentifier(),
-                                    "got disconnect from parent");
+                        LOG_CONNECTIONS(parent_broker_id,
+                                        getIdentifier(),
+                                        "got disconnect from parent");
                         sendDisconnect();
                         addActionMessage(CMD_STOP);
                         return;
@@ -2634,7 +2634,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
 {
     if (request == "isinit") {
         return (getBrokerState() >= broker_state_t::operating) ? std::string("true") :
-                                                            std::string("false");
+                                                                 std::string("false");
     }
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");
@@ -3039,7 +3039,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first]).push_back(queryRep);
+        std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first])
+            .push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(m.messageID, std::string(queryRep.payload.to_string()));
     } else {
@@ -3522,7 +3523,7 @@ bool CoreBroker::allInitReady() const
     if (initReady) {
         // now do a more formal count of federates as there may be non-counting ones
         return (getCountableFederates() >= minFederateCount);
-            }
+    }
     return false;
     // return std::all_of(_brokers.begin(), _brokers.end(), [](const auto& brk) {
     //   return ((brk._nonLocal) || (brk.state==connection_state::init_requested));

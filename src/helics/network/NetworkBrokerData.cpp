@@ -42,13 +42,13 @@ std::shared_ptr<helicsCLI11App>
         ->disable_flag_override();
     nbparser
         ->add_option_function<std::string>(
-        "--broker_address",
-        [this, localAddress](const std::string& addr) {
-            auto brkprt = extractInterfaceandPort(addr);
-            brokerAddress = brkprt.first;
-            brokerPort = brkprt.second;
-            checkAndUpdateBrokerAddress(localAddress);
-        },
+            "--broker_address",
+            [this, localAddress](const std::string& addr) {
+                auto brkprt = extractInterfaceandPort(addr);
+                brokerAddress = brkprt.first;
+                brokerPort = brkprt.second;
+                checkAndUpdateBrokerAddress(localAddress);
+            },
             "location of the broker i.e. network address")
         ->envname("HELICS_BROKER_ADDRESS");
     nbparser->add_flag("--reuse_address",
@@ -133,7 +133,7 @@ std::shared_ptr<helicsCLI11App>
         ->transform(CLI::Transformer({{"auto", "-1"}}, CLI::ignore_case));
     nbparser
         ->add_option("--brokerport",
-                         brokerPort,
+                     brokerPort,
                      "the port number to use to connect with the broker")
         ->envname("HELICS_BROKER_PORT");
 
