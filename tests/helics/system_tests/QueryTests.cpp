@@ -1043,19 +1043,21 @@ TEST_F(query, queries_disconnected)
     vFed1->requestTime(3.0);
     res = vFed1->query(vFed2->getName(), "state");
     int ii{0};
-    while (res != "disconnected") {
+    while (res.find("disconnected")==std::string::npos) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         res = vFed1->query(vFed2->getName(), "state");
         if (++ii > 10) {
             break;
         }
     }
-    EXPECT_EQ(res, "disconnected");
+    EXPECT_THAT(res, ::testing::HasSubstr("disconnected"));
     res = vFed1->query(vFed2->getName(), "dependency_graph");
-    EXPECT_EQ(res, "#disconnected");
+    EXPECT_THAT(res, ::testing::HasSubstr("disconnected"));
+    EXPECT_THAT(res, ::testing::HasSubstr("error"));
     vFed1->finalize();
 }
 
+//the pupose is to make it doesn't block
 TEST_F(query, queries_disconnected_global)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
