@@ -2468,15 +2468,15 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
             }
         }
     }
-        for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
-            auto& fed = _federates[ii];
+    for (size_t ii = 0; ii < _federates.size(); ++ii) {  // NOLINT
+        auto& fed = _federates[ii];
 
-            if (fed.parent == brkid) {
-                if (fed.state != connection_state::error) {
-                    fed.state = connection_state::disconnected;
-                }
+        if (fed.parent == brkid) {
+            if (fed.state != connection_state::error) {
+                fed.state = connection_state::disconnected;
             }
         }
+    }
 }
 
 void CoreBroker::disconnectBroker(BasicBrokerInfo& brk)
@@ -3220,7 +3220,8 @@ void CoreBroker::processQuery(ActionMessage& m)
                     route = parent_route_id;
                     switch (broker->state) {
                         case connection_state::error:
-                            response = generateJsonErrorResponse(503, "target broker is in error state");
+                            response =
+                                generateJsonErrorResponse(503, "target broker is in error state");
                             break;
                         case connection_state::disconnected:
                         case connection_state::request_disconnect:
@@ -3269,8 +3270,8 @@ void CoreBroker::checkQueryTimeouts()
         for (auto& qt : queryTimeouts) {
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
-                    activeQueries.setDelayedValue(
-                        qt.first, generateJsonErrorResponse(504, "query timeout"));
+                    activeQueries.setDelayedValue(qt.first,
+                                                  generateJsonErrorResponse(504, "query timeout"));
                     qt.first = 0;
                 }
             }
