@@ -1,6 +1,6 @@
 {
   "name": "helics",
-  "version-string": "2.7.0",
+  "version-string": "2.7.1",
   "description": "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)",
   "homepage": "https://helics.org/",
   "default-features": ["zeromq", "ipc", "webserver"],
