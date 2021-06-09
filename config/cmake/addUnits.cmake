@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -27,3 +27,4 @@ set_target_properties(units-static PROPERTIES FOLDER Extern)
 
 hide_variable(UNITS_HEADER_ONLY)
 hide_variable(UNITS_BUILD_OBJECT_LIBRARY)
+hide_variable(UNITS_NAMESPACE)

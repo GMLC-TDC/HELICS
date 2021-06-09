@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -14,13 +14,19 @@
 set(FMT_SILENT ON)
 
 if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 14) # Supported values are ``14``, and ``17``.
+    set(CMAKE_CXX_STANDARD 17) # Supported values are ``14``, and ``17``.
 endif()
 
 set(SUPPORTS_VARIADIC_TEMPLATES ON)
 set(SUPPORTS_USER_DEFINED_LITERALS ON)
-set(FMT_HAS_VARIANT OFF)
+set(FMT_HAS_VARIANT ON)
 set(type STRING CACHE INTERNAL "")
+
+
+set(FMT_OS
+    ON
+    CACHE INTERNAL ""
+)
 
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)
@@ -34,3 +40,5 @@ hide_variable(FMT_WERROR)
 hide_variable(FMT_FUZZ)
 hide_variable(FMT_CUDA_TEST)
 hide_variable(FMT_DEBUG_POSTFIX)
+hide_variable(FMT_INC_DIR)
+

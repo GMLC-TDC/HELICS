@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -35,3 +35,6 @@ hide_variable(SPDLOG_SANITIZE_ADDRESS)
 hide_variable(SPDLOG_TIDY)
 hide_variable(SPDLOG_WCHAR_FILENAMES)
 hide_variable(SPDLOG_WCHAR_SUPPORT)
+hide_variable(SPDLOG_DISABLE_DEFAULT_LOGGER)
+hide_variable(SPDLOG_FMT_EXTERNAL_HO)
+hide_variable(SPDLOG_INSTALL)

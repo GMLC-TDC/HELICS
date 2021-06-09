@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -12,7 +12,7 @@ if(hasParent)
     include(AddGooglebenchmark)
     add_subdirectory(helics)
 else()
-    cmake_minimum_required(VERSION 3.10...3.18)
+    cmake_minimum_required(VERSION 3.10...3.20)
     set(HELICS_BUILD_TESTS OFF CACHE INTERNAL "")
     set(BUILD_PYTHON_INTERFACE OFF CACHE INTERNAL "")
     set(BUILD_PYTHON2_INTERFACE OFF CACHE INTERNAL "")

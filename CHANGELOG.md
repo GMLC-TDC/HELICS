@@ -36,6 +36,32 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Deprecated functions from HELICS 2
 - the separate headers for the C shared library are no longer installed only a single header is needed and includes all functionsa and operations.
 
+## [2.7.1][] - 2021-06-05
+
+There were several bug fixes in this patch release. Some of them related to changes in [2.7.0][] and some new ones that came up from bug reports. Some new enhancements are experimental signal handlers in the C-api, which will be used in the python interface to provide a little better user experience when trying to kill a co-simulation.
+
+### Changed
+
+- String output on recorders is now always JSON compatible and allows escaped characters. This allows some additional values to be displayed in ascii format vs base 64 encoding. #1910
+- Players read the string fields through a JSON parser unless marked with b64\[\] to match the string output on recorders #1910
+- The default webserver port is now 8080 to allow user space execution on non-Windows platforms #1936
+
+### Fixed
+
+- An issue with recorders writing text fields in the incorrect order which could result in incorrect playback #1910
+- Fix an issue with core naming that occasionally resulted in same broker name errors when using default names on federates #1919
+- Fix an issue where queries were not being resolved when a core disconnects which could result in deadlock. #1931
+- The `wait_for_current_time` flag was not working properly in some cases where time interruption was also taking place #1933
+- Fixed issue with the webserver not responding with the index page when requested or detecting the correct broker for certain trivial requests #1936
+
+### Added
+
+- Signal handlers for catching SIGINT and optional user callback are available in the C shared API #1915
+- Added support for environment variables for setting some network connection settings and other information #1921
+- Queries now have timeouts #1931
+- Command line and environment variable options for setting the webserver port numbers #1936
+
+
 ## [2.6.1][] - 2020-10-15
 
 Several small bug fixes and minor enhancements to query operations
@@ -833,4 +859,6 @@ This is a major revision so this changelog will not capture all the changes that
 [2.5.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.5.2
 [2.6.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.0
 [2.6.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.6.1
+[2.7.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.7.0
+[2.7.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v2.7.1
 [3.0.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.0-alpha.1
