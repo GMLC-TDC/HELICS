@@ -54,7 +54,7 @@ helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err)
     if (fedObj == nullptr) {
         return nullptr;
     }
-    if ((fedObj->type == helics::vtype::value_fed) || (fedObj->type == helics::vtype::combination_fed)) {
+    if ((fedObj->type == helics::FederateType::VALUE) || (fedObj->type == helics::FederateType::COMBINATION)) {
         auto* rval = dynamic_cast<helics::ValueFederate*>(fedObj->fedptr.get());
         if (rval != nullptr) {
             return rval;
@@ -72,7 +72,7 @@ helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err)
     if (fedObj == nullptr) {
         return nullptr;
     }
-    if ((fedObj->type == helics::vtype::message_fed) || (fedObj->type == helics::vtype::combination_fed)) {
+    if ((fedObj->type == helics::FederateType::MESSAGE) || (fedObj->type == helics::FederateType::COMBINATION)) {
         auto* rval = dynamic_cast<helics::MessageFederate*>(fedObj->fedptr.get());
         if (rval != nullptr) {
             return rval;
@@ -97,7 +97,7 @@ std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, 
     if (fedObj == nullptr) {
         return nullptr;
     }
-    if ((fedObj->type == helics::vtype::value_fed) || (fedObj->type == helics::vtype::combination_fed)) {
+    if ((fedObj->type == helics::FederateType::VALUE) || (fedObj->type == helics::FederateType::COMBINATION)) {
         auto rval = std::dynamic_pointer_cast<helics::ValueFederate>(fedObj->fedptr);
         if (rval) {
             return rval;
@@ -113,7 +113,7 @@ std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate f
     if (fedObj == nullptr) {
         return nullptr;
     }
-    if ((fedObj->type == helics::vtype::message_fed) || (fedObj->type == helics::vtype::combination_fed)) {
+    if ((fedObj->type == helics::FederateType::MESSAGE) || (fedObj->type == helics::FederateType::COMBINATION)) {
         auto rval = std::dynamic_pointer_cast<helics::MessageFederate>(fedObj->fedptr);
         if (rval) {
             return rval;
@@ -399,7 +399,7 @@ HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo
         helicsErrorHandler(err);
         return nullptr;
     }
-    FedI->type = helics::vtype::value_fed;
+    FedI->type = helics::FederateType::VALUE;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -417,7 +417,7 @@ HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, Helic
         helicsErrorHandler(err);
         return nullptr;
     }
-    FedI->type = helics::vtype::value_fed;
+    FedI->type = helics::FederateType::VALUE;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -444,7 +444,7 @@ HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateIn
         helicsErrorHandler(err);
         return nullptr;
     }
-    FedI->type = helics::vtype::message_fed;
+    FedI->type = helics::FederateType::MESSAGE;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -463,7 +463,7 @@ HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, Hel
         helicsErrorHandler(err);
         return nullptr;
     }
-    FedI->type = helics::vtype::message_fed;
+    FedI->type = helics::FederateType::MESSAGE;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -490,7 +490,7 @@ HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFedera
         helicsErrorHandler(err);
         return nullptr;
     }
-    FedI->type = helics::vtype::combination_fed;
+    FedI->type = helics::FederateType::COMBINATION;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -509,7 +509,7 @@ HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile,
         return nullptr;
     }
 
-    FedI->type = helics::vtype::combination_fed;
+    FedI->type = helics::FederateType::COMBINATION;
     FedI->valid = fedValidationIdentifier;
     auto* fed = reinterpret_cast<HelicsFederate>(FedI.get());
     getMasterHolder()->addFed(std::move(FedI));
@@ -545,7 +545,7 @@ HelicsCore helicsFederateGetCore(HelicsFederate fed, HelicsError* err)
         return nullptr;
     }
     auto core = std::make_unique<helics::CoreObject>();
-    core->valid = coreValidationIdentifier;
+    core->valid = gCoreValidationIdentifier;
     core->coreptr = fedObj->getCorePointer();
     auto* retcore = reinterpret_cast<HelicsCore>(core.get());
     getMasterHolder()->addCore(std::move(core));
@@ -604,7 +604,23 @@ void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* err
     // LCOV_EXCL_STOP
 }
 
+
 void helicsFederateFinalize(HelicsFederate fed, HelicsError* err)
+{
+    helicsFederateDisconnect(fed, err);
+}
+
+void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err)
+{
+    helicsFederateDisconnectAsync(fed, err);
+}
+
+void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err)
+{
+    helicsFederateDisconnectComplete(fed, err);
+}
+
+void helicsFederateDisconnect(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -620,7 +636,7 @@ void helicsFederateFinalize(HelicsFederate fed, HelicsError* err)
     // LCOV_EXCL_STOP
 }
 
-void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err)
+void helicsFederateDisconnectAsync(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -636,7 +652,7 @@ void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err)
     // LCOV_EXCL_STOP
 }
 
-void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err)
+void helicsFederateDisconnectComplete(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
@@ -1183,7 +1199,7 @@ void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsErr
         if (cr) {
             cr->setLogFile(AS_STRING(logFile));
             // LCOV_EXCL_START
-        } else {  // this can theoretically happen but it we be pretty odd
+        } else {  // this can theoretically happen but it would be pretty odd
             assignError(err, HELICS_ERROR_INVALID_FUNCTION_CALL, invalidFederateCore);
             return;
             // LCOV_EXCL_STOP
@@ -1239,11 +1255,11 @@ const char* helicsFederateGetCommand(HelicsFederate fed, HelicsError* err)
     auto* fedObj = helics::getFedObject(fed, err);
 
     if (fedObj == nullptr) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     auto res = fedObj->fedptr->getCommand();
     if (res.first.empty()) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     fedObj->commandBuffer = std::move(res);
     return fedObj->commandBuffer.first.c_str();
@@ -1254,7 +1270,7 @@ const char* helicsFederateGetCommandSource(HelicsFederate fed, HelicsError* err)
     auto* fedObj = helics::getFedObject(fed, err);
 
     if (fedObj == nullptr) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     return fedObj->commandBuffer.second.c_str();
 }
@@ -1264,11 +1280,11 @@ const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsError* err)
     auto* fedObj = helics::getFedObject(fed, err);
 
     if (fedObj == nullptr) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     auto res = fedObj->fedptr->waitCommand();
     if (res.first.empty()) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     fedObj->commandBuffer = std::move(res);
     return fedObj->commandBuffer.first.c_str();

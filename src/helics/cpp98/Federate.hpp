@@ -625,7 +625,7 @@ class Federate {
     */
     void localError(int errorCode, const std::string& errorString)
     {
-        helicsFederateLocalError(fed, errorCode, errorString.c_str());
+        helicsFederateLocalError(fed, errorCode, errorString.c_str(), hThrowOnError());
     }
 
     /** generate a global error to terminate the federation
@@ -634,7 +634,7 @@ class Federate {
     */
     void globalError(int errorCode, const std::string& errorString)
     {
-        helicsFederateGlobalError(fed, errorCode, errorString.c_str());
+        helicsFederateGlobalError(fed, errorCode, errorString.c_str(), hThrowOnError());
     }
 
     /** log an error message*/

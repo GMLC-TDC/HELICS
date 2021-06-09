@@ -20,8 +20,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int coreValidationIdentifier = 0x378424EC;
-static const int brokerValidationIdentifier = 0xA3467D20;
+static const int gCoreValidationIdentifier = 0x378424EC;
+static const int gBrokerValidationIdentifier = 0xA3467D20;
 
 namespace helics {
 class Core;
@@ -37,7 +37,7 @@ class Filter;
 class FilterObject;
 
 /** type code embedded in the objects so the library knows how to cast them appropriately*/
-enum class vtype : int { generic_fed, value_fed, message_fed, combination_fed, invalid_fed };
+enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, INVALID };
 
 /** object wrapping a broker for the c-api*/
 class BrokerObject {
@@ -82,7 +82,7 @@ class MessageHolder {
 /** object wrapping a federate for the c-api*/
 class FedObject {
   public:
-    vtype type = vtype::invalid_fed;
+    FederateType type = FederateType::INVALID;
     int index{-2};
     int valid{0};
     std::shared_ptr<Federate> fedptr;
@@ -167,16 +167,16 @@ inline void assignError(HelicsError* err, int error_code, const char* string)
     }
 }
 
-extern const std::string emptyStr;
-extern const std::string nullStringArgument;
-#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : emptyStr
+extern const std::string gEmptyStr;
+extern const std::string gNullStringArgument;
+#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gEmptyStr
 
-#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(emptyStr)
+#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gEmptyStr)
 
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, nullStringArgument.c_str());                                                   \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gNullStringArgument.c_str());                                                   \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
@@ -202,7 +202,7 @@ function checks the output String is not nullptr and if the maxlen >0
 fill the err term if it is not valid and return false,  otherwise return true if everything looks fine
 
 */
-bool checkOutArgString(const char* outputString, int maxlen, HelicsError* err);
+bool checkOutputArgString(const char* outputString, int maxlen, HelicsError* err);
 
 /** class for containing all the objects associated with a federation*/
 class MasterObjectHolder {

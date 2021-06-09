@@ -311,7 +311,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
-    helicsFederateLocalError(fed1, 9827, "user generated error");
+    helicsFederateLocalError(fed1, 9827, "user generated error",nullptr);
 
     auto err = helicsErrorInitialize();
     helicsFederateRequestTime(fed1, 3.0, &err);
@@ -335,7 +335,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     helicsFederateRequestTime(fed1, 2.0, nullptr);
-    helicsFederateGlobalError(fed1, 9827, "user generated global error");
+    helicsFederateGlobalError(fed1, 9827, "user generated global error",nullptr);
 
     auto err = helicsErrorInitialize();
     helicsFederateRequestTime(fed1, 3.0, &err);
