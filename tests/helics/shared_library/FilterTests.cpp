@@ -18,8 +18,10 @@ class filter_simple_type_tests:
     public FederateTestFixture {
 };
 
+/*
 class filter_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
+*/
 
 class filter_tests: public FederateTestFixture, public ::testing::Test {
 };
@@ -1131,4 +1133,6 @@ TEST_F(filter_tests, callback_test)
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_simple_type_tests,
                          ::testing::ValuesIn(CoreTypes_simple));
+/*
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(CoreTypes));
+*/
