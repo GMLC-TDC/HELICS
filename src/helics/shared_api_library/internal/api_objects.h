@@ -176,7 +176,7 @@ extern const std::string gNullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gNullStringArgument.c_str());                                                   \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gNullStringArgument.c_str());                                                  \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
