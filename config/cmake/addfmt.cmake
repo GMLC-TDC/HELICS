@@ -41,4 +41,3 @@ hide_variable(FMT_FUZZ)
 hide_variable(FMT_CUDA_TEST)
 hide_variable(FMT_DEBUG_POSTFIX)
 hide_variable(FMT_INC_DIR)
-

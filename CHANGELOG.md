@@ -61,7 +61,6 @@ There were several bug fixes in this patch release. Some of them related to chan
 - Queries now have timeouts #1931
 - Command line and environment variable options for setting the webserver port numbers #1936
 
-
 ## [2.6.1][] - 2020-10-15
 
 Several small bug fixes and minor enhancements to query operations
