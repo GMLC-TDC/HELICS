@@ -29,7 +29,7 @@ extern "C" {
  * @param fed The federate to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -45,7 +45,7 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, Heli
  * @param fed The federate to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -64,7 +64,7 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed
  *
  * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -80,7 +80,7 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterCloningFilter(HelicsFederate fe
  *
  * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -97,7 +97,7 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalCloningFilter(HelicsFeder
  * @param core The core to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -113,7 +113,7 @@ HELICS_EXPORT HelicsFilter helicsCoreRegisterFilter(HelicsCore core, HelicsFilte
  *
  * @param core The core to register through.
  * @param name The name of the filter (can be NULL).
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -135,7 +135,7 @@ HELICS_EXPORT int helicsFederateGetFilterCount(HelicsFederate fed);
  *
  * @param fed The federate object to use to get the filter.
  * @param name The name of the filter.
- * 
+ *
  * @param[in,out] err The error object to complete if there is an error.
 
  *
@@ -148,7 +148,7 @@ HELICS_EXPORT HelicsFilter helicsFederateGetFilter(HelicsFederate fed, const cha
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
@@ -180,7 +180,7 @@ HELICS_EXPORT const char* helicsFilterGetName(HelicsFilter filt);
  * @param filt The filter to modify.
  * @param prop A string containing the property to set.
  * @param val A numerical value for the property.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -192,7 +192,7 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
  * @param filt The filter to modify.
  * @param prop A string containing the property to set.
  * @param val A string containing the new value.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -204,7 +204,7 @@ HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, co
  * @details All messages going to a destination are copied to the delivery address(es).
  * @param filt The given filter to add a destination target to.
  * @param dst The name of the endpoint to add as a destination target.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -236,7 +236,7 @@ HELICS_EXPORT void helicsFilterAddSourceTarget(HelicsFilter filt, const char* so
  *
  * @param filt The given filter.
  * @param deliveryEndpoint The name of the endpoint to deliver messages to.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -247,8 +247,8 @@ HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char
  *
  * @param filt The given filter.
  * @param target The named endpoint to remove as a target.
- * 
- * 
+ *
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -259,7 +259,7 @@ HELICS_EXPORT void helicsFilterRemoveTarget(HelicsFilter filt, const char* targe
  *
  * @param filt The given filter (must be a cloning filter).
  * @param deliveryEndpoint A string with the delivery endpoint to remove.
- * 
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -278,7 +278,7 @@ HELICS_EXPORT const char* helicsFilterGetInfo(HelicsFilter filt);
  *
  * @param filt The given filter.
  * @param info The string to set.
- * 
+ *
  * @param[in,out] err An error object to fill out in case of an error.
 
  */
@@ -299,7 +299,7 @@ HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagn
  * @param filter The filter object to set the tag for.
  * @param tagname The string to set.
  * @param tagvalue the string value to associate with a tag.
- * 
+ *
  * @param[in,out] err An error object to fill out in case of an error.
 
  */
@@ -311,7 +311,7 @@ HELICS_EXPORT void helicsFilterSetTag(HelicsFilter filt, const char* tagname, co
  * @param filt The given filter.
  * @param option The option to set /ref helics_handle_options.
  * @param value The value of the option commonly 0 for false 1 for true.
- * 
+ *
  * @param[in,out] err An error object to fill out in case of an error.
 
  */

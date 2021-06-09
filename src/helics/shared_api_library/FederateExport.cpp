@@ -604,7 +604,6 @@ void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* err
     // LCOV_EXCL_STOP
 }
 
-
 void helicsFederateFinalize(HelicsFederate fed, HelicsError* err)
 {
     helicsFederateDisconnect(fed, err);

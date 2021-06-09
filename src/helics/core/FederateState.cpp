@@ -48,14 +48,14 @@ static const std::string gEmptyStr;
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
             if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
-                logMessage(HELICS_LOG_LEVEL_SUMMARY, gEmptyStr, message);                           \
+                logMessage(HELICS_LOG_LEVEL_SUMMARY, gEmptyStr, message);                          \
             }                                                                                      \
         } while (false)
 
 #    define LOG_INTERFACES(message)                                                                \
         do {                                                                                       \
             if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                         \
-                logMessage(HELICS_LOG_LEVEL_INTERFACES, gEmptyStr, message);                        \
+                logMessage(HELICS_LOG_LEVEL_INTERFACES, gEmptyStr, message);                       \
             }                                                                                      \
         } while (false)
 
@@ -63,14 +63,14 @@ static const std::string gEmptyStr;
 #        define LOG_TIMING(message)                                                                \
             do {                                                                                   \
                 if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                         \
-                    logMessage(HELICS_LOG_LEVEL_TIMING, gEmptyStr, message);                        \
+                    logMessage(HELICS_LOG_LEVEL_TIMING, gEmptyStr, message);                       \
                 }                                                                                  \
             } while (false)
 
 #        define LOG_DATA(message)                                                                  \
             do {                                                                                   \
                 if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                           \
-                    logMessage(HELICS_LOG_LEVEL_DATA, gEmptyStr, message);                          \
+                    logMessage(HELICS_LOG_LEVEL_DATA, gEmptyStr, message);                         \
                 }                                                                                  \
             } while (false)
 #    else
@@ -82,7 +82,7 @@ static const std::string gEmptyStr;
 #        define LOG_TRACE(message)                                                                 \
             do {                                                                                   \
                 if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                          \
-                    logMessage(HELICS_LOG_LEVEL_TRACE, gEmptyStr, message);                         \
+                    logMessage(HELICS_LOG_LEVEL_TRACE, gEmptyStr, message);                        \
                 }                                                                                  \
             } while (false)
 #    else
