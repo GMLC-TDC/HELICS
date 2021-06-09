@@ -116,6 +116,9 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateFinalize
  - \ref helicsFederateFinalizeAsync
  - \ref helicsFederateFinalizeComplete
+ - \ref helicsFederateDisconnect
+ - \ref helicsFederateDisconnectAsync
+ - \ref helicsFederateDisconnectComplete
  - \ref helicsFederateFree
  - \ref helicsFederateEnterInitializingMode
  - \ref helicsFederateEnterInitializingModeAsync
