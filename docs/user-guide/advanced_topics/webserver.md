@@ -133,7 +133,7 @@ For queries that did not result in a valid response the response will be:
 }
 ```
 
-the status code corresponds to the most appropriate html error codes.  
+The status code corresponds to the most appropriate html error codes.  
 
 ## Making queries
 
