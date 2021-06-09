@@ -572,9 +572,9 @@ void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, Heli
     }
 }
 
-void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* errorString)
+void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* errorString, HelicsError* err)
 {
-    auto* fedObj = getFed(fed, nullptr);
+    auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
         return;
     }
@@ -583,13 +583,14 @@ void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* er
     }
     // LCOV_EXCL_START
     catch (...) {
+        return helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
 
-void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* errorString)
+void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* errorString, HelicsError* err)
 {
-    auto* fedObj = getFed(fed, nullptr);
+    auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
         return;
     }
@@ -598,6 +599,7 @@ void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* err
     }
     // LCOV_EXCL_START
     catch (...) {
+        return helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }

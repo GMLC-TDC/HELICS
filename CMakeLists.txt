@@ -21,7 +21,7 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD "beta")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-05-18")
+set(HELICS_DATE "2021-06-10")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
