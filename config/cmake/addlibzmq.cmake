@@ -20,7 +20,7 @@ else()
 endif()
 
 
-set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.3)
+set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.4)
 
 
 string(TOLOWER "libzmq" lcName)
