@@ -360,7 +360,10 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
+typedef enum {
+    HELICS_SEQUENCING_MODE_FAST = 0,
+    HELICS_SEQUENCING_MODE_ORDERED = 1
+} HelicsSequencingModes;
 
 /**
  * @file
@@ -581,14 +584,13 @@ HELICS_EXPORT HelicsBool helicsIsCoreTypeAvailable(const char* type);
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
  * @param initString An initialization string to send to the core. The format is similar to command line arguments.
  *                   Typical options include a broker name, the broker address, the number of federates, etc.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A HelicsCore object.
- * @forcpponly
+ * 
  * If the core is invalid, err will contain the corresponding error message and the returned object will be NULL.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsCore helicsCreateCore(const char* type, const char* name, const char* initString, HelicsError* err);
 
@@ -597,14 +599,14 @@ HELICS_EXPORT HelicsCore helicsCreateCore(const char* type, const char* name, co
  *
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
- * @forcpponly
+ * 
  * @param argc The number of arguments.
- * @endforcpponly
+
  * @param argv The list of string values from a command line.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string
  *                    if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A HelicsCore object.
  */
@@ -616,9 +618,9 @@ HELICS_EXPORT HelicsCore helicsCreateCoreFromArgs(const char* type, const char* 
  * @details This will create a new broker object that references the existing broker. The new broker object must be freed as well.
  *
  * @param core An existing HelicsCore.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A new reference to the same broker.
  */
@@ -639,14 +641,13 @@ HELICS_EXPORT HelicsBool helicsCoreIsValid(HelicsCore core);
  * @param initString An initialization string to send to the core-the format is similar to command line arguments.
  *                   Typical options include a broker address such as --broker="XSSAF" if this is a subbroker, or the number of federates,
  * or the address.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A HelicsBroker object.
- * @forcpponly
+ * 
  * It will be NULL if there was an error indicated in the err object.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* initString, HelicsError* err);
 
@@ -655,13 +656,13 @@ HELICS_EXPORT HelicsBroker helicsCreateBroker(const char* type, const char* name
  *
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
- * @forcpponly
+ * 
  * @param argc The number of arguments.
- * @endforcpponly
+
  * @param argv The list of string values from a command line.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A HelicsCore object.
  */
@@ -674,9 +675,9 @@ HELICS_EXPORT HelicsBroker
  * @details This will create a new broker object that references the existing broker it must be freed as well.
  *
  * @param broker An existing HelicsBroker.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A new reference to the same broker.
  */
@@ -704,9 +705,8 @@ HELICS_EXPORT HelicsBool helicsBrokerIsConnected(HelicsBroker broker);
  * @param broker The broker to generate the connection from.
  * @param source The name of the publication (cannot be NULL).
  * @param target The name of the target to send the publication data (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerDataLink(HelicsBroker broker, const char* source, const char* target, HelicsError* err);
 
@@ -716,9 +716,8 @@ HELICS_EXPORT void helicsBrokerDataLink(HelicsBroker broker, const char* source,
  * @param broker The broker to generate the connection from.
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data from (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);
 
@@ -728,9 +727,8 @@ HELICS_EXPORT void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, co
  * @param broker The broker to generate the connection from.
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data going to (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void
     helicsBrokerAddDestinationFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err);
@@ -740,9 +738,8 @@ HELICS_EXPORT void
  *
  * @param broker The broker to generate the connections from.
  * @param file A JSON or TOML file containing connection information.
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerMakeConnections(HelicsBroker broker, const char* file, HelicsError* err);
 
@@ -751,9 +748,9 @@ HELICS_EXPORT void helicsBrokerMakeConnections(HelicsBroker broker, const char* 
  *
  * @param core The core to wait for.
  * @param msToWait The time out in millisecond (<0 for infinite timeout).
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return HELICS_TRUE if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
@@ -764,9 +761,9 @@ HELICS_EXPORT HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWa
  *
  * @param broker The broker to wait for.
  * @param msToWait The time out in millisecond (<0 for infinite timeout).
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return HELICS_TRUE if the disconnect was successful, HELICS_FALSE if there was a timeout.
  */
@@ -787,9 +784,8 @@ HELICS_EXPORT HelicsBool helicsCoreIsConnected(HelicsCore core);
  * @param core The core to generate the connection from.
  * @param source The name of the publication (cannot be NULL).
  * @param target The name of the target to send the publication data (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreDataLink(HelicsCore core, const char* source, const char* target, HelicsError* err);
 
@@ -799,9 +795,8 @@ HELICS_EXPORT void helicsCoreDataLink(HelicsCore core, const char* source, const
  * @param core The core to generate the connection from.
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data from (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreAddSourceFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);
 
@@ -811,9 +806,8 @@ HELICS_EXPORT void helicsCoreAddSourceFilterToEndpoint(HelicsCore core, const ch
  * @param core The core to generate the connection from.
  * @param filter The name of the filter (cannot be NULL).
  * @param endpoint The name of the endpoint to filter the data going to (cannot be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreAddDestinationFilterToEndpoint(HelicsCore core, const char* filter, const char* endpoint, HelicsError* err);
 
@@ -822,9 +816,8 @@ HELICS_EXPORT void helicsCoreAddDestinationFilterToEndpoint(HelicsCore core, con
  *
  * @param core The core to generate the connections from.
  * @param file A JSON or TOML file containing connection information.
- * @forcpponly
+ * 
  * @param[in,out] err A HelicsError object, can be NULL if the errors are to be ignored.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreMakeConnections(HelicsCore core, const char* file, HelicsError* err);
 
@@ -871,9 +864,8 @@ HELICS_EXPORT const char* helicsCoreGetAddress(HelicsCore core);
  *          a direct signal to the core to trigger the federation initialization.
  *
  * @param core The core object to enable init values for.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreSetReadyToInit(HelicsCore core, HelicsError* err);
 
@@ -881,9 +873,9 @@ HELICS_EXPORT void helicsCoreSetReadyToInit(HelicsCore core, HelicsError* err);
  * Connect a core to the federate based on current configuration.
  *
  * @param core The core to connect.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return HELICS_FALSE if not connected, HELICS_TRUE if it is connected.
  */
@@ -893,9 +885,8 @@ HELICS_EXPORT HelicsBool helicsCoreConnect(HelicsCore core, HelicsError* err);
  * Disconnect a core from the federation.
  *
  * @param core The core to query.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreDisconnect(HelicsCore core, HelicsError* err);
 
@@ -906,9 +897,9 @@ HELICS_EXPORT void helicsCoreDisconnect(HelicsCore core, HelicsError* err);
  *          federate must still be active in the process.
  *
  * @param fedName The name of the federate to retrieve.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return NULL if no fed is available by that name otherwise a HelicsFederate with that name.
  */
@@ -918,9 +909,8 @@ HELICS_EXPORT HelicsFederate helicsGetFederateByName(const char* fedName, Helics
  * Disconnect a broker.
  *
  * @param broker The broker to disconnect.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err);
 
@@ -960,9 +950,9 @@ HELICS_EXPORT void helicsBrokerFree(HelicsBroker broker);
  *
  * @param fedName The name of the federate to create, can NULL or an empty string to use the default name from fi or an assigned name.
  * @param fi The federate info object that contains details on the federate.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque value federate object.
  */
@@ -974,9 +964,9 @@ HELICS_EXPORT HelicsFederate helicsCreateValueFederate(const char* fedName, Heli
  * @details HelicsFederate objects can be used in all functions that take a HelicsFederate or HelicsFederate object as an argument.
  *
  * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque value federate object.
  */
@@ -990,9 +980,9 @@ HELICS_EXPORT HelicsFederate helicsCreateValueFederateFromConfig(const char* con
  *
  * @param fedName The name of the federate to create.
  * @param fi The federate info object that contains details on the federate.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque message federate object.
  */
@@ -1005,9 +995,9 @@ HELICS_EXPORT HelicsFederate helicsCreateMessageFederate(const char* fedName, He
  * argument.
  *
  * @param configFile A Config(JSON,TOML) file or a JSON string that contains setup and configuration information.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque message federate object.
  */
@@ -1021,9 +1011,9 @@ HELICS_EXPORT HelicsFederate helicsCreateMessageFederateFromConfig(const char* c
  *
  * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
  * @param fi The federate info object that contains details on the federate.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque value federate object nullptr if the object creation failed.
  */
@@ -1036,9 +1026,9 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
  *          that take a HelicsFederate, helics_message_federate or HelicsFederate object as an argument
  *
  * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return An opaque combination federate object.
  */
@@ -1050,9 +1040,9 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
  * @details This will create a new HelicsFederate object that references the existing federate. The new object must be freed as well.
  *
  * @param fed An existing HelicsFederate.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A new reference to the same federate.
  */
@@ -1069,9 +1059,9 @@ HELICS_EXPORT HelicsFederateInfo helicsCreateFederateInfo(void);
  * Create a federate info object from an existing one and clone the information.
  *
  * @param fi A federateInfo object to duplicate.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  *  @return A HelicsFederateInfo object which is a reference to the created object.
  */
@@ -1083,9 +1073,8 @@ HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, 
  * @param fi A federateInfo object.
  * @param argc The number of command line arguments.
  * @param argv An array of strings from the command line.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
 
@@ -1106,9 +1095,8 @@ HELICS_EXPORT HelicsBool helicsFederateIsValid(HelicsFederate fed);
  *
  * @param fi The federate info object to alter.
  * @param corename The identifier for a core to link to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);
 
@@ -1117,9 +1105,8 @@ HELICS_EXPORT void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const ch
  *
  * @param fi The federate info object to alter.
  * @param coreInit A string containing command line arguments to be passed to the core.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, const char* coreInit, HelicsError* err);
 
@@ -1128,9 +1115,8 @@ HELICS_EXPORT void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, co
  *
  * @param fi The federate info object to alter.
  * @param brokerInit A string with command line arguments for a generated broker.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, const char* brokerInit, HelicsError* err);
 
@@ -1140,9 +1126,8 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, 
  * @details Valid values available by definitions in api-data.h.
  * @param fi The federate info object to alter.
  * @param coretype An numerical code for a core type see /ref helics_CoreType.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int coretype, HelicsError* err);
 
@@ -1151,9 +1136,8 @@ HELICS_EXPORT void helicsFederateInfoSetCoreType(HelicsFederateInfo fi, int core
  *
  * @param fi The federate info object to alter.
  * @param coretype A string naming a core type.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi, const char* coretype, HelicsError* err);
 
@@ -1163,9 +1147,8 @@ HELICS_EXPORT void helicsFederateInfoSetCoreTypeFromString(HelicsFederateInfo fi
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
  * @param fi The federate info object to alter.
  * @param broker A string which defines the connection information for a broker either a name or an address.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char* broker, HelicsError* err);
 
@@ -1175,9 +1158,8 @@ HELICS_EXPORT void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char
  * @details This is only used if the core is automatically created, the broker information will be transferred to the core for connection.
  * @param fi The federate info object to alter.
  * @param brokerkey A string containing a key for the broker to connect.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const char* brokerkey, HelicsError* err);
 
@@ -1188,9 +1170,8 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const c
  * This will only be useful for network broker connections.
  * @param fi The federate info object to alter.
  * @param brokerPort The integer port number to use for connection with a broker.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fi, int brokerPort, HelicsError* err);
 
@@ -1200,9 +1181,8 @@ HELICS_EXPORT void helicsFederateInfoSetBrokerPort(HelicsFederateInfo fi, int br
  * @details This is only used if the core is automatically created, the port information will be transferred to the core for connection.
  * @param fi The federate info object to alter.
  * @param localPort A string with the port information to use as the local server port can be a number or "auto" or "os_local".
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetLocalPort(HelicsFederateInfo fi, const char* localPort, HelicsError* err);
 
@@ -1248,9 +1228,8 @@ HELICS_EXPORT int helicsGetOptionValue(const char* val);
  * @param fi The federate info object to alter.
  * @param flag A numerical index for a flag.
  * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
 
@@ -1261,9 +1240,8 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int fl
  * For example if the separator character is '/'  then a local endpoint would have a globally reachable name of fedName/localName.
  * @param fi The federate info object to alter.
  * @param separator The character to use as a separator.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
 
@@ -1273,9 +1251,8 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char se
  * @param fi The federate info object to alter.
  * @param timeProperty An integer representation of the time based property to set see /ref helics_properties.
  * @param propertyValue The value of the property to set the timeProperty to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
@@ -1288,9 +1265,8 @@ HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int 
  * @param fi The federateInfo object to alter.
  * @param intProperty An int identifying the property.
  * @param propertyValue The value to set the property to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
 
@@ -1299,9 +1275,7 @@ HELICS_EXPORT void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, i
  *
  * @param fed The federate to which to load interfaces.
  * @param file The name of a file to load the interfaces from either JSON, or TOML.
- * @forcpponly
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, HelicsError* err);
 
@@ -1313,8 +1287,12 @@ HELICS_EXPORT void helicsFederateRegisterInterfaces(HelicsFederate fed, const ch
  * @param fed The federate to create an error in.
  * @param errorCode The integer code for the error.
  * @param errorString A string describing the error.
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string);
+HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed,
+                                             int errorCode,
+                                             const char* error_string,
+                                             HelicsError* err);
 
 /**
  * Generate a local error in a federate.
@@ -1324,23 +1302,44 @@ HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, 
  * @param fed The federate to create an error in.
  * @param errorCode The integer code for the error.
  * @param errorString A string describing the error.
+ * 
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string);
+HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed,
+                                            int errorCode,
+                                            const char* error_string,
+                                            HelicsError* err);
 
 /**
- * Finalize the federate. This function halts all communication in the federate and disconnects it from the core.
+ * Disconnct/finalize the federate. This function halts all communication in the federate and disconnects it from the core.
  */
 HELICS_EXPORT void helicsFederateFinalize(HelicsFederate fed, HelicsError* err);
 
 /**
- * Finalize the federate in an async call.
+ * Disconnct/finalize the federate in an async call.
  */
 HELICS_EXPORT void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
- * Complete the asynchronous finalize call.
+ * Complete the asynchronous disconnct/finalize call.
  */
 HELICS_EXPORT void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Disconnct/finalize the federate. This function halts all communication in the federate and disconnects it
+ * from the core.  This call is identical to helicsFederateFinalize.
+ */
+HELICS_EXPORT void helicsFederateDisconnect(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Disconnct/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync.
+ */
+HELICS_EXPORT void helicsFederateDisconnectAsync(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Complete the asynchronous disconnct/finalize call.  This call is identical to helicsFederateFinalizeComplete
+ */
+HELICS_EXPORT void helicsFederateDisconnectComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Release the memory associated with a federate.
@@ -1364,9 +1363,8 @@ HELICS_EXPORT void helicsCloseLibrary(void);
  * state. This is a blocking call and will block until the core allows it to proceed.
  *
  * @param fed The federate to operate on.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 
@@ -1376,9 +1374,8 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
  * @details The function helicsFederateEnterInitializationModeFinalize must be called to finish the operation.
  *
  * @param fed The federate to operate on.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
 
@@ -1386,9 +1383,8 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
  * Check if the current Asynchronous operation has completed.
  *
  * @param fed The federate to operate on.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
  */
@@ -1398,9 +1394,8 @@ HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate 
  * Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
  *
  * @param fed The federate desiring to complete the initialization step.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
@@ -1411,9 +1406,8 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fe
  *          For an asynchronous alternative call see /ref helicsFederateEnterExecutingModeAsync.
  *
  * @param fed A federate to change modes.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err);
 
@@ -1424,9 +1418,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsEr
  * sequence.
  *
  * @param fed The federate object to complete the call.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, HelicsError* err);
 
@@ -1434,9 +1427,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, Hel
  * Complete the call to /ref helicsFederateEnterExecutingModeAsync.
  *
  * @param fed The federate object to complete the call.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* err);
 
@@ -1448,9 +1440,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, 
  *
  * @param fed The federate to make the request of.
  * @param iterate The requested iteration mode.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return An iteration structure with field containing the time and iteration status.
  */
@@ -1466,9 +1457,8 @@ HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterative(He
  *
  * @param fed The federate to make the request of.
  * @param iterate The requested iteration mode.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate fed, HelicsIterationRequest iterate, HelicsError* err);
 
@@ -1476,9 +1466,8 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate
  * Complete the asynchronous iterative call into ExecutionMode.
  *
  * @param fed The federate to make the request of.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return An iteration object containing the iteration time and iteration_status.
  */
@@ -1488,9 +1477,8 @@ HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterativeCom
  * Get the current state of a federate.
  *
  * @param fed The federate to query.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return State the resulting state if void return HELICS_OK.
  */
@@ -1500,9 +1488,8 @@ HELICS_EXPORT HelicsFederateState helicsFederateGetState(HelicsFederate fed, Hel
  * Get the core object associated with a federate.
  *
  * @param fed A federate object.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return A core object, nullptr if invalid.
  */
@@ -1513,9 +1500,8 @@ HELICS_EXPORT HelicsCore helicsFederateGetCore(HelicsFederate fed, HelicsError* 
  *
  * @param fed The federate to make the request of.
  * @param requestTime The next requested time.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid.
  */
@@ -1526,9 +1512,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTime(HelicsFederate fed, HelicsTim
  *
  * @param fed The federate to make the request of.
  * @param timeDelta The requested amount of time to advance.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
@@ -1541,9 +1526,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeAdvance(HelicsFederate fed, He
  * time plus the minimum time step.
  *
  * @param fed The federate to make the request of.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
@@ -1558,12 +1542,11 @@ HELICS_EXPORT HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, Helic
  * @param fed The federate to make the request of.
  * @param requestTime The next desired time.
  * @param iterate The requested iteration mode.
- * @forcpponly
+ * 
  * @param[out] outIteration  The iteration specification of the result.
- * @endforcpponly
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated along with the appropriate iteration result.
  * @beginPythonOnly
@@ -1583,9 +1566,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
  *
  * @param fed The federate to make the request of.
  * @param requestTime The next requested time.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsError* err);
 
@@ -1593,9 +1575,8 @@ HELICS_EXPORT void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime
  * Complete an asynchronous requestTime call.
  *
  * @param fed The federate to make the request of.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  */
@@ -1610,9 +1591,8 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, H
  * @param fed The federate to make the request of.
  * @param requestTime The next desired time.
  * @param iterate The requested iteration mode.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void
     helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
@@ -1621,10 +1601,9 @@ HELICS_EXPORT void
  * Complete an iterative time request asynchronous call.
  *
  * @param fed The federate to make the request of.
- * @forcpponly
+ * 
  * @param[out] outIterate The iteration specification of the result.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  *
  * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  * @beginPythonOnly
@@ -1650,9 +1629,8 @@ HELICS_EXPORT const char* helicsFederateGetName(HelicsFederate fed);
  * @param fed The federate object to set the property for.
  * @param timeProperty A integer code for a time property.
  * @param time The requested value of the property.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetTimeProperty(HelicsFederate fed, int timeProperty, HelicsTime time, HelicsError* err);
 
@@ -1662,9 +1640,8 @@ HELICS_EXPORT void helicsFederateSetTimeProperty(HelicsFederate fed, int timePro
  * @param fed The federate to alter a flag for.
  * @param flag The flag to change.
  * @param flagValue The new value of the flag. 0 for false, !=0 for true.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetFlagOption(HelicsFederate fed, int flag, HelicsBool flagValue, HelicsError* err);
 
@@ -1676,9 +1653,8 @@ HELICS_EXPORT void helicsFederateSetFlagOption(HelicsFederate fed, int flag, Hel
  *
  * @param fed The federate info object to alter.
  * @param separator The character to use as a separator.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetSeparator(HelicsFederate fed, char separator, HelicsError* err);
 
@@ -1688,9 +1664,8 @@ HELICS_EXPORT void helicsFederateSetSeparator(HelicsFederate fed, char separator
  * @param fed The federate to change the property for.
  * @param intProperty The property to set.
  * @param propertyVal The value of the property.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetIntegerProperty(HelicsFederate fed, int intProperty, int propertyVal, HelicsError* err);
 
@@ -1699,9 +1674,8 @@ HELICS_EXPORT void helicsFederateSetIntegerProperty(HelicsFederate fed, int intP
  *
  * @param fed The federate query.
  * @param timeProperty The property to query.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, HelicsError* err);
 
@@ -1710,9 +1684,9 @@ HELICS_EXPORT HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int t
  *
  * @param fed The federate to get the flag for.
  * @param flag The flag to query.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The value of the flag.
  */
@@ -1723,9 +1697,9 @@ HELICS_EXPORT HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int fla
  *
  * @param fed The federate to get the flag for.
  * @param intProperty A code for the property to set /ref helics_handle_options.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The value of the property.
  */
@@ -1735,9 +1709,9 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intPr
  * Get the current time of the federate.
  *
  * @param fed The federate object to query.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The current time of the federate.
  */
@@ -1750,9 +1724,8 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
  * @param fed The federate to set the global through.
  * @param valueName The name of the global to set.
  * @param value The value of the global.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
@@ -1761,9 +1734,8 @@ HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* value
  *
  * @param fed The federate to add the dependency for.
  * @param fedName The name of the federate to depend on.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateAddDependency(HelicsFederate fed, const char* fedName, HelicsError* err);
 
@@ -1772,9 +1744,8 @@ HELICS_EXPORT void helicsFederateAddDependency(HelicsFederate fed, const char* f
  *
  * @param fed The federate to set the log file for.
  * @param logFile The name of the log file.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsError* err);
 
@@ -1783,9 +1754,8 @@ HELICS_EXPORT void helicsFederateSetLogFile(HelicsFederate fed, const char* logF
  *
  * @param fed The federate to log the error message through.
  * @param logmessage The message to put in the log.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogErrorMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1794,9 +1764,8 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(HelicsFederate fed, const char*
  *
  * @param fed The federate to log the warning message through.
  * @param logmessage The message to put in the log.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogWarningMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1805,9 +1774,8 @@ HELICS_EXPORT void helicsFederateLogWarningMessage(HelicsFederate fed, const cha
  *
  * @param fed The federate to log the info message through.
  * @param logmessage The message to put in the log.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogInfoMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1816,9 +1784,8 @@ HELICS_EXPORT void helicsFederateLogInfoMessage(HelicsFederate fed, const char* 
  *
  * @param fed The federate to log the debug message through.
  * @param logmessage The message to put in the log.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogDebugMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1828,9 +1795,8 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(HelicsFederate fed, const char*
  * @param fed The federate to log the message through.
  * @param loglevel The level of the message to log see /ref helics_log_levels.
  * @param logmessage The message to put in the log.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateLogLevelMessage(HelicsFederate fed, int loglevel, const char* logmessage, HelicsError* err);
 
@@ -1840,9 +1806,8 @@ HELICS_EXPORT void helicsFederateLogLevelMessage(HelicsFederate fed, int logleve
  * @param fed The federate to send the command through.
  * @param target The name of the object to send the command to.
  * @param command The command to send.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err);
 
@@ -1850,9 +1815,9 @@ HELICS_EXPORT void helicsFederateSendCommand(HelicsFederate fed, const char* tar
  * Get a command sent to the federate.
  *
  * @param fed The federate to get the command for.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1862,9 +1827,9 @@ HELICS_EXPORT const char* helicsFederateGetCommand(HelicsFederate fed, HelicsErr
  * Get the source of the most recently retrieved command sent to the federate.
  *
  * @param fed The federate to get the command for.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1876,9 +1841,9 @@ HELICS_EXPORT const char* helicsFederateGetCommandSource(HelicsFederate fed, Hel
  * @param fed The federate to get the command for.
  * @param target The name of the object to send the command to.
  * @param command The command to send.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1891,9 +1856,8 @@ HELICS_EXPORT const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsEr
  * @param core The core to set the global through.
  * @param valueName The name of the global to set.
  * @param value The value of the global.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err);
 
@@ -1905,9 +1869,8 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
  * @param broker The broker to set the global through.
  * @param valueName The name of the global to set.
  * @param value The value of the global.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
@@ -1917,9 +1880,8 @@ HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueN
  * @param core The core to send the command through.
  * @param target The name of the object to send the command to.
  * @param command The command to send.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
@@ -1929,9 +1891,8 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
  * @param core The core to send the command through.
  * @param target The name of the object to send the command to.
  * @param command The command to send.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
@@ -1940,9 +1901,8 @@ HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* targ
  *
  * @param core The core to set the log file for.
  * @param logFileName The name of the file to log to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err);
 
@@ -1951,9 +1911,8 @@ HELICS_EXPORT void helicsCoreSetLogFile(HelicsCore core, const char* logFileName
  *
  * @param broker The broker to set the log file for.
  * @param logFileName The name of the file to log to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err);
 
@@ -1962,9 +1921,8 @@ HELICS_EXPORT void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFi
  *
  * @param broker The broker to set the time barrier for.
  * @param barrierTime The time to set the barrier at.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err);
 
@@ -1981,9 +1939,8 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(HelicsBroker broker);
  * @param broker The broker to generate the global error on.
  * @param errorCode The error code to associate with the global error.
  * @param errorString An error message to associate with the global error.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err);
 
@@ -1993,9 +1950,8 @@ HELICS_EXPORT void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, c
  * @param core The core to generate the global error.
  * @param errorCode The error code to associate with the global error.
  * @param errorString An error message to associate with the global error.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err);
 /**
@@ -2015,15 +1971,14 @@ HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* quer
  *
  * @param query The query object to use in the query.
  * @param fed A federate to send the query through.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- * @forcpponly
+ * 
  *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
- * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
@@ -2034,15 +1989,14 @@ HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate f
  *
  * @param query The query object to use in the query.
  * @param core The core to send the query to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- * @forcpponly
+ * 
  *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
- * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
 
@@ -2053,15 +2007,14 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore c
  *
  * @param query The query object to use in the query.
  * @param broker The broker to send the query to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- * @forcpponly
+ * 
  *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid
- * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
 
@@ -2070,9 +2023,8 @@ HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBrok
  *
  * @param query The query object to use in the query.
  * @param fed A federate to send the query through.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
@@ -2083,14 +2035,13 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * not.
  *
  * @param query The query object to complete execution of.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
- * @forcpponly
+ * 
  *         The return will be nullptr if query is an invalid object
- * @endforcpponly
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
@@ -2112,9 +2063,8 @@ HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
  * @param query The query object to change the target of.
  * @param target the name of the target to query
  *
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, HelicsError* err);
 
@@ -2123,9 +2073,8 @@ HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, H
  *
  * @param query The query object to change the target of.
  * @param queryString the new queryString
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, HelicsError* err);
 
@@ -2135,9 +2084,8 @@ HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* quer
  * @param query The query object to change the order for.
  * @param mode 0 for fast, 1 for ordered
  *
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 
@@ -2167,9 +2115,9 @@ HELICS_EXPORT void helicsCleanupLibrary(void);
  * /ref helicsCreateCombinationFederate.
  * @param key The identifier matching a publication to get a subscription for.
  * @param units A string listing the units of the subscription (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the subscription.
  */
@@ -2185,9 +2133,9 @@ HELICS_EXPORT HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed,
  * @param key The identifier for the publication the global publication key will be prepended with the federate name.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2204,9 +2152,9 @@ HELICS_EXPORT HelicsPublication
  * @param key The identifier for the publication.
  * @param type A string labeling the type of the publication.
  * @param units A string listing the units of the subscription (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2223,9 +2171,9 @@ HELICS_EXPORT HelicsPublication
  * @param key The identifier for the publication.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2242,9 +2190,9 @@ HELICS_EXPORT HelicsPublication
  * @param key The identifier for the publication.
  * @param type A string describing the expected type of the publication.
  * @param units A string listing the units of the subscription (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2261,9 +2209,9 @@ HELICS_EXPORT HelicsPublication
  * @param key The identifier for the publication the global input key will be prepended with the federate name.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the input (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the input.
  */
@@ -2280,9 +2228,9 @@ HELICS_EXPORT HelicsInput
  * @param key The identifier for the input.
  * @param type A string describing the expected type of the input.
  * @param units A string listing the units of the input maybe NULL.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2299,9 +2247,9 @@ HELICS_EXPORT HelicsInput
  * @param key The identifier for the publication.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the subscription maybe NULL.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2318,9 +2266,9 @@ HELICS_EXPORT HelicsPublication
  * @param key The identifier for the publication.
  * @param type A string defining the type of the input.
  * @param units A string listing the units of the subscription maybe NULL.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the publication.
  */
@@ -2332,9 +2280,9 @@ HELICS_EXPORT HelicsPublication
  *
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the publication.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @return A HelicsPublication object, the object will not be valid and err will contain an error code if no publication with the
  * specified key exists.
@@ -2346,9 +2294,9 @@ HELICS_EXPORT HelicsPublication helicsFederateGetPublication(HelicsFederate fed,
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsPublication.
  */
@@ -2359,9 +2307,9 @@ HELICS_EXPORT HelicsPublication helicsFederateGetPublicationByIndex(HelicsFedera
  *
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the input.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
  * key exists.
@@ -2373,9 +2321,9 @@ HELICS_EXPORT HelicsInput helicsFederateGetInput(HelicsFederate fed, const char*
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsInput, which will be NULL if an invalid index.
  */
@@ -2386,9 +2334,9 @@ HELICS_EXPORT HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int 
  *
  * @param fed The value federate object to use to get the publication.
  * @param key The name of the publication that a subscription is targeting.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
  * key exists.
@@ -2407,9 +2355,9 @@ HELICS_EXPORT void helicsFederateClearUpdates(HelicsFederate fed);
  *
  * @param fed The value federate object to use to register the publications.
  * @param json The JSON publication string.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @details This would be the same JSON that would be used to publish data.
  */
@@ -2420,9 +2368,8 @@ HELICS_EXPORT void helicsFederateRegisterFromPublicationJSON(HelicsFederate fed,
  *
  * @param fed The value federate object through which to publish the data.
  * @param json The publication file name or literal JSON data string.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFederatePublishJSON(HelicsFederate fed, const char* json, HelicsError* err);
 
@@ -2449,9 +2396,8 @@ HELICS_EXPORT HelicsBool helicsPublicationIsValid(HelicsPublication pub);
  * @param pub The publication to publish for.
  * @param data A pointer to the raw data.
  * @param inputDataLength The size in bytes of the data to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const void* data, int inputDataLength, HelicsError* err);
 
@@ -2460,9 +2406,8 @@ HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const vo
  *
  * @param pub The publication to publish for.
  * @param str The string to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
 
@@ -2471,9 +2416,8 @@ HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const c
  *
  * @param pub The publication to publish for.
  * @param val The numerical value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishInteger(HelicsPublication pub, int64_t val, HelicsError* err);
 
@@ -2482,9 +2426,8 @@ HELICS_EXPORT void helicsPublicationPublishInteger(HelicsPublication pub, int64_
  *
  * @param pub The publication to publish for.
  * @param val The boolean value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishBoolean(HelicsPublication pub, HelicsBool val, HelicsError* err);
 
@@ -2493,9 +2436,8 @@ HELICS_EXPORT void helicsPublicationPublishBoolean(HelicsPublication pub, Helics
  *
  * @param pub The publication to publish for.
  * @param val The numerical value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishDouble(HelicsPublication pub, double val, HelicsError* err);
 
@@ -2504,9 +2446,8 @@ HELICS_EXPORT void helicsPublicationPublishDouble(HelicsPublication pub, double 
  *
  * @param pub The publication to publish for.
  * @param val The numerical value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishTime(HelicsPublication pub, HelicsTime val, HelicsError* err);
 
@@ -2515,9 +2456,8 @@ HELICS_EXPORT void helicsPublicationPublishTime(HelicsPublication pub, HelicsTim
  *
  * @param pub The publication to publish for.
  * @param val The numerical value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishChar(HelicsPublication pub, char val, HelicsError* err);
 
@@ -2527,9 +2467,8 @@ HELICS_EXPORT void helicsPublicationPublishChar(HelicsPublication pub, char val,
  * @param pub The publication to publish for.
  * @param real The real part of a complex number to publish.
  * @param imag The imaginary part of a complex number to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishComplex(HelicsPublication pub, double real, double imag, HelicsError* err);
 
@@ -2538,10 +2477,9 @@ HELICS_EXPORT void helicsPublicationPublishComplex(HelicsPublication pub, double
  *
  * @param pub The publication to publish for.
  * @param vectorInput A pointer to an array of double data.
- * @forcpponly
+ * 
  * @param vectorLength The number of points to publish.
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
@@ -2551,9 +2489,8 @@ HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const d
  * @param pub The publication to publish for.
  * @param str A string for the name to publish.
  * @param val A double for the value to publish.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
 
@@ -2562,9 +2499,8 @@ HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, con
  *
  * @param pub The publication to add the target for.
  * @param target The name of an input that the data should be sent to.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationAddTarget(HelicsPublication pub, const char* target, HelicsError* err);
 
@@ -2582,9 +2518,8 @@ HELICS_EXPORT HelicsBool helicsInputIsValid(HelicsInput ipt);
  *
  * @param ipt The named input to modify.
  * @param target The name of a publication that an input should subscribe to.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputAddTarget(HelicsInput ipt, const char* target, HelicsError* err);
 
@@ -2608,12 +2543,12 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
  * Get the raw data for the latest value of a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[out] data The memory location of the data
  * @param maxDataLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return  raw Bytes of the value, the value is uninterpreted raw bytes.
@@ -2632,12 +2567,12 @@ HELICS_EXPORT int helicsInputGetStringSize(HelicsInput ipt);
  * Get a string value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[out] outputString Storage for copying a null terminated string.
  * @param maxStringLength The maximum size of information that str can hold.
  * @param[out] actualLength The actual length of the string.
  * @param[in,out] err Error term for capturing errors.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return A string data
@@ -2649,9 +2584,9 @@ HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int
  * Get an integer value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An int64_t value with the current value of the input.
  */
@@ -2661,9 +2596,9 @@ HELICS_EXPORT int64_t helicsInputGetInteger(HelicsInput ipt, HelicsError* err);
  * Get a boolean value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A boolean value of current input value.
  */
@@ -2673,9 +2608,9 @@ HELICS_EXPORT HelicsBool helicsInputGetBoolean(HelicsInput ipt, HelicsError* err
  * Get a double value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The double value of the input.
  */
@@ -2685,9 +2620,9 @@ HELICS_EXPORT double helicsInputGetDouble(HelicsInput ipt, HelicsError* err);
  * Get a time value from a subscription.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The resulting time value.
  */
@@ -2697,14 +2632,13 @@ HELICS_EXPORT HelicsTime helicsInputGetTime(HelicsInput ipt, HelicsError* err);
  * Get a single character value from an input.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return The resulting character value.
- * @forcpponly
+ * 
  *         NAK (negative acknowledgment) symbol returned on error
- * @endforcpponly
  */
 HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
 
@@ -2712,10 +2646,10 @@ HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
  * Get a complex object from an input object.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
  * error.
- * @endforcpponly
+
  *
  * @return A HelicsComplex structure with the value.
  */
@@ -2725,12 +2659,12 @@ HELICS_EXPORT HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsE
  * Get a pair of double forming a complex number from a subscriptions.
  *
  * @param ipt The input to get the data for.
- * @forcpponly
+ * 
  * @param[out] real Memory location to place the real part of a value.
  * @param[out] imag Memory location to place the imaginary part of a value.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * On error the values will not be altered.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return a pair of floating point values that represent the real and imag values
@@ -2749,12 +2683,12 @@ HELICS_EXPORT int helicsInputGetVectorSize(HelicsInput ipt);
  * Get a vector from a subscription.
  *
  * @param ipt The input to get the result for.
- * @forcpponly
+ * 
  * @param[out] data The location to store the data.
  * @param maxLength The maximum size of the vector.
  * @param[out] actualSize Location to place the actual length of the resulting vector.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return a list of floating point values
@@ -2766,13 +2700,13 @@ HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxL
  * Get a named point from a subscription.
  *
  * @param ipt The input to get the result for.
- * @forcpponly
+ * 
  * @param[out] outputString Storage for copying a null terminated string.
  * @param maxStringLength The maximum size of information that str can hold.
  * @param[out] actualLength The actual length of the string
  * @param[out] val The double value for the named point.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return a string and a double value for the named point
@@ -2794,10 +2728,9 @@ HELICS_EXPORT void
  *
  * @param ipt The input to set the default for.
  * @param data A pointer to the raw data to use for the default.
- * @forcpponly
+ * 
  * @param inputDataLength The size of the raw data.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data, int inputDataLength, HelicsError* err);
 
@@ -2806,9 +2739,8 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data,
  *
  * @param ipt The input to set the default for.
  * @param str A pointer to the default string.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
 
@@ -2817,9 +2749,8 @@ HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str,
  *
  * @param ipt The input to set the default for.
  * @param val The default integer.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultInteger(HelicsInput ipt, int64_t val, HelicsError* err);
 
@@ -2828,9 +2759,8 @@ HELICS_EXPORT void helicsInputSetDefaultInteger(HelicsInput ipt, int64_t val, He
  *
  * @param ipt The input to set the default for.
  * @param val The default boolean value.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultBoolean(HelicsInput ipt, HelicsBool val, HelicsError* err);
 
@@ -2839,9 +2769,8 @@ HELICS_EXPORT void helicsInputSetDefaultBoolean(HelicsInput ipt, HelicsBool val,
  *
  * @param ipt The input to set the default for.
  * @param val The default time value.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultTime(HelicsInput ipt, HelicsTime val, HelicsError* err);
 
@@ -2850,9 +2779,8 @@ HELICS_EXPORT void helicsInputSetDefaultTime(HelicsInput ipt, HelicsTime val, He
  *
  * @param ipt The input to set the default for.
  * @param val The default char value.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsError* err);
 
@@ -2861,9 +2789,8 @@ HELICS_EXPORT void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsEr
  *
  * @param ipt The input to set the default for.
  * @param val The default double value.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultDouble(HelicsInput ipt, double val, HelicsError* err);
 
@@ -2873,9 +2800,8 @@ HELICS_EXPORT void helicsInputSetDefaultDouble(HelicsInput ipt, double val, Heli
  * @param ipt The input to set the default for.
  * @param real The default real value.
  * @param imag The default imaginary value.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, double imag, HelicsError* err);
 
@@ -2885,9 +2811,8 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, do
  * @param ipt The input to set the default for.
  * @param vectorInput A pointer to an array of double data.
  * @param vectorLength The number of points to publish.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 
@@ -2897,9 +2822,8 @@ HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* ve
  * @param ipt The input to set the default for.
  * @param str A pointer to a string representing the name.
  * @param val A double value for the value of the named point.
- * @forcpponly
+ * 
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
 
@@ -3016,9 +2940,8 @@ HELICS_EXPORT const char* helicsInputGetInfo(HelicsInput inp);
  *
  * @param inp The input to query.
  * @param info The string to set.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
 
@@ -3037,9 +2960,8 @@ HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname
  * @param inp The input object to query.
  * @param tagname The string to set.
  * @param tagvalue The string value to associate with a tag.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -3057,9 +2979,8 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
  *
  * @param pub The publication to set the info field for.
  * @param info The string to set.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
 
@@ -3078,9 +2999,8 @@ HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const c
  * @param pub The publication object to query.
  * @param tagname The string to set.
  * @param tagvalue The string value to associate with a tag.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -3100,9 +3020,8 @@ HELICS_EXPORT int helicsInputGetOption(HelicsInput inp, int option);
  * @param inp The input to query.
  * @param option The option to set for the input /ref helics_handle_options.
  * @param value The value to set the option to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetOption(HelicsInput inp, int option, int value, HelicsError* err);
 
@@ -3122,9 +3041,8 @@ HELICS_EXPORT int helicsPublicationGetOption(HelicsPublication pub, int option);
  * @param pub The publication to query.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @param val The value to set the option to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationSetOption(HelicsPublication pub, int option, int val, HelicsError* err);
 
@@ -3133,9 +3051,8 @@ HELICS_EXPORT void helicsPublicationSetOption(HelicsPublication pub, int option,
  *
  * @param pub The publication to modify.
  * @param tolerance The tolerance level for publication, values changing less than this value will not be published.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsPublicationSetMinimumChange(HelicsPublication pub, double tolerance, HelicsError* err);
 
@@ -3144,9 +3061,8 @@ HELICS_EXPORT void helicsPublicationSetMinimumChange(HelicsPublication pub, doub
  *
  * @param inp The input to modify.
  * @param tolerance The tolerance level for registering an update, values changing less than this value will not show as being updated.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsInputSetMinimumChange(HelicsInput inp, double tolerance, HelicsError* err);
 
@@ -3195,14 +3111,13 @@ HELICS_EXPORT int helicsFederateGetInputCount(HelicsFederate fed);
  *           with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
  * @param type A string describing the expected type of the publication (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the endpoint.
- * @forcpponly
+ * 
  *         nullptr on failure.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -3216,13 +3131,12 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, 
               with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint, the given name is the global identifier.
  * @param type A string describing the expected type of the publication (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  * @return An object containing the endpoint.
- * @forcpponly
+ * 
  *         nullptr on failure.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -3237,14 +3151,13 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate
  *           with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint. This will be prepended with the federate name for the global identifier.
  * @param type A string describing the expected type of the publication (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return An object containing the endpoint.
- * @forcpponly
+ * 
  *         nullptr on failure.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
                                                                     const char* name,
@@ -3262,13 +3175,12 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFedera
               with helicsCreateMessageFederate or helicsCreateCombinationFederate.
  * @param name The identifier for the endpoint, the given name is the global identifier.
  * @param type A string describing the expected type of the publication (may be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  * @return An object containing the endpoint.
- * @forcpponly
+ * 
  *         nullptr on failure.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
                                                                           const char* name,
@@ -3280,14 +3192,13 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(Helics
  *
  * @param fed The message federate object to use to get the endpoint.
  * @param name The name of the endpoint.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @return A HelicsEndpoint object.
- * @forcpponly
+ * 
  *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
 
@@ -3296,14 +3207,13 @@ HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsEndpoint.
- * @forcpponly
+ * 
  *         It will be NULL if given an invalid index.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
 
@@ -3321,9 +3231,8 @@ HELICS_EXPORT HelicsBool helicsEndpointIsValid(HelicsEndpoint endpoint);
  *
  * @param endpoint The endpoint to set the destination for.
  * @param dst A string naming the desired default endpoint.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, const char* dst, HelicsError* err);
 
@@ -3341,10 +3250,9 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint end
  *
  * @param endpoint The endpoint to send the data from.
  * @param data The data to send.
- * @forcpponly
+ * 
  * @param inputDataLength The length of the data to send.
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 
@@ -3354,17 +3262,16 @@ HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* 
  * @param endpoint The endpoint to send the data from.
 
  * @param data The data to send.
- * @forcpponly
+ * 
  * @param inputDataLength The length of the data to send.
  * @param dst The target destination.
- * @forcpponly
+ * 
  *             nullptr to use the default destination.
- * @endforcpponly
+
  * @beginpythononly
  *             "" to use the default destination.
  * @endpythononly
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void
     helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
@@ -3374,20 +3281,19 @@ HELICS_EXPORT void
  *
  * @param endpoint The endpoint to send the data from.
  * @param data The data to send.
- * @forcpponly
+ * 
  * @param inputDataLength The length of the data to send.
- * @endforcpponly
+
  * @param dst The target destination.
- * @forcpponly
+ * 
  *             nullptr to use the default destination.
- * @endforcpponly
+
  * @beginpythononly
  *             "" to use the default destination.
  * @endpythononly
  * @param time The time the message should be sent.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 
 HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
@@ -3403,13 +3309,12 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
  * @param endpoint The endpoint to send the data from.
  *
  * @param data The data to send.
- * @forcpponly
+ * 
  * @param inputDataLength The length of the data to send.
- * @endforcpponly
+
   @param time The time the message should be sent.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 
 HELICS_EXPORT void
@@ -3420,9 +3325,8 @@ HELICS_EXPORT void
  *
  * @param endpoint The endpoint to send the data from.
  * @param message The actual message to send which will be copied.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -3432,9 +3336,8 @@ HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMess
  *
  * @param endpoint The endpoint to send the data from.
  * @param message The actual message to send which will be copied.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -3443,9 +3346,8 @@ HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, He
  *
  * @param endpoint The endpoint to use.
  * @param key The name of the publication.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSubscribe(HelicsEndpoint endpoint, const char* key, HelicsError* err);
 
@@ -3496,9 +3398,9 @@ HELICS_EXPORT HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
  *
  * @param endpoint The endpoint object to associate the message with.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
+
  *
  * @return A new HelicsMessage.
  */
@@ -3521,9 +3423,9 @@ HELICS_EXPORT HelicsMessage helicsFederateGetMessage(HelicsFederate fed);
  * @details The message is empty and isValid will return false since there is no data associated with the message yet.
  *
  * @param fed the federate object to associate the message with
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
+
  *
  * @return A HelicsMessage containing the message data.
  */
@@ -3579,9 +3481,8 @@ HELICS_EXPORT const char* helicsEndpointGetInfo(HelicsEndpoint end);
  *
  * @param endpoint The endpoint to set the information for
  * @param info The string to store in the field
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* info, HelicsError* err);
 
@@ -3600,9 +3501,8 @@ HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const ch
  * @param endpoint The endpoint to query.
  * @param tagname The string to set.
  * @param tagvalue The string value to associate with a tag.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -3612,9 +3512,8 @@ HELICS_EXPORT void helicsEndpointSetTag(HelicsEndpoint endpoint, const char* tag
  * @param endpoint The endpoint to modify.
  * @param option Integer code for the option to set /ref helics_handle_options.
  * @param value The value to set the option to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointSetOption(HelicsEndpoint endpoint, int option, int value, HelicsError* err);
 
@@ -3632,9 +3531,8 @@ HELICS_EXPORT int helicsEndpointGetOption(HelicsEndpoint endpoint, int option);
  *
  * @param endpoint The endpoint to modify.
  * @param targetEndpoint the endpoint to get messages from
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointAddSourceTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
@@ -3643,9 +3541,8 @@ HELICS_EXPORT void helicsEndpointAddSourceTarget(HelicsEndpoint endpoint, const 
  *
  * @param endpoint The endpoint to modify.
  * @param targetEndpoint the name of the endpoint to send messages to
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointAddDestinationTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
@@ -3654,9 +3551,8 @@ HELICS_EXPORT void helicsEndpointAddDestinationTarget(HelicsEndpoint endpoint, c
  *
  * @param endpoint The endpoint to modify.
  * @param targetEndpoint the name of the endpoint to send messages to
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointRemoveTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 
@@ -3665,9 +3561,8 @@ HELICS_EXPORT void helicsEndpointRemoveTarget(HelicsEndpoint endpoint, const cha
  *
  * @param endpoint The endpoint to modify.
  * @param filterName the name of the filter to add
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 
@@ -3676,9 +3571,8 @@ HELICS_EXPORT void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const 
  *
  * @param endpoint The endpoint to modify.
  * @param targetEndpoint the name of the filter to add
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsEndpointAddDestinationFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 
@@ -3774,12 +3668,12 @@ HELICS_EXPORT int helicsMessageGetByteCount(HelicsMessage message);
  * Get the raw data for a message object.
  *
  * @param message A message object to get the data for.
- * @forcpponly
+ * 
  * @param[out] data The memory location of the data.
  * @param maxMessageLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @beginPythonOnly
  * @return Raw string data.
@@ -3810,9 +3704,8 @@ HELICS_EXPORT HelicsBool helicsMessageIsValid(HelicsMessage message);
  *
  * @param message The message object in question.
  * @param src A string containing the source.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetSource(HelicsMessage message, const char* src, HelicsError* err);
 
@@ -3821,9 +3714,8 @@ HELICS_EXPORT void helicsMessageSetSource(HelicsMessage message, const char* src
  *
  * @param message The message object in question.
  * @param dst A string containing the new destination.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
@@ -3832,9 +3724,8 @@ HELICS_EXPORT void helicsMessageSetDestination(HelicsMessage message, const char
  *
  * @param message The message object in question.
  * @param src A string containing the new original source.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetOriginalSource(HelicsMessage message, const char* src, HelicsError* err);
 
@@ -3843,9 +3734,8 @@ HELICS_EXPORT void helicsMessageSetOriginalSource(HelicsMessage message, const c
  *
  * @param message The message object in question.
  * @param dst A string containing the new original source.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetOriginalDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
@@ -3854,9 +3744,8 @@ HELICS_EXPORT void helicsMessageSetOriginalDestination(HelicsMessage message, co
  *
  * @param message The message object in question.
  * @param time The time the message should be delivered.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetTime(HelicsMessage message, HelicsTime time, HelicsError* err);
 
@@ -3868,9 +3757,8 @@ HELICS_EXPORT void helicsMessageSetTime(HelicsMessage message, HelicsTime time, 
  *
  * @param message The message object in question.
  * @param newSize The new size in bytes of the buffer.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageResize(HelicsMessage message, int newSize, HelicsError* err);
 
@@ -3881,9 +3769,8 @@ HELICS_EXPORT void helicsMessageResize(HelicsMessage message, int newSize, Helic
  *
  * @param message The message object in question.
  * @param reserveSize The number of bytes to reserve in the message object.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageReserve(HelicsMessage message, int reserveSize, HelicsError* err);
 
@@ -3894,9 +3781,8 @@ HELICS_EXPORT void helicsMessageReserve(HelicsMessage message, int reserveSize, 
  *
  * @param message The message object in question.
  * @param messageID A new message ID.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetMessageID(HelicsMessage message, int32_t messageID, HelicsError* err);
 
@@ -3913,9 +3799,8 @@ HELICS_EXPORT void helicsMessageClearFlags(HelicsMessage message);
  * @param message The message object in question.
  * @param flag An index of a flag to set on the message.
  * @param flagValue The desired value of the flag.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, HelicsBool flagValue, HelicsError* err);
 
@@ -3924,9 +3809,8 @@ HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, H
  *
  * @param message The message object in question.
  * @param str A string containing the message data.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
 
@@ -3936,9 +3820,8 @@ HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str
  * @param message The message object in question.
  * @param data A string containing the message data.
  * @param inputDataLength The length of the data to input.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
@@ -3948,9 +3831,8 @@ HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data,
  * @param message The message object in question.
  * @param data A string containing the message data to append.
  * @param inputDataLength The length of the data to input.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageAppendData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
@@ -3959,9 +3841,8 @@ HELICS_EXPORT void helicsMessageAppendData(HelicsMessage message, const void* da
  *
  * @param src_message The message object to copy from.
  * @param dst_message The message object to copy to.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageCopy(HelicsMessage src_message, HelicsMessage dst_message, HelicsError* err);
 
@@ -3969,9 +3850,8 @@ HELICS_EXPORT void helicsMessageCopy(HelicsMessage src_message, HelicsMessage ds
  * Clone a message object.
  *
  * @param message The message object to copy from.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT HelicsMessage helicsMessageClone(HelicsMessage message, HelicsError* err);
 
@@ -3988,9 +3868,8 @@ HELICS_EXPORT void helicsMessageFree(HelicsMessage message);
  * Reset a message to empty state
  * @param message The message object to copy from.
  * @details The message after this function will be empty, with no source or destination
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsMessageClear(HelicsMessage message, HelicsError* err);
 
@@ -4005,9 +3884,9 @@ HELICS_EXPORT void helicsMessageClear(HelicsMessage message, HelicsError* err);
  * @param fed The federate to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4021,9 +3900,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, Heli
  * @param fed The federate to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4040,9 +3919,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed
  *
  * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4056,9 +3935,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterCloningFilter(HelicsFederate fe
  *
  * @param fed The federate to register through.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4073,9 +3952,9 @@ HELICS_EXPORT HelicsFilter helicsFederateRegisterGlobalCloningFilter(HelicsFeder
  * @param core The core to register through.
  * @param type The type of filter to create /ref HelicsFilterTypes.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4089,9 +3968,9 @@ HELICS_EXPORT HelicsFilter helicsCoreRegisterFilter(HelicsCore core, HelicsFilte
  *
  * @param core The core to register through.
  * @param name The name of the filter (can be NULL).
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object.
  */
@@ -4111,9 +3990,9 @@ HELICS_EXPORT int helicsFederateGetFilterCount(HelicsFederate fed);
  *
  * @param fed The federate object to use to get the filter.
  * @param name The name of the filter.
- * @forcpponly
+ * 
  * @param[in,out] err The error object to complete if there is an error.
- * @endforcpponly
+
  *
  * @return A HelicsFilter object, the object will not be valid and err will contain an error code if no filter with the specified name
  * exists.
@@ -4124,9 +4003,9 @@ HELICS_EXPORT HelicsFilter helicsFederateGetFilter(HelicsFederate fed, const cha
  *
  * @param fed The federate object in which to create a publication.
  * @param index The index of the publication to get.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  *
  * @return A HelicsFilter, which will be NULL if an invalid index is given.
  */
@@ -4156,9 +4035,8 @@ HELICS_EXPORT const char* helicsFilterGetName(HelicsFilter filt);
  * @param filt The filter to modify.
  * @param prop A string containing the property to set.
  * @param val A numerical value for the property.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double val, HelicsError* err);
 
@@ -4168,9 +4046,8 @@ HELICS_EXPORT void helicsFilterSet(HelicsFilter filt, const char* prop, double v
  * @param filt The filter to modify.
  * @param prop A string containing the property to set.
  * @param val A string containing the new value.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 
@@ -4180,9 +4057,8 @@ HELICS_EXPORT void helicsFilterSetString(HelicsFilter filt, const char* prop, co
  * @details All messages going to a destination are copied to the delivery address(es).
  * @param filt The given filter to add a destination target to.
  * @param dst The name of the endpoint to add as a destination target.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dst, HelicsError* err);
 
@@ -4193,9 +4069,8 @@ HELICS_EXPORT void helicsFilterAddDestinationTarget(HelicsFilter filt, const cha
  *
  * @param filt The given filter.
  * @param source The name of the endpoint to add as a source target.
- * @forcpponly.
+ * .
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterAddSourceTarget(HelicsFilter filt, const char* source, HelicsError* err);
 
@@ -4212,9 +4087,8 @@ HELICS_EXPORT void helicsFilterAddSourceTarget(HelicsFilter filt, const char* so
  *
  * @param filt The given filter.
  * @param deliveryEndpoint The name of the endpoint to deliver messages to.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 
@@ -4223,10 +4097,9 @@ HELICS_EXPORT void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char
  *
  * @param filt The given filter.
  * @param target The named endpoint to remove as a target.
- * @forcpponly
- * @forcpponly
+ * 
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterRemoveTarget(HelicsFilter filt, const char* target, HelicsError* err);
 
@@ -4235,9 +4108,8 @@ HELICS_EXPORT void helicsFilterRemoveTarget(HelicsFilter filt, const char* targe
  *
  * @param filt The given filter (must be a cloning filter).
  * @param deliveryEndpoint A string with the delivery endpoint to remove.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterRemoveDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 
@@ -4254,9 +4126,8 @@ HELICS_EXPORT const char* helicsFilterGetInfo(HelicsFilter filt);
  *
  * @param filt The given filter.
  * @param info The string to set.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetInfo(HelicsFilter filt, const char* info, HelicsError* err);
 
@@ -4275,9 +4146,8 @@ HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagn
  * @param filter The filter object to set the tag for.
  * @param tagname The string to set.
  * @param tagvalue the string value to associate with a tag.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -4287,9 +4157,8 @@ HELICS_EXPORT void helicsFilterSetTag(HelicsFilter filt, const char* tagname, co
  * @param filt The given filter.
  * @param option The option to set /ref helics_handle_options.
  * @param value The value of the option commonly 0 for false 1 for true.
- * @forcpponly
+ * 
  * @param[in,out] err An error object to fill out in case of an error.
- * @endforcpponly
  */
 
 HELICS_EXPORT void helicsFilterSetOption(HelicsFilter filt, int option, int value, HelicsError* err);
@@ -4317,9 +4186,8 @@ HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *               the function arguments are loglevel, an identifier, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsBrokerSetLoggingCallback(HelicsBroker broker,
                                                   void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
@@ -4336,9 +4204,8 @@ HELICS_EXPORT void helicsBrokerSetLoggingCallback(HelicsBroker broker,
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *               The function arguments are loglevel, an identifier, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsCoreSetLoggingCallback(HelicsCore core,
                                                 void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
@@ -4356,9 +4223,8 @@ HELICS_EXPORT void helicsCoreSetLoggingCallback(HelicsCore core,
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *        The function arguments are loglevel, an identifier string, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void
     helicsFederateSetLoggingCallback(HelicsFederate fed,
@@ -4376,9 +4242,8 @@ HELICS_EXPORT void
  *                 The function arguments are the message to filter and a pointer to user data.
  *                 The filter should return a new message.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  void (*filtCall)(HelicsMessage message, void* userData),
@@ -4397,9 +4262,8 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
  * null terminated answerSize is an outputParameter intended to filled out by the userCallback and should contain the length of the return
  * string. The return pointer can be NULL if no answer is given and HELICS will generate the appropriate response.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 
 HELICS_EXPORT void
@@ -4417,9 +4281,8 @@ HELICS_EXPORT void
  * @param buffer The buffer received in a helicsQueryCallback.
  * @param str Pointer to the data to fill the buffer with.
  * @param strSize The size of the string.
- * @forcpponly
+ * 
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
  */
 HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
 
