@@ -12,8 +12,10 @@
     CoreTypes
     multibroker
     broker_hierarchies
+    environment_variables
     simultaneous_cosimulations
     orchestration
+    program_termination
 
 ```
 
@@ -37,5 +39,7 @@ The Advanced Topics will cover:
 - **Multiple Brokers**
   - [**Connecting Multiple Core Types (Multi-Protocol Broker)**](./multibroker.md) What to do when one type of communication isn't sufficient. **TDH**: I've already referenced the multi-broker example in CoreTypes.md. The only content in this file that isn't in the example is the "Limitations" section.
   - [**Broker Hierarchies**](./broker_hierarchies.md) - Purpose of broker hierarchies and how to configure a HELICS co-simulation to implement one.
+- [**Environment Variables**](./environment_variables.md) - HELICS supports some environment variables for configuration of a federate or broker.
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
 - [**Orchestration Tool (Merlin)**](./orchestration.md) Brief guide on using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
+- [**Program termination**](./program_termination.md) - Some additional features in HELICS related to program shutdown and co-simulation termination.

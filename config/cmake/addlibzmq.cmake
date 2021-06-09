@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2019-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2019-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -117,6 +117,11 @@ set(ENABLE_CPACK
     CACHE INTERNAL ""
 )
 
+set(ZMQ_OUTPUT_BASENAME
+    zmq
+    CACHE INTERNAL ""
+)
+
 set(ZEROMQ_CMAKECONFIG_INSTALL_DIR
     ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ
     CACHE INTERNAL ""
@@ -146,6 +151,8 @@ hide_variable(WITH_LIBSODIUM)
 hide_variable(WITH_MILITANT)
 hide_variable(WITH_OPENPGM)
 hide_variable(WITH_VMCI)
+hide_variable(WITH_LIBSODIUM_STATIC)
+hide_variable(WITH_NORM)
 
 hide_variable(POLLER)
 hide_variable(API_POLLER)
