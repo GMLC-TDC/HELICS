@@ -1128,9 +1128,9 @@ TEST(evil_federate_test, helicsFederateLocalError)
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
 
-    EXPECT_NO_THROW(helicsFederateLocalError(nullptr, 4, nullptr,nullptr));
+    EXPECT_NO_THROW(helicsFederateLocalError(nullptr, 4, nullptr, nullptr));
 
-    EXPECT_NO_THROW(helicsFederateLocalError(evil_federate, -25, "error_message",nullptr));
+    EXPECT_NO_THROW(helicsFederateLocalError(evil_federate, -25, "error_message", nullptr));
 }
 
 TEST(evil_federate_test, helicsFederateGlobalError)
@@ -1140,9 +1140,9 @@ TEST(evil_federate_test, helicsFederateGlobalError)
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
 
-    EXPECT_NO_THROW(helicsFederateGlobalError(nullptr, 4, nullptr,nullptr));
+    EXPECT_NO_THROW(helicsFederateGlobalError(nullptr, 4, nullptr, nullptr));
 
-    EXPECT_NO_THROW(helicsFederateGlobalError(evil_federate, -25, "error_message",nullptr));
+    EXPECT_NO_THROW(helicsFederateGlobalError(evil_federate, -25, "error_message", nullptr));
 }
 
 TEST(evil_federate_test, helicsFederateFinalize)
