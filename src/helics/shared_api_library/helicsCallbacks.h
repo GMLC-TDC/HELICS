@@ -30,9 +30,9 @@ extern "C" {
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *               the function arguments are loglevel, an identifier, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 HELICS_EXPORT void helicsBrokerSetLoggingCallback(HelicsBroker broker,
                                                   void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
@@ -49,9 +49,9 @@ HELICS_EXPORT void helicsBrokerSetLoggingCallback(HelicsBroker broker,
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *               The function arguments are loglevel, an identifier, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 HELICS_EXPORT void helicsCoreSetLoggingCallback(HelicsCore core,
                                                 void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),
@@ -69,9 +69,9 @@ HELICS_EXPORT void helicsCoreSetLoggingCallback(HelicsCore core,
  * @param logger A callback with signature void(int, const char *, const char *, void *);
  *        The function arguments are loglevel, an identifier string, a message string, and a pointer to user data.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 HELICS_EXPORT void
     helicsFederateSetLoggingCallback(HelicsFederate fed,
@@ -89,9 +89,9 @@ HELICS_EXPORT void
  *                 The function arguments are the message to filter and a pointer to user data.
  *                 The filter should return a new message.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  void (*filtCall)(HelicsMessage message, void* userData),
@@ -110,9 +110,9 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
  * null terminated answerSize is an outputParameter intended to filled out by the userCallback and should contain the length of the return
  * string. The return pointer can be NULL if no answer is given and HELICS will generate the appropriate response.
  * @param userdata A pointer to user data that is passed to the function when executing.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 
 HELICS_EXPORT void
@@ -130,9 +130,9 @@ HELICS_EXPORT void
  * @param buffer The buffer received in a helicsQueryCallback.
  * @param str Pointer to the data to fill the buffer with.
  * @param strSize The size of the string.
- * @forcpponly
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
- * @endforcpponly
+
  */
 HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
 

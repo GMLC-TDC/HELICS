@@ -112,7 +112,7 @@ bool MessageFederateManager::hasMessage(const Endpoint& ept)
 /**
  * Returns the number of pending receives for the specified destination endpoint.
  */
-uint64_t MessageFederateManager::pendingMessagesCount(const Endpoint& ept)
+uint64_t MessageFederateManager::pendingMessageCount(const Endpoint& ept)
 {
     if (ept.dataReference != nullptr) {
         auto* eptDat = reinterpret_cast<EndpointData*>(ept.dataReference);
@@ -125,7 +125,7 @@ uint64_t MessageFederateManager::pendingMessagesCount(const Endpoint& ept)
 @details this function is not preferred in multi-threaded contexts due to the required locking
 prefer to just use getMessage until it returns an invalid Message.
 */
-uint64_t MessageFederateManager::pendingMessagesCount() const
+uint64_t MessageFederateManager::pendingMessageCount() const
 {
     auto eptDat = eptData.lock_shared();
     uint64_t sz = 0;
