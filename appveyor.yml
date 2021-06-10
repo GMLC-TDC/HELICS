@@ -7,7 +7,7 @@ branches:
     - develop
     - helics3
 
-version: 3.0.0.{build}
+version: 3.0.0.beta.{build}
 
 image: Visual Studio 2019
 
