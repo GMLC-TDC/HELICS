@@ -1,5 +1,5 @@
 <p align="center">
-<img src="docs/logos/helics-logo-long-primary-black.svg" width="500">
+<img src="docs/logos/helics-logo-long-primary-black.svg" width="700">
 </p>
 
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
