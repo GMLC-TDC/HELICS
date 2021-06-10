@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.0.0][] ~ 2021-07-10
 
-HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom format that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The full change log will be filled out as the release progresses from lpha to beta to final release. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.  
+HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom format that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The full change log will be filled out as the release progresses from lpha to beta to final release. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
 
 ### Changed
 
@@ -21,7 +21,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The C shared library now comes with only a single header `helics.h` this should be included for all uses of the C shared library
 - The name of the C based shared library changed to `libhelics.dll/so`
 - The name of the C++ shared library changed to `libhelicscpp.dll/so`
-- The name of the apps library changed to `libhelicscpp-apps.dll/so`  
+- The name of the apps library changed to `libhelicscpp-apps.dll/so`
 - The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 - All HELICS specific CMake variables start with `HELICS_`
 - The format for log messages now includes a simulation time stamp `[t=xxxx]`
