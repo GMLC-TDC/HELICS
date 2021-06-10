@@ -217,7 +217,7 @@ HELICS_EXPORT void helicsFilterAddDestinationTarget(HelicsFilter filt, const cha
  *
  * @param filt The given filter.
  * @param source The name of the endpoint to add as a source target.
- * .
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
