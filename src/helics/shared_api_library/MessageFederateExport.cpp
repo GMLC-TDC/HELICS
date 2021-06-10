@@ -404,22 +404,22 @@ HelicsBool helicsEndpointHasMessage(HelicsEndpoint endpoint)
     return (endObj->endPtr->hasMessage()) ? HELICS_TRUE : HELICS_FALSE;
 }
 
-int helicsFederatePendingMessagesCount(HelicsFederate fed)
+int helicsFederatePendingMessageCount(HelicsFederate fed)
 {
     auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
         return 0;
     }
-    return static_cast<int>(mFed->pendingMessagesCount());
+    return static_cast<int>(mFed->pendingMessageCount());
 }
 
-int helicsEndpointPendingMessagesCount(HelicsEndpoint endpoint)
+int helicsEndpointPendingMessageCount(HelicsEndpoint endpoint)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return 0;
     }
-    return static_cast<int>(endObj->endPtr->pendingMessagesCount());
+    return static_cast<int>(endObj->endPtr->pendingMessageCount());
 }
 static constexpr uint16_t messageKeyCode = 0xB3;
 

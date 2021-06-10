@@ -3206,14 +3206,14 @@ TEST(evil_message_fed_test, helicsFederateHasMessage)
     EXPECT_EQ(res2, HELICS_FALSE);
 }
 
-TEST(evil_message_fed_test, helicsFederatePendingMessagesCount)
+TEST(evil_message_fed_test, helicsFederatePendingMessageCount)
 {
     // int helicsFederatePendingMessages(HelicsFederate fed);
     char rdata[256];
     auto evil_federate = reinterpret_cast<HelicsFederate>(rdata);
-    auto res1 = helicsFederatePendingMessagesCount(nullptr);
+    auto res1 = helicsFederatePendingMessageCount(nullptr);
     EXPECT_EQ(res1, 0);
-    auto res2 = helicsFederatePendingMessagesCount(evil_federate);
+    auto res2 = helicsFederatePendingMessageCount(evil_federate);
     EXPECT_EQ(res2, 0);
 }
 
@@ -3754,9 +3754,9 @@ TEST(evil_endpoint_test, helicsEndpointPendingMessages)
     // int helicsEndpointPendingMessages(HelicsEndpoint endpoint);
     char rdata[256];
     auto evil_ept = reinterpret_cast<HelicsEndpoint>(rdata);
-    auto res1 = helicsEndpointPendingMessagesCount(nullptr);
+    auto res1 = helicsEndpointPendingMessageCount(nullptr);
     EXPECT_EQ(res1, 0);
-    auto res2 = helicsEndpointPendingMessagesCount(evil_ept);
+    auto res2 = helicsEndpointPendingMessageCount(evil_ept);
     EXPECT_EQ(res2, 0);
 }
 

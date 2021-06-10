@@ -262,18 +262,18 @@ bool MessageFederate::hasMessage(const Endpoint& ept) const
     return false;
 }
 
-uint64_t MessageFederate::pendingMessagesCount(const Endpoint& ept) const
+uint64_t MessageFederate::pendingMessageCount(const Endpoint& ept) const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->pendingMessagesCount(ept);
+        return mfManager->pendingMessageCount(ept);
     }
     return 0;
 }
 
-uint64_t MessageFederate::pendingMessagesCount() const
+uint64_t MessageFederate::pendingMessageCount() const
 {
     if (currentMode >= Modes::INITIALIZING) {
-        return mfManager->pendingMessagesCount();
+        return mfManager->pendingMessageCount();
     }
     return 0;
 }

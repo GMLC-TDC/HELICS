@@ -158,9 +158,9 @@ bool Endpoint::hasMessage() const
 }
 
 /** check if there is a message available*/
-std::uint64_t Endpoint::pendingMessagesCount() const
+std::uint64_t Endpoint::pendingMessageCount() const
 {
-    return (fed != nullptr) ? fed->pendingMessagesCount(*this) : 0;
+    return (fed != nullptr) ? fed->pendingMessageCount(*this) : 0;
 }
 
 void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& callback)

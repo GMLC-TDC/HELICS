@@ -196,12 +196,12 @@ TEST(misc_tests, misc_tests)
 
     auto returnTime = helicsFederateRequestTimeComplete(fed1, nullptr);
     EXPECT_EQ(returnTime, 1.0);
-    auto ep2MsgCount = helicsEndpointPendingMessagesCount(ep2);
+    auto ep2MsgCount = helicsEndpointPendingMessageCount(ep2);
     EXPECT_EQ(ep2MsgCount, 0);
 
     returnTime = helicsFederateRequestTime(fed1, 3.0, nullptr);
     EXPECT_EQ(returnTime, 3.0);
-    ep2MsgCount = helicsEndpointPendingMessagesCount(ep2);
+    ep2MsgCount = helicsEndpointPendingMessageCount(ep2);
     EXPECT_EQ(ep2MsgCount, 3);
 
     helicsFederateDestroy(fed1);

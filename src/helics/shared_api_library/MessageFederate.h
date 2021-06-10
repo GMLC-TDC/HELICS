@@ -308,14 +308,14 @@ HELICS_EXPORT HelicsBool helicsEndpointHasMessage(HelicsEndpoint endpoint);
  *
  * @param fed The federate to get the number of waiting messages from.
  */
-HELICS_EXPORT int helicsFederatePendingMessagesCount(HelicsFederate fed);
+HELICS_EXPORT int helicsFederatePendingMessageCount(HelicsFederate fed);
 
 /**
  * Returns the number of pending receives for all endpoints of a particular federate.
  *
  * @param endpoint The endpoint to query.
  */
-HELICS_EXPORT int helicsEndpointPendingMessagesCount(HelicsEndpoint endpoint);
+HELICS_EXPORT int helicsEndpointPendingMessageCount(HelicsEndpoint endpoint);
 
 /**
  * Receive a packet from a particular endpoint.
