@@ -133,6 +133,8 @@ For queries that did not result in a valid response the response will be:
 }
 ```
 
+The status code corresponds to the most appropriate html error codes.
+
 ## Making queries
 
 As a demo case there is a `brokerServerTestCase` executable built as part of the HELICS_EXAMPLES.

@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.18)
+cmake_minimum_required(VERSION 3.10...3.20)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -696,6 +696,7 @@ hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
 hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
 hide_variable(GMLC_UTILITIES_OBJECT_LIB)
 hide_variable(GMLC_UTILITIES_STATIC_LIB)
+hide_variable(GMLC_UTILITIES_CLANG_TIDY_OPTIONS)
 
 target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
 add_library(HELICS::utilities ALIAS gmlc_utilities)

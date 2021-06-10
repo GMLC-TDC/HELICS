@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -13,6 +13,9 @@
 #
 
 set(gtest_version release-1.10.0)
+
+set(gtest_version_new aa533ab)
+
 set(gtest_vtype GIT_TAG)
 # depending on what the version is set to the git_clone command may need to change to
 # GIT_TAG||GIT_BRANCH|GIT_COMMIT
@@ -29,7 +32,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     fetchcontent_declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG ${gtest_version}
+        GIT_TAG ${gtest_version_new}
     )
 
     fetchcontent_getproperties(googletest)

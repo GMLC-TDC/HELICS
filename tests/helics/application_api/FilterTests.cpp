@@ -29,10 +29,12 @@ class filter_single_type_test:
     public FederateTestFixture {
 };
 
+/*
 class filter_all_type_test:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {
 };
+*/
 
 class filter_tests: public ::testing::Test, public FederateTestFixture {
 };
@@ -964,7 +966,6 @@ class rfcheck {
   public:
     int mCnt{0};
 
-  public:
     rfcheck() = default;
     rfcheck(std::shared_ptr<helics::MessageFederate> fed, int index):
         mFed(std::move(fed)), mIndex(index)
@@ -2320,4 +2321,6 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_single_type_test,
                          ::testing::ValuesIn(CoreTypes_simple));
+/*
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
+*/

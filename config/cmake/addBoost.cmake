@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,6 +15,7 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
+        boost_1_76_0
         boost_1_75_0
         boost_1_74_0
         boost_1_73_0
@@ -24,29 +25,22 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_69_0
         boost_1_68_0
         boost_1_67_0
-        boost_1_66_0
-        boost_1_65_1
-        boost_1_65_0
-        boost_1_64_0
-        boost_1_63_0
-        boost_1_62_0
-        boost_1_61_0
-        boost_1_58_0
     )
 
     set(
         poss_prefixes
         C:
-        C:/boost
         C:/local
+        C:/boost
         C:/local/boost
         C:/Libraries
         "C:/Program Files/boost"
         C:/ProgramData/chocolatey/lib
         D:
-        D:/boost
         D:/local
+        D:/boost
         D:/local/boost
+        D:/Libraries
     )
 
     # create an empty list
