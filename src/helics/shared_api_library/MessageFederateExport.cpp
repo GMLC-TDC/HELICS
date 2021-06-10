@@ -30,7 +30,7 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
 }
 
 static constexpr char nullcstr[] = "";
-const std::string nullStringArgument("the supplied string argument is null and therefore invalid");
+const std::string gNullStringArgument("the supplied string argument is null and therefore invalid");
 
 static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
@@ -228,9 +228,9 @@ void helicsEndpointSendData(HelicsEndpoint endpoint, const void* data, int input
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
             if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(emptyStr);
+                endObj->endPtr->send(gEmptyStr);
             } else {
-                endObj->endPtr->sendTo(dest, emptyStr);
+                endObj->endPtr->sendTo(dest, gEmptyStr);
             }
         } else {
             if ((dest == nullptr) || (std::string(dest).empty())) {
@@ -253,7 +253,7 @@ void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inpu
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->send(emptyStr);
+            endObj->endPtr->send(gEmptyStr);
         } else {
             endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
         }
@@ -271,7 +271,7 @@ void helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int in
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendTo(emptyStr, AS_STRING_VIEW(dest));
+            endObj->endPtr->sendTo(gEmptyStr, AS_STRING_VIEW(dest));
         } else {
             endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest));
         }
@@ -289,7 +289,7 @@ void helicsEndpointSendBytesAt(HelicsEndpoint endpoint, const void* data, int in
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendAt(emptyStr, time);
+            endObj->endPtr->sendAt(gEmptyStr, time);
         } else {
             endObj->endPtr->sendAt(reinterpret_cast<const char*>(data), inputDataLength, time);
         }
@@ -312,7 +312,7 @@ void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendToAt(emptyStr, AS_STRING_VIEW(dest), time);
+            endObj->endPtr->sendToAt(gEmptyStr, AS_STRING_VIEW(dest), time);
         } else {
             endObj->endPtr->sendToAt(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest), time);
         }
@@ -404,22 +404,22 @@ HelicsBool helicsEndpointHasMessage(HelicsEndpoint endpoint)
     return (endObj->endPtr->hasMessage()) ? HELICS_TRUE : HELICS_FALSE;
 }
 
-int helicsFederatePendingMessagesCount(HelicsFederate fed)
+int helicsFederatePendingMessageCount(HelicsFederate fed)
 {
     auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
         return 0;
     }
-    return static_cast<int>(mFed->pendingMessagesCount());
+    return static_cast<int>(mFed->pendingMessageCount());
 }
 
-int helicsEndpointPendingMessagesCount(HelicsEndpoint endpoint)
+int helicsEndpointPendingMessageCount(HelicsEndpoint endpoint)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
         return 0;
     }
-    return static_cast<int>(endObj->endPtr->pendingMessagesCount());
+    return static_cast<int>(endObj->endPtr->pendingMessageCount());
 }
 static constexpr uint16_t messageKeyCode = 0xB3;
 
@@ -633,7 +633,7 @@ const char* helicsEndpointGetInfo(HelicsEndpoint end)
 {
     auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     try {
         const std::string& info = endObj->endPtr->getInfo();
@@ -641,7 +641,7 @@ const char* helicsEndpointGetInfo(HelicsEndpoint end)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -666,7 +666,7 @@ const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     try {
         const std::string& info = endObj->endPtr->getTag(AS_STRING(tagname));
@@ -674,7 +674,7 @@ const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return emptyStr.c_str();
+        return gEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }

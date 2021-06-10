@@ -308,11 +308,14 @@ void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, Helic
 void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 void helicsFederateInfoSetIntegerProperty(HelicsFederateInfo fi, int intProperty, int propertyValue, HelicsError* err);
 void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, HelicsError* err);
-void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string);
-void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string);
+void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string, HelicsError* err);
+void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string, HelicsError* err);
 void helicsFederateFinalize(HelicsFederate fed, HelicsError* err);
 void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err);
 void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err);
+void helicsFederateDisconnect(HelicsFederate fed, HelicsError* err);
+void helicsFederateDisconnectAsync(HelicsFederate fed, HelicsError* err);
+void helicsFederateDisconnectComplete(HelicsFederate fed, HelicsError* err);
 void helicsFederateFree(HelicsFederate fed);
 void helicsCloseLibrary(void);
 
@@ -503,8 +506,8 @@ void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage me
 void helicsEndpointSubscribe(HelicsEndpoint endpoint, const char* key, HelicsError* err);
 HelicsBool helicsFederateHasMessage(HelicsFederate fed);
 HelicsBool helicsEndpointHasMessage(HelicsEndpoint endpoint);
-int helicsFederatePendingMessagesCount(HelicsFederate fed);
-int helicsEndpointPendingMessagesCount(HelicsEndpoint endpoint);
+int helicsFederatePendingMessageCount(HelicsFederate fed);
+int helicsEndpointPendingMessageCount(HelicsEndpoint endpoint);
 HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
 HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* err);
 HelicsMessage helicsFederateGetMessage(HelicsFederate fed);

@@ -411,7 +411,7 @@ TEST(combo_tests, check_combination_file_load)
             fed.getPublication(1).publish(1);
         }
     }
-    EXPECT_EQ(fed.pendingMessagesCount(), 3U);
+    EXPECT_EQ(fed.pendingMessageCount(), 3U);
     fed.finalize();
     fut_play.get();
     fut_rec.get();

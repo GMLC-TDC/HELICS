@@ -175,11 +175,11 @@ class HELICS_CXX_EXPORT MessageFederate:
     /**
      * Returns the number of pending receives for the specified destination endpoint.
      */
-    uint64_t pendingMessagesCount(const Endpoint& ept) const;
+    uint64_t pendingMessageCount(const Endpoint& ept) const;
     /**
      * Returns the number of pending receives for all endpoints.
      */
-    uint64_t pendingMessagesCount() const;
+    uint64_t pendingMessageCount() const;
     /** receive a packet from a particular endpoint
     @param ept the identifier for the endpoint
     @return a message object*/

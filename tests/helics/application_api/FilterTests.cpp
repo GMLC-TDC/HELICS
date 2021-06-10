@@ -705,8 +705,8 @@ TEST_F(filter_tests, reroute_separate)
     }
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     EXPECT_EQ(cntb, 0);
     filt->finalize();
@@ -777,7 +777,7 @@ TEST_F(filter_tests, many_filters)
 
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 10);
     for (auto& ffed : filterFeds) {
@@ -854,7 +854,7 @@ TEST_F(filter_tests, many_filters_multi)
 
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 40);
     for (auto& ffed : filterFeds) {
@@ -941,14 +941,14 @@ TEST_F(filter_tests, reroute_cascade)
 
     t1.join();
     t2.join();
-    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r6.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r7.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r8.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r1.pendingMessageCount(), 0U);
+    EXPECT_EQ(r2.pendingMessageCount(), 0U);
+    EXPECT_EQ(r3.pendingMessageCount(), 0U);
+    EXPECT_EQ(r4.pendingMessageCount(), 0U);
+    EXPECT_EQ(r5.pendingMessageCount(), 0U);
+    EXPECT_EQ(r6.pendingMessageCount(), 0U);
+    EXPECT_EQ(r7.pendingMessageCount(), 0U);
+    EXPECT_EQ(r8.pendingMessageCount(), 0U);
 
     EXPECT_EQ(cntb, 40);
     for (auto& ffed : filterFeds) {
@@ -1135,8 +1135,8 @@ TEST_F(filter_tests, reroute_separate2)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     // auto res2 = broker->query("root", "global_time_debugging");
     broker->waitForDisconnect();
@@ -1193,8 +1193,8 @@ TEST_F(filter_tests, reroute_separate3)
     }
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     filt->finalize();
 }
@@ -1253,8 +1253,8 @@ TEST_F(filter_tests, reroute_separate_dest_target)
     }
     t1.join();
     t2.join();
-    EXPECT_EQ(p2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(p3.pendingMessagesCount(), 10U);
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     EXPECT_EQ(cntb, 0);
     filt->finalize();
@@ -1489,13 +1489,13 @@ TEST_F(filter_tests, reroute_separate2_5message)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r1.pendingMessageCount(), 0U);
+    EXPECT_EQ(r2.pendingMessageCount(), 0U);
+    EXPECT_EQ(r3.pendingMessageCount(), 0U);
+    EXPECT_EQ(r4.pendingMessageCount(), 0U);
+    EXPECT_EQ(r5.pendingMessageCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index = 0;
@@ -1607,13 +1607,13 @@ TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r1.pendingMessageCount(), 0U);
+    EXPECT_EQ(r2.pendingMessageCount(), 0U);
+    EXPECT_EQ(r3.pendingMessageCount(), 0U);
+    EXPECT_EQ(r4.pendingMessageCount(), 0U);
+    EXPECT_EQ(r5.pendingMessageCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index = 0;
@@ -1731,13 +1731,13 @@ TEST_F(filter_tests, reroute_separate2_5message_b)
     // auto res = broker->query("root", "global_time_debugging");
     t3.join();
     filt->finalize();
-    EXPECT_EQ(r1.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r2.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r3.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r4.pendingMessagesCount(), 0U);
-    EXPECT_EQ(r5.pendingMessagesCount(), 0U);
+    EXPECT_EQ(r1.pendingMessageCount(), 0U);
+    EXPECT_EQ(r2.pendingMessageCount(), 0U);
+    EXPECT_EQ(r3.pendingMessageCount(), 0U);
+    EXPECT_EQ(r4.pendingMessageCount(), 0U);
+    EXPECT_EQ(r5.pendingMessageCount(), 0U);
 
-    EXPECT_EQ(p3.pendingMessagesCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 0U);
     EXPECT_EQ(cnt, 11);
     int totalMessageCount{0};
     int index{0};
@@ -2194,7 +2194,7 @@ TEST_F(filter_test, message_multi_clone_test)
     sFed2->requestTimeComplete();
     dcFed->requestTimeComplete();
 
-    auto mcnt = dFed->pendingMessagesCount(p3);
+    auto mcnt = dFed->pendingMessageCount(p3);
     EXPECT_EQ(mcnt, 2);
     auto res = dFed->hasMessage();
     EXPECT_TRUE(res);
@@ -2218,7 +2218,7 @@ TEST_F(filter_test, message_multi_clone_test)
     }
 
     // now check the message clone
-    mcnt = dcFed->pendingMessagesCount(p4);
+    mcnt = dcFed->pendingMessageCount(p4);
     EXPECT_EQ(mcnt, 2);
     res = dcFed->hasMessage();
     EXPECT_TRUE(res);

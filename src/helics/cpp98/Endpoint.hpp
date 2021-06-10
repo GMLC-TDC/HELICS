@@ -231,7 +231,7 @@ class Endpoint {
     /** get the default destination for an endpoint*/
     const char* getDefaultDestination() const { return helicsEndpointGetDefaultDestination(ep); }
     /** Returns the number of pending receives for endpoint **/
-    uint64_t pendingMessagesCount() const { return helicsEndpointPendingMessagesCount(ep); }
+    uint64_t pendingMessageCount() const { return helicsEndpointPendingMessageCount(ep); }
 
     /** Get a packet from an endpoint **/
     Message getMessage() { return Message(helicsEndpointGetMessage(ep)); }

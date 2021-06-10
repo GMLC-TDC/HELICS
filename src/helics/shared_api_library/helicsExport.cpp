@@ -42,7 +42,7 @@ const char* helicsGetCompilerVersion(void)
 
 static constexpr const char* nullstrPtr = "";
 
-const std::string emptyStr;
+const std::string gEmptyStr;
 
 HelicsError helicsErrorInitialize(void)
 {
@@ -210,7 +210,7 @@ CoreObject* getCoreObject(HelicsCore core, HelicsError* err) noexcept
         return nullptr;
     }
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
-    if (coreObj->valid == coreValidationIdentifier) {
+    if (coreObj->valid == gCoreValidationIdentifier) {
         return coreObj;
     }
     assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidCoreString);
@@ -227,7 +227,7 @@ BrokerObject* getBrokerObject(HelicsBroker broker, HelicsError* err) noexcept
         return nullptr;
     }
     auto* brokerObj = reinterpret_cast<helics::BrokerObject*>(broker);
-    if (brokerObj->valid == brokerValidationIdentifier) {
+    if (brokerObj->valid == gBrokerValidationIdentifier) {
         return brokerObj;
     }
     assignError(err, HELICS_ERROR_INVALID_OBJECT, invalidBrokerString);
@@ -279,7 +279,7 @@ HelicsCore helicsCreateCore(const char* type, const char* name, const char* init
     }
     try {
         auto core = std::make_unique<helics::CoreObject>();
-        core->valid = coreValidationIdentifier;
+        core->valid = gCoreValidationIdentifier;
         auto nstring = AS_STRING(name);
         if (nstring.empty()) {
             core->coreptr = helics::CoreFactory::create(ct, AS_STRING(initString));
@@ -313,7 +313,7 @@ HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc
     }
     auto core = std::make_unique<helics::CoreObject>();
     try {
-        core->valid = coreValidationIdentifier;
+        core->valid = gCoreValidationIdentifier;
         std::vector<std::string> args;
         args.reserve(static_cast<size_t>(argc) - 1);
         for (int ii = argc - 1; ii > 0; ii--) {
@@ -339,7 +339,7 @@ HelicsCore helicsCoreClone(HelicsCore core, HelicsError* err)
         return nullptr;
     }
     auto coreClone = std::make_unique<helics::CoreObject>();
-    coreClone->valid = coreValidationIdentifier;
+    coreClone->valid = gCoreValidationIdentifier;
     coreClone->coreptr = coreObj->coreptr;
     auto* retcore = reinterpret_cast<HelicsCore>(coreClone.get());
     getMasterHolder()->addCore(std::move(coreClone));
@@ -395,7 +395,7 @@ HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* 
         return nullptr;
     }
     auto broker = std::make_unique<helics::BrokerObject>();
-    broker->valid = brokerValidationIdentifier;
+    broker->valid = gBrokerValidationIdentifier;
     try {
         broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), AS_STRING(initString));
         auto* retbroker = reinterpret_cast<HelicsBroker>(broker.get());
@@ -423,7 +423,7 @@ HelicsBroker helicsCreateBrokerFromArgs(const char* type, const char* name, int 
         return nullptr;
     }
     auto broker = std::make_unique<helics::BrokerObject>();
-    broker->valid = brokerValidationIdentifier;
+    broker->valid = gBrokerValidationIdentifier;
     try {
         std::vector<std::string> args;
         args.reserve(static_cast<size_t>(argc) - 1);
@@ -448,7 +448,7 @@ HelicsBroker helicsBrokerClone(HelicsBroker broker, HelicsError* err)
         return nullptr;
     }
     auto brokerClone = std::make_unique<helics::BrokerObject>();
-    brokerClone->valid = brokerValidationIdentifier;
+    brokerClone->valid = gBrokerValidationIdentifier;
     brokerClone->brokerptr = brokerObj->brokerptr;
     auto* retbroker = reinterpret_cast<HelicsBroker>(brokerClone.get());
     getMasterHolder()->addBroker(std::move(brokerClone));
