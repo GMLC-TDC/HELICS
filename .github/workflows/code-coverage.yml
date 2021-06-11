@@ -27,7 +27,6 @@ jobs:
       DISABLE_INTERFACES: 'Java'
       DISABLE_EXAMPLES: 'true'
       CI_TEST_FLAGS: ""
-      DISABLE_INTERFACES: "Java"
       
     steps:
     - uses: actions/checkout@v2
