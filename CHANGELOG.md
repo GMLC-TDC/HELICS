@@ -25,7 +25,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The style of enumerations and structures was changed to match an updated [style guide](./docs/developer-guide/style.md)
 - All HELICS specific CMake variables start with `HELICS_`
 - The format for log messages now includes a simulation time stamp `[t=xxxx]`
-- Log level numerical values have been expanded (multiplied by 3) to allow more gradiations in log levels than was previously allowed
+- Log level numerical values have been expanded (multiplied by 3) to allow more gradations in log levels than was previously allowed
 - The allowed set of string names has been reduced to avoid confusion and remove duplicate entries
 
 ### Fixed
@@ -40,8 +40,8 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 
 - Message structure from C API
 - Deprecated functions from HELICS 2
-- the separate headers for the C shared library are no longer installed only a single header is needed and includes all functionsa and operations.
-- the cereal library is no longer installed or used with HELICS
+- The separate headers for the C shared library are no longer installed only a single header is needed and includes all functionsa and operations.
+- The cereal library is no longer installed or used with HELICS
 
 ## [2.7.1][] - 2021-06-05
 

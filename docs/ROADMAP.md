@@ -7,7 +7,7 @@ This document contains tentative plans for changes and improvements of note in u
 This will be the last of the 2.X series releases, there will likely be at least one patch release after this before fully moving to 3.0
 
 - Internal text based (probably JSON) message format option for general backwards compatibility
-- prep for HELICS 3 transition
+- Prep for HELICS 3 transition
 
 ## \[3.0\] ~ 2021-7-10 Final release
 
