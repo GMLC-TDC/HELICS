@@ -221,6 +221,12 @@ std::tuple<federate_state, message_processing_result, bool>
             /* FALLTHROUGH */
         case CMD_TIME_CHECK:
             if (state != HELICS_EXECUTING) {
+                if (state == HELICS_INITIALIZING)
+                {
+                    cmd.setAction(CMD_EXEC_CHECK);
+                    proc = message_processing_result::reprocess_message;
+                }
+
                 break;
             }
             if (!timeGranted_mode) {

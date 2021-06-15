@@ -80,45 +80,6 @@ void ForwardingTimeCoordinator::disconnect()
     }
 }
 
-/*
-void ForwardingTimeCoordinator::disconnect()
-{
-    if (sendMessageFunction) {
-        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
-        for (auto dep : dependencies) {
-            if (dep.next < Time::maxVal()) {
-                connections.insert(dep.fedID);
-            }
-        }
-        if (connections.empty()) {
-            return;
-        }
-        ActionMessage bye(CMD_DISCONNECT);
-
-        bye.source_id = source_id;
-        if (connections.size() == 1) {
-            bye.dest_id = *connections.begin();
-            if (bye.dest_id == source_id) {
-                processTimeMessage(bye);
-            } else {
-                sendMessageFunction(bye);
-            }
-        } else {
-            ActionMessage multi(CMD_MULTI_MESSAGE);
-            for (auto fed : connections) {
-                bye.dest_id = fed;
-                if (fed == source_id) {
-                    processTimeMessage(bye);
-                } else {
-                    appendMessage(multi, bye);
-                }
-            }
-            sendMessageFunction(multi);
-        }
-    }
-}
-*/
-
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id);
@@ -136,7 +97,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 
-    if (updateUpstream) {
+    if (updateUpstream && !noParent) {
         auto upd = generateTimeRequest(upstream, global_federate_id{});
         transmitTimingMessagesUpstream(upd);
     }
@@ -302,6 +263,10 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
         setActionFlag(nTime, iteration_requested_flag);
         nTime.Tdemin = std::min(dep.minDe, dep.Te);
         nTime.Te = dep.Te;
+    }
+    else if (dep.time_state == time_state_t::exec_requested)
+    {
+        nTime.setAction(CMD_IGNORE);
     }
     return nTime;
 }

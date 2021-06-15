@@ -1073,7 +1073,19 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 }
             } else if (command.dest_id == global_broker_id_local) {
                 if (timeCoord->processTimeMessage(command)) {
-                    timeCoord->updateTimeFactors();
+                    if (enteredExecutionMode) {
+                        timeCoord->updateTimeFactors();
+                    } else {
+                        auto res = timeCoord->checkExecEntry();
+                        if (res == message_processing_result::next_step) {
+                            enteredExecutionMode = true;
+                            LOG_TIMING(global_broker_id_local,
+                                       getIdentifier(),
+                                       "entering Exec Mode");
+                        }
+                        
+                    }
+                    
                 }
             } else {
                 routeMessage(command);

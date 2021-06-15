@@ -489,7 +489,11 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
                 }
                 break;
             case iteration_request::no_iterations:
-                fillEventVectorUpTo(time_granted);
+                if (wait_for_current_time) {
+                    fillEventVectorInclusive(time_granted);
+                } else {
+                    fillEventVectorUpTo(time_granted);
+                }
                 break;
         }
 

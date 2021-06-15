@@ -51,6 +51,9 @@ constexpr uint16_t non_counting_flag = nameless_interface_flag;
 /// overload of extra_flag1 to indicate the request is from a non-granting federate
 constexpr uint16_t non_granting_flag = extra_flag1;
 
+/// overload of extra_flag2 to indicate the request is from federate with delayed timing
+constexpr uint16_t delayed_timing_flag = extra_flag2;
+
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
 @tparam FlagIndex a type that can be used as part of a shift to index into a flag object
