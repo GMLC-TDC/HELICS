@@ -726,7 +726,7 @@ void CoreBroker::labelAsDisconnected(GlobalBrokerId brkid)
 
 void CoreBroker::sendDisconnect()
 {
-    ActionMessage bye(CMD_DISCONNECT);
+    ActionMessage bye(CMD_GLOBAL_DISCONNECT);
     bye.source_id = global_broker_id_local;
     _brokers.apply([this, &bye](auto& brk) {
         if (brk.state < connection_state::disconnected) {
@@ -1012,6 +1012,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_USER_DISCONNECT:
+        case CMD_GLOBAL_DISCONNECT:
             sendDisconnect();
             addActionMessage(CMD_STOP);
             break;
@@ -3544,6 +3545,20 @@ bool CoreBroker::allInitReady() const
     }
     if (static_cast<decltype(minBrokerCount)>(_brokers.size()) < minBrokerCount) {
         return false;
+    }
+    if (minChildCount > 0)
+    {
+        decltype(minChildCount) children{0U};
+        for (auto& brk : _brokers)
+        {
+            if (brk.parent == global_broker_id_local)
+            {
+                ++children;
+            }
+        }
+        if (children < minChildCount) {
+            return false;
+        }
     }
     bool initReady = (getAllConnectionState() >= connection_state::init_requested);
     if (initReady) {
