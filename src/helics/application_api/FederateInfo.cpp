@@ -89,21 +89,26 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"logLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"intloglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"intLogLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"int_log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"consoleLogLevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"consoleloglevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"console_log_level", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"intconsoleloglevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
+    {"intConsoleLogLevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"int_console_log_level", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"fileloglevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
+    {"fileLogLevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"file_log_level", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"intfileloglevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
+    {"intFileLogLevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"int_file_log_level", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"maxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"maxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS}};
+    {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
+    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS}};
 
 static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
