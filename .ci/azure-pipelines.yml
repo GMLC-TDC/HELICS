@@ -16,10 +16,10 @@ jobs:
           containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
           test_config: 'ci'
         gcc10:
-          containerImage: 'helics/buildenv:gcc10-builder'
+          containerImage: 'helics/buildenv:gcc11-builder'
           test_config: 'ci'
         clang10:
-          containerImage: 'helics/buildenv:clang10-builder'
+          containerImage: 'helics/buildenv:clang12-builder'
           test_config: 'ci'
         clang5:
           containerImage: 'helics/buildenv:clang5-builder'
