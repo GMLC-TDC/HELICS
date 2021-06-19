@@ -981,14 +981,26 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 return processActionMessage(cmd);
             }
             break;
-
+        case CMD_GLOBAL_DISCONNECT:
+        case CMD_USER_DISCONNECT:
+            if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
+                timeCoord->disconnect();
+                cmd.dest_id = parent_broker_id;
+                if (state != HELICS_ERROR) {
+                    setState(HELICS_TERMINATING);
+                }
+                routeMessage(cmd);
+            }
+            break;
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == global_id.load()) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     timeCoord->disconnect();
                     cmd.dest_id = parent_broker_id;
-                    setState(HELICS_TERMINATING);
+                    if (state != HELICS_ERROR) {
+                        setState(HELICS_TERMINATING);
+                    }
                     routeMessage(cmd);
                 }
             } else {
