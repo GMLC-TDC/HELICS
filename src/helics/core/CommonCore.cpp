@@ -458,7 +458,8 @@ bool CommonCore::allInitReady() const
         return false;
     }
     // the federate count must be greater than the min size
-    if (static_cast<decltype(minFederateCount)>(loopFederates.size()) < minFederateCount) {
+    auto fcount = static_cast<decltype(minFederateCount)>(loopFederates.size());
+    if ( fcount< minFederateCount || fcount < minChildCount) {
         return false;
     }
     // all federates must be requesting init
@@ -2722,7 +2723,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     timeoutMon->disableParentPing();
                 }
                 timeoutMon->reset();
-                if (delayInitCounter < 0 && minFederateCount == 0) {
+                if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
                     if (allInitReady()) {
                         if (transitionBrokerState(broker_state_t::connected,
                                                   broker_state_t::initializing)) {
@@ -2969,6 +2970,7 @@ void CommonCore::processCommand(ActionMessage&& command)
 
         break;
         case CMD_USER_DISCONNECT:
+        case CMD_GLOBAL_DISCONNECT:
             if (isConnected()) {
                 if (getBrokerState() <
                     broker_state_t::terminating) {  // only send a disconnect message
