@@ -89,21 +89,26 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"logLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"intloglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"intLogLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"int_log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
+    {"consoleLogLevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"consoleloglevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"console_log_level", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"intconsoleloglevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
+    {"intConsoleLogLevel", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"int_console_log_level", HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL},
     {"fileloglevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
+    {"fileLogLevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"file_log_level", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"intfileloglevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
+    {"intFileLogLevel", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"int_file_log_level", HELICS_PROPERTY_INT_FILE_LOG_LEVEL},
     {"maxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"maxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS}};
+    {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
+    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS}};
 
 static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
@@ -151,11 +156,8 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
 
     {"optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
-    {"nointerrupts", HELICS_FLAG_UNINTERRUPTIBLE},
-    {"no_interrupts", HELICS_FLAG_UNINTERRUPTIBLE},
     {"uninterruptible", HELICS_FLAG_UNINTERRUPTIBLE},
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
-    {"wait_for_current_time", HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE},
     {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
@@ -169,16 +171,23 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"waitForCurrentTimeUpdate", HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE},
     {"delay_init_entry", HELICS_FLAG_DELAY_INIT_ENTRY},
     {"delayinitentry", HELICS_FLAG_DELAY_INIT_ENTRY},
+    {"delayInitEntry", HELICS_FLAG_DELAY_INIT_ENTRY},
     {"enable_init_entry", HELICS_FLAG_ENABLE_INIT_ENTRY},
     {"enableinitentry", HELICS_FLAG_ENABLE_INIT_ENTRY},
+    {"enableInitEntry", HELICS_FLAG_ENABLE_INIT_ENTRY},
     {"ignore_time_mismatch_warnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
     {"ignoretimemismatchwarnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
+    {"ignoreTimeMismatchWarnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
     {"rollback", HELICS_FLAG_ROLLBACK},
     {"single_thread_federate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singlethreadfederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
+    {"singleThreadFederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"force_logging_flush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceloggingflush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
+    {"forceLoggingFlush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
+    {"dump_log", HELICS_FLAG_DUMPLOG},
     {"dumplog", HELICS_FLAG_DUMPLOG},
+    {"dumpLog", HELICS_FLAG_DUMPLOG},
     {"event_triggered", HELICS_FLAG_EVENT_TRIGGERED},
     {"eventtriggered", HELICS_FLAG_EVENT_TRIGGERED},
     {"eventTriggered", HELICS_FLAG_EVENT_TRIGGERED},
@@ -224,7 +233,7 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"input_priority_location", HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION},
     {"inputprioritylocation", HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION},
     {"inputPriorityLocation", HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION},
-    {"MultiInputHandlingMethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD},
+    {"multi_input_handling_method", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD},
     {"multiinputhandlingmethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD},
     {"multiInputHandlingMethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD}};
 
@@ -393,6 +402,12 @@ int getOptionValue(std::string val)
 
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
+    /*
+    The parser for the command line options ignores underscores and cases so
+    there's no need to explicitly support all three case styles. If users type
+    in any of the normal HELICS variants (nocase, camelCase, and snake_case) it
+    will work.
+    */
     auto app = std::make_unique<helicsCLI11App>("Federate Info Parsing");
     app->option_defaults()->ignore_case()->ignore_underscore();
     app->allow_config_extras(CLI::config_extras_mode::ignore_all);
