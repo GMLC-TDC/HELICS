@@ -3546,13 +3546,10 @@ bool CoreBroker::allInitReady() const
     if (static_cast<decltype(minBrokerCount)>(_brokers.size()) < minBrokerCount) {
         return false;
     }
-    if (minChildCount > 0)
-    {
+    if (minChildCount > 0) {
         decltype(minChildCount) children{0U};
-        for (auto& brk : _brokers)
-        {
-            if (brk.parent == global_broker_id_local)
-            {
+        for (const auto& brk : _brokers) {
+            if (brk.parent == global_broker_id_local) {
                 ++children;
             }
         }
