@@ -54,7 +54,7 @@ TEST(broker_tests, subbroker_min_test)
         std::async(std::launch::async, [fid2, &cr1]() { cr1->enterInitializingMode(fid2); });
 
     auto res = fut1.wait_for(std::chrono::milliseconds(100));
-    // this should not allow initilizingMode entry since only 1 subbroker
+    // this should not allow initializingMode entry since only 1 subbroker
     EXPECT_EQ(res, std::future_status::timeout);
 
     auto cr2 = helics::CoreFactory::create(helics::CoreType::TEST, "c2", "--broker=gb2");
@@ -64,7 +64,7 @@ TEST(broker_tests, subbroker_min_test)
         std::async(std::launch::async, [fid3, &cr2]() { cr2->enterInitializingMode(fid3); });
 
     res = fut1.wait_for(std::chrono::milliseconds(100));
-    // this should still not allow initilizingMode entry since still only 1 subbroker
+    // this should still not allow initializingMode entry since still only 1 subbroker
     EXPECT_EQ(res, std::future_status::timeout);
 
     auto brk3 = helics::BrokerFactory::create(helics::CoreType::TEST, "gb3", "--broker=gbroker2");
