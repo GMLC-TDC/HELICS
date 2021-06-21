@@ -26,6 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "coreTypeOperations.hpp"
 #include "fileConnections.hpp"
 #include "gmlc/concurrency/DelayedObjects.hpp"
+#include "gmlc/utilities/stringOps.h"
 #include "helicsVersion.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
@@ -267,30 +268,6 @@ CommonCore::~CommonCore()
 
 FederateState* CommonCore::getFederateAt(LocalFederateId federateID) const
 {
-    /*
-    #ifndef __apple_build_version__
-        static thread_local FederateState *lastV = nullptr;
-        if ((lastV == nullptr) || (lastV->local_id != federateID))
-        {
-            auto feds = federates.lock ();
-            lastV = (*feds)[federateID];
-        }
-        return lastV;
-    #else
-    #if __clang_major__ >= 8
-        static thread_local FederateState *lastV = nullptr;
-        if ((lastV == nullptr) || (lastV->local_id != federateID))
-        {
-            auto feds = federates.lock ();
-            lastV = (*feds)[federateID];
-        }
-        return lastV;
-    #else
-        auto feds = federates.lock ();
-        return (*feds)[federateID];
-    #endif
-    #endif
-    */
     auto feds = federates.lock();
     return (*feds)[federateID.baseValue()];
 }
@@ -2235,7 +2212,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\"]";
+               "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\"]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2393,6 +2370,24 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         return generateStringVector(loopFederates,
                                     [](const auto& fed) { return fed->getIdentifier(); });
     }
+
+    if (queryStr == "tags") {
+        Json::Value tagBlock = Json::objectValue;
+        for (const auto &tg:tags) {
+            tagBlock[tg.first] = tg.second;
+        }
+        return fileops::generateJsonString(tagBlock);
+    }
+    if (queryStr.compare(0, 4, "tag/")==0) {
+        std::string_view tag = queryStr;
+        tag.remove_prefix(4);
+        for (const auto& tg : tags) {
+            if (tag == tg.first) {
+                return Json::valueToQuotedString(tg.second.c_str());
+            }
+        }
+        return "\"\"";
+    }
     if (queryStr == "publications") {
         return generateStringVector_if(
             loopHandles,
@@ -2434,7 +2429,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     }
 
     if (queryStr == "address") {
-        return std::string{"\""} + getAddress() + '"';
+        return Json::valueToQuotedString(getAddress().c_str());
     }
     if (queryStr == "counter") {
         return fmt::format("{}", generateMapObjectCounter());
@@ -2521,9 +2516,33 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     }
     if (queryStr == "federate_map") {
         Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& /*val*/, const FedInfo& /*fed*/) {});
+        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
+            if (fed.fed->try_lock()) {
+                addFederateTags(val, fed.fed);
+                fed.fed->unlock();
+            }
+            else
+            {
+                addFederateTags(val, fed.fed);
+            }
+            });
+        // add core tags if needed
+        if (!tags.empty()) {
+            Json::Value tagBlock = Json::objectValue;
+            for (const auto &tg:tags) {
+                tagBlock[tg.first] = tg.second;
+            }
+            base["tags"] = tagBlock;
+        }
         return fileops::generateJsonString(base);
     }
+    // check tag value for a matching string
+    for (const auto &tg:tags) {
+        if (tg.first==queryStr) {
+            return Json::valueToQuotedString(tg.second.c_str());
+        }
+    }
+    // if nothing found generate an error response
     return generateJsonErrorResponse(400, "unrecognized core query");
 }
 
@@ -3346,6 +3365,18 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CLOSE_INTERFACE:
             disconnectInterface(command);
             break;
+        case CMD_CORE_TAG: 
+            if (command.source_id==global_broker_id_local && command.dest_id==global_broker_id_local) {
+            auto tag = command.getString(0);
+            for (auto& tg : tags) {
+                if (tg.first == tag) {
+                    tg.second = command.getString(0);
+                    break;
+                }
+            }
+            tags.emplace_back(tag, command.getString(0));
+        }
+            break;
         case CMD_CORE_CONFIGURE:
             processCoreConfigureCommands(command);
             break;
@@ -4051,7 +4082,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
     switch (cmd.action()) {
         case CMD_BROKER_QUERY_ORDERED:
             force_ordered = true;
-            // FALLTHROUGH
+            [[fallthrough]];
         case CMD_BROKER_QUERY:
 
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == direct_core_id) {
@@ -4554,7 +4585,7 @@ void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string in
         [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("local_info_", info); });
 }
 
-const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string& tag) const
+const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, const std::string& tag) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
@@ -4563,17 +4594,17 @@ const std::string& CommonCore::getTag(InterfaceHandle handle, const std::string&
     return emptyStr;
 }
 
-void CommonCore::setTag(helics::InterfaceHandle handle,
+void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
                         const std::string& tag,
                         const std::string& value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {
-        throw InvalidParameter("tag cannot be an empty string for setTag");
+        throw InvalidParameter("tag cannot be an empty string for setInterfaceTag");
     }
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo == nullptr) {
-        throw InvalidIdentifier("the handle specifier for setTag is not valid");
+        throw InvalidIdentifier("the handle specifier for setInterfaceTag is not valid");
         return;
     }
 
@@ -4589,6 +4620,49 @@ void CommonCore::setTag(helics::InterfaceHandle handle,
         tagcmd.setStringData(tag, value);
         addActionMessage(std::move(tagcmd));
     }
+}
+
+
+std::string CommonCore::getFederateTag(LocalFederateId federateID,
+                                              const std::string& tag)
+{
+    auto* fed = getFederateAt(federateID);
+    if (federateID == gLocalCoreId) {
+
+        auto val=query("core", std::string("tag/") + tag,HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        return gmlc::utilities::stringOps::removeQuotes(val);
+    }
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid (registerPublication)"));
+    }
+
+    return fed->getTag(tag);
+}
+
+void CommonCore::setFederateTag(LocalFederateId federateID,
+                                 const std::string& tag,
+                                 const std::string& value)
+{
+    static const std::string trueString{"true"};
+    if (tag.empty()) {
+        throw InvalidParameter("tag cannot be an empty string for setFederateTag");
+    }
+
+    if (federateID == gLocalCoreId) {
+
+        ActionMessage tagcmd(CMD_CORE_TAG);
+        tagcmd.source_id = getGlobalId();
+        tagcmd.dest_id = tagcmd.source_id;
+        tagcmd.setStringData(tag, value);
+        addActionMessage(std::move(tagcmd));
+        return;
+    }
+
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid (setFlag)"));
+    }
+    fed->setTag(tag, value);
 }
 
 }  // namespace helics

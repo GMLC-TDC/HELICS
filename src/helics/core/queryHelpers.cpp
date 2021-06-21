@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "queryHelpers.hpp"
 
 #include "HandleManager.hpp"
+#include "FederateState.hpp"
 
 namespace helics {
 
@@ -17,6 +18,18 @@ static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
         Json::Value tagBlock = Json::objectValue;
         for (size_t ii = 0; ii < bhi.tagCount(); ++ii) {
             const auto& tg = bhi.getTagByIndex(ii);
+            tagBlock[tg.first] = tg.second;
+        }
+        v["tags"] = tagBlock;
+    }
+}
+
+void addFederateTags(Json::Value& v, const FederateState* fed)
+{
+    if (fed->tagCount() > 0) {
+        Json::Value tagBlock = Json::objectValue;
+        for (size_t ii = 0; ii < fed->tagCount(); ++ii) {
+            const auto& tg = fed->getTagByIndex(ii);
             tagBlock[tg.first] = tg.second;
         }
         v["tags"] = tagBlock;

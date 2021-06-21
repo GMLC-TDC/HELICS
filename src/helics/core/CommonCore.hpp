@@ -272,11 +272,17 @@ class CommonCore: public Core, public BrokerBase {
     /** get the local information field of the interface*/
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override final;
 
-    virtual void setTag(InterfaceHandle handle,
+    virtual void setInterfaceTag(InterfaceHandle handle,
                         const std::string& tag,
                         const std::string& value) override final;
-    virtual const std::string& getTag(InterfaceHandle handle,
+    virtual const std::string& getInterfaceTag(InterfaceHandle handle,
                                       const std::string& tag) const override final;
+
+    virtual void setFederateTag(LocalFederateId fid,
+                                 const std::string& tag,
+                                 const std::string& value) override final;
+    virtual std::string getFederateTag(LocalFederateId fid,
+                                               const std::string& tag) override final;
 
   private:
     /** implementation details of the connection process
@@ -353,7 +359,7 @@ class CommonCore: public Core, public BrokerBase {
     std::unordered_map<std::string, route_id>
         knownExternalEndpoints;  //!< external map for all known external endpoints with names and
                                  //!< route
-
+    std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     std::unique_ptr<TimeoutMonitor>
         timeoutMon;  //!< class to handle timeouts and disconnection notices
     /** actually transmit messages that were delayed until the core was actually registered*/

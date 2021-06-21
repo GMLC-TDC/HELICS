@@ -102,8 +102,6 @@ class FederateState {
                                      //!< error it should cause a co-simulation abort
     int logLevel{HELICS_LOG_LEVEL_WARNING};  //!< the level of logging used in the federate
 
-    //   std::vector<ActionMessage> messLog;
-  private:
     std::shared_ptr<MessageTimer>
         mTimer;  //!< message timer object for real time operations and timeouts
     gmlc::containers::BlockingQueue<ActionMessage>
@@ -120,12 +118,14 @@ class FederateState {
     Time time_granted{startupTime};  //!< the most recent granted time;
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
-  private:
+
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)>
         loggerFunction;  //!< callback for logging functions
     std::function<std::string(std::string_view)>
         queryCallback;  //!< a callback for additional queries
+
+    std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -247,6 +247,17 @@ class FederateState {
     /** get the current logging level*/
     int loggingLevel() const { return logLevel; }
 
+    /** set a tag (key-value pair)*/
+    void setTag(const std::string& tag, const std::string& value);
+    /** search for a tag by name*/
+    const std::string& getTag(const std::string& tag) const;
+    /** get a tag (key-value pair) by index*/
+    const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
+    {
+        return tags[index];
+    }
+    /** get the number of tags associated with an interface*/
+    auto tagCount() const { return tags.size(); }
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur

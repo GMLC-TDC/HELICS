@@ -811,13 +811,31 @@ class Core {
      * @param value a string containing the value for the tag
      */
     virtual void
-        setTag(InterfaceHandle handle, const std::string& tag, const std::string& value) = 0;
+        setInterfaceTag(InterfaceHandle handle, const std::string& tag, const std::string& value) = 0;
     /**
      * getter for the interface tags
      * @param handle the identifier for the interface to set the info data on
      * @param tag the name of the tag to retrieve
      */
-    virtual const std::string& getTag(InterfaceHandle handle, const std::string& tag) const = 0;
+    virtual const std::string& getInterfaceTag(InterfaceHandle handle, const std::string& tag) const = 0;
+
+    /**
+     * setter for federate tags which are key-value pairs
+     * @param fid the identifier for the federate to set the tag data on
+     * @param tag a string containing the name of the tag
+     * @param value a string containing the value for the tag
+     */
+    virtual void setFederateTag(LocalFederateId fid,
+                                 const std::string& tag,
+                                 const std::string& value) = 0;
+    /**
+     * getter for the federate tags
+     * @details this returns a std::string since the string that may be returned is not guarenteed to be from a stable source
+     * @param handle the identifier for the federate to set the info data on
+     * @param tag the name of the tag to retrieve
+     */
+    virtual std::string getFederateTag(LocalFederateId fid,
+                                               const std::string& tag) = 0;
 };
 
 }  // namespace helics
