@@ -60,6 +60,8 @@ across different compilers*/
         cmd_broadcast_disconnect = 7,  //!< a broadcast disconnect message
         cmd_disconnect_core = 8,  //!< disconnect a core
         cmd_disconnect_broker = 9,  //!< disconnect a broker
+        cmd_global_disconnect = 1002,  //!< disconnect a federation
+
         cmd_disconnect_fed_ack = 1006,  //!< federate disconnect ack
         cmd_disconnect_core_ack = 1008,  //!< ack for core disconnect
         cmd_disconnect_broker_ack = 1009,  //!< ack for broker disconnect
@@ -197,6 +199,7 @@ across different compilers*/
 #define CMD_REG_BROKER action_message_def::action_t::cmd_reg_broker
 #define CMD_PRIORITY_DISCONNECT action_message_def::action_t::cmd_priority_disconnect
 #define CMD_USER_DISCONNECT action_message_def::action_t::cmd_user_disconnect
+#define CMD_GLOBAL_DISCONNECT action_message_def::action_t::cmd_global_disconnect
 #define CMD_DISCONNECT action_message_def::action_t::cmd_disconnect
 #define CMD_DISCONNECT_NAME action_message_def::action_t::cmd_disconnect_name
 #define CMD_DISCONNECT_CHECK action_message_def::action_t::cmd_disconnect_check

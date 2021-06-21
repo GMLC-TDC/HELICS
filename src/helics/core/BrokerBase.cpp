@@ -138,6 +138,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--minbrokers,--minbroker,--minbrokercount",
         minBrokerCount,
         "the minimum number of cores/brokers that need to be connected (ignored in cores)");
+    hApp->add_option(
+        "--children,--subbrokers",
+        minChildCount,
+        "the minimum number of child objects that need to be connected before entering init mode");
     hApp->add_option("--maxbrokers",
                      maxBrokerCount,
                      "the maximum number of brokers that will be connecting (ignored in cores)");
