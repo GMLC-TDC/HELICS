@@ -432,6 +432,15 @@ IterationResult Federate::enterExecutingModeComplete()
     }
 }
 
+void Federate::setTag(const std::string& tag, const std::string& value)
+{
+    coreObject->setFederateTag(fedID, tag, value);
+}
+
+std::string Federate::getTag(const std::string& tag){
+    return coreObject->getFederateTag(fedID, tag);
+}
+
 void Federate::setProperty(int32_t option, double timeValue)
 {
     coreObject->setTimeProperty(fedID, option, timeValue);
@@ -1132,7 +1141,8 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
         if (coreObject) {
             res = generateJsonQuotedString(coreObject->getIdentifier());
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1143,7 +1153,8 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
         if (coreObject) {
             res = coreObject->query(getName(), queryStr, mode);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     }
     return res;
@@ -1160,7 +1171,7 @@ std::string Federate::query(const std::string& target,
         if (coreObject) {
             res = coreObject->query(target, queryStr, mode);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res = generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     }
     return res;
@@ -1198,7 +1209,7 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return generateJsonErrorResponse(404, "No Async queries are available");
+    return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED, "No Async queries are available");
 }
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)

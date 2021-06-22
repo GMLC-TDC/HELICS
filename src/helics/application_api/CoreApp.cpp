@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../common/JsonGeneration.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -212,7 +213,20 @@ std::string CoreApp::query(const std::string& target,
                            const std::string& queryStr,
                            HelicsSequencingModes mode)
 {
-    return (core) ? core->query(target, queryStr, mode) : std::string("#error");
+    return (core) ? core->query(target, queryStr, mode) : generateJsonErrorResponse(JsonErrorCodes::BAD_GATEWAY,"Core not available");
+}
+
+void CoreApp::setTag(const std::string& tag, const std::string& value) {
+    if (core) {
+        core->setFederateTag(gLocalCoreId,tag, value);
+    }
+}
+
+std::string CoreApp::getTag(const std::string& tag) {
+    if (core) {
+        return core->getFederateTag(gLocalCoreId, tag);
+    }
+    return {};
 }
 
 void CoreApp::setGlobal(const std::string& valueName, const std::string& value)

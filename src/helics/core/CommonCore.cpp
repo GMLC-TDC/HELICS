@@ -2174,7 +2174,7 @@ std::string CommonCore::federateQuery(const FederateState* fed,
         if (queryStr == "exists") {
             return "false";
         }
-        return generateJsonErrorResponse(404, "Federate not found");
+        return generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "Federate not found");
     }
     if (queryStr == "exists") {
         return "true";
@@ -2543,7 +2543,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
     }
     // if nothing found generate an error response
-    return generateJsonErrorResponse(400, "unrecognized core query");
+    return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized core query");
 }
 
 std::string CommonCore::query(const std::string& target,
@@ -2557,7 +2557,7 @@ std::string CommonCore::query(const std::string& target,
                 return res;
             }
         }
-        return generateJsonErrorResponse(410, "Core has terminated");
+        return generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Core has terminated");
     }
     ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_QUERY : CMD_QUERY_ORDERED);
     querycmd.source_id = direct_core_id;
@@ -2618,7 +2618,7 @@ std::string CommonCore::query(const std::string& target,
                             status = std::future_status::ready;  // LCOV_EXCL_LINE
                     }
                 }
-                return generateJsonErrorResponse(500, "Unexpected Error #13");  // LCOV_EXCL_LINE
+                return generateJsonErrorResponse(JsonErrorCodes::INTERNAL_ERROR, "Unexpected Error #13");  // LCOV_EXCL_LINE
             }
         }
     }
@@ -3845,7 +3845,7 @@ void CommonCore::checkQueryTimeouts()
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
                     activeQueries.setDelayedValue(qt.first,
-                                                  generateJsonErrorResponse(504, "query timeout"));
+                                                  generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT, "query timeout"));
                     qt.first = 0;
                 }
             }

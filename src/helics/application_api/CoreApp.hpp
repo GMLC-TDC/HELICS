@@ -116,6 +116,20 @@ class HELICS_CXX_EXPORT CoreApp {
                       const std::string& queryStr,
                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
+     /** set a tag (key-value pair) for a core
+   @details the tag is an arbitrary user defined string and value; the tags for a core are
+   queryable through a tags query or "tag/<tagname>
+   @param tag the name of the tag to set the value for
+   @param value the value for the given tag*/
+    void setTag(const std::string& tag, const std::string& value);
+    /** get the value of a specific tag (key-value pair) for a core
+    @details the tag is an arbitrary user defined string and value; the tags for a core are
+    queryable
+    @param tag the name of the tag to get the value for
+    @return a std::string containing the value of the tag, if the tag is not defined the
+    value is an empty string*/
+    std::string getTag(const std::string& tag);
+
     /** set a federation global value
     @details this overwrites any previous value for this name
     globals can be queried with a target of "global" or "global_value" and queryStr of the value to

@@ -1888,7 +1888,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
             return Json::valueToQuotedString(tg.second.c_str());
         }
     }
-    return generateJsonErrorResponse(400, "unrecognized Federate query");
+    return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized Federate query");
 }
 
 std::string FederateState::processQuery(const std::string& query, bool force_ordering) const
