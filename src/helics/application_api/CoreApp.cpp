@@ -193,18 +193,16 @@ void CoreApp::makeConnections(const std::string& file)
         core->makeConnections(file);
     }
 }
-
+static const std::string estring;
 /** get the identifier of the core*/
 const std::string& CoreApp::getIdentifier() const
 {
-    static const std::string estring;
     return (core) ? core->getIdentifier() : estring;
 }
 
 /** get the network address of the core*/
 const std::string& CoreApp::getAddress() const
 {
-    static const std::string estring;
     return (core) ? core->getAddress() : estring;
 }
 
@@ -226,7 +224,7 @@ const std::string& CoreApp::getTag(const std::string& tag) const {
     if (core) {
         return core->getFederateTag(gLocalCoreId, tag);
     }
-    return {};
+    return estring;
 }
 
 void CoreApp::setGlobal(const std::string& valueName, const std::string& value)
