@@ -1185,7 +1185,7 @@ std::string Federate::query(const std::string& target,
     return res;
 }
 
-query_id_t Federate::queryAsync(const std::string& target,
+QueryId Federate::queryAsync(const std::string& target,
                                 const std::string& queryStr,
                                 HelicsSequencingModes mode)
 {
@@ -1196,10 +1196,10 @@ query_id_t Federate::queryAsync(const std::string& target,
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
-    return query_id_t(cnt);
+    return QueryId(cnt);
 }
 
-query_id_t Federate::queryAsync(const std::string& queryStr, HelicsSequencingModes mode)
+QueryId Federate::queryAsync(const std::string& queryStr, HelicsSequencingModes mode)
 {
     auto queryFut =
         std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });
@@ -1207,10 +1207,10 @@ query_id_t Federate::queryAsync(const std::string& queryStr, HelicsSequencingMod
     int cnt = asyncInfo->queryCounter++;
 
     asyncInfo->inFlightQueries.emplace(cnt, std::move(queryFut));
-    return query_id_t(cnt);
+    return QueryId(cnt);
 }
 
-std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
+std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
@@ -1231,7 +1231,7 @@ void Federate::setQueryCallback(const std::function<std::string(std::string_view
     }
 }
 
-bool Federate::isQueryCompleted(query_id_t queryIndex) const  // NOLINT
+bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
 {
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());

@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "../core/federate_id.hpp"
+#include "../core/LocalFederateId.hpp"
 #include "../core/helicsTime.hpp"
 #include "../helics_enums.h"
 #include "FederateInfo.hpp"
@@ -356,9 +356,9 @@ class HELICS_CXX_EXPORT Federate {
     query, can be defined by the federate
     @param mode fast (asynchronous; default) means the query goes on priority channels,
     ordered(synchronous) is slower but has more ordering guarantees
-    @return a query_id_t to use for returning the result
+    @return a QueryId to use for returning the result
     */
-    query_id_t queryAsync(const std::string& target,
+    QueryId queryAsync(const std::string& target,
                           const std::string& queryStr,
                           HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
@@ -367,9 +367,11 @@ class HELICS_CXX_EXPORT Federate {
     on the size of the federation and the specific string being queried
     @param queryStr a string with the query see other documentation for specific properties to
     query, can be defined by the federate
-    @return a query_id_t used to get the results of the query in the future
+    @param mode fast (asynchronous; default) means the query goes on priority channels,
+    ordered(synchronous) is slower but has more ordering guarantees
+    @return a QueryId used to get the results of the query in the future
     */
-    query_id_t queryAsync(const std::string& queryStr,
+    QueryId queryAsync(const std::string& queryStr,
                           HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** get the results of an async query
@@ -381,12 +383,12 @@ class HELICS_CXX_EXPORT Federate {
     string a string vector like "[string1; string2]" or JSON The string "#invalid" is returned if
     the query was not valid
     */
-    std::string queryComplete(query_id_t queryIndex);
+    std::string queryComplete(QueryId queryIndex);
 
     /** check if an asynchronous query call has been completed
     @return true if the results are ready for /ref queryFinalize
     */
-    bool isQueryCompleted(query_id_t queryIndex) const;
+    bool isQueryCompleted(QueryId queryIndex) const;
 
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests
@@ -410,6 +412,8 @@ class HELICS_CXX_EXPORT Federate {
   specific name of a federate, core, or broker
   @param commandStr a string with the command instructions, see other documentation for specific
   properties to command, can be defined by a federate
+  @param mode fast (asynchronous; default) means the command goes on priority channels,
+    ordered(synchronous) is slower but has more ordering guarantees
   */
     void sendCommand(
         const std::string& target,

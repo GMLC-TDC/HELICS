@@ -38,7 +38,6 @@ extern "C" {
  * @return An object containing the endpoint.
  *
  *         nullptr on failure.
-
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -195,12 +194,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* 
  * @param dst The target destination.
  *
  *             nullptr to use the default destination.
-
- * @beginpythononly
- *             "" to use the default destination.
- * @endpythononly
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void
     helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dst, HelicsError* err);
@@ -216,14 +210,9 @@ HELICS_EXPORT void
  * @param dst The target destination.
  *
  *             nullptr to use the default destination.
-
- * @beginpythononly
- *             "" to use the default destination.
- * @endpythononly
  * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 
 HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
@@ -425,7 +414,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* in
  * Get the data in a specified tag of an endpoint
  *
  * @param endpoint The endpoint to query.
- *
+ * @param tagname the name of the tag to query
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname);
@@ -511,10 +500,9 @@ HELICS_EXPORT void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const 
  * add a destination filter to an endpoint
  *
  * @param endpoint The endpoint to modify.
- * @param targetEndpoint the name of the filter to add
+ * @param filterName the name of the filter to add
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsEndpointAddDestinationFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 
@@ -615,11 +603,6 @@ HELICS_EXPORT int helicsMessageGetByteCount(HelicsMessage message);
  * @param maxMessageLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
-
- *
- * @beginPythonOnly
- * @return Raw string data.
- * @endPythonOnly
  */
 HELICS_EXPORT void helicsMessageGetBytes(HelicsMessage message, void* data, int maxMessageLength, int* actualSize, HelicsError* err);
 
@@ -648,7 +631,6 @@ HELICS_EXPORT HelicsBool helicsMessageIsValid(HelicsMessage message);
  * @param src A string containing the source.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetSource(HelicsMessage message, const char* src, HelicsError* err);
 
@@ -659,7 +641,6 @@ HELICS_EXPORT void helicsMessageSetSource(HelicsMessage message, const char* src
  * @param dst A string containing the new destination.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
@@ -670,7 +651,6 @@ HELICS_EXPORT void helicsMessageSetDestination(HelicsMessage message, const char
  * @param src A string containing the new original source.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetOriginalSource(HelicsMessage message, const char* src, HelicsError* err);
 
@@ -681,7 +661,6 @@ HELICS_EXPORT void helicsMessageSetOriginalSource(HelicsMessage message, const c
  * @param dst A string containing the new original source.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetOriginalDestination(HelicsMessage message, const char* dst, HelicsError* err);
 
@@ -692,7 +671,6 @@ HELICS_EXPORT void helicsMessageSetOriginalDestination(HelicsMessage message, co
  * @param time The time the message should be delivered.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetTime(HelicsMessage message, HelicsTime time, HelicsError* err);
 
@@ -706,7 +684,6 @@ HELICS_EXPORT void helicsMessageSetTime(HelicsMessage message, HelicsTime time, 
  * @param newSize The new size in bytes of the buffer.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageResize(HelicsMessage message, int newSize, HelicsError* err);
 
@@ -719,7 +696,6 @@ HELICS_EXPORT void helicsMessageResize(HelicsMessage message, int newSize, Helic
  * @param reserveSize The number of bytes to reserve in the message object.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageReserve(HelicsMessage message, int reserveSize, HelicsError* err);
 
@@ -732,7 +708,6 @@ HELICS_EXPORT void helicsMessageReserve(HelicsMessage message, int reserveSize, 
  * @param messageID A new message ID.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetMessageID(HelicsMessage message, int32_t messageID, HelicsError* err);
 
@@ -751,7 +726,6 @@ HELICS_EXPORT void helicsMessageClearFlags(HelicsMessage message);
  * @param flagValue The desired value of the flag.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, HelicsBool flagValue, HelicsError* err);
 
@@ -762,7 +736,6 @@ HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, H
  * @param str A string containing the message data.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
 
@@ -774,7 +747,6 @@ HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str
  * @param inputDataLength The length of the data to input.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
@@ -786,7 +758,6 @@ HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data,
  * @param inputDataLength The length of the data to input.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageAppendData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
 
@@ -797,7 +768,6 @@ HELICS_EXPORT void helicsMessageAppendData(HelicsMessage message, const void* da
  * @param dst_message The message object to copy to.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageCopy(HelicsMessage src_message, HelicsMessage dst_message, HelicsError* err);
 
@@ -807,7 +777,6 @@ HELICS_EXPORT void helicsMessageCopy(HelicsMessage src_message, HelicsMessage ds
  * @param message The message object to copy from.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT HelicsMessage helicsMessageClone(HelicsMessage message, HelicsError* err);
 
@@ -826,7 +795,6 @@ HELICS_EXPORT void helicsMessageFree(HelicsMessage message);
  * @details The message after this function will be empty, with no source or destination
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsMessageClear(HelicsMessage message, HelicsError* err);
 

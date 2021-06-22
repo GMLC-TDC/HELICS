@@ -27,12 +27,12 @@ constexpr IdentifierType invalid_id_value =
     static_cast<IdentifierType>(-1);  //!< defining an invalid id value
 
 /** the known types of identifiers*/
-enum class identifiers : char {
-    publication,
-    input,
-    filter,
-    endpoint,
-    query,
+enum class Identifiers : char {
+    PUBLICATION,
+    INPUT,
+    FILTER,
+    ENDPOINT,
+    QUERY,
 };
 
 /** enumeration of locality namespaces*/
@@ -47,37 +47,37 @@ to those that are a actually required and make sense, and make it as low impact 
 it also acts to limit any mistakes of on type of identifier for another
 */
 
-template<typename BaseType, identifiers ID, BaseType invalidValue>
-class identifier_id_t {
+template<typename BaseType, Identifiers ID, BaseType invalidValue>
+class IdentifierId {
   private:
     BaseType ivalue = invalidValue;  //!< the underlying index value
 
   public:
-    static const identifiers identity{ID};  //!< the type of the identifier
-    using underlyingType = BaseType;
+    static const Identifiers identity{ID};  //!< the type of the identifier
+    using UnderlyingType = BaseType;
     /** default constructor*/
-    constexpr identifier_id_t() noexcept: ivalue(invalidValue) {}
+    constexpr IdentifierId() noexcept: ivalue(invalidValue) {}
     /** value based constructor*/
-    constexpr explicit identifier_id_t(BaseType val) noexcept: ivalue(val) {}
+    constexpr explicit IdentifierId(BaseType val) noexcept: ivalue(val) {}
     /** copy constructor*/
-    constexpr identifier_id_t(const identifier_id_t& id) noexcept: ivalue(id.ivalue) {}
+    constexpr IdentifierId(const IdentifierId& id) noexcept: ivalue(id.ivalue) {}
     /** assignment from number*/
-    identifier_id_t& operator=(BaseType val) noexcept
+    IdentifierId& operator=(BaseType val) noexcept
     {
         ivalue = val;
         return *this;
     }
     /** copy assignment*/
-    identifier_id_t& operator=(const identifier_id_t& id) = default;
+    IdentifierId& operator=(const IdentifierId& id) = default;
 
     /** get the underlying value*/
     BaseType value() const noexcept { return ivalue; };
     /** equality operator*/
-    bool operator==(identifier_id_t id) const noexcept { return (ivalue == id.ivalue); }
+    bool operator==(IdentifierId id) const noexcept { return (ivalue == id.ivalue); }
     /** inequality operator*/
-    bool operator!=(identifier_id_t id) const noexcept { return (ivalue != id.ivalue); }
+    bool operator!=(IdentifierId id) const noexcept { return (ivalue != id.ivalue); }
     /** less than operator for sorting*/
-    bool operator<(identifier_id_t id) const noexcept { return (ivalue < id.ivalue); }
+    bool operator<(IdentifierId id) const noexcept { return (ivalue < id.ivalue); }
     // check if the current value is not the invalidValue
     bool isValid() const noexcept { return (ivalue != invalidValue); }
 };
@@ -86,10 +86,10 @@ class identifier_id_t {
 // specialize std::hash
 namespace std {
 /** custom hashing function for identifier types so they can be used in hash maps*/
-template<typename BaseType, helics::identifiers ID, BaseType invalidValue>
-struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>> {
+template<typename BaseType, helics::Identifiers ID, BaseType invalidValue>
+struct hash<helics::IdentifierId<BaseType, ID, invalidValue>> {
     using argument_type =
-        helics::identifier_id_t<BaseType, ID, invalidValue>;  //!< the type of object to hash
+        helics::IdentifierId<BaseType, ID, invalidValue>;  //!< the type of object to hash
     using result_type = std::size_t;  //!< the result type of the hash code
     /** the actual hash operator*/
     result_type operator()(argument_type const& key) const noexcept
@@ -100,11 +100,11 @@ struct hash<helics::identifier_id_t<BaseType, ID, invalidValue>> {
 }  // namespace std
 
 namespace helics {
-using publication_id_t =
-    identifier_id_t<IdentifierType, identifiers::publication, invalid_id_value>;
-using input_id_t = identifier_id_t<IdentifierType, identifiers::input, invalid_id_value>;
+using PublicationId =
+    IdentifierId<IdentifierType, Identifiers::PUBLICATION, invalid_id_value>;
+using InputId = IdentifierId<IdentifierType, Identifiers::INPUT, invalid_id_value>;
 
-using query_id_t = identifier_id_t<IdentifierType, identifiers::query, invalid_id_value>;
+using QueryId = IdentifierId<IdentifierType, Identifiers::QUERY, invalid_id_value>;
 
 /** data class for pair of a string and double*/
 class NamedPoint {

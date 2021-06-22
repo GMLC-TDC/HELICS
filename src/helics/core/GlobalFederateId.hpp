@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #pragma once
-#include "federate_id.hpp"
+#include "LocalFederateId.hpp"
 
 namespace helics {
 /** a shift in the global federate id numbers to allow discrimination between local ids and global
@@ -110,6 +110,8 @@ class GlobalFederateId {
         @details the global_id is shifted by a certain amount*/
     constexpr BaseType localIndex() const { return gid - gGlobalFederateIdShift; }
 
+    /** get a pointer to the index value type for copying from memory*/
+    BaseType* getBaseTypePointer() { return &gid; }
   private:
     static constexpr BaseType invalid_global_fed_id{-2'010'000'000};
     BaseType gid{invalid_global_fed_id};  //!< the underlying index value

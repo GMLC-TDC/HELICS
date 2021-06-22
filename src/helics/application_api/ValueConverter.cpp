@@ -20,9 +20,6 @@ namespace detail {
         /*! This code in checks namespace exerpted from cereal portable binary archives
         code is modified slightly to fit name conventions and make use of C++17
 
-        \file binary.hpp
-    \brief Binary input and output archives */
-        /*
           Copyright (c) 2014, Randolph Voorhies, Shane Grant
           All rights reserved.
 

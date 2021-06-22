@@ -148,6 +148,7 @@ type is used
 @details also cleans up any leftover Cores that were previously unregistered this can be controlled
 by calling cleanUpCores earlier if desired
 @param core a pointer to a testCore object that should be found globally
+@param type the type of core to create
 @return true if the registration was successful false otherwise*/
     bool registerCore(const std::shared_ptr<Core>& core, CoreType type);
 

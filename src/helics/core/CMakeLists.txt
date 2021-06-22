@@ -26,7 +26,7 @@ set(SRC_FILES
     HandleManager.cpp
     FilterCoordinator.cpp
     UnknownHandleManager.cpp
-    federate_id.cpp
+    LocalFederateId.cpp
     TimeoutMonitor.cpp
     coreTypeOperations.cpp
     helicsCLI11JsonConfig.cpp
@@ -47,7 +47,7 @@ set(PUBLIC_INCLUDE_FILES
     helicsTime.hpp
     CoreFederateInfo.hpp
     helicsVersion.hpp
-    federate_id.hpp
+    LocalFederateId.hpp
     helics_definitions.hpp
     helicsCLI11.hpp
     SmallBuffer.hpp
@@ -60,7 +60,7 @@ set(INCLUDE_FILES
     TimeCoordinator.hpp
     ForwardingTimeCoordinator.hpp
     loggingHelper.hpp
-    global_federate_id.hpp
+    GlobalFederateId.hpp
     basic_CoreTypes.hpp
     TimeoutMonitor.h
     CoreBroker.hpp
@@ -74,7 +74,7 @@ set(INCLUDE_FILES
     EndpointInfo.hpp
     flagOperations.hpp
     BasicHandleInfo.hpp
-    federate_id_extra.hpp
+    FederateIdExtra.hpp
     FilterInfo.hpp
     FilterCoordinator.hpp
     HandleManager.hpp

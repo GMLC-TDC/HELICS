@@ -480,11 +480,6 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
  * @param maxDataLength The maximum size of information that data can hold.
  * @param[out] actualSize The actual length of data copied to data.
  * @param[in,out] err A pointer to an error object for catching errors.
-
- *
- * @beginPythonOnly
- * @return  raw Bytes of the value, the value is uninterpreted raw bytes.
- * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
 
@@ -504,11 +499,6 @@ HELICS_EXPORT int helicsInputGetStringSize(HelicsInput ipt);
  * @param maxStringLength The maximum size of information that str can hold.
  * @param[out] actualLength The actual length of the string.
  * @param[in,out] err Error term for capturing errors.
-
- *
- * @beginPythonOnly
- * @return A string data
- * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, HelicsError* err);
 
@@ -518,7 +508,6 @@ HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int
  * @param ipt The input to get the data for.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return An int64_t value with the current value of the input.
  */
@@ -530,7 +519,6 @@ HELICS_EXPORT int64_t helicsInputGetInteger(HelicsInput ipt, HelicsError* err);
  * @param ipt The input to get the data for.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return A boolean value of current input value.
  */
@@ -542,7 +530,6 @@ HELICS_EXPORT HelicsBool helicsInputGetBoolean(HelicsInput ipt, HelicsError* err
  * @param ipt The input to get the data for.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The double value of the input.
  */
@@ -554,7 +541,6 @@ HELICS_EXPORT double helicsInputGetDouble(HelicsInput ipt, HelicsError* err);
  * @param ipt The input to get the data for.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The resulting time value.
  */
@@ -566,12 +552,9 @@ HELICS_EXPORT HelicsTime helicsInputGetTime(HelicsInput ipt, HelicsError* err);
  * @param ipt The input to get the data for.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The resulting character value.
- *
  *         NAK (negative acknowledgment) symbol returned on error
-
  */
 HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
 
@@ -582,7 +565,6 @@ HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
  *
  * @param[in,out] err A helics error object, if the object is not empty the function is bypassed otherwise it is filled in if there is an
  * error.
-
  *
  * @return A HelicsComplex structure with the value.
  */
@@ -597,11 +579,6 @@ HELICS_EXPORT HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsE
  * @param[out] imag Memory location to place the imaginary part of a value.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  * On error the values will not be altered.
-
- *
- * @beginPythonOnly
- * @return a pair of floating point values that represent the real and imag values
- * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetComplex(HelicsInput ipt, double* real, double* imag, HelicsError* err);
 
@@ -621,11 +598,6 @@ HELICS_EXPORT int helicsInputGetVectorSize(HelicsInput ipt);
  * @param maxLength The maximum size of the vector.
  * @param[out] actualSize Location to place the actual length of the resulting vector.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
- *
- * @beginPythonOnly
- * @return a list of floating point values
- * @endPythonOnly
  */
 HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
 
@@ -639,11 +611,6 @@ HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxL
  * @param[out] actualLength The actual length of the string
  * @param[out] val The double value for the named point.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
- *
- * @beginPythonOnly
- * @return a string and a double value for the named point
- * @endPythonOnly
  */
 HELICS_EXPORT void
     helicsInputGetNamedPoint(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, double* val, HelicsError* err);
@@ -664,7 +631,6 @@ HELICS_EXPORT void
  *
  * @param inputDataLength The size of the raw data.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data, int inputDataLength, HelicsError* err);
 
@@ -675,7 +641,6 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data,
  * @param str A pointer to the default string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
 
@@ -686,7 +651,6 @@ HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str,
  * @param val The default integer.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultInteger(HelicsInput ipt, int64_t val, HelicsError* err);
 
@@ -697,7 +661,6 @@ HELICS_EXPORT void helicsInputSetDefaultInteger(HelicsInput ipt, int64_t val, He
  * @param val The default boolean value.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultBoolean(HelicsInput ipt, HelicsBool val, HelicsError* err);
 
@@ -708,7 +671,6 @@ HELICS_EXPORT void helicsInputSetDefaultBoolean(HelicsInput ipt, HelicsBool val,
  * @param val The default time value.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultTime(HelicsInput ipt, HelicsTime val, HelicsError* err);
 
@@ -719,7 +681,6 @@ HELICS_EXPORT void helicsInputSetDefaultTime(HelicsInput ipt, HelicsTime val, He
  * @param val The default char value.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsError* err);
 
@@ -730,7 +691,6 @@ HELICS_EXPORT void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsEr
  * @param val The default double value.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultDouble(HelicsInput ipt, double val, HelicsError* err);
 
@@ -742,7 +702,6 @@ HELICS_EXPORT void helicsInputSetDefaultDouble(HelicsInput ipt, double val, Heli
  * @param imag The default imaginary value.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, double imag, HelicsError* err);
 
@@ -754,7 +713,6 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, do
  * @param vectorLength The number of points to publish.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 
@@ -766,7 +724,6 @@ HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* ve
  * @param val A double value for the value of the named point.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
 
@@ -885,7 +842,6 @@ HELICS_EXPORT const char* helicsInputGetInfo(HelicsInput inp);
  * @param info The string to set.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err);
 
@@ -893,7 +849,7 @@ HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsE
  * Get the data in a specified tag of an input.
  *
  * @param inp The input object to query.
- *
+ * @param tagname the name of the tag to get the value for.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname);
@@ -906,7 +862,6 @@ HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname
  * @param tagvalue The string value to associate with a tag.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -926,7 +881,6 @@ HELICS_EXPORT const char* helicsPublicationGetInfo(HelicsPublication pub);
  * @param info The string to set.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsError* err);
 
@@ -934,7 +888,7 @@ HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* i
  * Get the data in a specified tag of a publication.
  *
  * @param pub The publication object to query.
- *
+ * @param tagname the name of the tag to query.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname);
@@ -942,12 +896,11 @@ HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const c
 /**
  * Set the data in a specific tag for a publication.
  *
- * @param pub The publication object to query.
- * @param tagname The string to set.
+ * @param pub The publication object to set a tag for.
+ * @param tagname The name of string to set.
  * @param tagvalue The string value to associate with a tag.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const char* tagvalue, HelicsError* err);
 
@@ -969,7 +922,6 @@ HELICS_EXPORT int helicsInputGetOption(HelicsInput inp, int option);
  * @param value The value to set the option to.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsInputSetOption(HelicsInput inp, int option, int value, HelicsError* err);
 
@@ -991,7 +943,6 @@ HELICS_EXPORT int helicsPublicationGetOption(HelicsPublication pub, int option);
  * @param val The value to set the option to.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsPublicationSetOption(HelicsPublication pub, int option, int val, HelicsError* err);
 
@@ -1002,7 +953,6 @@ HELICS_EXPORT void helicsPublicationSetOption(HelicsPublication pub, int option,
  * @param tolerance The tolerance level for publication, values changing less than this value will not be published.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsPublicationSetMinimumChange(HelicsPublication pub, double tolerance, HelicsError* err);
 
@@ -1013,7 +963,6 @@ HELICS_EXPORT void helicsPublicationSetMinimumChange(HelicsPublication pub, doub
  * @param tolerance The tolerance level for registering an update, values changing less than this value will not show as being updated.
  *
  * @param[in,out] err An error object to fill out in case of an error.
-
  */
 HELICS_EXPORT void helicsInputSetMinimumChange(HelicsInput inp, double tolerance, HelicsError* err);
 

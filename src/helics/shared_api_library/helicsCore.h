@@ -820,7 +820,7 @@ HELICS_EXPORT void helicsFederateRegisterInterfaces(HelicsFederate fed, const ch
  * @param errorString A string describing the error.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* error_string, HelicsError* err);
+HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* errorString, HelicsError* err);
 
 /**
  * Generate a local error in a federate.
@@ -832,7 +832,7 @@ HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, 
  * @param errorString A string describing the error.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string, HelicsError* err);
+HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* errorString, HelicsError* err);
 
 /**
  * Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it from the core.
@@ -889,7 +889,6 @@ HELICS_EXPORT void helicsCloseLibrary(void);
  * @param fed The federate to operate on.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 
@@ -901,7 +900,6 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
  * @param fed The federate to operate on.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
 
@@ -911,7 +909,6 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
  * @param fed The federate to operate on.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
  */
@@ -923,7 +920,6 @@ HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate 
  * @param fed The federate desiring to complete the initialization step.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
@@ -936,7 +932,6 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fe
  * @param fed A federate to change modes.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err);
 
@@ -949,7 +944,6 @@ HELICS_EXPORT void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsEr
  * @param fed The federate object to complete the call.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, HelicsError* err);
 
@@ -959,7 +953,6 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, Hel
  * @param fed The federate object to complete the call.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* err);
 
@@ -973,7 +966,6 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, 
  * @param iterate The requested iteration mode.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return An iteration structure with field containing the time and iteration status.
  */
@@ -991,7 +983,6 @@ HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterative(He
  * @param iterate The requested iteration mode.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate fed, HelicsIterationRequest iterate, HelicsError* err);
 
@@ -1001,7 +992,6 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate
  * @param fed The federate to make the request of.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return An iteration object containing the iteration time and iteration_status.
  */
@@ -1013,7 +1003,6 @@ HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterativeCom
  * @param fed The federate to query.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return State the resulting state if void return HELICS_OK.
  */
@@ -1025,7 +1014,6 @@ HELICS_EXPORT HelicsFederateState helicsFederateGetState(HelicsFederate fed, Hel
  * @param fed A federate object.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A core object, nullptr if invalid.
  */
@@ -1038,7 +1026,6 @@ HELICS_EXPORT HelicsCore helicsFederateGetCore(HelicsFederate fed, HelicsError* 
  * @param requestTime The next requested time.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid.
  */
@@ -1051,7 +1038,6 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTime(HelicsFederate fed, HelicsTim
  * @param timeDelta The requested amount of time to advance.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
@@ -1066,7 +1052,6 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeAdvance(HelicsFederate fed, He
  * @param fed The federate to make the request of.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated or is invalid
  */
@@ -1083,15 +1068,10 @@ HELICS_EXPORT HelicsTime helicsFederateRequestNextStep(HelicsFederate fed, Helic
  * @param iterate The requested iteration mode.
  *
  * @param[out] outIteration  The iteration specification of the result.
-
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated along with the appropriate iteration result.
- * @beginPythonOnly
- * This function also returns the iteration specification of the result.
- * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
                                                             HelicsTime requestTime,
@@ -1108,7 +1088,6 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterative(HelicsFederate fed,
  * @param requestTime The next requested time.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsError* err);
 
@@ -1118,7 +1097,6 @@ HELICS_EXPORT void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime
  * @param fed The federate to make the request of.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The time granted to the federate, will return HELICS_TIME_MAXTIME if the simulation has terminated.
  */
@@ -1135,7 +1113,6 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, H
  * @param iterate The requested iteration mode.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void
     helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
@@ -1147,12 +1124,8 @@ HELICS_EXPORT void
  *
  * @param[out] outIterate The iteration specification of the result.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return The granted time, will return HELICS_TIME_MAXTIME if the simulation has terminated.
- * @beginPythonOnly
- * This function also returns the iteration specification of the result.
- * @endPythonOnly
  */
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed,
                                                                     HelicsIterationResult* outIterate,
@@ -1412,7 +1385,6 @@ HELICS_EXPORT const char* helicsFederateGetCommand(HelicsFederate fed, HelicsErr
  * @param fed The federate to get the command for.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1422,11 +1394,8 @@ HELICS_EXPORT const char* helicsFederateGetCommandSource(HelicsFederate fed, Hel
  * Get a command sent to the federate. Blocks until a command is received.
  *
  * @param fed The federate to get the command for.
- * @param target The name of the object to send the command to.
- * @param command The command to send.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1474,7 +1443,7 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
 /**
  * Send a command to another helics object through a broker.
  *
- * @param core The core to send the command through.
+ * @param broker The broker to send the command through.
  * @param target The name of the object to send the command to.
  * @param command The command to send.
  *

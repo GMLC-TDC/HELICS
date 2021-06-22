@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "core-data.hpp"
-#include "federate_id.hpp"
+#include "LocalFederateId.hpp"
 
 #include <functional>
 #include <memory>
@@ -106,7 +106,9 @@ class Core {
 
     /**
     * Federate has encountered a global error and the federation should halt.
-    @param federateID the federate
+    * @param federateID the federate
+    * @param errorCode a numerical code associated with the error
+    * @param errorString a text message associated with the error
     */
     virtual void globalError(LocalFederateId federateID,
                              int32_t errorCode,
@@ -114,18 +116,14 @@ class Core {
 
     /**
      * Federate has encountered a local error and should be disconnected.
+     * @param federateID the federate
+     * @param errorCode a numerical code associated with the error
+     * @param errorString a text message associated with the error 
      */
     virtual void localError(LocalFederateId federateID,
                             int32_t errorCode,
                             const std::string& errorString) = 0;
 
-    /**
-     * Federate has encountered an unrecoverable error.
-     */
-    void error(LocalFederateId federateID, int32_t errorCode = -1)
-    {
-        globalError(federateID, errorCode, "");
-    }
     /** get the last error code from a core*/
     virtual int getErrorCode() const = 0;
     /** get the last error message*/
@@ -383,14 +381,6 @@ class Core {
      */
     virtual const std::string& getInjectionUnits(InterfaceHandle handle) const = 0;
 
-    /**
-     * Returns units for specified handle.
-     */
-    [[deprecated("please use getExtractionUnits instead")]] const std::string&
-        getUnits(InterfaceHandle handle) const
-    {
-        return getExtractionUnits(handle);
-    }
     /** get the injection type for an interface,  this is the type for data coming into an interface
      *@details for filters this is the input type, for publications this is type used to transmit
      *data, for endpoints this is the specified type and for inputs this is the type of the
@@ -529,6 +519,7 @@ class Core {
     *
     @param handle an interface to add the target to
     @param dest the target endpoint for the filter
+    @param hint the interface type for the destination target
     */
     virtual void addDestinationTarget(InterfaceHandle handle,
                                       std::string_view dest,
@@ -540,6 +531,7 @@ class Core {
     filter
     @param handle the identifier of the interface
     @param name the name of the filter or its target
+    @param hint the interface type for the destination target
     */
     virtual void addSourceTarget(InterfaceHandle handle,
                                  std::string_view name,
