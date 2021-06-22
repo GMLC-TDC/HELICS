@@ -834,8 +834,8 @@ class Core {
      * @param handle the identifier for the federate to set the info data on
      * @param tag the name of the tag to retrieve
      */
-    virtual std::string getFederateTag(LocalFederateId fid,
-                                               const std::string& tag) = 0;
+    virtual const std::string& getFederateTag(LocalFederateId fid,
+                                               const std::string& tag) const = 0;
 };
 
 }  // namespace helics

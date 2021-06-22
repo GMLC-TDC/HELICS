@@ -4623,14 +4623,15 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
 }
 
 
-std::string CommonCore::getFederateTag(LocalFederateId federateID,
-                                              const std::string& tag)
+const std::string& CommonCore::getFederateTag(LocalFederateId federateID,
+                                              const std::string& tag) const
 {
     auto* fed = getFederateAt(federateID);
     if (federateID == gLocalCoreId) {
-
-        auto val=query("core", std::string("tag/") + tag,HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
-        return gmlc::utilities::stringOps::removeQuotes(val);
+        static thread_local std::string val;
+        val=const_cast<CommonCore *>(this)->query("core", std::string("tag/") + tag,HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        val=gmlc::utilities::stringOps::removeQuotes(val);
+        return val;
     }
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerPublication)"));

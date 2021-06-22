@@ -128,7 +128,7 @@ class HELICS_CXX_EXPORT CoreApp {
     @param tag the name of the tag to get the value for
     @return a std::string containing the value of the tag, if the tag is not defined the
     value is an empty string*/
-    std::string getTag(const std::string& tag);
+    const std::string& getTag(const std::string& tag) const;
 
     /** set a federation global value
     @details this overwrites any previous value for this name

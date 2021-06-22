@@ -265,9 +265,9 @@ class HELICS_CXX_EXPORT Federate {
     @details the tag is an arbitrary user defined string and value; the tags for a federate are
     queryable
     @param tag the name of the tag to get the value for
-    @return a std::string containing the value of the tag, if the tag is not defined the
+    @return a const std::string& containing the value of the tag, if the tag is not defined the
     value is an empty string*/
-    std::string getTag(const std::string& tag);
+    const std::string& getTag(const std::string& tag) const;
 
     /** set a time property for a federate
     @param option the option to set

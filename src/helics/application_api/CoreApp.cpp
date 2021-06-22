@@ -222,7 +222,7 @@ void CoreApp::setTag(const std::string& tag, const std::string& value) {
     }
 }
 
-std::string CoreApp::getTag(const std::string& tag) {
+const std::string& CoreApp::getTag(const std::string& tag) const {
     if (core) {
         return core->getFederateTag(gLocalCoreId, tag);
     }

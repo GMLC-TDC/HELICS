@@ -437,7 +437,7 @@ void Federate::setTag(const std::string& tag, const std::string& value)
     coreObject->setFederateTag(fedID, tag, value);
 }
 
-std::string Federate::getTag(const std::string& tag){
+const std::string& Federate::getTag(const std::string& tag) const{
     return coreObject->getFederateTag(fedID, tag);
 }
 
@@ -979,6 +979,9 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             }
         }
     }
+    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+        this->setTag(tagname, tagvalue);
+    });
 }
 
 void Federate::registerFilterInterfacesToml(const std::string& tomlString)
@@ -1111,6 +1114,9 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             }
         }
     }
+    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+        this->setTag(tagname, tagvalue);
+    });
 }
 
 Filter& Federate::getFilter(int index)

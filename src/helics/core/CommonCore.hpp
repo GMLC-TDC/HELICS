@@ -281,8 +281,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void setFederateTag(LocalFederateId fid,
                                  const std::string& tag,
                                  const std::string& value) override final;
-    virtual std::string getFederateTag(LocalFederateId fid,
-                                               const std::string& tag) override final;
+    virtual const std::string& getFederateTag(LocalFederateId fid,
+                                               const std::string& tag) const override final;
 
   private:
     /** implementation details of the connection process
