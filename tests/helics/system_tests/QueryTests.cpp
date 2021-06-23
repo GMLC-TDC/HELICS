@@ -8,13 +8,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/testFixtures.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/application_api/CombinationFederate.hpp"
+#include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
-#include "helics/application_api/CoreApp.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -601,13 +601,13 @@ TEST_F(query, federate_tags)
 {
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
-    
+
     vFed1->setTag("description", "a federate description");
     vFed1->setTag("version", "1.4.5");
 
     EXPECT_EQ(vFed1->getTag("version"), "1.4.5");
     EXPECT_EQ(vFed1->getTag("description"), "a federate description");
-    //test an unknown tag
+    // test an unknown tag
     EXPECT_TRUE(vFed1->getTag("nonatag").empty());
 
     vFed1->enterInitializingMode();
@@ -622,7 +622,6 @@ TEST_F(query, federate_tags)
     EXPECT_STREQ(val["version"].asCString(), "1.4.5");
     EXPECT_STREQ(val["description"].asCString(), "a federate description");
 
-    
     helics::cleanupHelicsLibrary();
 }
 
@@ -642,7 +641,7 @@ TEST_F(query, core_tags)
     EXPECT_TRUE(cr.getTag("nonatag").empty());
 
     vFed1->enterInitializingMode();
-   
+
     auto res = vFed1->query("core", "tags", HELICS_SEQUENCING_MODE_FAST);
 
     auto desc = vFed1->query("core", "description");

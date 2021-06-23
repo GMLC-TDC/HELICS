@@ -2536,7 +2536,8 @@ std::string CoreBroker::query(const std::string& target,
     }
     if (target == "parent") {
         if (isRootc) {
-            return generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "broker has no parent");  // LCOV_EXCL_LINE
+            return generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND,
+                                             "broker has no parent");  // LCOV_EXCL_LINE
         }
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
                                                                      CMD_BROKER_QUERY_ORDERED);
@@ -3182,8 +3183,8 @@ void CoreBroker::processQuery(ActionMessage& m)
             }
             queryResp.payload = globalSet.generate();
         } else {
-            queryResp.payload = generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND,
-                                                          "Global value not found");
+            queryResp.payload =
+                generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "Global value not found");
         }
         if (queryResp.dest_id == global_broker_id_local) {
             activeQueries.setDelayedValue(m.messageID, std::string(queryResp.payload.to_string()));
@@ -3230,7 +3231,9 @@ void CoreBroker::processQuery(ActionMessage& m)
                             break;
                         case connection_state::disconnected:
                         case connection_state::request_disconnect:
-                            response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE, "federate is disconnected");
+                            response =
+                                generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
+                                                          "federate is disconnected");
                             break;
                         default:
                             break;
@@ -3275,7 +3278,8 @@ void CoreBroker::checkQueryTimeouts()
         for (auto& qt : queryTimeouts) {
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
-                    activeQueries.setDelayedValue(qt.first,
+                    activeQueries.setDelayedValue(
+                        qt.first,
                         generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT,
                                                   "query timeout"));
                     qt.first = 0;

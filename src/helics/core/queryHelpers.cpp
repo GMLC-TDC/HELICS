@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "queryHelpers.hpp"
 
-#include "HandleManager.hpp"
 #include "FederateState.hpp"
+#include "HandleManager.hpp"
 
 namespace helics {
 

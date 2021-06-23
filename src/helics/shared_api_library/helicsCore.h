@@ -1302,7 +1302,7 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT const char * helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
+HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
 
 /**
  * Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.

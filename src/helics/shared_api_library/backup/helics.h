@@ -360,10 +360,7 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum {
-    HELICS_SEQUENCING_MODE_FAST = 0,
-    HELICS_SEQUENCING_MODE_ORDERED = 1
-} HelicsSequencingModes;
+typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
 
 /**
  * @file
@@ -1798,7 +1795,7 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT const char * helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
+HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
 
 /**
  * Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.
