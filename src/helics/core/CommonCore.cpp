@@ -2373,12 +2373,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
 
     if (queryStr == "tags") {
         Json::Value tagBlock = Json::objectValue;
-        for (const auto &tg:tags) {
+        for (const auto& tg : tags) {
             tagBlock[tg.first] = tg.second;
         }
         return fileops::generateJsonString(tagBlock);
     }
-    if (queryStr.compare(0, 4, "tag/")==0) {
+    if (queryStr.compare(0, 4, "tag/") == 0) {
         std::string_view tag = queryStr;
         tag.remove_prefix(4);
         for (const auto& tg : tags) {
@@ -2520,16 +2520,14 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
             if (fed.fed->try_lock()) {
                 addFederateTags(val, fed.fed);
                 fed.fed->unlock();
-            }
-            else
-            {
+            } else {
                 addFederateTags(val, fed.fed);
             }
-            });
+        });
         // add core tags if needed
         if (!tags.empty()) {
             Json::Value tagBlock = Json::objectValue;
-            for (const auto &tg:tags) {
+            for (const auto& tg : tags) {
                 tagBlock[tg.first] = tg.second;
             }
             base["tags"] = tagBlock;
@@ -2537,8 +2535,8 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         return fileops::generateJsonString(base);
     }
     // check tag value for a matching string
-    for (const auto &tg:tags) {
-        if (tg.first==queryStr) {
+    for (const auto& tg : tags) {
+        if (tg.first == queryStr) {
             return Json::valueToQuotedString(tg.second.c_str());
         }
     }
@@ -2618,7 +2616,8 @@ std::string CommonCore::query(const std::string& target,
                             status = std::future_status::ready;  // LCOV_EXCL_LINE
                     }
                 }
-                return generateJsonErrorResponse(JsonErrorCodes::INTERNAL_ERROR, "Unexpected Error #13");  // LCOV_EXCL_LINE
+                return generateJsonErrorResponse(JsonErrorCodes::INTERNAL_ERROR,
+                                                 "Unexpected Error #13");  // LCOV_EXCL_LINE
             }
         }
     }
@@ -3280,17 +3279,18 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_CLOSE_INTERFACE:
             disconnectInterface(command);
             break;
-        case CMD_CORE_TAG: 
-            if (command.source_id==global_broker_id_local && command.dest_id==global_broker_id_local) {
-            auto tag = command.getString(0);
-            for (auto& tg : tags) {
-                if (tg.first == tag) {
-                    tg.second = command.getString(1);
-                    break;
+        case CMD_CORE_TAG:
+            if (command.source_id == global_broker_id_local &&
+                command.dest_id == global_broker_id_local) {
+                auto tag = command.getString(0);
+                for (auto& tg : tags) {
+                    if (tg.first == tag) {
+                        tg.second = command.getString(1);
+                        break;
+                    }
                 }
+                tags.emplace_back(tag, command.getString(1));
             }
-            tags.emplace_back(tag, command.getString(1));
-        }
             break;
         case CMD_CORE_CONFIGURE:
             processCoreConfigureCommands(command);
@@ -3759,8 +3759,10 @@ void CommonCore::checkQueryTimeouts()
         for (auto& qt : queryTimeouts) {
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
-                    activeQueries.setDelayedValue(qt.first,
-                                                  generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT, "query timeout"));
+                    activeQueries.setDelayedValue(
+                        qt.first,
+                        generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT,
+                                                  "query timeout"));
                     qt.first = 0;
                 }
             }
@@ -3923,8 +3925,7 @@ void CommonCore::checkDependencies()
 
 void CommonCore::processDisconnectCommand(ActionMessage& cmd)
 {
-    switch (cmd.action())
-    {
+    switch (cmd.action()) {
         case CMD_USER_DISCONNECT:
         case CMD_GLOBAL_DISCONNECT:
             if (isConnected()) {
@@ -3952,7 +3953,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             timeCoord->processTimeMessage(cmd);
             loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
             checkAndProcessDisconnect();
-        break;
+            break;
         case CMD_STOP:
 
             if (isConnected()) {
@@ -4006,8 +4007,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             checkAndProcessDisconnect();
             break;
         case CMD_DISCONNECT_CORE_ACK:
-            if ((cmd.dest_id == global_broker_id_local) &&
-                (cmd.source_id == higher_broker_id)) {
+            if ((cmd.dest_id == global_broker_id_local) && (cmd.source_id == higher_broker_id)) {
                 ActionMessage bye(CMD_DISCONNECT_FED_ACK);
                 bye.source_id = parent_broker_id;
                 for (auto fed : loopFederates) {
@@ -4613,8 +4613,8 @@ const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, const std
 }
 
 void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
-                        const std::string& tag,
-                        const std::string& value)
+                                 const std::string& tag,
+                                 const std::string& value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {
@@ -4640,15 +4640,17 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
     }
 }
 
-
 const std::string& CommonCore::getFederateTag(LocalFederateId federateID,
                                               const std::string& tag) const
 {
     auto* fed = getFederateAt(federateID);
     if (federateID == gLocalCoreId) {
         static thread_local std::string val;
-        val=const_cast<CommonCore *>(this)->query("core", std::string("tag/") + tag,HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
-        val=gmlc::utilities::stringOps::removeQuotes(val);
+        val = const_cast<CommonCore*>(this)->query(
+            "core",
+            std::string("tag/") + tag,
+            HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        val = gmlc::utilities::stringOps::removeQuotes(val);
         return val;
     }
     if (fed == nullptr) {
@@ -4659,8 +4661,8 @@ const std::string& CommonCore::getFederateTag(LocalFederateId federateID,
 }
 
 void CommonCore::setFederateTag(LocalFederateId federateID,
-                                 const std::string& tag,
-                                 const std::string& value)
+                                const std::string& tag,
+                                const std::string& value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {
@@ -4668,7 +4670,6 @@ void CommonCore::setFederateTag(LocalFederateId federateID,
     }
 
     if (federateID == gLocalCoreId) {
-
         ActionMessage tagcmd(CMD_CORE_TAG);
         tagcmd.source_id = getGlobalId();
         tagcmd.dest_id = tagcmd.source_id;

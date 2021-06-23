@@ -19,18 +19,18 @@ inline std::string generateJsonQuotedString(const std::string& string)
     return V.c_str();
 }
 
-enum class JsonErrorCodes:std::int32_t {
-    BAD_REQUEST=400,
-    FORBIDDEN=403,
-    NOT_FOUND=404,
-    METHOD_NOT_ALLOWED=405,
-    TIMEOUT=408,
-    DISCONNECTED=410,
-    INTERNAL_ERROR=500,
-    NOT_IMPLEMENTED=501,
-    BAD_GATEWAY=502,
-    SERVICE_UNAVAILABLE=503,
-    GATEWAY_TIMEOUT=504
+enum class JsonErrorCodes : std::int32_t {
+    BAD_REQUEST = 400,
+    FORBIDDEN = 403,
+    NOT_FOUND = 404,
+    METHOD_NOT_ALLOWED = 405,
+    TIMEOUT = 408,
+    DISCONNECTED = 410,
+    INTERNAL_ERROR = 500,
+    NOT_IMPLEMENTED = 501,
+    BAD_GATEWAY = 502,
+    SERVICE_UNAVAILABLE = 503,
+    GATEWAY_TIMEOUT = 504
 };
 /** generate a json error response string*/
 inline std::string generateJsonErrorResponse(JsonErrorCodes code, const std::string& message)

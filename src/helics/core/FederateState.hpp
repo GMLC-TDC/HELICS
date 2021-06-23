@@ -258,6 +258,7 @@ class FederateState {
     }
     /** get the number of tags associated with an interface*/
     auto tagCount() const { return tags.size(); }
+
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur

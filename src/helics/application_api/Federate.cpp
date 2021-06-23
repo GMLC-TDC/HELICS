@@ -437,7 +437,8 @@ void Federate::setTag(const std::string& tag, const std::string& value)
     coreObject->setFederateTag(fedID, tag, value);
 }
 
-const std::string& Federate::getTag(const std::string& tag) const{
+const std::string& Federate::getTag(const std::string& tag) const
+{
     return coreObject->getFederateTag(fedID, tag);
 }
 
@@ -1177,7 +1178,8 @@ std::string Federate::query(const std::string& target,
         if (coreObject) {
             res = coreObject->query(target, queryStr, mode);
         } else {
-            res = generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     }
     return res;
@@ -1215,7 +1217,8 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED, "No Async queries are available");
+    return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED,
+                                     "No Async queries are available");
 }
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)

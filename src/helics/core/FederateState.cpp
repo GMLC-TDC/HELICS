@@ -1874,11 +1874,10 @@ std::string FederateState::processQueryActual(std::string_view query) const
         }
         return fileops::generateJsonString(base);
     }
-    
+
     if (queryCallback) {
-        auto val=queryCallback(query);
-        if (!val.empty())
-        {
+        auto val = queryCallback(query);
+        if (!val.empty()) {
             return val;
         }
     }

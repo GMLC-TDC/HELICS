@@ -76,7 +76,7 @@
     ["global2", "this is another global value"]
   ],
   // add some tags about the federate
-  "tags":{
+  "tags": {
     "description": "fedb description",
     "version": 27
   }

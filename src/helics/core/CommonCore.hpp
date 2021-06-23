@@ -273,16 +273,16 @@ class CommonCore: public Core, public BrokerBase {
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override final;
 
     virtual void setInterfaceTag(InterfaceHandle handle,
-                        const std::string& tag,
-                        const std::string& value) override final;
-    virtual const std::string& getInterfaceTag(InterfaceHandle handle,
-                                      const std::string& tag) const override final;
-
-    virtual void setFederateTag(LocalFederateId fid,
                                  const std::string& tag,
                                  const std::string& value) override final;
-    virtual const std::string& getFederateTag(LocalFederateId fid,
+    virtual const std::string& getInterfaceTag(InterfaceHandle handle,
                                                const std::string& tag) const override final;
+
+    virtual void setFederateTag(LocalFederateId fid,
+                                const std::string& tag,
+                                const std::string& value) override final;
+    virtual const std::string& getFederateTag(LocalFederateId fid,
+                                              const std::string& tag) const override final;
 
   private:
     /** implementation details of the connection process
@@ -427,7 +427,7 @@ class CommonCore: public Core, public BrokerBase {
     std::string filteredEndpointQuery(const FederateState* fed) const;
     /** process a command instruction for the core*/
     void processCommandInstruction(ActionMessage& command);
-    
+
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to
