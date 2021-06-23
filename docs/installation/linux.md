@@ -54,7 +54,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build
 cd build
-CMake ../
+cmake ../
 cCMake . # optional, to change install path or other configuration settings
 make
 make install
