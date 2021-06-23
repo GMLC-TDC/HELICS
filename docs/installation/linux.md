@@ -55,7 +55,7 @@ cd HELICS
 mkdir build
 cd build
 CMake ../
-cCMake . # optional, to change install path or other configuration settings
+cmake . # optional, to change install path or other configuration settings
 make
 make install
 ```
