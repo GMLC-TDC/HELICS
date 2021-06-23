@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/queryFunctions.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/helicsVersion.hpp"
+#include "helics/application_api/CoreApp.hpp"
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -593,6 +594,65 @@ TEST_F(query, interfaces)
     EXPECT_STREQ(val["publications"][0]["tags"]["tag1"].asCString(), "val1");
     EXPECT_STREQ(val["inputs"][0]["tags"]["tag2"].asCString(), "val2");
     EXPECT_STREQ(val["endpoints"][0]["tags"]["tag3"].asCString(), "val3");
+    helics::cleanupHelicsLibrary();
+}
+
+TEST_F(query, federate_tags)
+{
+    SetupTest<helics::CombinationFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    
+    vFed1->setTag("description", "a federate description");
+    vFed1->setTag("version", "1.4.5");
+
+    EXPECT_EQ(vFed1->getTag("version"), "1.4.5");
+    EXPECT_EQ(vFed1->getTag("description"), "a federate description");
+    //test an unknown tag
+    EXPECT_TRUE(vFed1->getTag("nonatag").empty());
+
+    vFed1->enterInitializingMode();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("fed0", "tags", HELICS_SEQUENCING_MODE_FAST);
+    auto desc = core->query("fed0", "description", HELICS_SEQUENCING_MODE_FAST);
+
+    EXPECT_EQ(desc, "\"a federate description\"");
+    core = nullptr;
+    vFed1->finalize();
+    auto val = loadJsonStr(res);
+    EXPECT_STREQ(val["version"].asCString(), "1.4.5");
+    EXPECT_STREQ(val["description"].asCString(), "a federate description");
+
+    
+    helics::cleanupHelicsLibrary();
+}
+
+TEST_F(query, core_tags)
+{
+    SetupTest<helics::CombinationFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto cr = helics::CoreApp(vFed1->getCorePointer());
+    cr.setTag("description", "a core description");
+    cr.setTag("version", "1.4.6");
+
+    EXPECT_EQ(cr.getTag("version"), "1.4.6");
+    EXPECT_EQ(cr.getTag("description"), "a core description");
+
+    // test an unknown tag
+    EXPECT_TRUE(cr.getTag("nonatag").empty());
+
+    vFed1->enterInitializingMode();
+   
+    auto res = vFed1->query("core", "tags", HELICS_SEQUENCING_MODE_FAST);
+
+    auto desc = vFed1->query("core", "description");
+    EXPECT_EQ(desc, "\"a core description\"");
+    cr.reset();
+    vFed1->finalize();
+    auto val = loadJsonStr(res);
+    EXPECT_STREQ(val["version"].asCString(), "1.4.6");
+    EXPECT_STREQ(val["description"].asCString(), "a core description");
+
     helics::cleanupHelicsLibrary();
 }
 

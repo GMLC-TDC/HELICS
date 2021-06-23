@@ -3370,11 +3370,11 @@ void CommonCore::processCommand(ActionMessage&& command)
             auto tag = command.getString(0);
             for (auto& tg : tags) {
                 if (tg.first == tag) {
-                    tg.second = command.getString(0);
+                    tg.second = command.getString(1);
                     break;
                 }
             }
-            tags.emplace_back(tag, command.getString(0));
+            tags.emplace_back(tag, command.getString(1));
         }
             break;
         case CMD_CORE_CONFIGURE:
