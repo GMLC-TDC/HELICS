@@ -393,6 +393,8 @@ class CommonCore: public Core, public BrokerBase {
     void processCommandsForCore(const ActionMessage& cmd);
     /** process configure commands for the core*/
     void processCoreConfigureCommands(ActionMessage& cmd);
+    /** process commands related to disconnect messages*/
+    void processDisconnectCommand(ActionMessage& cmd);
     /** handle the processing for a query command*/
     void processQueryCommand(ActionMessage& cmd);
     /** check if a newly registered subscription has a local publication
@@ -425,7 +427,7 @@ class CommonCore: public Core, public BrokerBase {
     std::string filteredEndpointQuery(const FederateState* fed) const;
     /** process a command instruction for the core*/
     void processCommandInstruction(ActionMessage& command);
-
+    
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to

@@ -2990,55 +2990,14 @@ void CommonCore::processCommand(ActionMessage&& command)
         break;
         case CMD_USER_DISCONNECT:
         case CMD_GLOBAL_DISCONNECT:
-            if (isConnected()) {
-                if (getBrokerState() <
-                    broker_state_t::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
-                    setBrokerState(broker_state_t::terminating);
-                    sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
-                }
-            } else if (getBrokerState() ==
-                       broker_state_t::errored) {  // we are disconnecting in an error state
-                sendDisconnect();
-                ActionMessage m(CMD_DISCONNECT);
-                m.source_id = global_broker_id_local;
-                transmit(parent_route_id, m);
-            }
-            addActionMessage(CMD_STOP);
-            // we can't just fall through since this may have generated other messages that need to
-            // be forwarded or processed
-            break;
-        case CMD_BROADCAST_DISCONNECT: {
-            timeCoord->processTimeMessage(command);
-            loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
-            checkAndProcessDisconnect();
-        } break;
+        case CMD_BROADCAST_DISCONNECT:
         case CMD_STOP:
-
-            if (isConnected()) {
-                if (getBrokerState() <
-                    broker_state_t::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
-                    setBrokerState(broker_state_t::terminating);
-                    sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
-                }
-            }
-            if (filterThread.load() == std::this_thread::get_id()) {
-                if (filterFed != nullptr) {
-                    delete filterFed;
-                    filterFed = nullptr;
-                    filterThread.store(std::thread::id{});
-                }
-            }
-            activeQueries.fulfillAllPromises("#disconnected");
+        case CMD_DISCONNECT:
+        case CMD_DISCONNECT_FED:
+        case CMD_DISCONNECT_CHECK:
+        case CMD_DISCONNECT_CORE_ACK:
+            processDisconnectCommand(command);
             break;
-
         case CMD_EXEC_GRANT:
             if (command.source_id == keyFed) {
                 simTime.store(0.0);
@@ -3081,33 +3040,6 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             routeMessage(command);
             break;
-        case CMD_DISCONNECT:
-        case CMD_DISCONNECT_FED:
-            if (command.dest_id == parent_broker_id) {
-                if (getBrokerState() < broker_state_t::terminating) {
-                    auto fed = loopFederates.find(command.source_id);
-                    if (fed == loopFederates.end()) {
-                        return;
-                    }
-                    fed->state = operation_state::disconnected;
-                    auto cstate = getBrokerState();
-                    if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
-                        command.setAction(CMD_DISCONNECT_FED);
-                        transmit(parent_route_id, command);
-                        if (minFederateState() != operation_state::disconnected ||
-                            filterFed != nullptr) {
-                            command.setAction(CMD_DISCONNECT_FED_ACK);
-                            command.dest_id = command.source_id;
-                            command.source_id = parent_broker_id;
-                            routeMessage(command);
-                        }
-                    }
-                }
-            } else {
-                routeMessage(command);
-            }
-
-            break;
         case CMD_TIME_BLOCK:
         case CMD_TIME_UNBLOCK:
             manageTimeBlocks(command);
@@ -3116,23 +3048,6 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_QUERY_ORDERED:
         case CMD_QUERY_REPLY_ORDERED:
             processQueryCommand(command);
-            break;
-        case CMD_DISCONNECT_CHECK:
-            checkAndProcessDisconnect();
-            break;
-        case CMD_DISCONNECT_CORE_ACK:
-            if ((command.dest_id == global_broker_id_local) &&
-                (command.source_id == higher_broker_id)) {
-                ActionMessage bye(CMD_DISCONNECT_FED_ACK);
-                bye.source_id = parent_broker_id;
-                for (auto fed : loopFederates) {
-                    if (fed->getState() != FederateStates::HELICS_FINISHED) {
-                        bye.dest_id = fed->global_id.load();
-                        fed->addAction(bye);
-                    }
-                }
-                addActionMessage(CMD_STOP);
-            }
             break;
         case CMD_SEND_COMMAND_ORDERED:
             if (command.dest_id == global_broker_id_local) {
@@ -4003,6 +3918,109 @@ void CommonCore::checkDependencies()
         clearActionFlag(adddep, child_flag);
         setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
+    }
+}
+
+void CommonCore::processDisconnectCommand(ActionMessage& cmd)
+{
+    switch (cmd.action())
+    {
+        case CMD_USER_DISCONNECT:
+        case CMD_GLOBAL_DISCONNECT:
+            if (isConnected()) {
+                if (getBrokerState() <
+                    broker_state_t::terminating) {  // only send a disconnect message
+                                                    // if we haven't done so already
+                    setBrokerState(broker_state_t::terminating);
+                    sendDisconnect();
+                    ActionMessage m(CMD_DISCONNECT);
+                    m.source_id = global_broker_id_local;
+                    transmit(parent_route_id, m);
+                }
+            } else if (getBrokerState() ==
+                       broker_state_t::errored) {  // we are disconnecting in an error state
+                sendDisconnect();
+                ActionMessage m(CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit(parent_route_id, m);
+            }
+            addActionMessage(CMD_STOP);
+            // we can't just fall through since this may have generated other messages that need to
+            // be forwarded or processed
+            break;
+        case CMD_BROADCAST_DISCONNECT:
+            timeCoord->processTimeMessage(cmd);
+            loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
+            checkAndProcessDisconnect();
+        break;
+        case CMD_STOP:
+
+            if (isConnected()) {
+                if (getBrokerState() <
+                    broker_state_t::terminating) {  // only send a disconnect message
+                                                    // if we haven't done so already
+                    setBrokerState(broker_state_t::terminating);
+                    sendDisconnect();
+                    ActionMessage m(CMD_DISCONNECT);
+                    m.source_id = global_broker_id_local;
+                    transmit(parent_route_id, m);
+                }
+            }
+            if (filterThread.load() == std::this_thread::get_id()) {
+                if (filterFed != nullptr) {
+                    delete filterFed;
+                    filterFed = nullptr;
+                    filterThread.store(std::thread::id{});
+                }
+            }
+            activeQueries.fulfillAllPromises("#disconnected");
+            break;
+        case CMD_DISCONNECT:
+        case CMD_DISCONNECT_FED:
+            if (cmd.dest_id == parent_broker_id) {
+                if (getBrokerState() < broker_state_t::terminating) {
+                    auto fed = loopFederates.find(cmd.source_id);
+                    if (fed == loopFederates.end()) {
+                        return;
+                    }
+                    fed->state = operation_state::disconnected;
+                    auto cstate = getBrokerState();
+                    if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
+                        cmd.setAction(CMD_DISCONNECT_FED);
+                        transmit(parent_route_id, cmd);
+                        if (minFederateState() != operation_state::disconnected ||
+                            filterFed != nullptr) {
+                            cmd.setAction(CMD_DISCONNECT_FED_ACK);
+                            cmd.dest_id = cmd.source_id;
+                            cmd.source_id = parent_broker_id;
+                            routeMessage(cmd);
+                        }
+                    }
+                }
+            } else {
+                routeMessage(cmd);
+            }
+
+            break;
+        case CMD_DISCONNECT_CHECK:
+            checkAndProcessDisconnect();
+            break;
+        case CMD_DISCONNECT_CORE_ACK:
+            if ((cmd.dest_id == global_broker_id_local) &&
+                (cmd.source_id == higher_broker_id)) {
+                ActionMessage bye(CMD_DISCONNECT_FED_ACK);
+                bye.source_id = parent_broker_id;
+                for (auto fed : loopFederates) {
+                    if (fed->getState() != FederateStates::HELICS_FINISHED) {
+                        bye.dest_id = fed->global_id.load();
+                        fed->addAction(bye);
+                    }
+                }
+                addActionMessage(CMD_STOP);
+            }
+            break;
+        default:
+            break;
     }
 }
 
