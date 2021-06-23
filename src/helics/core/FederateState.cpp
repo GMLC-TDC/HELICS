@@ -1750,11 +1750,6 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return generateStringVector(interfaceInformation.getEndpoints(),
                                     [](auto& ept) { return ept->key; });
     }
-    if (query == "interfaces") {
-        Json::Value base;
-        interfaceInformation.generateInferfaceConfig(base);
-        return fileops::generateJsonString(base);
-    }
     if (query == "global_flush") {
         return "{\"status\":true}";
     }
@@ -1823,7 +1818,25 @@ std::string FederateState::processQueryActual(std::string_view query) const
         timeCoord->generateConfig(base);
         generateConfig(base);
         interfaceInformation.generateInferfaceConfig(base);
+        addFederateTags(base, this);
         return fileops::generateJsonString(base);
+    }
+    if (query == "tags") {
+        Json::Value tagBlock = Json::objectValue;
+        for (const auto& tg : tags) {
+            tagBlock[tg.first] = tg.second;
+        }
+        return fileops::generateJsonString(tagBlock);
+    }
+    if (query.compare(0, 4, "tag/") == 0) {
+        std::string_view tag = query;
+        tag.remove_prefix(4);
+        for (const auto& tg : tags) {
+            if (tag == tg.first) {
+                return Json::valueToQuotedString(tg.second.c_str());
+            }
+        }
+        return "\"\"";
     }
     if (query == "dependents") {
         return generateStringVector(timeCoord->getDependents(),
@@ -1861,10 +1874,21 @@ std::string FederateState::processQueryActual(std::string_view query) const
         }
         return fileops::generateJsonString(base);
     }
+    
     if (queryCallback) {
-        return queryCallback(query);
+        auto val=queryCallback(query);
+        if (!val.empty())
+        {
+            return val;
+        }
     }
-    return generateJsonErrorResponse(400, "unrecognized Federate query");
+    // check tag value for a matching string
+    for (const auto& tg : tags) {
+        if (tg.first == query) {
+            return Json::valueToQuotedString(tg.second.c_str());
+        }
+    }
+    return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized Federate query");
 }
 
 std::string FederateState::processQuery(const std::string& query, bool force_ordering) const
@@ -1876,7 +1900,7 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            R"("publications","inputs","endpoints","interfaces","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time")";
+            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time")";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);
@@ -1886,5 +1910,34 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         }
     }
     return qstring;
+}
+
+void FederateState::setTag(const std::string& tag, const std::string& value)
+{
+    spinlock();
+    for (auto& tg : tags) {
+        if (tg.first == tag) {
+            unlock();
+            tg.second = value;
+            return;
+        }
+    }
+    tags.emplace_back(tag, value);
+    unlock();
+}
+
+static const std::string emptyStr;
+
+const std::string& FederateState::getTag(const std::string& tag) const
+{
+    spinlock();
+    for (const auto& tg : tags) {
+        if (tg.first == tag) {
+            unlock();
+            return tg.second;
+        }
+    }
+    unlock();
+    return emptyStr;
 }
 }  // namespace helics

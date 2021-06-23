@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class HandleManager;
 class GlobalFederateId;
+class FederateState;
 }  // namespace helics
 
 template<typename X, typename Proc>
@@ -61,4 +62,6 @@ void generateInterfaceConfig(Json::Value& iblock,
 
 Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
                                     const helics::GlobalFederateId& fed);
+
+void addFederateTags(Json::Value& v, const helics::FederateState* fed);
 }  // namespace helics

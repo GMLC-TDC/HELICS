@@ -1164,6 +1164,48 @@ void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const ch
     // LCOV_EXCL_STOP
 }
 
+static constexpr char invalidTagString[] = "Tag name cannot be null";
+void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err) {
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    if (tagName == nullptr) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTagString);
+        return;
+    }
+    try {
+        fedObj->setTag(tagName, AS_STRING(value));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err) {
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return nullcstr;
+    }
+    if (tagName == nullptr) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTagString);
+        return nullcstr;
+    }
+    try {
+        const auto& str=fedObj->getTag(tagName);
+        return str.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+        return nullcstr;
+    }
+    // LCOV_EXCL_STOP
+}
+
+
 static constexpr char invalidFedNameString[] = "Federate name for dependency cannot be null";
 void helicsFederateAddDependency(HelicsFederate fed, const char* fedName, HelicsError* err)
 {

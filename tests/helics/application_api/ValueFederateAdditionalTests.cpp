@@ -636,6 +636,8 @@ TEST(valuefed_json_tests, file_loadb)
     EXPECT_EQ(inp2.getTag("description"), "a test input");
     EXPECT_EQ(std::stod(inp2.getTag("period")), 0.7);
 
+    EXPECT_EQ(vFed.getTag("description"), "fedb description");
+    EXPECT_EQ(vFed.getTag("version"), "27");
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -667,6 +669,10 @@ TEST(valuefederate, toml_file_loadb)
     }
 
     vFed.enterExecutingMode();
+
+    EXPECT_EQ(vFed.getTag("description"), "fedb description");
+    EXPECT_EQ(vFed.getTag("version"), "27");
+
     vFed.disconnect();
 }
 

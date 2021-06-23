@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/core-exceptions.hpp"
 #include "../core/coreTypeOperations.hpp"
 #include "../core/helicsCLI11.hpp"
+#include "../common/JsonGeneration.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -192,18 +193,16 @@ void CoreApp::makeConnections(const std::string& file)
         core->makeConnections(file);
     }
 }
-
+static const std::string estring;
 /** get the identifier of the core*/
 const std::string& CoreApp::getIdentifier() const
 {
-    static const std::string estring;
     return (core) ? core->getIdentifier() : estring;
 }
 
 /** get the network address of the core*/
 const std::string& CoreApp::getAddress() const
 {
-    static const std::string estring;
     return (core) ? core->getAddress() : estring;
 }
 
@@ -212,7 +211,20 @@ std::string CoreApp::query(const std::string& target,
                            const std::string& queryStr,
                            HelicsSequencingModes mode)
 {
-    return (core) ? core->query(target, queryStr, mode) : std::string("#error");
+    return (core) ? core->query(target, queryStr, mode) : generateJsonErrorResponse(JsonErrorCodes::BAD_GATEWAY,"Core not available");
+}
+
+void CoreApp::setTag(const std::string& tag, const std::string& value) {
+    if (core) {
+        core->setFederateTag(gLocalCoreId,tag, value);
+    }
+}
+
+const std::string& CoreApp::getTag(const std::string& tag) const {
+    if (core) {
+        return core->getFederateTag(gLocalCoreId, tag);
+    }
+    return estring;
 }
 
 void CoreApp::setGlobal(const std::string& valueName, const std::string& value)

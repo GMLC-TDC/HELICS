@@ -2536,7 +2536,7 @@ std::string CoreBroker::query(const std::string& target,
     }
     if (target == "parent") {
         if (isRootc) {
-            return generateJsonErrorResponse(404, "broker has no parent");  // LCOV_EXCL_LINE
+            return generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "broker has no parent");  // LCOV_EXCL_LINE
         }
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
                                                                      CMD_BROKER_QUERY_ORDERED);
@@ -2826,7 +2826,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         return fileops::generateJsonString(base);
     }
-    return generateJsonErrorResponse(400, "unrecognized broker query");
+    return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized broker query");
 }
 
 std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
@@ -3182,7 +3182,8 @@ void CoreBroker::processQuery(ActionMessage& m)
             }
             queryResp.payload = globalSet.generate();
         } else {
-            queryResp.payload = generateJsonErrorResponse(404, "Global value not found");
+            queryResp.payload = generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND,
+                                                          "Global value not found");
         }
         if (queryResp.dest_id == global_broker_id_local) {
             activeQueries.setDelayedValue(m.messageID, std::string(queryResp.payload.to_string()));
@@ -3201,11 +3202,13 @@ void CoreBroker::processQuery(ActionMessage& m)
                 route = parent_route_id;
                 switch (fed->state) {
                     case connection_state::error:
-                        response = generateJsonErrorResponse(503, "federate is in error state");
+                        response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
+                                                             "federate is in error state");
                         break;
                     case connection_state::disconnected:
                     case connection_state::request_disconnect:
-                        response = generateJsonErrorResponse(503, "federate is disconnected");
+                        response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
+                                                             "federate is disconnected");
                         break;
                     default:
                         break;
@@ -3222,11 +3225,12 @@ void CoreBroker::processQuery(ActionMessage& m)
                     switch (broker->state) {
                         case connection_state::error:
                             response =
-                                generateJsonErrorResponse(503, "target broker is in error state");
+                                generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
+                                                          "target broker is in error state");
                             break;
                         case connection_state::disconnected:
                         case connection_state::request_disconnect:
-                            response = generateJsonErrorResponse(503, "federate is disconnected");
+                            response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE, "federate is disconnected");
                             break;
                         default:
                             break;
@@ -3238,7 +3242,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         }
         if (((route == parent_route_id) && (isRootc)) || !response.empty()) {
             if (response.empty()) {
-                response = generateJsonErrorResponse(404, "query not valid");
+                response = generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "query not valid");
             }
             ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
             queryResp.dest_id = m.source_id;
@@ -3272,7 +3276,8 @@ void CoreBroker::checkQueryTimeouts()
             if (activeQueries.isRecognized(qt.first) && !activeQueries.isCompleted(qt.first)) {
                 if (Time(ctime - qt.second) > queryTimeout) {
                     activeQueries.setDelayedValue(qt.first,
-                                                  generateJsonErrorResponse(504, "query timeout"));
+                        generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT,
+                                                  "query timeout"));
                     qt.first = 0;
                 }
             }
