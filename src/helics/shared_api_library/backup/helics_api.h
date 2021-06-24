@@ -353,6 +353,8 @@ HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int flag, HelicsError
 int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, HelicsError* err);
 HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
 void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
+void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
+const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
 void helicsFederateAddDependency(HelicsFederate fed, const char* fedName, HelicsError* err);
 void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsError* err);
 void helicsFederateLogErrorMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);

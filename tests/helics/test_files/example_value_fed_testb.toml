@@ -21,6 +21,8 @@ inputs=[
 {key="ipt2",  type="double",flags="connection_optional", target="pub1", global=true,tags=[{name="period",value=0.7},{name="description",value="a test input"}]}
 ]  #specify an input with a target
 
+#add some descriptive tags to a federate
+tags={description="fedb description", version=27}
 
 #Publications used in the federate
 [[publications]]
