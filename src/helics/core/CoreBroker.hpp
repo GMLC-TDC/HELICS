@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HandleManager.hpp"
 #include "TimeDependencies.hpp"
 #include "UnknownHandleManager.hpp"
-#include "federate_id_extra.hpp"
+#include "FederateIdExtra.hpp"
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
 #include "gmlc/containers/AirLock.hpp"

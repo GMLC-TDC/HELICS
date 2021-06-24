@@ -26,6 +26,7 @@ jobs:
       MAKEFLAGS: '-j 4'
       DISABLE_INTERFACES: 'Java'
       DISABLE_EXAMPLES: 'true'
+      DISABLE_CXX_SHARED: 'true'
       CI_TEST_FLAGS: ""
       
     steps:

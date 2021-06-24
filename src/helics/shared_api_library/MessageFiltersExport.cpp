@@ -515,7 +515,7 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
     }
 
     if (!fObj->custom) {
-        static constexpr char nonCustomFilterString[] = "filter must be a custom filter to specify callback";
+        static constexpr char nonCustomFilterString[] = "FILTER must be a custom FILTER to specify callback";
         assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCustomFilterString);
         return;
     }

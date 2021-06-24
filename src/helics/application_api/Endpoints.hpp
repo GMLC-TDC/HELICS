@@ -72,8 +72,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
             "second argument must be a pointer to a MessageFederate");
     }
     const std::string& getType() { return getExtractionType(); }
-    /** send a data block and length
-    @param dest string name of the destination
+    /** send a data block and length to the endpoint targets
     @param data pointer to data location
     @param data_size the length of the data
     */

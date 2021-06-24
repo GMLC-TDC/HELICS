@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 #include "InputInfo.hpp"
 #include "PublicationInfo.hpp"
-#include "federate_id_extra.hpp"
+#include "FederateIdExtra.hpp"
 #include "gmlc/containers/DualMappedPointerVector.hpp"
 
 #include "json/forwards.h"
@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-/** @file container for keeping the set of different interfaces information for a federate
+/** @file InterfaceInfo.hpp container for keeping the set of different interfaces information for a federate
  */
 namespace helics {
 /** generic class for holding information about interfaces for a core federate structure*/

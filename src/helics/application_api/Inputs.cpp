@@ -69,7 +69,7 @@ Input::Input(InterfaceVisibility locality,
 
 void Input::setDefaultBytes(data_view val)
 {
-    fed->setDefaultValue(*this, val);
+    fed->setDefaultValue(*this, std::move(val));
 }
 
 void Input::handleCallback(Time time)
@@ -591,12 +591,6 @@ Time Input::getLastUpdate() const
     return fed->getLastUpdateTime(*this);
 }
 
-/** register a callback for an update notification
-@details the callback is called just before the time request function returns
-@param callback a function with signature void(Time time)
-time is the time the value was updated,  this callback is a notification callback and doesn't
-return the value
-*/
 void Input::registerNotificationCallback(std::function<void(Time)> callback)
 {
     fed->setInputNotificationCallback(*this,

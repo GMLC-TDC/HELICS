@@ -20,9 +20,6 @@ namespace detail {
         /*! This code in checks namespace exerpted from cereal portable binary archives
         code is modified slightly to fit name conventions and make use of C++17
 
-        \file binary.hpp
-    \brief Binary input and output archives */
-        /*
           Copyright (c) 2014, Randolph Voorhies, Shane Grant
           All rights reserved.
 
@@ -286,7 +283,7 @@ namespace detail {
         std::size_t size = getDataSize(data);
         val.resize(size);
         if (size > 0) {
-            std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+            std::memcpy(reinterpret_cast<double *>(val.data()), data + 8, size * sizeof(std::complex<double>));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
             for (auto& v : val) {

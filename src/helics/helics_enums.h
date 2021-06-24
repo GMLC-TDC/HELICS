@@ -241,13 +241,13 @@ typedef enum {
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
     /** integer property controlling the maximum number of iterations in a federate*/
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
-    /** integer property controlling the log level in a federate see \ref helics_log_levels*/
+    /** integer property controlling the log level in a federate see \ref HelicsLogLevels*/
     HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     /** integer property controlling the log level for file logging in a federate see \ref
-       helics_log_levels*/
+       HelicsLogLevels*/
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
     /** integer property controlling the log level for file logging in a federate see \ref
-       helics_log_levels*/
+       HelicsLogLevels*/
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274
 } HelicsProperties;
 

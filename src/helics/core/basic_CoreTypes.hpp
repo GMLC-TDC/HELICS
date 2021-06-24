@@ -8,4 +8,4 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CoreTypes.hpp"
 #include "core-data.hpp"
-#include "global_federate_id.hpp"
+#include "GlobalFederateId.hpp"

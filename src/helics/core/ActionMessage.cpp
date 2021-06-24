@@ -379,16 +379,16 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     memcpy(&messageID, data, sizeof(int32_t));
     data += sizeof(int32_t);
     // source_id = GlobalFederateId{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&source_id, data, sizeof(GlobalFederateId));
+    memcpy(source_id.getBaseTypePointer(), data, sizeof(GlobalFederateId::BaseType));
     data += sizeof(GlobalFederateId);
     // source_handle = InterfaceHandle{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&source_handle, data, sizeof(InterfaceHandle));
+    memcpy(source_handle.getBaseTypePointer(), data, sizeof(InterfaceHandle::BaseType));
     data += sizeof(InterfaceHandle);
     // dest_id = GlobalFederateId{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&dest_id, data, sizeof(GlobalFederateId));
+    memcpy(dest_id.getBaseTypePointer(), data, sizeof(GlobalFederateId::BaseType));
     data += sizeof(GlobalFederateId);
     // dest_handle = InterfaceHandle{*reinterpret_cast<const int32_t *> (data)};
-    memcpy(&dest_handle, data, sizeof(InterfaceHandle));
+    memcpy(dest_handle.getBaseTypePointer(), data, sizeof(InterfaceHandle::BaseType));
     data += sizeof(InterfaceHandle);
     // counter = *reinterpret_cast<const uint16_t *> (data);
     memcpy(&counter, data, sizeof(uint16_t));
@@ -485,7 +485,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
 
 int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
 {
-    const std::byte* bytes = reinterpret_cast<const std::byte*>(data);
+    const auto* bytes = reinterpret_cast<const std::byte*>(data);
     if (bytes[0] != std::byte(LEADING_CHAR)) {
         return 0;
     }
@@ -497,7 +497,7 @@ int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
     message_size += static_cast<unsigned char>(bytes[2]);
     message_size <<= 8U;
     message_size += static_cast<unsigned char>(bytes[3]);
-    if (buffer_size < static_cast<size_t>(message_size + 2)) {
+    if (buffer_size < (static_cast<size_t>(message_size) + 2)) {
         return 0;
     }
     if (bytes[message_size] != std::byte(TAIL_CHAR1)) {
@@ -702,7 +702,7 @@ const char* actionMessageType(action_message_def::action_t action)
 }
 
 // set of strings to translate error codes to something sensible
-static constexpr frozen::unordered_map<int, frozen::string, 6> errorStrings = {
+static constexpr frozen::unordered_map<int, frozen::string, 8> errorStrings = {
     {connection_error_code, "connection error result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},

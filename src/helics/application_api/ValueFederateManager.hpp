@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/federate_id.hpp"
+#include "../core/LocalFederateId.hpp"
 #include "Inputs.hpp"
 #include "ValueFederate.hpp"
 #include "data_view.hpp"
@@ -30,7 +30,7 @@ struct publication_info {
     std::string type;  //!< publication type
     std::string units;  //!< publication units
     InterfaceHandle coreID;  //!< Handle from the core
-    publication_id_t id;  //!< the id used as the identifier
+    PublicationId id;  //!< the id used as the identifier
     int size{-1};  //!< required size of a publication
     bool forward{true};
     publication_info(const std::string& n_name,
@@ -44,7 +44,7 @@ struct publication_info {
 /** structure used to contain information about a subscription*/
 struct input_info {
     InterfaceHandle coreID;  //!< Handle from the core
-    input_id_t id;  //!< the id used as the identifier
+    InputId id;  //!< the id used as the identifier
     data_view lastData;  //!< the last published data from a target
     Time lastUpdate{0.0};  //!< the time the subscription was last updated
     Time lastQuery{0.0};  //!< the time the query was made

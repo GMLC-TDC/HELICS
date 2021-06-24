@@ -14,14 +14,15 @@ cmake_minimum_required(VERSION 3.10...3.20)
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
+
 project(HELICS VERSION 3.0.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD "beta")
+set(HELICS_VERSION_BUILD "beta.2")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-06-10")
+set(HELICS_DATE "2021-06-29")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
