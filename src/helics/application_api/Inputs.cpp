@@ -69,7 +69,7 @@ Input::Input(InterfaceVisibility locality,
 
 void Input::setDefaultBytes(data_view val)
 {
-    fed->setDefaultValue(*this, val);
+    fed->setDefaultValue(*this, std::move(val));
 }
 
 void Input::handleCallback(Time time)

@@ -485,7 +485,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
 
 int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
 {
-    const std::byte* bytes = reinterpret_cast<const std::byte*>(data);
+    const auto* bytes = reinterpret_cast<const std::byte*>(data);
     if (bytes[0] != std::byte(LEADING_CHAR)) {
         return 0;
     }
@@ -497,7 +497,7 @@ int ActionMessage::depacketize(const void* data, std::size_t buffer_size)
     message_size += static_cast<unsigned char>(bytes[2]);
     message_size <<= 8U;
     message_size += static_cast<unsigned char>(bytes[3]);
-    if (buffer_size < static_cast<size_t>(message_size + 2)) {
+    if (buffer_size < (static_cast<size_t>(message_size) + 2)) {
         return 0;
     }
     if (bytes[message_size] != std::byte(TAIL_CHAR1)) {
