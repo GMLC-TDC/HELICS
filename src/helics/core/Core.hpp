@@ -833,7 +833,7 @@ class Core {
      * getter for the federate tags
      * @param handle the identifier for the federate to set the info data on
      * @param tag the name of the tag to retrieve
-     * @return a reference to a const std::string with the tag value.  
+     * @return a reference to a const std::string with the tag value.
      */
     virtual const std::string& getFederateTag(LocalFederateId fid,
                                               const std::string& tag) const = 0;
