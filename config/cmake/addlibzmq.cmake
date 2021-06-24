@@ -172,6 +172,13 @@ else()
     set(zmq_target_output "libzmq")
 endif()
 
+if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+        target_compile_options(
+                ${zmq_target_output}
+                INTERFACE  $<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>
+            )
+endif()
+
 if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_LIB)
 
     if(NOT ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY AND NOT ${PROJECT_NAME}_SKIP_ZMQ_INSTALL)

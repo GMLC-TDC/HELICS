@@ -9,7 +9,7 @@ shopt -s nocasematch
 
 # Setup the flags for configuring HELICS with CMake
 OPTION_FLAGS_ARR=()
-OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON" "-DHELICS_EXAMPLES_WARNINGS_AS_ERROR=ON")
+OPTION_FLAGS_ARR+=("-DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON")
 
 # Enable adding the slower subproject tests; will not run for CI builds unless they run ctest with the Packaging label
 OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SUBPROJECT_TESTS=ON")
@@ -42,6 +42,12 @@ fi
 
 if [[ "$DISABLE_EXAMPLES" ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_BUILD_EXAMPLES=OFF")
+else
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_EXAMPLES=ON -DHELICS_EXAMPLES_WARNINGS_AS_ERROR=ON")
+fi
+
+if [[ "$DISABLE_CXX_SHARED" ]]; then
+    OPTION_FLAGS_ARR+=("-DHELICS_BUILD_CXX_SHARED_LIB=OFF")
 fi
 
 # Options related to the CMake build type
@@ -58,6 +64,7 @@ fi
 if [[ "$ENABLE_CPACK" ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_PACKAGE_BUILD=ON")
 fi
+
 if [[ "$INSTALL_SYSTEM_LIBRARIES" ]]; then
     OPTION_FLAGS_ARR+=("-DINSTALL_SYSTEM_LIBRARIES=ON")
 fi

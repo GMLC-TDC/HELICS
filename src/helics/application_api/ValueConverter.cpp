@@ -283,7 +283,7 @@ namespace detail {
         std::size_t size = getDataSize(data);
         val.resize(size);
         if (size > 0) {
-            std::memcpy(val.data(), data + 8, size * sizeof(std::complex<double>));
+            std::memcpy(reinterpret_cast<double *>(val.data()), data + 8, size * sizeof(std::complex<double>));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
             for (auto& v : val) {
