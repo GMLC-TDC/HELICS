@@ -81,6 +81,7 @@ class InterfaceHandle {
     bool isValid() const { return (hid != mInvalidHandle); }
     /** get a pointer to the index value type for copying from memory*/
     BaseType* getBaseTypePointer() { return &hid; }
+
   private:
     static constexpr BaseType mInvalidHandle{detail::gInvalidInterfaceHandle};
     BaseType hid{mInvalidHandle};  //!< the underlying index value

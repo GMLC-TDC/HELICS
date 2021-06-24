@@ -100,8 +100,7 @@ struct hash<helics::IdentifierId<BaseType, ID, invalidValue>> {
 }  // namespace std
 
 namespace helics {
-using PublicationId =
-    IdentifierId<IdentifierType, Identifiers::PUBLICATION, invalid_id_value>;
+using PublicationId = IdentifierId<IdentifierType, Identifiers::PUBLICATION, invalid_id_value>;
 using InputId = IdentifierId<IdentifierType, Identifiers::INPUT, invalid_id_value>;
 
 using QueryId = IdentifierId<IdentifierType, Identifiers::QUERY, invalid_id_value>;

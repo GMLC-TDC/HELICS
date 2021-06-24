@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "core-data.hpp"
 #include "LocalFederateId.hpp"
+#include "core-data.hpp"
 
 #include <functional>
 #include <memory>
@@ -105,11 +105,11 @@ class Core {
     virtual const std::string& getAddress() const = 0;
 
     /**
-    * Federate has encountered a global error and the federation should halt.
-    * @param federateID the federate
-    * @param errorCode a numerical code associated with the error
-    * @param errorString a text message associated with the error
-    */
+     * Federate has encountered a global error and the federation should halt.
+     * @param federateID the federate
+     * @param errorCode a numerical code associated with the error
+     * @param errorString a text message associated with the error
+     */
     virtual void globalError(LocalFederateId federateID,
                              int32_t errorCode,
                              const std::string& errorString) = 0;
@@ -118,7 +118,7 @@ class Core {
      * Federate has encountered a local error and should be disconnected.
      * @param federateID the federate
      * @param errorCode a numerical code associated with the error
-     * @param errorString a text message associated with the error 
+     * @param errorString a text message associated with the error
      */
     virtual void localError(LocalFederateId federateID,
                             int32_t errorCode,

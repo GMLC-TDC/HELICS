@@ -112,6 +112,7 @@ class GlobalFederateId {
 
     /** get a pointer to the index value type for copying from memory*/
     BaseType* getBaseTypePointer() { return &gid; }
+
   private:
     static constexpr BaseType invalid_global_fed_id{-2'010'000'000};
     BaseType gid{invalid_global_fed_id};  //!< the underlying index value
