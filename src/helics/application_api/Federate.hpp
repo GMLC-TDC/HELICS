@@ -359,8 +359,8 @@ class HELICS_CXX_EXPORT Federate {
     @return a QueryId to use for returning the result
     */
     QueryId queryAsync(const std::string& target,
-                          const std::string& queryStr,
-                          HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
+                       const std::string& queryStr,
+                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** make a query of the core in an async fashion
     @details this call is blocking until the value is returned which make take some time depending
@@ -372,7 +372,7 @@ class HELICS_CXX_EXPORT Federate {
     @return a QueryId used to get the results of the query in the future
     */
     QueryId queryAsync(const std::string& queryStr,
-                          HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
+                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** get the results of an async query
     @details the call will block until the results are returned inquiry of queryCompleted() to check

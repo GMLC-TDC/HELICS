@@ -1186,8 +1186,8 @@ std::string Federate::query(const std::string& target,
 }
 
 QueryId Federate::queryAsync(const std::string& target,
-                                const std::string& queryStr,
-                                HelicsSequencingModes mode)
+                             const std::string& queryStr,
+                             HelicsSequencingModes mode)
 {
     auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
         return coreObject->query(target, queryStr, mode);
