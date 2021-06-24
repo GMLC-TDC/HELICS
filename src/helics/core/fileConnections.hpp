@@ -160,6 +160,11 @@ namespace fileops {
                 }
             }
         }
+        if constexpr (std::is_base_of<Core, brkX>::value) {
+            loadTags(doc, [brk](const std::string& tagname, const std::string& tagvalue) {
+                brk->setFederateTag(gLocalCoreId, tagname, tagvalue);
+            });
+        }
     }
 }  // namespace fileops
 }  // namespace helics

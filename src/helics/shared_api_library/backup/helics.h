@@ -1328,33 +1328,33 @@ HELICS_EXPORT void helicsFederateGlobalError(HelicsFederate fed, int errorCode, 
 HELICS_EXPORT void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* error_string, HelicsError* err);
 
 /**
- * Disconnct/finalize the federate. This function halts all communication in the federate and disconnects it from the core.
+ * Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it from the core.
  */
 HELICS_EXPORT void helicsFederateFinalize(HelicsFederate fed, HelicsError* err);
 
 /**
- * Disconnct/finalize the federate in an async call.
+ * Disconnect/finalize the federate in an async call.
  */
 HELICS_EXPORT void helicsFederateFinalizeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
- * Complete the asynchronous disconnct/finalize call.
+ * Complete the asynchronous disconnect/finalize call.
  */
 HELICS_EXPORT void helicsFederateFinalizeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
- * Disconnct/finalize the federate. This function halts all communication in the federate and disconnects it
+ * Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it
  * from the core.  This call is identical to helicsFederateFinalize.
  */
 HELICS_EXPORT void helicsFederateDisconnect(HelicsFederate fed, HelicsError* err);
 
 /**
- * Disconnct/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync.
+ * Disconnect/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync.
  */
 HELICS_EXPORT void helicsFederateDisconnectAsync(HelicsFederate fed, HelicsError* err);
 
 /**
- * Complete the asynchronous disconnct/finalize call.  This call is identical to helicsFederateFinalizeComplete
+ * Complete the asynchronous disconnect/finalize call.  This call is identical to helicsFederateFinalizeComplete
  */
 HELICS_EXPORT void helicsFederateDisconnectComplete(HelicsFederate fed, HelicsError* err);
 
@@ -1771,6 +1771,31 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
 
  */
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
+
+/**
+ * Set a federate tag value.
+ *
+ * @details This overwrites any previous value for this tag.
+ * @param fed The federate to set the tag for.
+ * @param tagName The name of the tag to set.
+ * @param value The value of the tag.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
+
+/**
+ * Get a federate tag value.
+ *
+ * @param fed The federate to get the tag for.
+ * @param tagName The name of the tag to query.
+ * @param value The value of the tag.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
 
 /**
  * Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.
@@ -4209,7 +4234,7 @@ HELICS_EXPORT void helicsFilterAddDestinationTarget(HelicsFilter filt, const cha
  *
  * @param filt The given filter.
  * @param source The name of the endpoint to add as a source target.
- * .
+ *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */

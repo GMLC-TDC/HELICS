@@ -1280,6 +1280,31 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
 /**
+ * Set a federate tag value.
+ *
+ * @details This overwrites any previous value for this tag.
+ * @param fed The federate to set the tag for.
+ * @param tagName The name of the tag to set.
+ * @param value The value of the tag.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
+
+/**
+ * Get a federate tag value.
+ *
+ * @param fed The federate to get the tag for.
+ * @param tagName The name of the tag to query.
+ * @param value The value of the tag.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
+
+/**
  * Add a time dependency for a federate. The federate will depend on the given named federate for time synchronization.
  *
  * @param fed The federate to add the dependency for.

@@ -255,7 +255,21 @@ class HELICS_CXX_EXPORT Federate {
     result*/
     iteration_time requestTimeIterativeComplete();
 
-    /** set a time option for the federate
+    /** set a tag (key-value pair) for a federate
+    @details the tag is an arbitrary user defined string and value; the tags for a federate are
+    queryable through a "tags" query or "tag/<tagname>"
+    @param tag the name of the tag to set the value for
+    @param value the value for the given tag*/
+    void setTag(const std::string& tag, const std::string& value);
+    /** get the value of a specific tag (key-value pair) for a federate
+    @details the tag is an arbitrary user defined string and value; the tags for a federate are
+    queryable
+    @param tag the name of the tag to get the value for
+    @return a const std::string& containing the value of the tag, if the tag is not defined the
+    value is an empty string*/
+    const std::string& getTag(const std::string& tag) const;
+
+    /** set a time property for a federate
     @param option the option to set
     @param timeValue the value to be set
     */

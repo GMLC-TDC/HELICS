@@ -432,6 +432,16 @@ IterationResult Federate::enterExecutingModeComplete()
     }
 }
 
+void Federate::setTag(const std::string& tag, const std::string& value)
+{
+    coreObject->setFederateTag(fedID, tag, value);
+}
+
+const std::string& Federate::getTag(const std::string& tag) const
+{
+    return coreObject->getFederateTag(fedID, tag);
+}
+
 void Federate::setProperty(int32_t option, double timeValue)
 {
     coreObject->setTimeProperty(fedID, option, timeValue);
@@ -970,6 +980,9 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
             }
         }
     }
+    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+        this->setTag(tagname, tagvalue);
+    });
 }
 
 void Federate::registerFilterInterfacesToml(const std::string& tomlString)
@@ -1102,6 +1115,9 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
             }
         }
     }
+    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+        this->setTag(tagname, tagvalue);
+    });
 }
 
 Filter& Federate::getFilter(int index)
@@ -1132,7 +1148,8 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
         if (coreObject) {
             res = generateJsonQuotedString(coreObject->getIdentifier());
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
@@ -1143,7 +1160,8 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
         if (coreObject) {
             res = coreObject->query(getName(), queryStr, mode);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     }
     return res;
@@ -1160,7 +1178,8 @@ std::string Federate::query(const std::string& target,
         if (coreObject) {
             res = coreObject->query(target, queryStr, mode);
         } else {
-            res = generateJsonErrorResponse(410, "Federate is disconnected");
+            res =
+                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
         }
     }
     return res;
@@ -1198,7 +1217,8 @@ std::string Federate::queryComplete(query_id_t queryIndex)  // NOLINT
     if (fnd != asyncInfo->inFlightQueries.end()) {
         return fnd->second.get();
     }
-    return generateJsonErrorResponse(404, "No Async queries are available");
+    return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED,
+                                     "No Async queries are available");
 }
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
@@ -1416,13 +1436,13 @@ void Interface::setInfo(const std::string& info)
 
 const std::string& Interface::getTag(const std::string& tag) const
 {
-    return (cr != nullptr) ? cr->getTag(handle, tag) : emptyStr;
+    return (cr != nullptr) ? cr->getInterfaceTag(handle, tag) : emptyStr;
 }
 
 void Interface::setTag(const std::string& tag, const std::string& value)
 {
     if (cr != nullptr) {
-        cr->setTag(handle, tag, value);
+        cr->setInterfaceTag(handle, tag, value);
     } else {
         throw(
             InvalidFunctionCall("cannot call set tag on uninitialized or disconnected interface"));

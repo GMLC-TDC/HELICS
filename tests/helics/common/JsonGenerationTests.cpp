@@ -39,7 +39,7 @@ TEST(error_generation, egen1)
 {
     std::string message = "this is a message";
     int code{505};
-    auto estring = generateJsonErrorResponse(code, message);
+    auto estring = generateJsonErrorResponse(static_cast<JsonErrorCodes>(code), message);
     Json::Value V;
     EXPECT_NO_THROW(V = loadJsonStr(estring));
     EXPECT_TRUE(V.isObject());
@@ -54,7 +54,7 @@ TEST(error_generation, egen2)
 {
     std::string message = "this is a \"quoted\" message";
     int code{-216};
-    auto estring = generateJsonErrorResponse(code, message);
+    auto estring = generateJsonErrorResponse(static_cast<JsonErrorCodes>(code), message);
     Json::Value V;
     EXPECT_NO_THROW(V = loadJsonStr(estring));
     EXPECT_TRUE(V.isObject());

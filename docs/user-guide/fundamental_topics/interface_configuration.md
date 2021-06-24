@@ -51,6 +51,10 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
       "type":"double",
       "unit":"V",
       "global": true
+      "tags": {
+        "period": 0.5,
+        "description": "a test publication"
+      }
     },
     {
     ...
@@ -88,6 +92,7 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
   - `required` - At least one federate must subscribe to the publications.
   - `type` - Data type, such as integer, double, complex.
   - `units` - The units can be any sort of unit string, a wide assortment is supported and can be compound units such as m/s^2 and the conversion will convert as long as things are convertible. The unit match is also checked for other types and an error if mismatching units are detected. A warning is also generated if the units are not understood and not matching. The unit checking and conversion is only active if both the publication and subscription specify units. HELICS is able to do some levels of unit conversion, currently only on double type publications but more may be added in the future.
+    - `tags` - Arbitrary string value pairs that can be applied to interfaces. Tags are available to others through queries but are not transmitted by default. They can be used to store additional information about an interface that might be useful to applications. At some point in the future automated connection routines will make use of them. "tags" are applicable to any interface and can also be used on federates.
 - **`subscriptions`** - These are lists of the values being sent to and from the given federate.
   - `key` - This string identifies the federation-unique value that this federate wishes to receive. If `global` has been set to `false` in the `publications` JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is the publishing federate's `key` value.
   - `required` - The message being subscribed to must be provided by some other publisher in the federation.

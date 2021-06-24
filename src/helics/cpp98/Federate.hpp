@@ -610,6 +610,26 @@ class Federate {
         helicsFederateSetGlobal(fed, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** set a tag (key-value pair) for a federate
+    @details the tag is an arbitrary user defined string and value; the tags for a federate are
+    queryable through a "tags" query or "tag/<tagname>"
+    @param tag the name of the tag to set the value for
+    @param value the value for the given tag*/
+    void setTag(const std::string& tag, const std::string& value)
+    {
+        helicsFederateSetTag(fed, tag.c_str(), value.c_str(), hThrowOnError());
+    }
+    /** get the value of a specific tag (key-value pair) for a federate
+    @details the tag is an arbitrary user defined string and value; the tags for a federate are
+    queryable
+    @param tag the name of the tag to get the value for
+    @return a const char * containing the text value of the tag, if the tag is not defined the
+    value is a length 0 string*/
+    const char* getTag(const std::string& tag) const
+    {
+        return helicsFederateGetTag(fed, tag.c_str(), hThrowOnError());
+    }
+
     /** add a dependency for this federate
      @details adds an additional internal time dependency for the federate
      @param fedName the name of the federate to add a dependency on
