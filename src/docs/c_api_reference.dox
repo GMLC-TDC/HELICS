@@ -150,6 +150,8 @@ Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
  - \ref helicsFederateSetGlobal
+ - \ref helicsFederateSetTag
+ - \ref helicsFederateGetTag
  - \ref helicsFederateAddDependency
  - \ref helicsFederateSetLogFile
  - \ref helicsFederateLogErrorMessage
