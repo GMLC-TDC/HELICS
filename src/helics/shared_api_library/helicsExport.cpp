@@ -1050,7 +1050,7 @@ const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err)
     }
     queryObj->activeAsync = false;
     queryObj->activeFed = nullptr;
-    queryObj->asyncIndexCode = helics::query_id_t();
+    queryObj->asyncIndexCode = helics::QueryId();
     return queryObj->response.c_str();
 }
 

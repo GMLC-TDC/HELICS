@@ -269,8 +269,6 @@ Increased code coverage and additional bug fixes.
 - BrokerApp has a connect() method and constructor from a Broker shared pointer
 - Added a data_flow_graph query which gets all the connections in a federation
 
-### Deprecated
-
 ### Removed
 
 ## [2.4.1][] - 2020-03-06
@@ -312,8 +310,6 @@ Increased code coverage and additional bug fixes. The error propagation in HELIC
 - A 32-bit Windows zip install archive for releases
 - "global_time", "current_time", and "state" queries for brokers and cores, and "current_time" query for federates.
 - Support for a 'helics-release-build' event trigger to the release build GitHub Actions workflow
-
-### Deprecated
 
 ### Removed
 

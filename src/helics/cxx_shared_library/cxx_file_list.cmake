@@ -38,8 +38,6 @@ set(helics_shared_private_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/AsyncFedCallInfo.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/FilterOperations.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/FilterFederateManager.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/cxx_shared_library/BrokerFactory.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/cxx_shared_library/CoreFactory.hpp
 )
 
 set(conv_headers
@@ -56,7 +54,7 @@ set(core_include_files
     ${HELICS_LIBRARY_SOURCE_DIR}/core/SmallBuffer.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/core-data.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/CoreTypes.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/core/federate_id.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/core/LocalFederateId.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/CoreFederateInfo.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/Core.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/Broker.hpp
@@ -64,8 +62,6 @@ set(core_include_files
     ${HELICS_LIBRARY_SOURCE_DIR}/core/helicsCLI11.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/helicsVersion.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/core/core-exceptions.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/cxx_shared_library/BrokerFactory.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/cxx_shared_library/CoreFactory.hpp
 )
 
 set(utilities_include_files

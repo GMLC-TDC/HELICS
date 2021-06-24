@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-/**@ file
-@detail different signal generators for the source app
+/**@file
+@details different signal generators for the source app
 */
 
 #include "Source.hpp"

@@ -39,7 +39,7 @@ Index of functions available in the C and by extension the language API's
  - \ref helicsCreateQuery
 
  \section core Core Functions
-functions applying to a \ref helics_core object
+functions applying to a \ref HelicsCore object
  - \ref helicsCoreClone
  - \ref helicsCoreIsValid
  - \ref helicsCoreWaitForDisconnect
@@ -64,7 +64,7 @@ functions applying to a \ref helics_core object
  - \ref helicsCoreRegisterCloningFilter
 
  \section broker Broker Functions
-Functions applying to a \ref helics_broker object
+Functions applying to a \ref HelicsBroker object
  - \ref helicsBrokerClone
  - \ref helicsBrokerIsValid
  - \ref helicsBrokerIsConnected
@@ -87,7 +87,7 @@ Functions applying to a \ref helics_broker object
  - \ref helicsBrokerSetLoggingCallback
 
  \section fedinfo Federate Info Functions
-Functions applying to a \ref helics_federate_info object
+Functions applying to a \ref HelicsFederateInfo object
  - \ref helicsFederateInfoClone
  - \ref helicsFederateInfoLoadFromArgs
  - \ref helicsFederateInfoFree
@@ -106,7 +106,7 @@ Functions applying to a \ref helics_federate_info object
  - \ref helicsFederateInfoSetIntegerProperty
 
  \section federate Federate Functions
-Functions applying to all \ref helics_federate objects
+Functions applying to all \ref HelicsFederate objects
  - \ref helicsFederateDestroy
  - \ref helicsFederateClone
  - \ref helicsFederateIsValid
@@ -150,6 +150,8 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateGetIntegerProperty
  - \ref helicsFederateGetCurrentTime
  - \ref helicsFederateSetGlobal
+ - \ref helicsFederateSetTag
+ - \ref helicsFederateGetTag
  - \ref helicsFederateAddDependency
  - \ref helicsFederateSetLogFile
  - \ref helicsFederateLogErrorMessage
@@ -165,7 +167,7 @@ Functions applying to all \ref helics_federate objects
  - \ref helicsFederateSetQueryCallback
 
  \section vfederate Value Federate Functions
-functions applying to federates created as a value or combination federate \ref helics_federate objects
+functions applying to federates created as a value or combination federate \ref HelicsFederate objects
  - \ref helicsFederateRegisterSubscription
  - \ref helicsFederateRegisterPublication
  - \ref helicsFederateRegisterTypePublication
@@ -187,7 +189,7 @@ functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateGetInputCount
 
  \section pub Publication interface Functions
-functions applying to a \ref helics_publication object
+functions applying to a \ref HelicsPublication object
  - \ref helicsPublicationIsValid
  - \ref helicsPublicationPublishBytes
  - \ref helicsPublicationPublishString
@@ -212,7 +214,7 @@ functions applying to a \ref helics_publication object
  - \ref helicsPublicationSetMinimumChange
 
  \section input Input interface Functions
-functions applying to a \ref helics_input object
+functions applying to a \ref HelicsInput object
  - \ref helicsInputIsValid
  - \ref helicsInputAddTarget
  - \ref helicsInputGetByteCount
@@ -258,7 +260,7 @@ functions applying to a \ref helics_input object
  - \ref helicsInputClearUpdate
 
  \section message Message Federate Functions
-Functions applying to federates created as a value or combination federate \ref helics_federate objects
+Functions applying to federates created as a value or combination federate \ref HelicsFederate objects
  - \ref helicsFederateRegisterEndpoint
  - \ref helicsFederateRegisterGlobalEndpoint
  - \ref helicsFederateRegisterTargetedEndpoint
@@ -266,14 +268,14 @@ Functions applying to federates created as a value or combination federate \ref 
  - \ref helicsFederateGetEndpoint
  - \ref helicsFederateGetEndpointByIndex
  - \ref helicsFederateHasMessage
- - \ref helicsFederatePendingMessagesCount
+ - \ref helicsFederatePendingMessageCount
  - \ref helicsFederateGetMessage
  - \ref helicsFederateCreateMessage
  - \ref helicsFederateClearMessages
  - \ref helicsFederateGetEndpointCount
 
  \section messageObject Message object Functions
-functions applying to a \ref helics_message_object
+functions applying to a \ref HelicsMessage
  - \ref helicsMessageGetSource
  - \ref helicsMessageGetDestination
  - \ref helicsMessageGetOriginalSource
@@ -304,7 +306,7 @@ functions applying to a \ref helics_message_object
  - \ref helicsMessageClear
 
  \section endpoint Endpoint interface Functions
-functions applying to a \ref helics_endpoint object
+functions applying to a \ref HelicsEndpoint object
  - \ref helicsEndpointIsValid
  - \ref helicsEndpointSetDefaultDestination
  - \ref helicsEndpointGetDefaultDestination
@@ -316,7 +318,7 @@ functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointSendMessageZeroCopy
  - \ref helicsEndpointSubscribe
  - \ref helicsEndpointHasMessage
- - \ref helicsEndpointPendingMessagesCount
+ - \ref helicsEndpointPendingMessageCount
  - \ref helicsEndpointGetMessage
  - \ref helicsEndpointCreateMessage
  - \ref helicsEndpointGetType
@@ -334,7 +336,7 @@ functions applying to a \ref helics_endpoint object
  - \ref helicsEndpointAddDestinationFilter
 
  \section filterfed Filter Federate Functions
-Functions applying to all federates but related to \ref helics_filter
+Functions applying to all federates but related to \ref HelicsFilter
  - \ref helicsFederateRegisterFilter
  - \ref helicsFederateRegisterGlobalFilter
  - \ref helicsFederateRegisterCloningFilter
@@ -344,7 +346,7 @@ Functions applying to all federates but related to \ref helics_filter
  - \ref helicsFederateGetFilterByIndex
 
  \section filter Filter interface Functions
-Functions applying to a \ref helics_filter object
+Functions applying to a \ref HelicsFilter object
  - \ref helicsFilterSetCustomCallback
  - \ref helicsFilterIsValid
  - \ref helicsFilterGetName
@@ -363,7 +365,7 @@ Functions applying to a \ref helics_filter object
  - \ref helicsFilterGetOption
 
  \section query Query Functions
-functions applying to a \ref helics_query object
+functions applying to a \ref HelicsQuery object
  - \ref helicsQueryExecute
  - \ref helicsQueryCoreExecute
  - \ref helicsQueryBrokerExecute

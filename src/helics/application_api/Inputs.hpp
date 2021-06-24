@@ -178,9 +178,8 @@ class HELICS_CXX_EXPORT Input: public Interface {
 
     /** register a callback for an update notification
     @details the callback is called in the just before the time request function returns
-    @param callback a function with signature void( Time time)
-    time is the time the value was updated  This callback is a notification callback and doesn't
-    return the value
+    @param callback a function with signature void(Time time) where time is the time the value was
+    updated. This callback is a notification callback and doesn't return the value
     */
     void registerNotificationCallback(std::function<void(Time)> callback);
 

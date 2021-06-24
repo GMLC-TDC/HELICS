@@ -144,7 +144,7 @@ class QueryObject {
     std::shared_ptr<Federate> activeFed;  //!< pointer to the fed with the active Query
     bool activeAsync{false};
     HelicsSequencingModes mode{HELICS_SEQUENCING_MODE_FAST};  //!< the ordering mode used for the query
-    query_id_t asyncIndexCode;  //!< the index to use for the queryComplete call
+    QueryId asyncIndexCode;  //!< the index to use for the queryComplete call
     int valid{0};
 };
 

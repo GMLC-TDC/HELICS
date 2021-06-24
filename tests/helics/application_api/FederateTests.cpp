@@ -1082,10 +1082,10 @@ TEST(federate_tests, queryTest1)
     qres = Fed1->query("root", "subscriptions");
     EXPECT_NE(qres.find("error"), std::string::npos);
 
-    qres = Fed1->queryComplete(helics::query_id_t{4});
+    qres = Fed1->queryComplete(helics::QueryId{4});
     EXPECT_NE(qres.find("error"), std::string::npos);
 
-    EXPECT_FALSE(Fed1->isQueryCompleted(helics::query_id_t{2}));
+    EXPECT_FALSE(Fed1->isQueryCompleted(helics::QueryId{2}));
     EXPECT_NO_THROW(Fed1->logMessage(10, "test log message"));
 }
 
