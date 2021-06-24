@@ -623,8 +623,8 @@ class Federate {
     @details the tag is an arbitrary user defined string and value; the tags for a federate are
     queryable
     @param tag the name of the tag to get the value for
-    @return a const std::string& containing the value of the tag, if the tag is not defined the
-    value is an empty string*/
+    @return a const char * containing the text value of the tag, if the tag is not defined the
+    value is a length 0 string*/
     const char* getTag(const std::string& tag) const
     {
         return helicsFederateGetTag(fed, tag.c_str(), hThrowOnError());
