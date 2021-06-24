@@ -118,7 +118,7 @@ class HELICS_CXX_EXPORT CoreApp {
 
     /** set a tag (key-value pair) for a core
   @details the tag is an arbitrary user defined string and value; the tags for a core are
-  queryable through a tags query or "tag/<tagname>
+  queryable through a "tags" query or "tag/<tagname>"
   @param tag the name of the tag to set the value for
   @param value the value for the given tag*/
     void setTag(const std::string& tag, const std::string& value);

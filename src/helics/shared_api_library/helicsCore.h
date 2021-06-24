@@ -1280,12 +1280,12 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
 /**
- * Set a federate tag value
+ * Set a federate tag value.
  *
- * @details This overwrites any previous value for this name.
- * @param fed The federate to set the tag for
+ * @details This overwrites any previous value for this tag.
+ * @param fed The federate to set the tag for.
  * @param tagName The name of the tag to set.
- * @param value The value of the tag
+ * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -1293,11 +1293,11 @@ HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* value
 HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
 
 /**
- * Get a federate tag value
+ * Get a federate tag value.
  *
- * @param fed The federate to get the tag for
- * @param tagName The name of the tag to query
- * @param value The value of the tag
+ * @param fed The federate to get the tag for.
+ * @param tagName The name of the tag to query.
+ * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 

@@ -94,15 +94,15 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``version``        | the version string of the helics library [string]          |
 +--------------------+------------------------------------------------------------+
-| ``tags``           | A JSON structure with the tags and values [JSON]           |
+| ``tags``           | a JSON structure with the tags and values [JSON]           |
 +--------------------+------------------------------------------------------------+
-| ``tag/<tagname>``  | the value associate with a tagname [string]                |
+| ``tag/<tagname>``  | the value associated with a tagname [string]                |
 +--------------------+------------------------------------------------------------+
-| ``<tagname>``      | the value associate with a tagname [string]                |
+| ``<tagname>``      | the value associated with a tagname [string]                |
 +--------------------+------------------------------------------------------------+
 ```
 
-The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them. The difference between `tag/<tagname>` is that using the `tag\` prefix can retrieve any tag and will return an empty string if the tag doesn't exist. just using the tag name will not return tags of the same name as other queries and will generate an error response if the tag doesn't exist.
+The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them. The difference between `tag/<tagname>` and `<tagname>` is that using the `tag/` prefix can retrieve any tag and will return an empty string if the tag doesn't exist. Just using the tag name will not return tags of the same name as other queries and will generate an error response if the tag doesn't exist.
 
 ### Local Federate Queries
 
@@ -186,11 +186,11 @@ The following queries will be answered by a core:
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``global_flush``         | a query that just flushes the current system and returns the id's [JSON]            |
 +--------------------------+-------------------------------------------------------------------------------------+
-| ``tags``                 | A JSON structure with the tags and values [JSON]                                    |
+| ``tags``                 | a JSON structure with the tags and values [JSON]                                    |
 +--------------------------+-------------------------------------------------------------------------------------+
-| ``tag/<tagname>``        | the value associate with a tagname [string]                                         |
+| ``tag/<tagname>``        | the value associated with a tagname [string]                                         |
 +--------------------------+-------------------------------------------------------------------------------------+
-| ``<tagname>``            | the value associate with a tagname [string]                                         |
+| ``<tagname>``            | the value associated with a tagname [string]                                         |
 +--------------------------+-------------------------------------------------------------------------------------+
 ```
 
