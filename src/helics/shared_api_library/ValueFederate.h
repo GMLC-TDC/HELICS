@@ -849,7 +849,7 @@ HELICS_EXPORT void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsE
  * Get the data in a specified tag of an input.
  *
  * @param inp The input object to query.
- * @param tagname the name of the tag to get the value for.
+ * @param tagname The name of the tag to get the value for.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsInputGetTag(HelicsInput inp, const char* tagname);
@@ -888,7 +888,7 @@ HELICS_EXPORT void helicsPublicationSetInfo(HelicsPublication pub, const char* i
  * Get the data in a specified tag of a publication.
  *
  * @param pub The publication object to query.
- * @param tagname the name of the tag to query.
+ * @param tagname The name of the tag to query.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname);
@@ -897,7 +897,7 @@ HELICS_EXPORT const char* helicsPublicationGetTag(HelicsPublication pub, const c
  * Set the data in a specific tag for a publication.
  *
  * @param pub The publication object to set a tag for.
- * @param tagname The name of string to set.
+ * @param tagname The name of the tag to set.
  * @param tagvalue The string value to associate with a tag.
  *
  * @param[in,out] err An error object to fill out in case of an error.

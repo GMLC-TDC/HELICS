@@ -43,7 +43,7 @@ The public API includes the following
   - NOTE: core headers in the public API are headers that need to be available for the Application API public headers. The core API can be used more directly with static linking but applications are generally recommended to use the application API or other higher level API's
 
 - C Shared Library headers (c) All C library operations are merged into a single header helics.h
-A helics_api.h is available for generating interfaces which strips out import declarations and comments.  The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
+A helics_api.h header is available for generating interfaces which strips out import declarations and comments.  The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
 
 - App Library
 
@@ -57,7 +57,7 @@ A helics_api.h is available for generating interfaces which strips out import de
   - BrokerApp.hpp (aliased to application_api version)
   - CoreApp.hpp (aliased to application_api version)
 
-- Exceptions: The vector subscription Objects, and vector Input objects are subject to change.  
+- Exceptions: The vector subscription Objects, and vector Input objects are subject to change.
 
 - C++98 Library _All headers are mostly stable. Though we reserve the ability to make changes to make them better match the main C\+\+ API._
 

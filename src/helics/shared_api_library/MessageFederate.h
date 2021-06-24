@@ -414,7 +414,7 @@ HELICS_EXPORT void helicsEndpointSetInfo(HelicsEndpoint endpoint, const char* in
  * Get the data in a specified tag of an endpoint
  *
  * @param endpoint The endpoint to query.
- * @param tagname the name of the tag to query
+ * @param tagname The name of the tag to query.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname);
@@ -500,7 +500,7 @@ HELICS_EXPORT void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const 
  * add a destination filter to an endpoint
  *
  * @param endpoint The endpoint to modify.
- * @param filterName the name of the filter to add
+ * @param filterName The name of the filter to add.
  *
  * @param[in,out] err An error object to fill out in case of an error.
  */

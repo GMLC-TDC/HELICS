@@ -531,7 +531,7 @@ class Core {
     filter
     @param handle the identifier of the interface
     @param name the name of the filter or its target
-    @param hint the interface type for the destination target
+    @param hint the interface type for the source target
     */
     virtual void addSourceTarget(InterfaceHandle handle,
                                  std::string_view name,

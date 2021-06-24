@@ -288,7 +288,7 @@ HELICS_EXPORT void helicsFilterSetInfo(HelicsFilter filt, const char* info, Heli
  * Get the data in a specified tag of a filter.
  *
  * @param filt The filter to query.
- * @param tagname the name of the tag to query
+ * @param tagname The name of the tag to query.
  * @return A string with the tag data.
  */
 HELICS_EXPORT const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname);
