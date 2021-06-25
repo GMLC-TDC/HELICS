@@ -439,6 +439,42 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     vFed2->finalize();
 }
 
+TEST_F(timing_tests2, wait_for_current_time_flag2_error)
+{
+    extraBrokerArgs = "--debugging --consoleloglevel=no_print";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging --consoleloglevel=no_print";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed1->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed1->registerGlobalPublication<double>("pub1_1");
+    vFed1->registerGlobalPublication<double>("pub1_2");
+    vFed1->registerSubscription("pub2_1");
+
+    vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    auto& sub2_2 = vFed2->registerSubscription("pub1_2");
+    sub2_1.setDefault(9.9);
+    sub2_2.setDefault(10.5);
+
+    vFed2->enterExecutingModeAsync();
+    auto res=vFed1->enterExecutingMode();
+    EXPECT_EQ(res, helics::iteration_result::error);
+    
+
+    res=vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::error);
+    
+    broker.reset();
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
 TEST_F(timing_tests2, wait_for_current_time_flag_self)
 {
     extraBrokerArgs = "--debugging";
@@ -456,7 +492,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_self)
     vFed1->registerSubscription("pub2_1");
 
     vFed2->registerGlobalPublication<double>("pub2_1");
-    auto &pub2_2=vFed2->registerGlobalPublication<double>("pub2_2");
+    vFed2->registerGlobalPublication<double>("pub2_2");
 
     auto& sub2_1 = vFed2->registerSubscription("pub1_1");
     auto& sub2_2 = vFed2->registerSubscription("pub1_2");
@@ -507,6 +543,38 @@ TEST_F(timing_tests2, wait_for_current_time_flag_self)
     retTime = vFed2->requestTime(7.0);
     EXPECT_EQ(retTime, 7.0);
     vFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
+{
+    extraBrokerArgs = "--debugging --loglevel=no_print";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging --loglevel=no_print";
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    mFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+    // this should cause an error later
+    mFed1->setFlagOption(helics::defs::wait_for_current_time_update);
+    mFed1->registerGlobalEndpoint("ept1");
+
+    mFed2->registerGlobalEndpoint("ept2");
+
+    mFed2->enterExecutingModeAsync();
+   
+    auto res=mFed1->enterExecutingMode();
+    EXPECT_EQ(res, helics::iteration_result::error);   
+   
+    
+    res=mFed2->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::error);   
+    
+    broker.reset();
+    mFed1->finalize();
+
+    mFed2->finalize();
 }
 
 TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)

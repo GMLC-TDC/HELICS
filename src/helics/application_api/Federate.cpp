@@ -325,10 +325,8 @@ iteration_result Federate::enterExecutingMode(iteration_request iterate)
                     initializeToExecuteStateTransition(res);
                     break;
                 case iteration_result::error:
-                    // LCOV_EXCL_START
                     currentMode = modes::error;
                     break;
-                    // LCOV_EXCL_STOP
                 case iteration_result::halted:
                     currentMode = modes::finished;
                     break;

@@ -1083,9 +1083,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                                        getIdentifier(),
                                        "entering Exec Mode");
                         }
-                        
                     }
-                    
                 }
             } else {
                 routeMessage(command);
@@ -2215,6 +2213,9 @@ void CoreBroker::processError(ActionMessage& command)
     sendToLogger(command.source_id, log_level::error, std::string(), command.payload);
     if (command.source_id == global_broker_id_local) {
         setBrokerState(broker_state_t::errored);
+        if (command.action() == CMD_GLOBAL_ERROR) {
+            setErrorState(command.messageID, command.payload);
+        }
         broadcast(command);
         if (!isRootc) {
             command.setAction(CMD_LOCAL_ERROR);
@@ -2225,7 +2226,11 @@ void CoreBroker::processError(ActionMessage& command)
 
     if (command.source_id == parent_broker_id || command.source_id == root_broker_id) {
         setBrokerState(broker_state_t::errored);
+        if (command.action() == CMD_GLOBAL_ERROR) {
+            setErrorState(command.messageID, command.payload);
+        }
         broadcast(command);
+        return;
     }
 
     auto* brk = getBrokerById(global_broker_id(command.source_id));

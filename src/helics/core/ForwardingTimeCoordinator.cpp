@@ -102,8 +102,33 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         transmitTimingMessagesUpstream(upd);
     }
     if (updateDownstream) {
-        auto upd = generateTimeRequest(downstream, global_federate_id{});
-        transmitTimingMessagesDownstream(upd);
+        if (hasDelayedTimingFederate)
+        {
+            if (downstream.minFed == delayedFederate)
+            {
+                auto upd = generateTimeRequest(downstream, global_federate_id{});
+                transmitTimingMessagesDownstream(upd,delayedFederate);
+                auto td=generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id,delayedFederate);
+                DependencyInfo di;
+                di.update(td);
+                auto upd_delayed = generateTimeRequest(di, delayedFederate);
+                if (sendMessageFunction)
+                {
+                    sendMessageFunction(upd_delayed);
+                }
+            }
+            else
+            {
+                auto upd = generateTimeRequest(downstream, global_federate_id{});
+                transmitTimingMessagesDownstream(upd);
+            }
+        }
+        else
+        {
+            auto upd = generateTimeRequest(downstream, global_federate_id{});
+            transmitTimingMessagesDownstream(upd);
+        }
+        
     }
 }
 
@@ -229,10 +254,26 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     if (!dependencies.checkIfReadyForExecEntry(false)) {
         return ret;
     }
-
+    executionMode = true;
     ret = message_processing_result::next_step;
 
-    executionMode = true;
+    for (auto& dep : dependencies) {
+        if (dep.dependency && dep.dependent && dep.delayedTiming) {
+            if (hasDelayedTimingFederate) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = multiple_wait_for_current_time_flags;
+                ge.payload =
+                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
+                sendMessageFunction(ge);
+                return message_processing_result::error;
+            }
+            hasDelayedTimingFederate = true;
+            delayedFederate = dep.fedID;
+        }
+    }
+
     downstream.next = timeZero;
     downstream.time_state = time_state_t::time_granted;
     downstream.minDe = timeZero;
@@ -263,9 +304,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
         setActionFlag(nTime, iteration_requested_flag);
         nTime.Tdemin = std::min(dep.minDe, dep.Te);
         nTime.Te = dep.Te;
-    }
-    else if (dep.time_state == time_state_t::exec_requested)
-    {
+    } else if (dep.time_state == time_state_t::exec_requested) {
         nTime.setAction(CMD_IGNORE);
     }
     return nTime;
@@ -273,7 +312,10 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
 
 void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) const
 {
-    if (sendMessageFunction) {
+    if (!sendMessageFunction) {
+        return;
+    }
+
         for (auto dep : dependencies) {
             if (dep.connection == ConnectionType::child) {
                 continue;
@@ -284,42 +326,42 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
             msg.dest_id = dep.fedID;
             sendMessageFunction(msg);
         }
-    }
 }
 
-void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg) const
+void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
+                                                                 global_federate_id skipFed) const
 {
-    if (sendMessageFunction) {
-        if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
-            for (auto dep : dependencies) {
-                if (dep.connection != ConnectionType::child) {
+    if (!sendMessageFunction) {
+        return;
+    }
+    if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
+        for (auto dep : dependencies) {
+            if (dep.connection != ConnectionType::child) {
+                continue;
+            }
+            if (!dep.dependent) {
+                continue;
+            }
+            if (dep.fedID == skipFed)
+            {
+                continue;
+            }
+            if (dep.dependency) {
+                if (dep.next > msg.actionTime) {
                     continue;
                 }
-                if (!dep.dependent) {
+            }
+            msg.dest_id = dep.fedID;
+            sendMessageFunction(msg);
+        }
+    } else {
+        for (auto dep : dependencies) {
+            if (dep.dependent) {
+                if (dep.fedID == skipFed) {
                     continue;
-                }
-
-                if (dep.dependency) {
-                    if (dep.next > msg.actionTime) {
-                        continue;
-                    }
                 }
                 msg.dest_id = dep.fedID;
-                /*if (msg.dest_id == global_federate_id(131074)) {
-                    if (msg.actionTime > timeZero) {
-                        printf("sending TR to 131074 for next=%f\n",
-                               static_cast<double>(msg.actionTime));
-                    }
-                }
-                */
                 sendMessageFunction(msg);
-            }
-        } else {
-            for (auto dep : dependencies) {
-                if (dep.dependent) {
-                    msg.dest_id = dep.fedID;
-                    sendMessageFunction(msg);
-                }
             }
         }
     }

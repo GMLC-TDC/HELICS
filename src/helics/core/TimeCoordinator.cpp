@@ -747,6 +747,25 @@ message_processing_result TimeCoordinator::checkExecEntry()
     if (!dependencies.checkIfReadyForExecEntry(iterating != iteration_request::no_iterations)) {
         return ret;
     }
+
+    // check for timing deadlock with wait_for_current_time_flag
+    if (info.wait_for_current_time_updates)
+    {
+
+     for (auto& dep : dependencies) {
+        if (dep.dependency && dep.dependent && dep.delayedTiming  && dep.fedID!=source_id) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = multiple_wait_for_current_time_flags;
+                ge.payload =
+                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
+                sendMessageFunction(ge);
+                return message_processing_result::error;
+        }
+     }
+    }
+
     switch (iterating) {
         case iteration_request::no_iterations:
             if (!info.wait_for_current_time_updates) {
