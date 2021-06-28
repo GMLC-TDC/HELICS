@@ -568,7 +568,6 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     setActionFlag(exec, indicator_flag);
     addActionMessage(exec);
 
-    // TODO(PT): check for error conditions?
     return fed->enterExecutingMode(iterate, false);
 }
 
