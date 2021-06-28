@@ -38,6 +38,7 @@ class ForwardingTimeCoordinator {
   public:
     /// the identifier for inserting into the source id field of any generated messages;
     global_federate_id source_id{0};
+    global_federate_id delayedFederate{};
     /// flag indicating that the coordinator is trying to enter the exec mode
     bool checkingExec{false};
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
@@ -46,6 +47,7 @@ class ForwardingTimeCoordinator {
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
     bool noParent{false};  //!< indicator that the coordinator does not have parents
+    bool hasDelayedTimingFederate{false};  //!< indicator that federate is using delayed timing
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
@@ -78,7 +80,8 @@ class ForwardingTimeCoordinator {
 
   private:
     void transmitTimingMessagesUpstream(ActionMessage& msg) const;
-    void transmitTimingMessagesDownstream(ActionMessage& msg) const;
+    void transmitTimingMessagesDownstream(ActionMessage& msg,
+                                          global_federate_id skipFed = global_federate_id{}) const;
     /** generate a timeRequest message based on the dependency info data*/
     ActionMessage generateTimeRequest(const DependencyInfo& dep, global_federate_id fed) const;
 

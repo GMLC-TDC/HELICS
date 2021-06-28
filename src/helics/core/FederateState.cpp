@@ -477,22 +477,27 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
             time_granted = initializationTime;
             allowed_send_time = initializationTime;
         }
-        switch (iterate) {
-            case iteration_request::force_iteration:
-                fillEventVectorNextIteration(time_granted);
-                break;
-            case iteration_request::iterate_if_needed:
-                if (ret == message_processing_result::next_step) {
-                    fillEventVectorUpTo(time_granted);
-                } else {
+        if (ret != message_processing_result::error) {
+            switch (iterate) {
+                case iteration_request::force_iteration:
                     fillEventVectorNextIteration(time_granted);
-                }
-                break;
-            case iteration_request::no_iterations:
-                fillEventVectorUpTo(time_granted);
-                break;
+                    break;
+                case iteration_request::iterate_if_needed:
+                    if (ret == message_processing_result::next_step) {
+                        fillEventVectorUpTo(time_granted);
+                    } else {
+                        fillEventVectorNextIteration(time_granted);
+                    }
+                    break;
+                case iteration_request::no_iterations:
+                    if (wait_for_current_time) {
+                        fillEventVectorInclusive(time_granted);
+                    } else {
+                        fillEventVectorUpTo(time_granted);
+                    }
+                    break;
+            }
         }
-
         unlock();
 #ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (ret == message_processing_result::next_step)) {

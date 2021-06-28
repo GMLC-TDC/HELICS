@@ -374,13 +374,14 @@ enum cmd_error_codes : int {
     duplicate_broker_name_error_code = 7,
     mismatch_broker_key_error_code = 9,
     max_federate_count_exceeded = 11,
-    max_broker_count_exceeded = 13
+    max_broker_count_exceeded = 13,
+    multiple_wait_for_current_time_flags = 15
 };
 
 /** return a string associated with a particular error code
-@param[in,out] errorcode The error to get the string for
+@param[in,out] errorCode The error to get the string for
 @return a pointer to string with the name
 */
-const char* commandErrorString(int errorcode);
+const char* commandErrorString(int errorCode);
 
 }  // namespace helics
