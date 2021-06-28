@@ -214,7 +214,7 @@ const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(global_federa
 std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() const
 {
     std::vector<global_federate_id> deps;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependency) {
             deps.push_back(dep.fedID);
         }
@@ -225,7 +225,7 @@ std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() con
 std::vector<global_federate_id> ForwardingTimeCoordinator::getDependents() const
 {
     std::vector<global_federate_id> deps;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependent) {
             deps.push_back(dep.fedID);
         }
