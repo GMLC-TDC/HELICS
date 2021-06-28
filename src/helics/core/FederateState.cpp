@@ -477,7 +477,7 @@ iteration_result FederateState::enterExecutingMode(iteration_request iterate, bo
             time_granted = initializationTime;
             allowed_send_time = initializationTime;
         }
-        if (ret !=message_processing_result::error) {
+        if (ret != message_processing_result::error) {
             switch (iterate) {
                 case iteration_request::force_iteration:
                     fillEventVectorNextIteration(time_granted);

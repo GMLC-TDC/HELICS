@@ -647,8 +647,9 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
 /*
 #ifdef ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS
-//TODO: I think the EXE tests need to be moved to a different structure.  The EXE runner doesn't always work right for some reason
-// 
+//TODO: I think the EXE tests need to be moved to a different structure.  The EXE runner doesn't
+always work right for some reason
+//
 TEST_P(tracer_message_file_tests, test_message_files_exe)
 {
     std::this_thread::sleep_for(300ms);
@@ -690,7 +691,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     EXPECT_EQ(retTime, 6.0);
 
     cfed.finalize();
-    
+
     std::string outAct = out.get();
     int mcount = 0;
     int valcount = 0;
@@ -712,7 +713,7 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
     }
     EXPECT_EQ(mcount, 2);
     EXPECT_EQ(valcount, 4);
-    
+
     brk.waitForDisconnect();
     brk.reset();
 }

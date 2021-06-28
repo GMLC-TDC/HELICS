@@ -375,7 +375,7 @@ enum cmd_error_codes : int {
     mismatch_broker_key_error_code = 9,
     max_federate_count_exceeded = 11,
     max_broker_count_exceeded = 13,
-    multiple_wait_for_current_time_flags=15
+    multiple_wait_for_current_time_flags = 15
 };
 
 /** return a string associated with a particular error code

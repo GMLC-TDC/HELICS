@@ -1128,7 +1128,6 @@ TEST(valuefederate, file_and_config)
 
     Fed2->requestTimeAsync(1.0);
     Fed1->requestTimeComplete();
-    
 
     Fed1->finalize();
     auto t2 = Fed2->requestTimeComplete();

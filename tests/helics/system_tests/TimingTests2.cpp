@@ -270,16 +270,16 @@ TEST_F(timing_tests2, wait_for_current_time_exec_extry)
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
 
     vFed1->requestTimeAsync(1.0);
-    
+
     vFed2->enterExecutingModeComplete();
     // verify the correct value is available at time=0;
-    EXPECT_EQ(sub2_1.getValue<double>(), 3.5); 
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
 
     vFed2->requestTimeAsync(5.0);
-    
+
     auto retTime = vFed1->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
-   
+
     vFed1->finalize();
 
     retTime = vFed2->requestTimeComplete();
@@ -306,7 +306,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
     vFed1->enterExecutingMode();
-    
+
     vFed2->enterExecutingModeComplete();
     // this works since there are no reverse dependencies
     vFed1->requestTime(1.0);
@@ -395,7 +395,6 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
 
     vFed2->enterExecutingModeAsync();
     vFed1->enterExecutingMode();
-    
 
     pub1_1.publish(3.5);
 
@@ -415,12 +414,11 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-    
 
     vFed1->requestTimeAsync(3.0);
     retTime = vFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
-    
+
     EXPECT_EQ(sub2_2.getValue<double>(), 8.8);
 
     vFed2->requestTimeAsync(7.0);
@@ -463,13 +461,12 @@ TEST_F(timing_tests2, wait_for_current_time_flag2_error)
     sub2_2.setDefault(10.5);
 
     vFed2->enterExecutingModeAsync();
-    auto res=vFed1->enterExecutingMode();
+    auto res = vFed1->enterExecutingMode();
     EXPECT_EQ(res, helics::iteration_result::error);
-    
 
-    res=vFed2->enterExecutingModeComplete();
+    res = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(res, helics::iteration_result::error);
-    
+
     broker.reset();
     vFed1->finalize();
     vFed2->finalize();
@@ -563,14 +560,13 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
     mFed2->registerGlobalEndpoint("ept2");
 
     mFed2->enterExecutingModeAsync();
-   
-    auto res=mFed1->enterExecutingMode();
-    EXPECT_EQ(res, helics::iteration_result::error);   
-   
-    
-    res=mFed2->enterExecutingModeComplete();
-    EXPECT_EQ(res, helics::iteration_result::error);   
-    
+
+    auto res = mFed1->enterExecutingMode();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
+    res = mFed2->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
     broker.reset();
     mFed1->finalize();
 
@@ -619,7 +615,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     retTime = mFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
 
-    EXPECT_EQ(ept2.pendingMessages(),2U);
+    EXPECT_EQ(ept2.pendingMessages(), 2U);
 
     mFed2->requestTimeAsync(7.0);
     retTime = mFed1->requestTimeComplete();
@@ -676,7 +672,6 @@ TEST_F(timing_tests2, offset_timing)
     vFed2->finalize();
 }
 
-
 TEST_F(timing_tests2, wait_for_current_time_iterative)
 {
     extraBrokerArgs = "--debugging";
@@ -692,7 +687,7 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
     auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
     auto& sub1_1 = vFed1->registerSubscription("pub2_1");
 
-    auto &pub2_1=vFed2->registerGlobalPublication<double>("pub2_1");
+    auto& pub2_1 = vFed2->registerGlobalPublication<double>("pub2_1");
 
     auto& sub2_1 = vFed2->registerSubscription("pub1_1");
     sub2_1.setDefault(9.9);
@@ -718,7 +713,7 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
 
-    vFed1->requestTimeIterativeAsync(3.0,helics::iteration_request::iterate_if_needed);
+    vFed1->requestTimeIterativeAsync(3.0, helics::iteration_request::iterate_if_needed);
     retTime = vFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
 
@@ -726,7 +721,7 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
 
     pub2_1.publish(3.1);
 
-    vFed2->requestTimeIterativeAsync(7.0,helics::iteration_request::iterate_if_needed);
+    vFed2->requestTimeIterativeAsync(7.0, helics::iteration_request::iterate_if_needed);
 
     auto itTime = vFed1->requestTimeIterativeComplete();
     EXPECT_EQ(itTime.grantedTime, 1.0);
@@ -739,15 +734,15 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
     vFed1->requestTimeIterativeAsync(3.0, helics::iteration_request::iterate_if_needed);
 
-    //iteration 3
-    
+    // iteration 3
+
     itTime = vFed2->requestTimeIterativeComplete();
     EXPECT_EQ(itTime.grantedTime, 1.0);
     EXPECT_EQ(sub2_1.getValue<double>(), 5.4);
     pub2_1.publish(8.7);
     vFed2->requestTimeIterativeAsync(7.0, helics::iteration_request::iterate_if_needed);
 
-    //iteration 4
+    // iteration 4
     itTime = vFed1->requestTimeIterativeComplete();
     EXPECT_EQ(itTime.grantedTime, 1.0);
     EXPECT_EQ(itTime.state, helics::iteration_result::iterating);
@@ -765,13 +760,12 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
 
     vFed2->finalize();
 
-     itTime = vFed1->requestTimeIterativeComplete();
+    itTime = vFed1->requestTimeIterativeComplete();
     EXPECT_EQ(itTime.grantedTime, 3.0);
-     EXPECT_EQ(itTime.state, helics::iteration_result::next_step);
+    EXPECT_EQ(itTime.state, helics::iteration_result::next_step);
 
     broker.reset();
     vFed1->finalize();
-    
 }
 
 // Tests out the time barrier
