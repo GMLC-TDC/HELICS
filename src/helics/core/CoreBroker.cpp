@@ -1085,7 +1085,17 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 }
             } else if (command.dest_id == global_broker_id_local) {
                 if (timeCoord->processTimeMessage(command)) {
-                    timeCoord->updateTimeFactors();
+                    if (enteredExecutionMode) {
+                        timeCoord->updateTimeFactors();
+                    } else {
+                        auto res = timeCoord->checkExecEntry();
+                        if (res == MessageProcessingResult::NEXT_STEP) {
+                            enteredExecutionMode = true;
+                            LOG_TIMING(global_broker_id_local,
+                                       getIdentifier(),
+                                       "entering Exec Mode");
+                        }
+                    }
                 }
             } else {
                 routeMessage(command);
@@ -2257,6 +2267,9 @@ void CoreBroker::processError(ActionMessage& command)
                  command.payload.to_string());
     if (command.source_id == global_broker_id_local) {
         setBrokerState(broker_state_t::errored);
+        if (command.action() == CMD_GLOBAL_ERROR) {
+            setErrorState(command.messageID, command.payload.to_string());
+        }
         broadcast(command);
         if (!isRootc) {
             command.setAction(CMD_LOCAL_ERROR);
@@ -2267,7 +2280,11 @@ void CoreBroker::processError(ActionMessage& command)
 
     if (command.source_id == parent_broker_id || command.source_id == root_broker_id) {
         setBrokerState(broker_state_t::errored);
+        if (command.action() == CMD_GLOBAL_ERROR) {
+            setErrorState(command.messageID, command.payload.to_string());
+        }
         broadcast(command);
+        return;
     }
 
     auto* brk = getBrokerById(GlobalBrokerId(command.source_id));

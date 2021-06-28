@@ -97,20 +97,20 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 switch (grant) {
                     case MessageProcessingResult::ITERATING:
                         newMode = true;
-                        returnable = true;
+                        // returnable = true;
                         proc = grant;
                         break;
                     case MessageProcessingResult::NEXT_STEP:
                         newState = HELICS_EXECUTING;
                         newMode = true;
-                        returnable = true;
+                        // returnable = true;
                         proc = grant;
                         break;
                     case MessageProcessingResult::CONTINUE_PROCESSING:
                         break;
                     default:
                         newMode = true;
-                        returnable = true;
+                        // returnable = true;
                         proc = grant;
                         break;
                 }
@@ -144,14 +144,14 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                     proc = MessageProcessingResult::REPROCESS_MESSAGE;
                 }
             } else {
-                returnable = false;
+                // returnable = false;
                 switch (timeCoord->processTimeMessage(cmd)) {
                     case message_process_result::delay_processing:
-                        returnable = true;
+                        // returnable = true;
                         proc = MessageProcessingResult::DELAY_MESSAGE;
                         break;
                     case message_process_result::no_effect:
-                        returnable = true;
+                        // returnable = true;
                         proc = MessageProcessingResult::CONTINUE_PROCESSING;
                     default:
                         break;
@@ -218,6 +218,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             [[fallthrough]];
         case CMD_TIME_CHECK:
             if (state != HELICS_EXECUTING) {
+                if (state == HELICS_INITIALIZING) {
+                    cmd.setAction(CMD_EXEC_CHECK);
+                    proc = MessageProcessingResult::REPROCESS_MESSAGE;
+                }
+
                 break;
             }
             if (!timeGranted_mode) {
