@@ -51,8 +51,7 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     if (iterating != iteration_request::no_iterations) {
         setIterationFlags(execreq, iterating);
     }
-    if (info.wait_for_current_time_updates)
-    {
+    if (info.wait_for_current_time_updates) {
         setActionFlag(execreq, delayed_timing_flag);
     }
     transmitTimingMessages(execreq);
@@ -557,8 +556,7 @@ void TimeCoordinator::sendTimeRequest() const
     if (nonGranting) {
         setActionFlag(upd, non_granting_flag);
     }
-    if (info.wait_for_current_time_updates)
-    {
+    if (info.wait_for_current_time_updates) {
         setActionFlag(upd, delayed_timing_flag);
     }
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
@@ -585,8 +583,7 @@ void TimeCoordinator::sendTimeRequest() const
         upd.counter = iteration;
     }
     if (checkAndSendTimeRequest(upd, upstream.minFed)) {
-        if (upstream.minFed.isValid())
-        {
+        if (upstream.minFed.isValid()) {
             upd.dest_id = upstream.minFed;
             upd.setExtraData(global_federate_id{}.baseValue());
             if (info.event_triggered) {
@@ -749,11 +746,9 @@ message_processing_result TimeCoordinator::checkExecEntry()
     }
 
     // check for timing deadlock with wait_for_current_time_flag
-    if (info.wait_for_current_time_updates)
-    {
-
-     for (auto& dep : dependencies) {
-        if (dep.dependency && dep.dependent && dep.delayedTiming  && dep.fedID!=source_id) {
+    if (info.wait_for_current_time_updates) {
+        for (auto& dep : dependencies) {
+            if (dep.dependency && dep.dependent && dep.delayedTiming && dep.fedID != source_id) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
                 ge.dest_id = parent_broker_id;
                 ge.source_id = source_id;
@@ -762,8 +757,8 @@ message_processing_result TimeCoordinator::checkExecEntry()
                     "Multiple federates declaring wait_for_current_time flag will result in deadlock";
                 sendMessageFunction(ge);
                 return message_processing_result::error;
+            }
         }
-     }
     }
 
     switch (iterating) {
@@ -772,8 +767,7 @@ message_processing_result TimeCoordinator::checkExecEntry()
                 ret = message_processing_result::next_step;
             } else {
                 total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, source_id);
-                if (total.next > timeZero)
-                {
+                if (total.next > timeZero) {
                     ret = message_processing_result::next_step;
                 }
             }

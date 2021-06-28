@@ -102,33 +102,28 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         transmitTimingMessagesUpstream(upd);
     }
     if (updateDownstream) {
-        if (hasDelayedTimingFederate)
-        {
-            if (downstream.minFed == delayedFederate)
-            {
+        if (hasDelayedTimingFederate) {
+            if (downstream.minFed == delayedFederate) {
                 auto upd = generateTimeRequest(downstream, global_federate_id{});
-                transmitTimingMessagesDownstream(upd,delayedFederate);
-                auto td=generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id,delayedFederate);
+                transmitTimingMessagesDownstream(upd, delayedFederate);
+                auto td = generateMinTimeUpstream(dependencies,
+                                                  restrictive_time_policy,
+                                                  source_id,
+                                                  delayedFederate);
                 DependencyInfo di;
                 di.update(td);
                 auto upd_delayed = generateTimeRequest(di, delayedFederate);
-                if (sendMessageFunction)
-                {
+                if (sendMessageFunction) {
                     sendMessageFunction(upd_delayed);
                 }
-            }
-            else
-            {
+            } else {
                 auto upd = generateTimeRequest(downstream, global_federate_id{});
                 transmitTimingMessagesDownstream(upd);
             }
-        }
-        else
-        {
+        } else {
             auto upd = generateTimeRequest(downstream, global_federate_id{});
             transmitTimingMessagesDownstream(upd);
         }
-        
     }
 }
 
@@ -316,16 +311,16 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
         return;
     }
 
-        for (auto dep : dependencies) {
-            if (dep.connection == ConnectionType::child) {
-                continue;
-            }
-            if (!dep.dependent) {
-                continue;
-            }
-            msg.dest_id = dep.fedID;
-            sendMessageFunction(msg);
+    for (auto dep : dependencies) {
+        if (dep.connection == ConnectionType::child) {
+            continue;
         }
+        if (!dep.dependent) {
+            continue;
+        }
+        msg.dest_id = dep.fedID;
+        sendMessageFunction(msg);
+    }
 }
 
 void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
@@ -342,8 +337,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
             if (!dep.dependent) {
                 continue;
             }
-            if (dep.fedID == skipFed)
-            {
+            if (dep.fedID == skipFed) {
                 continue;
             }
             if (dep.dependency) {
