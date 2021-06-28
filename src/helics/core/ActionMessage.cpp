@@ -723,11 +723,11 @@ static constexpr size_t errEnd = sizeof(errorStrings) / sizeof(errorPair);
 // this was done this way to keep the string array as a constexpr otherwise it could be deleted as
 // this function can (in actuality-there was a case that did this) be used as the program is
 // shutting down
-const char* commandErrorString(int errorcode)
+const char* commandErrorString(int errorCode)
 {
     const auto* pptr = static_cast<const errorPair*>(errorStrings);
-    const auto* res = std::find_if(pptr, pptr + errEnd, [errorcode](const auto& pt) {
-        return (pt.first == errorcode);
+    const auto* res = std::find_if(pptr, pptr + errEnd, [errorCode](const auto& pt) {
+        return (pt.first == errorCode);
     });
     if (res != pptr + errEnd) {
         return res->second;

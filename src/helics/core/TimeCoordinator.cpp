@@ -51,6 +51,10 @@ void TimeCoordinator::enteringExecMode(iteration_request mode)
     if (iterating != iteration_request::no_iterations) {
         setIterationFlags(execreq, iterating);
     }
+    if (info.wait_for_current_time_updates)
+    {
+        setActionFlag(execreq, delayed_timing_flag);
+    }
     transmitTimingMessages(execreq);
 }
 
@@ -553,7 +557,10 @@ void TimeCoordinator::sendTimeRequest() const
     if (nonGranting) {
         setActionFlag(upd, non_granting_flag);
     }
-
+    if (info.wait_for_current_time_updates)
+    {
+        setActionFlag(upd, delayed_timing_flag);
+    }
     upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
     if (info.event_triggered) {
         upd.Te = std::min(upd.Te, upstream.Te + info.outputDelay);
@@ -578,14 +585,17 @@ void TimeCoordinator::sendTimeRequest() const
         upd.counter = iteration;
     }
     if (checkAndSendTimeRequest(upd, upstream.minFed)) {
-        upd.dest_id = upstream.minFed;
-        upd.setExtraData(global_federate_id{}.baseValue());
-        if (info.event_triggered) {
-            upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-            upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
+        if (upstream.minFed.isValid())
+        {
+            upd.dest_id = upstream.minFed;
+            upd.setExtraData(global_federate_id{}.baseValue());
+            if (info.event_triggered) {
+                upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
+                upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
+            }
+            upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+            sendMessageFunction(upd);
         }
-        upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
-        sendMessageFunction(upd);
     }
 
     //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),
@@ -737,9 +747,36 @@ message_processing_result TimeCoordinator::checkExecEntry()
     if (!dependencies.checkIfReadyForExecEntry(iterating != iteration_request::no_iterations)) {
         return ret;
     }
+
+    // check for timing deadlock with wait_for_current_time_flag
+    if (info.wait_for_current_time_updates)
+    {
+
+     for (auto& dep : dependencies) {
+        if (dep.dependency && dep.dependent && dep.delayedTiming  && dep.fedID!=source_id) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = multiple_wait_for_current_time_flags;
+                ge.payload =
+                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
+                sendMessageFunction(ge);
+                return message_processing_result::error;
+        }
+     }
+    }
+
     switch (iterating) {
         case iteration_request::no_iterations:
-            ret = message_processing_result::next_step;
+            if (!info.wait_for_current_time_updates) {
+                ret = message_processing_result::next_step;
+            } else {
+                total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, source_id);
+                if (total.next > timeZero)
+                {
+                    ret = message_processing_result::next_step;
+                }
+            }
             break;
         case iteration_request::iterate_if_needed:
             if (hasInitUpdates) {
