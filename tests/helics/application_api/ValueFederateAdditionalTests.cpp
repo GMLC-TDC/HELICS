@@ -1135,23 +1135,23 @@ TEST(valuefederate, file_and_config)
     EXPECT_TRUE(p1.isValid());
 
     Fed1->enterExecutingModeAsync();
-    Fed2->enterExecutingMode();
+    Fed2->enterExecutingModeAsync();
     Fed1->enterExecutingModeComplete();
 
     EXPECT_TRUE(Fed2->getFlagOption(HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE));
     p1.publish(std::complex<double>(1, 2));
 
     Fed1->requestTimeAsync(1.0);
-    auto t2 = Fed2->requestTime(1.0);
-    EXPECT_EQ(t2, 0.5);  // fed2 has wait_for_current_time flag active
-    Fed2->requestTimeAsync(1.0);
-    Fed1->requestTimeComplete();
+    Fed2->enterExecutingModeComplete();
     auto val = i1.getValue<std::complex<double>>();
 
     EXPECT_EQ(val, std::complex<double>(1, 2));
 
+    Fed2->requestTimeAsync(1.0);
+    Fed1->requestTimeComplete();
+
     Fed1->finalize();
-    t2 = Fed2->requestTimeComplete();
+    auto t2 = Fed2->requestTimeComplete();
     EXPECT_EQ(t2, 1.0);
     Fed2->finalize();
     broker->disconnect();

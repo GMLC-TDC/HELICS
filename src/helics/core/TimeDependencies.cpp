@@ -23,6 +23,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.time_state = checkActionFlag(m, iteration_requested_flag) ?
                 time_state_t::exec_requested_iterative :
                 time_state_t::exec_requested;
+            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
@@ -52,6 +53,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
             break;
         case CMD_TIME_GRANT:
             dep.time_state = time_state_t::time_granted;
