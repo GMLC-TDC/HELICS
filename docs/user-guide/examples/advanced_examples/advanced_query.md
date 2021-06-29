@@ -123,3 +123,11 @@ Federate Charger (with id 131072) has the following subscriptions:
     Battery/EV4_current from federate Battery
     Battery/EV5_current from federate Battery
 ```
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

@@ -287,7 +287,7 @@ The error codes match with [HTTP error codes](https://developer.mozilla.org/en-U
 
 ### Application API
 
-There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html)
+There are two basic calls in the application API as part of a [federate object](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Federate.html)
 In addition to the call described above a second version omits the "target" specification and always queries the local federate.
 
 ```cpp
@@ -300,7 +300,7 @@ There is also an asyncrhonous version (that is, non-blocking) that returns a `qu
 query_id_t     queryAsync(const std::string& target, const std::string& queryStr)
 ```
 
-In the header [`<helics\queryFunctions.hpp>`](../doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
+In the header [`<helics\queryFunctions.hpp>`](https://docs.helics.org/en/latest/doxygen/queryFunctions_8hpp.html) a few helper functions are defined to vectorize query results and some utility functions to wait for a federate to enter init, or wait for a federate to join the federation.
 
 ### C API and interface API's
 
@@ -316,3 +316,13 @@ As long as timeouts are enabled in the library itself, queries have a timeout sy
 ## Example
 
 A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query)).
+
+
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

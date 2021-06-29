@@ -19,7 +19,7 @@ This section describes how to configure the federate interfaces using JSON files
 
 ## JSON Configuration
 
-Federate interfaces must be configured with JSON files if they are built from non-open-source tools, such as the simulators listed in the reference page on [Tools with HELICS Support](../../references/tools_using_helics.md). Federates built from simulators written by the user can be configured with JSON files or API calls.
+Federate interfaces must be configured with JSON files if they are built from non-open-source tools, such as the simulators listed in the reference page on [Tools with HELICS Support](../../references/Tools_using_HELICS.md). Federates built from simulators written by the user can be configured with JSON files or API calls.
 
 The [Examples](../examples/examples_index.md) illustrate in detail how to integrate federates built from open source tools, such as Python. The [Fundamental Combination Federation](../examples/fundamental_examples/fundamental_combo.md) configures the Python federate interfaces with JSON files. In this co-simulation, there are three federates: a value Battery federate, a combination Charger federate, and a message Controller federate. The example JSON shows the interface configuration for the combination federate to illustrate the different types of interfaces.
 
@@ -102,7 +102,7 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
 
 ## API Configuration
 
-Configuring the federate interface with the API is done internal to a user-written simulator. The specific API used will depend on the language the simulator is written in. Native APIs for HELICS are available in [C++](https://docs.helics.org/en/latest/doxygen/index.html) and [C](../../references/C_API.md). MATLAB, Java, Julia, Nim, and Python all support the C API calls (ex: `helicsFederateEnterExecutionMode()`). Python and Julia also have native APIs (see: [Python (PyHELICS)](https://python.helics.org/api/), [Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)) that wrap the C APIs to better support the conventions of their languages. The [API References](../../references/api-reference/index.md) page contains links to the APIs.
+Configuring the federate interface with the API is done internal to a user-written simulator. The specific API used will depend on the language the simulator is written in. Native APIs for HELICS are available in [C++](https://docs.helics.org/en/latest/doxygen/index.html) and [C](../../references/api-reference/C_API.md). MATLAB, Java, Julia, Nim, and Python all support the C API calls (ex: `helicsFederateEnterExecutionMode()`). Python and Julia also have native APIs (see: [Python (PyHELICS)](https://python.helics.org/api/), [Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)) that wrap the C APIs to better support the conventions of their languages. The [API References](../../references/api-reference/index.md) page contains links to the APIs.
 
 The [Examples](../examples/examples_index.md) in this User Guide are written in Python -- the following federate interface configuration guidance will use the [PyHELICS](https://python.helics.org/api/) API, but can easily be adapted to other C-based HELICS APIs.
 

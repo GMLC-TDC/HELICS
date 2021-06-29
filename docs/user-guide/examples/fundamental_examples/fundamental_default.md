@@ -61,7 +61,7 @@ With a better understanding of how we want to configure the pubs and subs, we ca
 
 Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`.
 
-There are [extensive ways](../../configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
+There are [extensive ways](../../../references/configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
 ```json
 {
@@ -78,7 +78,7 @@ There are [extensive ways](../../configuration_options_reference.html) to config
 
 ```
 
-In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../configuration_options_reference.html#logging-options)), and set the `core_type` to `zmq` ([the most common](../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
+In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../../../references/configuration_options_reference.html#logging-options)), and set the `core_type` to `zmq` ([the most common](../../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
 
 This federate is configured with pubs and subs, so it will need an option to indicate the publication and the subscription configurations (for brevity, only the first pub and sub are printed below):
 
@@ -172,7 +172,7 @@ If all goes well, this will reward us with two figures:
 
 We can see the state of charge of each battery over the duration of the co-simulation in the first figure, and the aggregated instantaneous power draw in the second. As the engineer tasked with assessing the power needs for this charging garage, do you think you have enough information at this stage? If not, how would you change the co-simulation to better model the research needs?
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

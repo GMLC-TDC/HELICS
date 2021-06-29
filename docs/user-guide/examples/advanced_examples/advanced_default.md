@@ -16,7 +16,7 @@ The Advanced Base Example tutorial is organized as follows:
 
 All files necessary to run the Advanced Base Example can be found in the [Advanced Examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_default)
 
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/fundamental_default)
+[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_default)
 
 The files include:
 
@@ -58,10 +58,10 @@ This graph also clearly shows that each EV was estimated to have a 100% SOC when
 
 The data shown in the power graph is arguably the point of the analysis. It shows our maximum charging power for this simulated time as 80 kW. If this is the only simulation result we have, we would be inclined to use this as a design value for our electricity delivery infrastructure. More nuanced views could be had, though, by:
 
-1. Running this co-simulation multiple times using a different random seed to see if 80 kW is truly the maximum power draw. (We do a version of this in an [example demonstrating how to run multiple HELICS co-simulations simultaneously](../examples/advanced_examples/advanced_brokers_simultaneous.md) on a single compute node.)
-2. Plotting the charging power as a histogram to get a better understanding of the distribution of the instantaneous charging power. (We also do this as part of our [example on using an orchestration tool to use HELICS co-simulations as part of a more complex analysis](../examples/advanced_examples/advanced_orchestration.md).)
+1. Running this co-simulation multiple times using a different random seed to see if 80 kW is truly the maximum power draw. (We do a version of this in an [example demonstrating how to run multiple HELICS co-simulations simultaneously](./advanced_brokers_simultaneous.md) on a single compute node.)
+2. Plotting the charging power as a histogram to get a better understanding of the distribution of the instantaneous charging power. (We also do this as part of our [example on using an orchestration tool to use HELICS co-simulations as part of a more complex analysis](./advanced_orchestration.md).)
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

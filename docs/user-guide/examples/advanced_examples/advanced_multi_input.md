@@ -124,3 +124,12 @@ The primary result of interest is still the cumulative charging power.
 ![placeholder](../../../img/advanced_multi_input_power.png)
 
 As the batteries are not replaced during charging, the initial charging power will be the peak power. The points in time when a battery reaches full charge, though, can be clearly seen as the discrete changes in cumulative charging power.
+
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

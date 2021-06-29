@@ -10,7 +10,7 @@ cd swig
 ./configure --prefix=/Users/$(whoami)/local/swig-matlab/ && make -j8 && make install
 ```
 
-The matlab interface can be built using BUILD_MATLAB_INTERFACE in the cmake build of HELICS. This will use a MATLAB installation to build the interface. See [installation](../installation/language.html)
+The matlab interface can be built using BUILD_MATLAB_INTERFACE in the cmake build of HELICS. This will use a MATLAB installation to build the interface. See [installation](../user-guide/installation/language.html)
 
 **Octave**
 
