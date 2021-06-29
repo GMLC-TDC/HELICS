@@ -118,12 +118,12 @@ void ForwardingTimeCoordinator::updateTimeFactors()
                 }
             } else {
                 auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-        transmitTimingMessagesDownstream(upd);
-    }
+                transmitTimingMessagesDownstream(upd);
+            }
         } else {
             auto upd = generateTimeRequest(downstream, GlobalFederateId{});
             transmitTimingMessagesDownstream(upd);
-}
+        }
     }
 }
 
@@ -311,17 +311,17 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
         return;
     }
 
-        for (auto dep : dependencies) {
-            if (dep.connection == ConnectionType::child) {
-                continue;
-            }
-            if (!dep.dependent) {
-                continue;
-            }
-            msg.dest_id = dep.fedID;
-            sendMessageFunction(msg);
+    for (auto dep : dependencies) {
+        if (dep.connection == ConnectionType::child) {
+            continue;
         }
+        if (!dep.dependent) {
+            continue;
+        }
+        msg.dest_id = dep.fedID;
+        sendMessageFunction(msg);
     }
+}
 
 void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
                                                                  GlobalFederateId skipFed) const
@@ -329,37 +329,37 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     if (!sendMessageFunction) {
         return;
     }
-        if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
-            for (auto dep : dependencies) {
-                if (dep.connection != ConnectionType::child) {
-                    continue;
-                }
-                if (!dep.dependent) {
-                    continue;
-                }
+    if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
+        for (auto dep : dependencies) {
+            if (dep.connection != ConnectionType::child) {
+                continue;
+            }
+            if (!dep.dependent) {
+                continue;
+            }
             if (dep.fedID == skipFed) {
                 continue;
             }
-                if (dep.dependency) {
-                    if (dep.next > msg.actionTime) {
-                        continue;
-                    }
+            if (dep.dependency) {
+                if (dep.next > msg.actionTime) {
+                    continue;
+                }
+            }
+            msg.dest_id = dep.fedID;
+            sendMessageFunction(msg);
+        }
+    } else {
+        for (auto dep : dependencies) {
+            if (dep.dependent) {
+                if (dep.fedID == skipFed) {
+                    continue;
                 }
                 msg.dest_id = dep.fedID;
                 sendMessageFunction(msg);
             }
-        } else {
-            for (auto dep : dependencies) {
-                if (dep.dependent) {
-                if (dep.fedID == skipFed) {
-                    continue;
-                }
-                    msg.dest_id = dep.fedID;
-                    sendMessageFunction(msg);
-                }
-            }
         }
     }
+}
 
 bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {

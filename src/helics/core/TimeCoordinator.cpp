@@ -584,15 +584,15 @@ void TimeCoordinator::sendTimeRequest() const
     }
     if (checkAndSendTimeRequest(upd, upstream.minFed)) {
         if (upstream.minFed.isValid()) {
-        upd.dest_id = upstream.minFed;
-        upd.setExtraData(GlobalFederateId{}.baseValue());
-        if (info.event_triggered) {
-            upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
-            upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
+            upd.dest_id = upstream.minFed;
+            upd.setExtraData(GlobalFederateId{}.baseValue());
+            if (info.event_triggered) {
+                upd.Te = (time_exec != Time::maxVal()) ? time_exec + info.outputDelay : time_exec;
+                upd.Te = std::min(upd.Te, upstream.TeAlt + info.outputDelay);
+            }
+            upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+            sendMessageFunction(upd);
         }
-        upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
-        sendMessageFunction(upd);
-    }
     }
 
     //    printf("%d next=%f, exec=%f, Tdemin=%f\n", source_id, static_cast<double>(time_next),

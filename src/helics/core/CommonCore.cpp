@@ -4639,8 +4639,7 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
     }
 }
 
-const std::string& CommonCore::getFederateTag(LocalFederateId fid,
-                                              const std::string& tag) const
+const std::string& CommonCore::getFederateTag(LocalFederateId fid, const std::string& tag) const
 {
     auto* fed = getFederateAt(fid);
     if (fid == gLocalCoreId) {
