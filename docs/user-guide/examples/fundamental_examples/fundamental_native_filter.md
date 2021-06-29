@@ -224,7 +224,6 @@ Note that we have made a number of simplifying assumptions in this analysis:
 - There will always be an EV waiting to be charged (the charging ports are never idle).
 - There is a constant number of charging ports -- we know what the power draw will look like given a static number of ports, but we do not know the underlying demand for power from EVs.
 
-
 How would you model an unknown demand for vehicle charging? How would you model idle charging ports? What other simplifications do you see that can be addressed?
 
 ## [Questions and Help](../../support.md)

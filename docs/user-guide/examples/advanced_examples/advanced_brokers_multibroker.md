@@ -114,7 +114,6 @@ As has been mentioned, since this is just a change to the co-simulation architec
 
 ![placeholder](../../../img/advanced_multibroker_battery_SOCs.png)
 
-
 ## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?

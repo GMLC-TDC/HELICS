@@ -317,8 +317,6 @@ As long as timeouts are enabled in the library itself, queries have a timeout sy
 
 A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query)).
 
-
-
 ## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?

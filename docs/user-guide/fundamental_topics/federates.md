@@ -137,12 +137,12 @@ Combination federates make use of both value signals and message signals for tra
 
 The following table may be useful in understanding the differences between the two methods by which federates can communicate:
 
-|                                                | Values                           | Messages                               |
-| :--------------------------------------------- | :------------------------------- | :------------------------------------- |
-| Interface Type:                                | Publication/Subscription/Input   | Endpoint/Filter                        |
+|                                               | Values                           | Messages                               |
+| :-------------------------------------------- | :------------------------------- | :------------------------------------- |
+| Interface Type:                               | Publication/Subscription/Input   | Endpoint/Filter                        |
 | [Signal Route](./advanced_topics/queries.md): | Fixed, defined at initialization | Determined at time of transmission     |
-| Outgoing signal:                               | 1 to n (broadcast)               | 1 to 1 - defined sender and receiver   |
-| Incoming signal:                               | n to 1 (promiscuous)             | None                                   |
-| Status on Message Bus:                         | Current value always available   | Removed when received                  |
-| Fidelity:                                      | Default value                    | Rerouting/modification through filters |
-| Signal Contents:                               | Physical units                   | Generic binary blobs                   |
+| Outgoing signal:                              | 1 to n (broadcast)               | 1 to 1 - defined sender and receiver   |
+| Incoming signal:                              | n to 1 (promiscuous)             | None                                   |
+| Status on Message Bus:                        | Current value always available   | Removed when received                  |
+| Fidelity:                                     | Default value                    | Rerouting/modification through filters |
+| Signal Contents:                              | Physical units                   | Generic binary blobs                   |
