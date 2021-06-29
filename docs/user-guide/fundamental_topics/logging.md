@@ -53,7 +53,7 @@ which includes a name and internal id code for the federate followed by a time i
 
 ## Setting up the Simulator for Logging
 
-The [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md) incorporates simple logging for the two federate co-simulation. These federates, Battery and Charger, are user-written in Python with PyHELICS, so we have the luxury of setting up the simulator for logging.
+The [Fundamental Base Example](../examples/fundamental_examples/fundamental_default.md) incorporates simple logging for the two federate co-simulation. These federates, Battery and Charger, are user-written in Python with PyHELICS, so we have the luxury of setting up the simulator for logging.
 
 In the Battery simulator, we need to import `logging` and set up the logger:
 
@@ -68,7 +68,7 @@ logger.setLevel(logging.DEBUG)
 
 Now we can use the `logger` to print different levels of detail about the co-simulation execution to log files. These files will be generated for each federate in the co-simulation and the broker with the naming convention "name assigned to federate/broker"`.log`.
 
-A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fudnamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file.
+A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fundamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file.
 
 ```python
 logger.info('Only prints to log file if log_level = 2 or summary')
@@ -80,7 +80,7 @@ logger.warning('Only prints to log file if log_level = 1 or warning')
 
 ## Setting up the Federate for Logging
 
-Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the [`HelicsFederateInfo` class](https://python.helics.org/api/capi-py/#HelicsFederateInfo) which can also be directly specified through the property functions.
+Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the [`HelicsFederateInfo` class](https://python.helics.org/api/capi-py#HelicsFederateInfo) which can also be directly specified through the property functions.
 
 - `helics_property_int_log_level` - General logging level applicable to both file and console logs
 

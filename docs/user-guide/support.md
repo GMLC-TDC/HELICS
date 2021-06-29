@@ -5,8 +5,8 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 - [**Documentation**](https://docs.helics.org/en/latest/) - Though you're already here at the documentation site, the following pages may be of particular interest:
 
   - [Installation Guide](./installation/index.md) - Help with getting HELICS installed with the correct options for your particular use case
-  - [User Guide](./user-guide/index.md) - Comprehensive guide to understanding and using HELICS covering both the [fundamentals](./user-guide/co-simulation_overview.md) as well as more [advanced topics](./user-guide/broker_hierarchies.md).
-  - [API reference](./user_guide/index.md) - HELICS is written in C++ with many supported language bindings. The C++ Doxygen is the most comprehensive reference for the HELICS API
+  - [User Guide](./index.md) - Comprehensive guide to understanding and using HELICS covering both the [fundamentals](./fundamental_topics/fundamental_topics_index) as well as more [advanced topics](./advanced_topics/advanced_topics_index.md).
+  - [API reference](..references/api-reference/index.md) - HELICS is written in C++ with many supported language bindings. The C++ Doxygen is the most comprehensive reference for the HELICS API
 
 - **User Forum (forthcoming)** - Once Github moves their forums feature out of beta we'll implement it to provide a space where user's can discuss their HELICS use cases and get support on how to use HELICS.
 
@@ -24,6 +24,3 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
 - **[Gitter](https://gitter.im/GMLC-TDC/HELICS)** - Live chat with developers (when they're logged in) for quick fix support.
 
 - **Virtual Office Hours** - HELICS developers have periodic open office hours where anybody can come and get hands-on help with understanding HELICS better or getting a particular feature to work. Contact helicsteam@helics.org for an invitation.
-
-- [**Using the web interface**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
-- [**(Termination) Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.

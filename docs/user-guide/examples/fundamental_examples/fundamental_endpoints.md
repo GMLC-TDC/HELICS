@@ -10,7 +10,7 @@ This tutorial is organized as follows:
   - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
     - [Config Files](#config-files)
     - [Simulators](#simulators)
-  - [Co-simulation Execution](co-simulation-execution)
+  - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
@@ -103,7 +103,7 @@ You might ask yourself: "How does HELICS know where to send the message?" There 
 1. Endpoints send messages as encoded strings
 2. Endpoints can have default destinations, but this is not required
 3. Endpoints should not be used to model physics
-4. Messages sent from endpoints are allowed to be corrupted (see [Filters](./fundamental_filters.md)!)
+4. Messages sent from endpoints are allowed to be corrupted (see [Filters](./fundamental_native_filters.md)!)
 5. Messages sent from endpoints do not show up on a HELICS `dependency_graph`
    (A `dependency_graph` is a graph of dependencies in a federation. Because pub/subs have explicit connections, HELICS can establish when the information arrives through a `dependency_graph`. See [Queries](../../advanced_topics/queries.md) for more information.)
 
@@ -141,7 +141,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
     ]
 ```
 
-If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../configuration_options_reference.html#period-0) that the `period` controls the minimum time resolution for a federate.
+If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.html#period-0) that the `period` controls the minimum time resolution for a federate.
 
 We have a federation sending messages at the same time (`"period": 60`), and HELICS doesn't know which message arrives first. We need to introduce an `offset` to the config file of one of the federates to force it to wait until the message has been received. We also need to keep `"uninterruptible": false`, so that the federate will be granted the time at which it has received a message (which will be `"period": 60`).
 
@@ -224,7 +224,7 @@ And add that offset to `requested_time`:
         requested_time = (grantedtime+update_interval+update_offset)
 ```
 
-The next largest difference with implementing communication between simulators with endpoints vs pub/subs comes from the lack of innate message dependency, as described above with the `dependency_graph`. (Which can be accessed for pub/subs with a [query](.../../advanced_topics/queries.md).) Best practice for handling message receipt is to check if a message is waiting to be retrieved for an endpoint. The following code replaces `charging_voltage = h.helicsInputGetDouble((subid[j]))` from the Base Example (we are looping over `end_count`, the number of endpoints for this federate):
+The next largest difference with implementing communication between simulators with endpoints vs pub/subs comes from the lack of innate message dependency, as described above with the `dependency_graph`. (Which can be accessed for pub/subs with a [query](../../advanced_topics/queries.md).) Best practice for handling message receipt is to check if a message is waiting to be retrieved for an endpoint. The following code replaces `charging_voltage = h.helicsInputGetDouble((subid[j]))` from the Base Example (we are looping over `end_count`, the number of endpoints for this federate):
 
 ```python
             endpoint_name = h.helicsEndpointGetName(endid[j])
@@ -317,7 +317,7 @@ And we get these figures:
 
 Armed now with the knowledge of endpoints and messages, how could you change the research question?
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

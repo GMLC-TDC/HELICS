@@ -43,7 +43,7 @@ The helics_cli will launch the co-simulation and the web interface will update e
 
 ### Debugging runs
 
-Just like writing code, it is not unusual for a co-simulation to not quite work write the first time it's constructed and the web interface provides tooling to help verify and trouble-shoot the construction co-simulation. [There's a whole section on trouble-shooting techniques](./troubleshooting.md) and we won't re-iterate the guidance here but here's how the web interface can be used try to get a diagnostic view of the federation's operation.
+Just like writing code, it is not unusual for a co-simulation to not quite work write the first time it's constructed and the web interface provides tooling to help verify and trouble-shoot the construction co-simulation. [There's a whole section on trouble-shooting techniques](../troubleshooting.md) and we won't re-iterate the guidance here but here's how the web interface can be used try to get a diagnostic view of the federation's operation.
 
 1. (optional but highly recommended) Load in a configuration file - Limit the federates and publications to those of interest and most revealing of the state of the simulation.
 2. Enter a simulated time of interest and press the "Run to next grant" button (number 4 in the above diagram)

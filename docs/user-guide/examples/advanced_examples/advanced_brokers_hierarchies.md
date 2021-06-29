@@ -74,7 +74,7 @@ Additionally, each federate has to define the broker to which it is attempting t
 
 ## Execution and Results
 
-Since this example requires three brokers and their respective federates to run simultaneously, `helic_cli` will be used to launch the three sets of brokers and federates, just like the in [simultaneous co-simulation example](./advanced_broker_simultaneous.md)
+Since this example requires three brokers and their respective federates to run simultaneously, `helic_cli` will be used to launch the three sets of brokers and federates, just like the in [simultaneous co-simulation example](./advanced_brokers_simultaneous.md)
 
 `$ helics run --path=./broker_hierarchy_runner_A.json &`
 `$ helics run --path=./broker_hierarchy_runner_B.json &`
@@ -89,3 +89,11 @@ The peak charging results are shown below. As can be seen, the peak power amplit
 ![placeholder](../../../img/advanced_hierarchy_battery_SOCs.png)
 
 These results are identical to those in the base [Advanced Default example](./advanced_default.md); this is expected as only the structure of the co-simulation has been changed and not any of the federate code itself.
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!
