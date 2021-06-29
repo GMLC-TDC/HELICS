@@ -757,7 +757,6 @@ HELICS_EXPORT int helicsGetOptionValue(const char* val);
  * @param value The desired value of the flag HELICS_TRUE or HELICS_FALSE.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
 
@@ -770,7 +769,6 @@ HELICS_EXPORT void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int fl
  * @param separator The character to use as a separator.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
 
@@ -782,7 +780,6 @@ HELICS_EXPORT void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char se
  * @param propertyValue The value of the property to set the timeProperty to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
 
@@ -1148,7 +1145,6 @@ HELICS_EXPORT const char* helicsFederateGetName(HelicsFederate fed);
  * @param time The requested value of the property.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateSetTimeProperty(HelicsFederate fed, int timeProperty, HelicsTime time, HelicsError* err);
 
@@ -1160,7 +1156,6 @@ HELICS_EXPORT void helicsFederateSetTimeProperty(HelicsFederate fed, int timePro
  * @param flagValue The new value of the flag. 0 for false, !=0 for true.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateSetFlagOption(HelicsFederate fed, int flag, HelicsBool flagValue, HelicsError* err);
 
@@ -1174,7 +1169,6 @@ HELICS_EXPORT void helicsFederateSetFlagOption(HelicsFederate fed, int flag, Hel
  * @param separator The character to use as a separator.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateSetSeparator(HelicsFederate fed, char separator, HelicsError* err);
 
@@ -1186,7 +1180,6 @@ HELICS_EXPORT void helicsFederateSetSeparator(HelicsFederate fed, char separator
  * @param propertyVal The value of the property.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateSetIntegerProperty(HelicsFederate fed, int intProperty, int propertyVal, HelicsError* err);
 
@@ -1197,7 +1190,6 @@ HELICS_EXPORT void helicsFederateSetIntegerProperty(HelicsFederate fed, int intP
  * @param timeProperty The property to query.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, HelicsError* err);
 
@@ -1208,7 +1200,6 @@ HELICS_EXPORT HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int t
  * @param flag The flag to query.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The value of the flag.
  */
@@ -1221,7 +1212,6 @@ HELICS_EXPORT HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int fla
  * @param intProperty A code for the property to set /ref helics_handle_options.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The value of the property.
  */
@@ -1233,7 +1223,6 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intPr
  * @param fed The federate object to query.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  *
  * @return The current time of the federate.
  */
@@ -1248,7 +1237,6 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
  * @param value The value of the global.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
@@ -1261,7 +1249,6 @@ HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* value
  * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
 
@@ -1273,7 +1260,6 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
 
@@ -1284,7 +1270,6 @@ HELICS_EXPORT const char* helicsFederateGetTag(HelicsFederate fed, const char* t
  * @param fedName The name of the federate to depend on.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateAddDependency(HelicsFederate fed, const char* fedName, HelicsError* err);
 
@@ -1295,7 +1280,6 @@ HELICS_EXPORT void helicsFederateAddDependency(HelicsFederate fed, const char* f
  * @param logFile The name of the log file.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsError* err);
 
@@ -1306,7 +1290,6 @@ HELICS_EXPORT void helicsFederateSetLogFile(HelicsFederate fed, const char* logF
  * @param logmessage The message to put in the log.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateLogErrorMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1317,7 +1300,6 @@ HELICS_EXPORT void helicsFederateLogErrorMessage(HelicsFederate fed, const char*
  * @param logmessage The message to put in the log.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateLogWarningMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1328,7 +1310,6 @@ HELICS_EXPORT void helicsFederateLogWarningMessage(HelicsFederate fed, const cha
  * @param logmessage The message to put in the log.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateLogInfoMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1339,7 +1320,6 @@ HELICS_EXPORT void helicsFederateLogInfoMessage(HelicsFederate fed, const char* 
  * @param logmessage The message to put in the log.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateLogDebugMessage(HelicsFederate fed, const char* logmessage, HelicsError* err);
 
@@ -1351,7 +1331,6 @@ HELICS_EXPORT void helicsFederateLogDebugMessage(HelicsFederate fed, const char*
  * @param logmessage The message to put in the log.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsFederateLogLevelMessage(HelicsFederate fed, int loglevel, const char* logmessage, HelicsError* err);
 
@@ -1363,7 +1342,6 @@ HELICS_EXPORT void helicsFederateLogLevelMessage(HelicsFederate fed, int logleve
  * @param command The command to send.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err);
 
@@ -1373,7 +1351,6 @@ HELICS_EXPORT void helicsFederateSendCommand(HelicsFederate fed, const char* tar
  * @param fed The federate to get the command for.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A string with the command for the federate, if the string is empty no command is available.
  */
@@ -1410,7 +1387,6 @@ HELICS_EXPORT const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsEr
  * @param value The value of the global.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err);
 
@@ -1424,7 +1400,6 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
  * @param value The value of the global.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
@@ -1436,7 +1411,6 @@ HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueN
  * @param command The command to send.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
@@ -1448,7 +1422,6 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
  * @param command The command to send.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
@@ -1459,7 +1432,6 @@ HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* targ
  * @param logFileName The name of the file to log to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err);
 
@@ -1470,7 +1442,6 @@ HELICS_EXPORT void helicsCoreSetLogFile(HelicsCore core, const char* logFileName
  * @param logFileName The name of the file to log to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err);
 
@@ -1481,7 +1452,6 @@ HELICS_EXPORT void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFi
  * @param barrierTime The time to set the barrier at.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err);
 
@@ -1500,7 +1470,6 @@ HELICS_EXPORT void helicsBrokerClearTimeBarrier(HelicsBroker broker);
  * @param errorString An error message to associate with the global error.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* errorString, HelicsError* err);
 
@@ -1512,7 +1481,6 @@ HELICS_EXPORT void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, c
  * @param errorString An error message to associate with the global error.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err);
 /**
@@ -1540,7 +1508,6 @@ HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* quer
  *
  *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
-
  */
 HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
@@ -1553,13 +1520,11 @@ HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate f
  * @param core The core to send the query to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
  *
  *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
-
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
 
@@ -1572,13 +1537,11 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore c
  * @param broker The broker to send the query to.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
  *
  *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid
-
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
 
@@ -1589,7 +1552,6 @@ HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBrok
  * @param fed A federate to send the query through.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err);
 
@@ -1602,12 +1564,10 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * @param query The query object to complete execution of.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
  *
  *         The return will be nullptr if query is an invalid object
-
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
@@ -1631,7 +1591,6 @@ HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
  *
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, HelicsError* err);
 
@@ -1642,7 +1601,6 @@ HELICS_EXPORT void helicsQuerySetTarget(HelicsQuery query, const char* target, H
  * @param queryString the new queryString
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, HelicsError* err);
 
@@ -1654,7 +1612,6 @@ HELICS_EXPORT void helicsQuerySetQueryString(HelicsQuery query, const char* quer
  *
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  */
 HELICS_EXPORT void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 
