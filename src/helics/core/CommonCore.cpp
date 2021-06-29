@@ -4639,11 +4639,11 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
     }
 }
 
-const std::string& CommonCore::getFederateTag(LocalFederateId federateID,
+const std::string& CommonCore::getFederateTag(LocalFederateId fid,
                                               const std::string& tag) const
 {
-    auto* fed = getFederateAt(federateID);
-    if (federateID == gLocalCoreId) {
+    auto* fed = getFederateAt(fid);
+    if (fid == gLocalCoreId) {
         static thread_local std::string val;
         val = const_cast<CommonCore*>(this)->query(
             "core",
@@ -4659,7 +4659,7 @@ const std::string& CommonCore::getFederateTag(LocalFederateId federateID,
     return fed->getTag(tag);
 }
 
-void CommonCore::setFederateTag(LocalFederateId federateID,
+void CommonCore::setFederateTag(LocalFederateId fid,
                                 const std::string& tag,
                                 const std::string& value)
 {
@@ -4668,7 +4668,7 @@ void CommonCore::setFederateTag(LocalFederateId federateID,
         throw InvalidParameter("tag cannot be an empty string for setFederateTag");
     }
 
-    if (federateID == gLocalCoreId) {
+    if (fid == gLocalCoreId) {
         ActionMessage tagcmd(CMD_CORE_TAG);
         tagcmd.source_id = getGlobalId();
         tagcmd.dest_id = tagcmd.source_id;
@@ -4677,7 +4677,7 @@ void CommonCore::setFederateTag(LocalFederateId federateID,
         return;
     }
 
-    auto* fed = getFederateAt(federateID);
+    auto* fed = getFederateAt(fid);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (setFlag)"));
     }
