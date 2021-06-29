@@ -665,11 +665,10 @@ INSTANTIATE_TEST_SUITE_P(tracer_tests,
                          tracer_clone_file_tests,
                          ::testing::ValuesIn(simple_clone_test_files));
 
-
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    ifndef DISABLE_SYSTEM_CALL_TESTS
-//TODO(PT): I think the EXE tests need to be moved to a different structure.  The EXE runner doesn't
-//always work right for some reason
+// TODO(PT): I think the EXE tests need to be moved to a different structure.  The EXE runner
+// doesn't always work right for some reason
 
 TEST_P(tracer_message_file_tests, test_message_files_exe)
 {
@@ -747,4 +746,3 @@ TEST_P(tracer_message_file_tests, test_message_files_exe)
 
 #    endif
 #endif
-

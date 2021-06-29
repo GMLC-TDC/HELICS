@@ -599,7 +599,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     mFed2->enterExecutingModeAsync();
     mFed1->enterExecutingMode();
 
-    ept1.sendTo("message1","ept2");
+    ept1.sendTo("message1", "ept2");
 
     mFed1->requestTimeAsync(1.0);
 
@@ -613,7 +613,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     auto retTime = mFed1->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
 
-    ept1.sendTo("message2","ept2");
+    ept1.sendTo("message2", "ept2");
 
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     EXPECT_FALSE(mFed2->isAsyncOperationCompleted());
@@ -627,7 +627,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     mFed2->requestTimeAsync(7.0);
     retTime = mFed1->requestTimeComplete();
     EXPECT_EQ(retTime, 3.0);
-    ept1.sendTo("message3","ept2");
+    ept1.sendTo("message3", "ept2");
 
     broker.reset();
     mFed1->finalize();

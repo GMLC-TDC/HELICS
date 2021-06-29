@@ -475,25 +475,25 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
             allowed_send_time = initializationTime;
         }
         if (ret != MessageProcessingResult::ERROR_RESULT) {
-        switch (iterate) {
-            case IterationRequest::FORCE_ITERATION:
-                fillEventVectorNextIteration(time_granted);
-                break;
-            case IterationRequest::ITERATE_IF_NEEDED:
-                if (ret == MessageProcessingResult::NEXT_STEP) {
-                    fillEventVectorUpTo(time_granted);
-                } else {
+            switch (iterate) {
+                case IterationRequest::FORCE_ITERATION:
                     fillEventVectorNextIteration(time_granted);
-                }
-                break;
-            case IterationRequest::NO_ITERATIONS:
+                    break;
+                case IterationRequest::ITERATE_IF_NEEDED:
+                    if (ret == MessageProcessingResult::NEXT_STEP) {
+                        fillEventVectorUpTo(time_granted);
+                    } else {
+                        fillEventVectorNextIteration(time_granted);
+                    }
+                    break;
+                case IterationRequest::NO_ITERATIONS:
                     if (wait_for_current_time) {
                         fillEventVectorInclusive(time_granted);
                     } else {
-                fillEventVectorUpTo(time_granted);
+                        fillEventVectorUpTo(time_granted);
                     }
-                break;
-        }
+                    break;
+            }
         }
         unlock();
 #ifndef HELICS_DISABLE_ASIO
