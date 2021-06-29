@@ -22,7 +22,7 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD "beta.2")
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-06-29")
+set(HELICS_DATE "2021-06-30")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -670,7 +670,7 @@ include(addfmt)
 # Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
-add_library(HELICS::jsoncpp_lib ALIAS jsoncpp_lib)
+add_library(HELICS::jsoncpp ALIAS jsoncpp_static)
 
 # --------------------------------------------------------------
 # Create the target for spdlog
