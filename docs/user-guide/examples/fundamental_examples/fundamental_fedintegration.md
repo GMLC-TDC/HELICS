@@ -12,7 +12,7 @@ This tutorial is organized as follows:
   - [Translation from JSON to PyHELICS API methods](#translation-from-json-to-pyhelics-api)
   - [Federate Integration with API calls](#federate-integration-with-api-calls)
   - [Dynamic Pub/Subs with API calls](#dynamic-pub-subs-with-api-calls)
-  - [Co-simulation Execution](co-simulation-execution)
+  - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Computing Environment
@@ -110,7 +110,7 @@ For example, let's look at our JSON config file of the Battery federate from the
 
 ```
 
-We can see from this config file that we need to find API method to assign the `name`, `loglevel`, `coreType`, `period`, `uninterruptible`, `terminate_on_error`, `wait_for_current_time_update`, and `pub`/`subs`. In this example, we will be using the [PyHELICS API methods](https://python.helics.org/api/capi-py/). This section will discuss how to translate JSON config files to API methods, how to configure the federate with these API calls in the co-simulation, and how to dynamically register publications and subscriptions with other federates.
+We can see from this config file that we need to find API method to assign the `name`, `loglevel`, `coreType`, `period`, `uninterruptible`, `terminate_on_error`, `wait_for_current_time_update`, and `pub`/`subs`. In this example, we will be using the [PyHELICS API methods](https://https://python.helics.org/api/capi-py). This section will discuss how to translate JSON config files to API methods, how to configure the federate with these API calls in the co-simulation, and how to dynamically register publications and subscriptions with other federates.
 
 ### Translation from JSON to PyHELICS API methods
 
@@ -140,8 +140,8 @@ h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_U
 If you find yourself wanting to set additional properties, there are a handful of places you can look:
 
 - [C++ source code](https://docs.helics.org/en/latest/doxygen/helics__enums_8h_source.html): Do a string search for the JSON property. This can provide clarity into which `enum` to use from the API.
-- [PyHELICS API methods](https://python.helics.org/api/capi-py/): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
-- [Configuration Options Reference](../../configuration_options_reference.html): API calls for C++, C, Python, and Julia
+- [PyHELICS API methods](https://https://python.helics.org/api/capi-py): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
+- [Configuration Options Reference](../../../references/configuration_options_reference.html): API calls for C++, C, Python, and Julia
 
 ### Federate Integration with API calls
 
@@ -284,7 +284,7 @@ This results in the same output; the only thing we have changed is the method of
 
 If your output is not the same as with the Base Example, it can be helpful to pinpoint source of the difference -- have you used the correct API method?
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

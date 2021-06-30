@@ -27,7 +27,7 @@ For this example, the [Advanced Default example](./advanced_default.md) has been
 
 #### HELICS differences
 
-Typically, all federates in a federation use the same core type. There can be cases, though, where a multi-site co-simulation with a more complex networking environment or performance requirements dictate the need for some federates to utilize a difference core type than others. For example, the `IPC` core utilizes a Boost library function to allow two executables both using Boost to communicate between themselves when running on the same compute node; since this is in-memory communication rather than over the network stack, performance is expected to be higher. It could be that a particular federation has been optimized to take advantage of this but must also communicate with federates on a separate compute node via ZMQ. In this case, a so-called "multibroker" can be configured to allow for the federation to run. (See the User Guide section on the [multi-protocol broker](../../advanced_topics/broker_hierarchies.md) and [broker core types](../../CoreTypes.md) for further details.)
+Typically, all federates in a federation use the same core type. There can be cases, though, where a multi-site co-simulation with a more complex networking environment or performance requirements dictate the need for some federates to utilize a difference core type than others. For example, the `IPC` core utilizes a Boost library function to allow two executables both using Boost to communicate between themselves when running on the same compute node; since this is in-memory communication rather than over the network stack, performance is expected to be higher. It could be that a particular federation has been optimized to take advantage of this but must also communicate with federates on a separate compute node via ZMQ. In this case, a so-called "multibroker" can be configured to allow for the federation to run. (See the User Guide section on the [multi-protocol broker](../../advanced_topics/broker_hierarchies.md) and [broker core types](../../advanced_topics/CoreTypes.md) for further details.)
 
 In this example, we won't be doing anything like that but, for demonstration purposes, simply using the same federation from the [Advanced Default example.](./advanced_default.md) and configuring it so each federate uses a different core type.
 
@@ -113,3 +113,11 @@ As has been mentioned, since this is just a change to the co-simulation architec
 ![placeholder](../../../img/advanced_multibroker_estimated_SOCs.png)
 
 ![placeholder](../../../img/advanced_multibroker_battery_SOCs.png)
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

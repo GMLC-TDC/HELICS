@@ -109,3 +109,11 @@ The peak charging results are shown below. As can be seen, the peak power amplit
 ![placeholder](../../../img/advanced_simultaneous_power_3.png)
 
 To do a more legitimate sensitivity analysis to the population of EVs that are being charged, a sample size larger than three is almost certainly necessary. [We've put together another example](./advanced_orchestration.md) to show how to orchestrate running larger sets of co-simulations to address exactly these kinds of needs.
+
+## [Questions and Help](../../support.md)
+
+Do you have questions about HELICS or need help?
+
+1. Come to [office hours](mailto:helicsteam@helics.org)!
+2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
+3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

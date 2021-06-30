@@ -8,7 +8,7 @@ This tutorial is organized as follows:
 - [Combination Federates](#combination-federates)
   - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
   - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
-  - [Co-simulation Execution](co-simulation-execution)
+  - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
@@ -223,11 +223,11 @@ Note that we have made a number of simplifying assumptions in this analysis:
 
 - There will always be an EV waiting to be charged (the charging ports are never idle).
 - There is a constant number of charging ports -- we know what the power draw will look like given a static number of ports, but we do not know the underlying demand for power from EVs.
-- The equipment which ferries the messages between the Charger and the Controller never fails -- we haven't incorporated [Filters](./fundamental_filters.md).
+- The equipment which ferries the messages between the Charger and the Controller never fails -- we haven't incorporated [Filters](./fundamental_native_filters.md).
 
 How would you model an unknown demand for vehicle charging? How would you model idle charging ports? What other simplifications do you see that can be addressed?
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

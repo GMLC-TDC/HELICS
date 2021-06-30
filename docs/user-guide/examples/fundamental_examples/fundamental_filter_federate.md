@@ -103,7 +103,7 @@ The resulting figures show the actual on board SOC at each EV charging port, the
 
 When comparing to the results from the [previous example without any filters](./fundamental_combo.md), the effects of the filter federate are clear. By modifying the control signals between the controller and charger it is relatively easy to cause significantly different behavior in the system.
 
-## [Questions and Help](../support.md)
+## [Questions and Help](../../support.md)
 
 Do you have questions about HELICS or need help?
 

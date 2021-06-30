@@ -3,7 +3,7 @@
 There are a number of classes of HELICS users:
 
 - **New users** that have little to no experience with HELICS and co-simulation in general
-  - Start with [**Installation**](../installation/index.md)
+  - Start with [**Installation**](./installation/index.md)
   - Read the [**Fundamental Topics**](./index.html#fundamental-topics)
   - Try the [**Examples**](./index.html#examples)
 - **Intermediate users (Modelers)** that have run co-simulations with HELICS using simulators in which somebody else has done the simulator integration with HELICS.
@@ -19,7 +19,7 @@ There are a number of classes of HELICS users:
   - Look in the [**Configurations Options Reference**](./index.html#configurations-options-reference) or jump straight to the API references
     - [C++](https://docs.helics.org/en/latest/doxygen/index.html)
     - C++98
-    - [C](https://docs.helics.org/en/helics3userguide/api-reference/C_API.html)
+    - [C](../references/api-reference/C_API.md)
     - [Python](https://python.helics.org/api/)
     - [Julia](https://julia.helics.org/latest/api/)
     - [nim](https://github.com/GMLC-TDC/helics.nim)
