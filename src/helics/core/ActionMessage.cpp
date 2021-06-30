@@ -712,9 +712,9 @@ static constexpr frozen::unordered_map<int, frozen::string, 8> errorStrings = {
     {max_broker_count_exceeded, "the maximum number of brokers or cores has been reached"},
     {mismatch_broker_key_error_code, "Broker key does not match"}};
 
-const char* commandErrorString(int errorcode)
+const char* commandErrorString(int errorCode)
 {
-    const auto* res = errorStrings.find(errorcode);
+    const auto* res = errorStrings.find(errorCode);
     return (res != errorStrings.end()) ? res->second.data() : static_cast<const char*>(unknownStr);
 }
 
