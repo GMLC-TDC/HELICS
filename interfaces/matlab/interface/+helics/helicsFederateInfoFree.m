@@ -1,3 +1,3 @@
 function varargout = helicsFederateInfoFree(varargin)
-  [varargout{1:nargout}] = helicsMEX(65, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(70, varargin{:});
 end

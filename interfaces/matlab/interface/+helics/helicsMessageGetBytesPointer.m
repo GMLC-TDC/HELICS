@@ -1,3 +1,3 @@
 function varargout = helicsMessageGetBytesPointer(varargin)
-  [varargout{1:nargout}] = helicsMEX(278, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(297, varargin{:});
 end
