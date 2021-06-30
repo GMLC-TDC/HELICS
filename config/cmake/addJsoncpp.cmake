@@ -13,6 +13,18 @@ set(JSONCPP_WITH_PKGCONFIG_SUPPORT OFF CACHE INTERNAL "")
 set(JSONCPP_WITH_POST_BUILD_UNITTEST OFF CACHE INTERNAL "")
 set(JSONCPP_WITH_WARNING_AS_ERROR OFF CACHE INTERNAL "")
 set(DEBUG_LIBNAME_SUFFIX ${CMAKE_DEBUG_POSTFIX} CACHE INTERNAL "")
+
+if (MSVC)
+
+if(STATIC_STANDARD_LIB STREQUAL "default")
+    set(JSONCPP_STATIC_WINDOWS_RUNTIME OFF CACHE INTERNAL "")
+elseif(STATIC_STANDARD_LIB STREQUAL "static")
+    set(JSONCPP_STATIC_WINDOWS_RUNTIME ON CACHE INTERNAL "")
+elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
+    set(JSONCPP_STATIC_WINDOWS_RUNTIME OFF CACHE INTERNAL "")
+endif()
+endif()
+
 # so json cpp exports to the correct target export
 
 set(INSTALL_EXPORT "" CACHE INTERNAL "")
@@ -28,6 +40,16 @@ if(BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+if(BUILD_STATIC_LIBS)
+    set(OLD_BUILD_STATIC_LIBS ${BUILD_STATIC_LIBS})
+    set(BUILD_STATIC_LIBS ON)
+endif()
+
+if(BUILD_OBJECT_LIBS)
+    set(OLD_BUILD_OBJECT_LIBS ${BUILD_OBJECT_LIBS})
+    set(BUILD_OBJECT_LIBS OFF)
+endif()
+
 # these are internal variables used in JSONCPP that we know to be true based on the
 # requirements in HELICS for newer compilers than JSONCPP supports
 set(HAVE_CLOCALE ON)
@@ -39,10 +61,18 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp"
                  "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp" EXCLUDE_FROM_ALL)
 
 
-set_target_properties(jsoncpp_lib PROPERTIES FOLDER Extern)
+set_target_properties(jsoncpp_static PROPERTIES FOLDER Extern)
 
 if(OLD_BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ${OLD_BUILD_SHARED_LIBS})
+endif()
+
+if(OLD_BUILD_STATIC_LIBS)
+    set(BUILD_STATIC_LIBS ${OLD_BUILD_STATIC_LIBS})
+endif()
+
+if(OLD_BUILD_OBJECT_LIBS)
+    set(BUILD_OBJECT_LIBS ${OLD_BUILD_OBJECT_LIBS})
 endif()
 
 hide_variable(JSONCPP_WITH_STRICT_ISO)
