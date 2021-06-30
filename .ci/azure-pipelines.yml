@@ -33,7 +33,6 @@ jobs:
     steps:
       - bash: |
           source scripts/setup-helics-ci-options.sh
-          module load mpi || true
           mkdir -p build && cd build
           ../scripts/ci-build.sh
         env:
