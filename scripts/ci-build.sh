@@ -6,7 +6,11 @@ fi
 
 # Setup MPI on Fedora build images
 source /etc/os-release
-if [[ "$ID" == "fedora" ]]; then module load mpi || true; fi
+if command -v module &>/dev/null; then
+    if [[ "$ID" == "fedora" ]]; then
+        module load mpi || true
+    fi
+fi
 
 # Flag variables are left unquoted for globbing and word splitting by bash (enable them to contain multiple arguments)
 echo "cmake -G \"${CMAKE_GENERATOR}\" ${JOB_OPTION_FLAGS} ${HELICS_DEPENDENCY_FLAGS} ${HELICS_OPTION_FLAGS} ${CMAKE_COMPILER_LAUNCHER} .."
