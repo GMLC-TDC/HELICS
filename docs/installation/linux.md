@@ -55,7 +55,7 @@ cd HELICS
 mkdir build
 cd build
 cmake ../
-# the options can be modified by altering the CmakeCache.txt file or by using ccmake command to edit them
+# the options can be modified by altering the CMakeCache.txt file or by using the ccmake command to edit them
 # the cmake-gui will also work to graphically edit the configuration options.  
 cmake . # optional, to change install path or other configuration settings if changed
 make
