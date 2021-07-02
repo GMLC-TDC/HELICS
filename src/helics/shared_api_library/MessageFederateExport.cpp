@@ -549,7 +549,7 @@ HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* 
     if (endObj == nullptr) {
         return nullptr;
     }
-    if (endObj->fed==nullptr) {
+    if (endObj->fed == nullptr) {
         return nullptr;
     }
     return endObj->fed->messages.newMessage();
