@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/zmq/ZmqCore.h"
 
 #include "gtest/gtest.h"
+#include <thread>
 #include <future>
 #include <iostream>
 

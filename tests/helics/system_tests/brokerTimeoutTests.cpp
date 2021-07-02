@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/test/TestComms.h"
 #include "helics/network/test/TestCore.h"
 
+#include <thread>
 #include <future>
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
