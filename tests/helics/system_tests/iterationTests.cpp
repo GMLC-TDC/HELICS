@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/ValueConverter.hpp"
 
 #include <future>
+#include <thread>
 
 struct iteration_tests: public FederateTestFixture, public ::testing::Test {
 };
