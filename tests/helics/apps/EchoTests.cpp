@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <cstdio>
 #include <future>
+#include <thread>
 
 // this test will test basic echo functionality
 TEST(echo_tests, echo_test1)

@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/ValueFederate.hpp"
 
 #include <future>
+#include <thread>
 
 struct command_tests: public FederateTestFixture, public ::testing::Test {
 };
