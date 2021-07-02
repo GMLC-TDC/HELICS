@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "testFixtures.hpp"
 
 #include "gmock/gmock.h"
-#include <thread>
 #include <future>
 #include <gtest/gtest.h>
+#include <thread>
 /** these test cases test out the value converters
  */
 

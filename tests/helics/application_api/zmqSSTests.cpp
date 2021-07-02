@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 
 #include "gtest/gtest.h"
-#include <thread>
 #include <future>
 #include <iostream>
+#include <thread>
 
 using namespace std::literals::chrono_literals;
 
