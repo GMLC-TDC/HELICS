@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/loadCores.hpp"
 
 #include "gtest/gtest.h"
-
 #include <thread>
 
 static const bool ld = helics::loadCores();
