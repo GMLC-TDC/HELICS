@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ctestFixtures.hpp"
 #include "helics/helics.h"
 
+#include <thread>
 #include <future>
 #include <gtest/gtest.h>
 /** these test cases test out the message federates

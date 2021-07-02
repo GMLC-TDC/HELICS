@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helics_definitions.hpp"
 #include "helics/helics_enums.h"
 
+#include <thread>
 #include <future>
 #include <gtest/gtest.h>
 #ifndef HELICS_SHARED_LIBRARY
