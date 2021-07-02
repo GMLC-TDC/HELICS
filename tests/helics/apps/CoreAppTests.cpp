@@ -26,6 +26,7 @@ using ::testing::HasSubstr;
 
 #include <cstdio>
 #include <future>
+#include <thread>
 
 TEST(CoreAppTests, constructor1)
 {

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageOperators.hpp"
 #include "testFixtures.hpp"
 
+#include <thread>
 #include <future>
 #include <gtest/gtest.h>
 #include <helics/core/Broker.hpp>

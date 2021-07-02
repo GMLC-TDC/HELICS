@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/tcp/TcpHelperClasses.h"
 
 #include "gtest/gtest.h"
+#include <thread>
 #include <future>
 #include <numeric>
 
