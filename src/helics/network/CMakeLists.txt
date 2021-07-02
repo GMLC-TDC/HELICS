@@ -21,6 +21,9 @@ set(IPC_SOURCE_FILES ipc/IpcCore.cpp ipc/IpcBroker.cpp ipc/IpcComms.cpp ipc/IpcQ
 
 set(MPI_SOURCE_FILES mpi/MpiCore.cpp mpi/MpiBroker.cpp mpi/MpiComms.cpp mpi/MpiService.cpp)
 
+
+set(PLUGIN_SOURCE_FILES plugin/CommsPlugin.cpp plugin/SharedObjectGeneration.cpp)
+
 set(ZMQ_SOURCE_FILES
     zmq/ZmqCore.cpp
     zmq/ZmqBroker.cpp
@@ -93,6 +96,8 @@ set(TCP_HEADER_FILES
     tcp/TcpCommsCommon.h
 )
 
+set(PLUGIN_HEADER_FILES plugin/CommsPlugin.hpp plugin/SharedObjectGeneration.hpp)
+
 if(HELICS_ENABLE_TEST_CORE)
     list(APPEND NETWORK_SRC_FILES ${TESTCORE_SOURCE_FILES})
     list(APPEND NETWORK_INCLUDE_FILES ${TESTCORE_HEADER_FILES})
@@ -126,6 +131,14 @@ endif()
 if(HELICS_ENABLE_MPI_CORE)
     list(APPEND NETWORK_SRC_FILES ${MPI_SOURCE_FILES})
     list(APPEND NETWORK_INCLUDE_FILES ${MPI_HEADER_FILES})
+endif()
+
+# change this to an actual option later
+set(HELICS_ENABLE_PLUGINS ON)
+
+if(HELICS_ENABLE_PLUGINS)
+    list(APPEND NETWORK_SRC_FILES ${PLUGIN_SOURCE_FILES})
+    list(APPEND NETWORK_INCLUDE_FILES ${PLUGIN_HEADER_FILES})
 endif()
 
 add_library(helics_network STATIC ${NETWORK_SRC_FILES} ${NETWORK_INCLUDE_FILES})
@@ -165,6 +178,10 @@ endif()
 
 if(HELICS_ENABLE_INPROC_CORE)
     source_group("inproc" FILES ${INPROCCORE_SOURCE_FILES} ${INPROCCORE_HEADER_FILES})
+endif()
+
+if(HELICS_ENABLE_PLUGINS)
+    source_group("plugins" FILES ${PLUGIN_SOURCE_FILES} ${PLUGIN_HEADER_FILES})
 endif()
 
 if(HELICS_ENABLE_MPI_CORE)
