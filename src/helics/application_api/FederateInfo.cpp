@@ -277,7 +277,7 @@ static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_
                                                       /** timing+ data transfer notices*/
                                                       {"data", HELICS_LOG_LEVEL_DATA},
                                                       /** same as data*/
-                                                      {"debug", HELICS_LOG_LEVEL_DATA},
+                                                      {"debug", HELICS_LOG_LEVEL_DEBUG},
                                                       /** all internal messages*/
                                                       {"trace", HELICS_LOG_LEVEL_TRACE}};
 
@@ -545,7 +545,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--loglevel",
            [this](int val) { setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, val); },
            "the logging level of a federate")
-        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+        ->transform(
+            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+
+        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
         ->envname("HELICS_LOG_LEVEL");
 
     app->add_option("--separator", separator, "separator character for local federates")
