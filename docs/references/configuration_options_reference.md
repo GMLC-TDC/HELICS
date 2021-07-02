@@ -83,7 +83,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
 
   //Logging
   "logfile": "output.log"
-  "log_level": 5,
+  "log_level": "warning",
   "force_logging_flush": false,
   "file_log_level": "",
   "console_log_level": "",
@@ -310,9 +310,9 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_terminate_on_error` [72]
+_Property's enumerated name:_ `HELICS_FLAG_TERMINATE_ON_ERROR` [72]
 
-If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions.
+If the `terminate_on_error` flag is set then a federate encountering an internal error will trigger a global error and cause the entire federation to terminate. Errors of this nature are typically the result of configuration errors, such as having a required publication that is not used or incompatible units or types on publications and subscriptions. This is the same option that is available in the `broker_init_string` but applied only to a specific federate (whereas when applied at the broker level it is effectively applied to all federates).
 
 ---
 
@@ -324,7 +324,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_source_only` [4]
+_Property's enumerated name:_ `HELICS_FLAG_SOURCE_ONLY` [4]
 
 Used to indicate to the federation that this federate is only producing data and has no inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
@@ -338,7 +338,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_observer` [0]
+_Property's enumerated name:_ `HELICS_FLAG_OBSERVER` [0]
 
 Used to indicate to the federation that this federate produces no data and only has inputs/subscriptions. Specifying this when appropriate allows HELICS to more efficiently grant times to the federation.
 
@@ -364,21 +364,21 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
 
-_Property's enumerated name:_ `helics_property_int_log_level` [271]
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_LEVEL` [271]
 
 _Valid values:_
 
-- -1 - no logging - `helics_log_level_no_print`
-- 0 - error - `helics_log_level_error`
-- 1 - warning - `helics_log_level_warning`
-- 2 - summary - `helics_log_level_summary`
-- 3 - connections - `helics_log_level_connections`
-- 4 - interfaces - `helics_log_level_interfaces`
-- 5 - timing - `helics_log_level_timing`
-- 6 - data - `helics_log_level_data`
-- 7 - trace - `helics_log_level_trace`
+- `no_print` - `HELICS_LOG_LEVEL_NO_PRINT`
+- `error` - `HELICS_LOG_LEVEL_ERROR`
+- `warning` - `HELICS_LOG_LEVEL_WARNING`
+- `summary` - `HELICS_LOG_LEVEL_SUMMARY`
+- `connections` - `HELICS_LOG_LEVEL_CONNECTIONS`
+- `interfaces` - `HELICS_LOG_LEVEL_INTERFACES`
+- `timing` - `HELICS_LOG_LEVEL_TIMING`
+- `data` - `HELICS_LOG_LEVEL_DATA`
+- `trace` - `HELICS_LOG_LEVEL_TRACE`
 
-Determines the level of detail for log messages. All messages at the user-provided level and lower will be printed to the log file. Valid levels and their corresponding enumerations are shown below.
+Determines the level of detail for log messages. In the list above, the keywords on the left can be used when specifying the logging level via a JSON configuration file. The enumerations on the right are used when configuring via the API.
 
 ---
 
@@ -390,7 +390,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
 
-_Property's enumerated name:_ `helics_property_int_file_log_level` [272]
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_FILE_LOG_LEVEL` [272]
 
 _Valid values:_ Same as in `loglevel`
 
@@ -406,7 +406,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
 
-_Property's enumerated name:_ `helics_property_int_console_log_level` [274]
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL` [274]
 
 _Valid values:_ Same as in `loglevel`
 
@@ -422,7 +422,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_force_logging_flush` [88]
+_Property's enumerated name:_ `HELICS_FLAG_FORCE_LOGGING_FLUSH` [88]
 
 Setting this option forces HELICS logging messages to be flushed to file after each one is written. This prevents the buffered IO most OSs implement to be bypassed such that all messages appear in the log file immediately after being written at the cost of slower simulation times due to more time spent writing to file.
 
@@ -436,7 +436,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_dumplog` [89]
+_Property's enumerated name:_ `HELICS_FLAG_DUMPLOG` [89]
 
 When set, a record of all messages is captured and written out to the log file at the conclusion of the co-simulation.
 
@@ -450,7 +450,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_ignore_time_mismatch_warnings` [67]
+_Property's enumerated name:_ `HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS` [67]
 
 If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is possible for the time granted a federate to be greater than the requested time. This situation would normally generate a warning message, but if this flag is set those warnings are silenced.
 
@@ -464,7 +464,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_uninterruptible` [1]
+_Property's enumerated name:_ `HELICS_FLAG_UNINTERRUPTIBLE` [1]
 
 Normally, a federate will be granted a time earlier than it requested when it receives a message from another federate; the presence of any message implies there could be an action the federate needs to take and may generate new messages of its own. There are times, though, when it is important that the federate only be granted a time (and begin simulating/executing again) that it has previously requested. For example, there could be some controller that should only operate at fixed intervals even if new data arrives earlier. In these cases, setting the `uninterruptible` flag will prevent premature time grants.
 
@@ -478,7 +478,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_period` [140]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_PERIOD` [140]
 
 Many time-based simulators have a minimum time-resolution or a user-configurable step size. The `period` parameter can be used to effectively synchronize the times that are granted with the defined simulation period. The default units for `period` are in seconds but the string for this parameter can include its own units (e.g. "2 ms" or "1 hour"). Setting `period` will force all time grants to occur at times of `n*period` even if subscriptions are updated, messages arrive, or the federate requests a time between periods. This value effectively makes the federates `uninterruptible` during the times between periods. Relatedly...
 
@@ -492,7 +492,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_offset` [141]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_OFFSET` [141]
 
 There may be cases where it is preferable to have a simulator receive time grants that are offset slightly in time to one or more other federates. Defining an `offset` value allows this to take place; units are handled the same as in `period`. Setting both `period` and `offset`, will result in the all times granted to the federate in question being constrained to `n*period + offset`.
 
@@ -506,7 +506,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_delta` [137]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_DELTA` [137]
 
 timeDelta has some similarities to `period`; where `period` constrained the granted time to regular intervals, `timeDelta` constrains the grant time to a minimum amount from the last granted time. Units are handled the same as in `period`.
 
@@ -520,7 +520,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_input_delay` [148]
+_Property's enumerated name:_ `HELICS_PROPERTY_INPUT_TIME_DELAY` [148]
 
 `inputDelay` specifies a delay in simulated time between when a signal arrives at a federate and when that federate is notified that a new value is available. `outputDelay` is similar but applies to signals being sent by a federate. Note that this applies to both value signals and message signals.
 
@@ -534,7 +534,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_output_delay` [150]
+_Property's enumerated name:_ `HELICS_TIME_PROPERTY_OUTPUT_TIME_DELAY` [150]
 
 `outputDelay` is similar to `input_delay` but applies to signals being sent by a federate. Note that this applies to both value signals and message signals.
 
@@ -548,7 +548,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_realtime` [16]
+_Property's enumerated name:_ `HELICS_FLAG_REALTIME` [16]
 
 If set to true the federate uses `rt_lag` and `rt_lead` to match the time grants of a federate to the computer wall clock.
 If the federate is running faster than real time this will insert additional delays. If the federate is running slower than real time this will cause a force grant, which can lead to non-deterministic behavior. `rt_lag` can be set to maxVal to disable force grant
@@ -563,7 +563,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_rt_lag` [143] and `helics_property_time_rt_lead` [144]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_RT_LAG` [143] and `HELICS_PROPERTY_TIME_RT_LEAD` [144]
 
 Defines "real-time" for HELICS by setting tolerances for HELICS to use when running a real-time co-simulation. HELICS is forced to keep simulated time within this window of wall-clock time. Most general purpose OSes do not provide guarantees of execution timing and thus very small values of `rt_lag` and `rt_lead` (less than 0.005) are not likely to be achievable.
 
@@ -577,7 +577,7 @@ _API:_ `helicsFederateInfoSetTimeProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
-_Property's enumerated name:_ `helics_property_time_rt_tolerance` [145]
+_Property's enumerated name:_ `HELICS_PROPERTY_TIME_RT_TOLERANCE` [145]
 
 Implements the same functionality of `rt_lag` and `rt_lead` but does so by using a single value to set symmetrical lead and lag constraints.
 
@@ -591,7 +591,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_wait_for_current_time_update` [10]
+_Property's enumerated name:_ `HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE` [10]
 
 If set to true, a federate will not be granted the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it. If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
 
@@ -605,7 +605,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_restrictive_time_policy` [11]
+_Property's enumerated name:_ `HELICS_FLAG_RESTRICTIVE_TIME_POLICY` [11]
 
 If set, a federate will not be granted the requested time until all other federates have completed at least 1 iteration of the current time or have moved past it. If it is known that 1 federate depends on others in a non-cyclic fashion, this can be used to optimize the order of execution without iterating.
 
@@ -623,7 +623,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_slow_responding` [29]
+_Property's enumerated name:_ `HELICS_FLAG_SLOW_RESPONDING` [29]
 
 If specified on a federate, setting this flag indicates the federate may be slow in responding, and to not forcibly eject the federate from the federation for the slow response. This is an uncommon scenario.
 
@@ -639,7 +639,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_forward_compute [14]
+_Property's enumerated name:_ `HELICS_FLAG_FORWARD_COMPUTE` [14]
 
 Indicates to the broker and the rest of the federation that this federate computes ahead of its granted time and can/does roll back when necessary. Federates able to do this (and who set this flag) allow more efficient time grants to the federation as a whole.
 
@@ -653,7 +653,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_rollback` [12]
+_Property's enumerated name:_ `HELICS_FLAG_ROLLBACK` [12]
 
 Indicates to the broker and the rest of the federation that this federate can/does roll back when necessary. Federates able to do this (and who set this flag) allow more efficient time grants to the federation as a whole.
 
@@ -667,7 +667,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
 
-_Property's enumerated name:_ `helics_property_int_max_iterations` [259]
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_MAX_ITERATIONS` [259]
 
 For federates engaged in iteration (recomputing values based on updated inputs at a single simulation timestep) there may be a need to enforce a maximum number of iterations. This option allows that value to be set. When any federate reaches this number of iterations, HELICS will evaluate the federation as a whole and grant the next smallest time supported by the iterating federates. This time will only be granted to the federates that would be able to execute at this time.
 
@@ -683,7 +683,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_flag_only_update_on_change` [454] and `helics_flag_only_transmit_on_change` [452]
+_Property's enumerated name:_ `HELICS_FLAG_ONLY_UPDATE_ON_CHANGE` [454] and `HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE` [452]
 
 Setting these flags prevents new value signals with the same value from being received by the federate or sent by the federate. Setting these flags will reduce the amount of traffic on the HELICS bus and can provide performance improvements in co-simulations with large numbers of messages.
 
@@ -709,7 +709,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_connection_required` [397]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_REQUIRED` [397]
 
 When a federate is initialized, one of its tasks is to make sure the recipients of directed signals exist. If, after the federation is initialized, the recipient can't be found, then by default a warning is generated and written to the log file. If the `connections_required` flag is set, this warning becomes a fatal error that stops the co-simulation.
 
@@ -726,7 +726,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_connection_optional` [402]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECITON_OPTIONAL` [402]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.
 
@@ -786,7 +786,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_buffer_data` [411]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_BUFFER_DATA` [411]
 
 (only valid for inputs and subscriptions) Setting this flag will buffer the last value sent during the initialization phase of HELICS co-simulations. When the execution phase begins, that value will be resent to the receiving handle.
 
@@ -818,7 +818,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_strict_type_checking` [414]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING` [414]
 
 When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.x
 
@@ -856,7 +856,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_connections` [522]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTIONS` [522]
 
 Allows an integer number of connections to be considered value for this input handle. Similar to `multiple_connections_allowed` but allows the number of sending handles to be defined to a specific number.
 
@@ -870,7 +870,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_input_priority_location` [510]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION` [510]
 
 When receiving values from multiple sending handles, when the values are received they or organized as a vector. This option is used to define which value in that vector has priority. The API can be called multiple times to set successive priorities.
 
@@ -884,7 +884,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_clear_priority_list` [512]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST` [512]
 
 When receiving values from multiple sending handles, when the values are received they or organized as a vector. This option is used to clear that priority list and redefine which values have priority.
 
@@ -898,7 +898,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_single_connection_only` [407]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY` [407]
 When set, this forces the input handle to have only one sending handle it will receive from. Setting this flag serves as a sort of double-check to ensure that only one other handle is sending to this input handle and that the federation has been configured as expected.
 
 ---
@@ -911,7 +911,8 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_multiple_connections_allowed` [409]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED` [409]
+
 When set, this flag allows the input handle to receive valuesfrom multiple other handles.
 
 ---
@@ -924,7 +925,7 @@ _API:_ `helicsInputSetOption`
 | [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
 
-_Property's enumerated name:_ `helics_handle_option_multi_input_handling_method` [507]
+_Property's enumerated name:_ `HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD` [507]
 _Property values:_
 
 - `none` | `no_op`
