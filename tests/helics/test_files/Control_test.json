@@ -1,6 +1,6 @@
 {
   "name": "EV_Controller",
-  "loglevel": 15,
+  "loglevel": "interfaces",
   "coreType": "zmq",
   "timeDelta": 1.0,
 
