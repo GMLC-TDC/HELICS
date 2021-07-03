@@ -61,7 +61,7 @@ TEST(logging_tests, file_logging)
         EXPECT_TRUE(res);
     }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=5";
+    fi.coreInitString = "--autobroker --logfile logfile.txt --fileloglevel=timing";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -96,7 +96,7 @@ TEST(logging_tests, file_logging_p2)
         EXPECT_TRUE(res);
     }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --fileloglevel=5";
+    fi.coreInitString = "--autobroker --fileloglevel=timing";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
     auto cr = Fed->getCorePointer();

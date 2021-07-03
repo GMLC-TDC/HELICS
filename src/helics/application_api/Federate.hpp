@@ -600,7 +600,7 @@ received
     */
     void logDebugMessage(const std::string& message) const
     {
-        logMessage(HELICS_LOG_LEVEL_DATA, message);
+        logMessage(HELICS_LOG_LEVEL_DEBUG, message);
     }
     /** call to complete async operation with no output*/
     void completeOperation();

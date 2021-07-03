@@ -1271,7 +1271,7 @@ void helicsFederateLogInfoMessage(HelicsFederate fed, const char* logmessage, He
 
 void helicsFederateLogDebugMessage(HelicsFederate fed, const char* logmessage, HelicsError* err)
 {
-    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_DATA, logmessage, err);
+    helicsFederateLogLevelMessage(fed, HELICS_LOG_LEVEL_DEBUG, logmessage, err);
 }
 
 void helicsFederateLogLevelMessage(HelicsFederate fed, int loglevel, const char* logmessage, HelicsError* err)

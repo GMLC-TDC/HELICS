@@ -108,13 +108,10 @@ static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_
                                                       {"warning", HELICS_LOG_LEVEL_WARNING},
                                                       {"summary", HELICS_LOG_LEVEL_SUMMARY},
                                                       {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
-                                                      /** connections+ interface definitions*/
                                                       {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
-                                                      /** interfaces + timing message*/
                                                       {"timing", HELICS_LOG_LEVEL_TIMING},
-                                                      /** timing+ data transfer notices*/
                                                       {"data", HELICS_LOG_LEVEL_DATA},
-                                                      /** all internal messages*/
+                                                      {"debug", HELICS_LOG_LEVEL_DEBUG},
                                                       {"trace", HELICS_LOG_LEVEL_TRACE}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
@@ -181,20 +178,26 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             [this](int val) { setLogLevel(val); },
             "the level at which to log, the higher this is set the more gets logged; set to \"no_print\" for no logging")
         ->envname("HELICS_BROKER_LOG_LEVEL")
+
         ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
 
     logging_group
         ->add_option("--fileloglevel",
                      fileLogLevel,
                      "the level at which messages get sent to the file")
-        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(
+            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group
         ->add_option("--consoleloglevel",
                      consoleLogLevel,
                      "the level at which messages get sent to the file")
 
-        ->transform(CLI::Transformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
+        ->transform(
+            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
+        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
     logging_group->add_flag(
         "--dumplog",
         dumplog,

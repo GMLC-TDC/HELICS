@@ -26,6 +26,9 @@ A list of known PRs that made breaking changes is also provided.
 
 - `Federate::error(int errorcode)` and `Federate::error(int errorcode, const std::string& message)` were removed, use `localError` instead (or `globalError` to stop the entire simulation). Changed in [#1363][1].
 
+### Command line interfaces
+The numerical value corresponding with the log levels have changed.  As such entering numerical values for log levels is no longer supported (it will be again someday). For now please use the text values "none(-1)", "no_print(-1)", "error(0)", "warning(1)", "summary(2)", "connections(3)", "interfaces(4)", "timing(5)", "data(6)", "debug(6)", "trace(7)". The previous values are shown in parenthesis. The new numerical values are subject to revision in a later release so are not considered stable at the moment.  
+
 ### C Shared API
 
 - Only 1 header is now used `#include <helics/helics.h>` for all uses of the C shared library in C/C++ code no other headers are needed, the other headers are no longer available.

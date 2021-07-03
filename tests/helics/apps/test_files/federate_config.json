@@ -1,7 +1,7 @@
 {
   "name": "fed1",
   "period": 1,
-  "log_level": 3,
+  "log_level": "connections",
   "corename": "ccore_combo",
   "type": "test",
   "endpoints": [
