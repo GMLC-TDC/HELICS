@@ -550,7 +550,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
 
 static inline Time checkAdd(Time val, Time increment)
 {
-    return (val < Time::maxVal() - increment) ? val + increment: Time::maxVal();
+    return (val < Time::maxVal() - increment) ? val + increment : Time::maxVal();
 }
 
 void TimeCoordinator::sendTimeRequest() const
@@ -564,14 +564,14 @@ void TimeCoordinator::sendTimeRequest() const
     if (info.wait_for_current_time_updates) {
         setActionFlag(upd, delayed_timing_flag);
     }
-    upd.Te = checkAdd(time_exec,info.outputDelay);
+    upd.Te = checkAdd(time_exec, info.outputDelay);
     if (info.event_triggered) {
-        upd.Te = std::min(upd.Te, checkAdd(upstream.Te,info.outputDelay));
+        upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
-    upd.Tdemin = std::min(checkAdd(upstream.Te,info.outputDelay), upd.Te);
+    upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
     if (info.event_triggered) {
-        upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe,info.outputDelay));
+        upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
 
         if (upd.Tdemin < upd.actionTime) {
             upd.actionTime = upd.Tdemin;
@@ -592,8 +592,8 @@ void TimeCoordinator::sendTimeRequest() const
             upd.dest_id = upstream.minFed;
             upd.setExtraData(GlobalFederateId{}.baseValue());
             if (info.event_triggered) {
-                upd.Te = checkAdd(time_exec,info.outputDelay);
-                upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt,info.outputDelay));
+                upd.Te = checkAdd(time_exec, info.outputDelay);
+                upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
             }
             upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
             sendMessageFunction(upd);
