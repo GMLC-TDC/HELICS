@@ -96,7 +96,7 @@ TEST(CoreAppTests, constructor4)
 TEST(CoreAppTests, constructor5)
 {
     std::vector<std::string> args{
-        "constructor4", "--autobroker", "--name", "core5", "--coretype", "test"};
+        "constructor5", "--autobroker", "--name", "core5", "--coretype", "test"};
     char* argv[6];
     argv[0] = &(args[0][0]);
     argv[1] = &(args[1][0]);
@@ -220,7 +220,7 @@ TEST(CoreAppTests, help)
 TEST(CoreAppTests, file_logging_p2)
 {
     helics::CoreApp app("--autobroker --name=loggerCore1 --coretype=test");
-    app.setLoggingLevel(5);
+    app.setLoggingLevel(15);
     const std::string lfilename = "logfile2.txt";
     app.setLogFile("logfile2.txt");
 

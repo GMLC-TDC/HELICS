@@ -135,3 +135,22 @@ TEST(CoreFactory_tests, udpCore_test)
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::UDP), false);
 }
 #endif
+
+/** This test should be removed once log levels with numbers is re-enabled ~helics 3.2 */
+TEST(core_tests, core_log_command_failures)
+{
+    EXPECT_THROW(helics::CoreFactory::create(helics::CoreType::TEST,
+                                             "corelog1",
+                                             "--loglevel=6 --root"),
+                 std::exception);
+
+    EXPECT_THROW(helics::CoreFactory::create(helics::CoreType::TEST,
+                                             "corelog2",
+                                             "--consoleloglevel=6 --root"),
+                 std::exception);
+
+    EXPECT_THROW(helics::CoreFactory::create(helics::CoreType::TEST,
+                                             "corelog3",
+                                             "--fileloglevel=6 --root"),
+                 std::exception);
+}

@@ -209,7 +209,7 @@ TEST(BrokerAppTests, help)
 TEST(BrokerAppTests, file_logging_p2)
 {
     helics::BrokerApp app("--name=loggerBrk1 --coretype=test");
-    app.setLoggingLevel(5);
+    app.setLoggingLevel(HELICS_LOG_LEVEL_TIMING);
     const std::string lfilename = "logfile3.txt";
     app.setLogFile("logfile3.txt");
     app.connect();

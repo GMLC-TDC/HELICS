@@ -211,9 +211,9 @@ TEST(federateInfo, loadinfoPropsJson)
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
 
-    f1 = helics::loadFederateInfo("{\"loglevel\":5}");
+    f1 = helics::loadFederateInfo(R"({"loglevel":"timing"})");
     EXPECT_EQ(f1.intProps.size(), 1U);
-    EXPECT_EQ(f1.intProps[0].second, 5);
+    EXPECT_EQ(f1.intProps[0].second, HELICS_LOG_LEVEL_TIMING);
 
     f1 = helics::loadFederateInfo(R"({"loglevel":"summary"})");
     EXPECT_EQ(f1.intProps.size(), 1U);
@@ -257,9 +257,9 @@ TEST(federateInfo, loadinfoPropsToml)
     EXPECT_EQ(f1.brokerPort, 5000);
     EXPECT_EQ(f1.localport, "5005");
 
-    f1 = helics::loadFederateInfo("\"loglevel\"=5");
+    f1 = helics::loadFederateInfo(R"("loglevel"="timing")");
     EXPECT_EQ(f1.intProps.size(), 1U);
-    EXPECT_EQ(f1.intProps[0].second, 5);
+    EXPECT_EQ(f1.intProps[0].second, HELICS_LOG_LEVEL_TIMING);
 
     f1 = helics::loadFederateInfo(R"("loglevel"="summary")");
     EXPECT_EQ(f1.intProps.size(), 1U);
