@@ -28,7 +28,7 @@ enum LogLevels : int {
         HELICS_LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
     TIMING = HELICS_LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
     DATA = HELICS_LOG_LEVEL_DATA,  //!< print timing+data transmissions
-    DEBUG = HELICS_LOG_LEVEL_DEBUG, //!< print data+additional debug info
+    DEBUG = HELICS_LOG_LEVEL_DEBUG,  //!< print data+additional debug info
     TRACE = HELICS_LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)
     FED = 99999  //!< special logging command for message coming from a fed
 };
@@ -66,9 +66,9 @@ enum LogLevels : int {
             if (maxLogLevel >= LogLevels::DATA) {                                                  \
                 sendToLogger(id, LogLevels::DATA, ident, message);                                 \
             }
-#        define LOG_DEBUG_MESSAGES(id, ident, message)                                              \
-            if (maxLogLevel >= LogLevels::DEBUG) {                                                  \
-                sendToLogger(id, LogLevels::DEBUG, ident, message);                                 \
+#        define LOG_DEBUG_MESSAGES(id, ident, message)                                             \
+            if (maxLogLevel >= LogLevels::DEBUG) {                                                 \
+                sendToLogger(id, LogLevels::DEBUG, ident, message);                                \
             }
 #    else
 #        define LOG_TIMING(id, ident, message)

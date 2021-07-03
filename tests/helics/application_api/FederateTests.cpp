@@ -78,7 +78,7 @@ TEST(federate_tests, federate_initialize_tests_env)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
-/*  reenable this test once log levels support numerical values again
+/*  re-enable this test once log levels support numerical values again
 TEST(federate_tests, federate_initialize_tests_env2)
 {
     setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", std::to_string(HELICS_LOG_LEVEL_CONNECTIONS));
