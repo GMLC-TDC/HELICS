@@ -90,8 +90,7 @@ TEST(broker_tests, subbroker_min_test)
     EXPECT_TRUE(brk3->waitForDisconnect());
 }
 
-
-/** This test should be removed once log levels with numbers is reenabled ~helics 3.2 */
+/** This test should be removed once log levels with numbers is re-enabled ~helics 3.2 */
 TEST(broker_tests, broker_log_command_failures)
 {
     EXPECT_THROW(helics::BrokerFactory::create(helics::CoreType::TEST,
