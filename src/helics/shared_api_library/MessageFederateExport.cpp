@@ -440,6 +440,12 @@ void MessageHolder::freeMessage(int index)
 void MessageHolder::clear()
 {
     freeMessageSlots.clear();
+    for (auto& m : messages) {
+        if (m) {
+            m->backReference = nullptr;
+            m->messageValidation = 0;
+        }
+    }
     messages.clear();
 }
 
@@ -558,6 +564,9 @@ helics_message_object helicsEndpointCreateMessageObject(helics_endpoint endpoint
 {
     auto* endObj = verifyEndpoint(endpoint, err);
     if (endObj == nullptr) {
+        return nullptr;
+    }
+    if (endObj->fed == nullptr) {
         return nullptr;
     }
     return endObj->fed->messages.newMessage();
