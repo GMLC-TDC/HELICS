@@ -1,11 +1,11 @@
-%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+%typemap(in, numinputs=0) HelicsError * (HelicsError etemp) {
     etemp=helicsErrorInitialize();
     $1=&etemp;
 }
 
-%typemap(freearg, canthrow=1) helics_error *
+%typemap(freearg, canthrow=1) HelicsError *
 {
-    if ($1->error_code!=helics_ok)
+    if ($1->error_code!=HELICS_OK)
     {
         SWIG_CSharpSetPendingException(SWIG_CSharpApplicationException, $1->message);
     }

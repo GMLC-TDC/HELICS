@@ -1254,43 +1254,43 @@ static swig_module_info swig_module = {swig_types, 27, 0, 0, 0, 0};
 
 #include "api-data.h"
 /* throw a helics error */
-static void throwHelicsMatlabError(helics_error *err) {
+static void throwHelicsMatlabError(HelicsError *err) {
   switch (err->error_code)
   {
-  case helics_ok:
+  case HELICS_OK:
     return;
-  case helics_error_registration_failure:
+  case HELICS_ERROR_REGISTRATION_FAILURE:
     mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
     break;
-  case   helics_error_connection_failure:
+  case   HELICS_ERROR_CONNECTION_FAILURE:
   mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
     break;
-  case   helics_error_invalid_object:
+  case   HELICS_ERROR_INVALID_OBJECT:
   mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
     break;
-  case   helics_error_invalid_argument:
+  case   HELICS_ERROR_INVALID_ARGUMENT:
   mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
     break;
-  case   helics_error_discard:
+  case   HELICS_ERROR_DISCARD:
   mexErrMsgIdAndTxt( "helics:discard", err->message);
     break;
-  case helics_error_system_failure:
+  case HELICS_ERROR_SYSTEM_FAILURE:
     mexErrMsgIdAndTxt( "helics:system_failure", err->message);
     break;
-  case   helics_error_invalid_state_transition:
+  case   HELICS_ERROR_INVALID_STATE_TRANSITION:
   mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
     break;
-  case   helics_error_invalid_function_call:
+  case   HELICS_ERROR_INVALID_FUNCTION_CALL:
   mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
     break;
-  case   helics_error_execution_failure:
+  case   HELICS_ERROR_EXECUTION_FAILURE:
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
     break;
-  case   helics_error_insufficient_space:
+  case   HELICS_ERROR_INSUFFICIENT_SPACE:
     mexErrMsgIdAndTxt( "helics:insufficient_space", err->message);
     break;
-  case   helics_error_other:
-  case   helics_error_external_type:
+  case   HELICS_ERROR_OTHER:
+  case   HELICS_ERROR_EXTERNAL_TYPE:
   default:
   mexErrMsgIdAndTxt( "helics:error", err->message);
     break;
