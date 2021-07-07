@@ -47,7 +47,7 @@ static void throwHelicsMatlabError(HelicsError *err) {
 
 %}
 
-%typemap(in, numinputs=0) HelicsError * (HelicsError * etemp) {
+%typemap(in, numinputs=0) HelicsError * (HelicsError etemp) {
     etemp=helicsErrorInitialize();
     $1=&etemp;
 }
@@ -252,7 +252,7 @@ static void throwHelicsMatlabError(HelicsError *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDataLength, int *actualSize) {
-    $2 = helicsInputGetRawValueSize(arg1) + 2;
+    $2 = helicsInputGetByteCount(arg1) + 2;
     $1 =  malloc($2);
 }
 
@@ -271,7 +271,7 @@ static void throwHelicsMatlabError(HelicsError *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxMessageLength, int *actualSize) {
-    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $2=helicsMessageGetByteCount(arg1)+2;
     $1 =  malloc($2);
 }
 

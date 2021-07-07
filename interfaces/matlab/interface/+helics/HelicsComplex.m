@@ -31,13 +31,13 @@ classdef HelicsComplex < SwigRef
       else
         tmp = helicsMEX(16, varargin{:});
         self.swigPtr = tmp.swigPtr;
-        tmp.SwigClear();
+        tmp.swigPtr = [];
       end
     end
     function delete(self)
       if self.swigPtr
         helicsMEX(17, self);
-        self.SwigClear();
+        self.swigPtr=[];
       end
     end
   end

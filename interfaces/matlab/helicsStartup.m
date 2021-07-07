@@ -10,7 +10,7 @@ end
 fprintf('Loading HELICS (from %s)...\n', helicsLibPath)
 
 %% Extract HELICS library name in a cross-platform way
-listing = dir(fullfile(helicsLibPath, '*helicsSharedLib.*'));
+listing = dir(fullfile(helicsLibPath, '*helics.*'));
 
 libraryName = '';
 
@@ -32,7 +32,7 @@ end
 %% Try some backups if not found
 if isempty(libraryName)
     %if we are empty try for a debug version
-    listing = dir(fullfile(directory, '*helicsSharedLibd.*'));
+    listing = dir(fullfile(helicsLibPath, '*helics.*'));
 
     for i=1:numel(listing)
         [~, ~, ext]=fileparts(listing(i).name);

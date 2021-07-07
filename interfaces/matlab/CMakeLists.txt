@@ -177,8 +177,9 @@ if(hasParent)
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/mkhelicsMEXFile.m
         COMMAND
             ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helics> -D
-            BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp -D
-            LIBRARY_INCLUDE_LOCATION=${CMAKE_BINARY_DIR}/helics_generated_includes/ -D
+            BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp 
+            -D LIBRARY_BUILD_LOCATION=${CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+            -D LIBRARY_INCLUDE_LOCATION=${CMAKE_BINARY_DIR}/helics_generated_includes/ -D
             SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
             ${CMAKE_CURRENT_SOURCE_DIR}/generateMEXcreationScript.cmake
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
@@ -189,6 +190,7 @@ else()
         COMMAND
             ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helics> -D
             BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp -D
+            LIBRARY_BUILD_LOCATION=${CMAKE_LIBRARY_OUTPUT_DIRECTORY} -D
             LIBRARY_INCLUDE_LOCATION=${TMP_HELICS_SHARED_LIB_INCLUDE_DIRS} -D
             SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
             ${CMAKE_CURRENT_SOURCE_DIR}/generateMEXcreationScript.cmake
