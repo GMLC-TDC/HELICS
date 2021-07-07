@@ -2116,18 +2116,6 @@ void CommonCore::setIdentifier(const std::string& name)
     }
 }
 
-// enumeration of subqueries that cascade and need multiple levels of processing
-enum Subqueries : std::uint16_t {
-    GENERAL_QUERY = 0,
-    CURRENT_TIME_MAP = 2,
-    DEPENDENCY_GRAPH = 3,
-    DATA_FLOW_GRAPH = 4,
-    GLOBAL_STATE = 6,
-    GLOBAL_TIME_DEBUGGING = 7,
-    GLOBAL_FLUSH = 8,
-    GLOBAL_STATUS = 9
-};
-
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
     {"global_status", {GLOBAL_STATUS, false}},
