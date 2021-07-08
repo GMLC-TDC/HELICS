@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <chrono>
 #include <future>
+#include <thread>
 
 /** @file these test cases test out the real time mode for HELICS
  */

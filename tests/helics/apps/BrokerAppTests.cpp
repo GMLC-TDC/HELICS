@@ -23,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstdio>
 #include <future>
+#include <thread>
 
 TEST(BrokerAppTests, constructor1)
 {
