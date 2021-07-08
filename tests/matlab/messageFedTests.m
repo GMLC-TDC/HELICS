@@ -32,8 +32,8 @@ end
 try
 helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
-helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_DELTA, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,HELICS_PROPERTY_INT_LOG_LEVEL,HELICS_LOG_LEVEL_WARNING);
 catch ec
     success=false;
     helicsBrokerDestroy(fedStruct.broker);
@@ -92,7 +92,7 @@ epid1 = helicsFederateRegisterEndpoint(feds.mFed, 'ep1', '');
 testCase.verifyNotEqual(epid1,0);
 helicsFederateEnterExecutingMode(feds.mFed);
 state=helicsFederateGetState(feds.mFed);
-testCase.verifyEqual(state,helics.helics_state_execution);
+testCase.verifyEqual(state,helics.HELICS_STATE_EXECUTION);
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
 catch e
@@ -151,23 +151,23 @@ helicsFederateSetTimeProperty(feds.mFed,int32(137),1.0);
 helicsFederateEnterExecutingMode(feds.mFed);
 data = 'this is a random string message';
 
-helicsEndpointSendEventRaw(epid1,'ep2',data,1.0);
+helicsEndpointSendBytesToAt(epid1,data,'ep2',1.0);
 
 granted_time=helicsFederateRequestTime(feds.mFed,2.0);
 testCase.verifyEqual(granted_time,1.0);
 
 res=helicsFederateHasMessage(feds.mFed);
-testCase.verifyEqual(res,helics_true);
+testCase.verifyEqual(res,HELICS_TRUE);
 res=helicsEndpointHasMessage(epid1);
-testCase.verifyEqual(res,helics_false);
+testCase.verifyEqual(res,HELICS_FALSE);
 res=helicsEndpointHasMessage(epid2);
-testCase.verifyEqual(res,helics_true);
+testCase.verifyEqual(res,HELICS_TRUE);
 
 message = helicsEndpointGetMessage(epid2);
-testCase.verifyEqual(message.data,data);
-testCase.verifyEqual(double(message.length),length(data));
-testCase.verifyEqual(message.original_source,'fed1/ep1');
-testCase.verifyEqual(message.time,1.0);
+testCase.verifyEqual(helicsMessageGetBytes(message),data);
+testCase.verifyEqual(double(helicsMessageGetByteCount(message)),length(data));
+testCase.verifyEqual(helicsMessageGetOriginalSource(message),'fed1/ep1');
+testCase.verifyEqual(helicsMessageGetTime(message),1.0);
 success=closeStruct(feds);
 testCase.verifyThat(success,IsTrue);
 

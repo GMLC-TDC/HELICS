@@ -177,25 +177,25 @@ static void throwHelicsMatlabError(HelicsError *err) {
 
 // typemap for vector output functions
 
-%typemap(arginit) (double data[], int maxlen, int *actualSize) {
+%typemap(arginit) (double data[], int maxLength, int *actualSize) {
   $1=(double *)(NULL);
 }
 
-%typemap(in, numinputs=0) (double data[], int maxlen, int *actualSize) {
+%typemap(in, numinputs=0) (double data[], int maxLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (double data[], int maxlen, int *actualSize) {
+%typemap(freearg) (double data[], int maxLength, int *actualSize) {
    //if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(double data[], int maxlen, int *actualSize) {
+%typemap(check)(double data[], int maxLength, int *actualSize) {
     $2=helicsInputGetVectorSize(arg1);
     $1 = (double *) mxCalloc($2,sizeof(double));
 }
 
-%typemap(argout) (double data[], int maxlen, int *actualSize) {
+%typemap(argout) (double data[], int maxLength, int *actualSize) {
 
     mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
     mxSetPr(mat,$1);

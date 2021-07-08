@@ -31,8 +31,8 @@ end
 try
 helicsFederateInfoSetCoreTypeFromString(fedInfo,'zmq');
 helicsFederateInfoSetCoreInitString(fedInfo,fedinitstring);
-helicsFederateInfoSetTimeProperty(fedInfo,helics_property_time_delta, 0.01);
-helicsFederateInfoSetIntegerProperty(fedInfo,helics_property_int_log_level,1);
+helicsFederateInfoSetTimeProperty(fedInfo,HELICS_PROPERTY_TIME_DELTA, 0.01);
+helicsFederateInfoSetIntegerProperty(fedInfo,HELICS_PROPERTY_INT_LOG_LEVEL,HELICS_LOG_LEVEL_WARNING);
 catch ec
     success=false;
     helicsBrokerDestroy(fedStruct.broker);
@@ -117,12 +117,12 @@ helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 helicsFederateRegisterGlobalEndpoint(mFed, 'port2', 'random');
 
-f1=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_custom,'filter1');
+f1=helicsFederateRegisterGlobalFilter(fFed,helics.HELICS_FILTER_TYPE_CUSTOM,'filter1');
 helicsFilterAddSourceTarget(f1,'port1');
-f2=helicsFederateRegisterGlobalFilter(fFed,helics.helics_filter_type_delay,'filter2');
+f2=helicsFederateRegisterGlobalFilter(fFed,helics.HELICS_FILTER_TYPE_DELAY,'filter2');
 helicsFilterAddDestinationTarget(f2,'port2');
 helicsFederateRegisterEndpoint(fFed,'fout','');
-f3=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_random_delay,'filter3');
+f3=helicsFederateRegisterFilter(fFed,helics.HELICS_FILTER_TYPE_RANDOM_DELAY,'filter3');
 helicsFilterAddSourceTarget(f3,'fed2/fout');
 
 helicsFederateEnterExecutingModeAsync(mFed);
@@ -159,7 +159,7 @@ p1=helicsFederateRegisterGlobalEndpoint(mFed, 'port1', '');
 
 p2=helicsFederateRegisterGlobalEndpoint(mFed, 'port2', '');
 
-f1=helicsFederateRegisterFilter(fFed,helics.helics_filter_type_delay,'filter1');
+f1=helicsFederateRegisterFilter(fFed,helics.HELICS_FILTER_TYPE_DELAY,'filter1');
 helicsFilterAddSourceTarget(f1,'port1');
 helicsFilterSet(f1,'delay',2.5);
 
@@ -168,20 +168,20 @@ helicsFederateEnterExecutingMode(fFed);
 helicsFederateEnterExecutingModeComplete(mFed);
 
 data='hello world';
-helicsEndpointSendMessageRaw(p1,'port2',data);
+helicsEndpointSendBytesTo(p1,data,'port2');
 
 granted_time=helicsFederateRequestTime(mFed,1.0);
 testCase.verifyEqual(granted_time,1.0);
 
 res=helicsFederateHasMessage(mFed);
-testCase.verifyEqual(res,helics_false);
+testCase.verifyEqual(res,HELICS_FALSE);
 
 granted_time=helicsFederateRequestTime(mFed,3.0);
 testCase.verifyEqual(granted_time,2.5);
 
 
 res=helicsEndpointHasMessage(p2);
-testCase.verifyEqual(res,helics_true);
+testCase.verifyEqual(res,HELICS_TRUE);
 
 
 success=closeStruct(feds);
