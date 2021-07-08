@@ -12,7 +12,6 @@
 }
 
 
-
 //typemap for short maxlen strings
 //%typemap(in) (char *outputString, int maxlen) {
  // $1 = (char*)JCALL2(GetByteArrayElements, jenv, $input, 0);
