@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <complex>
 #include <future>
+#include <thread>
 
 #define CORE_TYPE_TO_TEST helics::core_type::TEST
 
