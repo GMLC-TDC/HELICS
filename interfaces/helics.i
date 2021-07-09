@@ -25,5 +25,12 @@
 %ignore HelicsError;
 %ignore helicsMessageGetRawDataPointer;
 %ignore helicsMessageResize;
+%ignore helicsBrokerSetLoggingCallback;
+%ignore helicsCoreSetLoggingCallback;
+%ignore helicsFederateSetLoggingCallback;
+%ignore helicsFilterSetCustomCallback;
+%ignore helicsFederateSetQueryCallback;
+%ignore helicsQueryBufferFill;
+%ignore helicsLoadSignalHandlerCallback;
 
 %include "helics/helics.h"

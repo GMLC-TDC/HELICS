@@ -629,7 +629,7 @@ TEST_F(query, core_tags)
 {
     SetupTest<helics::CombinationFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
-
+    ASSERT_TRUE(vFed1);
     auto cr = helics::CoreApp(vFed1->getCorePointer());
     cr.setTag("description", "a core description");
     cr.setTag("version", "1.4.6");
