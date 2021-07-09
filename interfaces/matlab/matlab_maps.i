@@ -1,44 +1,44 @@
 
 %{
-#include "api-data.h"
+#include "helics/helics.h"
 /* throw a helics error */
-static void throwHelicsMatlabError(helics_error *err) {
+static void throwHelicsMatlabError(HelicsError *err) {
   switch (err->error_code)
   {
-  case helics_ok:
+  case HELICS_OK:
     return;
-  case helics_error_registration_failure:
+  case HELICS_ERROR_REGISTRATION_FAILURE:
     mexErrMsgIdAndTxt( "helics:registration_failure", err->message);
     break;
-  case   helics_error_connection_failure:
+  case   HELICS_ERROR_CONNECTION_FAILURE:
   mexErrMsgIdAndTxt( "helics:connection_failure", err->message);
     break;
-  case   helics_error_invalid_object:
+  case   HELICS_ERROR_INVALID_OBJECT:
   mexErrMsgIdAndTxt( "helics:invalid_object", err->message);
     break;
-  case   helics_error_invalid_argument:
+  case   HELICS_ERROR_INVALID_ARGUMENT:
   mexErrMsgIdAndTxt( "helics:invalid_argument", err->message);
     break;
-  case   helics_error_discard:
+  case   HELICS_ERROR_DISCARD:
   mexErrMsgIdAndTxt( "helics:discard", err->message);
     break;
-  case helics_error_system_failure:
+  case HELICS_ERROR_SYSTEM_FAILURE:
     mexErrMsgIdAndTxt( "helics:system_failure", err->message);
     break;
-  case   helics_error_invalid_state_transition:
+  case   HELICS_ERROR_INVALID_STATE_TRANSITION:
   mexErrMsgIdAndTxt( "helics:invalid_state_transition", err->message);
     break;
-  case   helics_error_invalid_function_call:
+  case   HELICS_ERROR_INVALID_FUNCTION_CALL:
   mexErrMsgIdAndTxt( "helics:invalid_function_call", err->message);
     break;
-  case   helics_error_execution_failure:
+  case   HELICS_ERROR_EXECUTION_FAILURE:
   mexErrMsgIdAndTxt( "helics:execution_failure", err->message);
     break;
-  case   helics_error_insufficient_space:
+  case   HELICS_ERROR_INSUFFICIENT_SPACE:
     mexErrMsgIdAndTxt( "helics:insufficient_space", err->message);
     break;
-  case   helics_error_other:
-  case   helics_error_external_type:
+  case   HELICS_ERROR_OTHER:
+  case   HELICS_ERROR_EXTERNAL_TYPE:
   default:
   mexErrMsgIdAndTxt( "helics:error", err->message);
     break;
@@ -47,14 +47,14 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 %}
 
-%typemap(in, numinputs=0) helics_error * (helics_error etemp) {
+%typemap(in, numinputs=0) HelicsError * (HelicsError etemp) {
     etemp=helicsErrorInitialize();
     $1=&etemp;
 }
 
-%typemap(freearg) helics_error *
+%typemap(freearg) HelicsError *
 {
-    if ($1->error_code!=helics_ok)
+    if ($1->error_code!=HELICS_OK)
     {
         throwHelicsMatlabError($1);
     }
@@ -177,25 +177,25 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 // typemap for vector output functions
 
-%typemap(arginit) (double data[], int maxlen, int *actualSize) {
+%typemap(arginit) (double data[], int maxLength, int *actualSize) {
   $1=(double *)(NULL);
 }
 
-%typemap(in, numinputs=0) (double data[], int maxlen, int *actualSize) {
+%typemap(in, numinputs=0) (double data[], int maxLength, int *actualSize) {
   $3=&($2);
 }
 
-%typemap(freearg) (double data[], int maxlen, int *actualSize) {
+%typemap(freearg) (double data[], int maxLength, int *actualSize) {
    //if ($1) free($1);
 }
 
 // Set argument to NULL before any conversion occurs
-%typemap(check)(double data[], int maxlen, int *actualSize) {
+%typemap(check)(double data[], int maxLength, int *actualSize) {
     $2=helicsInputGetVectorSize(arg1);
     $1 = (double *) mxCalloc($2,sizeof(double));
 }
 
-%typemap(argout) (double data[], int maxlen, int *actualSize) {
+%typemap(argout) (double data[], int maxLength, int *actualSize) {
 
     mxArray *mat=mxCreateDoubleMatrix(*$3,1,mxREAL);
     mxSetPr(mat,$1);
@@ -252,7 +252,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxDataLength, int *actualSize) {
-    $2 = helicsInputGetRawValueSize(arg1) + 2;
+    $2 = helicsInputGetByteCount(arg1) + 2;
     $1 =  malloc($2);
 }
 
@@ -271,7 +271,7 @@ static void throwHelicsMatlabError(helics_error *err) {
 
 // Set argument to NULL before any conversion occurs
 %typemap(check)(void *data, int maxMessageLength, int *actualSize) {
-    $2=helicsMessageGetRawDataSize(arg1)+2;
+    $2=helicsMessageGetByteCount(arg1)+2;
     $1 =  malloc($2);
 }
 

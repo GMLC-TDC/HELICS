@@ -9,7 +9,6 @@
 
 #File used to generate the matlab interface and overwrite the existing files if requested
 
-file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
 
   get_filename_component(helics.i_INCLUDE_DIR "${HELICS_SWIG_helics.i_FILE}" DIRECTORY)
 
@@ -18,13 +17,13 @@ file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
     COMMAND
       "${SWIG_EXECUTABLE}" "-matlab" "-c++" -o "helicsMEX.cpp"
-      "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
+      "-I${HELICS_SOURCE_DIR}/src/helics/shared_api_library/backup/"
       "-I${helics.i_INCLUDE_DIR}"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsMatlab.i
     DEPENDS
       ../helics.i
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsMatlab.i
-      ${SHARED_LIB_HEADERS}
+      ${HELICS_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h
       ${CMAKE_CURRENT_SOURCE_DIR}/matlab_maps.i
   )
 

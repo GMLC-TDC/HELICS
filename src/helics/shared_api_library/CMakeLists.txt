@@ -44,11 +44,11 @@ if(PYTHON_EXECUTABLE)
     )
 else()
     configure_file(
-        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics.h
+        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h
         ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h COPYONLY
     )
     configure_file(
-        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics_api.h
+        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics_api.h
         ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h COPYONLY
     )
 endif()
