@@ -11,8 +11,6 @@ Logging in HELICS provides a way to understand the operation of a federate and i
 
 There are several levels used inside HELICS for logging. The level can be set with the enumerations when using an API to set the logging level. When configuring the log level via an external JSON config, the enumerations are slightly different:
 
-
-
 ```eval_rst
 +-----------------------------------+-----------------------+
 | API enumeration                   | JSON config keyword   |
@@ -36,10 +34,6 @@ There are several levels used inside HELICS for logging. The level can be set wi
 | ``HELICS_LOG_LEVEL_TRACE``        | ``trace``             |
 +------------------------------------------+----------------+
 ```
-
-
-
-
 
 - `helics_log_level_no_print` Don't log anything
 - `helics_log_level_error` Log error and faults from within HELICS
