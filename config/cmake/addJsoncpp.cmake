@@ -57,8 +57,8 @@ set(HAVE_LOCALECONV ON)
 set(COMPILER_HAS_DEPRECATED ON)
 set(HAVE_STDINT_H ON)
 set(HAVE_DECIMAL_POINT ON)
-add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp"
-                 "${PROJECT_BINARY_DIR}/ThirdParty/jsoncpp" EXCLUDE_FROM_ALL)
+add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp"
+                 "${PROJECT_BINARY_DIR}/ThirdParty/json_cpp" EXCLUDE_FROM_ALL)
 
 
 set_target_properties(jsoncpp_static PROPERTIES FOLDER Extern)

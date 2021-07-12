@@ -1,10 +1,6 @@
 [submodule "ThirdParty/asio"]
     path = ThirdParty/asio
     url = https://github.com/chriskohlhoff/asio
-[submodule "ThirdParty/jsoncpp"]
-    path = ThirdParty/jsoncpp
-    url = https://github.com/open-source-parsers/jsoncpp.git
-    branch = master
 [submodule "ThirdParty/fmtlib"]
     path = ThirdParty/fmtlib
     url = https://github.com/fmtlib/fmt.git
@@ -30,3 +26,7 @@
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
     url = https://github.com/gabime/spdlog.git
+[submodule "ThirdParty/json_cpp"]
+    path = ThirdParty/json_cpp
+    url = https://github.com/open-source-parsers/jsoncpp.git
+    branch = master
