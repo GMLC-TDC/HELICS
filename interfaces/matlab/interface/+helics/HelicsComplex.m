@@ -7,20 +7,20 @@ classdef HelicsComplex < SwigRef
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(11, self);
+        varargout{1} = helicsMEX(12, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(12, self, varargin{1});
+        helicsMEX(13, self, varargin{1});
       end
     end
     function varargout = imag(self, varargin)
       narginchk(1, 2)
       if nargin==1
         nargoutchk(0, 1)
-        varargout{1} = helicsMEX(13, self);
+        varargout{1} = helicsMEX(14, self);
       else
         nargoutchk(0, 0)
-        helicsMEX(14, self, varargin{1});
+        helicsMEX(15, self, varargin{1});
       end
     end
     function self = HelicsComplex(varargin)
@@ -29,15 +29,15 @@ classdef HelicsComplex < SwigRef
           self.swigPtr = varargin{1}.swigPtr;
         end
       else
-        tmp = helicsMEX(15, varargin{:});
+        tmp = helicsMEX(16, varargin{:});
         self.swigPtr = tmp.swigPtr;
-        tmp.SwigClear();
+        tmp.swigPtr = [];
       end
     end
     function delete(self)
       if self.swigPtr
-        helicsMEX(16, self);
-        self.SwigClear();
+        helicsMEX(17, self);
+        self.swigPtr=[];
       end
     end
   end

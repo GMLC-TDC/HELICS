@@ -1,3 +1,3 @@
 function varargout = helicsQueryBrokerExecute(varargin)
-  [varargout{1:nargout}] = helicsMEX(144, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(155, varargin{:});
 end

@@ -22,9 +22,6 @@ classdef SwigRef < handle
     function SwigSet(self,ptr)
         self.swigPtr = ptr;
     end
-    function SwigClear(self)
-        self.swigPtr = [];
-    end
     function ptr = SwigGet(self)
         ptr = self.swigPtr;
     end

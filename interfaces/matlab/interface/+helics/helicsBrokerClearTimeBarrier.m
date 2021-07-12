@@ -1,3 +1,3 @@
 function varargout = helicsBrokerClearTimeBarrier(varargin)
-  [varargout{1:nargout}] = helicsMEX(140, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(149, varargin{:});
 end

@@ -37,6 +37,7 @@ Value federates are used when the federate is simulating the physics of a system
 
 The information modeled by value federates is physical values in a system with associated units. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples_index.md), the batteries and chargers are both value federates; charger applies a voltage to the battery (Charger federate sending the Battery federate that value) and the Battery federate responds with the charging current which it sends back to the Charger. These two federates each update the other's boundary condition's state: the voltage and current. Federates that model physics must be configured as **value federates**. Value federates typically will update at very regular intervals based on the fidelity of their models and/or the resolution of any supporting data they are using.
 
+
 #### Value Federate Interfaces
 
 Value federates have direct fixed connections through interfaces to other federates. There are three interface types for value federates that allow the interactions between the federates to be flexibly defined. The difference between the three types revolves around whether the interface is for sending or receiving values and whether the sender/receiver is defined by the federate:
@@ -53,6 +54,7 @@ Value federates have direct fixed connections through interfaces to other federa
   - Receiving interface
   - Handle named with `"key"` in configuration
   - Source handle of value is not necessary, however it can be specified with `"targets"` -- Named Inputs can receive values from multiple `"targets"`
+
 
 The most commonly used of these fixed interfaces are publications and subscriptions. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples_index.md), the Battery federate and the Charger federate have fixed pub/sub connections. In the figure below, publishing interfaces are in <span style="color:red;">**red**</span> and the subscription interfaces are in <span style="color:orange;">**yellow**</span>. The Battery federate **publishes** the current flowing into the battery from the publication interface named `EV_Battery/EV_current` and does not specify the intended recipient. The Charger federate **subscribes** to the amps from the Battery with the subscription interface named `EV_Battery/EV_current` -- the receiving interface only specifies the sender.
 

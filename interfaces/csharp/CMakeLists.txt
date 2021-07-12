@@ -12,7 +12,9 @@ if(SWIG_EXECUTABLE)
 
     set_property(SOURCE helicsCsharp.i PROPERTY SWIG_MODULE_NAME helics)
     # set_source_files_properties(helicsCsharp.i PROPERTIES SWIG_FLAGS "-outfile;helics.cs")
-    set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-namespace;gmlc")
+    set_property(SOURCE file.i PROPERTY USE_LIBRARY_INCLUDE_DIRECTORIES TRUE)
+    set(CMAKE_SWIG_FLAGS "-outfile;helics.cs;-I${PROJECT_BINARY_DIR}/helics_generated_includes/")
+    # set(SWIG_INCLUDE_DIRECTORIES ${PROJECT_BINARY_DIR}/helics_generated_includes/)
 
     swig_add_library(
         CShelics
@@ -25,6 +27,10 @@ if(SWIG_EXECUTABLE)
 
     set_target_properties(
         ${SWIG_MODULE_CShelics_REAL_NAME} PROPERTIES FOLDER interfaces DEBUG_POSTFIX ""
+    )
+
+    target_include_directories(
+        ${SWIG_MODULE_CShelics_REAL_NAME} PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/
     )
 
 else()

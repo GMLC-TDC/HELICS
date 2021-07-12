@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <vector>
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"
@@ -884,6 +885,7 @@ helics::FedObject::~FedObject()
 {
     // we want to remove the values in the arrays before deleting the fedptr
     // and we want to do it inside this function to ensure it does so in a consistent manner
+    messages.clear();
     inputs.clear();
     pubs.clear();
     epts.clear();

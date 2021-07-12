@@ -176,8 +176,10 @@ typedef enum {
     HELICS_LOG_LEVEL_TIMING = 15,
     /** timing+ data transfer notices*/
     HELICS_LOG_LEVEL_DATA = 18,
+    /** data+ additional debug message*/
+    HELICS_LOG_LEVEL_DEBUG = 21,
     /** all internal messages*/
-    HELICS_LOG_LEVEL_TRACE = 21
+    HELICS_LOG_LEVEL_TRACE = 24
 } HelicsLogLevels;
 
 /** enumeration of return values from the C interface functions

@@ -149,7 +149,6 @@ if(NOT HELICS_ENABLE_SWIG OR NOT SWIG_EXECUTABLE OR MATLAB_SWIG_NOT_AVAILABLE)
     install(FILES ${MATLAB_GENERATED_FILES} DESTINATION matlab COMPONENT matlab)
 else()
     message(STATUS "Building with swig")
-    file(GLOB SHARED_LIB_HEADERS ${TMP_HELICS_SHARED_LIB_INCLUDE_DIRS}/*.h)
 
     # custom command for building the wrap file
     add_custom_command(
@@ -179,8 +178,7 @@ if(hasParent)
         COMMAND
             ${CMAKE_COMMAND} -D LIBRARY_FILE=$<TARGET_LINKER_FILE:HELICS::helics> -D
             BUILD_FILE=${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp -D
-            LIBRARY_INCLUDE_LOCATION=${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/ -D
-            OTHER_INCLUDE_LOCATION=${CMAKE_BINARY_DIR}/src/helics/shared_api_library/ -D
+            LIBRARY_INCLUDE_LOCATION=${CMAKE_BINARY_DIR}/helics_generated_includes/ -D
             SOURCE_DIR=${CMAKE_CURRENT_SOURCE_DIR} -P
             ${CMAKE_CURRENT_SOURCE_DIR}/generateMEXcreationScript.cmake
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp
@@ -231,32 +229,15 @@ add_custom_target(
 )
 set_target_properties(helicsMEX PROPERTIES FOLDER interfaces)
 
-file(GLOB HSHARED_LIB_SOURCES ${TMP_HELICS_SHARED_LIB_INCLUDE_DIRS}/*.h)
-
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.${Matlab_MEX_EXTENSION} DESTINATION matlab
         COMPONENT matlab
 )
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/helicsMEX.cpp DESTINATION matlab COMPONENT matlab)
 
-if(WIN32)
-    install(FILES $<TARGET_LINKER_FILE:HELICS::helics> DESTINATION matlab COMPONENT matlab)
-    if(hasParent)
-        install(FILES ${CMAKE_BINARY_DIR}/src/helics/shared_api_library/helics_export.h
-                DESTINATION matlab/headers COMPONENT matlab
-        )
-    else()
-        install(FILES ${TMP_HELICS_SHARED_LIB_INCLUDE_DIRS}/helics_export.h
-                DESTINATION matlab/headers COMPONENT matlab
-        )
-    endif()
-    install(FILES helicsSharedLib.h libhelicsSharedLib.h DESTINATION matlab COMPONENT matlab)
-endif()
-
 if(COMMAND install_key_files_with_comp)
     install_key_files_with_comp(matlab)
 endif()
-install(FILES ${HSHARED_LIB_SOURCES} DESTINATION matlab/headers COMPONENT matlab)
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/generatehelicsMEXFile.m DESTINATION matlab
         COMPONENT matlab

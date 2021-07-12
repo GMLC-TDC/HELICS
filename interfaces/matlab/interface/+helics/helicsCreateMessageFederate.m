@@ -1,3 +1,3 @@
 function varargout = helicsCreateMessageFederate(varargin)
-  [varargout{1:nargout}] = helicsMEX(57, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(61, varargin{:});
 end

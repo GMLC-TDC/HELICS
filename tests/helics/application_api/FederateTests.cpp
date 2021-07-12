@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmock/gmock.h"
 #include <future>
 #include <gtest/gtest.h>
+#include <thread>
 /** these test cases test out the value converters
  */
 
@@ -77,7 +78,7 @@ TEST(federate_tests, federate_initialize_tests_env)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
-
+/*  re-enable this test once log levels support numerical values again
 TEST(federate_tests, federate_initialize_tests_env2)
 {
     setEnvironmentVariable("HELICS_BROKER_LOG_LEVEL", std::to_string(HELICS_LOG_LEVEL_CONNECTIONS));
@@ -102,7 +103,7 @@ TEST(federate_tests, federate_initialize_tests_env2)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
-
+*/
 TEST(federate_tests, time_step_tests)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
