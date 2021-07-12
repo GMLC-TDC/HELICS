@@ -27,6 +27,6 @@
     path = ThirdParty/spdlog
     url = https://github.com/gabime/spdlog.git
 [submodule "ThirdParty/json_cpp"]
-	path = ThirdParty/json_cpp
-	url = https://github.com/open-source-parsers/jsoncpp.git
-	branch = master
+    path = ThirdParty/json_cpp
+    url = https://github.com/open-source-parsers/jsoncpp.git
+    branch = master

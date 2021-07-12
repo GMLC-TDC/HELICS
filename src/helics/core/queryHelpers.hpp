@@ -17,7 +17,7 @@ class GlobalFederateId;
 class FederateState;
 
 // enumeration of subqueries that cascade and need multiple levels of processing
-enum Subqueries: std::uint16_t {
+enum Subqueries : std::uint16_t {
     GENERAL_QUERY = 0,
     FEDERATE_MAP = 1,
     CURRENT_TIME_MAP = 2,
