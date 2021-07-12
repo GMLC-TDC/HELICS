@@ -15,6 +15,21 @@ namespace helics {
 class HandleManager;
 class GlobalFederateId;
 class FederateState;
+
+// enumeration of subqueries that cascade and need multiple levels of processing
+enum Subqueries: std::uint16_t {
+    GENERAL_QUERY = 0,
+    FEDERATE_MAP = 1,
+    CURRENT_TIME_MAP = 2,
+    DEPENDENCY_GRAPH = 3,
+    DATA_FLOW_GRAPH = 4,
+    VERSION_ALL = 5,
+    GLOBAL_STATE = 6,
+    GLOBAL_TIME_DEBUGGING = 7,
+    GLOBAL_FLUSH = 8,
+    GLOBAL_STATUS = 9
+};
+
 }  // namespace helics
 
 template<typename X, typename Proc>
