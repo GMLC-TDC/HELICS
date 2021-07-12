@@ -2620,8 +2620,6 @@ void CoreBroker::sendCommand(const std::string& target,
     transmitToParent(std::move(cmdcmd));
 }
 
-
-
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
     {"federate_map", {FEDERATE_MAP, false}},
