@@ -360,8 +360,8 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         endif()
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/CMakeLists.txt")
-        submod_update(ThirdParty/jsoncpp)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/CMakeLists.txt")
+        submod_update(ThirdParty/json_cpp)
     endif()
 
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/containers/gmlc/containers/BlockingQueue.hpp")
@@ -851,7 +851,7 @@ set(LICENSE_LIST
     "units"
     "${PROJECT_SOURCE_DIR}/ThirdParty/units/LICENSE"
     "JsonCpp"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/jsoncpp/LICENSE"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/LICENSE"
     "toml11"
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
     "GMLC Utilities"
