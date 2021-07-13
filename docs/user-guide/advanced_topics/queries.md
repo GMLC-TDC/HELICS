@@ -48,7 +48,7 @@ The `queryStr` is the specific data being requested; the tables below show the v
 - a single quoted string `"answer"` \[string\]
 - a vector of quoted strings delimited by `','` `["answer1","answer"","answer3"]` \[sv\] this is a JSON compliant string vector
 - a JSON string with an object structure \[structure\]
-As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes, `HELICS_SEQUENCING_MODE_FAST` which travels along priority channels and is identical to previous versions in which all queries traveled along those channels. The other mode is `HELICS_SEQUENCING_MODE_ORDERED` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least until after it gets to the specified target.
+  As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes, `HELICS_SEQUENCING_MODE_FAST` which travels along priority channels and is identical to previous versions in which all queries traveled along those channels. The other mode is `HELICS_SEQUENCING_MODE_ORDERED` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least until after it gets to the specified target.
 
 ### Federate Queries
 
