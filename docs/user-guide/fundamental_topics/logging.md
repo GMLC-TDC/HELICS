@@ -9,18 +9,30 @@ Logging in HELICS provides a way to understand the operation of a federate and i
 
 ## Log Levels
 
-There are several levels used inside HELICS for logging. The level can be set with either an integer or the string.
+There are several levels used inside HELICS for logging. The level can be set with the enumerations when using an API to set the logging level. When configuring the log level via an external JSON config, the enumerations are slightly different:
 
-```python
-helics_log_level_no_print = -1,
-helics_log_level_error = 0,
-helics_log_level_warning = 1,
-helics_log_level_summary = 2,
-helics_log_level_connections = 3,
-helics_log_level_interfaces = 4,
-helics_log_level_timing = 5,
-helics_log_level_data = 6,
-helics_log_level_trace = 7
+```eval_rst
++-----------------------------------+-----------------------+
+| API enumeration                   | JSON config keyword   |
++===================================+=======================+
+| ``HELICS_LOG_LEVEL_NO_PRINT`      | ``no_print``          |
++-----------------------------------+-----------------------+
+| ``HELICS_LOG_LEVEL_ERROR``        | ``error``             |
++-----------------------------------+-----------------------+
+| ``HELICS_LOG_LEVEL_WARNING``      | ``warning``           |
++-----------------------------------+-----------------------+
+| ``HELICS_LOG_LEVEL_SUMMARY``      | ``summary``           |
++------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_CONNECTIONS``  | ``connections``       |
++------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_INTERFACES``   | ``interfaces``        |
++------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_TIMING``       | ``timing``            |
++------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_DATA``         | ``data``              |
++------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_TRACE``        | ``trace``             |
++------------------------------------------+----------------+
 ```
 
 - `helics_log_level_no_print` Don't log anything
