@@ -6,10 +6,10 @@ Windows installers are available with the different [releases](https://github.co
 
 ## Build Requirements
 
-- Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
-- CMake 3.4 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
+- Microsoft Visual C++ 2017 or newer (MS Build Tools also works)
+- CMake 3.10 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
 - git
-- Boost 1.58 or newer
+- Boost 1.67 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -18,18 +18,18 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 
 To set up your environment:
 
-1.  Install Microsoft Visual C++ 2015 or newer (2017 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
+1.  Install Microsoft Visual C++ 2017 or newer (2019 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
 2.  Install
-    [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html)
-    [Windows downloads](https://dl.bintray.com/boostorg/release/1.70.0/binaries/)
-    1.61 or later recommended (core library should build with 1.58,
-    but tests will not). For CMake to detect it automatically either
+    [Boost](https://www.boost.org/doc/libs/1_74_0/more/getting_started/windows.html)
+    [Windows downloads](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
+    1.67 or later recommended (core library should build with 1.58,
+    but tests and web interface will not). For CMake to detect it automatically either
     extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
     environment variable to the install location. The CMake will only automatically find
     boost 1.58 or newer.
-    Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
-    or newer. Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017. Visual studio 2019 will require CMake 3.14 or later.
-    Boost 1.70 with CMake 3.14+ is the current recommended configuration.
+    Building with Visual Studio 2017 will require boost 1.67 or newer and CMake 3.15+
+    or newer.
+    Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 
     As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
     because it builds all dependencies but handles getting the right install paths to dependencies set correctly.
@@ -47,7 +47,7 @@ To set up your environment:
     if you need MPI support.
 5.  _Optional_ Install
     [SWIG](http://www.swig.org/download.html)
-    if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab). For Matlab, Python 3, and Java swig is not necessary. For Octave, Python2, and C\# swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
+    if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab). For Matlab and Java swig is not necessary. For Octave, and C\# swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
 
 ```shell
      choco install swig

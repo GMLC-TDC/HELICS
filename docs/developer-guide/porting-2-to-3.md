@@ -25,6 +25,7 @@ A list of known PRs that made breaking changes is also provided.
 ### Application API (C++17)
 
 - `Federate::error(int errorcode)` and `Federate::error(int errorcode, const std::string& message)` were removed, use `localError` instead (or `globalError` to stop the entire simulation). Changed in [#1363][1].
+- ValueFederate::publishString and publishDouble have been removed please use the Publication interface `publish` methods which take a wide variety of types
 
 ### Command line interfaces
 
@@ -39,6 +40,8 @@ The numerical value corresponding with the log levels have changed. As such ente
 - Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [#1363][1].
 - all constants such as flags and properties are now CAPITAL_SNAKE_CASE
 - all structures are now CamelCase, though the old form will be available in helics3 though will be deprecated at some point.
+- `helicsPublicationGetKey` renamed to `helicsPublicationGetName`
+-
 
 ### C++98 API (wrapper around the C Shared API)
 

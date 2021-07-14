@@ -8,9 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [3.0.0][] ~ 2021-07-10
+## [3.0.0][] - 2021-07-15
 
-HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom format that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The full change log will be filled out as the release progresses from lpha to beta to final release. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
+HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom format that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
 
 ### Changed
 
@@ -27,21 +27,25 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The format for log messages now includes a simulation time stamp `[t=xxxx]`
 - Log level numerical values have been expanded (multiplied by 3) to allow more gradations in log levels than was previously allowed
 - The allowed set of string names has been reduced to avoid confusion and remove duplicate entries
+- All queries (except `global_value`) return a valid json string.  Errors from queries return a structure with an HTTP error code and message
 
 ### Fixed
+- All bug fixes included in HELICS 2.X are included in HELICS 3
 
 ### Added
 
 - Command interface
 - Targeted Endpoints
 - Interface Tags
+- Federate and Core Tags
 
 ### Removed
 
 - Message structure from C API
 - Deprecated functions from HELICS 2
-- The separate headers for the C shared library are no longer installed only a single header is needed and includes all functionsa and operations.
+- The separate headers for the C shared library are no longer installed only a single header(helics.h) is needed and includes all functions and operations.
 - The cereal library is no longer installed or used with HELICS
+- The C++ API no longer has generic type support through Cereal.  
 
 ## [2.7.1][] - 2021-06-05
 
