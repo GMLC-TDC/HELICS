@@ -463,13 +463,6 @@ if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
 endif()
 
 # -------------------------------------------------------------
-# Things to keep builds on macOS < 10.12 working for now
-# -------------------------------------------------------------
-if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS "10.12")
-    add_definitions(-DLIBGUARDED_NO_DEFAULT)
-endif()
-
-# -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
