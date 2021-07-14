@@ -49,6 +49,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Manoj Kumar Cebol Sundarrajan](https://github.com/manoj1511)
 
 ### Other
+
 - [Beroset](https://github.com/beroset)
 - [Nitin Barthwal](https://github.com/nitin-barthwal)
 
@@ -88,7 +89,7 @@ Several components of libGuarded are being used in the core and application libr
 
 ### [fmt](http://fmtlib.net/latest/index.html)
 
-fmt is used for string formatting and in the spdlog library as well.  Current FMT version is 8.0+ The library is included as a submodule. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
+fmt is used for string formatting and in the spdlog library as well. Current FMT version is 8.0+ The library is included as a submodule. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
 
 ### [gmlc/containers](https://github.com/GMLC-TDC/containers)
 

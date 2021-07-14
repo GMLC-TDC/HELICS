@@ -20,7 +20,7 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD )
+set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
 set(HELICS_DATE "2021-07-15")
 
