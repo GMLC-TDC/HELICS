@@ -2,11 +2,11 @@
 
 ## Requirements
 
-- C++11 compiler (C++14 preferred).
-- CMake 3.4 or newer
+- C++17 compiler (C++14 preferred).
+- CMake 3.10 or newer
 - git
-- Boost 1.58 or newer
-- ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
+- Boost 1.67 or newer
+- ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
 - MPI-2 implementation (if MPI support is
   needed)
 
