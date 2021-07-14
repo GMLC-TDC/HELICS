@@ -36,11 +36,11 @@ A multi-language, cross-platform framework that enables different simulators to 
 
 ## Introduction
 
-Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or multiple instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together established (or new/emerging) simulation tools from multiple domains to form a complex software-simulation without having to change the individual tools.
+Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together simulation tools from multiple domains to form a complex software-simulation without having to change the individual tools.
 
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulator that provides a scripting interface or access to source code. 
 
-Previous and existing uses have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
+Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
 
 ## Getting Started
 
