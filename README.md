@@ -2,6 +2,8 @@
 <img src="docs/logos/helics-logo-long-primary-black.svg" width="700">
 </p>
 
+A multi-language, cross-platform framework that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on high-performance computers, the cloud, or a mix of all of these.
+
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
@@ -17,28 +19,26 @@
 
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
+  - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
   - [Changelog](#changelog)
   - [RoadMap](#roadmap)
-- [Installers](#installers)
-- [Building HELICS](#build-from-source-instructions)
-- [Docker](#docker)
+- [Installation](#installation)
+  - [Building from Source](#build-from-source)
+  - [Docker](#docker)
 - [Tools with HELICS support](#tools-with-helics-support)
 - [Contributing](#contributing)
 - [Build Status](#build-status)
+- [Publications](#publications)
+- [In the News](#in-the-news)
+- [History and Motivation](#history-and-motivation)
 - [Release](#release)
 
 ## Introduction
 
-Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides an open-source, general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OS X). It is not a modeling tool by itself, but rather an integration tool that enables multiple existing simulation tools (and/or multiple instances of the same tool), known as "federates," to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together established (or new/emerging) off-the-shelf tools from multiple domains to form a complex software-simulation without having to change the individual tools (known as "black-box" modeling). All that is required is for someone to write a thin interface layer for each tool that interfaces with existing simulation time control and data value updating, such as through an existing scripting interface. Moreover, the HELICS community has a growing ecosystem of established interfaces for popular tools, such that many users can simply mix and match existing tools with their own data and run complex co-simulations with minimal coding.
+Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or multiple instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together established (or new/emerging) simulation tools from multiple domains to form a complex software-simulation without having to change the individual tools. Previous and existing uses have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
 
-Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools. ([Supported Tools](docs/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain. Previous and existing HELICS efforts have stretched across a wide range of scales in time and spatial area: From transient dynamics (e.g. power system frequency response or electromechanical transient simulation) through steady-state power flow and markets to long-term planning studies. And from individual appliance behaviors, through distribution & bulk systems, and to nation-wide simulations.
-
-HELICS is also highly scalable, enabling everything from simple connections between two software federates on a laptop to large-scale simulations with 10s of thousands of federates (or more) running on high-performance computers, in the cloud, or a mix of all of these. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages and simulation tools is growing all the time.
-
-**Brief History:** HELICS began as the core software development of the Grid Modernization Laboratory Consortium ([GMLC](https://gridmod.labworks.org/)) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity ([OE](https://www.energy.gov/oe/office-electricity-delivery-and-energy-reliability)) and Energy Efficiency and Renewable Energy ([EERE](https://www.energy.gov/eere/office-energy-efficiency-renewable-energy)). As such, its first use cases were around modern electric power systems, though today it is used for a much larger range of applications. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
-
-**Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.
+Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulator that provides a scripting interface or access to source code. 
 
 ## Getting Started
 
@@ -57,6 +57,10 @@ The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) 
 A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) for getting started
 
 A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepared for the IEEE PES General meeting in Atlanta. The example materials are available on Binder.
+
+### Language Bindings
+
+HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages is growing all the time.
 
 ## Documentation
 
@@ -78,7 +82,7 @@ For a history of changes to HELICS
 
 For a snapshot of some current plans for what is to come
 
-## Installers
+## Installation
 
 ### Windows
 
@@ -93,7 +97,7 @@ Support for installing the Python interface and HELICS apps is provided with pip
 
 HELICS can be installed on Linux (and macOS) using Spack, a package manager aimed at HPC environments. See [spack install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-spack-macos-linux) for the instructions.
 
-## Build from Source Instructions
+### Building from Source
 
 [Windows](https://docs.helics.org/en/latest/user-guide/installation/windows.html)
 
@@ -101,7 +105,7 @@ HELICS can be installed on Linux (and macOS) using Spack, a package manager aime
 
 [Ubuntu](https://docs.helics.org/en/latest/user-guide/installation/linux.html)
 
-## Docker
+### Docker
 
 Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/helics/repository/docker/helics/helics). This image does not include any libraries for linking just the executables. `helics_broker`, `helics_app`, `helics_recorder`, `helics_player`, and `helics_broker_server`. Other images are expected to be available in the future. See [Docker](https://docs.helics.org/en/latest/user-guide/installation/docker.html) for a few more details.
 
@@ -109,11 +113,11 @@ Some of the HELICS apps are available from [docker](https://cloud.docker.com/u/h
 
 As a co-simulation framework, HELICS is designed to bring together domain-specific modeling tools so they interact during run time. It effectively tries to build on the shoulders of giants by not reinventing trusted simulation tools, but instead, merely acting as a mediator to coordinate such interactions. HELICS's full power is only apparent when you use it to combine these domain-specific tools.
 
-Thankfully the HELICS API is designed to be minimally invasive and make it straightforward to connect most any tool that provides either a scripting interface or access to source code. As listed below, a growing set of energy domain tools have HELICS support either natively or through an external interface. We also provide a set of helper apps for various utility and testing purposes.
+Thankfully the HELICS API is designed to be minimally invasive and make it straightforward to connect most any tool that provides either a scripting interface or access to source code. As listed on [Tools using HELICS](docs/references/Tools_using_helics.md), a growing set of energy domain tools have HELICS support either natively or through an external interface. We also provide a set of helper apps for various utility and testing purposes.
 
 We are always looking for help adding support for more tools, so please contact us if you have any additions.
 
-[Tools](docs/references/Tools_using_HELICS.md)
+[Supported Tools](docs/references/Tools_using_HELICS.md)
 
 ### HELICS helper Apps
 
@@ -184,6 +188,12 @@ Some timing benchmarks with HELICS are written to use the Google Benchmark libra
 ## In the News
 
 HELICS was selected as an [R&D 100 Award Finalist](https://www.rdworldonline.com/finalists-announced-for-2019-rd-100-awards/).
+
+## History and Motivation
+
+**Brief History:** HELICS began as the core software development of the Grid Modernization Laboratory Consortium ([GMLC](https://gridmod.labworks.org/)) project on integrated Transmission-Distribution-Communication simulation (TDC, GMLC project 1.4.15) supported by the U.S. Department of Energy's Offices of Electricity ([OE](https://www.energy.gov/oe/office-electricity-delivery-and-energy-reliability)) and Energy Efficiency and Renewable Energy ([EERE](https://www.energy.gov/eere/office-energy-efficiency-renewable-energy)). As such, its first use cases were around modern electric power systems, though today it is used for a much larger range of applications. HELICS's layered, high-performance, co-simulation framework builds on the collective experience of multiple national labs.
+
+**Motivation:** Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations.
 
 ## Source Repo
 
