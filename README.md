@@ -93,7 +93,6 @@ Support for installing the Python interface and HELICS apps is provided with pip
 
 HELICS can be installed on Linux (and macOS) using Spack, a package manager aimed at HPC environments. See [spack install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-spack-macos-linux) for the instructions.
 
-
 ## Build from Source Instructions
 
 [Windows](https://docs.helics.org/en/latest/user-guide/installation/windows.html)

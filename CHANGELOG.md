@@ -27,9 +27,10 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The format for log messages now includes a simulation time stamp `[t=xxxx]`
 - Log level numerical values have been expanded (multiplied by 3) to allow more gradations in log levels than was previously allowed
 - The allowed set of string names has been reduced to avoid confusion and remove duplicate entries
-- All queries (except `global_value`) return a valid json string.  Errors from queries return a structure with an HTTP error code and message
+- All queries (except `global_value`) return a valid json string. Errors from queries return a structure with an HTTP error code and message
 
 ### Fixed
+
 - All bug fixes included in HELICS 2.X are included in HELICS 3
 
 ### Added
@@ -45,7 +46,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - Deprecated functions from HELICS 2
 - The separate headers for the C shared library are no longer installed only a single header(helics.h) is needed and includes all functions and operations.
 - The cereal library is no longer installed or used with HELICS
-- The C++ API no longer has generic type support through Cereal.  
+- The C++ API no longer has generic type support through Cereal.
 
 ## [2.7.1][] - 2021-06-05
 

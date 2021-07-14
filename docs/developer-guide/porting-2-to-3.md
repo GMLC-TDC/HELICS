@@ -40,7 +40,7 @@ A list of known PRs that made breaking changes is also provided.
 
 ### Command line interfaces
 
-The numerical value corresponding with the log levels have changed. As such entering numerical values for log levels is no longer supported (it will be again someday). For now please use the text values "none(-1)", "no_print(-1)", "error(0)", "warning(1)", "summary(2)", "connections(3)", "interfaces(4)", "timing(5)", "data(6)", "debug(6)", "trace(7)". The previous values are shown in parenthesis. The new numerical values are subject to revision in a later release so are not considered stable at the moment and are not currently accepted as valid values for command line or config files.  
+The numerical value corresponding with the log levels have changed. As such entering numerical values for log levels is no longer supported (it will be again someday). For now please use the text values "none(-1)", "no_print(-1)", "error(0)", "warning(1)", "summary(2)", "connections(3)", "interfaces(4)", "timing(5)", "data(6)", "debug(6)", "trace(7)". The previous values are shown in parenthesis. The new numerical values are subject to revision in a later release so are not considered stable at the moment and are not currently accepted as valid values for command line or config files.
 
 ### C Shared API
 
@@ -48,12 +48,12 @@ The numerical value corresponding with the log levels have changed. As such ente
 - Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [#1363][1].
 - `helics_message_object` typedef was renamed to `HelicsMessage` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `HelicsMessage`. Changed in [#1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [#1363][1].
--  The send data API has changed to make the usage clearer and reflect the addition of targetted endpoints.  New methods are `helicsEndpointSendBytes`, `helicsEndpointSendBytesTo`, `helicsEndpointSendBytesAt`, `helicsEndpointSendBytesToAt`.  This reflects usage to send a raw byte packet to the targeted destination or a user specified one, and at the current granted time or a user specified time in the simulation future.  The C++98 API was changed accordingly.  The order of fields has also changed for consistency [#1677][9]
+- The send data API has changed to make the usage clearer and reflect the addition of targeted endpoints. New methods are `helicsEndpointSendBytes`, `helicsEndpointSendBytesTo`, `helicsEndpointSendBytesAt`, `helicsEndpointSendBytesToAt`. This reflects usage to send a raw byte packet to the targeted destination or a user specified one, and at the current granted time or a user specified time in the simulation future. The C++98 API was changed accordingly. The order of fields has also changed for consistency [#1677][9]
 - Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [#1363][1].
 - all constants such as flags and properties are now CAPITAL_SNAKE_CASE [#1731][5]
 - all structures are now CamelCase, though the old form will be available in helics3 though will be deprecated at some point. [#1731][5] [#1580][11]
 - `helicsPublicationGetKey` renamed to `helicsPublicationGetName` [#1856][4]
-- recommended to change `helicsFederateFinalize` to `helicsFederateDisconnect`  The finalize method is still in place but will be deprecated in a future release. [#1952][2].
+- recommended to change `helicsFederateFinalize` to `helicsFederateDisconnect` The finalize method is still in place but will be deprecated in a future release. [#1952][2].
 - `helicsMessageGetFlag` renamed to `helicsMessageGetFlagOption` for better symmetry [#1680][7]
 - `helics<*>PendingMessages` moved `helics<*>PendingMessageCount` [#1679][8]
 
@@ -63,17 +63,18 @@ The numerical value corresponding with the log levels have changed. As such ente
 
 ### Queries
 
-- Queries now return valid JSON except for `global_value` queries.  Any code parsing the query return value will need to be adjusted.   Error codes are reported back as HTML error codes and a message.  
+- Queries now return valid JSON except for `global_value` queries. Any code parsing the query return value will need to be adjusted. Error codes are reported back as HTML error codes and a message.
 
-### Libraries  
--  The C based shared library is now `libhelics.dll` or the appropriate extension based on the OS [#1727][6] [#1572][10]
--  The C++ shared library is now `libhelicscpp.[dll\so\dylib]` [#1727][6] [#1572][10]
--  The apps library is now `libhelicscpp-apps.[dll\so\dylib]` [#1727][6] [#1572][10]
+### Libraries
+
+- The C based shared library is now `libhelics.dll` or the appropriate extension based on the OS [#1727][6] [#1572][10]
+- The C++ shared library is now `libhelicscpp.[dll\so\dylib]` [#1727][6] [#1572][10]
+- The apps library is now `libhelicscpp-apps.[dll\so\dylib]` [#1727][6] [#1572][10]
 
 ### CMake
-- All HELICS CMake variables now start with `HELICS_`   [#1907][3]
-- Projects using HELICS as a subproject or linking with the CMake targets should use `HELICS::helics` for the C API,  `HELICS::helicscpp` for the C++ shared library,  `HELICS::helicscpp98` for the C++98 API, and `HELICS::helicscpp-apps` for the apps library.  If you are linking with the static libraries you should know enough to be able to figure out what to do, otherwise it is not recommended.
 
+- All HELICS CMake variables now start with `HELICS_` [#1907][3]
+- Projects using HELICS as a subproject or linking with the CMake targets should use `HELICS::helics` for the C API, `HELICS::helicscpp` for the C++ shared library, `HELICS::helicscpp98` for the C++98 API, and `HELICS::helicscpp-apps` for the apps library. If you are linking with the static libraries you should know enough to be able to figure out what to do, otherwise it is not recommended.
 
 [1]: https://github.com/GMLC-TDC/HELICS/pull/1363 "PR #1363"
 [2]: https://github.com/GMLC-TDC/HELICS/pull/1952 "PR #1952"
