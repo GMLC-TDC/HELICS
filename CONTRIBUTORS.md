@@ -11,21 +11,27 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Andy Fisher](https://github.com/afisher1)
 - [Jason Fuller](https://github.com/jcfuller1)
 - [Shwetha Niddodi](https://github.com/shwethanidd)
-- [Trevor Hardy](https://github.com/trevorhardy)
+- [Trevor Hardy](https://energyenvironment.pnnl.gov/staff/staff_info.asp?staff_num=2704)
 - [Monish Mukherjee](https://github.com/MuMonish)
 - [Jacob Hansen](https://github.com/Jacobhansens)
 - [Marc Eberlein](https://github.com/eberleim)
 - [Shrirang Abhyankar](https://github.com/abhyshr)
 - [Corrine Roth](https://github.com/corinnegroth)
+- [Allison Campbell](https://github.com/allisonmcampbell)
+- [Emily Barret](https://github.com/ELBarrett)
 
 ### Lawrence Livermore National Lab
 
 - [Ryan Mast](https://github.com/nightlark)
 - [Steve Smith](https://github.com/smithsg84)
 - [Philip Top](https://github.com/phlptp)
-- [Denis Nadeau](https://github.com/dnadeau4)
+- [Denis Nadeau](https://github.com/dnadeau4) (Now LANL)
 - [Ben Salazar](https://github.com/salazar33)
 - [Brian Kelley](https://github.com/bmkelley)
+- [Hoa Ngo](https://github.com/hgngo)
+- [Ai Enkoji](https://github.com/aenkoji1)
+- [Nan Duan](https://github.com/nan-duan)
+- [Nathan Yee](https://github.com/yee29)
 
 ### National Renewable Energy Lab
 
@@ -34,12 +40,17 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Bryan Palmintier](https://github.com/bpalmintier)
 - [Bryan Richardson](https://github.com/activeshadow)
 - [Matt Irish](https://github.com/mattirish)
+- [Slava Barsuk](https://github.com/vbarsuk)
 
 ### Argonne National Lab
 
 - [Shrirang Abhyankar](https://github.com/abhyshr) (now PNNL)
 - [Karthikeyan Balasubramaniam](https://github.com/karthikbalasu)
 - [Manoj Kumar Cebol Sundarrajan](https://github.com/manoj1511)
+
+### Other
+- [Beroset](https://github.com/beroset)
+- [Nitin Barthwal](https://github.com/nitin-barthwal)
 
 ## Used Libraries or Code
 
@@ -61,7 +72,7 @@ JsonCpp is used for parsing json files. It is included as a submodule JsonCpp is
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 
-CLI11 is a command line parser and was used as a replacement for boost::program_options. The modifications used in HELICS were merged to the CLI11 library and are now fully integrated in the upstream repository as of the 1.9 release of CLI11. The project was created by [Henry Schreiner](https://github.com/henryiii). Release 1.9 the CLI11 single file header is included with a HELICS install. CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
+CLI11 is a command line parser used throughout HELICS. Most modifications used in HELICS were merged to the CLI11 library and work continues to integrate the remaining modifications. The project was created by [Henry Schreiner](https://github.com/henryiii). A slightly modified version of 2.0 is included with the HELICS source code. CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
 
 ### [toml11](https://github.com/ToruNiina/toml11)
 
@@ -77,7 +88,7 @@ Several components of libGuarded are being used in the core and application libr
 
 ### [fmt](http://fmtlib.net/latest/index.html)
 
-fmt replaces boost::format for internal logging and message printing. The library is included as a submodule. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
+fmt is used for string formatting and in the spdlog library as well.  Current FMT version is 8.0+ The library is included as a submodule. fmt is licensed under [BSD 2 clause](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst) license.
 
 ### [gmlc/containers](https://github.com/GMLC-TDC/containers)
 
@@ -95,10 +106,6 @@ Several generic operations and utilities from HELICS and GridDyn are encapsulate
 
 A library that provides runtime unit values, instead of individual unit types, for the purposes of working with units of measurement at run time possibly from user input. It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/LLNL/units/blob/master/LICENSE) license.
 
-### [cereal](https://github.com/USCiLab/cereal)
-
-The cereal library is used for serialization of messages sent around inside HELICS. A modified version of cereal is included in the HELICS source and licensed under the [BSD-3 clause](https://github.com/USCiLab/cereal/blob/master/LICENSE) license. The modifications include modifying the headers to use relative paths instead of absolute so it can be included in different locations.
-
 ### [spdlog](https://https://github.com/gabime/spdlog)
 
 Very fast, header-only/compiled, C++ logging library. The spdlog library is used for logging. It is included in HELICS as a submodule and is released under a [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE) license.
@@ -106,14 +113,6 @@ Very fast, header-only/compiled, C++ logging library. The spdlog library is used
 ### [FNCS](https://github.com/FNCS/fncs), [IGMS](https://www.nrel.gov/docs/fy16osti/65552.pdf), and FSKIT
 
 While not used directly, much of the inspiration for HELICS comes from three separate projects at the different National Labs. These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL. The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.
-
-### [c++17 headers](https://github.com/tcbrindle/cpp17_headers)
-
-HELICS makes use of `C++17` headers, but due to `C++14` compatibility requirements these are not available on all supported compilers. So included library headers are used from @tcbrindle including std\::any, and std\::string_view; std\::optional is used via [containers](https://github.com/GMLC-TDC/containers). These fall under the boost license, this library is an aggregate from a number of different sources, see the [README](https://github.com/tcbrindle/cpp17_headers/blob/master/README.md) for more details. The Boost versions of these libraries are not used due to incompatibilities through different boost versions that HELICS supports, so a single stable source was used. When the minimum boost version and compiler is updated this code will likely be removed.
-
-### [mpark/variant](https://github.com/mpark/variant)
-
-This variant was chosen for compatibility with C++17 over boost variant and better cross platform support than some of the other versions available. The single header version is included with the source. [Boost Software License](https://github.com/mpark/variant/blob/master/LICENSE.md).
 
 ### [gulrak/filesystem](https://github.com/gulrak/filesystem)
 
