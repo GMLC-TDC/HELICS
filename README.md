@@ -2,7 +2,7 @@
 <img src="docs/logos/helics-logo-long-primary-black.svg" width="700">
 </p>
 
-A multi-language, cross-platform framework that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on supercomputers, the cloud, or a mix of these platforms.
+A multi-language, cross-platform library that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on supercomputers, the cloud, or a mix of these platforms.
 
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
@@ -38,25 +38,23 @@ A multi-language, cross-platform framework that enables different simulators to 
 
 Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together simulation tools from multiple domains to form a complex software-simulation without having to change the individual tools.
 
-Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code. 
+Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code.
 
 Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
 
 ## Getting Started
 
-The users guide has been completely redone for the upcoming HELICS 3. HELICS 3 will be released in July 2021, and the [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest you check it out if you are looking for more documentation.
+The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here for the if you are looking for more documentation.
 
-We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).
+We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).  These videos do not reflect recent HELICS advances but do introduce some basic concepts.  
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
-Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples). This repo provides a number of examples using the different libraries and interfaces.
+Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples). This repo provides a number of examples using the different libraries and interfaces, including those used in the user guide.
 
 The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) provides a series of tutorials using HELICS to build a co-simulation using domain-specific external modeling tools that is built around an electric power system use case with integrated transmission-distribution-market-communication quasi-steady-state-timeseries (QSTS) simulation.
 
 The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) includes examples for a growing range of research use cases for inspiration.
-
-A [Users guide](https://helics.readthedocs.io/en/latest/user-guide/index.html) for getting started
 
 A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepared for the IEEE PES General meeting in Atlanta. The example materials are available on Binder.
 
@@ -82,7 +80,7 @@ For a history of changes to HELICS
 
 ### [ROADMAP](docs/ROADMAP.md)
 
-For a snapshot of some current plans for what is to come
+For a snapshot of some current plans for what is to come.
 
 ## Installation
 
@@ -101,11 +99,9 @@ HELICS can be installed on Linux (and macOS) using Spack, a package manager aime
 
 ### Building from Source
 
-[Windows](https://docs.helics.org/en/latest/user-guide/installation/windows.html)
-
-[Mac](https://docs.helics.org/en/latest/user-guide/installation/mac.html)
-
-[Ubuntu](https://docs.helics.org/en/latest/user-guide/installation/linux.html)
+- [Windows](https://docs.helics.org/en/latest/user-guide/installation/windows.html)
+- [Mac](https://docs.helics.org/en/latest/user-guide/installation/mac.html)
+- [Ubuntu](https://docs.helics.org/en/latest/user-guide/installation/linux.html)
 
 ### Docker
 
@@ -135,6 +131,9 @@ Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for 
 
 ### Optional components
 
+<details>
+  <summary>Click to expand!</summary>
+
 A list of optional component that are not included in HELICS but are optionally used by the library
 
 #### [zmq](http://www.zeromq.org)
@@ -148,8 +147,11 @@ HELICS tests are written to use the Google Test and mock frameworks. Google Test
 ### [Google Benchmark](https://github.com/google/benchmark)
 
 Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
+</details>
 
 ## Build Status
+<details>
+  <summary>Click to expand!</summary>
 
 <table>
   <tr>
@@ -182,6 +184,7 @@ Some timing benchmarks with HELICS are written to use the Google Benchmark libra
   <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
+</details>
 
 ## Publications
 

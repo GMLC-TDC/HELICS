@@ -72,41 +72,6 @@ $ helics_recorder --version
 3.x.x (20XX-XX-XX)
 ```
 
-### Building HELICS with python support
-
-Run the following:
-
-```bash
-$ sudo apt-get install python3-dev
-$ CMake -DBUILD_PYTHON_INTERFACE=ON -DCMake_INSTALL_PREFIX=~/.local/helics-X.X.X/ ..
-$ make -j8
-$ make install
-```
-
-Add the following to your `~/.bashrc` file.
-
-```bash
-export PYTHONPATH=~/.local/helics-X.X.X/python:$PYTHONPATH
-export PATH=~/.local/bin:$PATH
-```
-
-### Testing HELICS with python support
-
-If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.
-
-```bash
-$ ipython
-Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
-Type 'copyright', 'credits' or 'license' for more information
-IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
-
-In [1]: import helics
-
-In [2]: helics.helicsGetVersion()
-Out[2]: '3.x.x (20XX-XX-XX)'
-
-```
-
 ## A few Specialized Platforms
 
 The HELICS build supports a few specialized platforms, more will be added as needed. Generally the build requirements are automatically detected but that is not always possible. So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
