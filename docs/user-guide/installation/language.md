@@ -67,27 +67,27 @@ Out[2]: 'x.x.x (20XX-XX-XX)'
 ## HELICS with GCC and Python3
 
 First you will need to build boost using gcc from source. Download
-[boost](http://www.boost.org/users/history/version_1_70_0.html) from the
+[boost](http://www.boost.org/users/history/version_1_74_0.html) from the
 boost.org website.
 
-Unzip the folder boost_1_70_0 to any location, for example Downloads.
+Unzip the folder boost_1_74_0 to any location, for example Downloads.
 
 ```bash
-$ cd ~/Downloads/boost_1_70_0
+$ cd ~/Downloads/boost_1_74_0
 $ ./bootstrap.sh --with-python=/Users/$USER/miniconda3/python3 --prefix=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7
-$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.70
+$ ./bootstrap.sh --prefix=/ --prefix=/Users/$USER/local/boost-gcc-1.74
 $ ./b2
 $ ./b2 install
 $ # OR
 $ ./bjam cxxflags='-fPIC' cflags='-fPIC' -a link=static install # For static linking
 ```
 
-This will install boost in the `~/local/boost-gcc-1.70` folder
+This will install boost in the `~/local/boost-gcc-1.74` folder
 
 Next, you will need to build HELICS and tell it what the BOOST_ROOT is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-x.x.x/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.64" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="/Users/$USER/local/helics-gcc-x.x.x/" -DBOOST_ROOT="/Users/$USER/local/boost-gcc-1.74" -DBUILD_PYTHON_INTERFACE=ON -DPYTHON_LIBRARY=$(python3-config --prefix)/lib/libpython3.6m.dylib -DPYTHON_INCLUDE_DIR=$(python3-config --prefix)/include/python3.6m -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/gcc-7 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/7.2.0_1/bin/g++-7 ../
 $ make clean; make -j 4; make install
 ```
 
@@ -142,9 +142,9 @@ display(helics.helicsGetVersion())
 The helics Startup usually isn't required on Windows systems. Alternatively, you can load the HELICS library manually, depending on which operating system you use.
 
 ```matlab
-loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.dylib'));
-loadlibrary(GetFullPath('path/to/helics/install/libhelicsSharedLib.so'));
-loadlibrary(GetFullPath('C:\path\to\helics\install\helicsSharedLib.dll'));
+loadlibrary(GetFullPath('path/to/helics/install/libhelics.dylib'));
+loadlibrary(GetFullPath('path/to/helics/install/libhelics.so'));
+loadlibrary(GetFullPath('C:\path\to\helics\install\libhelics.dll'));
 
 display(helics.helicsGetVersion())
 ```
@@ -164,7 +164,7 @@ Alternatively, you wish to build the MATLAB interface without using CMake, and y
 
 ```bash
 cd ~/GitRepos/GMLC-TDC/HELICS/swig/
-mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelicsSharedLib -L/path/to/helics_install/lib/helics/
+mex -I../src/helics/shared_api_library ./matlab/helics_wrap.cxx -lhelics -L/path/to/helics_install/lib/helics/
 mv helicsMEX.* matlab/
 ```
 
@@ -189,7 +189,7 @@ add the octave folder in the install directory to the octave path
 ```bash
 >>helics
 >> helicsGetVersion()
-ans = x.x.x (20XX-XX-XX)
+ans = 3.x.x (20XX-XX-XX)
 ```
 
 ### Notes
