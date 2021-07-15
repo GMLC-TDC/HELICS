@@ -14,19 +14,19 @@ if(hasParent)
 
     if(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
-        if(BUILD_JAVA_INTERFACE)
+	if(HELICS_BUILD_JAVA_INTERFACE)
             add_subdirectory(java)
         endif()
 
-        if(BUILD_MATLAB_INTERFACE)
+	if(HELICS_BUILD_MATLAB_INTERFACE)
             add_subdirectory(matlab)
         endif()
 
-        if(BUILD_OCTAVE_INTERFACE)
+	if(HELICS_BUILD_OCTAVE_INTERFACE)
             add_subdirectory(octave)
         endif()
 
-        if(BUILD_CSHARP_INTERFACE)
+	if(HELICS_BUILD_CSHARP_INTERFACE)
             # add_subdirectory(csharp)
         endif()
 
@@ -36,9 +36,9 @@ else()
     cmake_minimum_required(VERSION 3.10..3.18)
 
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
-    set(BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")
-    set(BUILD_CSHARP_INTERFACE OFF CACHE INTERNAL "")
+    set(HELICS_BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")
+    set(HELICS_BUILD_JAVA_INTERFACE OFF CACHE INTERNAL "")
+    set(HELICS_BUILD_CSHARP_INTERFACE OFF CACHE INTERNAL "")
     set(HELICS_BUILD_EXAMPLES OFF CACHE INTERNAL "")
     set(HELICS_BUILD_BENCHMARKS OFF CACHE INTERNAL "")
     # now call into the root directory

@@ -5,11 +5,13 @@ on:
     branches:
       - develop
       - master
+      - main
       - helics3
   pull_request:
     branches:
       - develop
       - master
+      - main
       - helics3
 
 jobs:
