@@ -44,7 +44,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 
 - Message structure from C API
 - Deprecated functions from HELICS 2
-- The separate headers for the C shared library are no longer installed only a single header(helics.h) is needed and includes all functions and operations.
+- The separate headers for the C shared library are no longer installed. Instead only a single header (`helics.h`) is needed and includes all functions and operations.
 - The cereal library is no longer installed or used with HELICS
 - The C++ API no longer has generic type support through Cereal.
 
