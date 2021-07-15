@@ -46,7 +46,7 @@ Previous and existing use cases have stretched across a wide range of scales in 
 
 The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here for the if you are looking for more documentation.
 
-We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg).  These videos do not reflect recent HELICS advances but do introduce some basic concepts.  
+We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg). These videos do not reflect recent HELICS advances but do introduce some basic concepts.
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
@@ -147,9 +147,11 @@ HELICS tests are written to use the Google Test and mock frameworks. Google Test
 ### [Google Benchmark](https://github.com/google/benchmark)
 
 Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
+
 </details>
 
 ## Build Status
+
 <details>
   <summary>Click to expand!</summary>
 
