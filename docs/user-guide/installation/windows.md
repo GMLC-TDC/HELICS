@@ -2,7 +2,7 @@
 
 ## Windows Installers
 
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases). The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases). The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with a pre-built Java 1.8 interface. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
 
 ## Build Requirements
 
@@ -124,54 +124,6 @@ x.x.x 20XX-XX-XX
 ```
 
 there may be additional build information if a non tagged version is built.
-
-## Building HELICS with python support
-
-Setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
-path then the appropriate libraries and flags will be automatically found. If SWIG is available and you wish to regenerate the interface, `ENABLE_SWIG` can be set to ON to use swig
-to generate the interface files. `SWIG_EXECUTABLE` can be set to the path of the swig.exe if
-We highly recommend using Anaconda3/Miniconda3 for the Python distribution.
-Additionally, you will need to ensure that the Python distribution used is built using the same compiler architecture (x86/x64) as the one you are using to build HELICS, as well as the one that was used to build Boost (as mentioned above).
-ZeroMQ will be built using the CMake build process.
-
-![](../img/windows-command-line-install.png)
-
-```bash
-CMake -DCMake_BUILD_TYPE=Release -DCMake_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
-CMake --build . --config Release --target install
-```
-
-otherwise they can be set through CMake flags
-
-```bash
-CMake -DCMake_BUILD_TYPE=Release -DCMake_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
-CMake --build . --config Release --target install
-```
-
-![](../img/windows-command-line-success.png)
-
-Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
-
-```bash
-set PYTHONPATH=C:\local\helics-X.X.X\python;%PYTHONPATH%
-```
-
-If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.
-
-```bash
-$ ipython
-Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
-Type 'copyright', 'credits' or 'license' for more information
-IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
-
-In [1]: import helics
-
-In [2]: helics.helicsGetVersion()
-Out[2]: 'x.x.x (20XX-XX-XX)'
-
-```
-
-![](../img/windows-python-success.png)
 
 ## MSYS2
 
