@@ -28,7 +28,7 @@ jobs:
       if: github.event.action == 'published' || github.event.action == 'helics-release-build' || github.event_name == 'workflow_dispatch'
       
     - name: Create archive
-      if: github.event.action != 'helics-release-build'
+      if: github.event.action != 'helics-release-build' && github.event_name != 'workflow_dispatch'
       # Creates the archive then moves it to an artifact subfolder
       run: ./scripts/_git-all-archive.sh -l "$(git rev-parse --abbrev-ref "${GITHUB_REF}")" && mkdir artifact && mv "Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz" artifact/
     - name: Create archive (no version)
@@ -37,7 +37,7 @@ jobs:
       run: ./scripts/_git-all-archive.sh && mkdir artifact && mv "Helics-source.tar.gz" artifact/
      
     - name: Upload archive to release
-      if: github.event.action != 'helics-release-build'
+      if: github.event.action != 'helics-release-build' && github.event_name != 'workflow_dispatch'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         UPLOAD_URL: ${{ github.event.release.upload_url }}
