@@ -14,19 +14,19 @@ if(hasParent)
 
     if(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
-	if(HELICS_BUILD_JAVA_INTERFACE)
+        if(HELICS_BUILD_JAVA_INTERFACE)
             add_subdirectory(java)
         endif()
 
-	if(HELICS_BUILD_MATLAB_INTERFACE)
+        if(HELICS_BUILD_MATLAB_INTERFACE)
             add_subdirectory(matlab)
         endif()
 
-	if(HELICS_BUILD_OCTAVE_INTERFACE)
+        if(HELICS_BUILD_OCTAVE_INTERFACE)
             add_subdirectory(octave)
         endif()
 
-	if(HELICS_BUILD_CSHARP_INTERFACE)
+        if(HELICS_BUILD_CSHARP_INTERFACE)
             # add_subdirectory(csharp)
         endif()
 
