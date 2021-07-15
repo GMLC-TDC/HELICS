@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- C++17 compiler (C++14 preferred).
+- C++17 compiler.
 - CMake 3.10 or newer
 - git
 - Boost 1.67 or newer

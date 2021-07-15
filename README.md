@@ -2,7 +2,7 @@
 <img src="docs/logos/helics-logo-long-primary-black.svg" width="700">
 </p>
 
-A multi-language, cross-platform framework that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on high-performance computers, the cloud, or a mix of all of these.
+A multi-language, cross-platform framework that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on supercomputers, the cloud, or a mix of these platforms.
 
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
