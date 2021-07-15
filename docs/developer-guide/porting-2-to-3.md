@@ -35,8 +35,8 @@ A list of known PRs that made breaking changes is also provided.
 ### Application API (C++17)
 
 - `Federate::error(int errorcode)` and `Federate::error(int errorcode, const std::string& message)` were removed, use `localError` instead (or `globalError` to stop the entire simulation). Changed in [#1363][1].
-- ValueFederate::publishString and publishDouble have been removed please use the Publication interface `publish` methods which take a wide variety of types
-- the interface object headers are now included by default when including the corresponding federate
+- `ValueFederate::publishString` and `ValueFederate::publishDouble` have been removed, please use the Publication interface `publish` methods which take a wide variety of types
+- The interface object headers are now included by default when including the corresponding federate
 
 ### Command line interfaces
 
@@ -44,16 +44,16 @@ The numerical value corresponding with the log levels have changed. As such ente
 
 ### C Shared API
 
-- Only 1 header is now used `#include <helics/helics.h>` for all uses of the C shared library in C/C++ code no other headers are needed, the other headers are no longer available. [#1727][6]
+- Only 1 header is now used `#include <helics/helics.h>` for all uses of the C shared library in C/C++ code -- no other headers are needed, the other headers are no longer available. [#1727][6]
 - Removed `helics_message` struct -- call functions to set fields instead. `helicsEndpointGetMessage` and `helicsFederateGetMessage` returning this struct were removed -- call functions to get field values instead. Changed in [#1363][1].
 - `helics_message_object` typedef was renamed to `HelicsMessage` in `api-data.h`; in `MessageFederate.h` and `helicsCallbacks.h` all `helics_message_object` arguments and return types are now `HelicsMessage`. Changed in [#1363][1].
 - Renamed `helicsEndpointSendMessageObject` to `helicsEndpointSendMessage`, `helicsSendMessageObjectZeroCopy` to `helicsSendMessageZeroCopy`, `helicsEndpointGetMessageObject` to `helicsEndpointGetMessage`, `helicsEndpointCreateMessageObject` to `helicsEndpointCreateMessage`, `helicsFederateGetMessageObject` to `helicsFederateGetMessage`, and `helicsFederateCreateMessageObject` to `helicsFederateCreateMessage`. Changed in [#1363][1].
 - The send data API has changed to make the usage clearer and reflect the addition of targeted endpoints. New methods are `helicsEndpointSendBytes`, `helicsEndpointSendBytesTo`, `helicsEndpointSendBytesAt`, `helicsEndpointSendBytesToAt`. This reflects usage to send a raw byte packet to the targeted destination or a user specified one, and at the current granted time or a user specified time in the simulation future. The C++98 API was changed accordingly. The order of fields has also changed for consistency [#1677][9]
 - Removed `helicsEndpointClearMessages` -- it did nothing, `helicsFederateClearMessages` or `helicsMessageFree` should be used instead. Changed in [#1363][1].
-- all constants such as flags and properties are now CAPITAL_SNAKE_CASE [#1731][5]
-- all structures are now CamelCase, though the old form will be available in helics3 though will be deprecated at some point. [#1731][5] [#1580][11]
+- All constants such as flags and properties are now CAPITAL_SNAKE_CASE [#1731][5]
+- All structures are now CamelCase, though the old form will be available in helics3 though will be deprecated at some point. [#1731][5] [#1580][11]
 - `helicsPublicationGetKey` renamed to `helicsPublicationGetName` [#1856][4]
-- recommended to change `helicsFederateFinalize` to `helicsFederateDisconnect` The finalize method is still in place but will be deprecated in a future release. [#1952][2].
+- Recommended to change `helicsFederateFinalize` to `helicsFederateDisconnect`, the finalize method is still in place but will be deprecated in a future release. [#1952][2].
 - `helicsMessageGetFlag` renamed to `helicsMessageGetFlagOption` for better symmetry [#1680][7]
 - `helics<*>PendingMessages` moved `helics<*>PendingMessageCount` [#1679][8]
 

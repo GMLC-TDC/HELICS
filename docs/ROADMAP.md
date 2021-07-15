@@ -17,9 +17,9 @@ Mostly things that didn't quite make it into the 3.0 release and a number of bug
 - Single thread cores (partial at release)
 - Plugin architecture for user defined cores
 - SSL capable core via plugin
-- full xSDK compatibility
+- Full xSDK compatibility
 - Much more general debugging support
-- performance improvements
+- Performance improvements
 - Profiling capability for profiling co-simulations (Some capabilities will be in 2.8 as well)
-- bug fixes, tests and tuning related to HELICS 3 increased use.
+- Bug fixes, tests and tuning related to HELICS 3 increased use.
 - Separate out matlab HELICS interface in matlab oriented way vs current swig build

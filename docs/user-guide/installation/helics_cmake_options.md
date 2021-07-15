@@ -31,12 +31,12 @@ There are several different additional options available to configure HELICS for
 These options effect the configuration of HELICS itself and how/what gets built into the HELICS core libraries
 
 - `HELICS_ENABLE_ZMQ_CORE` : \[Default=ON\] Enable the HELICS ZeroMQ related core types
-- `HELICS_ENABLE_TCP_CORE` : \[Default=ON\] Enable the HELICS TCPIP related core types
+- `HELICS_ENABLE_TCP_CORE` : \[Default=ON\] Enable the HELICS TCP related core types
 - `HELICS_ENABLE_UDP_CORE` : \[Default=ON\] Enable the HELICS UDP core type
 - `HELICS_ENABLE_IPC_CORE` : \[Default=ON\] Enable the HELICS interprocess shared memory related core types
 - `HELICS_ENABLE_TEST_CORE` : \[Default=OFF\] Enable the HELICS in process core type with some additional features for tests, required and enabled if the `HELICS_BUILD_TESTS` option is enabled
 - `HELICS_ENABLE_INPROC_CORE` : \[Default=ON\] Enable the HELICS in process core type, required if `HELICS_BUILD_BENCHMARKS` is on
-- `HELICS_ENABLE_MPI_CORE` : \[Default=OFF\] Enable the HELICS Message Passing interface(MPI) related core types, most commonly used for High performance computing application (HPC)
+- `HELICS_ENABLE_MPI_CORE` : \[Default=OFF\] Enable the HELICS Message Passing Interface (MPI) related core types, most commonly used for High Performance Computing applications (HPC)
 
 #### HELICS logging Options
 

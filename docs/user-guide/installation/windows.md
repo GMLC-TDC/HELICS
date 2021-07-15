@@ -7,7 +7,7 @@ Windows installers are available with the different [releases](https://github.co
 ## Build Requirements
 
 - Microsoft Visual C++ 2017 or newer (MS Build Tools also works)
-- CMake 3.10 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
+- CMake 3.10 or newer (CMake should be newer than the Visual Studio and Boost version you are using)
 - git
 - Boost 1.67 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
@@ -22,12 +22,11 @@ To set up your environment:
 2.  Install
     [Boost](https://www.boost.org/doc/libs/1_74_0/more/getting_started/windows.html)
     [Windows downloads](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
-    1.67 or later recommended (core library should build with 1.58,
-    but tests and web interface will not). For CMake to detect it automatically either
+    1.67 or later recommended. For CMake to detect it automatically either
     extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
     environment variable to the install location. The CMake will only automatically find
-    boost 1.58 or newer.
-    Building with Visual Studio 2017 will require boost 1.67 or newer and CMake 3.15+
+    Boost 1.67 or newer.
+    Building with Visual Studio 2017 will require boost 1.67 or newer and CMake 3.10+
     or newer.
     Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 
@@ -47,7 +46,7 @@ To set up your environment:
     if you need MPI support.
 5.  _Optional_ Install
     [SWIG](http://www.swig.org/download.html)
-    if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab). For Matlab and Java swig is not necessary. For Octave, and C\# swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
+    if you wish to generate the interface libraries for MATLAB and Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you do need to regenerate the MATLAB interface a modified version of swig is necessary, see [MATLAB Swig](../introduction/matlab). For Octave and C\# a swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
 
 ```shell
      choco install swig
