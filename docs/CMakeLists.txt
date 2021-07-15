@@ -10,17 +10,17 @@
 if(MSVC)
 
     set(app_doc_sources
-        apps/Echo.md
-        apps/Broker.md
-        apps/App.md
-        apps/Player.md
-        apps/index.md
-        apps/Source.md
-        apps/Clone.md
-        apps/BrokerServer.md
-        apps/cmdArgs.md
-        apps/Recorder.md
-        apps/Tracer.md
+        references/apps/Echo.md
+        references/apps/Broker.md
+        references/apps/App.md
+        references/apps/Player.md
+        references/apps/index.md
+        references/apps/Source.md
+        references/apps/Clone.md
+        references/apps/BrokerServer.md
+        references/apps/cmdArgs.md
+        references/apps/Recorder.md
+        references/apps/Tracer.md
     )
 
     add_custom_target(helics_app_docs SOURCES ${app_doc_sources})

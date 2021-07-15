@@ -27,9 +27,6 @@ RUN git clone https://github.com/GMLC-TDC/HELICS.git helics
 WORKDIR /root/develop/helics/build
 
 RUN cmake \
-  -DBUILD_PYTHON_INTERFACE=ON \
-  -DPYTHON_INCLUDE_DIR=/usr/include/python3.6/ \
-  -DPYTHON_LIBRARY=/usr/lib/x86_64-linux-gnu/libpython3.6m.so \
   -DCMAKE_INSTALL_PREFIX=/helics \
   ..
 RUN make -j8 && make install
@@ -48,6 +45,8 @@ ENV PYTHONPATH /usr/local/python
 # recognize and import libhelicsSharedLib.so.
 RUN apt install -y --no-install-recommends python3-dev \
   && rm -rf /var/lib/apt/lists/*
+
+RUN pip install helics
 
 CMD ["python3", "-c", "import helics; print(helics.helicsGetVersion())"]
 ```

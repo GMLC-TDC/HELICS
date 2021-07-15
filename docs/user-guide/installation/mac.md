@@ -2,11 +2,11 @@
 
 ## Requirements
 
-- C++11 compiler (C++14 preferred).
-- CMake 3.4 or newer
+- C++17 compiler.
+- CMake 3.10 or newer
 - git
-- Boost 1.58 or newer
-- ZeroMQ 4.1.4 or newer (if ZeroMQ support is needed)
+- Boost 1.67 or newer
+- ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
 - MPI-2 implementation (if MPI support is
   needed)
 
@@ -104,25 +104,9 @@ make
 make install
 ```
 
-### Building HELICS with python support
-
-Run the following:
-
-```bash
-cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
-make -j8
-make install
-```
-
-Add the following to your `~/.bashrc` file.
-
-```bash
-export PYTHONPATH=$HOME/local/helics-master/python:$PYTHONPATH
-```
-
 ### Building HELICS with MATLAB support
 
-To install HELICS with MATLAB support, you will need to add run cmake with the `-DBUILD_MATLAB_INTERFACE=ON` option.
+To install HELICS with MATLAB support, you will need to add run cmake with the `-DHELICS_BUILD_MATLAB_INTERFACE=ON` option.
 
 The important thing to note is that the MATLAB binaries are in the PATH.
 Specifically, `mex` must be available in the PATH.
@@ -144,7 +128,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
+cmake -DHELICS_BUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
 make -j8
 make install
 ```
@@ -178,7 +162,7 @@ mv helicsMEX.* matlab/
 
 You will need HELICS installed correctly before the above can be run successfully.
 
-### Building HELICS using gcc and python
+### Building HELICS using gcc
 
 Firstly, you'll need gcc. You can `brew install gcc`. Depending on the version of gcc you'll need to modify the following instructions slightly. These instructions are for `gcc-8.2.0`.
 
@@ -222,7 +206,7 @@ This will install boost in the `~/local/boost-gcc-1.69.0` folder
 Next, you will need to build HELICS and tell it what the `BOOST_ROOT` is.
 
 ```bash
-$ cmake -DCMAKE_INSTALL_PREFIX="$HOME/local/helics-gcc-X.X.X/" -DBOOST_ROOT="$HOME/local/boost-gcc-1.69.0" -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
+$ cmake -DCMAKE_INSTALL_PREFIX="$HOME/local/helics-gcc-X.X.X/" -DBOOST_ROOT="$HOME/local/boost-gcc-1.69.0" -DCMAKE_C_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/gcc-8 -DCMAKE_CXX_COMPILER=/usr/local/Cellar/gcc/8.2.0/bin/g++-8 ../
 $ make clean; make -j 4; make install
 ```
 
@@ -241,23 +225,6 @@ x.x.x (20XX-XX-XX)
 
 $ helics_recorder --version
 x.x.x (20XX-XX-XX)
-```
-
-### Testing HELICS with python support
-
-If you open a interactive Python session and import helics, you should be able to get the version of `helics` and an output that is similar to the following.
-
-```bash
-$ ipython
-Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
-Type 'copyright', 'credits' or 'license' for more information
-IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
-
-In [1]: import helics
-
-In [2]: helics.helicsGetVersion()
-Out[2]: 'x.x.x (20XX-XX-XX)'
-
 ```
 
 ### Testing HELICS with MATLAB support

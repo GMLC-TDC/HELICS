@@ -13,16 +13,14 @@
 - `HELICS_ENABLE_PACKAGE_BUILD` : \[Default=OFF\] Enable the generation of some installer packages for HELICS
 - `HELICS_GENERATE_DOXYGEN_DOC` : \[Default=OFF\] Generate doxygen documentation for HELICS
 - `HELICS_WITH_CMAKE_PACKAGE` : \[Default=ON\] Generate a `HELICSConfig.cmake` file on install for loading into other libraries
-- `BUILD_OCTAVE_INTERACE` : \[Default=OFF\] Build the HELICS Octave Interface
-- `BUILD_PYTHON_INTERACE` : \[Default=OFF\] Build the HELICS Python3 Interface
-- `BUILD_PYTHON2_INTERACE` : \[Default=OFF\] Build the HELICS Python2 Interface (can be used at the same time as BUILD_PYTHON_INTERFACE)
-- `BUILD_JAVA_INTERACE` : \[Default=OFF\] Build the HELICS Java Interface
-- `BUILD_MATLAB_INTERACE` : \[Default=OFF\] Build the HELICS Matlab Interface
-- `BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface, NOTE: Only available for CMake 3.8 or higher.
-- `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building, HELICS requires 14 or higher which will be used if nothing is specified, HELICS 3.0 will require 17 or higher.
+- `HELICS_BUILD_OCTAVE_INTERACE` : \[Default=OFF\] Build the HELICS Octave Interface
+- `HELICS_BUILD_JAVA_INTERACE` : \[Default=OFF\] Build the HELICS Java Interface
+- `HELICS_BUILD_MATLAB_INTERACE` : \[Default=OFF\] Build the HELICS Matlab Interface
+- `HELICS_BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface, NOTE: Only available for CMake 3.8 or higher.
+- `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building, HELICS 3.0 requires 17 or higher which will be used if nothing is specified.
 - `HELICS_INSTALL` :\[Default=ON\] If set to off HELICS will not generate any install instructions
 
-NOTE: Most HELICS options are prefixed with HELICS\_ to separate them from other libraries so HELICS can be used cleanly as a subproject. The BUILD_XXX_INTERFACE options have not been changed since that would be a large change in an intermediate version, but they will be changed in HELICS 3.0 to HELICS_BUILD_XXXX_INTERFACE to complete the prefixing change for consistency across the library.
+NOTE: All HELICS options are prefixed with HELICS\_ to separate them from other libraries so HELICS can be used cleanly as a subproject.
 
 ## Advanced Options
 
@@ -32,13 +30,13 @@ There are several different additional options available to configure HELICS for
 
 These options effect the configuration of HELICS itself and how/what gets built into the HELICS core libraries
 
-- `ENABLE_ZMQ_CORE` : \[Default=ON\] Enable the HELICS ZeroMQ related core types
-- `ENABLE_TCP_CORE` : \[Default=ON\] Enable the HELICS TCPIP related core types
-- `ENABLE_UDP_CORE` : \[Default=ON\] Enable the HELICS UDP core type
-- `ENABLE_IPC_CORE` : \[Default=ON\] Enable the HELICS interprocess shared memory related core types
-- `ENABLE_TEST_CORE` : \[Default=OFF\] Enable the HELICS in process core type with some additional features for tests, required and enabled if the `HELICS_BUILD_TESTS` option is enabled
-- `ENABLE_INPROC_CORE` : \[Default=ON\] Enable the HELICS in process core type, required if `HELICS_BUILD_BENCHMARKS` is on
-- `ENABLE_MPI_CORE` : \[Default=OFF\] Enable the HELICS Message Passing interface(MPI) related core types, most commonly used for High performance computing application (HPC)
+- `HELICS_ENABLE_ZMQ_CORE` : \[Default=ON\] Enable the HELICS ZeroMQ related core types
+- `HELICS_ENABLE_TCP_CORE` : \[Default=ON\] Enable the HELICS TCP related core types
+- `HELICS_ENABLE_UDP_CORE` : \[Default=ON\] Enable the HELICS UDP core type
+- `HELICS_ENABLE_IPC_CORE` : \[Default=ON\] Enable the HELICS interprocess shared memory related core types
+- `HELICS_ENABLE_TEST_CORE` : \[Default=OFF\] Enable the HELICS in process core type with some additional features for tests, required and enabled if the `HELICS_BUILD_TESTS` option is enabled
+- `HELICS_ENABLE_INPROC_CORE` : \[Default=ON\] Enable the HELICS in process core type, required if `HELICS_BUILD_BENCHMARKS` is on
+- `HELICS_ENABLE_MPI_CORE` : \[Default=OFF\] Enable the HELICS Message Passing Interface (MPI) related core types, most commonly used for High Performance Computing applications (HPC)
 
 #### HELICS logging Options
 
@@ -56,7 +54,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `HELICS_ENABLE_ERROR_ON_WARNING` :\[Default=OFF\] Turns on Werror or equivalent, probably not useful for normal activity, There isn't many warnings but left in to allow the possibility
 - `HELICS_ENABLE_EXTRA_COMPILER_WARNINGS` : \[Default=ON\] Turn on higher levels of warnings in the compilers, can be turned off if you didn't need or want the warning checks.
 - `STATIC_STANDARD_LIB`: \[Default=""\] link the standard library as a static library for no additional C++ system dependencies (recognized values are `default`, `static`, and `dynamic`, anything else is treated the same as `default`)
-- `HELICS_ENABLE_SWIG`: \[Default=OFF\] Conditional option if `BUILD_MATLAB_INTERACE` or `BUILD_PYTHON_INTERFACE` or `BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used. This enables swig usage in cases where it would not otherwise be necessary.
+- `HELICS_ENABLE_SWIG`: \[Default=OFF\] Conditional option if `HELICS_BUILD_MATLAB_INTERACE` or `HELICS_BUILD_JAVA_INTERACE` is selected and no other option that requires swig is used. This enables swig usage in cases where it would not otherwise be necessary.
 - `HELICS_USE_NEW_PYTHON_FIND`: \[Default=OFF\] If python is required, this option can be set to use newer FindPython routines from CMake, if CMake version in use is >=3.12, This does change the variables that need to be set to link to a specific python, but can be helpful in some situations with newer python versions.
 - `HELICS_ENABLE_GIT_HOOKS`: install a git hook to check clang format before a push
 - `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake. So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.

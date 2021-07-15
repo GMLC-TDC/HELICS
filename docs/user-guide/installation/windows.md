@@ -2,14 +2,14 @@
 
 ## Windows Installers
 
-Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases). The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with pre-built Python 3.6 and Java 1.8 interfaces. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
+Windows installers are available with the different [releases](https://github.com/GMLC-TDC/HELICS/releases). The release includes zip archives with static libraries containing both the Debug version and Release version for several versions of Visual Studio. There is also an installer and zip file for getting the HELICS apps and shared library along with a pre-built Java 1.8 interface. There is also an archive with just the C shared library and headers, intended for use with 3rd party interfaces.
 
 ## Build Requirements
 
-- Microsoft Visual C++ 2015 or newer (MS Build Tools also works)
-- CMake 3.4 or newer(CMake should be newer than the Visual Studio and Boost version you are using)
+- Microsoft Visual C++ 2017 or newer (MS Build Tools also works)
+- CMake 3.10 or newer (CMake should be newer than the Visual Studio and Boost version you are using)
 - git
-- Boost 1.58 or newer
+- Boost 1.67 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
 
 ## Setup for Visual Studio
@@ -18,18 +18,17 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 
 To set up your environment:
 
-1.  Install Microsoft Visual C++ 2015 or newer (2017 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
+1.  Install Microsoft Visual C++ 2017 or newer (2019 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
 2.  Install
-    [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html)
-    [Windows downloads](https://dl.bintray.com/boostorg/release/1.70.0/binaries/)
-    1.61 or later recommended (core library should build with 1.58,
-    but tests will not). For CMake to detect it automatically either
+    [Boost](https://www.boost.org/doc/libs/1_74_0/more/getting_started/windows.html)
+    [Windows downloads](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
+    1.67 or later recommended. For CMake to detect it automatically either
     extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
     environment variable to the install location. The CMake will only automatically find
-    boost 1.58 or newer.
-    Building with Visual Studio 2017 will require boost 1.65.1 or newer and CMake 3.9
-    or newer. Use 14.0 versions for Visual Studio 2015, 14.1 files for Visual studio 2017. Visual studio 2019 will require CMake 3.14 or later.
-    Boost 1.70 with CMake 3.14+ is the current recommended configuration.
+    Boost 1.67 or newer.
+    Building with Visual Studio 2017 will require boost 1.67 or newer and CMake 3.10+
+    or newer.
+    Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 
     As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
     because it builds all dependencies but handles getting the right install paths to dependencies set correctly.
@@ -47,7 +46,7 @@ To set up your environment:
     if you need MPI support.
 5.  _Optional_ Install
     [SWIG](http://www.swig.org/download.html)
-    if you wish to generate the interface libraries, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you want to generate the MATLAB interface a modified version of swig is necessary see [MATLAB Swig](../introduction/matlab). For Matlab, Python 3, and Java swig is not necessary. For Octave, Python2, and C\# swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
+    if you wish to generate the interface libraries for MATLAB and Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you do need to regenerate the MATLAB interface a modified version of swig is necessary, see [MATLAB Swig](../introduction/matlab). For Octave and C\# a swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
 
 ```shell
      choco install swig
@@ -125,54 +124,6 @@ x.x.x 20XX-XX-XX
 ```
 
 there may be additional build information if a non tagged version is built.
-
-## Building HELICS with python support
-
-Setting `-DBUILD_PYTHON_INTERFACE=ON` will generate a project to build the python interface, if python is installed to a system
-path then the appropriate libraries and flags will be automatically found. If SWIG is available and you wish to regenerate the interface, `ENABLE_SWIG` can be set to ON to use swig
-to generate the interface files. `SWIG_EXECUTABLE` can be set to the path of the swig.exe if
-We highly recommend using Anaconda3/Miniconda3 for the Python distribution.
-Additionally, you will need to ensure that the Python distribution used is built using the same compiler architecture (x86/x64) as the one you are using to build HELICS, as well as the one that was used to build Boost (as mentioned above).
-ZeroMQ will be built using the CMake build process.
-
-![](../img/windows-command-line-install.png)
-
-```bash
-CMake -DCMake_BUILD_TYPE=Release -DCMake_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
-CMake --build . --config Release --target install
-```
-
-otherwise they can be set through CMake flags
-
-```bash
-CMake -DCMake_BUILD_TYPE=Release -DCMake_INSTALL_PREFIX="C:\local\helics-X.X.X"  -DBUILD_PYTHON_INTERFACE=ON -G "Visual Studio 14 2015 Win64" ..
-CMake --build . --config Release --target install
-```
-
-![](../img/windows-command-line-success.png)
-
-Add the following to the Windows PYTHONPATH environment variable or run the following in the command line.
-
-```bash
-set PYTHONPATH=C:\local\helics-X.X.X\python;%PYTHONPATH%
-```
-
-If you open a interactive Python session and import HELICS, you should be able to get the version of `helics` and an output that is similar to the following.
-
-```bash
-$ ipython
-Python 3.6.4 |Anaconda, Inc.| (default, Jan 16 2018, 12:04:33)
-Type 'copyright', 'credits' or 'license' for more information
-IPython 6.2.1 -- An enhanced Interactive Python. Type '?' for help.
-
-In [1]: import helics
-
-In [2]: helics.helicsGetVersion()
-Out[2]: 'x.x.x (20XX-XX-XX)'
-
-```
-
-![](../img/windows-python-success.png)
 
 ## MSYS2
 

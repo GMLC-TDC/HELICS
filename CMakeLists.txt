@@ -20,9 +20,9 @@ project(HELICS VERSION 3.0.0)
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
-set(HELICS_VERSION_BUILD "beta.2")
+set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-06-30")
+set(HELICS_DATE "2021-07-15")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -460,13 +460,6 @@ mark_as_advanced(HELICS_BUILD_CONFIGURATION)
 
 if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
     target_link_libraries(helics_base INTERFACE atomic)
-endif()
-
-# -------------------------------------------------------------
-# Things to keep builds on macOS < 10.12 working for now
-# -------------------------------------------------------------
-if(CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS "10.12")
-    add_definitions(-DLIBGUARDED_NO_DEFAULT)
 endif()
 
 # -------------------------------------------------------------
