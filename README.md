@@ -46,7 +46,7 @@ Previous and existing use cases have stretched across a wide range of scales in 
 
 ## Getting Started
 
-The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here for the if you are looking for more information on HELICS rather it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
+The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
