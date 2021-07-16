@@ -130,9 +130,9 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     set_property(SOURCE helicsJava.i PROPERTY USE_LIBRARY_INCLUDE_DIRECTORIES TRUE)
     set_property(SOURCE helicsJava.i PROPERTY DEPENDS HELICS::helics)
     set_property(
-        SOURCE helicsJava.i PROPERTY INCLUDE_DIRECTORIES
-                                     ${HELICS_BINARY_DIR}/helics_generated_includes/
-				     ${HELICS_INCLUDE_DIRS}
+        SOURCE helicsJava.i
+        PROPERTY INCLUDE_DIRECTORIES ${HELICS_BINARY_DIR}/helics_generated_includes/
+                 ${HELICS_INCLUDE_DIRS}
     )
     set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
 
@@ -159,7 +159,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         target_include_directories(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE ${JNI_INCLUDE_DIRS})
         target_include_directories(
             ${SWIG_MODULE_helicsJava_REAL_NAME}
-	    PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/ ${HELICS_INCLUDE_DIRS}
+            PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/ ${HELICS_INCLUDE_DIRS}
         )
 
         message(STATUS "Using new swig target_include_directories")
