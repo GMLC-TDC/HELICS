@@ -40,9 +40,9 @@ Welcome to the repository for the Hierarchical Engine for Large-scale Infrastruc
 
 It is important to note that HELICS cannot in and of itself simulate anything, rather it is a framework to make it easy to bring together other existing (or novel) simulation tools to tackle problems that can't readily be solved by a single tool alone. After all "simulations are better together," and HELICS is designed to help get you there easily and quickly. HELICS has also already worked out many of the more subtle aspects of synchronizing simulations so you don't have to.
 
-Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code. 
+Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code.
 
-Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations. 
+Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
 
 ## Getting Started
 
