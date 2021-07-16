@@ -48,7 +48,7 @@ endif()
 # ##################################################################################################
 # Find HELICS
 if(NOT hasParent OR NOT TARGET HELICS::helics)
-    find_package(HELICS 2 REQUIRED)
+    find_package(HELICS 3 REQUIRED)
 endif()
 
 if(HELICS_ENABLE_SWIG OR HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
@@ -118,6 +118,7 @@ if(NOT USE_MODERNIZED_SWIG)
     include_directories(${JAVA_INCLUDE_PATH2})
     include_directories(${JNI_INCLUDE_DIRS})
     include_directories(${HELICS_BINARY_DIR}/helics_generated_includes/)
+    include_directories(${HELICS_INCLUDE_DIRS})
     # "Using old SWIG include_directories")
 endif()
 
@@ -131,6 +132,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     set_property(
         SOURCE helicsJava.i PROPERTY INCLUDE_DIRECTORIES
                                      ${HELICS_BINARY_DIR}/helics_generated_includes/
+				     ${HELICS_INCLUDE_DIRS}
     )
     set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
 
@@ -157,7 +159,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
         target_include_directories(${SWIG_MODULE_helicsJava_REAL_NAME} PRIVATE ${JNI_INCLUDE_DIRS})
         target_include_directories(
             ${SWIG_MODULE_helicsJava_REAL_NAME}
-            PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/
+	    PRIVATE ${HELICS_BINARY_DIR}/helics_generated_includes/ ${HELICS_INCLUDE_DIRS}
         )
 
         message(STATUS "Using new swig target_include_directories")

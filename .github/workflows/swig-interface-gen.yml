@@ -1,6 +1,7 @@
 name: Generate SWIG Interfaces
 
 on:
+  workflow_dispatch:
   push:
     branches: 
       - master
@@ -19,6 +20,9 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Generate C API Headers
+      run: |
+              python3 scripts/generateHelicsH.py src/helics/shared_api_library/backup/helics/ ./
     - name: Run SWIG
       run: |
         rm -rf interfaces/*/interface/*
@@ -34,15 +38,15 @@ jobs:
         popd
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
-      run: git add interfaces/
+      run: git add interfaces/ src/helics/shared_api_library/backup/
     - uses: gmlc-tdc/create-pr-action@v0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        COMMIT_MSG: "Automated update to SWIG generated interface files"
-        PR_TITLE: "Automated update to SWIG generated interface files"
-        PR_BODY: "Automated update to SWIG generated interface files from commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
-        GIT_EMAIL: "HELICS-bot@users.noreply.github.com"
-        GIT_NAME: "HELICS-bot"
-        BRANCH_PREFIX: "swig-gen/"
+        COMMIT_MSG: "Automated update to generated interface files"
+        PR_TITLE: "Automated update to generated interface files"
+        PR_BODY: "Automated update to generated interface files from commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
+        GIT_NAME: "github-actions[bot]"
+        GIT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
+        BRANCH_PREFIX: "interface-gen/"
         DISABLE_STAGING: true
