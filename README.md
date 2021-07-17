@@ -2,7 +2,7 @@
 <img src="docs/logos/helics-logo-long-primary-black.svg" width="700">
 </p>
 
-A multi-language, cross-platform library that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 10,000+ running on supercomputers, the cloud, or a mix of these platforms.
+A multi-language, cross-platform library that enables different simulators to easily exchange data and stay synchronized in time. Scalable from two simulators on a laptop to 100,000+ running on supercomputers, the cloud, or a mix of these platforms.
 
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
@@ -36,7 +36,9 @@ A multi-language, cross-platform library that enables different simulators to ea
 
 ## Introduction
 
-Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together simulation tools from multiple domains to form a complex software-simulation without having to change the individual tools.
+Welcome to the repository for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together simulation tools from multiple domains to form a complex software simulation without having to change the individual tools.
+
+It is important to note that HELICS cannot in and of itself simulate anything, rather it is a framework to make it easy to bring together other existing (or novel) simulation tools to tackle problems that can't readily be solved by a single tool alone. After all "simulations are better together," and HELICS is designed to help get you there easily and quickly. HELICS has also already worked out many of the more subtle aspects of synchronizing simulations so you don't have to.
 
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code.
 
@@ -44,11 +46,13 @@ Previous and existing use cases have stretched across a wide range of scales in 
 
 ## Getting Started
 
-The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here for the if you are looking for more documentation.
-
-We've created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg). These videos do not reflect recent HELICS advances but do introduce some basic concepts.
+The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
 
 The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
+
+You can also [Try HELICS online](https://mybinder.org/v2/gh/kdheepak/openmod-2019-helics-tutorial/master?urlpath=lab/tree/notebooks/cosimulation-introduction.ipynb) without having to install any software.
+
+Earlier we also created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg). These videos do not reflect recent HELICS advances but do introduce some basic concepts.
 
 Several examples of HELICS federates and projects are located in [HELICS-Examples](https://github.com/GMLC-TDC/HELICS-Examples). This repo provides a number of examples using the different libraries and interfaces, including those used in the user guide.
 
@@ -89,11 +93,11 @@ For a snapshot of some current plans for what is to come.
 Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) comes with a Windows installer and zip file containing the HELICS apps and C shared library with Python 3.6 and Java 1.8 interfaces, zip files containing compiled HELICS static libraries built against several MSVC versions, and an archive containing just the C shared library with headers. For building with Debug support it is generally recommended to build from Source or use HELICS as a subproject.
 Make sure the latest [Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) is installed.
 
-### pip
+### Cross-platform Python (via pip)
 
 Support for installing the Python interface and HELICS apps is provided with pip, see [pip install](https://python.helics.org) for the instructions. The files used to build the pip package are in a separate [repo](https://github.com/GMLC-TDC/pyhelics).
 
-### Spack
+### Linux and macOS (via Spack)
 
 HELICS can be installed on Linux (and macOS) using Spack, a package manager aimed at HPC environments. See [spack install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-spack-macos-linux) for the instructions.
 
@@ -119,10 +123,10 @@ We are always looking for help adding support for more tools, so please contact 
 
 ### HELICS helper Apps
 
-- [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations.
-- [Player](./docs/references/apps/Player.md), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. HELICS Player is included in the HELICS distribution.
-- [Recorder](./docs/references/apps/Recorder.md), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. HELICS Recorder is included in the HELICS distribution.
-- [Broker](./docs/references/apps/Broker.md), which is a command line tool for running a Broker. There is also a [Broker Server](https://helics.readthedocs.io/en/latest/user-guide/simultaneous_cosimulation) which can generate brokers as needed, and can include a REST API.
+- [HELICS CLI](https://github.com/GMLC-TDC/helics-cli) provides a simple way to automate configuring, starting, and stopping HELICS co-simulations. This helps in overcoming the challenges associated with successfully sequencing and starting simulations of all sizes and is particularly helpful for larger simulations.
+- [Broker](./docs/references/apps/Broker.md), which is a command line tool for running a Broker, the core hub in HELICS for data exchange. One or more brokers are what tie the simulation tools together in a HELICS federation. There is also a [Broker Server](https://helics.readthedocs.io/en/latest/user-guide/simultaneous_cosimulation) which can generate brokers as needed, and can include a REST API.
+- [Player](./docs/references/apps/Player.md), which acts as a simple send-only federate that simply publishes a stream of timed HELICS messages from a user-defined file. This can be very useful when testing a federate in isolation by mimicking the data that will eventually come from other sources, and in assembling or debugging federations to stand in for any federates which might not be quite ready or that take a long time to run. The Player can also readily playback the files created by the HELICS Recorder (see below). HELICS Player is included in the HELICS distribution.
+- [Recorder](./docs/references/apps/Recorder.md), which acts as a simple receive-only federate that prints out or saves messages from one or more subscribed streams. This makes it easy to monitor some or all of the data exchanged via HELICS and can also be part of debugging and modular workflows. For example it can record the data exchanged during a (partly?) successful run to play back (see Player above) to other federates without having to launch those parts again or to isolate/test changes to a subset of a federation. HELICS Recorder is included in the HELICS distribution.
 - [App](./docs/references/apps/App.md) is a general app executable which can run a number of other apps including Player and Recorder, as well as a [Tracer](./docs/references/apps/Tracer.md), [Echo](./docs/references/apps/Echo.md), [Source](./docs/references/apps/Source.md), and [Clone](./docs/references/apps/Clone.md).
 
 ## Contributing
@@ -138,7 +142,7 @@ A list of optional component that are not included in HELICS but are optionally 
 
 #### [zmq](http://www.zeromq.org)
 
-ZeroMQ message passing is used in the ZMQ core networking. The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `ENABLE_ZMQ_CORE` to `OFF`
+ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
 
 ### [Google Test](https://github.com/google/googletest)
 
@@ -189,6 +193,8 @@ Some timing benchmarks with HELICS are written to use the Google Benchmark libra
 </details>
 
 ## Publications
+
+If you use HELICS in your research, please cite:
 
 \[1\] B. Palmintier, D. Krishnamurthy, P. Top, S. Smith, J. Daily, and J. Fuller, “Design of the HELICS High-Performance Transmission-Distribution-Communication-Market Co-Simulation Framework,” in _Proc. of the 2017 Workshop on Modeling and Simulation of Cyber-Physical Energy Systems_, Pittsburgh, PA, 2017. [pre-print](https://www.nrel.gov/docs/fy17osti/67928.pdf) | [published](https://ieeexplore.ieee.org/document/8064542/)
 
