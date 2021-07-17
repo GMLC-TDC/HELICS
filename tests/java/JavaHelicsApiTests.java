@@ -420,7 +420,7 @@ public class JavaHelicsApiTests {
             if (returnTime != 1.0) {
                 javaHelicsApiTests.helicsAssert("returnTime[0] != 1.0");
             }
-            int ep2MsgCount = helics.helicsEndpointPendingMessagesCount(ep2);
+            int ep2MsgCount = helics.helicsEndpointPendingMessageCount(ep2);
             if (ep2MsgCount != 3) {
                 javaHelicsApiTests.helicsAssert("ep2MsgCount != 3");
             }
@@ -465,7 +465,7 @@ public class JavaHelicsApiTests {
             if (!"Ep2".equals(msg2OriginalDestination)) {
                 javaHelicsApiTests.helicsAssert("!msg2OriginalDestination.equals(\"Ep2\")");
             }
-            int fed1MsgCount = helics.helicsFederatePendingMessagesCount(fed1);
+            int fed1MsgCount = helics.helicsFederatePendingMessageCount(fed1);
             if (fed1MsgCount != 1) {
                 javaHelicsApiTests.helicsAssert("fed1MsgCount != 1");
             }
