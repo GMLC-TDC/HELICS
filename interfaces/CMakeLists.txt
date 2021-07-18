@@ -91,7 +91,7 @@ endif()
 
 # cmake-format: off
 # add a helper variable for standalone interface swig builds
-set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}/src/helics/shared_api_library" "${HELICS_BINARY_DIR}/src/helics/shared_api_library")
+set(HELICS_SWIG_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}" "${HELICS_SOURCE_DIR}/src/helics/shared_api_library" "${HELICS_BINARY_DIR}/src/helics/shared_api_library" "${HELICS_BINARY_DIR}/helics_generated_includes")
 # cmake-format: on
 
 # TODO: remove this after all of the interfaces work as standalone builds

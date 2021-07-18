@@ -122,7 +122,7 @@ endif()
 find_package(Matlab COMPONENTS MAIN_PROGRAM)
 
 # ##################################################################################################
-# Build the Java interface
+# Build the MATLAB interface
 # ##################################################################################################
 message(STATUS "Building MATLAB")
 get_target_property(TMP_HELICS_SHARED_LIB_INCLUDE_DIRS HELICS::helics INTERFACE_INCLUDE_DIRECTORIES)

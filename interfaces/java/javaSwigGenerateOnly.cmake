@@ -9,8 +9,6 @@
 
 #File used to generate the Java interface and overwrite the existing files if requested
 
-file(GLOB SHARED_LIB_HEADERS ${CMAKE_SOURCE_DIR}/src/helics/shared_api_library/*.h)
-
 if(SWIG_VERSION VERSION_GREATER "4.0.0")
   set(SWIG_DOXYGEN_FLAG "-doxygen")
 endif()
@@ -22,13 +20,13 @@ endif()
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/helicsJava.c
     COMMAND
       "${SWIG_EXECUTABLE}" "-java" "-package" "com.java.helics" -o "helicsJava.c" "${SWIG_DOXYGEN_FLAG}"
-      "-I${CMAKE_SOURCE_DIR}/src/helics/shared_api_library"
+      "-I${HELICS_SOURCE_DIR}/src/helics/shared_api_library/backup/"
       "-I${helics.i_INCLUDE_DIR}"
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsJava.i
     DEPENDS
       ${HELICS_SWIG_helics.i_FILE}
       ${CMAKE_CURRENT_SOURCE_DIR}/helicsJava.i
-      ${SHARED_LIB_HEADERS}
+      ${HELICS_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h
       ${CMAKE_CURRENT_SOURCE_DIR}/java_maps.i
   )
 
