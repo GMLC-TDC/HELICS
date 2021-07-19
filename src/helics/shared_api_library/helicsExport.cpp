@@ -849,6 +849,7 @@ helics::FedObject::~FedObject()
 {
     // we want to remove the values in the arrays before deleting the fedptr
     // and we want to do it inside this function to ensure it does so in a consistent manner
+    messages.clear();
     inputs.clear();
     pubs.clear();
     epts.clear();

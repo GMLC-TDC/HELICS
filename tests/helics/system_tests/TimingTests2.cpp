@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.hpp"
 
 #include <future>
+#include <thread>
 
 struct timing_tests2: public FederateTestFixture, public ::testing::Test {
 };
@@ -241,6 +242,53 @@ TEST_F(timing_tests2, ring_test3)
     vFed1->finalize();
 }
 
+TEST_F(timing_tests2, wait_for_current_time_exec_extry)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
+    vFed1->registerSubscription("pub2_1");
+
+    vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(9.9);
+
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+
+    pub1_1.publish(3.5);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->requestTimeAsync(1.0);
+
+    vFed2->enterExecutingModeComplete();
+    // verify the correct value is available at time=0;
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    vFed2->requestTimeAsync(5.0);
+
+    auto retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    vFed1->finalize();
+
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 5.0);
+
+    vFed2->finalize();
+}
+
 TEST_F(timing_tests2, wait_for_current_time_flag)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
@@ -256,14 +304,16 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     auto& sub3 = vFed3->registerSubscription("pub1");
     sub2.setDefault(2.6);
     sub3.setDefault(1.9);
-    vFed1->enterExecutingModeAsync();
+    vFed3->enterExecutingModeAsync();
     vFed2->enterExecutingModeAsync();
-    vFed3->enterExecutingMode();
-    vFed1->enterExecutingModeComplete();
+    vFed1->enterExecutingMode();
+
     vFed2->enterExecutingModeComplete();
     // this works since there are no reverse dependencies
     vFed1->requestTime(1.0);
     pub1->publish(3.5);
+    vFed3->enterExecutingModeComplete();
+
     auto tm1 = vFed1->requestTime(3.0);
     EXPECT_EQ(tm1, 3.0);
     auto tm2 = vFed2->requestTime(1.0);
@@ -344,25 +394,32 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     sub2_1.setDefault(9.9);
     sub2_2.setDefault(10.5);
 
-    vFed1->enterExecutingModeAsync();
-    vFed2->enterExecutingMode();
-    vFed1->enterExecutingModeComplete();
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
 
     pub1_1.publish(3.5);
+
+    vFed1->requestTimeAsync(1.0);
+
+    vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
 
     vFed2->requestTimeAsync(5.0);
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
 
-    vFed1->requestTime(1.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    auto retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
     pub1_2.publish(8.8);
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
     vFed1->requestTimeAsync(3.0);
-    auto retTime = vFed2->requestTimeComplete();
+    retTime = vFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 1.0);
-    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
     EXPECT_EQ(sub2_2.getValue<double>(), 8.8);
 
     vFed2->requestTimeAsync(7.0);
@@ -379,6 +436,203 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     retTime = vFed2->requestTime(7.0);
     EXPECT_EQ(retTime, 7.0);
     vFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_flag2_error)
+{
+    extraBrokerArgs = "--debugging --consoleloglevel=no_print";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging --consoleloglevel=no_print";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed1->setFlagOption(helics::defs::wait_for_current_time_update);
+    vFed1->registerGlobalPublication<double>("pub1_1");
+    vFed1->registerGlobalPublication<double>("pub1_2");
+    vFed1->registerSubscription("pub2_1");
+
+    vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    auto& sub2_2 = vFed2->registerSubscription("pub1_2");
+    sub2_1.setDefault(9.9);
+    sub2_2.setDefault(10.5);
+
+    vFed2->enterExecutingModeAsync();
+    auto res = vFed1->enterExecutingMode();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
+    res = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
+    broker.reset();
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_flag_self)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
+    auto& pub1_2 = vFed1->registerGlobalPublication<double>("pub1_2");
+    vFed1->registerSubscription("pub2_1");
+
+    vFed2->registerGlobalPublication<double>("pub2_1");
+    vFed2->registerGlobalPublication<double>("pub2_2");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    auto& sub2_2 = vFed2->registerSubscription("pub1_2");
+    auto& sub2_self = vFed2->registerSubscription("pub2_2");
+    sub2_1.setDefault(9.9);
+    sub2_2.setDefault(10.5);
+    sub2_self.setDefault(3.3);
+
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+
+    pub1_1.publish(3.5);
+
+    vFed1->requestTimeAsync(1.0);
+
+    vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    vFed2->requestTimeAsync(5.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    auto retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    pub1_2.publish(8.8);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->requestTimeAsync(3.0);
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    EXPECT_EQ(sub2_2.getValue<double>(), 8.8);
+
+    vFed2->requestTimeAsync(7.0);
+    retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+    pub1_1.publish(5.4);
+
+    broker.reset();
+    vFed1->finalize();
+
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+
+    retTime = vFed2->requestTime(7.0);
+    EXPECT_EQ(retTime, 7.0);
+    vFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
+{
+    extraBrokerArgs = "--debugging --loglevel=no_print";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging --loglevel=no_print";
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    mFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+    // this should cause an error later
+    mFed1->setFlagOption(helics::defs::wait_for_current_time_update);
+    mFed1->registerGlobalEndpoint("ept1");
+
+    mFed2->registerGlobalEndpoint("ept2");
+
+    mFed2->enterExecutingModeAsync();
+
+    auto res = mFed1->enterExecutingMode();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
+    res = mFed2->enterExecutingModeComplete();
+    EXPECT_EQ(res, helics::iteration_result::error);
+
+    broker.reset();
+    mFed1->finalize();
+
+    mFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    mFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+
+    auto& ept1 = mFed1->registerGlobalEndpoint("ept1");
+
+    auto& ept2 = mFed2->registerGlobalEndpoint("ept2");
+
+    mFed2->enterExecutingModeAsync();
+    mFed1->enterExecutingMode();
+
+    ept1.send("ept2", "message1");
+
+    mFed1->requestTimeAsync(1.0);
+
+    mFed2->enterExecutingModeComplete();
+    EXPECT_TRUE(ept2.hasMessage());
+
+    mFed2->requestTimeAsync(5.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(mFed2->isAsyncOperationCompleted());
+
+    auto retTime = mFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    ept1.send("ept2", "message2");
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(mFed2->isAsyncOperationCompleted());
+
+    mFed1->requestTimeAsync(3.0);
+    retTime = mFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    EXPECT_EQ(ept2.pendingMessages(), 2U);
+
+    mFed2->requestTimeAsync(7.0);
+    retTime = mFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+    ept1.send("ept2", "message3");
+
+    broker.reset();
+    mFed1->finalize();
+
+    retTime = mFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 3.0);
+
+    retTime = mFed2->requestTime(7.0);
+    EXPECT_EQ(retTime, 7.0);
+    EXPECT_EQ(ept2.pendingMessages(), 3U);
+    mFed2->finalize();
 }
 
 TEST_F(timing_tests2, offset_timing)
@@ -417,6 +671,102 @@ TEST_F(timing_tests2, offset_timing)
 
     vFed1->finalize();
     vFed2->finalize();
+}
+
+TEST_F(timing_tests2, wait_for_current_time_iterative)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::wait_for_current_time_update);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(9.9);
+    sub1_1.setDefault(10.22);
+
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+
+    pub1_1.publish(3.5);
+
+    vFed1->requestTimeAsync(1.0);
+
+    vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    vFed2->requestTimeAsync(1.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    auto retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->requestTimeIterativeAsync(3.0, helics::iteration_request::iterate_if_needed);
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    pub2_1.publish(3.1);
+
+    vFed2->requestTimeIterativeAsync(7.0, helics::iteration_request::iterate_if_needed);
+
+    auto itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(itTime.state, helics::iteration_result::iterating);
+    EXPECT_EQ(sub1_1.getValue<double>(), 3.1);
+
+    pub1_1.publish(5.4);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    vFed1->requestTimeIterativeAsync(3.0, helics::iteration_request::iterate_if_needed);
+
+    // iteration 3
+
+    itTime = vFed2->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(sub2_1.getValue<double>(), 5.4);
+    pub2_1.publish(8.7);
+    vFed2->requestTimeIterativeAsync(7.0, helics::iteration_request::iterate_if_needed);
+
+    // iteration 4
+    itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(itTime.state, helics::iteration_result::iterating);
+    EXPECT_EQ(sub1_1.getValue<double>(), 8.7);
+
+    pub1_1.publish(7.3);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    vFed1->requestTimeIterativeAsync(3.0, helics::iteration_request::iterate_if_needed);
+    // iteration 5
+
+    itTime = vFed2->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(sub2_1.getValue<double>(), 7.3);
+
+    vFed2->finalize();
+
+    itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 3.0);
+    EXPECT_EQ(itTime.state, helics::iteration_result::next_step);
+
+    broker.reset();
+    vFed1->finalize();
 }
 
 // Tests out the time barrier

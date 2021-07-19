@@ -80,45 +80,6 @@ void ForwardingTimeCoordinator::disconnect()
     }
 }
 
-/*
-void ForwardingTimeCoordinator::disconnect()
-{
-    if (sendMessageFunction) {
-        std::set<global_federate_id> connections(dependents.begin(), dependents.end());
-        for (auto dep : dependencies) {
-            if (dep.next < Time::maxVal()) {
-                connections.insert(dep.fedID);
-            }
-        }
-        if (connections.empty()) {
-            return;
-        }
-        ActionMessage bye(CMD_DISCONNECT);
-
-        bye.source_id = source_id;
-        if (connections.size() == 1) {
-            bye.dest_id = *connections.begin();
-            if (bye.dest_id == source_id) {
-                processTimeMessage(bye);
-            } else {
-                sendMessageFunction(bye);
-            }
-        } else {
-            ActionMessage multi(CMD_MULTI_MESSAGE);
-            for (auto fed : connections) {
-                bye.dest_id = fed;
-                if (fed == source_id) {
-                    processTimeMessage(bye);
-                } else {
-                    appendMessage(multi, bye);
-                }
-            }
-            sendMessageFunction(multi);
-        }
-    }
-}
-*/
-
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, source_id);
@@ -136,13 +97,33 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 
-    if (updateUpstream) {
+    if (updateUpstream && !noParent) {
         auto upd = generateTimeRequest(upstream, global_federate_id{});
         transmitTimingMessagesUpstream(upd);
     }
     if (updateDownstream) {
-        auto upd = generateTimeRequest(downstream, global_federate_id{});
-        transmitTimingMessagesDownstream(upd);
+        if (hasDelayedTimingFederate) {
+            if (downstream.minFed == delayedFederate) {
+                auto upd = generateTimeRequest(downstream, global_federate_id{});
+                transmitTimingMessagesDownstream(upd, delayedFederate);
+                auto td = generateMinTimeUpstream(dependencies,
+                                                  restrictive_time_policy,
+                                                  source_id,
+                                                  delayedFederate);
+                DependencyInfo di;
+                di.update(td);
+                auto upd_delayed = generateTimeRequest(di, delayedFederate);
+                if (sendMessageFunction) {
+                    sendMessageFunction(upd_delayed);
+                }
+            } else {
+                auto upd = generateTimeRequest(downstream, global_federate_id{});
+                transmitTimingMessagesDownstream(upd);
+            }
+        } else {
+            auto upd = generateTimeRequest(downstream, global_federate_id{});
+            transmitTimingMessagesDownstream(upd);
+        }
     }
 }
 
@@ -228,7 +209,7 @@ const DependencyInfo* ForwardingTimeCoordinator::getDependencyInfo(global_federa
 std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() const
 {
     std::vector<global_federate_id> deps;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependency) {
             deps.push_back(dep.fedID);
         }
@@ -239,7 +220,7 @@ std::vector<global_federate_id> ForwardingTimeCoordinator::getDependencies() con
 std::vector<global_federate_id> ForwardingTimeCoordinator::getDependents() const
 {
     std::vector<global_federate_id> deps;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependent) {
             deps.push_back(dep.fedID);
         }
@@ -268,10 +249,26 @@ message_processing_result ForwardingTimeCoordinator::checkExecEntry()
     if (!dependencies.checkIfReadyForExecEntry(false)) {
         return ret;
     }
-
+    executionMode = true;
     ret = message_processing_result::next_step;
 
-    executionMode = true;
+    for (auto& dep : dependencies) {
+        if (dep.dependency && dep.dependent && dep.delayedTiming) {
+            if (hasDelayedTimingFederate) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = multiple_wait_for_current_time_flags;
+                ge.payload =
+                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
+                sendMessageFunction(ge);
+                return message_processing_result::error;
+            }
+            hasDelayedTimingFederate = true;
+            delayedFederate = dep.fedID;
+        }
+    }
+
     downstream.next = timeZero;
     downstream.time_state = time_state_t::time_granted;
     downstream.minDe = timeZero;
@@ -302,59 +299,63 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
         setActionFlag(nTime, iteration_requested_flag);
         nTime.Tdemin = std::min(dep.minDe, dep.Te);
         nTime.Te = dep.Te;
+    } else if (dep.time_state == time_state_t::exec_requested) {
+        nTime.setAction(CMD_IGNORE);
     }
     return nTime;
 }
 
 void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) const
 {
-    if (sendMessageFunction) {
+    if (!sendMessageFunction) {
+        return;
+    }
+
+    for (auto dep : dependencies) {
+        if (dep.connection == ConnectionType::child) {
+            continue;
+        }
+        if (!dep.dependent) {
+            continue;
+        }
+        msg.dest_id = dep.fedID;
+        sendMessageFunction(msg);
+    }
+}
+
+void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
+                                                                 global_federate_id skipFed) const
+{
+    if (!sendMessageFunction) {
+        return;
+    }
+    if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
         for (auto dep : dependencies) {
-            if (dep.connection == ConnectionType::child) {
+            if (dep.connection != ConnectionType::child) {
                 continue;
             }
             if (!dep.dependent) {
                 continue;
             }
+            if (dep.fedID == skipFed) {
+                continue;
+            }
+            if (dep.dependency) {
+                if (dep.next > msg.actionTime) {
+                    continue;
+                }
+            }
             msg.dest_id = dep.fedID;
             sendMessageFunction(msg);
         }
-    }
-}
-
-void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg) const
-{
-    if (sendMessageFunction) {
-        if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
-            for (auto dep : dependencies) {
-                if (dep.connection != ConnectionType::child) {
+    } else {
+        for (auto dep : dependencies) {
+            if (dep.dependent) {
+                if (dep.fedID == skipFed) {
                     continue;
-                }
-                if (!dep.dependent) {
-                    continue;
-                }
-
-                if (dep.dependency) {
-                    if (dep.next > msg.actionTime) {
-                        continue;
-                    }
                 }
                 msg.dest_id = dep.fedID;
-                /*if (msg.dest_id == global_federate_id(131074)) {
-                    if (msg.actionTime > timeZero) {
-                        printf("sending TR to 131074 for next=%f\n",
-                               static_cast<double>(msg.actionTime));
-                    }
-                }
-                */
                 sendMessageFunction(msg);
-            }
-        } else {
-            for (auto dep : dependencies) {
-                if (dep.dependent) {
-                    msg.dest_id = dep.fedID;
-                    sendMessageFunction(msg);
-                }
             }
         }
     }

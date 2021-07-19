@@ -24,6 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstdio>
 #include <future>
+#include <thread>
 
 TEST(recorder_tests, simple_recorder_test)
 {
