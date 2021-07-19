@@ -30,7 +30,7 @@ jobs:
       with:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
-    - uses: pre-commit/action@v1.1.0
+    - uses: pre-commit/action@v2.0.3
     - name: Create/update a file update PR with changed files
       if: failure() && github.event.pull_request.draft != true && github.event.pull_request.head.repo.full_name == github.repository
       uses: gmlc-tdc/create-pr-action@v0.2
