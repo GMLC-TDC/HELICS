@@ -37,10 +37,11 @@ repos:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
-      - id: shellcheck
-      - id: shfmt
-        args: [-w]
       - id: script-must-have-extension
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.7.2.1
+    hooks:
+      - id: shellcheck
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.10
     hooks:
@@ -58,6 +59,12 @@ repos:
           ]
   - repo: local
     hooks:
+      - id: shfmt
+        name: shfmt
+        language: golang
+        additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.0]
+        entry: shfmt -w
+        types: [shell]
       - id: docker-clang-format
         name: Docker Clang Format
         language: docker_image
