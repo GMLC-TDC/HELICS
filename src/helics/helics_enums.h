@@ -153,7 +153,9 @@ typedef enum {
     /** specify that the log files should be flushed on every log message*/
     HELICS_FLAG_FORCE_LOGGING_FLUSH = 88,
     /** specify that a full log should be dumped into a file*/
-    HELICS_FLAG_DUMPLOG = 89
+    HELICS_FLAG_DUMPLOG = 89,
+    /** specify that helics should capture profiling data*/
+    HELICS_FLAG_PROFILING = 93
 } HelicsFlags;
 
 /** log level definitions

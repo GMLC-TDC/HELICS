@@ -28,6 +28,7 @@ class logger;
 namespace helics {
 class ForwardingTimeCoordinator;
 class helicsCLI11App;
+class ProfilerBuffer;
 /** base class for broker like objects
  */
 class BrokerBase {
@@ -130,6 +131,8 @@ class BrokerBase {
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
+    std::shared_ptr<ProfilerBuffer>
+        prBuff;  //!< buffer for profiling messages
   private:
     /** indicator that ticks should be forwarded to the command processor regardless */
     bool forwardTick{false};
