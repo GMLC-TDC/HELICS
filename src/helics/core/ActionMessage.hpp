@@ -179,7 +179,7 @@ class ActionMessage {
      */
     std::string packetize() const;
     void packetize(std::string& data) const;
-    /** covert to a byte vector using a reference*/
+    /** convert to a byte vector using a reference*/
     void to_vector(std::vector<char>& data) const;
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
