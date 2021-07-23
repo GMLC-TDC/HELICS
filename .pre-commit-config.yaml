@@ -1,4 +1,6 @@
 exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
+ci:
+  skip: [docker-clang-format]
 repos:
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.1
@@ -6,16 +8,16 @@ repos:
       - id: dockerfile_lint
         args: [--rulefile, ./config/Docker/docker_rules.yml, --dockerfile]
   - repo: https://github.com/psf/black
-    rev: 19.10b0
+    rev: 21.7b0
     hooks:
       - id: black
         args: ["--line-length=100"]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.7
+    rev: v1.1.10
     hooks:
       - id: remove-tabs
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.5.0
+    rev: v4.0.1
     hooks:
       - id: check-added-large-files
       - id: mixed-line-ending
@@ -37,17 +39,18 @@ repos:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
-      - id: shellcheck
-      - id: shfmt
-        args: [-w]
       - id: script-must-have-extension
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.7.2.1
+    hooks:
+      - id: shellcheck
   - repo: https://github.com/cheshirekow/cmake-format-precommit
-    rev: v0.6.10
+    rev: v0.6.13
     hooks:
       - id: cmake-format
         exclude: "cmake+"
   - repo: https://github.com/codespell-project/codespell
-    rev: v1.16.0
+    rev: v2.1.0
     hooks:
       - id: codespell
         args:
@@ -58,6 +61,12 @@ repos:
           ]
   - repo: local
     hooks:
+      - id: shfmt
+        name: shfmt
+        language: golang
+        additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.0]
+        entry: shfmt -w
+        types: [shell]
       - id: docker-clang-format
         name: Docker Clang Format
         language: docker_image
