@@ -255,7 +255,7 @@ static const std::map<std::string, int> option_value_map{
     {"3", 3},
     {"4", 4},
     // vector operation values
-    {"NONE", HELICS_MULTI_INPUT_NO_OP},
+    {"none", HELICS_MULTI_INPUT_NO_OP},
     {"no_op", HELICS_MULTI_INPUT_NO_OP},
     {"and", HELICS_MULTI_INPUT_AND_OPERATION},
     {"or", HELICS_MULTI_INPUT_OR_OPERATION},
@@ -267,7 +267,7 @@ static const std::map<std::string, int> option_value_map{
     {"vectorize", HELICS_MULTI_INPUT_VECTORIZE_OPERATION},
     {"diff", HELICS_MULTI_INPUT_DIFF_OPERATION}};
 
-static const std::map<std::string, int> log_level_map{{"NONE", HELICS_LOG_LEVEL_NO_PRINT},
+static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"error", HELICS_LOG_LEVEL_ERROR},
                                                       {"warning", HELICS_LOG_LEVEL_WARNING},
