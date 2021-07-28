@@ -265,7 +265,11 @@ TEST(profiling_tests, save_file)
     Fed->enterExecutingMode();
     Fed->finalize();
     helics::cleanupHelicsLibrary();
-    EXPECT_TRUE(ghc::filesystem::exists("save_profile.txt"));
+    if (!ghc::filesystem::exists("save_profile.txt")) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        helics::cleanupHelicsLibrary();
+    }
+    ASSERT_TRUE(ghc::filesystem::exists("save_profile.txt"));
 
     std::vector<std::string> mlog;
     std::ifstream in("save_profile.txt");
@@ -322,7 +326,11 @@ TEST(profiling_tests, broker_file_save)
     Fed->finalize();
 
     helics::cleanupHelicsLibrary();
-    EXPECT_TRUE(ghc::filesystem::exists("save_profile2.txt"));
+    if (!ghc::filesystem::exists("save_profile2.txt")) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        helics::cleanupHelicsLibrary();
+    }
+    ASSERT_TRUE(ghc::filesystem::exists("save_profile2.txt"));
 
     std::vector<std::string> mlog;
     std::ifstream in("save_profile2.txt");
