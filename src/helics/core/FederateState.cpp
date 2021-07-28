@@ -842,7 +842,6 @@ void FederateState::generateProfilingMarker()
         prof.payload = message;
         parent_->addActionMessage(std::move(prof));
     }
-    
 }
 
 void FederateState::generateProfilingMessage(bool enterHelicsCode)
@@ -851,7 +850,9 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     static constexpr std::string_view entry_string("ENTRY");
     static constexpr std::string_view exit_string("EXIT");
     std::string message = fmt::format(
-        "<PROFILING>{}[{}]({})HELICS CODE {}<{}></PROFILING>", name, global_id.load().baseValue(),
+        "<PROFILING>{}[{}]({})HELICS CODE {}<{}></PROFILING>",
+        name,
+        global_id.load().baseValue(),
         fedStateString(getState()),
         (enterHelicsCode ? entry_string : exit_string),
         std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count());
@@ -1447,8 +1448,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             slow_responding = value;
             break;
         case defs::Flags::PROFILING:
-            if (value && !mProfilerActive)
-            {
+            if (value && !mProfilerActive) {
                 generateProfilingMarker();
             }
             mProfilerActive = value;

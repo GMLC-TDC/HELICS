@@ -124,8 +124,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
     {"debugging", HELICS_FLAG_DEBUGGING},
     {"profiling", HELICS_FLAG_PROFILING},
-    {"local_profiling_capture",
-     HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
+    {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyupdateonchange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyUpdateOnChange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
@@ -277,7 +276,7 @@ static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_
                                                       {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
                                                       /** interfaces + timing message*/
                                                       {"timing", HELICS_LOG_LEVEL_TIMING},
-                                                      {"profiling", HELICS_LOG_LEVEL_WARNING-1},
+                                                      {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
                                                       /** timing+ data transfer notices*/
                                                       {"data", HELICS_LOG_LEVEL_DATA},
                                                       /** same as data for now*/

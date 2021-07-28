@@ -6,21 +6,21 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <vector>
 #include <string>
 #include <utility>
+#include <vector>
 
 namespace helics {
-    class ProfilerBuffer {
+class ProfilerBuffer {
   public:
-        ~ProfilerBuffer();
+    ~ProfilerBuffer();
     void addMessage(const std::string& data);
-        void addMessage(std::string&& data);
+    void addMessage(std::string&& data);
     void writeFile();
-        void setOutputFile(std::string fileName) { mFileName = std::move(fileName); }
+    void setOutputFile(std::string fileName) { mFileName = std::move(fileName); }
+
   private:
-        std::vector<std::string> mBuffers;
+    std::vector<std::string> mBuffers;
     std::string mFileName;
-        
-    };
-}
+};
+}  // namespace helics
