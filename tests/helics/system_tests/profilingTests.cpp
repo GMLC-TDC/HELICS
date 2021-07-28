@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
-#include "helics/core/CoreFactory.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "helics/external/filesystem.hpp"
@@ -16,15 +16,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
-#include <thread>
 #include <regex>
+#include <thread>
 
 /** these test cases test out user-directed logging functionality
  */
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
-TEST(profiling_tests, basic )
+TEST(profiling_tests, basic)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --profiler=log";
@@ -34,9 +34,11 @@ TEST(profiling_tests, basic )
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     auto cr = Fed->getCorePointer();
     cr->setLoggingCallback(helics::gLocalCoreId,
-        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
-            mlog.lock()->emplace_back(level, message);
-        });
+                           [&mlog](int level,
+                                   std::string_view /*unused*/,
+                                   std::string_view message) {
+                               mlog.lock()->emplace_back(level, message);
+                           });
 
     cr.reset();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
@@ -47,13 +49,13 @@ TEST(profiling_tests, basic )
     ASSERT_TRUE(!mlog.lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto &logM:mlog.lock()) {
-        if (logM.second.find("MARKER")!=std::string::npos) {
+    for (const auto& logM : mlog.lock()) {
+        if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
             std::smatch ml;
             std::regex ptime("<([^|>]*)></PROFILING>");
-            if (std::regex_search(logM.second,ml,ptime)) {
+            if (std::regex_search(logM.second, ml, ptime)) {
                 timeValues.push_back(std::stoll(ml[1]));
             }
         }
@@ -61,8 +63,8 @@ TEST(profiling_tests, basic )
     EXPECT_TRUE(hasMarker);
     std::int64_t current = 0LL;
     bool increasing{true};
-    for (auto st:timeValues) {
-        if (st<current) {
+    for (auto st : timeValues) {
+        if (st < current) {
             increasing = false;
         }
         current = st;
@@ -70,11 +72,11 @@ TEST(profiling_tests, basic )
     EXPECT_TRUE(increasing);
 }
 
-
 TEST(profiling_tests, broker_basic)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--brokerinitstring=\"--profiler=log --name=prbroker\" --autobroker --broker=prbroker";
+    fi.coreInitString =
+        "--brokerinitstring=\"--profiler=log --name=prbroker\" --autobroker --broker=prbroker";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -83,11 +85,9 @@ TEST(profiling_tests, broker_basic)
     EXPECT_TRUE(br);
 
     br->setLoggingCallback(
-                           [&mlog](int level,
-                                   std::string_view /*unused*/,
-                                   std::string_view message) {
-                               mlog.lock()->emplace_back(level, message);
-                           });
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
 
     br.reset();
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
@@ -121,12 +121,10 @@ TEST(profiling_tests, broker_basic)
     EXPECT_TRUE(increasing);
 }
 
-
 TEST(profiling_tests, broker_basic_no_flag)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString =
-        "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
+    fi.coreInitString = "--brokerinitstring=\"--name=prbroker2\" --autobroker --broker=prbroker2";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -170,7 +168,6 @@ TEST(profiling_tests, broker_basic_no_flag)
     EXPECT_TRUE(increasing);
 }
 
-
 TEST(profiling_tests, fed_capture)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -178,11 +175,10 @@ TEST(profiling_tests, fed_capture)
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
-    Fed->setLoggingCallback([&mlog](int level,
-                                   std::string_view /*unused*/,
-                                   std::string_view message) {
-                               mlog.lock()->emplace_back(level, message);
-                           });
+    Fed->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
     Fed->setFlagOption(helics::defs::LOCAL_PROFILING_CAPTURE);
     Fed->setFlagOption(helics::defs::PROFILING);
     Fed->enterExecutingMode();
@@ -214,7 +210,6 @@ TEST(profiling_tests, fed_capture)
     }
     EXPECT_TRUE(increasing);
 }
-
 
 TEST(profiling_tests, fed_capture2)
 {
@@ -260,7 +255,6 @@ TEST(profiling_tests, fed_capture2)
     EXPECT_TRUE(increasing);
 }
 
-
 TEST(profiling_tests, save_file)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -277,9 +271,9 @@ TEST(profiling_tests, save_file)
     std::ifstream in("save_profile.txt");
     // Check if object is valid
     ASSERT_TRUE(in) << "Cannot open save_profile.txt";
-    
+
     std::string str;
-    // Read the next line from File untill it reaches the end.
+    // Read the next line from File until it reaches the end.
     while (std::getline(in, str)) {
         // Line contains string of length > 0 then save it in vector
         if (!str.empty()) {
@@ -288,7 +282,6 @@ TEST(profiling_tests, save_file)
     }
     // Close The File
     in.close();
-
 
     ASSERT_TRUE(!mlog.empty());
     bool hasMarker{false};
@@ -317,7 +310,6 @@ TEST(profiling_tests, save_file)
     ghc::filesystem::remove("save_profile.txt");
 }
 
-
 TEST(profiling_tests, broker_file_save)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -326,7 +318,6 @@ TEST(profiling_tests, broker_file_save)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    
     Fed->enterExecutingMode();
     Fed->finalize();
 
@@ -339,7 +330,7 @@ TEST(profiling_tests, broker_file_save)
     ASSERT_TRUE(in) << "Cannot open save_profile2.txt";
 
     std::string str;
-    // Read the next line from File untill it reaches the end.
+    // Read the next line from File until it reaches the end.
     while (std::getline(in, str)) {
         // Line contains string of length > 0 then save it in vector
         if (!str.empty()) {

@@ -166,8 +166,7 @@ bool CommonCore::connect()
 bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
-    return ((currentState == BrokerState::operating) ||
-            (currentState == BrokerState::connected));
+    return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
 }
 
 const std::string& CommonCore::getAddress() const
@@ -340,8 +339,7 @@ bool CommonCore::isConfigured() const
 bool CommonCore::isOpenToNewFederates() const
 {
     auto cBrokerState = getBrokerState();
-    return ((cBrokerState != BrokerState::created) &&
-            (cBrokerState < BrokerState::operating) &&
+    return ((cBrokerState != BrokerState::created) && (cBrokerState < BrokerState::operating) &&
             (maxFederateCount == std::numeric_limits<int32_t>::max() ||
              (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
@@ -3298,7 +3296,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (allInitReady()) {
                     if (transitionBrokerState(BrokerState::connected,
                                               BrokerState::initializing)) {  // make sure we only
-                                                                                // do this once
+                                                                             // do this once
                         checkDependencies();
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
@@ -3339,11 +3337,10 @@ void CommonCore::processCommand(ActionMessage&& command)
 
             break;
         case CMD_PROFILER_DATA:
-            if (enable_profiling)
-            {
+            if (enable_profiling) {
                 saveProfilingData(command.payload.to_string());
             } else {
-                routeMessage(std::move(command),parent_broker_id);
+                routeMessage(std::move(command), parent_broker_id);
             }
             break;
         case CMD_SET_PROFILER_FLAG:
@@ -3930,7 +3927,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             if (isConnected()) {
                 if (getBrokerState() <
                     BrokerState::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
+                                                 // if we haven't done so already
                     setBrokerState(BrokerState::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
@@ -3958,7 +3955,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             if (isConnected()) {
                 if (getBrokerState() <
                     BrokerState::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
+                                                 // if we haven't done so already
                     setBrokerState(BrokerState::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);

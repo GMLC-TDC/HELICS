@@ -135,8 +135,8 @@ across different compilers*/
         cmd_core_tag = 220,  //!< command to update a tag on a core
         cmd_broker_tag = 222,  //!< command to update a tag on a broker
 
-        cmd_profiler_data=496, //!< command for profiler data
-        cmd_set_profiler_flag =498, //!< command to activate profiling
+        cmd_profiler_data = 496,  //!< command for profiler data
+        cmd_set_profiler_flag = 498,  //!< command to activate profiling
         cmd_update_filter_op =
             10427,  //!< command to update a filter op [should only used internal to a core]
         null_info_command =

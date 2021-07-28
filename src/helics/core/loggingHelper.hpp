@@ -20,7 +20,7 @@ using elsewhere is probably not going to work.
 enum LogLevels : int {
     NO_PRINT = HELICS_LOG_LEVEL_NO_PRINT,  //!< never print
     ERROR_LEVEL = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
-    PROFILING = HELICS_LOG_LEVEL_PROFILING, //!< profiling log level
+    PROFILING = HELICS_LOG_LEVEL_PROFILING,  //!< profiling log level
     WARNING = HELICS_LOG_LEVEL_WARNING,  //!< print/log warning and errors
     SUMMARY = HELICS_LOG_LEVEL_SUMMARY,  //!< print/log summary information
     CONNECTIONS =

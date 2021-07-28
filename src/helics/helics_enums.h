@@ -128,7 +128,8 @@ typedef enum {
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
     HELICS_FLAG_EVENT_TRIGGERED = 81,
-    /** specify that that federate should capture the profiling data to the local federate logging system*/
+    /** specify that that federate should capture the profiling data to the local federate logging
+       system*/
     HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
 } HelicsFederateFlags;
 
@@ -170,7 +171,7 @@ typedef enum {
     /** only print error level indicators*/
     HELICS_LOG_LEVEL_ERROR = 0,
     /** profiling log level*/
-    HELICS_LOG_LEVEL_PROFILING=2,
+    HELICS_LOG_LEVEL_PROFILING = 2,
     /** only print warnings and errors*/
     HELICS_LOG_LEVEL_WARNING = 3,
     /** warning errors and summary level information*/

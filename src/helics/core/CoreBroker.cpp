@@ -212,8 +212,7 @@ route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = getBrokerState();
-    return (cstate != BrokerState::created && cstate < BrokerState::operating &&
-            !haltOperations &&
+    return (cstate != BrokerState::created && cstate < BrokerState::operating && !haltOperations &&
             (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
              getCountableFederates() < maxFederateCount));
 }
@@ -344,7 +343,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                             global_fedid.baseValue(),
                                             route_id.baseValue()));
                 if (enable_profiling) {
-                    ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG, global_broker_id_local,global_fedid);
+                    ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG,
+                                                     global_broker_id_local,
+                                                     global_fedid);
                     setActionFlag(fedEnableProfiling, indicator_flag);
                     transmit(route_id, fedEnableProfiling);
                 }
@@ -557,7 +558,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 routing_table.emplace(fed->global_id, _federates.back().route);
                 // it also means we don't forward it
             }
-            
+
         } break;
         case CMD_BROKER_ACK: {  // we can't be root if we got one of these
             if (command.name() == identifier) {
@@ -1885,8 +1886,7 @@ bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CoreBroker::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if ((cBrokerState == BrokerState::terminating) ||
-        (cBrokerState == BrokerState::terminated)) {
+    if ((cBrokerState == BrokerState::terminating) || (cBrokerState == BrokerState::terminated)) {
         return;
     }
     if (cBrokerState > BrokerState::configured) {
@@ -2662,7 +2662,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
 {
     if (request == "isinit") {
         return (getBrokerState() >= BrokerState::operating) ? std::string("true") :
-                                                                 std::string("false");
+                                                              std::string("false");
     }
     if (request == "isconnected") {
         return (isConnected()) ? std::string("true") : std::string("false");

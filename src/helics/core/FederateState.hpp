@@ -72,7 +72,7 @@ class FederateState {
         false};  //!< flag indicating that inputs should have strict type checking
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     /// flag indicating that a federate is likely to be slow in responding
-    bool slow_responding{false}; 
+    bool slow_responding{false};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
@@ -82,7 +82,8 @@ class FederateState {
     bool wait_for_current_time{false};
     /// flag indicating that the profiler code should be activated
     bool mProfilerActive{false};
-    /// Flag indicating that the profiling should be captured in the federate log instead of forwarded
+    /// Flag indicating that the profiling should be captured in the federate log instead of
+    /// forwarded
     bool mLocalProfileCapture{false};
     int errorCode{0};  //!< storage for an error code
     CommonCore* parent_{nullptr};  //!< pointer to the higher level;
@@ -315,6 +316,7 @@ class FederateState {
     void generateProfilingMessage(bool enterHelicsCode);
     /** generate a timing marker message system time + steady time*/
     void generateProfilingMarker();
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }
