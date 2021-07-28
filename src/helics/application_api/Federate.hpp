@@ -242,7 +242,7 @@ class HELICS_CXX_EXPORT Federate {
     @details /ref requestTimeIterativeComplete should be called to finish the operation and get the
     result
     @param nextInternalTimeStep the next requested time step
-    @param iterate a requested iteration level (none, require, optional)
+    @param iterate a requested iteration level (NONE, require, optional)
     */
     void requestTimeIterativeAsync(Time nextInternalTimeStep, IterationRequest iterate);
 
@@ -426,7 +426,7 @@ class HELICS_CXX_EXPORT Federate {
  */
     std::pair<std::string, std::string> getCommand();
 
-    /** get a command for the Federate, if there is none the call will block until a command is
+    /** get a command for the Federate, if there is NONE the call will block until a command is
 received
 @return a pair of strings <command,source> with the command instructions for the federate
 */

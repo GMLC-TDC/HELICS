@@ -100,7 +100,7 @@ static const std::unordered_map<std::string, CoreType> coreTypes{
     {"nng", CoreType::NNG},
     {"null", CoreType::NULLCORE},
     {"nullcore", CoreType::NULLCORE},
-    {"none", CoreType::NULLCORE},
+    {"NONE", CoreType::NULLCORE},
     {"http", CoreType::HTTP},
     {"HTTP", CoreType::HTTP},
     {"web", CoreType::HTTP},

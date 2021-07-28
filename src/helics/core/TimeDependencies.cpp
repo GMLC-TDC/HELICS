@@ -191,7 +191,7 @@ void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep
             break;
         case ConnectionType::none:
         default:
-            output["connection"] = "none";
+            output["connection"] = "NONE";
             break;
     }
 }

@@ -96,7 +96,7 @@ class NetworkBrokerData {
 std::string makePortAddress(const std::string& networkInterface, int portNumber);
 
 /** extract a port number and interface string from an address number
-@details,  if there is no port number it default to -1 this is true if none was listed
+@details,  if there is no port number it default to -1 this is true if NONE was listed
 or the interface doesn't use port numbers
 
 @param address a string with an network location description i.e 127.0.0.1:34
@@ -105,7 +105,7 @@ or the interface doesn't use port numbers
 std::pair<std::string, int> extractInterfaceandPort(const std::string& address);
 
 /** extract a port number string and interface string from an address number
-@details,  if there is no port number it default to empty string this is true if none was listed
+@details,  if there is no port number it default to empty string this is true if NONE was listed
 or the interface doesn't use port numbers
 
 @param address a string with an network location description i.e 127.0.0.1:34

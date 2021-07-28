@@ -440,7 +440,7 @@ class Federate {
   @details /ref requestTimeIterativeComplete should be called to finish the operation and get the
   result
   @param time the next requested time step
-  @param iterate a requested iteration level (none, require, optional)
+  @param iterate a requested iteration level (NONE, require, optional)
   */
     void requestTimeIterativeAsync(HelicsTime time, HelicsIterationRequest iterate)
     {

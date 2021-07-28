@@ -29,7 +29,7 @@ void TimeoutMonitor::tick(CommonCore* core)
                                message);
             core->sendErrorToFederates(-5, message);
             core->processDisconnect();
-            core->brokerState = BrokerBase::broker_state_t::errored;
+            core->brokerState = BrokerBase::BrokerState::errored;
             core->addActionMessage(CMD_STOP);
         } else {  // ping again
             ActionMessage png(CMD_PING_PRIORITY);
@@ -56,8 +56,8 @@ void TimeoutMonitor::tick(CommonCore* core)
         ActionMessage rsend(CMD_RESEND);
         rsend.messageID = static_cast<int32_t>(CMD_REG_BROKER);
         core->processCommand(std::move(rsend));
-    } else if ((core->brokerState == BrokerBase::broker_state_t::terminated) ||
-               (core->brokerState == BrokerBase::broker_state_t::errored)) {
+    } else if ((core->brokerState == BrokerBase::BrokerState::terminated) ||
+               (core->brokerState == BrokerBase::BrokerState::errored)) {
         if (waitingForConnection) {
             auto now = std::chrono::steady_clock::now();
             if (now - startWaiting > timeout) {
@@ -101,7 +101,7 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                               "broker lost connection with parent");
             brk->sendErrorToImmediateBrokers(-5);
             brk->processDisconnect();
-            brk->brokerState = BrokerBase::broker_state_t::errored;
+            brk->brokerState = BrokerBase::BrokerState::errored;
             brk->addActionMessage(CMD_STOP);
         } else {  // ping again
             ActionMessage png(CMD_PING_PRIORITY);
@@ -142,8 +142,8 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                     parentConnection.waitingForPingReply = true;
                 }
                 //}
-            } else if ((brk->brokerState == BrokerBase::broker_state_t::terminated) ||
-                       (brk->brokerState == BrokerBase::broker_state_t::errored)) {
+            } else if ((brk->brokerState == BrokerBase::BrokerState::terminated) ||
+                       (brk->brokerState == BrokerBase::BrokerState::errored)) {
                 if (waitingForConnection) {
                     if (now - startWaiting > timeout) {
                         ActionMessage png(CMD_CHECK_CONNECTIONS);
