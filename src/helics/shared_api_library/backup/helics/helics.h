@@ -362,10 +362,7 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum {
-    HELICS_SEQUENCING_MODE_FAST = 0,
-    HELICS_SEQUENCING_MODE_ORDERED = 1
-} HelicsSequencingModes;
+typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
 
 /**
  * @file

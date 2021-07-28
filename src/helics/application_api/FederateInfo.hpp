@@ -25,12 +25,13 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
         false};  //!< specify that the core should generate a broker if not found otherwise
     /** specify that the core/federate should operate in a user debugging
     mode which will turn off some timeouts*/
-    bool debugging{false}; 
+    bool debugging{false};
     CoreType coreType{CoreType::DEFAULT};  //!< the type of the core
     int brokerPort{-1};  //!< broker port information
 
     bool forceNewCore{false};  //!< indicator that the federate should not use an existing core
-    /** specify that the federate and associated core should enable profiling to the specified file*/
+    /** specify that the federate and associated core should enable profiling to the specified
+     * file*/
     std::string profilerFileName;
 
     std::string defName;  //!< a default name to use for a federate

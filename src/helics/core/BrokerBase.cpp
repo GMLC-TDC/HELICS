@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
+#include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -18,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
-#include "ProfilerBuffer.hpp"
 #if !defined(WIN32)
 #    include "spdlog/sinks/syslog_sink.h"
 #endif
@@ -161,7 +161,8 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
 
     // add the profiling setup command
-    hApp->add_option_function<std::string>("--profiler",
+    hApp->add_option_function<std::string>(
+        "--profiler",
         [this](const std::string& fileName) {
             if (!fileName.empty()) {
                 if (fileName == "log") {
@@ -174,12 +175,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                     }
                     prBuff->setOutputFile(fileName);
                 }
-                
+
                 enable_profiling = true;
             } else {
                 enable_profiling = false;
             }
-
         },
         "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system");
 
@@ -465,14 +465,11 @@ void BrokerBase::saveProfilingData(std::string_view message)
     if (prBuff) {
         prBuff->addMessage(std::string(message));
     } else {
-        sendToLogger(parent_broker_id,
-                     LogLevels::PROFILING,
-                     "[PROFILING]",
-                     message);
+        sendToLogger(parent_broker_id, LogLevels::PROFILING, "[PROFILING]", message);
     }
 }
 
-    void BrokerBase::setErrorState(int eCode, std::string_view estring)
+void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
     lastErrorString = std::string(estring);
     lastErrorCode.store(eCode);
