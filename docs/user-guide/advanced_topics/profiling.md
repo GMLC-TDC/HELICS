@@ -54,19 +54,19 @@ this will pass in the appropriate flags to all children federates.
 
 Profiling on a federate will recognize the same flags as a core, and pass them as appropriate to the core.  However a federate also supports passing the flags and a few additional ones into the federate itself.  
 
-```
+```c
 helicsFederateSetFlagOption(fed,HELICS_FLAG_PROFILING, HELICS_TRUE, &err);
 ```
 
 can directly enable the profiling.  If nothing else is set this will end up generating a message in the log of the root broker.
 
-```
+```c
 helicsFederateSetFlagOption(fed,HELICS_FLAG_PROFILING_MARKER, HELICS_TRUE, &err);
 ```
 
 can generate an additional marker message is logging is enabled.
 
-```
+```c
 helicsFederateSetFlagOption(fed,HELICS_FLAG_LOCAL_PROFILING_CAPTURE, HELICS_TRUE, &err);
 ```
 
