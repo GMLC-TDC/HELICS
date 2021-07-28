@@ -31,7 +31,7 @@ body {
 
 a {
   color: #0645ad;
-  text-decoration: NONE;
+  text-decoration: none;
 }
 
 a:visited {
@@ -154,7 +154,7 @@ dfn {
 ins {
   background: #ff9;
   color: #000;
-  text-decoration: NONE;
+  text-decoration: none;
 }
 
 mark {
@@ -222,7 +222,7 @@ figure {
 }
 
 figure img {
-  border: NONE;
+  border: none;
   margin: 0 auto;
 }
 
@@ -273,8 +273,8 @@ table td {
   * {
     background: transparent !important;
     color: black !important;
-    filter: NONE !important;
-    -ms-filter: NONE !important;
+    filter: none !important;
+    -ms-filter: none !important;
   }
 
   body {
