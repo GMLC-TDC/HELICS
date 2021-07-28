@@ -1239,8 +1239,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             } else {
                 if (isRootc) {
                     saveProfilingData(command.payload.to_string());
-                }
-                else {
+                } else {
                     routeMessage(std::move(command), parent_broker_id);
                 }
             }

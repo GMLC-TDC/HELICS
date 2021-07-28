@@ -3342,8 +3342,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (enable_profiling)
             {
                 saveProfilingData(command.payload.to_string());
-            }
-            else {
+            } else {
                 routeMessage(std::move(command),parent_broker_id);
             }
             break;

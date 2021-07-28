@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include <fstream>
+#include <cstring>
 
 #include "ProfilerBuffer.hpp"
 namespace helics {

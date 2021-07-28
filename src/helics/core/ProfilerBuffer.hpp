@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <vector>
 #include <string>
+#include <utility>
 
 namespace helics {
     class ProfilerBuffer {
