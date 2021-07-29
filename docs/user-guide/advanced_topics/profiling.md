@@ -18,7 +18,7 @@ There are 3 messages which may be observed
 The messages all start and end with <PROFILING> and </PROFILING> to make an xml-like tag.
 The message format is `FederateName[FederateID](federateState)MESSAGE<timestamp>`
 
-The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or 	`error`.
+The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or `error`.
 
 The three possible `MESSAGE` values are:
 
