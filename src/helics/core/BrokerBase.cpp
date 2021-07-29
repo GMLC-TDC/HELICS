@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
+#include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -158,6 +159,30 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+
+    // add the profiling setup command
+    hApp->add_option_function<std::string>(
+        "--profiler",
+        [this](const std::string& fileName) {
+            if (!fileName.empty()) {
+                if (fileName == "log") {
+                    if (prBuff) {
+                        prBuff.reset();
+                    }
+                } else {
+                    if (!prBuff) {
+                        prBuff = std::make_shared<ProfilerBuffer>();
+                    }
+                    prBuff->setOutputFile(fileName);
+                }
+
+                enable_profiling = true;
+            } else {
+                enable_profiling = false;
+            }
+        },
+        "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system");
+
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
@@ -328,25 +353,28 @@ void BrokerBase::configureBase()
 
     mainLoopIsRunning.store(true);
     queueProcessingThread = std::thread(&BrokerBase::queueProcessingLoop, this);
-    brokerState = broker_state_t::configured;
+    brokerState = BrokerState::configured;
 }
 
 static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
 {
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_TRACE || helicsLogLevel == -10) {
+    if (helicsLogLevel >= LogLevels::TRACE || helicsLogLevel == -10) {
         // dumplog == -10
         return spdlog::level::trace;
     }
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_TIMING) {
+    if (helicsLogLevel >= LogLevels::TIMING) {
         return spdlog::level::debug;
     }
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {
+    if (helicsLogLevel >= LogLevels::SUMMARY) {
         return spdlog::level::info;
     }
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_WARNING) {
+    if (helicsLogLevel >= LogLevels::WARNING) {
         return spdlog::level::warn;
     }
-    if (helicsLogLevel >= HELICS_LOG_LEVEL_ERROR) {
+    if (helicsLogLevel == LogLevels::PROFILING) {
+        return spdlog::level::info;
+    }
+    if (helicsLogLevel >= LogLevels::ERROR_LEVEL) {
         return spdlog::level::err;
     }
     return spdlog::level::critical;
@@ -432,12 +460,21 @@ void BrokerBase::generateNewIdentifier()
     uuid_like = false;
 }
 
+void BrokerBase::saveProfilingData(std::string_view message)
+{
+    if (prBuff) {
+        prBuff->addMessage(std::string(message));
+    } else {
+        sendToLogger(parent_broker_id, LogLevels::PROFILING, "[PROFILING]", message);
+    }
+}
+
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
     lastErrorString = std::string(estring);
     lastErrorCode.store(eCode);
-    if (brokerState.load() != broker_state_t::errored) {
-        brokerState.store(broker_state_t::errored);
+    if (brokerState.load() != BrokerState::errored) {
+        brokerState.store(BrokerState::errored);
         if (errorDelay <= timeZero) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
@@ -686,7 +723,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == broker_state_t::errored) {
+                if (brokerState.load() == BrokerState::errored) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -712,7 +749,7 @@ void BrokerBase::queueProcessingLoop()
 #ifndef DISABLE_TICK
                 if (messagesSinceLastTick == 0) {
                     command.messageID =
-                        forwardingReasons | static_cast<uint32_t>(TickForwardingReasons::no_comms);
+                        forwardingReasons | static_cast<uint32_t>(TickForwardingReasons::NO_COMMS);
                     processCommand(std::move(command));
                 } else if (forwardTick) {
                     command.messageID = forwardingReasons;
@@ -729,7 +766,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == broker_state_t::errored) {
+                if (brokerState.load() == BrokerState::errored) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td > errorDelay.to_ms()) {
@@ -812,16 +849,16 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
     forwardTick = (forwardingReasons != 0);
 }
 
-bool BrokerBase::setBrokerState(broker_state_t newState)
+bool BrokerBase::setBrokerState(BrokerState newState)
 {
-    if (brokerState.load() == broker_state_t::errored) {
+    if (brokerState.load() == BrokerState::errored) {
         return false;
     }
     brokerState.store(newState);
     return true;
 }
 
-bool BrokerBase::transitionBrokerState(broker_state_t expectedState, broker_state_t newState)
+bool BrokerBase::transitionBrokerState(BrokerState expectedState, BrokerState newState)
 {
     return brokerState.compare_exchange_strong(expectedState, newState);
 }
@@ -882,7 +919,7 @@ action_message_def::action_t BrokerBase::commandProcessor(ActionMessage& command
 }
 
 // LCOV_EXCL_START
-const std::string& brokerStateName(BrokerBase::broker_state_t state)
+const std::string& brokerStateName(BrokerBase::BrokerState state)
 {
     static const std::string createdString = "created";
     static const std::string configuringString = "configuring";
@@ -896,25 +933,25 @@ const std::string& brokerStateName(BrokerBase::broker_state_t state)
     static const std::string erroredString = "error";
     static const std::string otherString = "other";
     switch (state) {
-        case BrokerBase::broker_state_t::created:
+        case BrokerBase::BrokerState::created:
             return createdString;
-        case BrokerBase::broker_state_t::configuring:
+        case BrokerBase::BrokerState::configuring:
             return configuringString;
-        case BrokerBase::broker_state_t::configured:
+        case BrokerBase::BrokerState::configured:
             return configuredString;
-        case BrokerBase::broker_state_t::connecting:
+        case BrokerBase::BrokerState::connecting:
             return connectingString;
-        case BrokerBase::broker_state_t::connected:
+        case BrokerBase::BrokerState::connected:
             return connectedString;
-        case BrokerBase::broker_state_t::initializing:
+        case BrokerBase::BrokerState::initializing:
             return initializingString;
-        case BrokerBase::broker_state_t::operating:
+        case BrokerBase::BrokerState::operating:
             return operatingString;
-        case BrokerBase::broker_state_t::terminating:
+        case BrokerBase::BrokerState::terminating:
             return terminatingString;
-        case BrokerBase::broker_state_t::terminated:
+        case BrokerBase::BrokerState::terminated:
             return terminatedString;
-        case BrokerBase::broker_state_t::errored:
+        case BrokerBase::BrokerState::errored:
             return erroredString;
         default:
             return otherString;

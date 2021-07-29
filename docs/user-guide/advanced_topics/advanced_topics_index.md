@@ -17,6 +17,7 @@
     orchestration
     orchestration_monte_carlo
     program_termination
+    profiling
 
 ```
 
@@ -44,3 +45,4 @@ The Advanced Topics will cover:
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system
 - [**Orchestration Tool (Merlin)**](./orchestration.md) Brief guide on using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
 - [**Program termination**](./program_termination.md) - Some additional features in HELICS related to program shutdown and co-simulation termination.
+- [**Profiling**](./profiling.md) - Some profiling capability for co-simulations.

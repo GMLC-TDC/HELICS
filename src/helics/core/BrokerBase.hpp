@@ -28,6 +28,7 @@ class logger;
 namespace helics {
 class ForwardingTimeCoordinator;
 class helicsCLI11App;
+class ProfilerBuffer;
 /** base class for broker like objects
  */
 class BrokerBase {
@@ -98,7 +99,7 @@ class BrokerBase {
     // std::unique_ptr<TimeCoordinator> filterTimeCoord;
     // global_federate_id filterFedID;
     /** enumeration of the possible core states*/
-    enum class broker_state_t : int16_t {
+    enum class BrokerState : int16_t {
         created = -6,  //!< the broker has been created
         configuring = -5,  //!< the broker is in the processing of configuring
         configured = -4,  //!< the broker itself has been configured and is ready to connect
@@ -112,10 +113,10 @@ class BrokerBase {
     };
 
     enum class TickForwardingReasons : uint32_t {
-        none = 0,
-        no_comms = 0x01,
-        ping_response = 0x02,
-        query_timeout = 0x04
+        NONE = 0,
+        NO_COMMS = 0x01,
+        PING_RESPONSE = 0x02,
+        QUERY_TIMEOUT = 0x04
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
@@ -126,17 +127,21 @@ class BrokerBase {
 
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
     bool uuid_like{false};  //!< will be set to true if the name looks like a uuid
+    bool enable_profiling{false};  //!< indicator that profiling is enabled
     decltype(std::chrono::steady_clock::now())
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
+    /// buffer for profiling messages
+    std::shared_ptr<ProfilerBuffer> prBuff;
+
     /** indicator that ticks should be forwarded to the command processor regardless */
     bool forwardTick{false};
     /** reasons ticks might be forwarded*/
     uint32_t forwardingReasons{0U};
     /** storage for the current state of the system */
-    std::atomic<broker_state_t> brokerState{broker_state_t::created};
+    std::atomic<BrokerState> brokerState{BrokerState::created};
 
   public:
     explicit BrokerBase(bool DisableQueue = false) noexcept;
@@ -208,9 +213,9 @@ class BrokerBase {
     }
     /** set tick forwarding for a specific reason*/
     void setTickForwarding(TickForwardingReasons reason, bool value = true);
-    broker_state_t getBrokerState() const { return brokerState.load(); }
-    bool setBrokerState(broker_state_t newState);
-    bool transitionBrokerState(broker_state_t expectedState, broker_state_t newState);
+    BrokerState getBrokerState() const { return brokerState.load(); }
+    bool setBrokerState(BrokerState newState);
+    bool transitionBrokerState(BrokerState expectedState, BrokerState newState);
     /** process a disconnect signal*/
     virtual void processDisconnect(bool skipUnregister = false) = 0;
     /** in the case of connection failure with a broker this function will try a reconnect procedure
@@ -233,7 +238,8 @@ class BrokerBase {
                               int logLevel,
                               std::string_view name,
                               std::string_view message) const;
-
+    /** save a profiling message*/
+    void saveProfilingData(std::string_view message);
     /** generate a new random id*/
     void generateNewIdentifier();
     /** generate the local address information*/
@@ -260,11 +266,11 @@ class BrokerBase {
         return messageCounter.load(std::memory_order_acquire);
     }
     friend class TimeoutMonitor;
-    friend const std::string& brokerStateName(broker_state_t state);
+    friend const std::string& brokerStateName(BrokerState state);
 };
 
 /** helper function to generate the name of a state as a string
  */
-const std::string& brokerStateName(BrokerBase::broker_state_t state);
+const std::string& brokerStateName(BrokerBase::BrokerState state);
 
 }  // namespace helics

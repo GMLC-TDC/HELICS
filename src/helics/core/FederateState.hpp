@@ -71,15 +71,20 @@ class FederateState {
     bool strict_input_type_checking{
         false};  //!< flag indicating that inputs should have strict type checking
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
-    bool slow_responding{
-        false};  //!< flag indicating that a federate is likely to be slow in responding
+    /// flag indicating that a federate is likely to be slow in responding
+    bool slow_responding{false};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
 
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
-    bool wait_for_current_time{
-        false};  //!< flag indicating that the federate should delay for the current time
+    /// flag indicating that the federate should delay for the current time
+    bool wait_for_current_time{false};
+    /// flag indicating that the profiler code should be activated
+    bool mProfilerActive{false};
+    /// Flag indicating that the profiling should be captured in the federate log instead of
+    /// forwarded
+    bool mLocalProfileCapture{false};
     int errorCode{0};  //!< storage for an error code
     CommonCore* parent_{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
@@ -305,6 +310,12 @@ class FederateState {
     int checkInterfaces();
     /** generate results from a query*/
     std::string processQueryActual(std::string_view query) const;
+    /** generate a federate profiling message
+    @param enterHelicsCode set to true when entering HELICS code section,
+    false when exiting*/
+    void generateProfilingMessage(bool enterHelicsCode);
+    /** generate a timing marker message system time + steady time*/
+    void generateProfilingMarker();
 
   public:
     /** get the granted time of a federate*/
