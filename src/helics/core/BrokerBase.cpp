@@ -162,24 +162,24 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 
     // add the profiling setup command
     hApp->add_option_function<std::string>(
-        "--profiler",
-        [this](const std::string& fileName) {
-            if (!fileName.empty()) {
+            "--profiler",
+            [this](const std::string& fileName) {
+                if (!fileName.empty()) {
                     if (fileName == "log" || fileName == "true") {
-                    if (prBuff) {
-                        prBuff.reset();
+                        if (prBuff) {
+                            prBuff.reset();
+                        }
+                    } else {
+                        if (!prBuff) {
+                            prBuff = std::make_shared<ProfilerBuffer>();
+                        }
+                        prBuff->setOutputFile(fileName);
                     }
-                } else {
-                    if (!prBuff) {
-                        prBuff = std::make_shared<ProfilerBuffer>();
-                    }
-                    prBuff->setOutputFile(fileName);
-                }
 
-                enable_profiling = true;
-            } else {
-                enable_profiling = false;
-            }
+                    enable_profiling = true;
+                } else {
+                    enable_profiling = false;
+                }
             },
             "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
         ->expected(0, 1)
@@ -471,7 +471,8 @@ void BrokerBase::saveProfilingData(std::string_view message)
     }
 }
 
-void BrokerBase::writeProfilingData() {
+void BrokerBase::writeProfilingData()
+{
     if (prBuff) {
         try {
             prBuff->writeFile();
