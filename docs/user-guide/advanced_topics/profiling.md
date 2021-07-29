@@ -15,42 +15,42 @@ There are 3 messages which may be observed
 <PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500></PROFILING>
 ```
 
-The messages all start and end with <PROFILING> and </PROFILING> to make an xml like tag.
-the message format is `FederateName[FederateID](federateState)MESSAGE<timestamp>`
+The messages all start and end with <PROFILING> and </PROFILING> to make an xml-like tag.
+The message format is `FederateName[FederateID](federateState)MESSAGE<timestamp>`
 
-the federate state is one of created, initializing, executing, terminating, terminated, error
+The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or 	`error`.
 
-The three possible `MESSAGE` values are: , , and
+The three possible `MESSAGE` values are:
 
 - `MARKER` : A time stamp matching the local system up time value with a global time timestamp.
 - `HELICS CODE ENTRY` : Indicator that the executing code is entering a HELICS controlled loop
 - `HELICS CODE EXIT` : Indicator that the executing code is returning control back to the federate.
 
-The timestamp values are an integer count of nanoseconds. for all 3 message types they are a system uptime which is monotonically non-decreasing and steady. But this is going to be different on every system. Therefore there is a marker that gets triggered when the profiling is activated. This matches a system up time, with the global system time. The ability to match these across multiple machines will depend on the time synchronization of those machines with each other. No effort is made in HELICS to do that or even measure it.
+The timestamp values are an integer count of nanoseconds. For all 3 message types they refer to the system up-time which is monotonically non-decreasing and steady. This value will differ from each computer on which federates are running, though. To calibrate for this there is a marker that gets triggered when the profiling is activated, indicating the local up-time that is synchronous across compute nodes. This matches a system up-time, with the global system time. The ability to match these across multiple machines will depend on the latency associated with time synchronization across the utilized compute nodes. No effort is made in HELICS to do remove this latency or even measure it; that is, though the marker time is measured in nanoseconds it could easily differ by microseconds or even milliseconds depending on the networking conditions between the compute nodes.
 
 ## Enabling profiling
 
-profiling can be enabled at any level of the hierarchy in HELICS. And this will automatically enable profiling on all the children of that object.
+Profiling can be enabled at any level of the hierarchy in HELICS and when enabled it will automatically enable profiling on all the children of that object. For example, if profiling is enabled on a broker, all associated cores will enable profiling and all federates associated with those cores will also have profiling enabled. This propagation will also apply to any child brokers and their associated cores and federates.
 
 ### Broker profiling
 
-Profiling is enabled via the command prompt by passing the `--profiler` option.
+Profiling is enabled via the command prompt by passing the `--profiler` option when calling `helics_broker`.
 
 - `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
-this will pass in the appropriate flags to all children brokers and cores.
+Enabling this flag will pass in the appropriate flags to all children brokers and cores.
 
 ### Core profiling
 
-Profiling is enabled via the command prompt by passing the `--profiler` option.
+Profiling is enabled via the `coreinitstring` by adding a `--profiler` option.
 
 - `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
-this will pass in the appropriate flags to all children federates.
+Enabling this flag will pass in the appropriate flags to all children federates.
 
 ### Federate profiling
 
@@ -66,17 +66,16 @@ can directly enable the profiling. If nothing else is set this will end up gener
 helicsFederateSetFlagOption(fed,HELICS_FLAG_PROFILING_MARKER, HELICS_TRUE, &err);
 ```
 
-can generate an additional marker message is logging is enabled.
+can generate an additional marker message if logging is enabled.
 
 ```c
 helicsFederateSetFlagOption(fed,HELICS_FLAG_LOCAL_PROFILING_CAPTURE, HELICS_TRUE, &err);
 ```
 
-will capture the profiling messages for the federate in the federate log instead of forwarding them to the core or broker.
+Capturea the profiling messages for the federate in the federate log instead of forwarding them to the core or broker.
 
 Some can be set through the flags option for federate configuration.
-`--flags=profiling,local_profiling_capture` can be set through command line or configuration files.
-the profiling marker doesn't make sense anywhere but through the program call.
+`--flags=profiling,local_profiling_capture` can be set through command line or configuration files. The profiling marker doesn't make sense anywhere but through the program call.
 
 ## Notes
 
