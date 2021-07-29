@@ -839,9 +839,11 @@ void FederateState::generateProfilingMarker()
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
     } else {
-        ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
-        prof.payload = message;
-        parent_->addActionMessage(std::move(prof));
+        if (parent_!=nullptr) {
+            ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
+            prof.payload = message;
+            parent_->addActionMessage(std::move(prof));
+        }
     }
 }
 
@@ -861,9 +863,12 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
     } else {
-        ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
-        prof.payload = message;
-        parent_->addActionMessage(std::move(prof));
+        if (parent_) {
+            ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
+            prof.payload = message;
+            parent_->addActionMessage(std::move(prof));
+        }
+        
     }
 }
 

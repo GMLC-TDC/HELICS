@@ -165,7 +165,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--profiler",
         [this](const std::string& fileName) {
             if (!fileName.empty()) {
-                if (fileName == "log") {
+                    if (fileName == "log" || fileName == "true") {
                     if (prBuff) {
                         prBuff.reset();
                     }

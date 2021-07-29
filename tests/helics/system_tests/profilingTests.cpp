@@ -374,3 +374,96 @@ TEST(profiling_tests, broker_file_save)
     EXPECT_TRUE(increasing);
     ghc::filesystem::remove("save_profile2.txt");
 }
+
+
+TEST(profiling_tests, config)
+{
+
+    auto fi=helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config.json");
+    
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    auto cr = Fed->getCorePointer();
+    cr->setLoggingCallback(helics::gLocalCoreId,
+                           [&mlog](int level,
+                                   std::string_view /*unused*/,
+                                   std::string_view message) {
+                               mlog.lock()->emplace_back(level, message);
+                           });
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    cr.reset();
+    Fed->setFlagOption(helics::defs::PROFILING_MARKER);
+    Fed->enterExecutingMode();
+    Fed->setFlagOption(helics::defs::PROFILING_MARKER);
+    Fed->finalize();
+
+    ASSERT_TRUE(!mlog.lock()->empty());
+    bool hasMarker{false};
+    std::vector<std::int64_t> timeValues;
+    for (const auto& logM : mlog.lock()) {
+        if (logM.second.find("MARKER") != std::string::npos) {
+            hasMarker = true;
+        } else if (logM.second.find("<PROFILING>") != std::string::npos) {
+            std::smatch ml;
+            std::regex ptime("<([^|>]*)></PROFILING>");
+            if (std::regex_search(logM.second, ml, ptime)) {
+                timeValues.push_back(std::stoll(ml[1]));
+            }
+        }
+    }
+    EXPECT_TRUE(hasMarker);
+    std::int64_t current = 0LL;
+    bool increasing{true};
+    for (auto st : timeValues) {
+        if (st < current) {
+            increasing = false;
+        }
+        current = st;
+    }
+    EXPECT_TRUE(increasing);
+}
+
+
+TEST(profiling_tests, config2)
+{
+    auto fi = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config2.json");
+    
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+    Fed->setFlagOption(helics::defs::PROFILING_MARKER);
+    Fed->enterExecutingMode();
+    Fed->setFlagOption(helics::defs::PROFILING_MARKER);
+    Fed->finalize();
+
+    ASSERT_TRUE(!mlog.lock()->empty());
+    bool hasMarker{false};
+    std::vector<std::int64_t> timeValues;
+    for (const auto& logM : mlog.lock()) {
+        if (logM.second.find("MARKER") != std::string::npos) {
+            hasMarker = true;
+        } else if (logM.second.find("<PROFILING>") != std::string::npos) {
+            std::smatch ml;
+            std::regex ptime("<([^|>]*)></PROFILING>");
+            if (std::regex_search(logM.second, ml, ptime)) {
+                timeValues.push_back(std::stoll(ml[1]));
+            }
+        }
+    }
+    EXPECT_TRUE(hasMarker);
+    std::int64_t current = 0LL;
+    bool increasing{true};
+    for (auto st : timeValues) {
+        if (st < current) {
+            increasing = false;
+        }
+        current = st;
+    }
+    EXPECT_TRUE(increasing);
+}
