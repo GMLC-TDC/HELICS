@@ -8,14 +8,14 @@ The profiling output can be either in the other log files or a separate file, an
 There are 3 messages which may be observed:
 
 ```txt
-<PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800>[[t=-9223372036.854776]</PROFILING>
+<PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800>[t=-9223372036.854776]</PROFILING>
 <PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500>[t=-1000000]<</PROFILING>
 <PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300>[t=0]<</PROFILING>
 <PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500>[t=0]<</PROFILING>
 ```
 
 The messages all start and end with <PROFILING> and </PROFILING> to make an xml-like tag.
-The message format is `FederateName[FederateID](federateState)MESSAGE[simulation time]<wall-clock time>`
+The message format is `FederateName[FederateID](federateState)MESSAGE[simulation time]<time>`
 
 The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or `error`.
 
@@ -24,6 +24,8 @@ The three possible `MESSAGE` values are:
 - `MARKER` : A time stamp matching the local system up time value with a global time timestamp.
 - `HELICS CODE ENTRY` : Indicator that the executing code is entering a HELICS controlled loop
 - `HELICS CODE EXIT` : Indicator that the executing code is returning control back to the federate.
+
+For `HELICS CODE ENTRY` and `HELICS CODE EXIT` messages the time is a steady clock time usually the time the system on which the federate is running has been up.  The `MARKER` messages have two time stamps for global coordination.  <steady clock time| system time>. The system time is the wall clock time as available by the system.  Which is usually with reference to Jan 1, 1970 and in GMT.
 
 The timestamp values are an integer count of nanoseconds. For all 3 message types they refer to the system up-time which is monotonically non-decreasing and steady. This value will differ from each computer on which federates are running, though. To calibrate for this there is a marker that gets triggered when the profiling is activated, indicating the local up-time that is synchronous across compute nodes. This matches a system up-time, with the global system time. The ability to match these across multiple machines will depend on the latency associated with time synchronization across the utilized compute nodes. No effort is made in HELICS to do remove this latency or even measure it; that is, though the marker time is measured in nanoseconds it could easily differ by microseconds or even milliseconds depending on the networking conditions between the compute nodes.
 
