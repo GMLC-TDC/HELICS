@@ -828,12 +828,13 @@ void FederateState::generateProfilingMarker()
     auto ctime = std::chrono::steady_clock::now();
     auto gtime = std::chrono::system_clock::now();
     std::string message = fmt::format(
-        "<PROFILING>{}[{}]({})MARKER<{}|{}></PROFILING>",
+        "<PROFILING>{}[{}]({})MARKER<{}|{}>[t={}]</PROFILING>",
         name,
         global_id.load().baseValue(),
         fedStateString(getState()),
         std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count(),
-        std::chrono::duration_cast<std::chrono::nanoseconds>(gtime.time_since_epoch()).count());
+        std::chrono::duration_cast<std::chrono::nanoseconds>(gtime.time_since_epoch()).count(),
+        static_cast<double>(time_granted));
 
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
@@ -850,12 +851,13 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     static constexpr std::string_view entry_string("ENTRY");
     static constexpr std::string_view exit_string("EXIT");
     std::string message = fmt::format(
-        "<PROFILING>{}[{}]({})HELICS CODE {}<{}></PROFILING>",
+        "<PROFILING>{}[{}]({})HELICS CODE {}<{}>[t={}]</PROFILING>",
         name,
         global_id.load().baseValue(),
         fedStateString(getState()),
         (enterHelicsCode ? entry_string : exit_string),
-        std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count());
+        std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count(),
+        static_cast<double>(time_granted));
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
     } else {

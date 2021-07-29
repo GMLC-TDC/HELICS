@@ -180,8 +180,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             } else {
                 enable_profiling = false;
             }
-        },
-        "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system");
+            },
+            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
+        ->expected(0, 1)
+        ->default_str("log");
 
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
