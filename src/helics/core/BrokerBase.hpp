@@ -240,6 +240,8 @@ class BrokerBase {
                               std::string_view message) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
+    /** write profiler data to file*/
+    void writeProfilingData();
     /** generate a new random id*/
     void generateNewIdentifier();
     /** generate the local address information*/

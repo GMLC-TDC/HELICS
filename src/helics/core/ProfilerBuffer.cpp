@@ -24,7 +24,10 @@ void ProfilerBuffer::addMessage(std::string&& data)
 ProfilerBuffer::~ProfilerBuffer()
 {
     try {
-        writeFile();
+        if (!mBuffers.empty()) {
+            writeFile();
+        }
+        
     }
     catch (const std::ios_base::failure&) {
     }

@@ -469,6 +469,16 @@ void BrokerBase::saveProfilingData(std::string_view message)
     }
 }
 
+void BrokerBase::writeProfilingData() {
+    if (prBuff) {
+        try {
+            prBuff->writeFile();
+        }
+        catch (const std::ios_base::failure&) {
+        }
+    }
+}
+
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
     lastErrorString = std::string(estring);
