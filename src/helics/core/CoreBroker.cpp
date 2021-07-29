@@ -760,7 +760,6 @@ void CoreBroker::sendDisconnect()
     if (enable_profiling) {
         writeProfilingData();
     }
-   
 }
 
 void CoreBroker::sendErrorToImmediateBrokers(int errorCode)

@@ -375,12 +375,9 @@ TEST(profiling_tests, broker_file_save)
     ghc::filesystem::remove("save_profile2.txt");
 }
 
-
 TEST(profiling_tests, config)
 {
-
-    auto fi=helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config.json");
-    
+    auto fi = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config.json");
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -425,11 +422,10 @@ TEST(profiling_tests, config)
     EXPECT_TRUE(increasing);
 }
 
-
 TEST(profiling_tests, config2)
 {
     auto fi = helics::loadFederateInfo(TEST_DIR "/../test_files/profiling_config2.json");
-    
+
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;

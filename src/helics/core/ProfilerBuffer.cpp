@@ -27,7 +27,6 @@ ProfilerBuffer::~ProfilerBuffer()
         if (!mBuffers.empty()) {
             writeFile();
         }
-        
     }
     catch (const std::ios_base::failure&) {
     }
