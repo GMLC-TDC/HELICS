@@ -1232,7 +1232,7 @@ This filter will copy a message and send it to the original destination plus a n
 
 ## Profiling
 
-HELICS 2.8 and v3.0.1 have a profiling capability that allows users to measure the time spent waiting for HELICS to grant it time and how much time is spent executing native code. These measurement are the foundation to understanding how to improve computation performance in a federation. Further details are provided in [Profiling page in the User Guide.](../user-guide/advanced_topics/profiling.md) When enabling profiling at the federate level there are a few APIs that can be utilized.
+HELICS 2.8 and v3.0.1 have a profiling capability that allows users to measure the time spent waiting for HELICS to grant it time and how much time is spent executing native code. These measurements are the foundation to understanding how to improve computation performance in a federation. Further details are provided in the [Profiling page in the User Guide.](../user-guide/advanced_topics/profiling.md) When enabling profiling at the federate level there are a few APIs that can be utilized.
 
 ### `profiling` [false]
 
@@ -1244,7 +1244,7 @@ Setting this flag enables profiling for the federate.
 
 ### `profiler` [""]
 
-Turns on profiling for the federate and allows the specification of the log file where profile messages will be written. No API is possible with option as it must be specified prior to the creation of the federates.
+Turns on profiling for the federate and allows the specification of the log file where profiling messages will be written. No API is possible with this option as it must be specified prior to the creation of the federates.
 
 ---
 
@@ -1252,7 +1252,7 @@ Turns on profiling for the federate and allows the specification of the log file
 
 **TODO** Add links to API references once they exist
 
-Setting this flag sends the messages profiling messages to the local federate log rather than propagating them up to the core and/or broker.
+Setting this flag sends the profiling messages to the local federate log rather than propagating them up to the core and/or broker.
 
 ---
 

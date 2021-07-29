@@ -1,6 +1,6 @@
 # Profiling
 
-As of HELICS 2.8 or HELICS 3.0.1 HELICS includes a basic profiling capability. This is simply the capability to generate timestamps when entering or exiting HELICS blocking call loops where a federate may be waiting on other federates.
+As of versions 2.8 or 3.0.1 HELICS includes a basic profiling capability. This is simply the capability to generate timestamps when entering or exiting HELICS blocking call loops where a federate may be waiting on other federates.
 
 ## Output
 
@@ -9,13 +9,13 @@ There are 3 messages which may be observed:
 
 ```txt
 <PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800>[t=-9223372036.854776]</PROFILING>
-<PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500>[t=-1000000]<</PROFILING>
-<PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300>[t=0]<</PROFILING>
-<PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500>[t=0]<</PROFILING>
+<PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500>[t=-1000000]</PROFILING>
+<PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300>[t=0]</PROFILING>
+<PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500>[t=0]</PROFILING>
 ```
 
 The messages all start and end with <PROFILING> and </PROFILING> to make an xml-like tag.
-The message format is `FederateName[FederateID](federateState)MESSAGE[simulation time]<time>`
+The message format is `FederateName[FederateID](federateState)MESSAGE<wall-clock time>[simulation time]`
 
 The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or `error`.
 
@@ -27,7 +27,7 @@ The three possible `MESSAGE` values are:
 
 For `HELICS CODE ENTRY` and `HELICS CODE EXIT` messages the time is a steady clock time usually the time the system on which the federate is running has been up.  The `MARKER` messages have two time stamps for global coordination.  <steady clock time| system time>. The system time is the wall clock time as available by the system.  Which is usually with reference to Jan 1, 1970 and in GMT.
 
-The timestamp values are an integer count of nanoseconds. For all 3 message types they refer to the system up-time which is monotonically non-decreasing and steady. This value will differ from each computer on which federates are running, though. To calibrate for this there is a marker that gets triggered when the profiling is activated, indicating the local up-time that is synchronous across compute nodes. This matches a system up-time, with the global system time. The ability to match these across multiple machines will depend on the latency associated with time synchronization across the utilized compute nodes. No effort is made in HELICS to do remove this latency or even measure it; that is, though the marker time is measured in nanoseconds it could easily differ by microseconds or even milliseconds depending on the networking conditions between the compute nodes.
+The timestamp values are an integer count of nanoseconds. For all 3 message types they refer to the system uptime which is monotonically non-decreasing and steady. This value will differ from each computer on which federates are running, though. To calibrate for this there is a marker that gets triggered when the profiling is activated, indicating the local uptime that is synchronous across compute nodes. This matches a system uptime, with the global system time. The ability to match these across multiple machines will depend on the latency associated with time synchronization across the utilized compute nodes. No effort is made in HELICS to remove this latency or even measure it; that is, though the marker time is measured in nanoseconds it could easily differ by microseconds or even milliseconds depending on the networking conditions between the compute nodes.
 
 ## Enabling profiling
 
@@ -73,7 +73,7 @@ can generate an additional marker message if logging is enabled.
 helicsFederateSetFlagOption(fed,HELICS_FLAG_LOCAL_PROFILING_CAPTURE, HELICS_TRUE, &err);
 ```
 
-Capturea the profiling messages for the federate in the federate log instead of forwarding them to the core or broker.
+captures the profiling messages for the federate in the federate log instead of forwarding them to the core or broker.
 
 Some can be set through the flags option for federate configuration.
 `--flags=profiling,local_profiling_capture` can be set through command line or configuration files. If enabling the `local_profiling_capture`, `profiling` must also be enabled; that is, just setting `local_profiling_capture` does not enable profiling. The profiling marker doesn't make sense anywhere but through the program call.
@@ -82,4 +82,4 @@ Some can be set through the flags option for federate configuration.
 
 This capability is preliminary and subject to change based on initial feedback. In HELICS 3 there will probably be some additional command infrastructure to handle profiling as well added in the future.
 
-If timing is done in the federate itself as well there will be a time gap, there is some processing code between the profiling message, and when the actual function call returns, but it is not blocking and should be fairly short though dependent on how much data is actually transferred in the federate.
+If timing is done in the federate itself as well there will be a time gap; there is some processing code between the profiling message, and when the actual function call returns, but it is not blocking and should be fairly short, though dependent on how much data is actually transferred in the federate.

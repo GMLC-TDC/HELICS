@@ -82,7 +82,7 @@ class FederateState {
     bool wait_for_current_time{false};
     /// flag indicating that the profiler code should be activated
     bool mProfilerActive{false};
-    /// Flag indicating that the profiling should be captured in the federate log instead of
+    /// flag indicating that the profiling should be captured in the federate log instead of
     /// forwarded
     bool mLocalProfileCapture{false};
     int errorCode{0};  //!< storage for an error code
