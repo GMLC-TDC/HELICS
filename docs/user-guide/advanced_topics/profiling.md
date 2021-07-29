@@ -5,18 +5,17 @@ As of HELICS 2.8 or HELICS 3.0.1 HELICS includes a basic profiling capability. T
 ## Output
 
 The profiling output can be either in the other log files or a separate file, and can be enabled at the federate, core, or broker levels.
-There are 3 messages which may be observed
+There are 3 messages which may be observed:
 
 ```txt
-<PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800></PROFILING>
-<PROFILING>test1[131072](initializing)HELICS CODE EXIT<138286445153700></PROFILING>
-<PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500></PROFILING>
-<PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300></PROFILING>
-<PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500></PROFILING>
+<PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800>[[t=-9223372036.854776]</PROFILING>
+<PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500>[t=-1000000]<</PROFILING>
+<PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300>[t=0]<</PROFILING>
+<PROFILING>test1[131072](executing)HELICS CODE ENTRY<138286445272500>[t=0]<</PROFILING>
 ```
 
 The messages all start and end with <PROFILING> and </PROFILING> to make an xml-like tag.
-The message format is `FederateName[FederateID](federateState)MESSAGE<timestamp>`
+The message format is `FederateName[FederateID](federateState)MESSAGE[simulation time]<wall-clock time>`
 
 The federate state is one of `created`, `initializing`, `executing`, `terminating`, `terminated`, or `error`.
 
@@ -75,7 +74,7 @@ helicsFederateSetFlagOption(fed,HELICS_FLAG_LOCAL_PROFILING_CAPTURE, HELICS_TRUE
 Capturea the profiling messages for the federate in the federate log instead of forwarding them to the core or broker.
 
 Some can be set through the flags option for federate configuration.
-`--flags=profiling,local_profiling_capture` can be set through command line or configuration files. The profiling marker doesn't make sense anywhere but through the program call.
+`--flags=profiling,local_profiling_capture` can be set through command line or configuration files. If enabling the `local_profiling_capture`, `profiling` must also be enabled; that is, just setting `local_profiling_capture` does not enable profiling. The profiling marker doesn't make sense anywhere but through the program call.
 
 ## Notes
 
