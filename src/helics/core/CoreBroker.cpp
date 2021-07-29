@@ -757,6 +757,10 @@ void CoreBroker::sendDisconnect()
     if (hasTimeDependency) {
         timeCoord->disconnect();
     }
+    if (enable_profiling) {
+        writeProfilingData();
+    }
+   
 }
 
 void CoreBroker::sendErrorToImmediateBrokers(int errorCode)

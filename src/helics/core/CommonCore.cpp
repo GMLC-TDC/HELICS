@@ -4344,6 +4344,10 @@ bool CommonCore::checkAndProcessDisconnect()
         checkInFlightQueriesForDisconnect();
         setBrokerState(BrokerState::terminating);
         timeCoord->disconnect();
+        if (enable_profiling) {
+            writeProfilingData();
+        }
+        
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
         transmit(parent_route_id, dis);

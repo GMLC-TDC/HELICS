@@ -872,7 +872,8 @@ MessageProcessingResult FederateState::processQueue() noexcept
     }
     auto initError = (state == HELICS_ERROR);
     bool error_cmd{false};
-    if (mProfilerActive) {
+    bool profilerActive{mProfilerActive};
+    if (profilerActive) {
         generateProfilingMessage(true);
     }
     // process the delay Queue first
@@ -914,7 +915,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     if (initError) {
         ret_code = MessageProcessingResult::ERROR_RESULT;
     }
-    if (mProfilerActive) {
+    if (profilerActive) {
         generateProfilingMessage(false);
     }
     return ret_code;
