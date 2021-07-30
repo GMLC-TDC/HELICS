@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/fmt_format.h"
 #include "ForwardingTimeCoordinator.hpp"
+#include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -157,6 +158,32 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+
+    // add the profiling setup command
+    hApp->add_option_function<std::string>(
+            "--profiler",
+            [this](const std::string& fileName) {
+                if (!fileName.empty()) {
+                    if (fileName == "log" || fileName == "true") {
+                        if (prBuff) {
+                            prBuff.reset();
+                        }
+                    } else {
+                        if (!prBuff) {
+                            prBuff = std::make_shared<ProfilerBuffer>();
+                        }
+                        prBuff->setOutputFile(fileName);
+                    }
+
+                    enable_profiling = true;
+                } else {
+                    enable_profiling = false;
+                }
+            },
+            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
+        ->expected(0, 1)
+        ->default_str("log");
+
     hApp->add_flag("--terminate_on_error,--halt_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
@@ -414,6 +441,27 @@ void BrokerBase::generateNewIdentifier()
     identifier = genId();
     uuid_like = false;
 }
+
+void BrokerBase::saveProfilingData(const std::string &message)
+{
+    if (prBuff) {
+        prBuff->addMessage(std::string(message));
+    } else {
+        sendToLogger(parent_broker_id, log_level::warning, "[PROFILING]", message);
+    }
+}
+
+void BrokerBase::writeProfilingData()
+{
+    if (prBuff) {
+        try {
+            prBuff->writeFile();
+        }
+        catch (const std::ios_base::failure&) {
+        }
+    }
+}
+
 
 void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {

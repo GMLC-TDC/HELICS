@@ -118,6 +118,8 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"no_ping", helics_flag_slow_responding},
     {"disable_ping", helics_flag_slow_responding},
     {"debugging", helics_flag_debugging},
+    {"profiling", helics_flag_profiling},
+    {"local_profiling_capture", helics_flag_local_profiling_capture},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},
@@ -250,6 +252,7 @@ static const std::map<std::string, int> log_level_map{{"none", helics_log_level_
                                                       {"no_print", helics_log_level_no_print},
                                                       {"error", helics_log_level_error},
                                                       {"warning", helics_log_level_warning},
+                                                      {"profiling", helics_log_level_warning},
                                                       {"summary", helics_log_level_summary},
                                                       {"connections", helics_log_level_connections},
                                                       /** connections+ interface definitions*/
@@ -267,6 +270,9 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
 {
     auto sflgs = gmlc::utilities::stringOps::splitline(flags);
     for (auto& flg : sflgs) {
+        if (flg.empty()) {
+            continue;  // LCOV_EXCL_LINE
+        }
         if (flg == "autobroker") {
             fi.autobroker = true;
             continue;
@@ -274,8 +280,8 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg == "debugging") {
             fi.debugging = true;
         }
-        if (flg.empty()) {
-            continue;  // LCOV_EXCL_LINE
+        if (flg == "profiling") {
+            fi.profilerFileName = "log";
         }
         auto loc = flagStringsTranslations.find(flg);
         if (loc != flagStringsTranslations.end()) {
@@ -464,6 +470,12 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
+    app->add_option(
+           "--profiler",
+           profilerFileName,
+           "Enable profiling and specify a file name, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
+        ->expected(0, 1)
+        ->default_str("log");
     app->add_option("--key,--broker_key",
                     key,
                     "specify a key to use to match a broker should match the broker key");
@@ -780,6 +792,10 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
     if (fi.debugging) {
         res.append(" --debugging");
+    }
+    if (!fi.profilerFileName.empty()) {
+        res.append(" --profiler=");
+        res.append(fi.profilerFileName);
     }
     if (!fi.brokerInitString.empty()) {
         res.append(" --brokerinit \"");

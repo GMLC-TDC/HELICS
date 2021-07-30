@@ -28,6 +28,7 @@ class logger;
 namespace helics {
 class ForwardingTimeCoordinator;
 class helicsCLI11App;
+class ProfilerBuffer;
 /** base class for broker like objects
  */
 class BrokerBase {
@@ -123,11 +124,15 @@ class BrokerBase {
 
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
     bool uuid_like{false};  //!< will be set to true if the name looks like a uuid
+    bool enable_profiling{false};  //!< indicator that profiling is enabled
     decltype(std::chrono::steady_clock::now())
         errorTimeStart;  //!< time when the error condition started related to the errorDelay
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
+    /// buffer for profiling messages
+    std::shared_ptr<ProfilerBuffer> prBuff;
+
     /** indicator that ticks should be forwarded to the command processor regardless */
     bool forwardTick{false};
     /** reasons ticks might be forwarded*/
@@ -229,6 +234,11 @@ class BrokerBase {
                               int logLevel,
                               const std::string& name,
                               const std::string& message) const;
+
+    /** save a profiling message*/
+    void saveProfilingData(const std::string &message);
+    /** write profiler data to file*/
+    void writeProfilingData();
 
     /** generate a new random id*/
     void generateNewIdentifier();

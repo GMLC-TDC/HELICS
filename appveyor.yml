@@ -3,11 +3,10 @@ clone_depth: 1
 branches:
   only:
     - main
-    - master
     - develop
-    - helics3
+    - helics2
 
-version: 2.7.1.{build}
+version: 2.7.2.{build}
 
 image: Visual Studio 2015
 

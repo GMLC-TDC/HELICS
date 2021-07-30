@@ -817,6 +817,55 @@ bool FederateState::messageShouldBeDelayed(const ActionMessage& cmd) const
     }
 }
 
+void FederateState::generateProfilingMarker()
+{
+    auto ctime = std::chrono::steady_clock::now();
+    auto gtime = std::chrono::system_clock::now();
+    std::string message = fmt::format(
+        "<PROFILING>{}[{}]({})MARKER<{}|{}>[t={}]</PROFILING>",
+        name,
+        global_id.load().baseValue(),
+        fedStateString(getState()),
+        std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count(),
+        std::chrono::duration_cast<std::chrono::nanoseconds>(gtime.time_since_epoch()).count(),
+        static_cast<double>(time_granted));
+
+    if (mLocalProfileCapture) {
+        logMessage(helics_log_level_warning, name, message);
+    } else {
+        if (parent_ != nullptr) {
+            ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
+            prof.payload = message;
+            parent_->addActionMessage(std::move(prof));
+        }
+    }
+}
+
+void FederateState::generateProfilingMessage(bool enterHelicsCode)
+{
+    auto ctime = std::chrono::steady_clock::now();
+    static const std::string entry_string("ENTRY");
+    static const std::string exit_string("EXIT");
+    std::string message = fmt::format(
+        "<PROFILING>{}[{}]({})HELICS CODE {}<{}>[t={}]</PROFILING>",
+        name,
+        global_id.load().baseValue(),
+        fedStateString(getState()),
+        (enterHelicsCode ? entry_string : exit_string),
+        std::chrono::duration_cast<std::chrono::nanoseconds>(ctime.time_since_epoch()).count(),
+        static_cast<double>(time_granted));
+    if (mLocalProfileCapture) {
+        logMessage(helics_log_level_warning, name, message);
+    } else {
+        if (parent_ != nullptr) {
+            ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
+            prof.payload = message;
+            parent_->addActionMessage(std::move(prof));
+        }
+    }
+}
+
+
 message_processing_result FederateState::processQueue() noexcept
 {
     if (state == HELICS_FINISHED) {
@@ -824,6 +873,10 @@ message_processing_result FederateState::processQueue() noexcept
     }
     auto initError = (state == HELICS_ERROR);
     bool error_cmd{false};
+    bool profilerActive{mProfilerActive};
+    if (profilerActive) {
+        generateProfilingMessage(true);
+    }
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
@@ -862,6 +915,9 @@ message_processing_result FederateState::processQueue() noexcept
     }
     if (initError) {
         ret_code = message_processing_result::error;
+    }
+    if (profilerActive) {
+        generateProfilingMessage(false);
     }
     return ret_code;
 }
@@ -1111,6 +1167,9 @@ message_processing_result FederateState::processActionMessage(ActionMessage& cmd
         } break;
         case CMD_REMOVE_ENDPOINT:
             break;
+        case CMD_SET_PROFILER_FLAG:
+            setOptionFlag(defs::profiling, checkActionFlag(cmd, indicator_flag));
+            break;
         case CMD_FED_ACK:
             if (state != HELICS_CREATED) {
                 break;
@@ -1327,6 +1386,20 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
         case defs::flags::slow_responding:
         case defs::flags::debugging:
             slow_responding = value;
+            break;
+        case defs::flags::profiling:
+            if (value && !mProfilerActive) {
+                generateProfilingMarker();
+            }
+            mProfilerActive = value;
+            break;
+        case defs::flags::profiling_marker:
+            if (value && mProfilerActive) {
+                generateProfilingMarker();
+            }
+            break;
+        case defs::flags::local_profiling_capture:
+            mLocalProfileCapture = value;
             break;
         case defs::flags::terminate_on_error:
             terminate_on_error = value;

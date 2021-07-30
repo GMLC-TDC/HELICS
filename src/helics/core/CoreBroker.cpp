@@ -342,6 +342,13 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                             command.name,
                                             global_fedid.baseValue(),
                                             route_id.baseValue()));
+                if (enable_profiling) {
+                    ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG,
+                                                     global_broker_id_local,
+                                                     global_fedid);
+                    setActionFlag(fedEnableProfiling, indicator_flag);
+                    transmit(route_id, fedEnableProfiling);
+                }
             }
         } break;
         case CMD_REG_BROKER: {
@@ -534,6 +541,13 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 }
                 transmit(route, command);
                 routing_table.emplace(fed->global_id, route);
+                if (enable_profiling) {
+                    ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG,
+                                                     global_broker_id_local,
+                                                     command.dest_id);
+                    setActionFlag(fedEnableProfiling, indicator_flag);
+                    transmit(route, fedEnableProfiling);
+                }
             } else {
                 // this means we haven't seen this federate before for some reason
                 _federates.insert(command.name, command.dest_id, command.name);
@@ -730,6 +744,9 @@ void CoreBroker::sendDisconnect()
     });
     if (hasTimeDependency) {
         timeCoord->disconnect();
+    }
+    if (enable_profiling) {
+        writeProfilingData();
     }
 }
 
@@ -1204,6 +1221,20 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_QUERY_ORDERED:
         case CMD_QUERY_REPLY_ORDERED:
             processQueryCommand(command);
+            break;
+        case CMD_PROFILER_DATA:
+            if (enable_profiling) {
+                saveProfilingData(command.payload);
+            } else {
+                if (isRootc) {
+                    saveProfilingData(command.payload);
+                } else {
+                    routeMessage(std::move(command), parent_broker_id);
+                }
+            }
+            break;
+        case CMD_SET_PROFILER_FLAG:
+            routeMessage(command);
             break;
         default:
             if (command.dest_id != global_broker_id_local) {

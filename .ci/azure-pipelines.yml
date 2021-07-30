@@ -4,9 +4,8 @@ trigger:
       - pre-commit/*
 pr:
   - main
-  - master
   - develop
-  - helics3
+  - helics2
 
 jobs:
   - job: Linux
