@@ -4,10 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: 
-      - master
       - main
       - develop
-      - helics3
+      - helics2
 
 jobs:
   build:
