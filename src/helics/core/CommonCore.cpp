@@ -636,7 +636,9 @@ local_federate_id CommonCore::registerFederate(const std::string& name,
 
     fed->local_id = local_id;
     fed->setParent(this);
-
+    if (enable_profiling) {
+        fed->setOptionFlag(defs::profiling, true);
+    }
     ActionMessage m(CMD_REG_FED);
     m.name = name;
     addActionMessage(m);
@@ -3034,7 +3036,16 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
 
             break;
-
+        case CMD_PROFILER_DATA:
+            if (enable_profiling) {
+                saveProfilingData(command.payload);
+            } else {
+                routeMessage(std::move(command), parent_broker_id);
+            }
+            break;
+        case CMD_SET_PROFILER_FLAG:
+            routeMessage(command);
+            break;
         default:
             if (isPriorityCommand(command)) {  // this is a backup if somehow one of these
                                                // message got here
@@ -3905,6 +3916,9 @@ bool CommonCore::checkAndProcessDisconnect()
         checkInFlightQueriesForDisconnect();
         setBrokerState(broker_state_t::terminating);
         timeCoord->disconnect();
+        if (enable_profiling) {
+            writeProfilingData();
+        }
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
         transmit(parent_route_id, dis);

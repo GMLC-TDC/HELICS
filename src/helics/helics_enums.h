@@ -117,7 +117,12 @@ typedef enum {
     helics_flag_strict_config_checking = 75,
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
-    helics_flag_event_triggered = 81
+    helics_flag_event_triggered = 81,
+    /** flag trigger for generating a profiling marker*/
+    helics_flag_profiling_marker = 95,
+    /** specify that that federate should capture the profiling data to the local federate logging
+       system*/
+    helics_flag_local_profiling_capture = 96
 } helics_federate_flags;
 
 /** enumeration of additional core flags*/
@@ -143,7 +148,9 @@ typedef enum {
     /** specify that the log files should be flushed on every log message*/
     helics_flag_force_logging_flush = 88,
     /** specify that a full log should be dumped into a file*/
-    helics_flag_dumplog = 89
+    helics_flag_dumplog = 89,
+    /** specify that helics should capture profiling data*/
+    helics_flag_profiling = 93
 } helics_flags;
 
 /** log level definitions
