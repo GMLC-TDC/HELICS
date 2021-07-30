@@ -55,10 +55,6 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 ## Used Libraries or Code
 
-### [BOOST](https://www.boost.org)
-
-Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a cmake flag.
-
 ### [Asio](https://think-async.com/Asio)
 
 Asio is used for TCP and UDP communication, as well as resolving IP addresses. The Asio library is included as a submodule. Asio is licensed under the [Boost Software License](https://github.com/chriskohlhoff/asio/blob/master/asio/LICENSE_1_0.txt).
@@ -133,3 +129,25 @@ Several CMake scripts came from other sources and were either used or modified f
 - Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm) particularly for the set_runtime macro to use static runtime libraries
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
 - Some scripts for including google test were borrowed and modified from [CLI11](https://github.com/CLIUtils/CLI11)
+
+
+## Optional components
+
+A list of optional component that are not included in HELICS but are optionally used by the library
+
+### [BOOST](https://www.boost.org)
+
+Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
+
+
+#### [zmq](http://www.zeromq.org)
+
+ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
+
+### [Google Test](https://github.com/google/googletest)
+
+HELICS tests are written to use the Google Test and mock frameworks. Google Test is included in the source tarball but is downloaded as an optional component. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
+
+### [Google Benchmark](https://github.com/google/benchmark)
+
+Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
