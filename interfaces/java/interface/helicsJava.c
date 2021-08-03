@@ -723,6 +723,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1EVENT_1TRIG
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1LOCAL_1PROFILING_1CAPTURE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsFederateFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsFederateFlags)HELICS_FLAG_LOCAL_PROFILING_CAPTURE;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1DELAY_1INIT_1ENTRY_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsCoreFlags result;
@@ -807,6 +819,30 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1DUMPLOG_1ge
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1PROFILING_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsFlags)HELICS_FLAG_PROFILING;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1PROFILING_1MARKER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsFlags)HELICS_FLAG_PROFILING_MARKER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1NO_1PRINT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsLogLevels result;
@@ -826,6 +862,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1ERROR
   (void)jenv;
   (void)jcls;
   result = (HelicsLogLevels)HELICS_LOG_LEVEL_ERROR;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1PROFILING_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsLogLevels result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsLogLevels)HELICS_LOG_LEVEL_PROFILING;
   jresult = (jint)result; 
   return jresult;
 }

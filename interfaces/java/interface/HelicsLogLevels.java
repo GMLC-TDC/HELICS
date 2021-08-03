@@ -21,6 +21,10 @@ public final class HelicsLogLevels {
    */
   public final static HelicsLogLevels HELICS_LOG_LEVEL_ERROR = new HelicsLogLevels("HELICS_LOG_LEVEL_ERROR", helicsJNI.HELICS_LOG_LEVEL_ERROR_get());
   /**
+   *  profiling log level
+   */
+  public final static HelicsLogLevels HELICS_LOG_LEVEL_PROFILING = new HelicsLogLevels("HELICS_LOG_LEVEL_PROFILING", helicsJNI.HELICS_LOG_LEVEL_PROFILING_get());
+  /**
    *  only print warnings and errors
    */
   public final static HelicsLogLevels HELICS_LOG_LEVEL_WARNING = new HelicsLogLevels("HELICS_LOG_LEVEL_WARNING", helicsJNI.HELICS_LOG_LEVEL_WARNING_get());
@@ -88,7 +92,7 @@ public final class HelicsLogLevels {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsLogLevels[] swigValues = { HELICS_LOG_LEVEL_NO_PRINT, HELICS_LOG_LEVEL_ERROR, HELICS_LOG_LEVEL_WARNING, HELICS_LOG_LEVEL_SUMMARY, HELICS_LOG_LEVEL_CONNECTIONS, HELICS_LOG_LEVEL_INTERFACES, HELICS_LOG_LEVEL_TIMING, HELICS_LOG_LEVEL_DATA, HELICS_LOG_LEVEL_DEBUG, HELICS_LOG_LEVEL_TRACE };
+  private static HelicsLogLevels[] swigValues = { HELICS_LOG_LEVEL_NO_PRINT, HELICS_LOG_LEVEL_ERROR, HELICS_LOG_LEVEL_PROFILING, HELICS_LOG_LEVEL_WARNING, HELICS_LOG_LEVEL_SUMMARY, HELICS_LOG_LEVEL_CONNECTIONS, HELICS_LOG_LEVEL_INTERFACES, HELICS_LOG_LEVEL_TIMING, HELICS_LOG_LEVEL_DATA, HELICS_LOG_LEVEL_DEBUG, HELICS_LOG_LEVEL_TRACE };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

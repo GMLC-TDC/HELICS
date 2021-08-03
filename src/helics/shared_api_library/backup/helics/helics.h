@@ -153,7 +153,10 @@ typedef enum {
     HELICS_FLAG_STRICT_CONFIG_CHECKING = 75,
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
-    HELICS_FLAG_EVENT_TRIGGERED = 81
+    HELICS_FLAG_EVENT_TRIGGERED = 81,
+    /** specify that that federate should capture the profiling data to the local federate logging
+       system*/
+    HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
@@ -179,7 +182,11 @@ typedef enum {
     /** specify that the log files should be flushed on every log message*/
     HELICS_FLAG_FORCE_LOGGING_FLUSH = 88,
     /** specify that a full log should be dumped into a file*/
-    HELICS_FLAG_DUMPLOG = 89
+    HELICS_FLAG_DUMPLOG = 89,
+    /** specify that helics should capture profiling data*/
+    HELICS_FLAG_PROFILING = 93,
+    /** flag trigger for generating a profiling marker*/
+    HELICS_FLAG_PROFILING_MARKER = 95
 } HelicsFlags;
 
 /** log level definitions
@@ -189,6 +196,8 @@ typedef enum {
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     /** only print error level indicators*/
     HELICS_LOG_LEVEL_ERROR = 0,
+    /** profiling log level*/
+    HELICS_LOG_LEVEL_PROFILING = 2,
     /** only print warnings and errors*/
     HELICS_LOG_LEVEL_WARNING = 3,
     /** warning errors and summary level information*/
@@ -362,7 +371,10 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
+typedef enum {
+    HELICS_SEQUENCING_MODE_FAST = 0,
+    HELICS_SEQUENCING_MODE_ORDERED = 1
+} HelicsSequencingModes;
 
 /**
  * @file
