@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqHelper.h"
 #include "ZmqRequestSets.h"
 #include "zmqSocketDescriptor.h"
+#include "../../core/flagOperations.hpp"
 
 #include <csignal>
 #include <map>
@@ -88,19 +89,21 @@ namespace zeromq {
     int ZmqComms::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
     {
         ActionMessage M(static_cast<std::byte*>(msg.data()), msg.size());
+        bool useJson = checkActionFlag(M, use_json_serialization_flag);
         if (isProtocolCommand(M)) {
             if (M.messageID == CLOSE_RECEIVER) {
                 return (-1);
             }
             auto reply = generateReplyToIncomingMessage(M);
-            auto str = reply.to_string();
+            auto str=(useJson) ? reply.to_json_string() :reply.to_string();
+
             sock.send(str);
             return 0;
         }
 
         ActionCallback(std::move(M));
         ActionMessage resp(CMD_PRIORITY_ACK);
-        auto str = resp.to_string();
+        auto str = (useJson) ? resp.to_json_string() : resp.to_string();
         sock.send(str);
         return 0;
     }
@@ -127,7 +130,7 @@ namespace zeromq {
         if (serverMode) {
             repSocket.setsockopt(ZMQ_LINGER, 500);
         }
-
+       
         while (PortNumber == -1) {
             zmq::message_t msg;
             controlSocket.recv(msg);
@@ -195,6 +198,7 @@ namespace zeromq {
             poller.resize(2);
         }
         setRxStatus(connection_status::connected);
+        
         while (true) {
             auto rc = zmq::poll(poller, std::chrono::milliseconds(1000));
             if (rc > 0) {
@@ -272,7 +276,7 @@ namespace zeromq {
                         return (-3);
                     }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
-                    auto str = getPorts.to_string();
+                    auto str = (useJsonSerialization)?getPorts.to_json_string():getPorts.to_string();
 
                     brokerReq.send(str);
                     poller.socket = static_cast<void*>(brokerReq);
@@ -493,7 +497,14 @@ namespace zeromq {
             if (processed) {
                 continue;
             }
-            cmd.to_vector(buffer);
+            if (getRouteTypeCode(rid)==json_route_code || useJsonSerialization) {
+                auto str = cmd.to_json_string();
+                buffer.resize(str.size());
+                std::copy(str.begin(), str.end(), buffer.begin());
+                
+            } else {
+                cmd.to_vector(buffer);
+            }
             if (rid == parent_route_id) {
                 if (hasBroker) {
                     brokerPushSocket.send(zmq::const_buffer(buffer.data(), buffer.size()),
