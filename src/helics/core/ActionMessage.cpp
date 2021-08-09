@@ -80,7 +80,7 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
 
 ActionMessage::ActionMessage(const void* data, size_t size): ActionMessage()
 {
-    fromByteArray(static_cast<const std::byte*>(data), size);
+    from_string(std::string(static_cast<const char*>(data), size));
 }
 
 ActionMessage::~ActionMessage() = default;
@@ -354,7 +354,8 @@ static std::string b64Decode(std::string_view stringToDecode)
 
 std::string ActionMessage::to_json_string() const {
     Json::Value packet;
-    packet["version"] = 3.0;
+    packet["version"] =
+        HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
     packet["command"] = static_cast<int>(messageAction);
     packet["messageId"] = messageID;
     packet["sourceId"] = source_id.baseValue();
@@ -465,6 +466,10 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         if (res > 0) {
             return static_cast<int>(res);
         }
+    }
+    //this means it probably is a JSON packate
+    if (data[0] == std::byte{'{'}) {
+        return 0;
     }
     std::size_t sz = 256 * 256 * (std::to_integer<std::size_t>(data[1])) +
         256 * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
@@ -626,7 +631,7 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
 std::size_t ActionMessage::from_string(std::string_view data)
 {
     auto result=fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (result==0U) {
+    if (result == 0U && data.size() > 0 && data.front() =='{') {
         if (from_json_string(data)) {
             return data.size();
         }
@@ -673,7 +678,8 @@ bool ActionMessage::from_json_string(std::string_view data)
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
     std::size_t bytesUsed = fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (bytesUsed == 0) {
+    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{')
+        {
         if (from_json_string(std::string_view(data.data(), data.size()))) {
             return data.size();
         }

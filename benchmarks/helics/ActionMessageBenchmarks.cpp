@@ -134,4 +134,136 @@ static void BMdepacketizeStrings(benchmark::State& state)
 // Register the function as a benchmark
 BENCHMARK(BMdepacketizeStrings);
 
+// benchmarks with the Json serialization of actionMessage
+
+static void BMtoStringJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_REG_FED);
+    obj.name("the name of the federate is really long");
+    obj.setStringData("this is a new string to add to the string data");
+    std::string load;
+    load.reserve(500);
+    for (auto _ : state) {
+        load=obj.to_json_string();
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMtoStringJson);
+
+static void BMfromStringJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_REG_FED);
+    obj.name("the name of the federate is really long");
+    obj.setStringData("this is a new string to add to the string data");
+    std::string load=obj.to_json_string();
+    ActionMessage conv;
+
+    for (auto _ : state) {
+        conv.from_string(load);
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMfromStringJson);
+
+static void BMfromStringJsonDirect(benchmark::State& state)
+{
+    ActionMessage obj(CMD_REG_FED);
+    obj.name("the name of the federate is really long");
+    obj.setStringData("this is a new string to add to the string data");
+    std::string load = obj.to_json_string();
+    ActionMessage conv;
+
+    for (auto _ : state) {
+        conv.from_json_string(load);
+    }
+}
+
+// Register the function as a benchmark
+BENCHMARK(BMfromStringJsonDirect);
+
+static void BMtoStringTimeJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_TIME_REQUEST);
+    std::string load;
+    for (auto _ : state) {
+        load=obj.to_json_string();
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMtoStringTimeJson);
+
+static void BMfromStringTimeJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_TIME_REQUEST);
+    auto load=obj.to_json_string();
+    ActionMessage conv;
+
+    for (auto _ : state) {
+        conv.from_string(load);
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMfromStringTimeJson);
+
+static void BMpacketizeJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_REG_FED);
+    obj.name("the name of the federate is really long");
+    obj.setStringData("this is a new string to add to the string data");
+    std::string load;
+    for (auto _ : state) {
+        load=obj.packetize_json();
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMpacketizeJson);
+
+static void BMdepacketizeJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_REG_FED);
+    obj.name("the name of the federate is really long");
+    obj.setStringData("this is a new string to add to the string data");
+    std::string load = obj.packetize_json();
+    ActionMessage conv;
+
+    for (auto _ : state) {
+        conv.depacketize(load.data(), static_cast<int>(load.size()));
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMdepacketizeJson);
+
+static void BMpacketizeStringsJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_MULTI_MESSAGE);
+    obj.name("sstring");
+    for (int ii = 0; ii < 100; ++ii) {
+        obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
+    }
+    std::string load;
+    for (auto _ : state) {
+        load=obj.packetize_json();
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMpacketizeStringsJson);
+
+static void BMdepacketizeStringsJson(benchmark::State& state)
+{
+    ActionMessage obj(CMD_MULTI_MESSAGE);
+    obj.name("sstring");
+    for (int ii = 0; ii < 100; ++ii) {
+        obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
+    }
+    
+    std::string load= obj.packetize_json();
+    ActionMessage conv;
+
+    for (auto _ : state) {
+        conv.depacketize(load.data(), static_cast<int>(load.size()));
+    }
+}
+// Register the function as a benchmark
+BENCHMARK(BMdepacketizeStringsJson);
+
 HELICS_BENCHMARK_MAIN(actionMessageBenchmark);
