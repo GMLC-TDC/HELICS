@@ -218,6 +218,7 @@ class ValueFederateManager {
     ValueFederate*
         fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
     LocalFederateId fedID;  //!< the federation ID from the core API
+    bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
     atomic_guarded<std::function<void(Input&, Time)>>
         allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>

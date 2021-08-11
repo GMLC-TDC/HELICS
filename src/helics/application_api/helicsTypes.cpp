@@ -54,6 +54,7 @@ const std::string& typeNameStringRef(DataType type)
     static const std::string complexVecString("complex_vector");
     static const std::string namedPointString("named_point");
     static const std::string timeString("time");
+    static const std::string jsonString("json");
     static const std::string nullString;
     switch (type) {
         case DataType::HELICS_DOUBLE:
@@ -74,6 +75,8 @@ const std::string& typeNameStringRef(DataType type)
             return complexVecString;
         case DataType::HELICS_NAMED_POINT:
             return namedPointString;
+        case DataType::HELICS_JSON:
+            return jsonString;
         default:
             return nullString;
     }
@@ -103,7 +106,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static constexpr frozen::unordered_map<frozen::string, DataType, 56> typeMap{
+static constexpr frozen::unordered_map<frozen::string, DataType, 57> typeMap{
     {"double", DataType::HELICS_DOUBLE},
     {"string", DataType::HELICS_STRING},
     {"binary", DataType::HELICS_BOOL},
@@ -157,6 +160,7 @@ static constexpr frozen::unordered_map<frozen::string, DataType, 56> typeMap{
     {"tm", DataType::HELICS_TIME},
     {"multi", DataType::HELICS_MULTI},
     {"many", DataType::HELICS_MULTI},
+    {"json", DataType::HELICS_JSON},
     {"def", DataType::HELICS_ANY},
     {"any", DataType::HELICS_ANY},
     {"", DataType::HELICS_ANY},
