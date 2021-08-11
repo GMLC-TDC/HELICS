@@ -361,7 +361,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 auto brk = _brokers.find(std::string(command.name()));
                 if (brk != _brokers.end()) {
                     // we would get this if the ack didn't go through for some reason
-                    brk->route = generateRouteId(jsonReply?json_route_code:0, routeCount++);
+                    brk->route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(brk->route,
                              command.getExtraData(),
                              command.getString(targetStringLoc));

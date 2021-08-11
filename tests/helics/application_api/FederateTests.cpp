@@ -5,11 +5,11 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
 #include "helics/core/BrokerFactory.hpp"
-#include "helics/application_api/BrokerApp.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
@@ -78,7 +78,6 @@ TEST(federate_tests, federate_initialize_tests_json)
 
     Fed = nullptr;  // force the destructor
     brk.waitForDisconnect();
-
 }
 
 #endif

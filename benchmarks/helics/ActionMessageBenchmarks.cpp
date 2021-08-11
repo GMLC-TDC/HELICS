@@ -10,7 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;  // NOLINT
 
-static ActionMessage generateTestMessage1() {
+static ActionMessage generateTestMessage1()
+{
     ActionMessage obj(CMD_REG_FED);
     obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
@@ -21,7 +22,6 @@ static const auto testMessage1 = generateTestMessage1();
 
 static void BMtoString(benchmark::State& state)
 {
-    
     std::string load;
     load.reserve(500);
     for (auto _ : state) {
@@ -175,7 +175,7 @@ static void BMtoStringTimeJson(benchmark::State& state)
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
     for (auto _ : state) {
-        load=obj.to_json_string();
+        load = obj.to_json_string();
     }
 }
 // Register the function as a benchmark
@@ -184,7 +184,7 @@ BENCHMARK(BMtoStringTimeJson);
 static void BMfromStringTimeJson(benchmark::State& state)
 {
     ActionMessage obj(CMD_TIME_REQUEST);
-    auto load=obj.to_json_string();
+    auto load = obj.to_json_string();
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -225,7 +225,7 @@ static void BMpacketizeStringsJson(benchmark::State& state)
     }
     std::string load;
     for (auto _ : state) {
-        load=obj.packetize_json();
+        load = obj.packetize_json();
     }
 }
 // Register the function as a benchmark
@@ -233,13 +233,13 @@ BENCHMARK(BMpacketizeStringsJson);
 
 static void BMdepacketizeStringsJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_MULTI_MESSAGE); 
+    ActionMessage obj(CMD_MULTI_MESSAGE);
     obj.name("sstring");
     for (int ii = 0; ii < 100; ++ii) {
         obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
     }
-    
-    std::string load= obj.packetize_json();
+
+    std::string load = obj.packetize_json();
     ActionMessage conv;
 
     for (auto _ : state) {

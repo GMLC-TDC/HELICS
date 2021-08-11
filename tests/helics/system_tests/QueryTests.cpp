@@ -600,7 +600,7 @@ TEST_F(query, interfaces)
 #ifdef HELICS_ENABLE_ZMQ_CORE
 TEST_F(query, interfaces_json_serialization)
 {
-    extraCoreArgs="--json";
+    extraCoreArgs = "--json";
     SetupTest<helics::CombinationFederate>("zmq4", 1);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
 
