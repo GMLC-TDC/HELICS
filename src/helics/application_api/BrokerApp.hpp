@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    BrokerApp(CoreType ctype, const std::string& argString);
+    BrokerApp(CoreType ctype, const std::string& argString = std::string{});
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker

@@ -135,9 +135,6 @@ Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for 
 
 ### Optional components
 
-<details>
-  <summary>Click to expand!</summary>
-
 A list of optional component that are not included in HELICS but are optionally used by the library
 
 #### [zmq](http://www.zeromq.org)
@@ -151,8 +148,6 @@ HELICS tests are written to use the Google Test and mock frameworks. Google Test
 ### [Google Benchmark](https://github.com/google/benchmark)
 
 Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
-
-</details>
 
 ## Build Status
 
