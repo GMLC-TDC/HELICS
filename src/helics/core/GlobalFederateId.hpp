@@ -191,8 +191,9 @@ class route_id {
 constexpr route_id parent_route_id{0};
 constexpr route_id control_route{-1};
 
-constexpr route_id generateRouteId(int32_t route_type_code, int32_t index) {
-    return route_id(route_type_code * 256 * 256*256 + index);
+constexpr route_id generateRouteId(int32_t route_type_code, int32_t index)
+{
+    return route_id(route_type_code * 256 * 256 * 256 + index);
 }
 
 constexpr int32_t getRouteTypeCode(route_id rid)
@@ -202,7 +203,7 @@ constexpr int32_t getRouteTypeCode(route_id rid)
 
 constexpr int32_t normal_route_code{0};
 constexpr int32_t json_route_code{10};
-    /** stream operator for a route_id
+/** stream operator for a route_id
  */
 std::ostream& operator<<(std::ostream& os, route_id id);
 

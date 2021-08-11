@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqComms.h"
 
 #include "../../core/ActionMessage.hpp"
+#include "../../core/flagOperations.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "ZmqCommsCommon.h"
@@ -15,14 +16,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ZmqHelper.h"
 #include "ZmqRequestSets.h"
 #include "zmqSocketDescriptor.h"
-#include "../../core/flagOperations.hpp"
 
+#include <algorithm>
 #include <csignal>
 #include <map>
 #include <memory>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 namespace helics {
 namespace zeromq {
@@ -96,7 +96,7 @@ namespace zeromq {
                 return (-1);
             }
             auto reply = generateReplyToIncomingMessage(M);
-            auto str=(useJson) ? reply.to_json_string() :reply.to_string();
+            auto str = (useJson) ? reply.to_json_string() : reply.to_string();
 
             sock.send(str);
             return 0;
@@ -131,7 +131,7 @@ namespace zeromq {
         if (serverMode) {
             repSocket.setsockopt(ZMQ_LINGER, 500);
         }
-       
+
         while (PortNumber == -1) {
             zmq::message_t msg;
             controlSocket.recv(msg);
@@ -199,7 +199,7 @@ namespace zeromq {
             poller.resize(2);
         }
         setRxStatus(connection_status::connected);
-        
+
         while (true) {
             auto rc = zmq::poll(poller, std::chrono::milliseconds(1000));
             if (rc > 0) {
@@ -277,7 +277,8 @@ namespace zeromq {
                         return (-3);
                     }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
-                    auto str = (useJsonSerialization)?getPorts.to_json_string():getPorts.to_string();
+                    auto str =
+                        (useJsonSerialization) ? getPorts.to_json_string() : getPorts.to_string();
 
                     brokerReq.send(str);
                     poller.socket = static_cast<void*>(brokerReq);
@@ -498,11 +499,11 @@ namespace zeromq {
             if (processed) {
                 continue;
             }
-            if (getRouteTypeCode(rid)==json_route_code || useJsonSerialization) {
+            if (getRouteTypeCode(rid) == json_route_code || useJsonSerialization) {
                 auto str = cmd.to_json_string();
                 buffer.resize(str.size());
                 std::copy(str.begin(), str.end(), buffer.begin());
-                
+
             } else {
                 cmd.to_vector(buffer);
             }

@@ -139,7 +139,7 @@ class CommsInterface {
         false};  //!< specify that the comms should assume we have a broker
     bool serverMode{true};  //!< some comms have a server mode and non-server mode
     bool autoBroker{false};  //!< the broker should be automatically generated if needed
-    bool useJsonSerialization{false}; //!< true to make all connections use JSON serialization
+    bool useJsonSerialization{false};  //!< true to make all connections use JSON serialization
     /** timeout for the initial connection to a broker or to bind a broker port(in ms)*/
     std::chrono::milliseconds connectionTimeout{4000};
     int maxMessageSize = 16 * 1024;  //!< the maximum message size for the queues (if needed)

@@ -12,9 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ActionMessage.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "flagOperations.hpp"
-#include "../common/JsonProcessingFunctions.hpp"
 #include "gmlc/utilities/base64.h"
 
 #include <algorithm>
@@ -283,7 +283,7 @@ int ActionMessage::serializedByteCount() const
 std::string ActionMessage::to_string() const
 {
     std::string data;
-    if (checkActionFlag(*this,use_json_serialization_flag)) {
+    if (checkActionFlag(*this, use_json_serialization_flag)) {
         data = to_json_string();
     } else {
         auto sz = serializedByteCount();
@@ -293,8 +293,8 @@ std::string ActionMessage::to_string() const
     return data;
 }
 
-
-std::string ActionMessage::to_json_string() const {
+std::string ActionMessage::to_json_string() const
+{
     Json::Value packet;
     packet["version"] =
         HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
@@ -317,7 +317,7 @@ std::string ActionMessage::to_json_string() const {
     packet["stringCount"] = stringData.size();
     if (!stringData.empty()) {
         packet["strings"] = Json::arrayValue;
-        for (const auto& str : stringData){
+        for (const auto& str : stringData) {
             packet["strings"].append(str);
         }
     }
@@ -409,7 +409,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
             return static_cast<int>(res);
         }
     }
-    //this means it probably is a JSON packate
+    // this means it probably is a JSON packate
     if (data[0] == std::byte{'{'}) {
         return 0;
     }
@@ -562,9 +562,10 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
     }
 
     std::size_t bytesUsed = fromByteArray(bytes + 4, message_size - 4);
-    if (bytesUsed==0U) {
-        if (from_json_string(std::string_view(reinterpret_cast<const char *>(bytes)+4,message_size-4))) {
-            bytesUsed=message_size+4;
+    if (bytesUsed == 0U) {
+        if (from_json_string(
+                std::string_view(reinterpret_cast<const char*>(bytes) + 4, message_size - 4))) {
+            bytesUsed = message_size + 4;
         }
     }
     return (bytesUsed > 0) ? message_size + 2 : 0;
@@ -572,21 +573,20 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
 
 std::size_t ActionMessage::from_string(std::string_view data)
 {
-    auto result=fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (result == 0U && data.size() > 0 && data.front() =='{') {
+    auto result = fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
+    if (result == 0U && data.size() > 0 && data.front() == '{') {
         if (from_json_string(data)) {
             return data.size();
         }
     }
     return result;
-
 }
 
 bool ActionMessage::from_json_string(std::string_view data)
 {
     try {
         auto val = fileops::loadJsonStr(data);
-        //auto version = val["version"].asFloat();
+        // auto version = val["version"].asFloat();
         messageAction = static_cast<action_message_def::action_t>(val["command"].asInt());
         messageID = val["messageId"].asInt();
         source_id = GlobalFederateId(val["sourceId"].asInt());
@@ -603,25 +603,24 @@ bool ActionMessage::from_json_string(std::string_view data)
             Tso.setBaseTimeCode(val["Tso"].asInt64());
         }
 
-        payload=val["payload"].asString();
+        payload = val["payload"].asString();
         auto stringCount = val["stringCount"].asUInt();
         stringData.resize(stringCount);
-        for (Json::ArrayIndex ii =0;ii<stringCount;++ii) {
+        for (Json::ArrayIndex ii = 0; ii < stringCount; ++ii) {
             setString(ii, val["strings"][ii].asString());
         }
     }
-    catch(...) {
+    catch (...) {
         return false;
     }
     return true;
-    
 }
 
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
-    std::size_t bytesUsed = fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{')
-        {
+    std::size_t bytesUsed =
+        fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
+    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
         if (from_json_string(std::string_view(data.data(), data.size()))) {
             return data.size();
         }

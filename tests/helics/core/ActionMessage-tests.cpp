@@ -450,7 +450,6 @@ TEST(ActionMessage, check_json_packetization)
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
-
 TEST(ActionMessage, jsonconversion_test)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
@@ -511,7 +510,6 @@ TEST(ActionMessage, jsonconversion_test2)
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
-
 TEST(ActionMessage, jsonconversion_test_binary_strings)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
@@ -526,7 +524,7 @@ TEST(ActionMessage, jsonconversion_test_binary_strings)
     cmd.payload = std::string(500000, 17);
     cmd.payload[6482] = std::byte(0);
 
-    cmd.setStringData("target", std::string(987,'\0'), "original_source");
+    cmd.setStringData("target", std::string(987, '\0'), "original_source");
 
     auto cmdString = cmd.to_json_string();
 
