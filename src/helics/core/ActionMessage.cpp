@@ -293,64 +293,6 @@ std::string ActionMessage::to_string() const
     return data;
 }
 
-static bool isBinaryData(std::string_view str)
-{
-    return std::any_of(str.begin(), str.end(), [](const auto& c) {
-        return ((c < 32) || (c == 34) || (c > 126));
-    });
-}
-
-static bool isEscapableData(std::string_view str)
-{
-    return std::all_of(str.begin(), str.end(), [](const auto& c) {
-        return ((c >= 32 && c <= 126) || (c == '\t') || (c == '\n'));
-    });
-}
-
-/** encode the string in base64 if needed otherwise just return the string*/
-static std::string b64Encode(std::string_view str2encode)
-{
-
-    if (isBinaryData(str2encode)) {
-        if (isEscapableData(str2encode)) {
-            return std::string(str2encode);
-        } else {
-            return std::string("b64[") +
-                gmlc::utilities::base64_encode(reinterpret_cast<const unsigned char*>(
-                                                   str2encode.data()),
-                                               str2encode.size()) +
-                ']';
-        }
-
-    } else {
-        return std::string(str2encode);
-    }
-}
-
-// check if the string has a base 64 encoding wrapper
-static int hasB64Wrapper(std::string_view str)
-{
-    if (str.compare(0, 4, "b64[") == 0) {
-        return 4;
-    }
-    return 0;
-}
-
-// decode a potentially base 64 encoded strings
-static std::string b64Decode(std::string_view stringToDecode)
-{
-    if (stringToDecode.empty()) {
-        return std::string{};
-    }
-    auto offset = hasB64Wrapper(stringToDecode);
-    if (offset != 0) {
-        stringToDecode.remove_suffix(1);
-        return gmlc::utilities::base64_decode_to_string(std::string(stringToDecode), offset);
-    }
-
-    // move is required since you are returning the rvalue and we want to move from the rvalue input
-    return std::string(stringToDecode);
-}
 
 std::string ActionMessage::to_json_string() const {
     Json::Value packet;
@@ -371,12 +313,12 @@ std::string ActionMessage::to_json_string() const {
         packet["Tdemin"] = Tdemin.getBaseTimeCode();
         packet["Tso"] = Tso.getBaseTimeCode();
     }
-    packet["payload"] = b64Encode(payload.to_string());
+    packet["payload"] = std::string(payload.to_string());
     packet["stringCount"] = stringData.size();
     if (!stringData.empty()) {
         packet["strings"] = Json::arrayValue;
         for (const auto& str : stringData){
-            packet["strings"].append(b64Encode(str));
+            packet["strings"].append(str);
         }
     }
     return fileops::generateJsonString(packet);
@@ -661,11 +603,11 @@ bool ActionMessage::from_json_string(std::string_view data)
             Tso.setBaseTimeCode(val["Tso"].asInt64());
         }
 
-        payload=b64Decode(val["payload"].asString());
+        payload=val["payload"].asString();
         auto stringCount = val["stringCount"].asUInt();
         stringData.resize(stringCount);
         for (Json::ArrayIndex ii =0;ii<stringCount;++ii) {
-            setString(ii, b64Decode(val["strings"][ii].asString()));
+            setString(ii, val["strings"][ii].asString());
         }
     }
     catch(...) {

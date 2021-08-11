@@ -10,15 +10,22 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;  // NOLINT
 
-static void BMtoString(benchmark::State& state)
-{
+static ActionMessage generateTestMessage1() {
     ActionMessage obj(CMD_REG_FED);
     obj.name("the name of the federate is really long");
     obj.setStringData("this is a new string to add to the string data");
+    return obj;
+}
+
+static const auto testMessage1 = generateTestMessage1();
+
+static void BMtoString(benchmark::State& state)
+{
+    
     std::string load;
     load.reserve(500);
     for (auto _ : state) {
-        obj.to_string(load);
+        testMessage1.to_string(load);
     }
 }
 // Register the function as a benchmark
@@ -26,12 +33,9 @@ BENCHMARK(BMtoString);
 
 static void BMfromString(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
-    obj.to_string(load);
+    testMessage1.to_string(load);
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -70,13 +74,10 @@ BENCHMARK(BMfromStringTime);
 
 static void BMpacketize(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
     for (auto _ : state) {
-        obj.packetize(load);
+        testMessage1.packetize(load);
     }
 }
 // Register the function as a benchmark
@@ -84,12 +85,9 @@ BENCHMARK(BMpacketize);
 
 static void BMdepacketize(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
-    obj.packetize(load);
+    testMessage1.packetize(load);
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -138,13 +136,10 @@ BENCHMARK(BMdepacketizeStrings);
 
 static void BMtoStringJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
     std::string load;
     load.reserve(500);
     for (auto _ : state) {
-        load=obj.to_json_string();
+        load = testMessage1.to_json_string();
     }
 }
 // Register the function as a benchmark
@@ -152,10 +147,7 @@ BENCHMARK(BMtoStringJson);
 
 static void BMfromStringJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
-    std::string load=obj.to_json_string();
+    std::string load = testMessage1.to_json_string();
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -167,10 +159,7 @@ BENCHMARK(BMfromStringJson);
 
 static void BMfromStringJsonDirect(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
-    std::string load = obj.to_json_string();
+    std::string load = testMessage1.to_json_string();
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -207,12 +196,9 @@ BENCHMARK(BMfromStringTimeJson);
 
 static void BMpacketizeJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
     std::string load;
     for (auto _ : state) {
-        load=obj.packetize_json();
+        load = testMessage1.packetize_json();
     }
 }
 // Register the function as a benchmark
@@ -220,10 +206,7 @@ BENCHMARK(BMpacketizeJson);
 
 static void BMdepacketizeJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_REG_FED);
-    obj.name("the name of the federate is really long");
-    obj.setStringData("this is a new string to add to the string data");
-    std::string load = obj.packetize_json();
+    std::string load = testMessage1.packetize_json();
     ActionMessage conv;
 
     for (auto _ : state) {
@@ -250,7 +233,7 @@ BENCHMARK(BMpacketizeStringsJson);
 
 static void BMdepacketizeStringsJson(benchmark::State& state)
 {
-    ActionMessage obj(CMD_MULTI_MESSAGE);
+    ActionMessage obj(CMD_MULTI_MESSAGE); 
     obj.name("sstring");
     for (int ii = 0; ii < 100; ++ii) {
         obj.setString(ii, ActionMessage(CMD_PING_REPLY).to_string());
