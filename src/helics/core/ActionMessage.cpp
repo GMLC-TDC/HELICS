@@ -314,12 +314,13 @@ std::string ActionMessage::to_json_string() const
         packet["Tso"] = Tso.getBaseTimeCode();
     }
     packet["payload"] = std::string(payload.to_string());
-    packet["stringCount"] = stringData.size();
+    packet["stringCount"] = static_cast<std::uint32_t>(stringData.size());
     if (!stringData.empty()) {
-        packet["strings"] = Json::arrayValue;
+        Json::Value sdata = Json::arrayValue;
         for (const auto& str : stringData) {
-            packet["strings"].append(str);
+            sdata.append(str);
         }
+        packet["strings"] = std::move(sdata);
     }
     return fileops::generateJsonString(packet);
 }
