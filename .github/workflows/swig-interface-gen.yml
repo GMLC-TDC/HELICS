@@ -40,7 +40,6 @@ jobs:
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
       
-    - uses: actions/setup-python@v2
     - name: set PY
       run: echo "PY=$(python --version --version | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
     - uses: actions/cache@v1
