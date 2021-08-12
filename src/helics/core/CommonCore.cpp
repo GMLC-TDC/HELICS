@@ -141,6 +141,10 @@ bool CommonCore::connect()
                 }
 
                 setActionFlag(m, core_flag);
+                if (useJsonSerialization) {
+                    setActionFlag(m, use_json_serialization_flag);
+                }
+
                 if (no_ping) {
                     setActionFlag(m, slow_responding_flag);
                 }

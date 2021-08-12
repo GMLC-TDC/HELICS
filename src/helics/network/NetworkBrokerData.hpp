@@ -65,6 +65,7 @@ class NetworkBrokerData {
         false};  //!< flag indicating that the name should be appended to the address
     bool noAckConnection{false};  //!< flag indicating that a connection ack message is not required
                                   //!< for broker connections
+    bool useJsonSerialization{false};  //!< for message serialization use JSON
     server_mode_options server_mode{server_mode_options::unspecified};  //!< setup a server mode
   public:
     NetworkBrokerData() = default;

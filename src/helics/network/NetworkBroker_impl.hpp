@@ -73,6 +73,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
     if ((netInfo.brokerName.empty()) && (netInfo.brokerAddress.empty())) {
         CoreBroker::setAsRoot();
     }
+    netInfo.useJsonSerialization = BrokerBase::useJsonSerialization;
     CommsBroker<COMMS, CoreBroker>::comms->setName(CoreBroker::getIdentifier());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo(netInfo);
     CommsBroker<COMMS, CoreBroker>::comms->setTimeout(BrokerBase::networkTimeout.to_ms());

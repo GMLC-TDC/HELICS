@@ -579,11 +579,12 @@ class Core {
     @param federateName the name of the dependent federate
     */
     virtual void addDependency(local_federate_id federateID, const std::string& federateName) = 0;
+
     /**
-     * Register known frequently communicating source/destination end points.
+     * Register communicating source/destination end points targets.
+     * @param source the endpoint that is sending data
+     * @param dest the endpoint receiving the data
      *
-     * May be used for error checking for compatible types and possible optimization by
-     * pre-registering the intent for these endpoints to communicate.
      */
     virtual void registerFrequentCommunicationsPair(const std::string& source,
                                                     const std::string& dest) = 0;
