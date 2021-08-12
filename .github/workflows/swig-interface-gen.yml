@@ -39,6 +39,18 @@ jobs:
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
+      
+    - uses: actions/setup-python@v2
+    - name: set PY
+      run: echo "PY=$(python --version --version | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - uses: pre-commit/action@v2.0.3
+      with:
+        extra_args: docker-clang-format
+        
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
