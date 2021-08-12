@@ -159,6 +159,9 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+    hApp->add_flag("--json",
+                   useJsonSerialization,
+                   "use the JSON serialization mode for communications");
 
     // add the profiling setup command
     hApp->add_option_function<std::string>(
