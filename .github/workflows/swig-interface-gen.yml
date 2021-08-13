@@ -3,8 +3,7 @@ name: Generate SWIG Interfaces
 on:
   workflow_dispatch:
   push:
-    branches: 
-      - master
+    branches:
       - main
       - develop
       - helics2
