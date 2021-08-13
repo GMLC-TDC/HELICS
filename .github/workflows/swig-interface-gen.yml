@@ -38,7 +38,7 @@ jobs:
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
     - uses: pre-commit/action@v2.0.3
       with:
-        extra_args: docker-clang-format
+        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/*
         
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
