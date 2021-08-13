@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include <stdint.h>
-    #include <stdlib.h>
+#include <stdlib.h>
 
 #ifndef HELICS_EXPORT
 #    if defined _WIN32 || defined __CYGWIN__
