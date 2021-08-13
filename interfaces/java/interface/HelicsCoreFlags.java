@@ -6,7 +6,7 @@
  * the SWIG interface file instead.
  * ----------------------------------------------------------------------------- */
 
-package com.java.helics;
+      package com.java.helics;
 
 /**
  *  enumeration of additional core flags
