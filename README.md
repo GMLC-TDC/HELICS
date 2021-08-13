@@ -22,9 +22,9 @@ A multi-language, cross-platform library that enables different simulators to ea
 - [Documentation](#documentation)
   - [Changelog](#changelog)
   - [RoadMap](#roadmap)
-- [Installation](#installation)
-  - [Building from Source](#build-from-source)
-  - [Docker](#docker)
+  - [Installation](#installation)
+  - [Quick links](#quick-links)
+
 - [Tools with HELICS support](#tools-with-helics-support)
 - [Contributing](#contributing)
 - [Build Status](#build-status)
@@ -87,6 +87,18 @@ A history of changes to HELICS
 
 A snapshot of some current plans for what is to come.
 
+### [Installation](https://docs.helics.org/en/latest/user-guide/installation/index.html)
+
+A guide to installing HELICS on different platforms
+
+### Quick links
+
+- [configuration option reference](docs/references/configuration_options_reference.md)
+- [Queries](docs/user-guide/advanced_topics/queries.md)
+- [Environment variables](docs/user-guide/advanced_topics/environment_variables.md)
+- [C function reference](https://docs.helics.org/en/latest/doxygen/C_api_index.html)
+- [CMake Variables](docs/user-guide/installation/helics_cmake_options.md)
+- [HELICS Apps](docs/references/apps/index.md)
 
 ### Docker
 
