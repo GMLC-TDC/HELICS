@@ -18,7 +18,7 @@
     orchestration_monte_carlo
     program_termination
     profiling
-    targetted_endpoints
+    targeted_endpoints
 
 ```
 

@@ -37,4 +37,4 @@ The topics considered "fundamental" to building a co-simualtion with HELICS are:
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
 - [**Execution with `helics_cli`**](./helics_cli.md) - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
 - [**Simulation Management**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
-- [**Simulator Integration**](./simulator_integration.md) - A guide for integrated HELICS into simulators.
+- [**Simulator Integration**](./simulator_integration.md) - A guide for integrating HELICS into simulators.
