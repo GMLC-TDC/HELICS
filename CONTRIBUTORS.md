@@ -130,7 +130,6 @@ Several CMake scripts came from other sources and were either used or modified f
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
 - Some scripts for including google test were borrowed and modified from [CLI11](https://github.com/CLIUtils/CLI11)
 
-
 ## Optional components
 
 A list of optional component that are not included in HELICS but are optionally used by the library
@@ -138,7 +137,6 @@ A list of optional component that are not included in HELICS but are optionally 
 ### [BOOST](https://www.boost.org)
 
 Boost is used in a few places in the code. The IPC core uses the Boost.Interprocess library. Some of the header-only Boost algorithms and other libraries are also used throughout the code. Some of the string parsing can optionally use boost spirit. The webserver that is part of the broker_server uses Boost::Beast from Boost 1.70 or higher. Boost is licensed under the Boost Software License. Boost can be removed entirely from the source code with the use of a [cmake](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) flag.
-
 
 #### [zmq](http://www.zeromq.org)
 

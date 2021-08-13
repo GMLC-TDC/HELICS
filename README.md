@@ -20,6 +20,7 @@ A multi-language, cross-platform library that enables different simulators to ea
 - [Getting Started](#getting-started)
   - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
+
   - [Changelog](#changelog)
   - [RoadMap](#roadmap)
   - [Installation](#installation)
@@ -125,7 +126,6 @@ We are always looking for help adding support for more tools, so please contact 
 ## Contributing
 
 Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing. See the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations. All prior contributors can be found [here](CONTRIBUTORS.md) along with a listing of included and optional components to HELICS.
-
 
 ## Build Status
 
