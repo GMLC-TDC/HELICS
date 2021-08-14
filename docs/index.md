@@ -17,6 +17,14 @@ Brief History: HELICS began as the core software development of the Grid Moderni
 
 Motivation: Energy systems and their associated information and communication technology systems are becoming increasingly intertwined. As a result, effectively designing, analyzing, and implementing modern energy systems increasingly relies on advanced modeling that simultaneously captures both the cyber and physical domains in combined simulations. It is designed to increase scalability and portability in modeling advanced features of highly integrated power system and cyber-physical energy systems.
 
+- Quick links
+  - [configuration Option Reference](./references/configuration_options_reference.md)
+  - [Queries](./user-guide/advanced_topics/queries.md)
+  - [Environment Variables](./user-guide/advanced_topics/environment_variables.md)
+  - [C function Reference](https://docs.helics.org/en/latest/doxygen/C_api_index.html)
+  - [CMake Variables](./user-guide/installation/helics_cmake_options.md)
+  - [HELICS Apps](../references/apps/index.md)
+
 ```eval_rst
 .. toctree::
    :maxdepth: 2
