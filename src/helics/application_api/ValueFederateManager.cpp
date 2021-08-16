@@ -52,11 +52,13 @@ int getTypeSize(const std::string& type)
     return (ret == typeSizes.end()) ? (-1) : ret->second;
 }
 
+static const std::string jsonStringType{"json"};
+
 Publication& ValueFederateManager::registerPublication(const std::string& key,
                                                        std::string type,
                                                        const std::string& units)
 {
-    type = getCleanedTypeName(type);
+    type = useJsonSerialization?jsonStringType:getCleanedTypeName(type);
     auto coreID = coreObject->registerPublication(fedID, key, type, units);
 
     auto pubHandle = publications.lock();
@@ -77,7 +79,7 @@ Input& ValueFederateManager::registerInput(const std::string& key,
                                            std::string type,
                                            const std::string& units)
 {
-    type = getCleanedTypeName(type);
+    type = useJsonSerialization ? jsonStringType : getCleanedTypeName(type);
     auto coreID = coreObject->registerInput(fedID, key, type, units);
     auto inpHandle = inputs.lock();
     decltype(inpHandle->insert(key, coreID, fed, coreID, key, units)) active;

@@ -694,6 +694,13 @@ SmallBuffer typeConvert(DataType type, double val)
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&val, 1);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_DOUBLE);
+            jv["value"] = val;
+            return fileops::generateJsonString(jv);
+        }
+                                  
     }
 }
 SmallBuffer typeConvert(DataType type, int64_t val)
@@ -730,6 +737,12 @@ SmallBuffer typeConvert(DataType type, int64_t val)
             auto v2 = static_cast<double>(val);
             return ValueConverter<double>::convert(&v2, 1);
         }
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_INT);
+            jv["value"] = val;
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -758,6 +771,12 @@ SmallBuffer typeConvert(DataType type, std::string_view val)
                 helicsGetComplexVector(val));
         case DataType::HELICS_VECTOR:
             return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_STRING);
+            jv["value"] = std::string(val);
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -799,6 +818,16 @@ SmallBuffer typeConvert(DataType type, const std::vector<double>& val)
         case DataType::HELICS_VECTOR:
         default:
             return ValueConverter<std::vector<double>>::convert(val);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
+            Json::Value vv = Json::arrayValue;
+            for (auto &v:val) {
+                vv.append(v);
+            }
+            jv["value"] = std::move(vv);
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -846,6 +875,16 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
         case DataType::HELICS_VECTOR:
         default:
             return ValueConverter<double>::convert(vals, size);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
+            Json::Value vv = Json::arrayValue;
+            for (size_t ii = 0; ii < size;++ii) {
+                vv.append(vals[ii]);
+            }
+            jv["value"] = std::move(vv);
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -881,6 +920,17 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
             }
             return ValueConverter<std::vector<double>>::convert(DV);
         }
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_COMPLEX_VECTOR);
+            Json::Value vv = Json::arrayValue;
+            for (auto& v : val) {
+                vv.append(v.real());
+                vv.append(v.imag());
+            }
+            jv["value"] = std::move(vv);
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
@@ -909,6 +959,15 @@ SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
         case DataType::HELICS_VECTOR: {
             std::vector<double> V{val.real(), val.imag()};
             return ValueConverter<std::vector<double>>::convert(V);
+        }
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_COMPLEX);
+            Json::Value vv = Json::arrayValue;
+            vv.append(val.real());
+            vv.append(val.imag());
+            jv["value"] = std::move(vv);
+            return fileops::generateJsonString(jv);
         }
     }
 }
@@ -944,6 +1003,13 @@ SmallBuffer typeConvert(DataType type, const NamedPoint& val)
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val.value), 1);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_NAMED_POINT);
+            jv["name"] = val.name;
+            jv["value"] = val.value;
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -976,6 +1042,13 @@ SmallBuffer typeConvert(DataType type, std::string_view str, double val)
         }
         case DataType::HELICS_VECTOR:
             return ValueConverter<double>::convert(&(val), 1);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_NAMED_POINT);
+            jv["name"] = std::string(str);
+            jv["value"] = val;
+            return fileops::generateJsonString(jv);
+        }
     }
 }
 
@@ -1005,6 +1078,12 @@ SmallBuffer typeConvert(DataType type, bool val)
         case DataType::HELICS_VECTOR: {
             auto v2 = val ? 1.0 : 0.0;
             return ValueConverter<double>::convert(&v2, 1);
+        }
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_BOOL);
+            jv["value"] = val;
+            return fileops::generateJsonString(jv);
         }
     }
 }

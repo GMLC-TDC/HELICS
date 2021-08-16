@@ -1390,7 +1390,7 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
         throw(InvalidIdentifier("Handle not valid (setValue)"));
     }
     if (handleInfo->handleType != InterfaceType::PUBLICATION) {
-        throw(InvalidIdentifier("handle does not point to a publication or control output"));
+        throw(InvalidIdentifier("handle does not point to a publication"));
     }
     if (checkActionFlag(*handleInfo, disconnected_flag)) {
         return;
@@ -1417,7 +1417,6 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
             mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
             mv.payload.assign(data, len);
             mv.actionTime = fed->nextAllowedSendTime();
-
             actionQueue.push(std::move(mv));
             return;
         }
