@@ -220,8 +220,7 @@ class ValueFederateManager {
     Core* coreObject;  //!< the pointer to the actual core
     ValueFederate*
         fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
-    
-    
+
     atomic_guarded<std::function<void(Input&, Time)>>
         allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
