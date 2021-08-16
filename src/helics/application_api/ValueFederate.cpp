@@ -30,6 +30,7 @@ ValueFederate::ValueFederate(const std::string& fedName, const FederateInfo& fi)
 {
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 ValueFederate::ValueFederate(const std::string& fedName,
                              const std::shared_ptr<Core>& core,
@@ -37,18 +38,21 @@ ValueFederate::ValueFederate(const std::string& fedName,
     Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(const std::string& fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = useJsonSerialization;
     if (looksLikeFile(configString)) {
         ValueFederate::registerInterfaces(configString);
     }
@@ -69,6 +73,7 @@ ValueFederate::ValueFederate() = default;
 ValueFederate::ValueFederate(bool /*res*/)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(ValueFederate&&) noexcept = default;

@@ -127,8 +127,8 @@ class BrokerBase {
 
     bool no_ping{false};  //!< indicator that the broker is not very responsive to ping requests
     bool uuid_like{false};  //!< will be set to true if the name looks like a uuid
-    bool useJsonSerialization{
-        false};  //!< specify that outgoing connection should use json serialization
+    /** specify that outgoing connection should use json serialization */
+    bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     decltype(std::chrono::steady_clock::now())
         errorTimeStart;  //!< time when the error condition started related to the errorDelay

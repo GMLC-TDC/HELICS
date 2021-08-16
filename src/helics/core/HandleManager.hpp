@@ -15,7 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <utility>
 namespace helics {
-/** class for managing a coordinating the different types of handles used in helics
+
+    /** class for managing a coordinating the different types of handles used in helics
 @details this class is not designed to be thread safe that would require a wrapper around it
 */
 class HandleManager {
@@ -106,7 +107,6 @@ class HandleManager {
     auto begin() const { return handles.begin(); }
     auto end() const { return handles.end(); }
     auto size() const { return handles.size(); }
-
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
     std::string generateName(InterfaceType what) const;

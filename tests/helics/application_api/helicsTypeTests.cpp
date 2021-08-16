@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <complex>
 #include <gtest/gtest.h>
+#include "helics/common/JsonProcessingFunctions.hpp"
 
 /** these test cases test out the value converters
  */
@@ -107,4 +108,97 @@ TEST(helics_types, cvector_to_string)
 
     auto V2 = helicsGetComplexVector(v);
     EXPECT_EQ(V1, V2);
+}
+
+
+TEST(json_type_conversion, to_json) {
+    auto res= typeConvert(DataType::HELICS_JSON, 49.7);
+    Json::Value jv;
+    defV result;
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), double_loc);
+    EXPECT_DOUBLE_EQ(std::get<double>(result), 49.7);
+
+    res = typeConvert(DataType::HELICS_JSON, 1956258LL);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), int_loc);
+    EXPECT_EQ(std::get<std::int64_t>(result), 1956258LL);
+
+    std::string_view testString("this is a test");
+    res = typeConvert(DataType::HELICS_JSON, testString);
+     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), string_loc);
+    EXPECT_EQ(std::get<std::string>(result), testString);
+
+    std::vector<double> testV{456.6, 19.5};
+    res = typeConvert(DataType::HELICS_JSON, testV);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), vector_loc);
+    EXPECT_EQ(std::get<std::vector<double>>(result), testV);
+    res = typeConvert(DataType::HELICS_JSON, testV.data(), testV.size());
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), vector_loc);
+    EXPECT_EQ(std::get<std::vector<double>>(result), testV);
+
+
+    std::vector<std::complex<double>> testcv;
+    testcv.emplace_back(15.7, -5363.55);
+    testcv.emplace_back(-543623.44, 151.133);
+    res = typeConvert(DataType::HELICS_JSON,
+                                              testcv);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), complex_vector_loc);
+    EXPECT_EQ(std::get<std::vector<std::complex<double>>>(result), testcv);
+
+    res = typeConvert(DataType::HELICS_JSON, testcv.front());
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), complex_loc);
+    EXPECT_EQ(std::get<std::complex<double>>(result), testcv.front());
+
+    NamedPoint t1("vvvv", 1851.44);
+    res = typeConvert(DataType::HELICS_JSON, t1);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), named_point_loc);
+    EXPECT_EQ(std::get<NamedPoint>(result), t1);
+
+    res = typeConvert(DataType::HELICS_JSON, t1.name,t1.value);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), named_point_loc);
+    EXPECT_EQ(std::get<NamedPoint>(result), t1);
+
+    res = typeConvert(DataType::HELICS_JSON, true);
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), int_loc);
+    EXPECT_EQ(std::get<std::int64_t>(result), 1);
 }
