@@ -58,7 +58,7 @@ Publication& ValueFederateManager::registerPublication(const std::string& key,
                                                        std::string type,
                                                        const std::string& units)
 {
-    type = useJsonSerialization?jsonStringType:getCleanedTypeName(type);
+    type = useJsonSerialization ? jsonStringType : getCleanedTypeName(type);
     auto coreID = coreObject->registerPublication(fedID, key, type, units);
 
     auto pubHandle = publications.lock();

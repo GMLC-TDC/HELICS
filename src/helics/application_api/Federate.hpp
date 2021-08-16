@@ -80,6 +80,7 @@ class HELICS_CXX_EXPORT Federate {
     bool strictConfigChecking{true};
     /** set to true to force all outgoing data to json serialization*/
     bool useJsonSerialization{true};
+
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:

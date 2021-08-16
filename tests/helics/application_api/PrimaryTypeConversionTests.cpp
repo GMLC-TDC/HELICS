@@ -115,7 +115,6 @@ TEST(type_conversion, double_conversion)
     EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", val}));
 }
 
-
 TEST(type_conversion, integer_type)
 {
     EXPECT_TRUE(helicsType<int64_t>() == DataType::HELICS_INT);

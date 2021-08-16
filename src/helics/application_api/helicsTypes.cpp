@@ -700,7 +700,6 @@ SmallBuffer typeConvert(DataType type, double val)
             jv["value"] = val;
             return fileops::generateJsonString(jv);
         }
-                                  
     }
 }
 SmallBuffer typeConvert(DataType type, int64_t val)
@@ -822,7 +821,7 @@ SmallBuffer typeConvert(DataType type, const std::vector<double>& val)
             Json::Value jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
             Json::Value vv = Json::arrayValue;
-            for (auto &v:val) {
+            for (auto& v : val) {
                 vv.append(v);
             }
             jv["value"] = std::move(vv);
@@ -879,7 +878,7 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
             Json::Value jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
             Json::Value vv = Json::arrayValue;
-            for (size_t ii = 0; ii < size;++ii) {
+            for (size_t ii = 0; ii < size; ++ii) {
                 vv.append(vals[ii]);
             }
             jv["value"] = std::move(vv);
