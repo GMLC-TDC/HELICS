@@ -494,9 +494,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
-    app->add_flag("--json",
-                  useJsonSerialization,
-                  "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
+    app->add_flag(
+        "--json",
+        useJsonSerialization,
+        "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
     app->add_option(
            "--profiler",
            profilerFileName,

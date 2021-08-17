@@ -5,9 +5,10 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/common/JsonProcessingFunctions.hpp"
+
 #include <complex>
 #include <gtest/gtest.h>
-#include "helics/common/JsonProcessingFunctions.hpp"
 
 /** these test cases test out the value converters
  */
@@ -110,9 +111,9 @@ TEST(helics_types, cvector_to_string)
     EXPECT_EQ(V1, V2);
 }
 
-
-TEST(json_type_conversion, to_json) {
-    auto res= typeConvert(DataType::HELICS_JSON, 49.7);
+TEST(json_type_conversion, to_json)
+{
+    auto res = typeConvert(DataType::HELICS_JSON, 49.7);
     Json::Value jv;
     defV result;
     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
@@ -132,7 +133,7 @@ TEST(json_type_conversion, to_json) {
 
     std::string_view testString("this is a test");
     res = typeConvert(DataType::HELICS_JSON, testString);
-     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
+    EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
     EXPECT_TRUE(jv.isMember("value"));
     EXPECT_TRUE(jv.isMember("type"));
 
@@ -156,12 +157,10 @@ TEST(json_type_conversion, to_json) {
     EXPECT_EQ(result.index(), vector_loc);
     EXPECT_EQ(std::get<std::vector<double>>(result), testV);
 
-
     std::vector<std::complex<double>> testcv;
     testcv.emplace_back(15.7, -5363.55);
     testcv.emplace_back(-543623.44, 151.133);
-    res = typeConvert(DataType::HELICS_JSON,
-                                              testcv);
+    res = typeConvert(DataType::HELICS_JSON, testcv);
     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
     EXPECT_TRUE(jv.isMember("value"));
     EXPECT_TRUE(jv.isMember("type"));
@@ -186,7 +185,7 @@ TEST(json_type_conversion, to_json) {
     EXPECT_EQ(result.index(), named_point_loc);
     EXPECT_EQ(std::get<NamedPoint>(result), t1);
 
-    res = typeConvert(DataType::HELICS_JSON, t1.name,t1.value);
+    res = typeConvert(DataType::HELICS_JSON, t1.name, t1.value);
     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
     EXPECT_TRUE(jv.isMember("value"));
     EXPECT_TRUE(jv.isMember("type"));
