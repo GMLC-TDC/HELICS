@@ -216,12 +216,10 @@ class ValueFederateManager {
                                                         InterfaceHandle,
                                                         reference_stability::stable>>
         publications;
-    Time CurrentTime = Time(-1.0);  //!< the current simulation time
+    Time CurrentTime{-1.0};  //!< the current simulation time
     Core* coreObject;  //!< the pointer to the actual core
-    ValueFederate*
-        fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
-    
-    
+    /** pointer back to the value Federate for creation of the Publication/Inputs */
+    ValueFederate* fed{nullptr};
     atomic_guarded<std::function<void(Input&, Time)>>
         allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>

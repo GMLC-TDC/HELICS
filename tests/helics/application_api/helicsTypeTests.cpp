@@ -122,7 +122,7 @@ TEST(json_type_conversion, to_json) {
     EXPECT_EQ(result.index(), double_loc);
     EXPECT_DOUBLE_EQ(std::get<double>(result), 49.7);
 
-    res = typeConvert(DataType::HELICS_JSON, 1956258LL);
+    res = typeConvert(DataType::HELICS_JSON, std::int64_t(1956258));
     EXPECT_NO_THROW(jv = fileops::loadJsonStr(res.to_string()));
     EXPECT_TRUE(jv.isMember("value"));
     EXPECT_TRUE(jv.isMember("type"));

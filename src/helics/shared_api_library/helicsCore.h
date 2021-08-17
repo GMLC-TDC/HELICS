@@ -1257,7 +1257,6 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  *
  * @param fed The federate to get the tag for.
  * @param tagName The name of the tag to query.
- * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
  */

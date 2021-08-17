@@ -822,7 +822,7 @@ SmallBuffer typeConvert(DataType type, const std::vector<double>& val)
             Json::Value jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
             Json::Value vv = Json::arrayValue;
-            for (auto &v:val) {
+            for (const auto &v:val) {
                 vv.append(v);
             }
             jv["value"] = std::move(vv);
@@ -924,7 +924,7 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
             Json::Value jv;
             jv["type"] = typeNameStringRef(DataType::HELICS_COMPLEX_VECTOR);
             Json::Value vv = Json::arrayValue;
-            for (auto& v : val) {
+            for (const auto& v : val) {
                 vv.append(v.real());
                 vv.append(v.imag());
             }

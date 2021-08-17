@@ -540,7 +540,7 @@ defV readJsonValue(const data_view& dv)
                 std::vector<std::complex<double>> res;
                 auto ca = jv["value"];
                 for (Json::ArrayIndex ii = 0; ii < ca.size() - 1; ii += 2) {
-                    res.push_back(std::complex<double>(ca[ii].asDouble(),ca[ii+1].asDouble()));
+                    res.emplace_back(ca[ii].asDouble(),ca[ii+1].asDouble());
                 }
                 result = std::move(res);
             }

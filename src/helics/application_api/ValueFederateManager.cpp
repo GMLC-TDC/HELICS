@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id):
-    coreObject(coreOb), fed(vfed), fedID(id)
+    coreObject(coreOb), fedID(id), fed(vfed)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
