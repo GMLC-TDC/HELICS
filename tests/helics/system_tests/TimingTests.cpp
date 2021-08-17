@@ -211,7 +211,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
+TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -239,7 +239,6 @@ TEST_F(timing_tests, test_uninteruptible_flag_two_way_comm)
                 std::cerr << "error in fed 1 publication at time " << t << std::endl;
                 break;
             }
-
             auto T2 = vFed1->requestTime(t);
             if (T2 == helics::Time::maxVal()) {
                 break;

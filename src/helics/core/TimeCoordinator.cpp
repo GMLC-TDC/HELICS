@@ -154,7 +154,7 @@ void TimeCoordinator::timeRequest(Time nextTime,
             nextTime = time_next;
         }
         if (info.uninterruptible) {
-            time_next = nextTime;
+            time_next = generateAllowedTime(nextTime);
         }
     }
     time_requested = nextTime;
@@ -182,7 +182,7 @@ bool TimeCoordinator::updateNextExecutionTime()
 {
     auto cexec = time_exec;
     if (info.uninterruptible) {
-        time_exec = time_requested;
+        time_exec = generateAllowedTime(time_requested);
     } else {
         time_exec = std::min(time_message, time_value);
         if (time_exec < Time::maxVal()) {
@@ -211,7 +211,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
         (iterating == IterationRequest::NO_ITERATIONS) ? getNextPossibleTime() : time_granted;
 
     if (info.uninterruptible) {
-        time_next = time_requested;
+        time_next = generateAllowedTime(time_requested) + info.outputDelay;
     } else {
         if (time_minminDe < Time::maxVal() && !info.restrictive_time_policy) {
             if (time_minminDe + info.inputDelay > time_next) {
@@ -1055,8 +1055,7 @@ int TimeCoordinator::getIntegerProperty(int intProperty) const
         case defs::Properties::MAX_ITERATIONS:
             return info.maxIterations;
         default:
-            // TODO(PT): make this something consistent
-            return -972;
+            return HELICS_INVALID_PROPERTY_VALUE;
     }
 }
 
