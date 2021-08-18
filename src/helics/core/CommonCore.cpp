@@ -74,11 +74,11 @@ CommonCore::CommonCore(const std::string& coreName):
 
 void CommonCore::configure(const std::string& configureString)
 {
-    if (transitionBrokerState(broker_state_t::created, broker_state_t::configuring)) {
+    if (transitionBrokerState(BrokerState::created, BrokerState::configuring)) {
         // initialize the brokerbase
         auto result = parseArgs(configureString);
         if (result != 0) {
-            setBrokerState(broker_state_t::created);
+            setBrokerState(BrokerState::created);
             if (result < 0) {
                 throw(helics::InvalidParameter("invalid arguments in configure string"));
             }
@@ -90,11 +90,11 @@ void CommonCore::configure(const std::string& configureString)
 
 void CommonCore::configureFromArgs(int argc, char* argv[])
 {
-    if (transitionBrokerState(broker_state_t::created, broker_state_t::configuring)) {
+    if (transitionBrokerState(BrokerState::created, BrokerState::configuring)) {
         // initialize the brokerbase
         auto result = parseArgs(argc, argv);
         if (result != 0) {
-            setBrokerState(broker_state_t::created);
+            setBrokerState(BrokerState::created);
             if (result < 0) {
                 throw(helics::InvalidParameter("invalid arguments in command line"));
             }
@@ -106,11 +106,11 @@ void CommonCore::configureFromArgs(int argc, char* argv[])
 
 void CommonCore::configureFromVector(std::vector<std::string> args)
 {
-    if (transitionBrokerState(broker_state_t::created, broker_state_t::configuring)) {
+    if (transitionBrokerState(BrokerState::created, BrokerState::configuring)) {
         // initialize the brokerbase
         auto result = parseArgs(std::move(args));
         if (result != 0) {
-            setBrokerState(broker_state_t::created);
+            setBrokerState(BrokerState::created);
             if (result < 0) {
                 throw(helics::InvalidParameter("invalid arguments in arguments structure"));
             }
@@ -123,11 +123,11 @@ void CommonCore::configureFromVector(std::vector<std::string> args)
 bool CommonCore::connect()
 {
     auto cBrokerState = getBrokerState();
-    if (cBrokerState == broker_state_t::errored) {
+    if (cBrokerState == BrokerState::errored) {
         return false;
     }
-    if (cBrokerState >= broker_state_t::configured) {
-        if (transitionBrokerState(broker_state_t::configured, broker_state_t::connecting)) {
+    if (cBrokerState >= BrokerState::configured) {
+        if (transitionBrokerState(BrokerState::configured, BrokerState::connecting)) {
             timeoutMon->setTimeout(timeout.to_ms());
             bool res = brokerConnect();
             if (res) {
@@ -143,20 +143,24 @@ bool CommonCore::connect()
                 }
 
                 setActionFlag(m, core_flag);
+                if (useJsonSerialization) {
+                    setActionFlag(m, use_json_serialization_flag);
+                }
+
                 if (no_ping) {
                     setActionFlag(m, slow_responding_flag);
                 }
                 transmit(parent_route_id, m);
-                setBrokerState(broker_state_t::connected);
+                setBrokerState(BrokerState::connected);
                 disconnection.activate();
             } else {
-                setBrokerState(broker_state_t::configured);
+                setBrokerState(BrokerState::configured);
             }
             return res;
         }
 
         LOG_WARNING(global_id.load(), getIdentifier(), "multiple connect calls");
-        while (getBrokerState() == broker_state_t::connecting) {
+        while (getBrokerState() == BrokerState::connecting) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
@@ -166,13 +170,12 @@ bool CommonCore::connect()
 bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
-    return ((currentState == broker_state_t::operating) ||
-            (currentState == broker_state_t::connected));
+    return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
 }
 
 const std::string& CommonCore::getAddress() const
 {
-    if ((getBrokerState() != broker_state_t::connected) || (address.empty())) {
+    if ((getBrokerState() != BrokerState::connected) || (address.empty())) {
         address = generateLocalAddressString();
     }
     return address;
@@ -181,9 +184,9 @@ const std::string& CommonCore::getAddress() const
 void CommonCore::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if (cBrokerState > broker_state_t::configured) {
-        if (cBrokerState < broker_state_t::terminating) {
-            setBrokerState(broker_state_t::terminating);
+    if (cBrokerState > BrokerState::configured) {
+        if (cBrokerState < BrokerState::terminating) {
+            setBrokerState(BrokerState::terminating);
             sendDisconnect();
             if ((global_broker_id_local != parent_broker_id) &&
                 (global_broker_id_local.isValid())) {
@@ -200,7 +203,7 @@ void CommonCore::processDisconnect(bool skipUnregister)
         }
         brokerDisconnect();
     }
-    setBrokerState(broker_state_t::terminated);
+    setBrokerState(BrokerState::terminated);
     if (!skipUnregister) {
         unregister();
     }
@@ -334,21 +337,20 @@ route_id CommonCore::getRoute(GlobalFederateId global_fedid) const
 
 bool CommonCore::isConfigured() const
 {
-    return (getBrokerState() >= broker_state_t::configured);
+    return (getBrokerState() >= BrokerState::configured);
 }
 
 bool CommonCore::isOpenToNewFederates() const
 {
     auto cBrokerState = getBrokerState();
-    return ((cBrokerState != broker_state_t::created) &&
-            (cBrokerState < broker_state_t::operating) &&
+    return ((cBrokerState != BrokerState::created) && (cBrokerState < BrokerState::operating) &&
             (maxFederateCount == std::numeric_limits<int32_t>::max() ||
              (federates.lock_shared()->size() < static_cast<size_t>(maxFederateCount))));
 }
 
 bool CommonCore::hasError() const
 {
-    return getBrokerState() == broker_state_t::errored;
+    return getBrokerState() == BrokerState::errored;
 }
 void CommonCore::globalError(LocalFederateId federateID,
                              int errorCode,
@@ -574,7 +576,7 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
 LocalFederateId CommonCore::registerFederate(const std::string& name, const CoreFederateInfo& info)
 {
     if (!waitCoreRegistration()) {
-        if (getBrokerState() == broker_state_t::errored) {
+        if (getBrokerState() == BrokerState::errored) {
             if (!lastErrorString.empty()) {
                 throw(RegistrationFailure(lastErrorString));
             }
@@ -582,7 +584,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
         throw(RegistrationFailure(
             "core is unable to register and has timed out, federate cannot be registered"));
     }
-    if (getBrokerState() >= broker_state_t::operating) {
+    if (getBrokerState() >= BrokerState::operating) {
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
     FederateState* fed = nullptr;
@@ -618,7 +620,9 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
 
     fed->local_id = local_id;
     fed->setParent(this);
-
+    if (enable_profiling) {
+        fed->setOptionFlag(defs::PROFILING, true);
+    }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
     addActionMessage(m);
@@ -677,7 +681,7 @@ LocalFederateId CommonCore::getFederateId(const std::string& name) const
 
 int32_t CommonCore::getFederationSize()
 {
-    if (getBrokerState() >= broker_state_t::operating) {
+    if (getBrokerState() >= BrokerState::operating) {
         return _global_federation_size;
     }
     // if we are in initialization return the local federation size
@@ -1386,7 +1390,7 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
         throw(InvalidIdentifier("Handle not valid (setValue)"));
     }
     if (handleInfo->handleType != InterfaceType::PUBLICATION) {
-        throw(InvalidIdentifier("handle does not point to a publication or control output"));
+        throw(InvalidIdentifier("handle does not point to a publication"));
     }
     if (checkActionFlag(*handleInfo, disconnected_flag)) {
         return;
@@ -1413,7 +1417,6 @@ void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len
             mv.counter = static_cast<uint16_t>(fed->getCurrentIteration());
             mv.payload.assign(data, len);
             mv.actionTime = fed->nextAllowedSendTime();
-
             actionQueue.push(std::move(mv));
             return;
         }
@@ -1571,7 +1574,7 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
         }
     }
     if (!waitCoreRegistration()) {
-        if (getBrokerState() >= broker_state_t::terminating) {
+        if (getBrokerState() >= BrokerState::terminating) {
             throw(RegistrationFailure("core is terminated no further registration possible"));
         }
         throw(RegistrationFailure("registration timeout exceeded"));
@@ -1607,7 +1610,7 @@ InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
         }
     }
     if (!waitCoreRegistration()) {
-        if (getBrokerState() >= broker_state_t::terminating) {
+        if (getBrokerState() >= BrokerState::terminating) {
             throw(RegistrationFailure("core is terminated no further registration possible"));
         }
         throw(RegistrationFailure("registration timeout exceeded"));
@@ -2108,7 +2111,7 @@ void CommonCore::setFilterOperator(InterfaceHandle filter, std::shared_ptr<Filte
 
 void CommonCore::setIdentifier(const std::string& name)
 {
-    if (getBrokerState() == broker_state_t::created) {
+    if (getBrokerState() == BrokerState::created) {
         identifier = name;
     } else {
         throw(
@@ -2535,7 +2538,7 @@ std::string CommonCore::query(const std::string& target,
                               const std::string& queryStr,
                               HelicsSequencingModes mode)
 {
-    if (getBrokerState() >= broker_state_t::terminating) {
+    if (getBrokerState() >= BrokerState::terminating) {
         if (target == "core" || target == getIdentifier() || target.empty()) {
             auto res = quickCoreQueries(queryStr);
             if (!res.empty()) {
@@ -2730,8 +2733,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 timeoutMon->reset();
                 if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
                     if (allInitReady()) {
-                        if (transitionBrokerState(broker_state_t::connected,
-                                                  broker_state_t::initializing)) {
+                        if (transitionBrokerState(BrokerState::connected,
+                                                  BrokerState::initializing)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
                             checkDependencies();
@@ -2913,14 +2916,14 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_IGNORE:
             break;
         case CMD_TICK:
-            if (isReasonForTick(command.messageID, TickForwardingReasons::ping_response) ||
-                isReasonForTick(command.messageID, TickForwardingReasons::no_comms)) {
-                if (getBrokerState() == broker_state_t::operating) {
+            if (isReasonForTick(command.messageID, TickForwardingReasons::PING_RESPONSE) ||
+                isReasonForTick(command.messageID, TickForwardingReasons::NO_COMMS)) {
+                if (getBrokerState() == BrokerState::operating) {
                     timeoutMon->tick(this);
                     LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
                 }
             }
-            if (isReasonForTick(command.messageID, TickForwardingReasons::query_timeout)) {
+            if (isReasonForTick(command.messageID, TickForwardingReasons::QUERY_TIMEOUT)) {
                 checkQueryTimeouts();
             }
 
@@ -3153,9 +3156,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
                 if (terminate_on_error) {
-                    if (getBrokerState() != broker_state_t::errored) {
+                    if (getBrokerState() != BrokerState::errored) {
                         sendErrorToFederates(command.messageID, command.payload.to_string());
-                        setBrokerState(broker_state_t::errored);
+                        setBrokerState(BrokerState::errored);
                     }
                     command.setAction(CMD_GLOBAL_ERROR);
                     command.source_id = global_broker_id_local;
@@ -3165,9 +3168,9 @@ void CommonCore::processCommand(ActionMessage&& command)
             } else {
                 if (command.dest_id == parent_broker_id) {
                     if (terminate_on_error) {
-                        if (getBrokerState() != broker_state_t::errored) {
+                        if (getBrokerState() != BrokerState::errored) {
                             sendErrorToFederates(command.messageID, command.payload.to_string());
-                            setBrokerState(broker_state_t::errored);
+                            setBrokerState(BrokerState::errored);
                         }
                         command.setAction(CMD_GLOBAL_ERROR);
                         command.source_id = global_broker_id_local;
@@ -3294,9 +3297,9 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (fed != nullptr) {
                 fed->init_transmitted = true;
                 if (allInitReady()) {
-                    if (transitionBrokerState(broker_state_t::connected,
-                                              broker_state_t::initializing)) {  // make sure we only
-                                                                                // do this once
+                    if (transitionBrokerState(BrokerState::connected,
+                                              BrokerState::initializing)) {  // make sure we only
+                                                                             // do this once
                         checkDependencies();
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
@@ -3306,8 +3309,8 @@ void CommonCore::processCommand(ActionMessage&& command)
         } break;
         case CMD_INIT_GRANT:
             if (transitionBrokerState(
-                    broker_state_t::initializing,
-                    broker_state_t::operating)) {  // forward the grant to all federates
+                    BrokerState::initializing,
+                    BrokerState::operating)) {  // forward the grant to all federates
                 if (filterFed != nullptr) {
                     filterFed->organizeFilterOperations();
                 }
@@ -3336,10 +3339,19 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
 
             break;
-
+        case CMD_PROFILER_DATA:
+            if (enable_profiling) {
+                saveProfilingData(command.payload.to_string());
+            } else {
+                routeMessage(std::move(command), parent_broker_id);
+            }
+            break;
+        case CMD_SET_PROFILER_FLAG:
+            routeMessage(command);
+            break;
         default:
-            if (isPriorityCommand(command)) {  // this is a backup if somehow one of these
-                                               // message got here
+            if (isPriorityCommand(command)) {
+                // this is a backup if somehow one of these message got here
                 processPriorityCommand(std::move(command));
             }
             break;
@@ -3758,7 +3770,7 @@ void CommonCore::checkQueryTimeouts()
             queryTimeouts.pop_front();
         }
         if (queryTimeouts.empty()) {
-            setTickForwarding(TickForwardingReasons::query_timeout, false);
+            setTickForwarding(TickForwardingReasons::QUERY_TIMEOUT, false);
         }
     }
 }
@@ -3917,16 +3929,16 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
         case CMD_GLOBAL_DISCONNECT:
             if (isConnected()) {
                 if (getBrokerState() <
-                    broker_state_t::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
-                    setBrokerState(broker_state_t::terminating);
+                    BrokerState::terminating) {  // only send a disconnect message
+                                                 // if we haven't done so already
+                    setBrokerState(BrokerState::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
                 }
             } else if (getBrokerState() ==
-                       broker_state_t::errored) {  // we are disconnecting in an error state
+                       BrokerState::errored) {  // we are disconnecting in an error state
                 sendDisconnect();
                 ActionMessage m(CMD_DISCONNECT);
                 m.source_id = global_broker_id_local;
@@ -3945,9 +3957,9 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
 
             if (isConnected()) {
                 if (getBrokerState() <
-                    broker_state_t::terminating) {  // only send a disconnect message
-                                                    // if we haven't done so already
-                    setBrokerState(broker_state_t::terminating);
+                    BrokerState::terminating) {  // only send a disconnect message
+                                                 // if we haven't done so already
+                    setBrokerState(BrokerState::terminating);
                     sendDisconnect();
                     ActionMessage m(CMD_DISCONNECT);
                     m.source_id = global_broker_id_local;
@@ -3966,14 +3978,14 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_FED:
             if (cmd.dest_id == parent_broker_id) {
-                if (getBrokerState() < broker_state_t::terminating) {
+                if (getBrokerState() < BrokerState::terminating) {
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed == loopFederates.end()) {
                         return;
                     }
                     fed->state = operation_state::disconnected;
                     auto cstate = getBrokerState();
-                    if ((!checkAndProcessDisconnect()) || (cstate < broker_state_t::operating)) {
+                    if ((!checkAndProcessDisconnect()) || (cstate < BrokerState::operating)) {
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
                         if (minFederateState() != operation_state::disconnected ||
@@ -4019,8 +4031,8 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             if (delayInitCounter <= 0) {
                 if (allInitReady()) {
                     if (transitionBrokerState(
-                            broker_state_t::connected,
-                            broker_state_t::initializing)) {  // make sure we only do this once
+                            BrokerState::connected,
+                            BrokerState::initializing)) {  // make sure we only do this once
                         checkDependencies();
                         cmd.setAction(CMD_INIT);
                         cmd.source_id = global_broker_id_local;
@@ -4109,7 +4121,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 } else {
                     if (cmd.source_id == direct_core_id) {
                         if (queryTimeouts.empty()) {
-                            setTickForwarding(TickForwardingReasons::query_timeout, true);
+                            setTickForwarding(TickForwardingReasons::QUERY_TIMEOUT, true);
                         }
                         queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
                     }
@@ -4135,7 +4147,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             if (cmd.dest_id == parent_broker_id) {
                 if (cmd.source_id == direct_core_id) {
                     if (queryTimeouts.empty()) {
-                        setTickForwarding(TickForwardingReasons::query_timeout, true);
+                        setTickForwarding(TickForwardingReasons::QUERY_TIMEOUT, true);
                     }
                     queryTimeouts.emplace_back(cmd.messageID, std::chrono::steady_clock::now());
                 }
@@ -4220,7 +4232,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
         }
         if (isDisconnectCommand(cmd)) {
             if ((cmd.action() == CMD_DISCONNECT) && (cmd.source_id == higher_broker_id)) {
-                setBrokerState(broker_state_t::terminating);
+                setBrokerState(BrokerState::terminating);
                 if (hasTimeDependency || hasFilters) {
                     timeCoord->disconnect();
                 }
@@ -4272,10 +4284,10 @@ bool CommonCore::waitCoreRegistration()
                                     brkid.baseValue(),
                                     sleepcnt));
         }
-        if (getBrokerState() <= broker_state_t::configured) {
+        if (getBrokerState() <= BrokerState::configured) {
             connect();
         }
-        if (getBrokerState() >= broker_state_t::terminating) {
+        if (getBrokerState() >= BrokerState::terminating) {
             return false;
         }
         if (sleepcnt == 4) {
@@ -4327,14 +4339,18 @@ void CommonCore::manageTimeBlocks(const ActionMessage& command)
 
 bool CommonCore::checkAndProcessDisconnect()
 {
-    if ((getBrokerState() == broker_state_t::terminating) ||
-        (getBrokerState() == broker_state_t::terminated)) {
+    if ((getBrokerState() == BrokerState::terminating) ||
+        (getBrokerState() == BrokerState::terminated)) {
         return true;
     }
     if (allDisconnected()) {
         checkInFlightQueriesForDisconnect();
-        setBrokerState(broker_state_t::terminating);
+        setBrokerState(BrokerState::terminating);
         timeCoord->disconnect();
+        if (enable_profiling) {
+            writeProfilingData();
+        }
+
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
         transmit(parent_route_id, dis);

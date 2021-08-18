@@ -3,11 +3,10 @@ clone_depth: 1
 branches:
   only:
     - main
-    - master
     - develop
-    - helics3
+    - helics2
 
-version: 3.0.0.beta.{build}
+version: 3.0.1.{build}
 
 image: Visual Studio 2019
 

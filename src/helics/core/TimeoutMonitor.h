@@ -31,7 +31,7 @@ class TimeoutMonitor {
     /** tick function for a broker,  executes one tick*/
     void tick(CoreBroker* brk);
     /** get a ping reply*/
-    void pingReply(const ActionMessage& m, CoreBroker* brk = nullptr);
+    void pingReply(const ActionMessage& cmd, CoreBroker* brk = nullptr);
     /**  set the overall timeout for the connection monitor*/
     void setTimeout(std::chrono::milliseconds to) { timeout = to; }
     /** reset the monitor to initial conditions*/

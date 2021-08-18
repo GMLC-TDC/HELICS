@@ -107,6 +107,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
+    useJsonSerialization = fi.useJsonSerialization;
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);

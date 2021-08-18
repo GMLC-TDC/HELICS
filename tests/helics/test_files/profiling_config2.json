@@ -1,0 +1,15 @@
+{
+  "name": "fed_pr2",
+  "coreType": "test",
+  "coreInitString": "--broker=prbroker4",
+  "autobroker": true,
+  "profiling": true,
+  "local_profiling_capture": true,
+  "publications": [
+    {
+      "global": true,
+      "key": "value_1",
+      "type": "complex"
+    }
+  ]
+}

@@ -134,6 +134,9 @@ across different compilers*/
 
         cmd_core_tag = 220,  //!< command to update a tag on a core
         cmd_broker_tag = 222,  //!< command to update a tag on a broker
+
+        cmd_profiler_data = 496,  //!< command for profiler data
+        cmd_set_profiler_flag = 498,  //!< command to activate profiling
         cmd_update_filter_op =
             10427,  //!< command to update a filter op [should only used internal to a core]
         null_info_command =
@@ -329,6 +332,8 @@ across different compilers*/
 #define CMD_INTERFACE_TAG action_message_def::action_t::cmd_interface_tag
 #define CMD_CORE_TAG action_message_def::action_t::cmd_core_tag
 #define CMD_BROKER_TAG action_message_def::action_t::cmd_broker_tag
+#define CMD_PROFILER_DATA action_message_def::action_t::cmd_profiler_data
+#define CMD_SET_PROFILER_FLAG action_message_def::action_t::cmd_set_profiler_flag
 
 #define CMD_ACK action_message_def::action_t::cmd_ack
 #define CMD_PRIORITY_ACK action_message_def::action_t::cmd_priority_ack

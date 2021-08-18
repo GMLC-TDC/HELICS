@@ -10,8 +10,7 @@ on:
     branches:
       - '!develop'
       - '!main'
-      - '!master'
-      - '!helics3'
+      - '!helics2'
     paths:
       - '**.jpg'
       - '**.jpeg'
