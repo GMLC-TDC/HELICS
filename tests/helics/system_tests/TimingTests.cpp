@@ -224,7 +224,7 @@ TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
     vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
-    auto& pub2 = vFed1->registerGlobalPublication<double>("pub2");
+    auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
     vFed1->registerSubscription("pub2");
     vFed2->registerSubscription("pub1");
 
@@ -280,6 +280,98 @@ TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
     EXPECT_EQ(rvec[1], 10.0);
     EXPECT_EQ(rvec.back(), 100.0);
 
+    vFed2->finalize();
+}
+
+TEST_F(timing_tests, test_uninterruptible_iterations)
+{
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
+    vFed1->registerSubscription("pub2");
+    vFed2->registerSubscription("pub1");
+    int iterationCount1{0};
+    int iterationCount2{0};
+    auto rfed1 = [&]() {
+        vFed1->enterExecutingMode();
+        double t{1.0};
+        double prevT{0.0};
+        while (t <= 100.0) {
+            try {
+                if (t>prevT) {
+                    pub1.publish(t);
+                }
+            }
+            catch (const helics::HelicsException&) {
+                std::cerr << "error in fed 1 publication at time " << t << std::endl;
+                break;
+            }
+            auto T2 = vFed1->requestTimeIterative(t,helics::IterationRequest::ITERATE_IF_NEEDED);
+            if (T2.grantedTime == helics::Time::maxVal()) {
+                break;
+            }
+            prevT = t;
+            if (T2.state==helics::IterationResult::NEXT_STEP) {
+                t += 1.0;
+            } else {
+                ++iterationCount1;
+            }
+            
+        }
+    };
+
+    auto rfed2 = [&]() {
+        vFed2->enterExecutingMode();
+        std::vector<helics::Time> res;
+        double t{5.0};
+        double prevT{0.0};
+        while (t <= 100.0) {
+            try {
+                if (t > prevT) {
+                    pub2.publish(t);
+                }
+            }
+            catch (const helics::HelicsException&) {
+                std::cerr << "error in fed 2 publication at time " << t << std::endl;
+                break;
+            }
+            auto T2 = vFed2->requestTimeIterative(t,helics::IterationRequest::ITERATE_IF_NEEDED);
+            res.push_back(T2.grantedTime);
+            prevT = t;
+            if (T2.state == helics::IterationResult::NEXT_STEP) {
+                t += 5.0;
+            } else {
+                ++iterationCount2;
+            }
+           
+            if (T2.grantedTime == helics::Time::maxVal()) {
+                break;
+            }
+        }
+        return res;
+    };
+
+    auto fed2res = std::async(std::launch::async, rfed2);
+    auto fed1res = std::async(std::launch::async, rfed1);
+
+    fed1res.get();
+    vFed1->finalize();
+    auto rvec = fed2res.get();
+    EXPECT_EQ(rvec.front(), 0.0);
+    EXPECT_EQ(rvec.size(), 40U);
+    EXPECT_EQ(rvec[1], 5.0);
+    EXPECT_EQ(rvec.back(), 100.0);
+    EXPECT_EQ(iterationCount1, 20);
+    EXPECT_EQ(iterationCount2, 20);
     vFed2->finalize();
 }
 
