@@ -381,13 +381,15 @@ TEST(profiling_tests, config)
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
-    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    auto mlog =
+        std::make_shared<gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>>>();
+
     auto cr = Fed->getCorePointer();
     cr->setLoggingCallback(helics::gLocalCoreId,
-                           [&mlog](int level,
+                           [mlog](int level,
                                    std::string_view /*unused*/,
                                    std::string_view message) {
-                               mlog.lock()->emplace_back(level, message);
+                               mlog->lock()->emplace_back(level, message);
                            });
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     cr.reset();
@@ -396,10 +398,10 @@ TEST(profiling_tests, config)
     Fed->setFlagOption(helics::defs::PROFILING_MARKER);
     Fed->finalize();
 
-    ASSERT_TRUE(!mlog.lock()->empty());
+    ASSERT_TRUE(!mlog->lock()->empty());
     bool hasMarker{false};
     std::vector<std::int64_t> timeValues;
-    for (const auto& logM : mlog.lock()) {
+    for (const auto& logM : mlog->lock()) {
         if (logM.second.find("MARKER") != std::string::npos) {
             hasMarker = true;
         } else if (logM.second.find("<PROFILING>") != std::string::npos) {
