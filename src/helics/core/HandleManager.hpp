@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <utility>
 namespace helics {
+
 /** class for managing a coordinating the different types of handles used in helics
 @details this class is not designed to be thread safe that would require a wrapper around it
 */

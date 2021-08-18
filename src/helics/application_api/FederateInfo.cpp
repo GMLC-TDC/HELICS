@@ -138,6 +138,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"realtime", HELICS_FLAG_REALTIME},
     {"real_time", HELICS_FLAG_REALTIME},
     {"realTime", HELICS_FLAG_REALTIME},
+    {"json", HELICS_FLAG_USE_JSON_SERIALIZATION},
     {"restrictivetimepolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictive_time_policy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictiveTimePolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
@@ -294,6 +295,9 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "debugging") {
             fi.debugging = true;
+        }
+        if (flg == "json") {
+            fi.useJsonSerialization = true;
         }
         if (flg == "profiling") {
             fi.profilerFileName = "log";
@@ -490,6 +494,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
+    app->add_flag(
+        "--json",
+        useJsonSerialization,
+        "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
     app->add_option(
            "--profiler",
            profilerFileName,
@@ -809,6 +817,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
     if (fi.debugging) {
         res.append(" --debugging");
+    }
+    if (fi.useJsonSerialization) {
+        res.append(" --json");
     }
     if (!fi.profilerFileName.empty()) {
         res.append(" --profiler=");

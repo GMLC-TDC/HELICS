@@ -30,6 +30,8 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     int brokerPort{-1};  //!< broker port information
 
     bool forceNewCore{false};  //!< indicator that the federate should not use an existing core
+    /** indicate that the federate should use json serialization for all data transfers*/
+    bool useJsonSerialization{false};
     /** specify that the federate and associated core should enable profiling to the specified
      * file*/
     std::string profilerFileName;
