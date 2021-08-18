@@ -268,6 +268,9 @@ typedef enum {
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274
 } HelicsProperties;
 
+/** result returned for requesting the value of an invalid/unknown property */
+const int HELICS_INVALID_PROPERTY_VALUE = -972;
+
 /** enumeration of the multi_input operations*/
 typedef enum {
     /** time and priority order the inputs from the core library*/
