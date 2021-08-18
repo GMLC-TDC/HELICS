@@ -307,7 +307,7 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
         double prevT{0.0};
         while (t <= 100.0) {
             try {
-                if (t>prevT) {
+                if (t > prevT) {
                     pub1.publish(t);
                 }
             }
@@ -315,17 +315,16 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
                 std::cerr << "error in fed 1 publication at time " << t << std::endl;
                 break;
             }
-            auto T2 = vFed1->requestTimeIterative(t,helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto T2 = vFed1->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
             if (T2.grantedTime == helics::Time::maxVal()) {
                 break;
             }
             prevT = t;
-            if (T2.state==helics::IterationResult::NEXT_STEP) {
+            if (T2.state == helics::IterationResult::NEXT_STEP) {
                 t += 1.0;
             } else {
                 ++iterationCount1;
             }
-            
         }
     };
 
@@ -344,7 +343,7 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
                 std::cerr << "error in fed 2 publication at time " << t << std::endl;
                 break;
             }
-            auto T2 = vFed2->requestTimeIterative(t,helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto T2 = vFed2->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
             res.push_back(T2.grantedTime);
             prevT = t;
             if (T2.state == helics::IterationResult::NEXT_STEP) {
@@ -352,7 +351,7 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
             } else {
                 ++iterationCount2;
             }
-           
+
             if (T2.grantedTime == helics::Time::maxVal()) {
                 break;
             }
