@@ -104,6 +104,7 @@ public class helicsJNI {
   public final static native int HELICS_PROPERTY_INT_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_FILE_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL_get();
+  public final static native int HELICS_INVALID_PROPERTY_VALUE_get();
   public final static native int HELICS_MULTI_INPUT_NO_OP_get();
   public final static native int HELICS_MULTI_INPUT_VECTORIZE_OPERATION_get();
   public final static native int HELICS_MULTI_INPUT_AND_OPERATION_get();
