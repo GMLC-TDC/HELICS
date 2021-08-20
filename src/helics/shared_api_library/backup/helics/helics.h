@@ -105,6 +105,8 @@ typedef enum {
     HELICS_DATA_TYPE_TIME = 8,
     /** raw data type*/
     HELICS_DATA_TYPE_RAW = 25,
+    /** type converts to a valid json string*/
+    HELICS_DATA_TYPE_JSON = 30,
     /** the data type can change*/
     HELICS_DATA_TYPE_MULTI = 33,
     /** open type that can be anything*/
@@ -151,6 +153,8 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     HELICS_FLAG_STRICT_CONFIG_CHECKING = 75,
+    /** specify that the federate should use json serialization for all data types*/
+    HELICS_FLAG_USE_JSON_SERIALIZATION = 79,
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
     HELICS_FLAG_EVENT_TRIGGERED = 81,
@@ -164,7 +168,9 @@ typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     HELICS_FLAG_DELAY_INIT_ENTRY = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    HELICS_FLAG_ENABLE_INIT_ENTRY = 47
+    HELICS_FLAG_ENABLE_INIT_ENTRY = 47,
+    /** ignored flag used to test some code paths*/
+    HELICS_FLAG_IGNORE = 999
 } HelicsCoreFlags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
@@ -371,7 +377,14 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum { HELICS_SEQUENCING_MODE_FAST = 0, HELICS_SEQUENCING_MODE_ORDERED = 1 } HelicsSequencingModes;
+typedef enum {
+    /** sequencing mode to operate on priority channels*/
+    HELICS_SEQUENCING_MODE_FAST = 0,
+    /** sequencing mode to operate on the normal channels*/
+    HELICS_SEQUENCING_MODE_ORDERED = 1,
+    /** select the default channel*/
+    HELICS_SEQUENCING_MODE_DEFAULT = 2
+} HelicsSequencingModes;
 
 /**
  * @file
@@ -1761,7 +1774,6 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  *
  * @param fed The federate to get the tag for.
  * @param tagName The name of the tag to query.
- * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
  */

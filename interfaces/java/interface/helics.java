@@ -1472,7 +1472,6 @@ public class helics {
    * @param fed The federate to get the tag for.<br>
    * @param tagName The name of the tag to query.<br>
    * <br>
-   * <br>
    * ,out] err A pointer to an error object for catching errors.
    */
   public static String helicsFederateGetTag(SWIGTYPE_p_void fed, String tagName) {

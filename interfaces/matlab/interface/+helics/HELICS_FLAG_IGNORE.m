@@ -1,7 +1,7 @@
-function v = HELICS_STATE_EXECUTION()
+function v = HELICS_FLAG_IGNORE()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 136);
+    vInitialized = helicsMEX(0, 47);
   end
   v = vInitialized;
 end

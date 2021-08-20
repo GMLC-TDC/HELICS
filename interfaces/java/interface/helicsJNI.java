@@ -34,6 +34,7 @@ public class helicsJNI {
   public final static native int HELICS_DATA_TYPE_BOOLEAN_get();
   public final static native int HELICS_DATA_TYPE_TIME_get();
   public final static native int HELICS_DATA_TYPE_RAW_get();
+  public final static native int HELICS_DATA_TYPE_JSON_get();
   public final static native int HELICS_DATA_TYPE_MULTI_get();
   public final static native int HELICS_DATA_TYPE_ANY_get();
   public final static native int HELICS_FLAG_OBSERVER_get();
@@ -50,10 +51,12 @@ public class helicsJNI {
   public final static native int HELICS_FLAG_SINGLE_THREAD_FEDERATE_get();
   public final static native int HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS_get();
   public final static native int HELICS_FLAG_STRICT_CONFIG_CHECKING_get();
+  public final static native int HELICS_FLAG_USE_JSON_SERIALIZATION_get();
   public final static native int HELICS_FLAG_EVENT_TRIGGERED_get();
   public final static native int HELICS_FLAG_LOCAL_PROFILING_CAPTURE_get();
   public final static native int HELICS_FLAG_DELAY_INIT_ENTRY_get();
   public final static native int HELICS_FLAG_ENABLE_INIT_ENTRY_get();
+  public final static native int HELICS_FLAG_IGNORE_get();
   public final static native int HELICS_FLAG_SLOW_RESPONDING_get();
   public final static native int HELICS_FLAG_DEBUGGING_get();
   public final static native int HELICS_FLAG_TERMINATE_ON_ERROR_get();
@@ -133,6 +136,7 @@ public class helicsJNI {
   public final static native int HELICS_FILTER_TYPE_FIREWALL_get();
   public final static native int HELICS_SEQUENCING_MODE_FAST_get();
   public final static native int HELICS_SEQUENCING_MODE_ORDERED_get();
+  public final static native int HELICS_SEQUENCING_MODE_DEFAULT_get();
   public final static native double HELICS_TIME_ZERO_get();
   public final static native double HELICS_TIME_EPSILON_get();
   public final static native double HELICS_TIME_INVALID_get();

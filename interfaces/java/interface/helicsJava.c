@@ -519,6 +519,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1RAW_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1JSON_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsDataTypes result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsDataTypes)HELICS_DATA_TYPE_JSON;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1MULTI_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsDataTypes result;
@@ -711,6 +723,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1STRICT_1CON
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1USE_1JSON_1SERIALIZATION_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsFederateFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsFederateFlags)HELICS_FLAG_USE_JSON_SERIALIZATION;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1EVENT_1TRIGGERED_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsFederateFlags result;
@@ -754,6 +778,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1ENABLE_1INI
   (void)jenv;
   (void)jcls;
   result = (HelicsCoreFlags)HELICS_FLAG_ENABLE_INIT_ENTRY;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1IGNORE_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsCoreFlags result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsCoreFlags)HELICS_FLAG_IGNORE;
   jresult = (jint)result; 
   return jresult;
 }
@@ -1702,6 +1738,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1SEQUENCING_1MODE_
   (void)jenv;
   (void)jcls;
   result = (HelicsSequencingModes)HELICS_SEQUENCING_MODE_ORDERED;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1SEQUENCING_1MODE_1DEFAULT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsSequencingModes result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsSequencingModes)HELICS_SEQUENCING_MODE_DEFAULT;
   jresult = (jint)result; 
   return jresult;
 }
