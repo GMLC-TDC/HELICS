@@ -8,7 +8,7 @@ CURRENT_DIRECTORY = os.path.realpath(os.path.dirname(__file__))
 
 
 def format_file(filename):
-    """ Format cmake files """
+    """Format cmake files"""
 
     cmd = f"cmake-format -i {filename}"
     print(f"Formatting {filename}")
@@ -18,7 +18,7 @@ def format_file(filename):
 
 
 def main():
-    """ cmake-format helper script """
+    """cmake-format helper script"""
 
     processes = []
 

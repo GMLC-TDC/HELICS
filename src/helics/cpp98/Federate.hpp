@@ -328,7 +328,7 @@ class Federate {
     /** called after one of the async calls and will indicate true if an async operation has
     completed
     @details only call from the same thread as the one that called the initial async call and will
-    return false if called when no aysnc operation is in flight*/
+    return false if called when no async operation is in flight*/
     bool isAsyncOperationCompleted() const
     {
         // returns int, 1 = true, 0 = false
