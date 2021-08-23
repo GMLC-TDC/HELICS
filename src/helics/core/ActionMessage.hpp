@@ -184,7 +184,7 @@ class ActionMessage {
     /** packetize the message with a simple header and tail sequence using json serialization
      */
     std::string packetize_json() const;
-    /** covert to a byte vector using a reference*/
+    /** convert to a byte vector using a reference*/
     void to_vector(std::vector<char>& data) const;
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
