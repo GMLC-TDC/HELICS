@@ -1,6 +1,7 @@
 name: Static Analyzers
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
