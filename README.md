@@ -7,13 +7,12 @@ A multi-language, cross-platform library that enables different simulators to ea
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
 [![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
-[![](https://api.codacy.com/project/badge/Grade/83ba19b36b714c729ec3a3d18504505e?branch=develop)](https://www.codacy.com/app/GMLC-TDC/HELICS?utm_source=github.com&utm_medium=referral&utm_content=GMLC-TDC/HELICS&utm_campaign=Badge_Grade;branch=develop)
 [![](https://ci.appveyor.com/api/projects/status/9rnwrtelsa68k5lt/branch/develop?svg=true)](https://ci.appveyor.com/project/HELICS/helics/history)
 [![Cirrus Status](https://api.cirrus-ci.com/github/GMLC-TDC/HELICS.svg)](https://cirrus-ci.com/github/GMLC-TDC/HELICS)
 [![Drone IO Status](https://cloud.drone.io/api/badges/GMLC-TDC/HELICS/status.svg?ref=refs/heads/develop)](https://cloud.drone.io/GMLC-TDC/HELICS)
 [![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
-[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE)
 
 ## Table of contents
 
@@ -21,11 +20,12 @@ A multi-language, cross-platform library that enables different simulators to ea
 - [Getting Started](#getting-started)
   - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
+
   - [Changelog](#changelog)
   - [RoadMap](#roadmap)
-- [Installation](#installation)
-  - [Building from Source](#build-from-source)
-  - [Docker](#docker)
+  - [Installation](#installation)
+  - [Quick links](#quick-links)
+
 - [Tools with HELICS support](#tools-with-helics-support)
 - [Contributing](#contributing)
 - [Build Status](#build-status)
@@ -46,9 +46,9 @@ Previous and existing use cases have stretched across a wide range of scales in 
 
 ## Getting Started
 
-The users guide has been completely redone for HELICS 3. The [docs](https://docs.helics.org/en/helics3/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
+The users guide has been completely redone for the release of HELICS 3.0.0. The [docs](https://docs.helics.org/en/latest/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
 
-The [Introduction to the HELICS documentation](https://helics.readthedocs.io/en/latest/introduction/index.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
+The [Orientation](https://docs.helics.org/en/latest/user-guide/orientation.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
 You can also [Try HELICS online](https://mybinder.org/v2/gh/kdheepak/openmod-2019-helics-tutorial/master?urlpath=lab/tree/notebooks/cosimulation-introduction.ipynb) without having to install any software.
 
@@ -64,11 +64,13 @@ A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepare
 
 ### Language Bindings
 
-HELICS provides a rich set of APIs for other languages including [Python](#pip), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages is growing all the time.
+HELICS provides a rich set of APIs for other languages including [Python](https://github.com/GMLC-TDC/pyhelics), C, Java, Octave, [Julia](https://github.com/GMLC-TDC/HELICS.jl), and Matlab. [nim](https://github.com/GMLC-TDC/helics.nim) and C# APIs are available on an experimental basis, and with an active open-source community, the set of supported languages is growing all the time.
 
 ## Documentation
 
 Our [ReadTheDocs](https://docs.helics.org/en/latest/) site provides a set of documentation including a set of introductory [examples](https://docs.helics.org/en/latest/user-guide/examples/examples_index.html), a [developers guide](https://docs.helics.org/en/latest/developer-guide/index.html), complete Doxygen generated [API documentation](https://helics.readthedocs.io/en/latest/doxygen/annotated.html), [API references for the supported languages](https://docs.helics.org/en/latest/references/api-reference/index.html#c-api-doxygen). A few more questions and answers are available on the [Wiki](https://github.com/GMLC-TDC/HELICS/wiki).
+
+[Installation Guide](https://docs.helics.org/en/latest/user-guide/installation/index.html)
 
 ### Documentation downloads
 
@@ -80,32 +82,24 @@ Additionally, our initial design requirements document can be found [here](docs/
 
 ### [CHANGELOG](CHANGELOG.md)
 
-For a history of changes to HELICS
+A history of changes to HELICS
 
 ### [ROADMAP](docs/ROADMAP.md)
 
-For a snapshot of some current plans for what is to come.
+A snapshot of some current plans for what is to come.
 
-## Installation
+### [Installation](https://docs.helics.org/en/latest/user-guide/installation/index.html)
 
-### Windows
+A guide to installing HELICS on different platforms
 
-Each [release](https://github.com/GMLC-TDC/HELICS/releases/latest) comes with a Windows installer and zip file containing the HELICS apps and C shared library with Python 3.6 and Java 1.8 interfaces, zip files containing compiled HELICS static libraries built against several MSVC versions, and an archive containing just the C shared library with headers. For building with Debug support it is generally recommended to build from Source or use HELICS as a subproject.
-Make sure the latest [Visual C++ Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) is installed.
+### Quick links
 
-### Cross-platform Python (via pip)
-
-Support for installing the Python interface and HELICS apps is provided with pip, see [pip install](https://python.helics.org) for the instructions. The files used to build the pip package are in a separate [repo](https://github.com/GMLC-TDC/pyhelics).
-
-### Linux and macOS (via Spack)
-
-HELICS can be installed on Linux (and macOS) using Spack, a package manager aimed at HPC environments. See [spack install](https://helics.readthedocs.io/en/latest/installation/package_manager.html#install-using-spack-macos-linux) for the instructions.
-
-### Building from Source
-
-- [Windows](https://docs.helics.org/en/latest/user-guide/installation/windows.html)
-- [Mac](https://docs.helics.org/en/latest/user-guide/installation/mac.html)
-- [Ubuntu](https://docs.helics.org/en/latest/user-guide/installation/linux.html)
+- [configuration option reference](docs/references/configuration_options_reference.md)
+- [Queries](docs/user-guide/advanced_topics/queries.md)
+- [Environment variables](docs/user-guide/advanced_topics/environment_variables.md)
+- [C function reference](https://docs.helics.org/en/latest/doxygen/C_api_index.html)
+- [CMake Variables](docs/user-guide/installation/helics_cmake_options.md)
+- [HELICS Apps](docs/references/apps/index.md)
 
 ### Docker
 
@@ -131,23 +125,7 @@ We are always looking for help adding support for more tools, so please contact 
 
 ## Contributing
 
-Contributors are welcome see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing. And the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations. All prior contributors can be found [here](CONTRIBUTORS.md)
-
-### Optional components
-
-A list of optional component that are not included in HELICS but are optionally used by the library
-
-#### [zmq](http://www.zeromq.org)
-
-ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.1. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [LGPL](https://github.com/zeromq/libzmq/blob/master/COPYING.LESSER) with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
-
-### [Google Test](https://github.com/google/googletest)
-
-HELICS tests are written to use the Google Test and mock frameworks. Google Test is included in the source tarball but is downloaded as an optional component. Google Test is released with a [BSD-3 clause](https://github.com/google/googletest/blob/master/LICENSE) license.
-
-### [Google Benchmark](https://github.com/google/benchmark)
-
-Some timing benchmarks with HELICS are written to use the Google Benchmark library. Benchmarks is an optional component and is not included in the main source tarball and must be downloaded separately. Google Benchmark is released with an [Apache 2.0](https://github.com/google/benchmark/blob/v1.5.0/LICENSE) license.
+Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for more details on the process of contributing. See the [Code of Conduct](.github/CODE_OF_CONDUCT.md) for guidelines on the community expectations. All prior contributors can be found [here](CONTRIBUTORS.md) along with a listing of included and optional components to HELICS.
 
 ## Build Status
 
@@ -157,32 +135,32 @@ Some timing benchmarks with HELICS are written to use the Google Benchmark libra
 <table>
   <tr>
     <td><b>Service</b></td>
-    <td><b>Master</b></td>
+    <td><b>Main</b></td>
     <td><b>Develop</b></td>
-    <td><b>helics3</b></td>
+    <td><b>helics2</b></td>
   </tr>
   <tr>
   <td>Travis CI</td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=master" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=main" alt="Build Status" /></a></td>
   <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics3" alt="Build Status" /></a></td>
+  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics2" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Azure</td>
-  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=master"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=master" alt="Build Status" /></a></td>
+  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=main"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=main" alt="Build Status" /></a></td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
-  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics3"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics3" alt="Build Status" /></a></td>
+  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics2"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics2" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Circle-CI</td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/master.svg?style=svg" alt="Build Status" /></a></td>
+  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main.svg?style=svg" alt="Build Status" /></a></td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics3.svg?style=svg" alt="Build Status" /></a></td>
+  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics2"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics2.svg?style=svg" alt="Build Status" /></a></td>
   </tr>
   <td>Docs</td>
   <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/helics3/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
+  <td><a href="https://docs.helics.org/en/helics2/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
 </details>

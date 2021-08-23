@@ -3,42 +3,44 @@ name: Generate SWIG Interfaces
 on:
   workflow_dispatch:
   push:
-    branches: 
-      - master
+    branches:
       - main
       - develop
-      - helics3
+      - helics2
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    container:
-      image: helics/buildenv:interface-gen
     
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
+        
     - name: Generate C API Headers
       run: |
               python3 scripts/generateHelicsH.py src/helics/shared_api_library/backup/helics/ ./
-    - name: Run SWIG
-      run: |
-        rm -rf interfaces/*/interface/*
-        mkdir build_matlab
-        pushd build_matlab
-        cmake -DHELICS_BUILD_MATLAB_INTERFACE=ON -DHELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_BOOST=ON -DHELICS_ENABLE_SWIG=ON -DSWIG_EXECUTABLE=/root/swig-matlab/bin/swig ..
-        make -j2 mfile_overwrite
-        popd
-        mkdir build_interface
-        pushd build_interface
-        cmake -DHELICS_BUILD_JAVA_INTERFACE=ON -DHELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY=ON -DHELICS_OVERWRITE_INTERFACE_FILES=ON -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_BUILD_TESTS=OFF -DHELICS_BUILD_APP_EXECUTABLES=OFF -DHELICS_DISABLE_BOOST=ON -DHELICS_ENABLE_SWIG=ON ..
-        make -j2 javafile_overwrite
-        popd
+  
+    # Run SWIG to generated updated matlab + java interface files
+    - uses: gmlc-tdc/helics-action/update-swig-interfaces@main
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
+      
+    # Run pre-commit docker-clang-format hook
+    - uses: actions/setup-python@v2
+    - name: set PY
+      run: echo "PY=$(python --version --version | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
+    - uses: actions/cache@v1
+      with:
+        path: ~/.cache/pre-commit
+        key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
+    - uses: pre-commit/action@v2.0.3
+      # Failure is expected, since we know it will be fixing up the generated helics header files
+      continue-on-error: true
+      with:
+        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
+        
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

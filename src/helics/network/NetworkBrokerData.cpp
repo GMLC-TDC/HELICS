@@ -161,7 +161,6 @@ std::shared_ptr<helicsCLI11App>
         ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case))
         ->envname("HELICS_LOCAL_PORT");
     nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
-
     nbparser->add_callback([this]() {
         if ((!brokerAddress.empty()) && (brokerPort == -1)) {
             if ((localInterface.empty()) && (portNumber != -1)) {
