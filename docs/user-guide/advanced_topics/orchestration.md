@@ -1,37 +1,36 @@
-# Orchestration
+
+# Orchestration on HPCs
 
 The goal of this guide is to show and guide you how to handle
-co-simulation orchestration. We will walk through using a specific
-tool ([merlin](https://github.com/LLNL/merlin)) that has tested with
-HELICS co-simulations. This is not the only tool that exist that has
-this capability and is not a requirement if all you want to achieve
-co-simulation orchestration. One advantage that Merlin has, is its
-ability to interface with HPC systems that have SLURM or Flux as their
+co-simulation orchestration on high performance computers. We will walk through using a specific
+tool ([Merlin](https://github.com/LLNL/merlin)) that has been tested with
+HELICS co-simulations. This is not the only tool that exists that has
+this capability and is not a requirement for
+co-simulation orchestration. One advantage that Merlin has is its
+ability to interface with HPC systems that have [SLURM](https://slurm.schedmd.com/documentation.html) or [Flux](https://flux-framework.org/) as their
 resource managers.
 
 ## Definition of "Orchestration" in HELICS
 
 We will define the term "orchestration" within HELICS as workflow and
-deployment. This will allow users to define a co-simulation workflow
+deployment in an HPC environment. This will allow users to define a co-simulation workflow
 they would like to execute and deploy the co-simulation either on
 their own machine or in an HPC environment.
 
-## What you will need
+## Orchestration with Merlin
 
 First you will need to build and install
-[merlin](https://github.com/LLNL/merlin). This guide will walk through
-a suggested co-simulation spec using merlin to launch a HELICS
-co-simulation. This is not a comprehensive guide on how to use merlin,
-but a guide to use merlin for HELICS co-simulation orchestration. For
-a full guide on how to use merlin, please refer to the merlin
+[Merlin](https://github.com/LLNL/merlin). This guide will walk through
+a suggested co-simulation spec using Merlin to launch a HELICS
+co-simulation. This is not a comprehensive guide on how to use Merlin,
+but a guide to use Merlin for HELICS co-simulation orchestration. For
+a full guide on how to use Merlin, please refer to the Merlin
 [tutorial](https://merlin.readthedocs.io/en/latest/tutorial.html).
-
-### Merlin
 
 Merlin is a distributed task queuing system, designed to allow complex
 HPC workflows to scale to large numbers of simulations. It is designed
 to make building, running, and processing large scale HPC
-workflows. It is not limited to HPC, it can also be setup on a single
+workflows manageable. It is not limited to HPC; it can also be set up on a single
 machine.
 
 Merlin translates a command-line focused workflow into discrete tasks
@@ -43,166 +42,14 @@ describes how the workflow executes.
 
 Once the Merlin spec has been created, the main execution logic is
 contained in the Study step. This step describes how the applications
-or scripts need to be executed in the commandline in order to execute
+or scripts need to be executed in the command line in order to execute
 your workflow. The study step is made up of multiple run steps that
 are represented as the nodes in the DAG.
 
-For a more in-depth explanation on how Merlin works, take a look at
-their documentation [here](https://merlin.readthedocs.io/en/latest/index.html)
+<--! For a more in-depth explanation on how Merlin works, take a look at
+their documentation [here](https://merlin.readthedocs.io/en/latest/index.html) -->
 
-### Merlin Specification
 
-A merlin specification has multiple parts that control how a
-co-simulation may run. Below we describe how each part can be used in
-a HELICS co-simulation workflow. For the sake of simplicity we are
-using the the pi-exchange python example that can be found
-[here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange). The
-goal will be to have merlin launch multiple pi-senders and
-pi-recievers.
-
-#### Merlin workflow description and environment
-
-Merlin has a description and and environment block. The description block,
-describes the name and a short description about the study.
-
-```yaml
-description:
-  name: Test helics
-  description: Juggle helics data
-```
-
-The env block describes the environment that the study will execute
-in. This is a place where you can set environment variables to control
-the number of federates you may need in your co-simulation.
-
-```yaml
-env:
-  variables:
-    OUTPUT_PATH: ./helics_juggle_output
-    N_SAMPLES: 8
-```
-
-In the example above `N_SAMPLES` will be used to describe how many
-pi-senders and pi-receivers we want in our co-simulation.
-
-#### Merlin Step
-
-The merlin step can simply be summarized as the input data generation
-step. This step describes how to create the initial inputs for the
-co-simulation so that subsequent steps can use this input to start the
-co-simulation. Below is how we might describe the merlin step for our
-pi-exchange study.
-
-```yaml
-merlin:
-  samples:
-    generate:
-      cmd: |
-        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
-        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
-        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
-    file: samples.csv
-    column_labels: [FED]
-
-NOTE: samples.csv is generated by make_samples.py. Each line in
-samples.csv is the name of the json fils that is created.
-
-```
-
-There is a python script called `make_samples.py` that generates
-all helics-cli json configs that will be executed by helics-cli that
-will be used to execute the co-simulations. `N_SAMPLES` is an
-environment variable that is set to 8, so in this example 8
-pireceivers and 8 pisenders will be created and used in this
-co-simulations. `make_samples.py` also outputs the name of each
-json file to a csv file called `samples.csv`. `samples.csv`
-contains the names of the json files that were generated. The
-`column_labels` tag tells merlin to set each column in
-`samples.csv` to `[FED]`. This means we can use `FED` as a
-variable in the study step. Below is an example of one of the json files that is
-created.
-
-```json
-{
-  "federates": [
-    {
-      "directory": ".",
-      "exec": "python3 -u pisender.py 0",
-      "host": "localhost",
-      "name": "pisender0"
-    }
-  ],
-  "name": "pisender0"
-}
-```
-
-This json file will then be used as the input file for helics-cli. The
-helics-cli will be executed in the study step in merlin which we will
-go over next.
-
-#### Study Step
-
-The study step is where merlin will execute all the steps specified in
-the block. Each step is denoted by a name and has a run segment. The
-run segment is where you will tell merlin what commands need to be
-executed.
-
-```yaml
-- name: start_federates <-- Name of the step
-  description: say Hello
-  run:
-    cmd: |
-      helics run --path=$(FED) <-- execute the helics_cli for each column in samples.csv
-      echo "DONE"
-```
-
-In the example snippet we ask Merlin to execute the json file that was
-created in the merlin step. Since the `FED` variable is a list,
-this command will get executed for each index in `FED`.
-
-### Full Spec
-
-Below is the full Merlin spec that was created to make 8 pi-receivers
-and 8 pi-senders and execute it as a merlin workflow.
-
-```yaml
-description:
-  name: Test helics
-  description: Juggle helics data
-
-env:
-  variables:
-    OUTPUT_PATH: ./helics_juggle_output
-    N_SAMPLES: 8
-
-merlin:
-  samples:
-    generate:
-      cmd: |
-        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
-        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
-        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
-    file: samples.csv
-    column_labels: [FED]
-
-study:
-  - name: start_federates
-    description: say Hello
-    run:
-      cmd: |
-        spack load helics
-        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(FED)
-        echo "DONE"
-  - name: cleanup
-    description: Clean up
-    run:
-      cmd: rm $(SPECROOT)/samples.csv
-      depends: [start_federates_*]
-```
-
-### DAG of the spec
-
-![](../../img/Merlin_pi_send_receive_DAG.png)
 
 ### Why Merlin
 
@@ -227,6 +74,165 @@ co-simulation if another co-simulation was needed and would then
 proceed to launch the co-simulation with the input generated by the
 analysis step
 
-### Other Resources
 
-- [Monte Carlo simulation using merlin](orchestration_monte_carlo.md)
+### Merlin Specification
+
+A Merlin specification has multiple parts that control how a
+co-simulation may run. Below we describe how each part can be used in
+a HELICS co-simulation workflow. For the sake of simplicity we are
+using the the pi-exchange python example that can be found
+[here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange). The
+goal will be to have Merlin launch multiple pi-senders and
+pi-recievers.
+
+#### Merlin workflow description and environment
+Merlin has a description and an environment block. The `description` block
+provides the name and a short description about the study.
+
+```
+description:
+    name: Test helics 
+    description: Juggle helics data
+```
+
+The `env` block describes the environment that the study will execute
+in. This is a place where you can set environment variables to control
+the number of federates you may need in your co-simulation. In this example, ```N_SAMPLES``` will be used to describe how many
+pi-senders and pi-receivers (total federates) we want in our co-simulation.
+
+```
+env:
+  variables:
+    OUTPUT_PATH: ./helics_juggle_output
+    N_SAMPLES: 8
+```
+
+
+
+
+
+#### Merlin Step
+
+The Merlin step is the input data generation
+step. This step describes how to create the initial inputs for the
+co-simulation so that subsquent steps can use this input to start the
+co-simulation. Below is how we might describe the Merlin step for our
+pi-exchange study.
+
+```
+merlin:
+  samples:
+    generate:
+      cmd: |
+        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
+        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
+        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
+    file: samples.csv
+    column_labels: [FED]
+	
+NOTE: samples.csv is generated by make_samples.py. Each line in
+samples.csv is the name of the json fils that is created.
+
+```
+
+There is a [python script called ```make_samples.py``` located on the HELICS repository](../orchestration_samples/simple) that generates
+all helics-cli json configs that will be executed by helics-cli that
+will be used to execute the co-simulations. ```N_SAMPLES``` is an
+environment variable that is set to 8, so in this example 8
+pireceivers and 8 pisenders will be created and used in this
+co-simulations. ```make_samples.py``` also outputs the name of each
+json file to a csv file called ```samples.csv```. ```samples.csv```
+contains the names of the json files that were generated. The
+```column_labels``` tag tells Merlin to set each column in
+```samples.csv``` to ```[FED]```. This means we can use ```FED``` as a
+variable in the study step. Below is an example of one of the json files that is
+created.
+
+```
+{
+    "federates": [
+        {
+            "directory": ".",
+            "exec": "python3 -u pisender.py 0",
+            "host": "localhost",
+            "name": "pisender0"
+        }
+    ],
+    "name": "pisender0"
+}
+```
+This json file will then be used as the input file for helics-cli. The
+helics-cli will be executed in the study step in Merlin which we will
+go over next.
+
+#### Study Step
+
+The study step is where Merlin will execute all the steps specified in
+the block. Each step is denoted by a name and has a run segment. The
+run segment is where you will tell Merlin what commands need to be
+executed.
+
+```
+    - name: start_federates <-- Name of the step
+      description: say Hello 
+      run:
+        cmd: |
+          helics run --path=$(FED) <-- execute the helics_cli for each column in samples.csv
+          echo "DONE"
+
+```
+In the example snippet we ask Merlin to execute the json file that was
+created in the Merlin step. Since the ```FED``` variable is a list,
+this command will get executed for each index in ```FED```.
+
+### Full Spec
+
+Below is the full Merlin spec that was created to make 8 pi-receivers
+and pi-senders and execute it as a Merlin workflow.
+
+```
+description:
+    name: Test helics 
+    description: Juggle helics data
+
+env:
+  variables:
+    OUTPUT_PATH: ./helics_juggle_output
+    N_SAMPLES: 8
+
+
+merlin:
+  samples:
+    generate:
+      cmd: |
+        python3 $(SPECROOT)/make_samples.py $(N_SAMPLES) $(MERLIN_INFO)
+        cp $(SPECROOT)/pireceiver.py $(MERLIN_INFO)
+        cp $(SPECROOT)/pisender.py $(MERLIN_INFO)
+    file: samples.csv
+    column_labels: [FED]
+
+
+study:
+    - name: start_federates
+      description: say Hello 
+      run:
+        cmd: |
+          spack load helics
+          helics run --path=$(FED)
+          echo "DONE"
+    - name: cleanup
+      description: Clean up
+      run:
+        cmd: rm $(SPECROOT)/samples.csv
+        depends: [start_federates_*]
+```
+
+### DAG of the spec
+
+Finally, we can look at the DAG of the spec to visualize the steps in the Study.
+
+![](../../img/Merlin_pi_send_receive_DAG.png)
+
+### Orchestration Example
+
+An example of orchestrating multiple simulation runs (e.g., Monte Carlo co-simulation) is given in the [Advanced Examples](../examples/advanced_examples/advanced_orchestration.md) Section.
