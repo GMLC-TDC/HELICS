@@ -45,9 +45,6 @@ jobs:
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
 
-    - name: git status
-      run: git status && git show
-
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
