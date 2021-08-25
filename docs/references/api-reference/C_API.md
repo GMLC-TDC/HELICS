@@ -5,437 +5,438 @@
 ```eval_rst
 
 .. doxygenenumvalue:: HELICS_ITERATION_REQUEST_NO_ITERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_REQUEST_FORCE_ITERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_RESULT_NEXT_STEP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_RESULT_ERROR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_RESULT_HALTED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ITERATION_RESULT_ITERATING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_STARTUP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_INITIALIZATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_EXECUTION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_FINALIZE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_ERROR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_PENDING_INIT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_PENDING_EXEC
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_PENDING_TIME
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_PENDING_ITERATIVE_TIME
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_PENDING_FINALIZE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_STATE_FINISHED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_DEFAULT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_ZMQ
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_MPI
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_TEST
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_INTERPROCESS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_IPC
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_TCP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_UDP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_ZMQ_SS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_NNG
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_TCP_SS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_HTTP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_WEBSOCKET
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_INPROC
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_NULL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_STRING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_DOUBLE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_INT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_COMPLEX
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_VECTOR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_COMPLEX_VECTOR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_NAMED_POINT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_BOOLEAN
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_TIME
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_RAW
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_JSON
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_MULTI
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_ANY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_OBSERVER
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_UNINTERRUPTIBLE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_INTERRUPTIBLE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_SOURCE_ONLY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_ONLY_UPDATE_ON_CHANGE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_RESTRICTIVE_TIME_POLICY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_ROLLBACK
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_FORWARD_COMPUTE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_REALTIME
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_SINGLE_THREAD_FEDERATE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_STRICT_CONFIG_CHECKING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_USE_JSON_SERIALIZATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_EVENT_TRIGGERED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_LOCAL_PROFILING_CAPTURE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_DELAY_INIT_ENTRY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_ENABLE_INIT_ENTRY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_IGNORE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_SLOW_RESPONDING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_DEBUGGING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_TERMINATE_ON_ERROR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_FORCE_LOGGING_FLUSH
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_DUMPLOG
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_PROFILING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FLAG_PROFILING_MARKER
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_NO_PRINT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_ERROR
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_PROFILING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_WARNING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_SUMMARY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_CONNECTIONS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_INTERFACES
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_TIMING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_DATA
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_DEBUG
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_TRACE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_FATAL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_EXTERNAL_TYPE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_OTHER
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_USER_ABORT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_INSUFFICIENT_SPACE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_EXECUTION_FAILURE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_INVALID_FUNCTION_CALL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_INVALID_STATE_TRANSITION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_SYSTEM_FAILURE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_DISCARD
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_INVALID_ARGUMENT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_INVALID_OBJECT
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_CONNECTION_FAILURE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_ERROR_REGISTRATION_FAILURE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_DELTA
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_PERIOD
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_OFFSET
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_RT_LAG
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_RT_LEAD
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_RT_TOLERANCE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_INPUT_DELAY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_OUTPUT_DELAY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_MAX_ITERATIONS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_LOG_LEVEL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_FILE_LOG_LEVEL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_NO_OP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_VECTORIZE_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_AND_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_OR_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_SUM_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_DIFF_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_MAX_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_MIN_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_AVERAGE_OPERATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_CONNECTION_REQUIRED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_BUFFER_DATA
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_HANDLE_OPTION_CONNECTIONS
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_CUSTOM
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_DELAY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_RANDOM_DELAY
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_RANDOM_DROP
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_REROUTE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_CLONE
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_FILTER_TYPE_FIREWALL
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_SEQUENCING_MODE_FAST
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_SEQUENCING_MODE_ORDERED
-		:project: helics
+    :project: helics
 
 .. doxygenenumvalue:: HELICS_SEQUENCING_MODE_DEFAULT
-		:project: helics
+    :project: helics
 
 ```
 
 ## Functions
+
 1. `General`
 1. `Creation`
 1. `Broker`
@@ -457,55 +458,55 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsGetVersion
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetBuildFlags
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetCompilerVersion
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsErrorInitialize
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsErrorClear
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsLoadSignalHandler
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsClearSignalHandler
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsLoadSignalHandlerCallback
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsAbort
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsIsCoreTypeAvailable
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetFederateByName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetPropertyIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetFlagIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetOptionIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsGetOptionValue
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCloseLibrary
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCleanupLibrary
-		:project: helics
+    :project: helics
 
 ```
 
@@ -514,40 +515,40 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsCreateCore
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateCoreFromArgs
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateBroker
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateBrokerFromArgs
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateValueFederate
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateValueFederateFromConfig
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateMessageFederate
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateMessageFederateFromConfig
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateCombinationFederate
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateCombinationFederateFromConfig
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateFederateInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCreateQuery
-		:project: helics
+    :project: helics
 
 ```
 
@@ -556,64 +557,64 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsBrokerClone
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerIsConnected
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerDataLink
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerAddSourceFilterToEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerAddDestinationFilterToEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerMakeConnections
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerWaitForDisconnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerGetIdentifier
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerGetAddress
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerDisconnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerDestroy
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerSetGlobal
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerSendCommand
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerSetLogFile
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerSetTimeBarrier
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerClearTimeBarrier
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerGlobalError
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsBrokerSetLoggingCallback
-		:project: helics
+    :project: helics
 
 ```
 
@@ -622,70 +623,70 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsCoreClone
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreWaitForDisconnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreIsConnected
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreDataLink
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreAddSourceFilterToEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreAddDestinationFilterToEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreMakeConnections
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreGetIdentifier
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreGetAddress
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreSetReadyToInit
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreConnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreDisconnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreDestroy
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreSetGlobal
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreSendCommand
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreSetLogFile
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreGlobalError
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreSetLoggingCallback
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreRegisterFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsCoreRegisterCloningFilter
-		:project: helics
+    :project: helics
 
 ```
 
@@ -694,52 +695,52 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFederateInfoClone
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoLoadFromArgs
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetCoreName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetCoreInitString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetBrokerInitString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetCoreType
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetCoreTypeFromString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetBroker
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetBrokerKey
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetBrokerPort
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetLocalPort
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetFlagOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetSeparator
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetTimeProperty
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateInfoSetIntegerProperty
-		:project: helics
+    :project: helics
 
 ```
 
@@ -748,178 +749,178 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFederateDestroy
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateClone
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterInterfaces
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGlobalError
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLocalError
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateFinalize
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateFinalizeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateFinalizeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateDisconnect
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateDisconnectAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateDisconnectComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterInitializingMode
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterInitializingModeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateIsAsyncOperationCompleted
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterInitializingModeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingMode
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingModeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingModeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingModeIterative
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingModeIterativeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateEnterExecutingModeIterativeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetState
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetCore
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeAdvance
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestNextStep
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeIterative
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeIterativeAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRequestTimeIterativeComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetTimeProperty
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetFlagOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetSeparator
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetIntegerProperty
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetTimeProperty
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetFlagOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetIntegerProperty
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetCurrentTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetGlobal
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateAddDependency
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetLogFile
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLogErrorMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLogWarningMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLogInfoMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLogDebugMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateLogLevelMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSendCommand
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetCommand
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetCommandSource
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateWaitCommand
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetLoggingCallback
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateSetQueryCallback
-		:project: helics
+    :project: helics
 
 ```
 
@@ -928,61 +929,61 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterSubscription
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterPublication
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterTypePublication
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalPublication
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalTypePublication
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterInput
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterTypeInput
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalInput
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalTypeInput
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetPublication
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetPublicationByIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetInput
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetInputByIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetSubscription
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateClearUpdates
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterFromPublicationJSON
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederatePublishJSON
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetPublicationCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetInputCount
-		:project: helics
+    :project: helics
 
 ```
 
@@ -991,70 +992,70 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsPublicationIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishBytes
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishInteger
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishBoolean
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishDouble
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishChar
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishComplex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishVector
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishNamedPoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationAddTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetType
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetUnits
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationSetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationSetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationGetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationSetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsPublicationSetMinimumChange
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1063,133 +1064,133 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsInputIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputAddTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetByteCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetBytes
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetStringSize
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetInteger
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetBoolean
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetDouble
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetChar
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetComplexObject
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetComplex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetVectorSize
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetVector
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetNamedPoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultBytes
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultInteger
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultBoolean
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultChar
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultDouble
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultComplex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultVector
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetDefaultNamedPoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetType
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetPublicationType
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsSubscriptionGetTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetUnits
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetInjectionUnits
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetExtractionUnits
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputGetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputSetMinimumChange
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputIsUpdated
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputLastUpdateTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsInputClearUpdate
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1198,40 +1199,40 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterTargetedEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalTargetedEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetEndpointByIndex
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateHasMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederatePendingMessageCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateCreateMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateClearMessages
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetEndpointCount
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1240,85 +1241,85 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsEndpointIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSetDefaultDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetDefaultDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendBytes
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendBytesTo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendBytesToAt
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendBytesAt
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSendMessageZeroCopy
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSubscribe
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointHasMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointPendingMessageCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointCreateMessage
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetType
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointSetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointGetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointAddSourceTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointAddDestinationTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointRemoveTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointAddSourceFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsEndpointAddDestinationFilter
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1327,88 +1328,88 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsMessageGetSource
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetOriginalSource
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetOriginalDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetMessageID
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetFlagOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetByteCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageGetBytes
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetSource
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetOriginalSource
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetOriginalDestination
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetTime
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageResize
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageReserve
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetMessageID
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageClearFlags
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetFlagOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageSetData
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageAppendData
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageCopy
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageClone
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsMessageClear
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1417,25 +1418,25 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterCloningFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateRegisterGlobalCloningFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetFilterCount
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetFilter
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFederateGetFilterByIndex
-		:project: helics
+    :project: helics
 
 ```
 
@@ -1444,52 +1445,52 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsFilterSetCustomCallback
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterIsValid
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterGetName
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterSet
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterSetString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterAddDestinationTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterAddSourceTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterAddDeliveryEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterRemoveTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterRemoveDeliveryEndpoint
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterGetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterSetInfo
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterGetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterSetTag
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterSetOption
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsFilterGetOption
-		:project: helics
+    :project: helics
 ```
 
 ### Query
@@ -1497,35 +1498,35 @@
 ```eval_rst
 
 .. doxygenfunction:: helicsQueryExecute
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryCoreExecute
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryBrokerExecute
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryExecuteAsync
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryExecuteComplete
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryIsCompleted
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQuerySetTarget
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQuerySetQueryString
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQuerySetOrdering
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryFree
-		:project: helics
+    :project: helics
 
 .. doxygenfunction:: helicsQueryBufferFill
-		:project: helics
+    :project: helics
 ```
