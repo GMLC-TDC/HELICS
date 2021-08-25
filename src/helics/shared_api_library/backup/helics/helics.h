@@ -47,7 +47,7 @@ extern "C" {
 /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
 typedef enum {
     /** a default core type that will default to something available*/
-    HELICS_CORE_TYPE_DEFAULT = 0,
+HELICS_CORE_TYPE_DEFAULT = 0,
     /** use the Zero MQ networking protocol */
     HELICS_CORE_TYPE_ZMQ = 1,
     /** use MPI for operation on a parallel cluster */
