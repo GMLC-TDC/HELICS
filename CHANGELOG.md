@@ -8,6 +8,23 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.0.1][] - 2021-08-26
+
+This release includes some bug fixes and refinements to the build process for HELICS3, as well as general bug fixes and the addition of a compatibility layer making it possible for HELICS 2 federates to interact with a HELICS 3 broker if absolutely required.   The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
+
+
+### Fixed
+
+- Timing issues using UNINTERUPTIBLE_FLAG and iterations together resulted in incorrect Timing
+- Some issues with the automated generation of interface files for inclusion in the repository (Java, and Matlab)
+- Fixed several broken links in the documentation pages
+
+### Added
+
+- JSON serialization method for HELICS supported data types
+- JSON serialization method for HELICS actionMessage to allow some level of backwards compatibility support.  The intention is that using the --json flag on a federate will allow full forward compatibility in the future.  It is slower but as it is a text stream and it includes a version code future version can adapt.
+- profiling capability See [Profiling](./docs/user-guide/advanced_topics/profiling.md)
+
 ## [3.0.0][] - 2021-07-15
 
 HELICS 3.0 is a major update to HELICS. The major features that have been added are the command interface and targeted Endpoints. Internally major changes include updating the minimum compiler to C++17, and updates to internal libraries. The binary serialization protocol was shifted from Cereal to a custom format that embeds the data type so is more suitable to HELICS data types. The initial release is an alpha release for some initial testing. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
