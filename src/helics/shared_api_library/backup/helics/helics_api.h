@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <stdlib.h>
 
 typedef enum {
-HELICS_CORE_TYPE_DEFAULT = 0,
+    HELICS_CORE_TYPE_DEFAULT = 0,
     HELICS_CORE_TYPE_ZMQ = 1,
     HELICS_CORE_TYPE_MPI = 2,
     HELICS_CORE_TYPE_TEST = 3,
