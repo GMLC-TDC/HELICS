@@ -243,5 +243,11 @@ texinfo_documents = [
 
 def setup(app):
     app.add_stylesheet("css/custom.css")  # may also be an URL
-    app.add_config_value("recommonmark_config", {"enable_eval_rst": True,}, True)
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            "enable_eval_rst": True,
+        },
+        True,
+    )
     app.add_transform(AutoStructify)
