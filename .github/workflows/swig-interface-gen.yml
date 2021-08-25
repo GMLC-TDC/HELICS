@@ -33,25 +33,21 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
-    # Run on helics.h and helics_api.h; --files seems to be broken and only run on the first file given
-    - uses: pre-commit/action@v2.0.3
+    # Run clang-format on helics.h and helics_api.h
+    - name: clang-format
+      uses: pre-commit/action@v2.0.3
       # Failure is expected, since we know it will be fixing up the generated helics header files
       continue-on-error: true
       with:
-        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics.h
-    - uses: pre-commit/action@v2.0.3
-      # Failure is expected, since we know it will be fixing up the generated helics header files
-      continue-on-error: true
-      with:
-        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics_api.h
+        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
      
-    - name: git status
-      run: git status
-
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
- 
+
+    - name: git status
+      run: git status && git show
+
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
