@@ -10,8 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.0.1][] - 2021-08-26
 
-This release includes some bug fixes and refinements to the build process for HELICS3, as well as general bug fixes and the addition of a compatibility layer making it possible for HELICS 2 federates to interact with a HELICS 3 broker if absolutely required.   The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
-
+This release includes some bug fixes and refinements to the build process for HELICS3, as well as general bug fixes and the addition of a compatibility layer making it possible for HELICS 2 federates to interact with a HELICS 3 broker if absolutely required. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
 
 ### Fixed
 
@@ -22,7 +21,7 @@ This release includes some bug fixes and refinements to the build process for HE
 ### Added
 
 - JSON serialization method for HELICS supported data types
-- JSON serialization method for HELICS actionMessage to allow some level of backwards compatibility support.  The intention is that using the --json flag on a federate will allow full forward compatibility in the future.  It is slower but as it is a text stream and it includes a version code future version can adapt.
+- JSON serialization method for HELICS actionMessage to allow some level of backwards compatibility support. The intention is that using the --json flag on a federate will allow full forward compatibility in the future. It is slower but as it is a text stream and it includes a version code future version can adapt.
 - profiling capability See [Profiling](./docs/user-guide/advanced_topics/profiling.md)
 
 ## [3.0.0][] - 2021-07-15
