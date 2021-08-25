@@ -21,12 +21,9 @@ jobs:
       run: |
               python3 scripts/generateHelicsH.py src/helics/shared_api_library/backup/helics/ ./
   
-    # Run SWIG to generated updated matlab + java interface files
+    # Run SWIG to generate updated matlab + java interface files
     - uses: gmlc-tdc/helics-action/update-swig-interfaces@main
-    - name: Stage changed interface files
-      shell: bash --noprofile --norc {0}
-      run: git add interfaces/ src/helics/shared_api_library/backup/
-      
+     
     # Run pre-commit docker-clang-format hook
     - uses: actions/setup-python@v2
     - name: set PY
@@ -51,6 +48,10 @@ jobs:
     - name: git status
       run: git status
 
+    - name: Stage changed interface files
+      shell: bash --noprofile --norc {0}
+      run: git add interfaces/ src/helics/shared_api_library/backup/
+ 
     - uses: gmlc-tdc/create-pr-action@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
