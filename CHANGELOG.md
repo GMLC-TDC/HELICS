@@ -14,15 +14,15 @@ This release includes some bug fixes and refinements to the build process for HE
 
 ### Fixed
 
-- Timing issues using UNINTERUPTIBLE_FLAG and iterations together resulted in incorrect Timing
+- Timing issues using UNINTERUPTIBLE_FLAG and iterations together resulted in incorrect timing
 - Some issues with the automated generation of interface files for inclusion in the repository (Java, and Matlab)
 - Fixed several broken links in the documentation pages
 
 ### Added
 
 - JSON serialization method for HELICS supported data types
-- JSON serialization method for HELICS actionMessage to allow some level of backwards compatibility support. The intention is that using the --json flag on a federate will allow full forward compatibility in the future. It is slower but as it is a text stream and it includes a version code future version can adapt.
-- profiling capability See [Profiling](./docs/user-guide/advanced_topics/profiling.md)
+- JSON serialization method for HELICS actionMessage to allow some level of backwards compatibility support. The intention is that using the --json flag on a federate will allow full forward compatibility in the future. It is slower but as it is a text stream and it includes a version code, future versions can adapt.
+- Profiling capability, see [Profiling](./docs/user-guide/advanced_topics/profiling.md)
 
 ## [3.0.0][] - 2021-07-15
 
