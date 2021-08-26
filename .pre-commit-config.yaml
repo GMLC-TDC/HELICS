@@ -53,11 +53,10 @@ repos:
     rev: v2.1.0
     hooks:
       - id: codespell
-        exclude: ^(docs/user-guide/examples/user_guide_examples)
         args:
           [
             "-w",
-            '--skip="*.csv,./docs/user-guide/examples/user_guide_examples/*/*/*.xml,./docs/user-guide/examples/user_guide_examples/*/*/*.glm"',
+            '--skip="*.csv,docs/user-guide/examples/user_guide_examples/*/*/*.xml,docs/user-guide/examples/user_guide_examples/*/*/*.glm"',
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
   - repo: local
