@@ -1,4 +1,4 @@
-exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|interfaces/python/interface/|.github/workflows/)
+exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|.github/workflows/)
 ci:
   skip: [docker-clang-format]
 repos:
