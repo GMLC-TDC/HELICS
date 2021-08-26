@@ -44,6 +44,7 @@ repos:
     rev: v0.7.2.1
     hooks:
       - id: shellcheck
+        args: [-x]
   - repo: https://github.com/cheshirekow/cmake-format-precommit
     rev: v0.6.13
     hooks:

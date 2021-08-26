@@ -5,6 +5,7 @@ if [[ "$SET_MSYS_PATH" == "true" ]]; then
 fi
 
 # Setup MPI on Fedora build images
+# shellcheck disable=SC1091
 source /etc/os-release
 if command -v module &>/dev/null; then
     if [[ "$ID" == "fedora" ]]; then

@@ -118,7 +118,7 @@ install_boost() {
     local install_path=$2
     local boost_toolset=$3
 
-    local b2_extra_options=""
+    local b2_extra_options=()
     local cxxflags_var=""
     local cxxflags_arr=()
     if [[ "${BOOST_CXX_FLAGS}" ]]; then
@@ -150,9 +150,9 @@ install_boost() {
         linkflags_var="linkflags=${linkflags_arr[*]}"
     fi
 
-    echo Boost link type: $b2_link_type
+    echo "Boost link type: $b2_link_type"
 
-    echo Boost b2 extra options ${b2_extra_options}
+    echo "Boost b2 extra options ${b2_extra_options[@]}"
 
     fetch_and_untar "${boost_version_str}.tar.gz" \
         "http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download"
@@ -167,7 +167,7 @@ install_boost() {
             toolset="${boost_toolset}" \
             "${cxxflags_var}" \
             "${linkflags_var}" \
-            ${b2_extra_options} >/dev/null
+            "${b2_extra_options[@]}" >/dev/null
     else
         mkdir -p "${install_path}/include" || exit
         cp -r boost "${install_path}/include"
