@@ -78,12 +78,6 @@ jobs:
       with:
         ref: develop
       if: github.event_name == 'schedule'
-      
-    # Build with Python 3.8 interface
-    - uses: actions/setup-python@v1
-      with:
-        python-version: '3.8'
-        architecture: ${{ matrix.arch }}
         
     # Compile HELICS and create the installer
     - name: Build installer
@@ -154,13 +148,6 @@ jobs:
       with:
         ref: develop
       if: github.event_name == 'schedule'
-      
-    # Build with Python 3.8 interface
-    - uses: actions/setup-python@v1
-      if: runner.os != 'Linux'
-      with:
-        python-version: '3.8'
-        architecture: ${{ matrix.arch }}
  
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
