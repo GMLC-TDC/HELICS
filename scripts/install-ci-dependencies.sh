@@ -24,12 +24,6 @@ else
     os_name="$(uname -s)"
 fi
 
-shared_lib_ext=so
-if [[ "$os_name" == "Darwin" ]]; then
-    shared_lib_ext=dylib
-fi
-export shared_api_ext
-
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
     boost_version=1.72.0
