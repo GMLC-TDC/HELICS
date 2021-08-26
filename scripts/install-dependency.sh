@@ -152,7 +152,7 @@ install_boost() {
 
     echo "Boost link type: $b2_link_type"
 
-    echo "Boost b2 extra options ${b2_extra_options[@]}"
+    echo "Boost b2 extra options ${b2_extra_options[*]}"
 
     fetch_and_untar "${boost_version_str}.tar.gz" \
         "http://sourceforge.net/projects/boost/files/boost/${boost_version}/${boost_version_str}.tar.gz/download"
