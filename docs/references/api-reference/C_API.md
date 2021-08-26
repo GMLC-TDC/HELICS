@@ -19,7 +19,6 @@
 1. [Filter methods](#filter)
 1. [Query methods](#query)
 
-
 ## Enums
 
 ```eval_rst
