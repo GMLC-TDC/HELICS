@@ -7,7 +7,7 @@ echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
 
 # Install Boost
 COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
-# shellcheck source=../common/Windows/install-boost.sh
+# shellcheck source=.github/actions/common/Windows/install-boost.sh
 source "${COMMON_SCRIPTS}/install-boost.sh"
 
 # Find cpack command (chocolatey has a command with the same name)
