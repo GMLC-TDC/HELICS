@@ -56,7 +56,7 @@ repos:
         args:
           [
             "-w",
-            '--skip="*.csv"',
+            '--skip="*.csv,./docs/user-guide/examples/user_guide_examples/*/*/*.xml,./docs/user-guide/examples/user_guide_examples/*/*/*.glm"',
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
   - repo: local
