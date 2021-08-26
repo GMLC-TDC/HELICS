@@ -1,6 +1,26 @@
 # C API Reference
 
-## Enum
+## Table of Contents
+
+1. [Enums](#enums)
+1. [General function](#general)
+1. [Creation functions](#creation)
+1. [Broker methods](#broker)
+1. [Core methods](#core)
+1. [FederateInfo methods](#federateinfo)
+1. [Federate methods](#federate)
+1. [ValueFederate](#valuefederate)
+1. [Publication methods](#publication)
+1. [Input methods](#input)
+1. [MessageFederate methods](#messagefederate)
+1. [Endpoint methods](#endpoint)
+1. [Message object methods](#message)
+1. [FilterFederate methods](#filterfederate)
+1. [Filter methods](#filter)
+1. [Query methods](#query)
+
+
+## Enums
 
 ```eval_rst
 
@@ -434,24 +454,6 @@
     :project: helics
 
 ```
-
-## Functions
-
-1. `General`
-1. `Creation`
-1. `Broker`
-1. `Core`
-1. `FederateInfo`
-1. `Federate`
-1. `ValueFederate`
-1. `Publication`
-1. `Input`
-1. `MessageFederate`
-1. `Endpoint`
-1. `Message`
-1. `FilterFederate`
-1. `Filter`
-1. `Query`
 
 ### General
 
