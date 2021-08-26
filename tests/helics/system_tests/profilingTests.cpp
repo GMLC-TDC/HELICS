@@ -387,8 +387,8 @@ TEST(profiling_tests, config)
     auto cr = Fed->getCorePointer();
     cr->setLoggingCallback(helics::gLocalCoreId,
                            [mlog](int level,
-                                   std::string_view /*unused*/,
-                                   std::string_view message) {
+                                  std::string_view /*unused*/,
+                                  std::string_view message) {
                                mlog->lock()->emplace_back(level, message);
                            });
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
