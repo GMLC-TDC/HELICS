@@ -168,7 +168,7 @@ void TimeCoordinator::timeRequest(Time nextTime,
 
     time_exec = std::min({time_value, time_message, time_requested});
     if (info.uninterruptible) {
-        if (time_exec > time_granted || iterating == IterationRequest::NO_ITERATIONS) {
+        if (time_exec > time_granted || iterating == iteration_request::no_iterations) {
             time_exec = time_requested;
         }
     }
@@ -184,7 +184,7 @@ bool TimeCoordinator::updateNextExecutionTime()
 {
     auto cexec = time_exec;
     if (info.uninterruptible) {
-        if (iterating == IterationRequest::NO_ITERATIONS) {
+        if (iterating == iteration_request::no_iterations) {
             time_exec = generateAllowedTime(time_requested);
         } else {
             time_exec = std::min(time_message, time_value);
@@ -222,7 +222,7 @@ void TimeCoordinator::updateNextPossibleEventTime()
         (iterating == iteration_request::no_iterations) ? getNextPossibleTime() : time_granted;
 
     if (info.uninterruptible) {
-        if (iterating == IterationRequest::NO_ITERATIONS) {
+        if (iterating == iteration_request::no_iterations) {
             time_next = generateAllowedTime(time_requested) + info.outputDelay;
         } else {
             if (time_minminDe < Time::maxVal() && !info.restrictive_time_policy) {

@@ -226,7 +226,7 @@ TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
         double t{1.0};
         while (t <= 100.0) {
             try {
-                pub1.publish(t);
+                pub1->publish(t);
             }
             catch (const helics::HelicsException&) {
                 std::cerr << "error in fed 1 publication at time " << t << std::endl;
@@ -271,11 +271,11 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE);
+    vFed1->setProperty(helics_property_time_delta, 1.0);
+    vFed1->setProperty(helics_property_time_period, 1.0);
+    vFed2->setProperty(helics_property_time_delta, 1.0);
+    vFed2->setProperty(helics_property_time_period, 1.0);
+    vFed2->setFlagOption(helics_flag_uninterruptible);
 
     auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
@@ -297,12 +297,12 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
                 std::cerr << "error in fed 1 publication at time " << t << std::endl;
                 break;
             }
-            auto T2 = vFed1->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto T2 = vFed1->requestTimeIterative(t, helics::iteration_request::iterate_if_needed);
             if (T2.grantedTime == helics::Time::maxVal()) {
                 break;
             }
             prevT = t;
-            if (T2.state == helics::IterationResult::NEXT_STEP) {
+            if (T2.state == helics::iteration_result::next_step) {
                 t += 1.0;
             } else {
                 ++iterationCount1;
@@ -325,10 +325,10 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
                 std::cerr << "error in fed 2 publication at time " << t << std::endl;
                 break;
             }
-            auto T2 = vFed2->requestTimeIterative(t, helics::IterationRequest::ITERATE_IF_NEEDED);
+            auto T2 = vFed2->requestTimeIterative(t, helics::iteration_request::iterate_if_needed);
             res.push_back(T2.grantedTime);
             prevT = t;
-            if (T2.state == helics::IterationResult::NEXT_STEP) {
+            if (T2.state == helics::iteration_result::next_step) {
                 t += 5.0;
             } else {
                 ++iterationCount2;
