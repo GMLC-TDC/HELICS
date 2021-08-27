@@ -123,6 +123,8 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"uninterruptible", HELICS_FLAG_UNINTERRUPTIBLE},
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
     {"debugging", HELICS_FLAG_DEBUGGING},
+    {"profiling", HELICS_FLAG_PROFILING},
+    {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyupdateonchange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyUpdateOnChange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
@@ -136,6 +138,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"realtime", HELICS_FLAG_REALTIME},
     {"real_time", HELICS_FLAG_REALTIME},
     {"realTime", HELICS_FLAG_REALTIME},
+    {"json", HELICS_FLAG_USE_JSON_SERIALIZATION},
     {"restrictivetimepolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictive_time_policy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictiveTimePolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
@@ -274,9 +277,10 @@ static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_
                                                       {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
                                                       /** interfaces + timing message*/
                                                       {"timing", HELICS_LOG_LEVEL_TIMING},
+                                                      {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
                                                       /** timing+ data transfer notices*/
                                                       {"data", HELICS_LOG_LEVEL_DATA},
-                                                      /** same as data*/
+                                                      /** same as data for now*/
                                                       {"debug", HELICS_LOG_LEVEL_DEBUG},
                                                       /** all internal messages*/
                                                       {"trace", HELICS_LOG_LEVEL_TRACE}};
@@ -291,6 +295,12 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "debugging") {
             fi.debugging = true;
+        }
+        if (flg == "json") {
+            fi.useJsonSerialization = true;
+        }
+        if (flg == "profiling") {
+            fi.profilerFileName = "log";
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -484,7 +494,16 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
-
+    app->add_flag(
+        "--json",
+        useJsonSerialization,
+        "tell the core and federate to use JSON based serialization for all messages, to ensure compatibility");
+    app->add_option(
+           "--profiler",
+           profilerFileName,
+           "Enable profiling and specify a file name, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
+        ->expected(0, 1)
+        ->default_str("log");
     app->add_option("--broker_key,--brokerkey,--brokerKey",
                     key,
                     "specify a key to use to match a broker should match the broker key");
@@ -798,6 +817,13 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
     if (fi.debugging) {
         res.append(" --debugging");
+    }
+    if (fi.useJsonSerialization) {
+        res.append(" --json");
+    }
+    if (!fi.profilerFileName.empty()) {
+        res.append(" --profiler=");
+        res.append(fi.profilerFileName);
     }
     if (!fi.brokerInitString.empty()) {
         res.append(" --broker_init_string \"");

@@ -223,6 +223,20 @@ TEST_P(valuefed_all_type_tests, dual_transfer)
     EXPECT_TRUE(res);
 }
 
+TEST_P(valuefed_all_type_tests, dual_transfer_json)
+{
+    SetupTest<helics::ValueFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication("pub1", "json");
+
+    auto& subid = vFed2->registerSubscription("pub1");
+    bool res = dual_transfer_test(vFed1, vFed2, pubid, subid);
+    EXPECT_TRUE(res);
+}
+
 TEST_P(valuefed_all_type_tests, dual_transfer_inputs)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);

@@ -24,11 +24,6 @@ else
     os_name="$(uname -s)"
 fi
 
-shared_lib_ext=so
-if [[ "$os_name" == "Darwin" ]]; then
-    shared_lib_ext=dylib
-fi
-
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
     boost_version=1.72.0
@@ -162,41 +157,6 @@ elif [[ "$os_name" == "Darwin" ]]; then
     export DYLD_LIBRARY_PATH=${PWD}/build/src/helics/shared_api_library/:$DYLD_LIBRARY_PATH
 fi
 
-if [[ "$os_name" == "Darwin" && -x "$(command -v brew)" ]]; then
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh
-    bash miniconda.sh -b -p "$HOME/miniconda"
-    export PATH="$HOME/miniconda/bin:$PATH"
-    conda config --set always_yes yes --set changeps1 no
-    conda update -q conda
-    conda info -a
-    pip install --user --upgrade pytest
-else
-    if hash pyenv; then
-        if [[ ${DEBUG_INSTALL_DEPENDENCY+x} ]]; then
-            pyenv versions
-        fi
-
-        # Default path listing order (pyenv versions is a bash script) should place latest version at the end (unless jython/miniconda/etc are installed)
-        last_pyversion=$(pyenv versions | tail -1)
-        # Remove a leading asterisk if present (though setting the version is redundant, since that is the one that is already active)
-        last_pyversion=${last_pyversion/#\*/}
-        # Remove a trailing set of parenthesis saying where the version was set
-        last_pyversion=${last_pyversion%(*)}
-        # Remove whitespace
-        last_pyversion="$(echo -e "$last_pyversion" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
-        pyenv global "${last_pyversion}"
-    fi
-
-    python3 -m pip install --user --upgrade pip wheel
-    python3 -m pip install --user --upgrade pytest
-fi
-
-pyver=$(python3 -c 'import sys; ver=sys.version_info[:2]; print(".".join(map(str,ver)))')
-
-PYTHON_LIB_PATH=$(python3-config --prefix)/lib/libpython${pyver}m.${shared_lib_ext}
-export PYTHON_LIB_PATH
-PYTHON_INCLUDE_PATH=$(python3-config --prefix)/include/python${pyver}m/
-export PYTHON_INCLUDE_PATH
 PYTHON_EXECUTABLE=$(command -v python3)
 export PYTHON_EXECUTABLE
 

@@ -4,9 +4,8 @@ trigger:
       - pre-commit/*
 pr:
   - main
-  - master
   - develop
-  - helics3
+  - helics2
 
 jobs:
   - job: Linux
@@ -72,7 +71,6 @@ jobs:
         condition: ne(variables['xcode_path'],'')
       - bash: |
           brew install swig zeromq boost
-          python3 -m pip install pytest
         displayName: 'Install dependencies'
       - bash: |
           source scripts/setup-helics-ci-options.sh
@@ -136,15 +134,6 @@ jobs:
       - bash: choco install swig --yes --limit-output
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
         displayName: Install swig
-
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: '3.5'
-          addToPath: true
-          architecture: $(langArch)
-
-      - bash: pip3 install pytest
-        displayName: Install pytest
 
       # -----------------------
       # Configure HELICS

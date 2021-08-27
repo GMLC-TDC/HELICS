@@ -597,6 +597,47 @@ TEST_F(query, interfaces)
     helics::cleanupHelicsLibrary();
 }
 
+#ifdef HELICS_ENABLE_ZMQ_CORE
+TEST_F(query, interfaces_json_serialization)
+{
+    extraCoreArgs = "--json";
+    SetupTest<helics::CombinationFederate>("zmq4", 1);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto& i1 = vFed1->registerGlobalInput<double>("ipt1", "kV");
+    auto& p1 = vFed1->registerGlobalPublication<double>("pub1", "V");
+    auto& e1 = vFed1->registerGlobalEndpoint("ept1", "type1");
+    p1.addTarget("ipt1");
+    p1.setTag("tag1", "val1");
+
+    i1.setTag("tag2", "val2");
+    e1.setTag("tag3", "val3");
+    vFed1->enterInitializingMode();
+    auto core = vFed1->getCorePointer();
+    auto res = core->query("fed0", "interfaces", HELICS_SEQUENCING_MODE_FAST);
+    core = nullptr;
+    vFed1->finalize();
+    auto val = loadJsonStr(res);
+    EXPECT_STREQ(val["inputs"][0]["name"].asCString(), "ipt1");
+    EXPECT_STREQ(val["publications"][0]["name"].asCString(), "pub1");
+    EXPECT_STREQ(val["endpoints"][0]["name"].asCString(), "ept1");
+    EXPECT_STREQ(val["inputs"][0]["type"].asCString(), "double");
+    EXPECT_STREQ(val["publications"][0]["type"].asCString(), "double");
+    EXPECT_STREQ(val["endpoints"][0]["type"].asCString(), "type1");
+
+    EXPECT_STREQ(val["inputs"][0]["units"].asCString(), "kV");
+    EXPECT_STREQ(val["publications"][0]["units"].asCString(), "V");
+
+    ASSERT_TRUE(val["inputs"][0]["tags"].isObject());
+    ASSERT_TRUE(val["publications"][0]["tags"].isObject());
+    ASSERT_TRUE(val["endpoints"][0]["tags"].isObject());
+    EXPECT_STREQ(val["publications"][0]["tags"]["tag1"].asCString(), "val1");
+    EXPECT_STREQ(val["inputs"][0]["tags"]["tag2"].asCString(), "val2");
+    EXPECT_STREQ(val["endpoints"][0]["tags"]["tag3"].asCString(), "val3");
+    helics::cleanupHelicsLibrary();
+}
+#endif
+
 TEST_F(query, federate_tags)
 {
     SetupTest<helics::CombinationFederate>("test", 1);
