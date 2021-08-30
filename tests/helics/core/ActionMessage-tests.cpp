@@ -420,10 +420,10 @@ TEST(ActionMessage, check_packetization)
 TEST(ActionMessage, check_json_packetization)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
-    cmd.source_id = GlobalFederateId(1);
-    cmd.source_handle = InterfaceHandle(2);
-    cmd.dest_id = GlobalFederateId(3);
-    cmd.dest_handle = InterfaceHandle(4);
+    cmd.source_id = global_federate_id(1);
+    cmd.source_handle = interface_handle(2);
+    cmd.dest_id = global_federate_id(3);
+    cmd.dest_handle = interface_handle(4);
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
@@ -435,7 +435,7 @@ TEST(ActionMessage, check_json_packetization)
     auto cmdString = cmd.packetize_json();
     EXPECT_GE(cmdStringNormal.size() + 6, cmdString.size());
     helics::ActionMessage cmd2;
-    auto res = cmd2.depacketize(reinterpret_cast<std::byte*>(cmdString.data()), cmdString.size());
+    auto res = cmd2.depacketize(cmdString.data(), cmdString.size());
     EXPECT_EQ(res, static_cast<int>(cmdString.size()));
     EXPECT_TRUE(cmd.action() == cmd2.action());
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
@@ -451,10 +451,10 @@ TEST(ActionMessage, check_json_packetization)
 TEST(ActionMessage, jsonconversion_test)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
-    cmd.source_id = GlobalFederateId(1);
-    cmd.source_handle = InterfaceHandle(2);
-    cmd.dest_id = GlobalFederateId(3);
-    cmd.dest_handle = InterfaceHandle(4);
+    cmd.source_id = global_federate_id(1);
+    cmd.source_handle = interface_handle(2);
+    cmd.dest_id = global_federate_id(3);
+    cmd.dest_handle = interface_handle(4);
     cmd.messageID = 762354;
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
@@ -482,10 +482,10 @@ TEST(ActionMessage, jsonconversion_test)
 TEST(ActionMessage, jsonconversion_test2)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
-    cmd.source_id = GlobalFederateId{1};
-    cmd.source_handle = InterfaceHandle{2};
-    cmd.dest_id = GlobalFederateId{3};
-    cmd.dest_handle = InterfaceHandle{4};
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
@@ -511,16 +511,16 @@ TEST(ActionMessage, jsonconversion_test2)
 TEST(ActionMessage, jsonconversion_test_binary_strings)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
-    cmd.source_id = GlobalFederateId{1};
-    cmd.source_handle = InterfaceHandle{2};
-    cmd.dest_id = GlobalFederateId{3};
-    cmd.dest_handle = InterfaceHandle{4};
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = std::string(500000, 17);
-    cmd.payload[6482] = std::byte(0);
+    cmd.payload[6482] = 0;
 
     cmd.setStringData("target", std::string(987, '\0'), "original_source");
 

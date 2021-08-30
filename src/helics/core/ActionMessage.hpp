@@ -193,7 +193,7 @@ class ActionMessage {
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
-    std::size_t depacketize(const char* data, int buffer_size);
+    int depacketize(const char* data, int buffer_size);
     /** read a command from a string
     @return number of bytes read*/
     std::size_t from_string(const std::string & data);

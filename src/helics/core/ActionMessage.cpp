@@ -282,7 +282,7 @@ std::string ActionMessage::to_string() const
     } else {
         auto sz = serializedByteCount();
         data.resize(sz);
-        toByteArray(reinterpret_cast<std::byte*>(&(data[0])), sz);
+        toByteArray(&(data[0]), sz);
     }
     return data;
 }
@@ -307,7 +307,7 @@ std::string ActionMessage::to_json_string() const
         packet["Tdemin"] = Tdemin.getBaseTimeCode();
         packet["Tso"] = Tso.getBaseTimeCode();
     }
-    packet["payload"] = std::string(payload.to_string());
+    packet["payload"] = payload;
     packet["stringCount"] = static_cast<std::uint32_t>(stringData.size());
     if (!stringData.empty()) {
         Json::Value sdata = Json::arrayValue;
@@ -316,7 +316,7 @@ std::string ActionMessage::to_json_string() const
         }
         packet["strings"] = std::move(sdata);
     }
-    return fileops::generateJsonString(packet);
+    return generateJsonString(packet);
 }
 
 constexpr auto LEADING_CHAR = '\xF3';
@@ -405,7 +405,7 @@ int ActionMessage::fromByteArray(const char* data, int buffer_size)
         }
     }
     // this means it probably is a JSON packate
-    if (data[0] == std::byte{'{'}) {
+    if (data[0] == '{') {
         return 0;
     }
     int sz = 256 * 256 * (static_cast<uint8_t>(data[1])) + 256 * static_cast<uint8_t>(data[2]) +
@@ -558,16 +558,16 @@ int ActionMessage::depacketize(const char* data, int buffer_size)
     int bytesUsed = fromByteArray(data + 4, message_size - 4);
     if (bytesUsed == 0U) {
         if (from_json_string(
-                std::string_view(reinterpret_cast<const char*>(bytes) + 4, message_size - 4))) {
+                std::string(data + 4, message_size - 4))) {
             bytesUsed = message_size + 4;
         }
     }
     return (bytesUsed > 0) ? message_size + 2 : 0;
 }
 
-void ActionMessage::from_string(const std::string& data)
+std::size_t ActionMessage::from_string(const std::string& data)
 {
-    auto result = fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
+    auto result = fromByteArray(data.data(), static_cast<int>(data.size()));
     if (result == 0U && data.size() > 0 && data.front() == '{') {
         if (from_json_string(data)) {
             return data.size();
@@ -576,17 +576,17 @@ void ActionMessage::from_string(const std::string& data)
     return result;
 }
 
-bool ActionMessage::from_json_string(std::string_view data)
+bool ActionMessage::from_json_string(const std::string& data)
 {
     try {
-        auto val = fileops::loadJsonStr(data);
+        auto val = loadJsonStr(data);
         // auto version = val["version"].asFloat();
         messageAction = static_cast<action_message_def::action_t>(val["command"].asInt());
         messageID = val["messageId"].asInt();
-        source_id = GlobalFederateId(val["sourceId"].asInt());
-        dest_id = GlobalFederateId(val["destId"].asInt());
-        source_handle = InterfaceHandle(val["sourceHandle"].asInt());
-        dest_handle = InterfaceHandle(val["destHandle"].asInt());
+        source_id = global_federate_id(val["sourceId"].asInt());
+        dest_id = global_federate_id(val["destId"].asInt());
+        source_handle = interface_handle(val["sourceHandle"].asInt());
+        dest_handle = interface_handle(val["destHandle"].asInt());
         counter = static_cast<uint16_t>(val["counter"].asUInt());
         flags = static_cast<uint16_t>(val["flags"].asUInt());
         sequenceID = val["sequenceId"].asUInt();
@@ -613,9 +613,9 @@ bool ActionMessage::from_json_string(std::string_view data)
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
     std::size_t bytesUsed =
-        fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
+        fromByteArray(data.data(), static_cast<int>(data.size()));
     if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
-        if (from_json_string(std::string_view(data.data(), data.size()))) {
+        if (from_json_string(std::string(data.data(), data.size()))) {
             return data.size();
         }
     }
