@@ -39,6 +39,9 @@ constexpr uint16_t slow_responding_flag = extra_flag4;
 /// overload of extra_flag3 indicating an operation is canceled
 constexpr uint16_t cancel_flag = extra_flag3;
 
+/// overload of optional_flag indicating that a federate is an observer only
+constexpr uint16_t observer_flag = optional_flag;
+
 /// overload of extra_flag3 indicating the message is from a parent object
 constexpr uint16_t parent_flag = extra_flag3;
 
@@ -48,8 +51,9 @@ constexpr uint16_t child_flag = extra_flag4;
 /// overload of nameless_interface_flag indicating that a federate should not count in any totals
 constexpr uint16_t non_counting_flag = empty_flag;
 
+/// overload of extra_flag2 indicating an endpoint is targeted
 constexpr uint16_t targetted_flag =
-    extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targeted
+    extra_flag2;  
 
 constexpr uint16_t filter_processing_required_flag =
     extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for

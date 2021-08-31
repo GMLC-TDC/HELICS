@@ -134,6 +134,9 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 proc = MessageProcessingResult::HALTED;
             }
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            timeCoord->processTimeMessage(cmd);
+            break;
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == localID) {
