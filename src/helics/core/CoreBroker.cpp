@@ -3380,12 +3380,6 @@ void CoreBroker::checkDependencies()
         timeCoord->removeDependent(higher_broker_id);
         timeCoord->removeDependent(fedid);
 
-        ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
-
-        rmdep.source_id = global_broker_id_local;
-        routeMessage(rmdep, higher_broker_id);
-        routeMessage(rmdep, fedid);
-
         ActionMessage adddep(CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
         setActionFlag(adddep, child_flag);
@@ -3394,6 +3388,12 @@ void CoreBroker::checkDependencies()
         clearActionFlag(adddep, child_flag);
         setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
+
+        ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
+
+        rmdep.source_id = global_broker_id_local;
+        routeMessage(rmdep, higher_broker_id);
+        routeMessage(rmdep, fedid);
     }
 }
 
