@@ -30,6 +30,10 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Install HELICS Dependencies
+      run: |
+        sudo apt-get install libzmq5-dev libboost-dev
+
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
