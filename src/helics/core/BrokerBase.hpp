@@ -72,14 +72,19 @@ class BrokerBase {
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;
-
+    /// flag indicating that no further message should be processed
     std::atomic<bool> haltOperations{
-        false};  //!< flag indicating that no further message should be processed
+        false};  
+    /// flag indicating the broker should use a conservative time policy
     bool restrictive_time_policy{
-        false};  //!< flag indicating the broker should use a conservative time policy
+        false};  
+    /// flag indicating that the federation should halt on any error
     bool terminate_on_error{
-        false};  //!< flag indicating that the federation should halt on any error
-    bool debugging{false};  //!< flag indicating operation in a user debugging mode
+        false};
+    /// flag indicating operation in a user debugging mode
+    bool debugging{false};
+    /// flag indicating that the broker is an observer only
+    bool observer{false};
   private:
     std::atomic<bool> mainLoopIsRunning{
         false};  //!< flag indicating that the main processing loop is running
@@ -89,8 +94,9 @@ class BrokerBase {
         false};  //!< flag indicating that the message queue should not be used and all functions
     //!< called directly instead of distinct thread
     bool disable_timer{false};  //!< turn off the timer/timeout subsystem completely
+    /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{
-        0};  //!< counter for the total number of message processed
+        0};  
   protected:
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control

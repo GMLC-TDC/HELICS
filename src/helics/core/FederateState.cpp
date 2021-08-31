@@ -1976,7 +1976,7 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time")";
+            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

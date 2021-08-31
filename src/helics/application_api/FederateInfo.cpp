@@ -297,12 +297,19 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "debugging") {
             fi.debugging = true;
+            continue;
         }
         if (flg == "json") {
             fi.useJsonSerialization = true;
+            // purposely not continuing here
         }
         if (flg == "profiling") {
             fi.profilerFileName = "log";
+            // purposely not continuing here
+        }
+        if (flg == "observer") {
+            fi.observer = true;
+            //purposely not continuing here
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -496,6 +503,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
+    app->add_flag("--observer",
+                  observer,
+                  "tell the federate/core that this federate is an observer");
     app->add_flag(
         "--json",
         useJsonSerialization,
@@ -819,6 +829,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
     if (fi.debugging) {
         res.append(" --debugging");
+    }
+    if (fi.observer) {
+        res.append(" --observer");
     }
     if (fi.useJsonSerialization) {
         res.append(" --json");

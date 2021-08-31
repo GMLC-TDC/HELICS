@@ -147,6 +147,7 @@ across different compilers*/
         cmd_time_request = 500,  //!< request a time or iteration
         cmd_force_time_grant =
             525,  //!< command to force grant a time regardless of other considerations
+
         cmd_send_message = cmd_info_basis + 20,  //!< send a message
         cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
         cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -395,7 +396,7 @@ across different compilers*/
 */
 const char* actionMessageType(action_message_def::action_t action);
 
-enum cmd_error_codes : int {
+enum CommandErrorCodes : int {
     lost_server_connection_code = -5,
     connection_error_code = -2,
     already_init_error_code = 5,
@@ -404,6 +405,7 @@ enum cmd_error_codes : int {
     mismatch_broker_key_error_code = 9,
     max_federate_count_exceeded = 11,
     max_broker_count_exceeded = 13,
+    broker_terminating = 14,
     multiple_wait_for_current_time_flags = 15
 };
 

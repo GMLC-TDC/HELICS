@@ -26,6 +26,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     /** specify that the core/federate should operate in a user debugging
     mode which will turn off some timeouts*/
     bool debugging{false};
+    bool observer{false};
     CoreType coreType{CoreType::DEFAULT};  //!< the type of the core
     int brokerPort{-1};  //!< broker port information
 

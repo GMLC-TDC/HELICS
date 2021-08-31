@@ -880,7 +880,29 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             // processing
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            if (disconnected)
+            {
+                ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
+                transmitTimingMessages(treq);
+            }
+            else if (lastSend.time_state == time_state_t::time_granted)
+            {
+                ActionMessage treq(CMD_TIME_GRANT,source_id,cmd.source_id);
+                treq.actionTime = lastSend.next;
+                transmitTimingMessages(treq);
+            }
+            else
+            {
+                ActionMessage treq(CMD_TIME_REQUEST,source_id,cmd.source_id);
+                treq.actionTime = lastSend.next;
+                treq.Tdemin = lastSend.minDe;
+                treq.Te = lastSend.Te;
+                treq.setExtraData(lastSend.minFed.baseValue());
+                transmitTimingMessages(treq);
 
+            }
+            return message_process_result::processed;
         default:
             break;
     }
