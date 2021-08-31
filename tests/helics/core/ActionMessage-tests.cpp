@@ -298,7 +298,7 @@ TEST(ActionMessage, conversion_test)
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
-TEST(ActionMessage_tests, conversion_test2)
+TEST(ActionMessage, conversion_test2)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -327,7 +327,7 @@ TEST(ActionMessage_tests, conversion_test2)
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
-TEST(ActionMessage_tests, message_message_conversion_test)
+TEST(ActionMessage, message_message_conversion_test)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id{1};
@@ -361,7 +361,7 @@ TEST(ActionMessage_tests, message_message_conversion_test)
 }
 
 // check some error handling in the toByteArray function
-TEST(ActionMessage_tests, check_conversions)
+TEST(ActionMessage, check_conversions)
 {
     helics::ActionMessage cmd(helics::CMD_PROTOCOL);
     cmd.messageID = 10;
@@ -384,8 +384,8 @@ TEST(ActionMessage_tests, check_conversions)
     EXPECT_EQ(res, -1);
 }
 
-// check some error handling in the toByteArray function
-TEST(ActionMessage_tests, check_packetization)
+// check packetization
+TEST(ActionMessage, check_packetization)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
     cmd.source_id = global_federate_id(1);
@@ -405,6 +405,128 @@ TEST(ActionMessage_tests, check_packetization)
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize(cmdString.data(), static_cast<int>(cmdString.size()));
     EXPECT_EQ(res, static_cast<int>(cmdString.size()));
+    EXPECT_TRUE(cmd.action() == cmd2.action());
+    EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ(cmd.source_id, cmd2.source_id);
+    EXPECT_EQ(cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ(cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ(cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ(cmd.payload, cmd2.payload);
+    EXPECT_EQ(cmd.flags, cmd2.flags);
+    EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
+}
+
+// check packetization
+TEST(ActionMessage, check_json_packetization)
+{
+    helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id(1);
+    cmd.source_handle = interface_handle(2);
+    cmd.dest_id = global_federate_id(3);
+    cmd.dest_handle = interface_handle(4);
+    setActionFlag(cmd, iteration_requested_flag);
+    setActionFlag(cmd, required_flag);
+    setActionFlag(cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = "hello world";
+
+    cmd.setStringData("target", "source as a very long string test .........", "original_source");
+    auto cmdStringNormal = cmd.to_json_string();
+    auto cmdString = cmd.packetize_json();
+    EXPECT_GE(cmdStringNormal.size() + 6, cmdString.size());
+    helics::ActionMessage cmd2;
+    auto res = cmd2.depacketize(cmdString.data(), cmdString.size());
+    EXPECT_EQ(res, static_cast<int>(cmdString.size()));
+    EXPECT_TRUE(cmd.action() == cmd2.action());
+    EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ(cmd.source_id, cmd2.source_id);
+    EXPECT_EQ(cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ(cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ(cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ(cmd.payload, cmd2.payload);
+    EXPECT_EQ(cmd.flags, cmd2.flags);
+    EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
+}
+
+TEST(ActionMessage, jsonconversion_test)
+{
+    helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id(1);
+    cmd.source_handle = interface_handle(2);
+    cmd.dest_id = global_federate_id(3);
+    cmd.dest_handle = interface_handle(4);
+    cmd.messageID = 762354;
+    setActionFlag(cmd, iteration_requested_flag);
+    setActionFlag(cmd, required_flag);
+    setActionFlag(cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = std::string(5000, 'a');
+
+    cmd.setStringData("target", "source as a very long string test .........", "original_source");
+
+    auto cmdString = cmd.to_json_string();
+
+    helics::ActionMessage cmd2(cmdString);
+    EXPECT_TRUE(cmd.action() == cmd2.action());
+    EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ(cmd.source_id, cmd2.source_id);
+    EXPECT_EQ(cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ(cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ(cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ(cmd.payload, cmd2.payload);
+    EXPECT_EQ(cmd.flags, cmd2.flags);
+    EXPECT_EQ(cmd.messageID, 762354);
+    EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
+}
+
+TEST(ActionMessage, jsonconversion_test2)
+{
+    helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
+    setActionFlag(cmd, iteration_requested_flag);
+    setActionFlag(cmd, required_flag);
+    setActionFlag(cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = std::string(500000, 'j');
+
+    cmd.setStringData("target", "source as a very long string test .........", "original_source");
+
+    auto cmdString = cmd.to_json_string();
+
+    helics::ActionMessage cmd2(cmdString);
+    EXPECT_TRUE(cmd.action() == cmd2.action());
+    EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
+    EXPECT_EQ(cmd.source_id, cmd2.source_id);
+    EXPECT_EQ(cmd.dest_id, cmd2.dest_id);
+    EXPECT_EQ(cmd.source_handle, cmd2.source_handle);
+    EXPECT_EQ(cmd.dest_handle, cmd2.dest_handle);
+    EXPECT_EQ(cmd.payload, cmd2.payload);
+    EXPECT_EQ(cmd.flags, cmd2.flags);
+    EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
+}
+
+TEST(ActionMessage, jsonconversion_test_binary_strings)
+{
+    helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
+    setActionFlag(cmd, iteration_requested_flag);
+    setActionFlag(cmd, required_flag);
+    setActionFlag(cmd, error_flag);
+    cmd.actionTime = 45.7;
+    cmd.payload = std::string(500000, 17);
+    cmd.payload[6482] = 0;
+
+    cmd.setStringData("target", std::string(987, '\0'), "original_source");
+
+    auto cmdString = cmd.to_json_string();
+
+    helics::ActionMessage cmd2(cmdString);
     EXPECT_TRUE(cmd.action() == cmd2.action());
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
     EXPECT_EQ(cmd.source_id, cmd2.source_id);

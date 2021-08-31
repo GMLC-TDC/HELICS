@@ -356,11 +356,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 earlyMessages.push_back(std::move(command));
                 break;
             }
+            bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
             if (command.counter > 0) {  // this indicates it is a resend
                 auto brk = _brokers.find(command.name);
                 if (brk != _brokers.end()) {
                     // we would get this if the ack didn't go through for some reason
-                    brk->route = route_id{routeCount++};
+                    brk->route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(brk->route,
                              command.getExtraData(),
                              command.getString(targetStringLoc));
@@ -382,7 +383,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = route_id(routeCount++);
+                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
@@ -412,7 +413,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = route_id(routeCount++);
+                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
@@ -434,7 +435,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = route_id{routeCount++};
+                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
@@ -457,7 +458,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 route_id newroute;
                 bool route_created = false;
                 if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = route_id{routeCount++};
+                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                     addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
                     route_created = true;
                 } else {
@@ -476,7 +477,8 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             }
             if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
                 // TODO(PT): this will need to be updated when we enable mesh routing
-                _brokers.back().route = route_id{routeCount++};
+                _brokers.back().route =
+                    generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
                 addRoute(_brokers.back().route,
                          command.getExtraData(),
                          command.getString(targetStringLoc));
@@ -1782,6 +1784,9 @@ bool CoreBroker::connect()
                     m.name = getIdentifier();
                     if (no_ping) {
                         setActionFlag(m, slow_responding_flag);
+                    }
+                    if (useJsonSerialization) {
+                        setActionFlag(m, use_json_serialization_flag);
                     }
                     if (!brokerKey.empty() && brokerKey != universalKey) {
                         m.setStringData(getAddress(), brokerKey);
@@ -3375,12 +3380,6 @@ void CoreBroker::checkDependencies()
         timeCoord->removeDependent(higher_broker_id);
         timeCoord->removeDependent(fedid);
 
-        ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
-
-        rmdep.source_id = global_broker_id_local;
-        routeMessage(rmdep, higher_broker_id);
-        routeMessage(rmdep, fedid);
-
         ActionMessage adddep(CMD_ADD_INTERDEPENDENCY);
         adddep.source_id = fedid;
         setActionFlag(adddep, child_flag);
@@ -3389,6 +3388,12 @@ void CoreBroker::checkDependencies()
         clearActionFlag(adddep, child_flag);
         setActionFlag(adddep, parent_flag);
         routeMessage(adddep, fedid);
+
+        ActionMessage rmdep(CMD_REMOVE_INTERDEPENDENCY);
+
+        rmdep.source_id = global_broker_id_local;
+        routeMessage(rmdep, higher_broker_id);
+        routeMessage(rmdep, fedid);
     }
 }
 

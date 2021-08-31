@@ -6,8 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "ActionMessage.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "flagOperations.hpp"
+#include "gmlc/utilities/base64.h"
 
 #include <algorithm>
 #include <complex>
@@ -275,10 +277,46 @@ int ActionMessage::serializedByteCount() const
 std::string ActionMessage::to_string() const
 {
     std::string data;
-    auto sz = serializedByteCount();
-    data.resize(sz);
-    toByteArray(&(data[0]), sz);
+    if (checkActionFlag(*this, use_json_serialization_flag)) {
+        data = to_json_string();
+    } else {
+        auto sz = serializedByteCount();
+        data.resize(sz);
+        toByteArray(&(data[0]), sz);
+    }
     return data;
+}
+
+std::string ActionMessage::to_json_string() const
+{
+    Json::Value packet;
+    packet["version"] =
+        HELICS_VERSION_MAJOR * 10000 + HELICS_VERSION_MINOR * 100 + HELICS_VERSION_PATCH;
+    packet["command"] = static_cast<int>(messageAction);
+    packet["messageId"] = messageID;
+    packet["sourceId"] = source_id.baseValue();
+    packet["sourceHandle"] = source_handle.baseValue();
+    packet["destId"] = dest_id.baseValue();
+    packet["destHandle"] = dest_handle.baseValue();
+    packet["counter"] = counter;
+    packet["flags"] = flags;
+    packet["sequenceId"] = sequenceID;
+    packet["actionTime"] = actionTime.getBaseTimeCode();
+    if (messageAction == CMD_TIME_REQUEST) {
+        packet["Te"] = Te.getBaseTimeCode();
+        packet["Tdemin"] = Tdemin.getBaseTimeCode();
+        packet["Tso"] = Tso.getBaseTimeCode();
+    }
+    packet["payload"] = payload;
+    packet["stringCount"] = static_cast<std::uint32_t>(stringData.size());
+    if (!stringData.empty()) {
+        Json::Value sdata = Json::arrayValue;
+        for (const auto& str : stringData) {
+            sdata.append(str);
+        }
+        packet["strings"] = std::move(sdata);
+    }
+    return generateJsonString(packet);
 }
 
 constexpr auto LEADING_CHAR = '\xF3';
@@ -289,6 +327,19 @@ std::string ActionMessage::packetize() const
 {
     std::string data;
     packetize(data);
+    return data;
+}
+
+std::string ActionMessage::packetize_json() const
+{
+    std::string data = to_json_string();
+    auto dsz = data.size() + sizeof(uint32_t);
+    data.insert(data.begin(), 4, LEADING_CHAR);
+    data[1] = static_cast<char>(((dsz >> 16U) & 0xFFU));
+    data[2] = static_cast<char>(((dsz >> 8U) & 0xFFU));
+    data[3] = static_cast<char>(dsz & 0xFFU);
+    data.push_back(TAIL_CHAR1);
+    data.push_back(TAIL_CHAR2);
     return data;
 }
 
@@ -352,6 +403,10 @@ int ActionMessage::fromByteArray(const char* data, int buffer_size)
         if (res > 0) {
             return static_cast<int>(res);
         }
+    }
+    // this means it probably is a JSON packate
+    if (data[0] == '{') {
+        return 0;
     }
     int sz = 256 * 256 * (static_cast<uint8_t>(data[1])) + 256 * static_cast<uint8_t>(data[2]) +
         static_cast<uint8_t>(data[3]);
@@ -501,17 +556,70 @@ int ActionMessage::depacketize(const char* data, int buffer_size)
     }
 
     int bytesUsed = fromByteArray(data + 4, message_size - 4);
+    if (bytesUsed == 0U) {
+        if (from_json_string(
+                std::string(data + 4, message_size - 4))) {
+            bytesUsed = message_size + 4;
+        }
+    }
     return (bytesUsed > 0) ? message_size + 2 : 0;
 }
 
-void ActionMessage::from_string(const std::string& data)
+std::size_t ActionMessage::from_string(const std::string& data)
 {
-    fromByteArray(data.data(), static_cast<int>(data.size()));
+    auto result = fromByteArray(data.data(), static_cast<int>(data.size()));
+    if (result == 0U && data.size() > 0 && data.front() == '{') {
+        if (from_json_string(data)) {
+            return data.size();
+        }
+    }
+    return result;
 }
 
-void ActionMessage::from_vector(const std::vector<char>& data)
+bool ActionMessage::from_json_string(const std::string& data)
 {
-    fromByteArray(data.data(), static_cast<int>(data.size()));
+    try {
+        auto val = loadJsonStr(data);
+        // auto version = val["version"].asFloat();
+        messageAction = static_cast<action_message_def::action_t>(val["command"].asInt());
+        messageID = val["messageId"].asInt();
+        source_id = global_federate_id(val["sourceId"].asInt());
+        dest_id = global_federate_id(val["destId"].asInt());
+        source_handle = interface_handle(val["sourceHandle"].asInt());
+        dest_handle = interface_handle(val["destHandle"].asInt());
+        counter = static_cast<uint16_t>(val["counter"].asUInt());
+        flags = static_cast<uint16_t>(val["flags"].asUInt());
+        sequenceID = val["sequenceId"].asUInt();
+        actionTime.setBaseTimeCode(val["actionTime"].asInt64());
+        if (messageAction == CMD_TIME_REQUEST) {
+            Te.setBaseTimeCode(val["Te"].asInt64());
+            Tdemin.setBaseTimeCode(val["Tdemin"].asInt64());
+            Tso.setBaseTimeCode(val["Tso"].asInt64());
+        }
+
+        payload = val["payload"].asString();
+        auto stringCount = val["stringCount"].asUInt();
+        stringData.resize(stringCount);
+        for (Json::ArrayIndex ii = 0; ii < stringCount; ++ii) {
+            setString(ii, val["strings"][ii].asString());
+        }
+    }
+    catch (...) {
+        return false;
+    }
+    return true;
+}
+
+std::size_t ActionMessage::from_vector(const std::vector<char>& data)
+{
+    std::size_t bytesUsed =
+        fromByteArray(data.data(), static_cast<int>(data.size()));
+    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
+        if (from_json_string(std::string(data.data(), data.size()))) {
+            return data.size();
+        }
+    }
+    return bytesUsed;
 }
 
 std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd)
