@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "HelicsPrimaryTypes.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../utilities/timeStringOps.hpp"
 #include "ValueConverter.hpp"
 
@@ -512,6 +513,56 @@ void valueExtract(const defV& dv, bool& val)
     }
 }
 
+defV readJsonValue(const data_view& dv)
+{
+    defV result;
+    try {
+        auto jv = loadJsonStr(dv.string());
+        switch (getTypeFromString(jv["type"].asCString())) {
+            case data_type::helics_double:
+                result = jv["value"].asDouble();
+                break;
+            case data_type::helics_complex:
+                result = std::complex<double>(jv["value"][0].asDouble(), jv["value"][1].asDouble());
+                break;
+            case data_type::helics_bool:
+                result = static_cast<std::int64_t>(jv["value"].asBool());
+                break;
+            case data_type::helics_vector: {
+                std::vector<double> res;
+                for (const auto& v : jv["value"]) {
+                    res.push_back(v.asDouble());
+                }
+                result = std::move(res);
+            } break;
+            case data_type::helics_complex_vector: {
+                std::vector<std::complex<double>> res;
+                auto ca = jv["value"];
+                for (Json::ArrayIndex ii = 0; ii < ca.size() - 1; ii += 2) {
+                    res.emplace_back(ca[ii].asDouble(), ca[ii + 1].asDouble());
+                }
+                result = std::move(res);
+            } break;
+            case data_type::helics_int:
+                result = jv["value"].asInt64();
+                break;
+                case data_type::helics_string:
+                result = jv["value"].asString();
+                break;
+                case data_type::helics_named_point:
+                result = NamedPoint(jv["name"].asCString(), jv["value"].asDouble());
+                break;
+            default:
+                result = dv.string();
+        }
+    }
+    catch (...) {
+        result = dv.string();
+    }
+    return result;
+}
+
+
 void valueExtract(const data_view& dv, data_type baseType, std::string& val)
 {
     switch (baseType) {
@@ -542,6 +593,9 @@ void valueExtract(const data_view& dv, data_type baseType, std::string& val)
         case data_type::helics_complex_vector:
             val = helicsComplexVectorString(
                 ValueConverter<std::vector<std::complex<double>>>::interpret(dv));
+            break;
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
             break;
     }
 }
@@ -595,6 +649,9 @@ void valueExtract(const data_view& dv, data_type baseType, std::vector<double>& 
             }
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
@@ -644,6 +701,9 @@ void valueExtract(const data_view& dv, data_type baseType, std::vector<std::comp
             val.push_back(cval);
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
@@ -690,6 +750,9 @@ void valueExtract(const data_view& dv, data_type baseType, std::complex<double>&
             val = ValueConverter<std::complex<double>>::interpret(dv);
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
@@ -756,6 +819,9 @@ void valueExtract(const data_view& dv, data_type baseType, NamedPoint& val)
         case data_type::helics_named_point:
             val = ValueConverter<NamedPoint>::interpret(dv);
             break;
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
@@ -808,6 +874,9 @@ void valueExtract(const data_view& dv, data_type baseType, Time& val)
             val = np.value;
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
@@ -875,6 +944,9 @@ void valueExtract(const data_view& dv, data_type baseType, bool& val)
             val = (vectorNorm(V) != 0.0);
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
         case data_type::helics_custom:
             throw(std::invalid_argument("unrecognized helics type"));
     }
@@ -904,6 +976,9 @@ void valueExtract(const data_view& dv, data_type baseType, defV& val)
             break;
         case data_type::helics_named_point:
             val = ValueConverter<NamedPoint>::interpret(dv);
+            break;
+        case data_type::helics_json:
+            val=readJsonValue(dv);
             break;
     }
 }

@@ -1332,7 +1332,7 @@ void CommonCore::setValue(interface_handle handle, const char* data, uint64_t le
         throw(InvalidIdentifier("Handle not valid (setValue)"));
     }
     if (handleInfo->handleType != handle_type::publication) {
-        throw(InvalidIdentifier("handle does not point to a publication or control output"));
+        throw(InvalidIdentifier("handle does not point to a publication"));
     }
     if (checkActionFlag(*handleInfo, disconnected_flag)) {
         return;

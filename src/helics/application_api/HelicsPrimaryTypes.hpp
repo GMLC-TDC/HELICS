@@ -141,6 +141,8 @@ HELICS_CXX_EXPORT void valueExtract(const defV& dv, char& val);
 /** extract the value from a variant to a bool*/
 HELICS_CXX_EXPORT void valueExtract(const defV& dv, bool& val);
 
+HELICS_CXX_EXPORT defV readJsonValue(const data_view& dv);
+
 HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, std::string& val);
 
 HELICS_CXX_EXPORT void
@@ -294,6 +296,9 @@ std::enable_if_t<std::is_arithmetic<X>::value>
             val = static_cast<X>(vectorNorm(V));
             break;
         }
+        case data_type::helics_json:
+            valueExtract(readJsonValue(dv), val);
+            break;
         case data_type::helics_custom:
             throw(std::invalid_argument("unrecognized helics type"));
     }

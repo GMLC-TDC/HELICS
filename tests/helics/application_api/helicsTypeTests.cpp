@@ -4,6 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "helics/common/JsonProcessingFunctions.hpp"
 
 #include <complex>
 #include <gtest/gtest.h>
@@ -88,4 +89,105 @@ TEST(helics_types, cvector_string)
     v = helicsGetComplexVector("c[1+4j,2-3j,invalid]");
     ASSERT_EQ(v.size(), 3U);
     EXPECT_EQ(v[2], invalidValue<std::complex<double>>());
+}
+
+
+TEST(json_type_conversion, to_json)
+{
+    auto res = typeConvert(data_type::helics_json, 49.7);
+    Json::Value jv;
+    defV result;
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), double_loc);
+    EXPECT_DOUBLE_EQ(mpark::get<double>(result), 49.7);
+
+    res = typeConvert(data_type::helics_json, std::int64_t(1956258));
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), int_loc);
+    EXPECT_EQ(mpark::get<std::int64_t>(result), 1956258LL);
+
+    std::string testString("this is a test");
+    res = typeConvert(data_type::helics_json, testString);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), string_loc);
+    EXPECT_EQ(mpark::get<std::string>(result), testString);
+
+    res = typeConvert(data_type::helics_json, testString.data());
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), string_loc);
+    EXPECT_EQ(mpark::get<std::string>(result), testString);
+
+    std::vector<double> testV{456.6, 19.5};
+    res = typeConvert(data_type::helics_json, testV);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), vector_loc);
+    EXPECT_EQ(mpark::get<std::vector<double>>(result), testV);
+    res = typeConvert(data_type::helics_json, testV.data(), testV.size());
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), vector_loc);
+    EXPECT_EQ(mpark::get<std::vector<double>>(result), testV);
+
+    std::vector<std::complex<double>> testcv;
+    testcv.emplace_back(15.7, -5363.55);
+    testcv.emplace_back(-543623.44, 151.133);
+    res = typeConvert(data_type::helics_json, testcv);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), complex_vector_loc);
+    EXPECT_EQ(mpark::get<std::vector<std::complex<double>>>(result), testcv);
+
+    res = typeConvert(data_type::helics_json, testcv.front());
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), complex_loc);
+    EXPECT_EQ(mpark::get<std::complex<double>>(result), testcv.front());
+
+    NamedPoint t1("vvvv", 1851.44);
+    res = typeConvert(data_type::helics_json, t1);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), named_point_loc);
+    EXPECT_EQ(mpark::get<NamedPoint>(result), t1);
+
+    res = typeConvert(data_type::helics_json, t1.name, t1.value);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), named_point_loc);
+    EXPECT_EQ(mpark::get<NamedPoint>(result), t1);
+
+    res = typeConvert(data_type::helics_json, true);
+    EXPECT_NO_THROW(jv = loadJsonStr(res.to_string()));
+    EXPECT_TRUE(jv.isMember("value"));
+    EXPECT_TRUE(jv.isMember("type"));
+    result = readJsonValue(res);
+    EXPECT_EQ(result.index(), int_loc);
+    EXPECT_EQ(mpark::get<std::int64_t>(result), 1);
 }

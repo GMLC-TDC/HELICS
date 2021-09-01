@@ -69,6 +69,8 @@ typedef enum {
     helics_data_type_time = 8,
     /** raw data type*/
     helics_data_type_raw = 25,
+    /** type converts to a valid json string*/
+    helics_data_type_json = 30,
     /** the data type can change*/
     helics_data_type_multi = 33,
     /** open type that can be anything*/
@@ -115,6 +117,8 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     helics_flag_strict_config_checking = 75,
+    /** specify that the federate should use json serialization for all data types*/
+    helics_flag_use_json_serialization = 79,
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
     helics_flag_event_triggered = 81,
@@ -130,7 +134,9 @@ typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     helics_flag_delay_init_entry = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    helics_flag_enable_init_entry = 47
+    helics_flag_enable_init_entry = 47,
+    /** ignored flag used to test some code paths*/
+    helics_flag_ignore = 999
 } helics_core_flags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
@@ -325,8 +331,12 @@ existing messages; ordered means it follows normal priority patterns and will be
 existing messages
 */
 typedef enum {
+    /** sequencing mode to operate on priority channels*/
     helics_sequencing_mode_fast = 0,
-    helics_sequencing_mode_ordered = 1
+    /** sequencing mode to operate on the normal channels*/
+    helics_sequencing_mode_ordered = 1,
+    /** select the default channel*/
+    helics_sequencing_mode_default = 2
 } helics_sequencing_mode;
 
 #ifdef __cplusplus
