@@ -7,6 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helicsTypes.hpp"
 
+#include "../common/JsonBuilder.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "ValueConverter.hpp"
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
@@ -33,6 +35,7 @@ const std::string& typeNameStringRef(data_type type)
     static const std::string complexVecString("complex_vector");
     static const std::string namedPointString("named_point");
     static const std::string timeString("time");
+    static const std::string jsonString("json");
     static const std::string nullString;
     switch (type) {
         case data_type::helics_double:
@@ -53,6 +56,8 @@ const std::string& typeNameStringRef(data_type type)
             return complexVecString;
         case data_type::helics_named_point:
             return namedPointString;
+        case data_type::helics_json:
+            return jsonString;
         default:
             return nullString;
     }
@@ -173,6 +178,7 @@ static const std::unordered_map<std::string, data_type> typeMap{
     {"tm", data_type::helics_time},
     {"multi", data_type::helics_multi},
     {"many", data_type::helics_multi},
+    {"json", data_type::helics_json},
     {"def", data_type::helics_any},
     {"any", data_type::helics_any},
     {"", data_type::helics_any},
@@ -599,6 +605,7 @@ data_block emptyBlock(data_type outputType, data_type inputType = data_type::hel
         }
         case data_type::helics_vector:
             return ValueConverter<std::vector<double>>::convert(std::vector<double>());
+        
     }
 }
 data_block typeConvert(data_type type, double val)
@@ -623,6 +630,12 @@ data_block typeConvert(data_type type, double val)
         }
         case data_type::helics_vector:
             return ValueConverter<double>::convert(&val, 1);
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_double);
+            jv["value"] = val;
+            return generateJsonString(jv);
+        }
     }
 }
 data_block typeConvert(data_type type, int64_t val)
@@ -659,6 +672,12 @@ data_block typeConvert(data_type type, int64_t val)
             auto v2 = static_cast<double>(val);
             return ValueConverter<double>::convert(&v2, 1);
         }
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_int);
+            jv["value"] = val;
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -686,6 +705,12 @@ data_block typeConvert(data_type type, const char* val)
                 helicsGetComplexVector(val));
         case data_type::helics_vector:
             return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_string);
+            jv["value"] = std::string(val);
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -714,6 +739,12 @@ data_block typeConvert(data_type type, const std::string& val)
                 helicsGetComplexVector(val));
         case data_type::helics_vector:
             return ValueConverter<std::vector<double>>::convert(helicsGetVector(val));
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_string);
+            jv["value"] = val;
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -755,6 +786,16 @@ data_block typeConvert(data_type type, const std::vector<double>& val)
         case data_type::helics_vector:
         default:
             return ValueConverter<std::vector<double>>::convert(val);
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_vector);
+            Json::Value vv = Json::arrayValue;
+            for (const auto& v : val) {
+                vv.append(v);
+            }
+            jv["value"] = std::move(vv);
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -802,6 +843,16 @@ data_block typeConvert(data_type type, const double* vals, size_t size)
         case data_type::helics_vector:
         default:
             return ValueConverter<double>::convert(vals, size);
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_vector);
+            Json::Value vv = Json::arrayValue;
+            for (size_t ii = 0; ii < size; ++ii) {
+                vv.append(vals[ii]);
+            }
+            jv["value"] = std::move(vv);
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -837,6 +888,17 @@ data_block typeConvert(data_type type, const std::vector<std::complex<double>>& 
             }
             return ValueConverter<std::vector<double>>::convert(DV);
         }
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_complex_vector);
+            Json::Value vv = Json::arrayValue;
+            for (const auto& v : val) {
+                vv.append(v.real());
+                vv.append(v.imag());
+            }
+            jv["value"] = std::move(vv);
+            return generateJsonString(jv);
+        }
     }
 }
 data_block typeConvert(data_type type, const std::complex<double>& val)
@@ -865,6 +927,15 @@ data_block typeConvert(data_type type, const std::complex<double>& val)
         case data_type::helics_vector: {
             std::vector<double> V{val.real(), val.imag()};
             return ValueConverter<std::vector<double>>::convert(V);
+        }
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_complex);
+            Json::Value vv = Json::arrayValue;
+            vv.append(val.real());
+            vv.append(val.imag());
+            jv["value"] = std::move(vv);
+            return generateJsonString(jv);
         }
     }
 }
@@ -899,6 +970,13 @@ data_block typeConvert(data_type type, const NamedPoint& val)
         }
         case data_type::helics_vector:
             return ValueConverter<double>::convert(&(val.value), 1);
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_named_point);
+            jv["name"] = val.name;
+            jv["value"] = val.value;
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -931,6 +1009,13 @@ data_block typeConvert(data_type type, const char* str, double val)
         }
         case data_type::helics_vector:
             return ValueConverter<double>::convert(&(val), 1);
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_named_point);
+            jv["name"] = std::string(str);
+            jv["value"] = val;
+            return generateJsonString(jv);
+        }
     }
 }
 
@@ -960,6 +1045,12 @@ data_block typeConvert(data_type type, bool val)
         case data_type::helics_vector: {
             auto v2 = val ? 1.0 : 0.0;
             return ValueConverter<double>::convert(&v2, 1);
+        }
+        case data_type::helics_json: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(data_type::helics_bool);
+            jv["value"] = val;
+            return generateJsonString(jv);
         }
     }
 }

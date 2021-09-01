@@ -945,6 +945,40 @@ TEST(valuefederate, indexed_inputs)
     Fed1->finalize();
 }
 
+TEST(valuefederate, json)
+{
+    helics::FederateInfo fi(helics::core_type::TEST);
+    fi.useJsonSerialization = true;
+    fi.coreName = "core_indexipt";
+    fi.coreInitString = "-f 1 --autobroker";
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("vfed1", fi);
+
+    auto& pub1 = Fed1->registerPublication("pub1", "double", "A");
+
+    auto& id0 = Fed1->registerIndexedInput<double>("inp", 0, "V");
+    Fed1->registerIndexedInput<double>("inp", 1, "V");
+
+    Fed1->registerIndexedInput<double>("inp", 1, 1, "A");
+
+    Fed1->enterExecutingMode();
+
+    auto& ip2 = Fed1->getInput("inp", 0);
+    EXPECT_TRUE(ip2.isValid());
+    EXPECT_EQ(ip2.getName(), id0.getName());
+    EXPECT_EQ(ip2.getType(), "json");
+
+    auto& ip3 = Fed1->getInput("inp", 1);
+    EXPECT_TRUE(ip3.isValid());
+    EXPECT_EQ(ip3.getType(), "json");
+
+    auto& ip4 = Fed1->getInput("inp", 1, 1);
+    EXPECT_TRUE(ip4.isValid());
+    EXPECT_EQ(ip4.getType(), "json");
+    EXPECT_EQ(pub1.getType(), "json");
+    Fed1->finalize();
+}
+
 TEST(valuefederate, indexed_pubs)
 {
     helics::FederateInfo fi(helics::core_type::TEST);

@@ -69,12 +69,12 @@ class ValueFederateManager {
     ~ValueFederateManager();
 
     Publication& registerPublication(const std::string& key,
-                                     const std::string& type,
+                                     std::string type,
                                      const std::string& units);
     /** register a subscription
     @details call is only valid in startup mode
     */
-    Input& registerInput(const std::string& key, const std::string& type, const std::string& units);
+    Input& registerInput(const std::string& key, std::string type, const std::string& units);
 
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location
@@ -203,8 +203,10 @@ class ValueFederateManager {
     @param inp the identifier for the subscription
     */
     static void clearUpdate(const Input& inp);
-
+    public:
+        bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
+    local_federate_id fedID;  //!< the federation ID from the core API
     shared_guarded_m<
         gmlc::containers::
             DualMappedVector<Input, std::string, interface_handle, reference_stability::stable>>
@@ -216,9 +218,8 @@ class ValueFederateManager {
         publications;
     Time CurrentTime = Time(-1.0);  //!< the current simulation time
     Core* coreObject;  //!< the pointer to the actual core
-    ValueFederate*
-        fed;  //!< pointer back to the value Federate for creation of the Publication/Inputs
-    local_federate_id fedID;  //!< the federation ID from the core API
+    /** pointer back to the value Federate for creation of the Publication/Inputs */
+    ValueFederate* fed{nullptr};
     atomic_guarded<std::function<void(Input&, Time)>>
         allCallback;  //!< the global callback function
     shared_guarded<std::vector<std::unique_ptr<input_info>>>

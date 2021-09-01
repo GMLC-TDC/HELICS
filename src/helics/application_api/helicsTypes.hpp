@@ -286,6 +286,7 @@ enum class data_type : int {
     helics_custom = helics_data_type_raw,
     helics_any = helics_data_type_any,
     helics_multi = helics_data_type_multi,
+    helics_json = helics_data_type_json,
     helics_unknown = 262355,
 
 };

@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
-    coreObject(coreOb), fed(vfed), fedID(id)
+    coreObject(coreOb), fedID(id), fed(vfed)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
@@ -51,10 +51,13 @@ int getTypeSize(const std::string& type)
     return (ret == typeSizes.end()) ? (-1) : ret->second;
 }
 
+static const std::string jsonStringType{"json"};
+
 Publication& ValueFederateManager::registerPublication(const std::string& key,
-                                                       const std::string& type,
+                                                       std::string type,
                                                        const std::string& units)
 {
+    type = useJsonSerialization ? jsonStringType : type;
     auto coreID = coreObject->registerPublication(fedID, key, type, units);
 
     auto pubHandle = publications.lock();
@@ -72,9 +75,10 @@ Publication& ValueFederateManager::registerPublication(const std::string& key,
 }
 
 Input& ValueFederateManager::registerInput(const std::string& key,
-                                           const std::string& type,
+                                           std::string type,
                                            const std::string& units)
 {
+    type = useJsonSerialization ? jsonStringType : type;
     auto coreID = coreObject->registerInput(fedID, key, type, units);
     auto inpHandle = inputs.lock();
     decltype(inpHandle->insert(key, coreID, fed, coreID, key, units)) active;
