@@ -191,7 +191,7 @@ bool TimeCoordinator::updateNextExecutionTime()
             if (time_exec < Time::maxVal()) {
                 time_exec += info.inputDelay;
             }
-            time_exec = (time_exec <= time_granted) ? time_exec = time_granted :
+            time_exec = (time_exec <= time_granted) ? time_granted :
                                                       generateAllowedTime(time_requested);
         }
     } else {

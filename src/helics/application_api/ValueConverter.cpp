@@ -237,6 +237,7 @@ namespace detail {
 
 
 /** interpret a view of the data block and store to the specified value*/
+template<>
 void ValueConverter3<std::vector<std::string>>::interpret(const data_view& block,
                                                          std::vector<std::string>& val)
 {
