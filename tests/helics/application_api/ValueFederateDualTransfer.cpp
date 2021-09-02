@@ -62,6 +62,46 @@ TEST_P(vfed_dual_transfer_ci_skip, string)
                                      "inside of the functional relationship of helics",
                                      std::string("I am a string"));
 }
+/** test checking the transfer when 1 federate is json */
+
+TEST(vfed_dual_transfer_json, double1)
+{
+    runDualFederateTestJson<double>("test", 10.3, 45.3, 22.7);
+}
+
+TEST(vfed_dual_transfer_json, int1)
+{
+    runDualFederateTestJson<int>("test", 5, 8, 43);
+}
+
+TEST(vfed_dual_transfer_json, int2)
+{
+    runDualFederateTestJson<int>("test", -5, 1241515, -43);
+}
+
+TEST(vfed_dual_transfer_json, types4)
+{
+    runDualFederateTestJson<char>("test", 'c', '\0', '\n');
+}
+
+TEST(vfed_dual_transfer_json, uint64_t1)
+{
+    runDualFederateTestJson<uint64_t>("test", 234252315, 0xFFF1'2345'7124'1412, 23521513412);
+}
+
+TEST(vfed_dual_transfer_json, float1)
+{
+    runDualFederateTestJson<float>("test", 10.3f, 45.3f, 22.7f);
+}
+
+TEST(vfed_dual_transfer_json, string)
+{
+    runDualFederateTestJson<std::string>("test",
+                                         "start",
+                                         "inside of the functional relationship of helics",
+                                         std::string("I am a string"));
+}
+
 
 /** test case checking that the transfer between two federates works as expected with publication
  * and subscription objects
