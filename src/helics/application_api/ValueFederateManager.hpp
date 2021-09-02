@@ -217,7 +217,7 @@ class ValueFederateManager {
                                                         reference_stability::stable>>
         publications;
     Time CurrentTime = Time(-1.0);  //!< the current simulation time
-    Core* coreObject;  //!< the pointer to the actual core
+    Core* coreObject{nullptr};  //!< the pointer to the actual core
     /** pointer back to the value Federate for creation of the Publication/Inputs */
     ValueFederate* fed{nullptr};
     atomic_guarded<std::function<void(Input&, Time)>>
