@@ -162,6 +162,8 @@ HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, boo
 
 HELICS_CXX_EXPORT void valueExtract(const data_view& dv, data_type baseType, defV& val);
 
+HELICS_CXX_EXPORT void valueExtract3(const data_view& dv, data_type baseType, defV& val);
+
 /** extract the value from a variant to a numerical type*/
 template<class X>
 std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)>

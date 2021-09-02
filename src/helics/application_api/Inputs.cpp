@@ -394,20 +394,39 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     res.reserve(dataV.size());
     for (size_t ii = 0; ii < dataV.size(); ++ii) {
         if (dataV[ii]) {
-            auto localTargetType = (injectionType == helics::data_type::helics_multi) ?
-                sourceTypes[ii].first :
-                injectionType;
+            if (targetType==data_type::helics_json) {
 
-            const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
-            if (localTargetType == helics::data_type::helics_double) {
-                res.emplace_back(doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
-            } else if (localTargetType == helics::data_type::helics_int) {
-                res.emplace_back();
-                integerExtractAndConvert(res.back(), *dataV[ii], localUnits, outputUnits);
             } else {
-                res.emplace_back();
-                valueExtract(*dataV[ii], localTargetType, res.back());
+                auto localTargetType = (injectionType == helics::data_type::helics_multi) ?
+                    sourceTypes[ii].first :
+                    injectionType;
+
+                const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
+                if (localTargetType==helics::data_type::helics_json||targetType!=helics::data_type::helics_json) {
+                    if (localTargetType == helics::data_type::helics_double) {
+                        res.emplace_back(
+                            doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
+                    } else if (localTargetType == helics::data_type::helics_int) {
+                        res.emplace_back();
+                        integerExtractAndConvert(res.back(), *dataV[ii], localUnits, outputUnits);
+                    } else {
+                        res.emplace_back();
+                        valueExtract(*dataV[ii], localTargetType, res.back());
+                    }
+                } else {
+                    if (localTargetType == helics::data_type::helics_double) {
+                        res.emplace_back(
+                            doubleExtractAndConvert3(*dataV[ii], localUnits, outputUnits));
+                    } else if (localTargetType == helics::data_type::helics_int) {
+                        res.emplace_back();
+                        integerExtractAndConvert3(res.back(), *dataV[ii], localUnits, outputUnits);
+                    } else {
+                        res.emplace_back();
+                        valueExtract3(*dataV[ii], localTargetType, res.back());
+                    }
+                }
             }
+            
         }
     }
     data_type type = data_type::helics_multi;
@@ -517,15 +536,30 @@ bool Input::checkUpdate(bool assumeUpdate)
             auto visitor = [&, this](auto&& arg) {
                 std::remove_reference_t<decltype(arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
-                if (injectionType == helics::data_type::helics_double) {
-                    defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
-                    valueExtract(val, newVal);
-                } else if (injectionType == helics::data_type::helics_int) {
-                    defV val;
-                    integerExtractAndConvert(val, dv, inputUnits, outputUnits);
-                    valueExtract(val, newVal);
+                if (injectionType==helics::data_type::helics_json||targetType!=data_type::helics_json) {
+                    if (injectionType == helics::data_type::helics_double) {
+                        defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
+                        valueExtract(val, newVal);
+                    } else if (injectionType == helics::data_type::helics_int) {
+                        defV val;
+                        integerExtractAndConvert(val, dv, inputUnits, outputUnits);
+                        valueExtract(val, newVal);
+                    } else {
+                        valueExtract(dv, injectionType, newVal);
+                    }
                 } else {
-                    valueExtract(dv, injectionType, newVal);
+                    if (injectionType == helics::data_type::helics_double) {
+                        defV val = doubleExtractAndConvert3(dv, inputUnits, outputUnits);
+                        valueExtract(val, newVal);
+                    } else if (injectionType == helics::data_type::helics_int) {
+                        defV val;
+                        integerExtractAndConvert3(val, dv, inputUnits, outputUnits);
+                        valueExtract(val, newVal);
+                    } else {
+                        defV val;
+                        valueExtract3(dv, injectionType, val);
+                        valueExtract(val, newVal);
+                    }
                 }
 
                 if (changeDetected(lastValue, newVal, delta)) {
@@ -738,6 +772,30 @@ void integerExtractAndConvert(defV& store,
     }
 }
 
+double doubleExtractAndConvert3(const data_view& dv,
+                               const std::shared_ptr<units::precise_unit>& inputUnits,
+                               const std::shared_ptr<units::precise_unit>& outputUnits)
+{
+    auto V = ValueConverter3<double>::interpret(dv);
+    if ((inputUnits) && (outputUnits)) {
+        V = units::convert(V, *inputUnits, *outputUnits);
+    }
+    return V;
+}
+
+void integerExtractAndConvert3(defV& store,
+                              const data_view& dv,
+                              const std::shared_ptr<units::precise_unit>& inputUnits,
+                              const std::shared_ptr<units::precise_unit>& outputUnits)
+{
+    auto V = ValueConverter3<int64_t>::interpret(dv);
+    if ((inputUnits) && (outputUnits)) {
+        store = units::convert(static_cast<double>(V), *inputUnits, *outputUnits);
+    } else {
+        store = V;
+    }
+}
+
 char Input::getValueChar()
 {
     if (fed->isUpdated(*this) || allowDirectFederateUpdate()) {
@@ -745,34 +803,70 @@ char Input::getValueChar()
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
-
-        if ((injectionType == data_type::helics_string) ||
-            (injectionType == data_type::helics_any) ||
-            (injectionType == data_type::helics_custom)) {
-            std::string out;
-            valueExtract(dv, injectionType, out);
-            if (changeDetectionEnabled) {
-                if (changeDetected(lastValue, out, delta)) {
+        if (injectionType==data_type::helics_json||targetType!=data_type::helics_json) {
+            if ((injectionType == data_type::helics_string) ||
+                (injectionType == data_type::helics_any) ||
+                (injectionType == data_type::helics_custom)) {
+                std::string out;
+                valueExtract(dv, injectionType, out);
+                if (changeDetectionEnabled) {
+                    if (changeDetected(lastValue, out, delta)) {
+                        lastValue = out;
+                    }
+                } else {
                     lastValue = out;
                 }
             } else {
-                lastValue = out;
+                int64_t out = invalidValue<int64_t>();
+                if (injectionType == helics::data_type::helics_double) {
+                    out =
+                        static_cast<int64_t>(doubleExtractAndConvert(dv, inputUnits, outputUnits));
+                } else {
+                    valueExtract(dv, injectionType, out);
+                }
+                if (changeDetectionEnabled) {
+                    if (changeDetected(lastValue, out, delta)) {
+                        lastValue = out;
+                    }
+                } else {
+                    lastValue = out;
+                }
             }
         } else {
-            int64_t out = invalidValue<int64_t>();
-            if (injectionType == helics::data_type::helics_double) {
-                out = static_cast<int64_t>(doubleExtractAndConvert(dv, inputUnits, outputUnits));
-            } else {
-                valueExtract(dv, injectionType, out);
-            }
-            if (changeDetectionEnabled) {
-                if (changeDetected(lastValue, out, delta)) {
+            if ((injectionType == data_type::helics_string) ||
+                (injectionType == data_type::helics_any) ||
+                (injectionType == data_type::helics_custom)) {
+                std::string out;
+                defV val;
+                valueExtract3(dv, injectionType, val);
+                valueExtract(val, out);
+                if (changeDetectionEnabled) {
+                    if (changeDetected(lastValue, out, delta)) {
+                        lastValue = out;
+                    }
+                } else {
                     lastValue = out;
                 }
             } else {
-                lastValue = out;
+                int64_t out = invalidValue<int64_t>();
+                if (injectionType == helics::data_type::helics_double) {
+                    out =
+                        static_cast<int64_t>(doubleExtractAndConvert3(dv, inputUnits, outputUnits));
+                } else {
+                    defV val;
+                    valueExtract3(dv, injectionType, val);
+                    valueExtract(val, out);
+                }
+                if (changeDetectionEnabled) {
+                    if (changeDetected(lastValue, out, delta)) {
+                        lastValue = out;
+                    }
+                } else {
+                    lastValue = out;
+                }
             }
         }
+        
     }
     char V;
     valueExtract(lastValue, V);

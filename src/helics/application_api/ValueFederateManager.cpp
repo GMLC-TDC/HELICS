@@ -95,6 +95,9 @@ Input& ValueFederateManager::registerInput(const std::string& key,
         auto datHandle = inputData.lock();
         datHandle->push_back(std::move(edat));
         ref.referenceIndex = static_cast<int>(datHandle->size() - 1);
+        if (useJsonSerialization) {
+            ref.targetType = data_type::helics_json;
+        }
         return ref;
     }
     throw(RegistrationFailure("Unable to register Input"));
