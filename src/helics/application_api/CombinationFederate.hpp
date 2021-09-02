@@ -67,6 +67,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     CombinationFederate(const CombinationFederate& fed) = delete;
     /** copy assignment deleted*/
     CombinationFederate& operator=(const CombinationFederate& fed) = delete;
+    virtual void setFlagOption(int flagIndex, bool flagValue = true) override;
     virtual void disconnect() override;
 
   protected:

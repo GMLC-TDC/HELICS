@@ -745,13 +745,12 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
             }
             break;
         }
-        case DataType::HELICS_COMPLEX: {
+        case DataType::HELICS_COMPLEX:
             val = ValueConverter<std::complex<double>>::interpret(dv);
             break;
-            case DataType::HELICS_JSON:
-                valueExtract(readJsonValue(dv), val);
-                break;
-        }
+        case DataType::HELICS_JSON:
+            valueExtract(readJsonValue(dv), val);
+            break;
     }
 }
 
