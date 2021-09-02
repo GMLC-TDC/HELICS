@@ -281,7 +281,6 @@ void runDualFederateTestv2(const std::string& CoreType_str,
     helics::cleanupHelicsLibrary();
 }
 
-
 template<class X>
 void runDualFederateTestJson(const std::string& core_type_str,
                              const X& defaultValue,

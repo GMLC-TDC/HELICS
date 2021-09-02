@@ -102,7 +102,6 @@ TEST(vfed_dual_transfer_json, string)
                                          std::string("I am a string"));
 }
 
-
 /** test case checking that the transfer between two federates works as expected with publication
  * and subscription objects
  */
