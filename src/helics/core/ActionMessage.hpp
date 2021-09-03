@@ -196,10 +196,10 @@ class ActionMessage {
     int depacketize(const char* data, int buffer_size);
     /** read a command from a string
     @return number of bytes read*/
-    std::size_t from_string(const std::string & data);
+    std::size_t from_string(const std::string& data);
     /** read a command from a json string
     @return true if successful*/
-    bool from_json_string(const std::string & data);
+    bool from_json_string(const std::string& data);
     /** read a command from a char vector*/
     std::size_t from_vector(const std::vector<char>& data);
 

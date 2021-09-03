@@ -394,15 +394,15 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
     res.reserve(dataV.size());
     for (size_t ii = 0; ii < dataV.size(); ++ii) {
         if (dataV[ii]) {
-            if (targetType==data_type::helics_json) {
-
+            if (targetType == data_type::helics_json) {
             } else {
                 auto localTargetType = (injectionType == helics::data_type::helics_multi) ?
                     sourceTypes[ii].first :
                     injectionType;
 
                 const auto& localUnits = (multiUnits) ? sourceTypes[ii].second : inputUnits;
-                if (localTargetType==helics::data_type::helics_json||targetType!=helics::data_type::helics_json) {
+                if (localTargetType == helics::data_type::helics_json ||
+                    targetType != helics::data_type::helics_json) {
                     if (localTargetType == helics::data_type::helics_double) {
                         res.emplace_back(
                             doubleExtractAndConvert(*dataV[ii], localUnits, outputUnits));
@@ -426,7 +426,6 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const data_block
                     }
                 }
             }
-            
         }
     }
     data_type type = data_type::helics_multi;
@@ -536,7 +535,8 @@ bool Input::checkUpdate(bool assumeUpdate)
             auto visitor = [&, this](auto&& arg) {
                 std::remove_reference_t<decltype(arg)> newVal;
                 (void)arg;  // suppress VS2015 warning
-                if (injectionType==helics::data_type::helics_json||targetType!=data_type::helics_json) {
+                if (injectionType == helics::data_type::helics_json ||
+                    targetType != data_type::helics_json) {
                     if (injectionType == helics::data_type::helics_double) {
                         defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                         valueExtract(val, newVal);
@@ -773,8 +773,8 @@ void integerExtractAndConvert(defV& store,
 }
 
 double doubleExtractAndConvert3(const data_view& dv,
-                               const std::shared_ptr<units::precise_unit>& inputUnits,
-                               const std::shared_ptr<units::precise_unit>& outputUnits)
+                                const std::shared_ptr<units::precise_unit>& inputUnits,
+                                const std::shared_ptr<units::precise_unit>& outputUnits)
 {
     auto V = ValueConverter3<double>::interpret(dv);
     if ((inputUnits) && (outputUnits)) {
@@ -784,9 +784,9 @@ double doubleExtractAndConvert3(const data_view& dv,
 }
 
 void integerExtractAndConvert3(defV& store,
-                              const data_view& dv,
-                              const std::shared_ptr<units::precise_unit>& inputUnits,
-                              const std::shared_ptr<units::precise_unit>& outputUnits)
+                               const data_view& dv,
+                               const std::shared_ptr<units::precise_unit>& inputUnits,
+                               const std::shared_ptr<units::precise_unit>& outputUnits)
 {
     auto V = ValueConverter3<int64_t>::interpret(dv);
     if ((inputUnits) && (outputUnits)) {
@@ -803,7 +803,7 @@ char Input::getValueChar()
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
-        if (injectionType==data_type::helics_json||targetType!=data_type::helics_json) {
+        if (injectionType == data_type::helics_json || targetType != data_type::helics_json) {
             if ((injectionType == data_type::helics_string) ||
                 (injectionType == data_type::helics_any) ||
                 (injectionType == data_type::helics_custom)) {
@@ -866,7 +866,6 @@ char Input::getValueChar()
                 }
             }
         }
-        
     }
     char V;
     valueExtract(lastValue, V);

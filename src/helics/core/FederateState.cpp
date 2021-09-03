@@ -865,7 +865,6 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     }
 }
 
-
 message_processing_result FederateState::processQueue() noexcept
 {
     if (state == HELICS_FINISHED) {

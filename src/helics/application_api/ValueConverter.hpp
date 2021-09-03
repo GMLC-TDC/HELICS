@@ -83,14 +83,13 @@ namespace detail {
     HELICS_CXX_EXPORT void convertFromBinary3(const unsigned char* data, double* val);
 
     HELICS_CXX_EXPORT void convertFromBinary3(const unsigned char* data,
-                                             std::vector<std::complex<double>>& val);
+                                              std::vector<std::complex<double>>& val);
 
     /** get the size of the data from the data stream for a specific type
     @details this returns the number of elements of the specific data type  it is NOT in bytes
     */
     HELICS_CXX_EXPORT size_t getDataSize3(const unsigned char* data);
-}
-
+}  // namespace detail
 
 /** converter for a basic value*/
 template<class X>
@@ -102,27 +101,23 @@ class ValueConverter3 {
     static X interpret(const data_view& block)
     {
         X val;
-        if (detail::detectType3(reinterpret_cast<const unsigned char*>(block.data())) == helicsType<X>())
-        {
+        if (detail::detectType3(reinterpret_cast<const unsigned char*>(block.data())) ==
+            helicsType<X>()) {
             detail::convertFromBinary3(reinterpret_cast<const unsigned char*>(block.data()), val);
+        } else {
+            ValueConverter<X>::interpret(block, val);
         }
-        else
-        {
-            ValueConverter<X>::interpret(block,val);
-        }
-        
+
         return val;
     }
 
     /** interpret a view of the data block and store to the specified value*/
     static void interpret(const data_view& block, X& val)
     {
-        if (detail::detectType3(reinterpret_cast<const unsigned char*>(block.data())) == helicsType<X>())
-        {
+        if (detail::detectType3(reinterpret_cast<const unsigned char*>(block.data())) ==
+            helicsType<X>()) {
             detail::convertFromBinary3(reinterpret_cast<const unsigned char*>(block.data()), val);
-        }
-        else
-        {
+        } else {
             ValueConverter<X>::interpret(block, val);
         }
     }
@@ -131,4 +126,4 @@ class ValueConverter3 {
     static std::string type() { return typeNameString<X>(); }
 };
 
-} 
+}  // namespace helics

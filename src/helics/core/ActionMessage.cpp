@@ -557,8 +557,7 @@ int ActionMessage::depacketize(const char* data, int buffer_size)
 
     int bytesUsed = fromByteArray(data + 4, message_size - 4);
     if (bytesUsed == 0U) {
-        if (from_json_string(
-                std::string(data + 4, message_size - 4))) {
+        if (from_json_string(std::string(data + 4, message_size - 4))) {
             bytesUsed = message_size + 4;
         }
     }
@@ -612,8 +611,7 @@ bool ActionMessage::from_json_string(const std::string& data)
 
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
-    std::size_t bytesUsed =
-        fromByteArray(data.data(), static_cast<int>(data.size()));
+    std::size_t bytesUsed = fromByteArray(data.data(), static_cast<int>(data.size()));
     if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
         if (from_json_string(std::string(data.data(), data.size()))) {
             return data.size();

@@ -233,7 +233,6 @@ TEST_P(valuefed_all_type_tests, dual_transfer_json)
     EXPECT_TRUE(res);
 }
 
-
 TEST_P(valuefed_all_type_tests, dual_transfer_inputs)
 {
     SetupTest<helics::ValueFederate>(GetParam(), 2);

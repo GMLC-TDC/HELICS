@@ -468,14 +468,14 @@ HELICS_CXX_EXPORT void
 /** convert a dataview to a double and do a unit conversion if appropriate*/
 HELICS_CXX_EXPORT double
     doubleExtractAndConvert3(const data_view& dv,
-                            const std::shared_ptr<units::precise_unit>& inputUnits,
-                            const std::shared_ptr<units::precise_unit>& outputUnits);
+                             const std::shared_ptr<units::precise_unit>& inputUnits,
+                             const std::shared_ptr<units::precise_unit>& outputUnits);
 
 HELICS_CXX_EXPORT void
     integerExtractAndConvert3(defV& store,
-                             const data_view& dv,
-                             const std::shared_ptr<units::precise_unit>& inputUnits,
-                             const std::shared_ptr<units::precise_unit>& outputUnits);
+                              const data_view& dv,
+                              const std::shared_ptr<units::precise_unit>& inputUnits,
+                              const std::shared_ptr<units::precise_unit>& outputUnits);
 
 /** class to handle an input and extract a specific type
 @tparam X the class of the value associated with a input*/
@@ -558,7 +558,8 @@ void Input::getValue_impl(std::integral_constant<int, primaryType> /*V*/, X& out
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
-        if (injectionType==helics::data_type::helics_json || targetType!=data_type::helics_json) {
+        if (injectionType == helics::data_type::helics_json ||
+            targetType != data_type::helics_json) {
             if (injectionType == helics::data_type::helics_double) {
                 defV val = doubleExtractAndConvert(dv, inputUnits, outputUnits);
                 valueExtract(val, out);
@@ -626,7 +627,8 @@ const X& Input::getValueRef()
         if (injectionType == data_type::helics_unknown) {
             loadSourceInformation();
         }
-        if (injectionType == helics::data_type::helics_json || targetType != data_type::helics_json) {
+        if (injectionType == helics::data_type::helics_json ||
+            targetType != data_type::helics_json) {
             if (changeDetectionEnabled) {
                 X out;
                 if (injectionType == helics::data_type::helics_double) {
