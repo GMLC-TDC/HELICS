@@ -52,7 +52,7 @@ TEST_P(vfed_dual_transfer_ci_skip, uint64_t1)
 
 TEST_P(vfed_dual_transfer_ci_skip, float1)
 {
-    runDualFederateTest<float>(GetParam(), 10.3f, 45.3F, 22.7F);
+    runDualFederateTest<float>(GetParam(), 10.3F, 45.3F, 22.7F);
 }
 
 TEST_P(vfed_dual_transfer_ci_skip, string)
