@@ -49,7 +49,8 @@ CombinationFederate::CombinationFederate(const std::string& fedName,
 CombinationFederate::CombinationFederate(CombinationFederate&&) noexcept = default;
 CombinationFederate::~CombinationFederate() = default;
 
-void CombinationFederate::setFlagOption(int flagIndex, bool flagValue) {
+void CombinationFederate::setFlagOption(int flagIndex, bool flagValue)
+{
     ValueFederate::setFlagOption(flagIndex, flagValue);
 }
 

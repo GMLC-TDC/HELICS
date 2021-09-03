@@ -445,7 +445,7 @@ void BrokerBase::generateNewIdentifier()
     uuid_like = false;
 }
 
-void BrokerBase::saveProfilingData(const std::string &message)
+void BrokerBase::saveProfilingData(const std::string& message)
 {
     if (prBuff) {
         prBuff->addMessage(std::string(message));
@@ -464,7 +464,6 @@ void BrokerBase::writeProfilingData()
         }
     }
 }
-
 
 void BrokerBase::setErrorState(int eCode, const std::string& estring)
 {

@@ -470,7 +470,7 @@ void Federate::setFlagOption(int flag, bool flagValue)
 
 bool Federate::getFlagOption(int flag) const
 {
-    if (flag==helics_flag_use_json_serialization) {
+    if (flag == helics_flag_use_json_serialization) {
         return useJsonSerialization;
     } else {
         return coreObject->getFlagOption(fedID, flag);
