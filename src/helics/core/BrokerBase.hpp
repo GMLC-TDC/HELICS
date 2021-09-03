@@ -238,7 +238,7 @@ class BrokerBase {
                               const std::string& message) const;
 
     /** save a profiling message*/
-    void saveProfilingData(const std::string &message);
+    void saveProfilingData(const std::string& message);
     /** write profiler data to file*/
     void writeProfilingData();
 

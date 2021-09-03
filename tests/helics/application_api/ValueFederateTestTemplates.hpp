@@ -327,19 +327,18 @@ void runDualFederateTestv2(const std::string& core_type_str,
     helics::cleanupHelicsLibrary();
 }
 
-
 template<class X>
 void runDualFederateTestJson(const std::string& core_type_str,
-                         const X& defaultValue,
-                         const X& testValue1,
-                         const X& testValue2)
+                             const X& defaultValue,
+                             const X& testValue1,
+                             const X& testValue2)
 {
     FederateTestFixture fixture;
 
     fixture.SetupTest<helics::ValueFederate>(core_type_str, 1);
     auto fedA = fixture.GetFederateAs<helics::ValueFederate>(0);
-    fixture.extraCoreArgs="--json";
-    fixture.AddFederates<helics::ValueFederate>(core_type_str, 1,fixture.brokers[0]);
+    fixture.extraCoreArgs = "--json";
+    fixture.AddFederates<helics::ValueFederate>(core_type_str, 1, fixture.brokers[0]);
     auto fedB = fixture.GetFederateAs<helics::ValueFederate>(1);
     fedB->setFlagOption(helics_flag_use_json_serialization);
 
@@ -349,7 +348,6 @@ void runDualFederateTestJson(const std::string& core_type_str,
     auto& subid = fedB->registerSubscription("pub1");
     fedA->setProperty(helics_property_time_delta, 1.0);
     fedB->setProperty(helics_property_time_delta, 1.0);
-    
 
     EXPECT_TRUE(fedB->getFlagOption(helics_flag_use_json_serialization));
     subid.setDefault(defaultValue);
@@ -396,7 +394,6 @@ void runDualFederateTestJson(const std::string& core_type_str,
     fedA->finalizeComplete();
     helics::cleanupHelicsLibrary();
 }
-
 
 template<class X>
 void runDualFederateTestObj(const std::string& core_type_str,

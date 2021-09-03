@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ValueConverter.hpp"
 
-#include "ValueConverter_impl.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "ValueConverter_impl.hpp"
 
 #include <complex>
 #include <vector>
@@ -29,7 +29,6 @@ template class ValueConverter<std::vector<std::string>>;
 template class ValueConverter<std::vector<std::complex<double>>>;
 template class ValueConverter<NamedPoint>;
 }  // namespace helics
-
 
 namespace helics {
 
@@ -101,18 +100,15 @@ namespace detail {
     static constexpr const unsigned char littleEndianCode{0x0};
     // static constexpr const unsigned char bigEndianCode{0x01};
 
-
     size_t getDataSize3(const unsigned char* data)
     {
-        return (static_cast<size_t>(data[4]) << 24U) +
-            (static_cast<size_t>(data[5]) << 16U) + (static_cast<size_t>(data[6]) << 8U) +
-            static_cast<size_t>(data[7]);
+        return (static_cast<size_t>(data[4]) << 24U) + (static_cast<size_t>(data[5]) << 16U) +
+            (static_cast<size_t>(data[6]) << 8U) + static_cast<size_t>(data[7]);
     }
 
     data_type detectType3(const unsigned char* data)
     {
-        switch (data[0] & 0xFEU)
-        {
+        switch (data[0] & 0xFEU) {
             case intCode:
                 return data_type::helics_int;
             case doubleCode:
@@ -235,11 +231,10 @@ namespace detail {
     }
 }  // namespace detail
 
-
 /** interpret a view of the data block and store to the specified value*/
 template<>
 void ValueConverter3<std::vector<std::string>>::interpret(const data_view& block,
-                                                         std::vector<std::string>& val)
+                                                          std::vector<std::string>& val)
 {
     val.clear();
     auto str = ValueConverter3<std::string>::interpret(block);

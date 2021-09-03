@@ -121,7 +121,6 @@ across different compilers*/
         cmd_broker_configure = 211,  //!< command to update the configuration of a broker
         cmd_base_configure = 213,  //!< command to update the configuration of a broker/core base
 
-            
         cmd_profiler_data = 496,  //!< command for profiler data
         cmd_set_profiler_flag = 498,  //!< command to activate profiling
 

@@ -98,7 +98,9 @@ std::shared_ptr<helicsCLI11App>
                        autobroker,
                        "allow a broker to be automatically created if one is not available");
     nbparser
-        ->add_option("--brokerinit,--brokerinitstring", brokerInitString, "the initialization string for the broker")
+        ->add_option("--brokerinit,--brokerinitstring",
+                     brokerInitString,
+                     "the initialization string for the broker")
         ->envname("HELICS_BROKER_INIT");
     nbparser
         ->add_flag_function(

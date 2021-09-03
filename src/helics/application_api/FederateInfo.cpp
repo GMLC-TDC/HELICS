@@ -120,7 +120,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"debugging", helics_flag_debugging},
     {"profiling", helics_flag_profiling},
     {"local_profiling_capture", helics_flag_local_profiling_capture},
-    {"profiling_marker",helics_flag_profiling_marker},
+    {"profiling_marker", helics_flag_profiling_marker},
     {"only_update_on_change", helics_flag_only_update_on_change},
     {"only_transmit_on_change", helics_flag_only_transmit_on_change},
     {"forward_compute", helics_flag_forward_compute},

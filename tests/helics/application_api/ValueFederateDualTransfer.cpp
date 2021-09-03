@@ -97,9 +97,9 @@ TEST(vfed_dual_transfer_json, float1)
 TEST(vfed_dual_transfer_json, string)
 {
     runDualFederateTestJson<std::string>("test",
-                                     "start",
-                                     "inside of the functional relationship of helics",
-                                     std::string("I am a string"));
+                                         "start",
+                                         "inside of the functional relationship of helics",
+                                         std::string("I am a string"));
 }
 
 /** test case checking that the transfer between two federates works as expected with publication
