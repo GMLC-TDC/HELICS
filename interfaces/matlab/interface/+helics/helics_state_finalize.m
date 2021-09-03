@@ -1,7 +1,7 @@
 function v = helics_state_finalize()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 128);
+    vInitialized = helicsMEX(0, 135);
   end
   v = vInitialized;
 end

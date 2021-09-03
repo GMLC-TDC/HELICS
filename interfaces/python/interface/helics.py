@@ -124,6 +124,8 @@ helics_data_type_time = _helics.helics_data_type_time
 r""" time data type"""
 helics_data_type_raw = _helics.helics_data_type_raw
 r""" raw data type"""
+helics_data_type_json = _helics.helics_data_type_json
+r""" type converts to a valid json string"""
 helics_data_type_multi = _helics.helics_data_type_multi
 r""" the data type can change"""
 helics_data_type_any = _helics.helics_data_type_any
@@ -173,15 +175,26 @@ r"""
     specify that checking on configuration files should be strict and throw and error on any
       invalid values
     """
+helics_flag_use_json_serialization = _helics.helics_flag_use_json_serialization
+r""" specify that the federate should use json serialization for all data types"""
 helics_flag_event_triggered = _helics.helics_flag_event_triggered
 r"""
     specify that the federate is event triggered-meaning (all/most) events are triggered by
           incoming events
     """
+helics_flag_profiling_marker = _helics.helics_flag_profiling_marker
+r""" flag trigger for generating a profiling marker"""
+helics_flag_local_profiling_capture = _helics.helics_flag_local_profiling_capture
+r"""
+    specify that that federate should capture the profiling data to the local federate logging
+          system
+    """
 helics_flag_delay_init_entry = _helics.helics_flag_delay_init_entry
 r""" used to delay a core from entering initialization mode even if it would otherwise be ready"""
 helics_flag_enable_init_entry = _helics.helics_flag_enable_init_entry
 r""" used to clear the HELICS_DELAY_INIT_ENTRY flag in cores"""
+helics_flag_ignore = _helics.helics_flag_ignore
+r""" ignored flag used to test some code paths"""
 helics_flag_slow_responding = _helics.helics_flag_slow_responding
 r"""
     flag specifying that a federate, core, or broker may be slow to respond to pings
@@ -199,6 +212,8 @@ helics_flag_force_logging_flush = _helics.helics_flag_force_logging_flush
 r""" specify that the log files should be flushed on every log message"""
 helics_flag_dumplog = _helics.helics_flag_dumplog
 r""" specify that a full log should be dumped into a file"""
+helics_flag_profiling = _helics.helics_flag_profiling
+r""" specify that helics should capture profiling data"""
 helics_log_level_no_print = _helics.helics_log_level_no_print
 r""" don't print anything except a few catastrophic errors"""
 helics_log_level_error = _helics.helics_log_level_error
@@ -370,7 +385,11 @@ r"""
           firewall like rules
     """
 helics_sequencing_mode_fast = _helics.helics_sequencing_mode_fast
+r""" sequencing mode to operate on priority channels"""
 helics_sequencing_mode_ordered = _helics.helics_sequencing_mode_ordered
+r""" sequencing mode to operate on the normal channels"""
+helics_sequencing_mode_default = _helics.helics_sequencing_mode_default
+r""" select the default channel"""
 helics_iteration_request_no_iteration = _helics.helics_iteration_request_no_iteration
 r""" no iteration is requested"""
 helics_iteration_request_force_iteration = _helics.helics_iteration_request_force_iteration
@@ -422,6 +441,7 @@ class helics_complex(object):
 # Register helics_complex in _helics:
 _helics.helics_complex_swigregister(helics_complex)
 cvar = _helics.cvar
+HELICS_INVALID_PROPERTY_VALUE = cvar.HELICS_INVALID_PROPERTY_VALUE
 helics_time_zero = cvar.helics_time_zero
 helics_time_epsilon = cvar.helics_time_epsilon
 helics_time_invalid = cvar.helics_time_invalid

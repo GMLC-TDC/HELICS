@@ -20,6 +20,10 @@ public final class helics_core_flags {
    *  used to clear the HELICS_DELAY_INIT_ENTRY flag in cores
    */
   public final static helics_core_flags helics_flag_enable_init_entry = new helics_core_flags("helics_flag_enable_init_entry", helicsJNI.helics_flag_enable_init_entry_get());
+  /**
+   *  ignored flag used to test some code paths
+   */
+  public final static helics_core_flags helics_flag_ignore = new helics_core_flags("helics_flag_ignore", helicsJNI.helics_flag_ignore_get());
 
   public final int swigValue() {
     return swigValue;
@@ -55,7 +59,7 @@ public final class helics_core_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_core_flags[] swigValues = { helics_flag_delay_init_entry, helics_flag_enable_init_entry };
+  private static helics_core_flags[] swigValues = { helics_flag_delay_init_entry, helics_flag_enable_init_entry, helics_flag_ignore };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

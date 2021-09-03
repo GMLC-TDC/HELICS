@@ -1,3 +1,3 @@
 function varargout = helicsCoreDisconnect(varargin)
-  [varargout{1:nargout}] = helicsMEX(65, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(66, varargin{:});
 end

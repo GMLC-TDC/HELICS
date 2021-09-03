@@ -35,6 +35,10 @@ public final class helics_flags {
    *  specify that a full log should be dumped into a file
    */
   public final static helics_flags helics_flag_dumplog = new helics_flags("helics_flag_dumplog", helicsJNI.helics_flag_dumplog_get());
+  /**
+   *  specify that helics should capture profiling data
+   */
+  public final static helics_flags helics_flag_profiling = new helics_flags("helics_flag_profiling", helicsJNI.helics_flag_profiling_get());
 
   public final int swigValue() {
     return swigValue;
@@ -70,7 +74,7 @@ public final class helics_flags {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_flags[] swigValues = { helics_flag_slow_responding, helics_flag_debugging, helics_flag_terminate_on_error, helics_flag_force_logging_flush, helics_flag_dumplog };
+  private static helics_flags[] swigValues = { helics_flag_slow_responding, helics_flag_debugging, helics_flag_terminate_on_error, helics_flag_force_logging_flush, helics_flag_dumplog, helics_flag_profiling };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

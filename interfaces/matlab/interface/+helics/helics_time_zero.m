@@ -1,3 +1,3 @@
 function v = helics_time_zero()
-  v = helicsMEX(5);
+  v = helicsMEX(6);
 end

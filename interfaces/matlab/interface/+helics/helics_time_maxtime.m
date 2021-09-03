@@ -1,3 +1,3 @@
 function v = helics_time_maxtime()
-  v = helicsMEX(8);
+  v = helicsMEX(9);
 end

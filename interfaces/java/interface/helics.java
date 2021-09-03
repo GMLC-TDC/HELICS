@@ -10,6 +10,13 @@ package com.java.helics;
 
 public class helics {
   /**
+   *  result returned for requesting the value of an invalid/unknown property 
+   */
+  public static int getHELICS_INVALID_PROPERTY_VALUE() {
+    return helicsJNI.HELICS_INVALID_PROPERTY_VALUE_get();
+  }
+
+  /**
    *  definition of time zero-the beginning of simulation 
    */
   public static double getHelics_time_zero() {
