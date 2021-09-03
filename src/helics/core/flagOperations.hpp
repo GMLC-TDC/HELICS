@@ -19,7 +19,7 @@ enum operation_flags : uint16_t {
     core_flag = 3,  //!< flag indicating that message comes from a core vs a broker
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
-    empty_flag = 6,  //!< flag indicating that the message is empty
+    use_json_serialization_flag = 6,  //!< flag to indicate it should use the json packetization
     extra_flag1 = 7,  //!< extra flag
     optional_flag = 8,  //!< flag indicating that a connection is optional and may not be matched
     clone_flag =
@@ -30,7 +30,7 @@ enum operation_flags : uint16_t {
     disconnected_flag = 12,  //!< flag indicating that a broker/federate is disconnected
     extra_flag3 = 13,  //!< extra flag
     extra_flag4 = 14,  //!< extra flag
-    nameless_interface_flag = 15,  //!< flag indicating the interface is nameless
+    empty_flag = 15,  //!< flag indicating the message is empty
 };
 
 /// overload of extra_flag4 indicating a federate, core or broker is slow responding
@@ -46,7 +46,7 @@ constexpr uint16_t parent_flag = extra_flag3;
 constexpr uint16_t child_flag = extra_flag4;
 
 /// overload of nameless_interface_flag indicating that a federate should not count in any totals
-constexpr uint16_t non_counting_flag = nameless_interface_flag;
+constexpr uint16_t non_counting_flag = empty_flag;
 
 constexpr uint16_t targetted_flag =
     extra_flag2;  //!< overload of extra_flag2 indicating an endpoint is targeted
@@ -61,8 +61,8 @@ constexpr uint16_t non_granting_flag = extra_flag1;
 /// overload of extra_flag2 to indicate the request is from federate with delayed timing
 constexpr uint16_t delayed_timing_flag = extra_flag2;
 
-/// overload of flag to indicate it should use the json packetization
-constexpr uint16_t use_json_serialization_flag = extra_flag3;
+/// overload of flag to indicate an interface is nameless
+constexpr uint16_t nameless_interface_flag = empty_flag;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
