@@ -4,13 +4,13 @@ on:
   push:
     branches:
       - develop
-      - master
-      - helics3
+      - main
+      - helics2
   pull_request:
     branches:
       - develop
-      - master
-      - helics3
+      - main
+      - helics2
 
 jobs:
   cpplint:

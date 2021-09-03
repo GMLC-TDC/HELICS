@@ -9,8 +9,8 @@ on:
   push:
     branches:
       - !develop
-      - !master
-      - !helics3
+      - !main
+      - !helics2
     paths:
       - '**.jpg'
       - '**.jpeg'
