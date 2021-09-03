@@ -157,6 +157,16 @@ void ValueFederate::removeTarget(const Input& inp, const std::string& target)
     vfManager->removeTarget(inp, target);
 }
 
+void ValueFederate::setFlagOption(int flag, bool flagValue)
+{
+    if (flag == helics_flag_use_json_serialization) {
+        useJsonSerialization = flagValue;
+        vfManager->useJsonSerialization = flagValue;
+    } else {
+        Federate::setFlagOption(flag, flagValue);
+    }
+}
+
 void ValueFederate::addAlias(const Publication& pub, const std::string& shortcutName)
 {
     vfManager->addAlias(pub, shortcutName);

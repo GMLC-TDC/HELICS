@@ -391,6 +391,12 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     void addAlias(const Publication& pub, const std::string& shortcutName);
 
+     /** set a flag for the federate
+   @param flag an index into the flag /ref flag-definitions.h
+   @param flagValue the value of the flag defaults to true
+   */
+    virtual void setFlagOption(int flag, bool flagValue = true) override;
+
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param inp the subscription identifier

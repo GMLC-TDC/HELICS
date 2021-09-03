@@ -89,4 +89,8 @@ TEST(prop_tests, flagprops)
     EXPECT_EQ(helicsGetFlagIndex("STRICT_CONFIG_CHECKING"), helics_flag_strict_config_checking);
     EXPECT_EQ(helicsGetFlagIndex("FORCE_LOGGING_FLUSH"), helics_flag_force_logging_flush);
     EXPECT_EQ(helicsGetFlagIndex("DUMPLOG"), helics_flag_dumplog);
+    EXPECT_EQ(helicsGetFlagIndex("LOCAL_PROFILING_CAPTURE"), helics_flag_local_profiling_capture);
+    EXPECT_EQ(helicsGetFlagIndex("PROFILING"), helics_flag_profiling);
+    EXPECT_EQ(helicsGetFlagIndex("PROFILING_MARKER"), helics_flag_profiling_marker);
+    EXPECT_EQ(helicsGetFlagIndex("USE_JSON_SERIALIZATION"), helics_flag_use_json_serialization);
 }

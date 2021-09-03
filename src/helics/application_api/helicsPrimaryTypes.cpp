@@ -983,6 +983,38 @@ void valueExtract(const data_view& dv, data_type baseType, defV& val)
     }
 }
 
+void valueExtract3(const data_view& dv, data_type baseType, defV& val)
+{
+    switch (baseType) {
+        case data_type::helics_double:
+            val = ValueConverter3<double>::interpret(dv);
+            break;
+        case data_type::helics_int:
+        case data_type::helics_time:
+            val = ValueConverter3<int64_t>::interpret(dv);
+            break;
+        case data_type::helics_string:
+        default:
+            val = ValueConverter3<std::string>::interpret(dv);
+            break;
+        case data_type::helics_vector:
+            val = ValueConverter3<std::vector<double>>::interpret(dv);
+            break;
+        case data_type::helics_complex:
+            val = ValueConverter3<std::complex<double>>::interpret(dv);
+            break;
+        case data_type::helics_complex_vector:
+            val = ValueConverter3<std::vector<std::complex<double>>>::interpret(dv);
+            break;
+        case data_type::helics_named_point:
+            val = ValueConverter3<NamedPoint>::interpret(dv);
+            break;
+        case data_type::helics_json:
+            val = readJsonValue(dv);
+            break;
+    }
+}
+
 void valueConvert(defV& val, data_type newType)
 {
     auto index = val.index();
