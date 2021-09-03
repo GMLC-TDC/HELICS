@@ -18,6 +18,8 @@ algorithms
 
 #include <string>
 #include <utility>
+#include <vector>
+
 namespace helics {
 /** converter for a basic value*/
 template<class X>
