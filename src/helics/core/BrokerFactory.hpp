@@ -82,7 +82,7 @@ namespace BrokerFactory {
 @return a shared_ptr to the Broker*/
     std::shared_ptr<Broker> getConnectedBroker();
     /**  get a broker by index (0 based)
-@param index, the index counter value of the broker
+@param index the index counter value of the broker
 @return a shared_ptr to the Broker*/
     std::shared_ptr<Broker> getBrokerByIndex(size_t index);
 

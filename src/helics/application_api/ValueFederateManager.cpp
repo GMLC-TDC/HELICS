@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id):
-    coreObject(coreOb), fedID(id), fed(vfed)
+    fedID(id), coreObject(coreOb), fed(vfed)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
@@ -95,6 +95,9 @@ Input& ValueFederateManager::registerInput(const std::string& key,
         auto datHandle = inputData.lock();
         datHandle->push_back(std::move(edat));
         ref.referenceIndex = static_cast<int>(datHandle->size() - 1);
+        if (useJsonSerialization) {
+            ref.targetType = data_type::helics_json;
+        }
         return ref;
     }
     throw(RegistrationFailure("Unable to register Input"));

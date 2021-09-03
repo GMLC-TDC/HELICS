@@ -68,9 +68,8 @@ class ValueFederateManager {
     ValueFederateManager(Core* coreOb, ValueFederate* vfed, local_federate_id id);
     ~ValueFederateManager();
 
-    Publication& registerPublication(const std::string& key,
-                                     std::string type,
-                                     const std::string& units);
+    Publication&
+        registerPublication(const std::string& key, std::string type, const std::string& units);
     /** register a subscription
     @details call is only valid in startup mode
     */
@@ -203,8 +202,9 @@ class ValueFederateManager {
     @param inp the identifier for the subscription
     */
     static void clearUpdate(const Input& inp);
-    public:
-        bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
+
+  public:
+    bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
     local_federate_id fedID;  //!< the federation ID from the core API
     shared_guarded_m<
@@ -217,7 +217,7 @@ class ValueFederateManager {
                                                         reference_stability::stable>>
         publications;
     Time CurrentTime = Time(-1.0);  //!< the current simulation time
-    Core* coreObject;  //!< the pointer to the actual core
+    Core* coreObject{nullptr};  //!< the pointer to the actual core
     /** pointer back to the value Federate for creation of the Publication/Inputs */
     ValueFederate* fed{nullptr};
     atomic_guarded<std::function<void(Input&, Time)>>
