@@ -546,10 +546,10 @@ defV readJsonValue(const data_view& dv)
             case data_type::helics_int:
                 result = jv["value"].asInt64();
                 break;
-                case data_type::helics_string:
+            case data_type::helics_string:
                 result = jv["value"].asString();
                 break;
-                case data_type::helics_named_point:
+            case data_type::helics_named_point:
                 result = NamedPoint(jv["name"].asCString(), jv["value"].asDouble());
                 break;
             default:
@@ -561,7 +561,6 @@ defV readJsonValue(const data_view& dv)
     }
     return result;
 }
-
 
 void valueExtract(const data_view& dv, data_type baseType, std::string& val)
 {
@@ -978,7 +977,7 @@ void valueExtract(const data_view& dv, data_type baseType, defV& val)
             val = ValueConverter<NamedPoint>::interpret(dv);
             break;
         case data_type::helics_json:
-            val=readJsonValue(dv);
+            val = readJsonValue(dv);
             break;
     }
 }

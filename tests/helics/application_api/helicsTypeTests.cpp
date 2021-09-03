@@ -91,7 +91,6 @@ TEST(helics_types, cvector_string)
     EXPECT_EQ(v[2], invalidValue<std::complex<double>>());
 }
 
-
 TEST(json_type_conversion, to_json)
 {
     auto res = typeConvert(data_type::helics_json, 49.7);

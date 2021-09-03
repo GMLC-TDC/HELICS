@@ -605,7 +605,6 @@ data_block emptyBlock(data_type outputType, data_type inputType = data_type::hel
         }
         case data_type::helics_vector:
             return ValueConverter<std::vector<double>>::convert(std::vector<double>());
-        
     }
 }
 data_block typeConvert(data_type type, double val)
