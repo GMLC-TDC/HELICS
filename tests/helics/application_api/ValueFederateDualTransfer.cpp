@@ -52,7 +52,7 @@ TEST_P(vfed_dual_transfer_ci_skip, uint64_t1)
 
 TEST_P(vfed_dual_transfer_ci_skip, float1)
 {
-    runDualFederateTest<float>(GetParam(), 10.3f, 45.3f, 22.7f);
+    runDualFederateTest<float>(GetParam(), 10.3f, 45.3F, 22.7F);
 }
 
 TEST_P(vfed_dual_transfer_ci_skip, string)
@@ -91,7 +91,7 @@ TEST(vfed_dual_transfer_json, uint64_t1)
 
 TEST(vfed_dual_transfer_json, float1)
 {
-    runDualFederateTestJson<float>("test", 10.3f, 45.3f, 22.7f);
+    runDualFederateTestJson<float>("test", 10.3F, 45.3F, 22.7F);
 }
 
 TEST(vfed_dual_transfer_json, string)
@@ -133,7 +133,7 @@ TEST_P(vfed_dual_transfer_ci_skip, obj_uint64_t)
 
 TEST_P(vfed_dual_transfer_ci_skip, obj_float)
 {
-    runDualFederateTestObj<float>(GetParam(), 10.3f, 45.3f, 22.7f);
+    runDualFederateTestObj<float>(GetParam(), 10.3F, 45.3F, 22.7F);
 }
 
 TEST_P(vfed_dual_transfer_ci_skip, obj_string)

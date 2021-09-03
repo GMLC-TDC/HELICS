@@ -481,9 +481,8 @@ bool Federate::getFlagOption(int flag) const
 {
     if (flag == HELICS_FLAG_USE_JSON_SERIALIZATION) {
         return useJsonSerialization;
-    } else {
-        return coreObject->getFlagOption(fedID, flag);
     }
+    return coreObject->getFlagOption(fedID, flag);
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
