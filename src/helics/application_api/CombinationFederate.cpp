@@ -54,7 +54,6 @@ void CombinationFederate::setFlagOption(int flagIndex, bool flagValue)
     ValueFederate::setFlagOption(flagIndex, flagValue);
 }
 
-
 void CombinationFederate::disconnect()
 {
     ValueFederate::disconnect();

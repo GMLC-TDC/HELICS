@@ -19,7 +19,7 @@ enum operation_flags : uint16_t {
     core_flag = 3,  //!< flag indicating that message comes from a core vs a broker
     error_flag = 4,  //!< flag indicating an error condition associated with the command
     indicator_flag = 5,  //!< flag used for setting values
-    use_json_serialization_flag = 6,  //!<flag to indicate it should use the json packetization
+    use_json_serialization_flag = 6,  //!< flag to indicate it should use the json packetization
     extra_flag1 = 7,  //!< extra flag
     optional_flag = 8,  //!< flag indicating that a connection is optional and may not be matched
     clone_flag =
@@ -62,7 +62,7 @@ constexpr uint16_t non_granting_flag = extra_flag1;
 constexpr uint16_t delayed_timing_flag = extra_flag2;
 
 /// overload of flag to indicate an interface is nameless
-constexpr uint16_t nameless_interface_flag=empty_flag;
+constexpr uint16_t nameless_interface_flag = empty_flag;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

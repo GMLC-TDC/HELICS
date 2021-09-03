@@ -429,7 +429,7 @@ bool checkTypeMatch(const std::string& type1, const std::string& type2, bool str
         return false;
     }
 
-    if ((type2.empty()) || (type2 == "def") || (type2 == "any") || (type1=="json")) {
+    if ((type2.empty()) || (type2 == "def") || (type2 == "any") || (type1 == "json")) {
         return true;
     }
     if (convertible_set.find(type1) != convertible_set.end()) {
