@@ -8,6 +8,21 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [2.8.0][] - 2021-09-10
+
+Final Minor release in the 2.X series of HELICS.  This includes a compatibility layer for future compatibility through the "--json" flag.  There may be more bug fix releases
+
+### Changed
+
+- Upgraded Units library to 0.5.0
+- CMAKE 3.20 was tested and verified and used as the baseline version when available.
+
+### Fixed
+
+
+### Added
+
+
 ## [2.7.1][] - 2021-06-03
 
 There were several bug fixes in this patch release. Some of them related to changes in [2.7.0][] and some new ones that came up from bug reports. Some new enhancements are experimental signal handlers in the C-api, which will be used in the python interface to provide a little better user experience when trying to kill a co-simulation.
