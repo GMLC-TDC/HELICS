@@ -3195,6 +3195,20 @@ SWIG_From_char  (char c)
 #ifdef __cplusplus
 extern "C" {
 #endif
+SWIGINTERN int Swig_var_HELICS_INVALID_PROPERTY_VALUE_set(PyObject *_val SWIGUNUSED) {
+  SWIG_Error(SWIG_AttributeError,"Variable HELICS_INVALID_PROPERTY_VALUE is read-only.");
+  return 1;
+}
+
+
+SWIGINTERN PyObject *Swig_var_HELICS_INVALID_PROPERTY_VALUE_get(void) {
+  PyObject *pyobj = 0;
+  
+  pyobj = SWIG_From_int((int)(HELICS_INVALID_PROPERTY_VALUE));
+  return pyobj;
+}
+
+
 SWIGINTERN int Swig_var_helics_time_zero_set(PyObject *_val SWIGUNUSED) {
   SWIG_Error(SWIG_AttributeError,"Variable helics_time_zero is read-only.");
   return 1;
@@ -20258,6 +20272,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_data_type_boolean",SWIG_From_int((int)(helics_data_type_boolean)));
   SWIG_Python_SetConstant(d, "helics_data_type_time",SWIG_From_int((int)(helics_data_type_time)));
   SWIG_Python_SetConstant(d, "helics_data_type_raw",SWIG_From_int((int)(helics_data_type_raw)));
+  SWIG_Python_SetConstant(d, "helics_data_type_json",SWIG_From_int((int)(helics_data_type_json)));
   SWIG_Python_SetConstant(d, "helics_data_type_multi",SWIG_From_int((int)(helics_data_type_multi)));
   SWIG_Python_SetConstant(d, "helics_data_type_any",SWIG_From_int((int)(helics_data_type_any)));
   SWIG_Python_SetConstant(d, "helics_flag_observer",SWIG_From_int((int)(helics_flag_observer)));
@@ -20274,14 +20289,19 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_flag_single_thread_federate",SWIG_From_int((int)(helics_flag_single_thread_federate)));
   SWIG_Python_SetConstant(d, "helics_flag_ignore_time_mismatch_warnings",SWIG_From_int((int)(helics_flag_ignore_time_mismatch_warnings)));
   SWIG_Python_SetConstant(d, "helics_flag_strict_config_checking",SWIG_From_int((int)(helics_flag_strict_config_checking)));
+  SWIG_Python_SetConstant(d, "helics_flag_use_json_serialization",SWIG_From_int((int)(helics_flag_use_json_serialization)));
   SWIG_Python_SetConstant(d, "helics_flag_event_triggered",SWIG_From_int((int)(helics_flag_event_triggered)));
+  SWIG_Python_SetConstant(d, "helics_flag_profiling_marker",SWIG_From_int((int)(helics_flag_profiling_marker)));
+  SWIG_Python_SetConstant(d, "helics_flag_local_profiling_capture",SWIG_From_int((int)(helics_flag_local_profiling_capture)));
   SWIG_Python_SetConstant(d, "helics_flag_delay_init_entry",SWIG_From_int((int)(helics_flag_delay_init_entry)));
   SWIG_Python_SetConstant(d, "helics_flag_enable_init_entry",SWIG_From_int((int)(helics_flag_enable_init_entry)));
+  SWIG_Python_SetConstant(d, "helics_flag_ignore",SWIG_From_int((int)(helics_flag_ignore)));
   SWIG_Python_SetConstant(d, "helics_flag_slow_responding",SWIG_From_int((int)(helics_flag_slow_responding)));
   SWIG_Python_SetConstant(d, "helics_flag_debugging",SWIG_From_int((int)(helics_flag_debugging)));
   SWIG_Python_SetConstant(d, "helics_flag_terminate_on_error",SWIG_From_int((int)(helics_flag_terminate_on_error)));
   SWIG_Python_SetConstant(d, "helics_flag_force_logging_flush",SWIG_From_int((int)(helics_flag_force_logging_flush)));
   SWIG_Python_SetConstant(d, "helics_flag_dumplog",SWIG_From_int((int)(helics_flag_dumplog)));
+  SWIG_Python_SetConstant(d, "helics_flag_profiling",SWIG_From_int((int)(helics_flag_profiling)));
   SWIG_Python_SetConstant(d, "helics_log_level_no_print",SWIG_From_int((int)(helics_log_level_no_print)));
   SWIG_Python_SetConstant(d, "helics_log_level_error",SWIG_From_int((int)(helics_log_level_error)));
   SWIG_Python_SetConstant(d, "helics_log_level_warning",SWIG_From_int((int)(helics_log_level_warning)));
@@ -20319,6 +20339,18 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_property_int_log_level",SWIG_From_int((int)(helics_property_int_log_level)));
   SWIG_Python_SetConstant(d, "helics_property_int_file_log_level",SWIG_From_int((int)(helics_property_int_file_log_level)));
   SWIG_Python_SetConstant(d, "helics_property_int_console_log_level",SWIG_From_int((int)(helics_property_int_console_log_level)));
+  globals = SWIG_globals();
+  if (!globals) {
+    PyErr_SetString(PyExc_TypeError, "Failure to create SWIG globals.");
+#if PY_VERSION_HEX >= 0x03000000
+    return NULL;
+#else
+    return;
+#endif
+  }
+  PyDict_SetItemString(md, "cvar", globals);
+  Py_DECREF(globals);
+  SWIG_addvarlink(globals, "HELICS_INVALID_PROPERTY_VALUE", Swig_var_HELICS_INVALID_PROPERTY_VALUE_get, Swig_var_HELICS_INVALID_PROPERTY_VALUE_set);
   SWIG_Python_SetConstant(d, "helics_multi_input_no_op",SWIG_From_int((int)(helics_multi_input_no_op)));
   SWIG_Python_SetConstant(d, "helics_multi_input_vectorize_operation",SWIG_From_int((int)(helics_multi_input_vectorize_operation)));
   SWIG_Python_SetConstant(d, "helics_multi_input_and_operation",SWIG_From_int((int)(helics_multi_input_and_operation)));
@@ -20351,17 +20383,7 @@ SWIG_init(void) {
   SWIG_Python_SetConstant(d, "helics_filter_type_firewall",SWIG_From_int((int)(helics_filter_type_firewall)));
   SWIG_Python_SetConstant(d, "helics_sequencing_mode_fast",SWIG_From_int((int)(helics_sequencing_mode_fast)));
   SWIG_Python_SetConstant(d, "helics_sequencing_mode_ordered",SWIG_From_int((int)(helics_sequencing_mode_ordered)));
-  globals = SWIG_globals();
-  if (!globals) {
-    PyErr_SetString(PyExc_TypeError, "Failure to create SWIG globals.");
-#if PY_VERSION_HEX >= 0x03000000
-    return NULL;
-#else
-    return;
-#endif
-  }
-  PyDict_SetItemString(md, "cvar", globals);
-  Py_DECREF(globals);
+  SWIG_Python_SetConstant(d, "helics_sequencing_mode_default",SWIG_From_int((int)(helics_sequencing_mode_default)));
   SWIG_addvarlink(globals, "helics_time_zero", Swig_var_helics_time_zero_get, Swig_var_helics_time_zero_set);
   SWIG_addvarlink(globals, "helics_time_epsilon", Swig_var_helics_time_epsilon_get, Swig_var_helics_time_epsilon_set);
   SWIG_addvarlink(globals, "helics_time_invalid", Swig_var_helics_time_invalid_get, Swig_var_helics_time_invalid_set);

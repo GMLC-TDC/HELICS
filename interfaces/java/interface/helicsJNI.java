@@ -34,6 +34,7 @@ public class helicsJNI {
   public final static native int helics_data_type_boolean_get();
   public final static native int helics_data_type_time_get();
   public final static native int helics_data_type_raw_get();
+  public final static native int helics_data_type_json_get();
   public final static native int helics_data_type_multi_get();
   public final static native int helics_data_type_any_get();
   public final static native int helics_flag_observer_get();
@@ -50,14 +51,19 @@ public class helicsJNI {
   public final static native int helics_flag_single_thread_federate_get();
   public final static native int helics_flag_ignore_time_mismatch_warnings_get();
   public final static native int helics_flag_strict_config_checking_get();
+  public final static native int helics_flag_use_json_serialization_get();
   public final static native int helics_flag_event_triggered_get();
+  public final static native int helics_flag_profiling_marker_get();
+  public final static native int helics_flag_local_profiling_capture_get();
   public final static native int helics_flag_delay_init_entry_get();
   public final static native int helics_flag_enable_init_entry_get();
+  public final static native int helics_flag_ignore_get();
   public final static native int helics_flag_slow_responding_get();
   public final static native int helics_flag_debugging_get();
   public final static native int helics_flag_terminate_on_error_get();
   public final static native int helics_flag_force_logging_flush_get();
   public final static native int helics_flag_dumplog_get();
+  public final static native int helics_flag_profiling_get();
   public final static native int helics_log_level_no_print_get();
   public final static native int helics_log_level_error_get();
   public final static native int helics_log_level_warning_get();
@@ -95,6 +101,7 @@ public class helicsJNI {
   public final static native int helics_property_int_log_level_get();
   public final static native int helics_property_int_file_log_level_get();
   public final static native int helics_property_int_console_log_level_get();
+  public final static native int HELICS_INVALID_PROPERTY_VALUE_get();
   public final static native int helics_multi_input_no_op_get();
   public final static native int helics_multi_input_vectorize_operation_get();
   public final static native int helics_multi_input_and_operation_get();
@@ -127,6 +134,7 @@ public class helicsJNI {
   public final static native int helics_filter_type_firewall_get();
   public final static native int helics_sequencing_mode_fast_get();
   public final static native int helics_sequencing_mode_ordered_get();
+  public final static native int helics_sequencing_mode_default_get();
   public final static native double helics_time_zero_get();
   public final static native double helics_time_epsilon_get();
   public final static native double helics_time_invalid_get();

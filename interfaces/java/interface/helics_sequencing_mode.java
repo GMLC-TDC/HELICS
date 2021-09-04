@@ -15,8 +15,18 @@ package com.java.helics;
  * existing messages
  */
 public final class helics_sequencing_mode {
+  /**
+   *  sequencing mode to operate on priority channels
+   */
   public final static helics_sequencing_mode helics_sequencing_mode_fast = new helics_sequencing_mode("helics_sequencing_mode_fast", helicsJNI.helics_sequencing_mode_fast_get());
+  /**
+   *  sequencing mode to operate on the normal channels
+   */
   public final static helics_sequencing_mode helics_sequencing_mode_ordered = new helics_sequencing_mode("helics_sequencing_mode_ordered", helicsJNI.helics_sequencing_mode_ordered_get());
+  /**
+   *  select the default channel
+   */
+  public final static helics_sequencing_mode helics_sequencing_mode_default = new helics_sequencing_mode("helics_sequencing_mode_default", helicsJNI.helics_sequencing_mode_default_get());
 
   public final int swigValue() {
     return swigValue;
@@ -52,7 +62,7 @@ public final class helics_sequencing_mode {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_sequencing_mode[] swigValues = { helics_sequencing_mode_fast, helics_sequencing_mode_ordered };
+  private static helics_sequencing_mode[] swigValues = { helics_sequencing_mode_fast, helics_sequencing_mode_ordered, helics_sequencing_mode_default };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

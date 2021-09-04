@@ -53,6 +53,10 @@ public final class helics_data_type {
    */
   public final static helics_data_type helics_data_type_raw = new helics_data_type("helics_data_type_raw", helicsJNI.helics_data_type_raw_get());
   /**
+   *  type converts to a valid json string
+   */
+  public final static helics_data_type helics_data_type_json = new helics_data_type("helics_data_type_json", helicsJNI.helics_data_type_json_get());
+  /**
    *  the data type can change
    */
   public final static helics_data_type helics_data_type_multi = new helics_data_type("helics_data_type_multi", helicsJNI.helics_data_type_multi_get());
@@ -95,7 +99,7 @@ public final class helics_data_type {
     swigNext = this.swigValue+1;
   }
 
-  private static helics_data_type[] swigValues = { helics_data_type_string, helics_data_type_double, helics_data_type_int, helics_data_type_complex, helics_data_type_vector, helics_data_type_complex_vector, helics_data_type_named_point, helics_data_type_boolean, helics_data_type_time, helics_data_type_raw, helics_data_type_multi, helics_data_type_any };
+  private static helics_data_type[] swigValues = { helics_data_type_string, helics_data_type_double, helics_data_type_int, helics_data_type_complex, helics_data_type_vector, helics_data_type_complex_vector, helics_data_type_named_point, helics_data_type_boolean, helics_data_type_time, helics_data_type_raw, helics_data_type_json, helics_data_type_multi, helics_data_type_any };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
