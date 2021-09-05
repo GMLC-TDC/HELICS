@@ -23,7 +23,7 @@ set(UNITS_CLANG_TIDY_OPTIONS "" CACHE INTERNAL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/units"
                  "${PROJECT_BINARY_DIR}/ThirdParty/units")
 
-set_target_properties(units-static PROPERTIES FOLDER Extern)
+set_target_properties(units PROPERTIES FOLDER Extern)
 
 hide_variable(UNITS_HEADER_ONLY)
 hide_variable(UNITS_BUILD_OBJECT_LIBRARY)
