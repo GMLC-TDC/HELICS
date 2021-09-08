@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
         }
     }
     cFed->finalize();
-   
+
     if (passed) {
         std::cout << "Federate 2 has PASSED the test";
     } else {
