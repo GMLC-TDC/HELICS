@@ -80,7 +80,7 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
 
 ActionMessage::ActionMessage(const void* data, size_t size): ActionMessage()
 {
-    from_string(std::string(static_cast<const char*>(data), size));
+    from_string(std::string_view(static_cast<const char*>(data), size));
 }
 
 ActionMessage::~ActionMessage() = default;
