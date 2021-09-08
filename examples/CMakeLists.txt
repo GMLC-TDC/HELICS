@@ -25,3 +25,5 @@ endif()
 if(HELICS_BUILD_CXX_SHARED_LIB)
     add_subdirectory(comboFederates_cpp_shared)
 endif()
+
+add_subdirectory(interopExample)
