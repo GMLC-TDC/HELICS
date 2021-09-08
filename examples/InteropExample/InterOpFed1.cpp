@@ -7,13 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 
-
 #include <iostream>
 #include <thread>
 
 int main(int argc, char* argv[])
 {
-    
     helics::FederateInfo fi(argc, argv);
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     helics::BrokerApp brk(fi.coreType, fi.brokerInitString + " -f 2");
@@ -22,7 +20,7 @@ int main(int argc, char* argv[])
     auto name = cFed->getName();
 
     helics::SmallBuffer mbuf(256, 0);
-    for (int ii=0;ii<256;++ii) {
+    for (int ii = 0; ii < 256; ++ii) {
         mbuf[ii] = std::byte(ii);
     }
     // this line actually creates an endpoint
@@ -42,30 +40,26 @@ int main(int argc, char* argv[])
         ept.sendTo(message.data(), message.size(), "ioFed2/ept");
         ept.sendTo(mbuf, "ioFed2/ept");
         pubid.publish(i);
-        
+
         auto newTime = cFed->requestTime(i);
-        
 
         if (cFed->isUpdated(subid)) {
             auto val = subid.getValue<int>();
-            if (val != i)
-            {
+            if (val != i) {
                 passed = false;
             }
-        } else
-        {
+        } else {
             passed = false;
         }
-        if (ept.pendingMessageCount() != 2)
-        {
+        if (ept.pendingMessageCount() != 2) {
             passed = false;
         } else {
             auto m1 = ept.getMessage();
-            if (m1->data.to_string().find(mback)==std::string_view::npos) {
+            if (m1->data.to_string().find(mback) == std::string_view::npos) {
                 passed = false;
             }
             auto m2 = ept.getMessage();
-            if (mbuf!=m2->data) {
+            if (mbuf != m2->data) {
                 passed = false;
             }
         }

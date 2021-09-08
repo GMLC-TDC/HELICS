@@ -540,7 +540,6 @@ TEST(ActionMessage, jsonconversion_test_binary_strings)
     EXPECT_TRUE(cmd.getStringData() == cmd2.getStringData());
 }
 
-
 TEST(ActionMessage, jsonconversion_test_binary_strings2)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
@@ -553,7 +552,7 @@ TEST(ActionMessage, jsonconversion_test_binary_strings2)
     setActionFlag(cmd, error_flag);
     cmd.actionTime = 45.7;
     cmd.payload = helics::SmallBuffer(256, 0);
-    for (int ii=0;ii<256;++ii) {
+    for (int ii = 0; ii < 256; ++ii) {
         cmd.payload[ii] = std::byte(ii);
     }
 
