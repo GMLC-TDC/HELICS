@@ -964,6 +964,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     setState(HELICS_ERROR);
                     return MessageProcessingResult::ERROR_RESULT;
                 }
+                timeCoord->enterInitialization();
                 break;
             case HELICS_EXECUTING:
                 timeCoord->updateTimeFactors();
