@@ -629,6 +629,20 @@ If specified on a federate, setting this flag indicates the federate may be slow
 
 If applied to a core or broker (`--slow_responding` in the `core_init_string` or `broker_init_string`, respectively), it is indicative that the broker doesn't respond to internal pings quickly and should not be disconnected from the federation for the slow response.
 
+---
+
+### `event_triggered` [false]
+
+_API:_ `helicsFederateInfoSetTimeProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
+| [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
+
+_Property's enumerated name:_ `HELICS_FLAG_EVENT_TRIGGERED` []
+
+For federates that are event-driven rather than timing driven, this flag must be set (to increase timing efficiency and avoid timing lock-ups). Event-driven federates are those that don't progress through simulation time at regular timesteps but instead wait for arriving messages to act. The most common examples are controller federates which generally request infinite time (well, `HELICS_TIME_MAXTIME`) and rely on HELICS to grant them an earlier time whenever a signal (often message) has arrived. Filter federates are another common federate type that must have this flag set.
+
 ## Iteration
 
 ### `forward_compute` | `forwardcompute` | `forwardCompute` [false]
