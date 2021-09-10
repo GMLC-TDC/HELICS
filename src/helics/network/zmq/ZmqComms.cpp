@@ -277,6 +277,9 @@ namespace zeromq {
                         return (-3);
                     }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
+                    if (useJsonSerialization) {
+                        setActionFlag(getPorts, use_json_serialization_flag);
+                    }
                     auto str =
                         (useJsonSerialization) ? getPorts.to_json_string() : getPorts.to_string();
 

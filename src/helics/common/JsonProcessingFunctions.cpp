@@ -97,6 +97,7 @@ std::string getKey(const Json::Value& element)
 std::string generateJsonString(const Json::Value& block)
 {
     Json::StreamWriterBuilder builder;
+    builder["emitUTF8"] = true;
     builder["commentStyle"] = "None";
     builder["indentation"] = "   ";  // or whatever you like
     auto writer = std::unique_ptr<Json::StreamWriter>(builder.newStreamWriter());
