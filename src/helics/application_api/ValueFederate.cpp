@@ -73,6 +73,7 @@ ValueFederate::ValueFederate() = default;
 ValueFederate::ValueFederate(bool /*res*/)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager->useJsonSerialization = useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(ValueFederate&&) noexcept = default;

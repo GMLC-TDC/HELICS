@@ -8,19 +8,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CombinationFederate.hpp"
 
 #include <iostream>
-#include <thread>
+
+#include "helics/application_api/Endpoints.hpp"
+#include "helics/application_api/Subscriptions.hpp"
+#include "helics/application_api/Publications.hpp"
 
 int main(int argc, char* argv[])
 {
     helics::FederateInfo fi(argc, argv);
-    fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+    fi.setProperty(helics_property_time_period, 1.0);
 
     auto cFed = std::make_unique<helics::CombinationFederate>("ioFed2", fi);
     auto name = cFed->getName();
 
-    helics::SmallBuffer mbuf(256, 0);
+    helics::data_block mbuf(256, 0);
     for (int ii = 0; ii < 256; ++ii) {
-        mbuf[ii] = std::byte(ii);
+        mbuf[ii] = char(ii);
     }
     // this line actually creates an endpoint
     auto& ept = cFed->registerEndpoint("ept");
@@ -36,8 +39,8 @@ int main(int argc, char* argv[])
         std::string mback = std::string(" at time ") + std::to_string(i);
         std::string message = std::string("message sent from ioFed2 to ioFed1");
         message.append(mback);
-        ept.sendTo(message.data(), message.size(), "ioFed1/ept");
-        ept.sendTo(mbuf, "ioFed1/ept");
+        ept.send("ioFed1/ept", message.data(), message.size() );
+        ept.send("ioFed1/ept", mbuf);
         pubid.publish(i);
 
         auto newTime = cFed->requestTime(i);
@@ -50,11 +53,11 @@ int main(int argc, char* argv[])
         } else {
             passed = false;
         }
-        if (ept.pendingMessageCount() != 2) {
+        if (ept.pendingMessages() != 2) {
             passed = false;
         } else {
             auto m1 = ept.getMessage();
-            if (m1->data.to_string().find(mback) == std::string_view::npos) {
+            if (m1->data.to_string().find(mback) == std::string::npos) {
                 passed = false;
             }
             auto m2 = ept.getMessage();

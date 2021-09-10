@@ -541,17 +541,17 @@ TEST(ActionMessage, jsonconversion_test_binary_strings)
 TEST(ActionMessage, jsonconversion_test_binary_strings2)
 {
     helics::ActionMessage cmd(helics::CMD_SEND_MESSAGE);
-    cmd.source_id = GlobalFederateId{1};
-    cmd.source_handle = InterfaceHandle{2};
-    cmd.dest_id = GlobalFederateId{3};
-    cmd.dest_handle = InterfaceHandle{4};
+    cmd.source_id = global_federate_id{1};
+    cmd.source_handle = interface_handle{2};
+    cmd.dest_id = global_federate_id{3};
+    cmd.dest_handle = interface_handle{4};
     setActionFlag(cmd, iteration_requested_flag);
     setActionFlag(cmd, required_flag);
     setActionFlag(cmd, error_flag);
     cmd.actionTime = 45.7;
-    cmd.payload = helics::SmallBuffer(256, 0);
+    cmd.payload = std::string(256, '\0');
     for (int ii = 0; ii < 256; ++ii) {
-        cmd.payload[ii] = std::byte(ii);
+        cmd.payload[ii] = char(ii);
     }
 
     cmd.setStringData("target", std::string(987, '\0'), "original_source");

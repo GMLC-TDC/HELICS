@@ -73,7 +73,12 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
 
 ActionMessage::ActionMessage(const char* data, size_t size): ActionMessage()
 {
-    fromByteArray(data, static_cast<int>(size));
+    auto result = fromByteArray(data, static_cast<int>(size));
+    if (result == 0U && size > 0 && data[0] == '{') {
+        if (!from_json_string(data)) {
+            messageAction = CMD_INVALID;
+        }
+    }
 }
 
 ActionMessage::~ActionMessage() = default;
