@@ -572,7 +572,7 @@ int ActionMessage::depacketize(const char* data, int buffer_size)
 std::size_t ActionMessage::from_string(const std::string& data)
 {
     auto result = fromByteArray(data.data(), static_cast<int>(data.size()));
-    if (result == 0U && data.size() > 0 && data.front() == '{') {
+    if (result == 0U && !data.empty() && data.front() == '{') {
         if (from_json_string(data)) {
             return data.size();
         }
@@ -617,7 +617,7 @@ bool ActionMessage::from_json_string(const std::string& data)
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
     std::size_t bytesUsed = fromByteArray(data.data(), static_cast<int>(data.size()));
-    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
+    if (bytesUsed == 0 && !data.empty() && data.front() == '{') {
         if (from_json_string(std::string(data.data(), data.size()))) {
             return data.size();
         }
