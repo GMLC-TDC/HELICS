@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/Publications.hpp"
+#include "helics/application_api/Subscriptions.hpp"
 
 #include <iostream>
 
@@ -39,9 +39,9 @@ int main(int argc, char* argv[])
         std::string mback = std::string(" at time ") + std::to_string(i);
         std::string message = std::string("message sent from ioFed1 to ioFed2");
         message.append(mback);
-        ept.send("ioFed2/ept", message.data(), message.size() );
+        ept.send("ioFed2/ept", message.data(), message.size());
         ept.send("ioFed2/ept", mbuf);
-        
+
         pubid.publish(i);
 
         auto newTime = cFed->requestTime(i);
