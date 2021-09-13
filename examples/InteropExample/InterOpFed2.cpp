@@ -32,19 +32,19 @@ int main(int argc, char* argv[])
     cFed->enterInitializingMode();
     cFed->enterExecutingMode();
     bool passed{true};
-    for (int i = 1; i < 10; ++i) {
-        std::string mback = std::string(" at time ") + std::to_string(i);
+    for (int ii = 1; ii < 10; ++ii) {
+        std::string mback = std::string(" at time ") + std::to_string(ii);
         std::string message = std::string("message sent from ioFed2 to ioFed1");
         message.append(mback);
         ept.sendTo(message.data(), message.size(), "ioFed1/ept");
         ept.sendTo(mbuf, "ioFed1/ept");
-        pubid.publish(i);
+        pubid.publish(ii);
 
-        auto newTime = cFed->requestTime(i);
+        cFed->requestTime(ii);
 
         if (cFed->isUpdated(subid)) {
             auto val = subid.getValue<int>();
-            if (val != i) {
+            if (val != ii) {
                 passed = false;
             }
         } else {

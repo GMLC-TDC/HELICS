@@ -24,8 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace zeromq {
+namespace helics::zeromq {
     void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
         NetworkCommsInterface::loadNetworkInfo(netInfo);
@@ -597,5 +596,4 @@ namespace zeromq {
         }
     }
 
-}  // namespace zeromq
-}  // namespace helics
+}  // namespace helics::zeromq
