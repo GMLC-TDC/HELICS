@@ -80,7 +80,7 @@ ActionMessage::ActionMessage(const std::vector<char>& bytes): ActionMessage()
 
 ActionMessage::ActionMessage(const void* data, size_t size): ActionMessage()
 {
-    from_string(std::string(static_cast<const char*>(data), size));
+    from_string(std::string_view(static_cast<const char*>(data), size));
 }
 
 ActionMessage::~ActionMessage() = default;
@@ -575,7 +575,7 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
 std::size_t ActionMessage::from_string(std::string_view data)
 {
     auto result = fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (result == 0U && data.size() > 0 && data.front() == '{') {
+    if (result == 0U && !data.empty() && data.front() == '{') {
         if (from_json_string(data)) {
             return data.size();
         }
@@ -621,7 +621,7 @@ std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
     std::size_t bytesUsed =
         fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
-    if (bytesUsed == 0 && data.size() > 0 && data.front() == '{') {
+    if (bytesUsed == 0 && !data.empty() && data.front() == '{') {
         if (from_json_string(std::string_view(data.data(), data.size()))) {
             return data.size();
         }
