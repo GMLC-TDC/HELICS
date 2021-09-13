@@ -10,13 +10,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[]) // NOLINT
 {
     helics::FederateInfo fi(argc, argv);
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
 
     auto cFed = std::make_unique<helics::CombinationFederate>("ioFed2", fi);
-    auto name = cFed->getName();
 
     helics::SmallBuffer mbuf(256, 0);
     for (int ii = 0; ii < 256; ++ii) {
