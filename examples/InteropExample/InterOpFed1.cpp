@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-int main(int argc, char* argv[]) // NOLINT
+int main(int argc, char* argv[])  // NOLINT
 {
     helics::FederateInfo fi(argc, argv);
     fi.setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
