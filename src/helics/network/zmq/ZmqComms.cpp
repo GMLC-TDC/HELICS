@@ -276,8 +276,7 @@ namespace helics::zeromq {
                         return (-3);
                     }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
-                    if (useJsonSerialization)
-                    {
+                    if (useJsonSerialization) {
                         setActionFlag(getPorts, use_json_serialization_flag);
                     }
                     auto str =
