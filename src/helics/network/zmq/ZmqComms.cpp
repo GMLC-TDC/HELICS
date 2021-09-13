@@ -24,8 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace zeromq {
+namespace helics::zeromq {
     void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
         NetworkCommsInterface::loadNetworkInfo(netInfo);
@@ -277,6 +276,9 @@ namespace zeromq {
                         return (-3);
                     }
                     ActionMessage getPorts = generatePortRequest((serverMode) ? 2 : 1);
+                    if (useJsonSerialization) {
+                        setActionFlag(getPorts, use_json_serialization_flag);
+                    }
                     auto str =
                         (useJsonSerialization) ? getPorts.to_json_string() : getPorts.to_string();
 
@@ -593,5 +595,4 @@ namespace zeromq {
         }
     }
 
-}  // namespace zeromq
-}  // namespace helics
+}  // namespace helics::zeromq
