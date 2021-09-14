@@ -629,6 +629,10 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
+    if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER))
+    {
+        setActionFlag(m, observer_flag);
+    }
     addActionMessage(m);
     // check some properties that should be inherited from the federate if it is the first one
     if (checkProperties) {
