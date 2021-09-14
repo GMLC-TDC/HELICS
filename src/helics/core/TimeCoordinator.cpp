@@ -861,12 +861,19 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
         if (ret == MessageProcessingResult::NEXT_STEP)
         {
             updateTimeFactors();
-            time_granted = generateAllowedTime(total.next) - info.period;
+            if (dependencyCount() > 0)
+            {
+                time_granted =
+                    generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
+            }
+            else {
+                time_granted = timeZero;
+            }
             time_grantBase = time_granted;
             executionMode=true;
             iteration = 0;
 
-            ActionMessage execgrant(CMD_TIME_GRANT);
+            ActionMessage execgrant(time_granted>timeZero?CMD_TIME_GRANT:CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             execgrant.actionTime = time_granted;
             transmitTimingMessages(execgrant);

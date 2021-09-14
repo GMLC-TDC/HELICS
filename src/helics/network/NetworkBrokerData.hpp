@@ -66,6 +66,7 @@ class NetworkBrokerData {
     bool noAckConnection{false};  //!< flag indicating that a connection ack message is not required
                                   //!< for broker connections
     bool useJsonSerialization{false};  //!< for message serialization use JSON
+    bool observer{false};  //!< specify that the network connection is used for observation only
     ServerModeOptions server_mode{ServerModeOptions::UNSPECIFIED};  //!< setup a server mode
   public:
     NetworkBrokerData() = default;

@@ -301,15 +301,15 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "json") {
             fi.useJsonSerialization = true;
-            // purposely not continuing here
+            // purposely not continuing here so the setFlagOption gets called
         }
         if (flg == "profiling") {
             fi.profilerFileName = "log";
-            // purposely not continuing here
+            // purposely not continuing here so the setFlagOption gets called
         }
         if (flg == "observer") {
             fi.observer = true;
-            //purposely not continuing here
+            //purposely not continuing here so the setFlagOption gets called
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
