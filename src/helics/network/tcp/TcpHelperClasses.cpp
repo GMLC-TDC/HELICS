@@ -36,11 +36,11 @@ void TcpConnection::startReceive()
         }
         if (!triggerhalt) {
             socket_.async_read_some(asio::buffer(data.data() + residBufferSize,
-                                               data.size() - residBufferSize),
-                                  [ptr = shared_from_this()](const std::error_code& err,
-                                                             size_t bytes) {
-                                      ptr->handle_read(err, bytes);
-                                  });
+                                                 data.size() - residBufferSize),
+                                    [ptr = shared_from_this()](const std::error_code& err,
+                                                               size_t bytes) {
+                                        ptr->handle_read(err, bytes);
+                                    });
             if (triggerhalt) {
                 // cancel previous operation if triggerhalt is now active
                 socket_.lowest_layer().cancel();
@@ -200,7 +200,8 @@ void TcpConnection::waitOnClose()
 
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200))) {
             std::cout << "wait timeout " << static_cast<int>(state.load()) << " "
-                      << socket_.lowest_layer().is_open() << " " << receivingHalt.isTriggered() << std::endl;
+                      << socket_.lowest_layer().is_open() << " " << receivingHalt.isTriggered()
+                      << std::endl;
 
             std::cout << "wait info " << context_.stopped() << " " << connecting << std::endl;
         }
@@ -228,8 +229,9 @@ TcpConnection::TcpConnection(asio::io_context& io_context,
     tcp::resolver resolver(io_context);
     tcp::resolver::query query(tcp::v4(), connection, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-    socket_.lowest_layer().async_connect(*endpoint_iterator,
-                          [this](const std::error_code& error) { connect_handler(error); });
+    socket_.lowest_layer().async_connect(*endpoint_iterator, [this](const std::error_code& error) {
+        connect_handler(error);
+    });
 }
 
 void TcpConnection::connect_handler(const std::error_code& error)
