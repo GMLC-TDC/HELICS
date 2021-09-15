@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
+#include <asio/io_context.hpp>
 #include <atomic>
 #include <future>
 #include <map>
@@ -26,8 +27,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <string>
 #include <utility>
-
-#include <asio/io_context.hpp>
 
 /** class defining a (potential) singleton Asio io_context manager for all asio usage*/
 class AsioContextManager: public std::enable_shared_from_this<AsioContextManager> {
