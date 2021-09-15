@@ -90,7 +90,7 @@ namespace tcp {
         template<typename Process>
         void send_async(const void* buffer, size_t dataLength, Process callback)
         {
-		socket_.async_write_some(asio::buffer(buffer, dataLength), callback);
+            socket_.async_write_some(asio::buffer(buffer, dataLength), callback);
         }
         /**perform an asynchronous receive operation
     @param buffer the data to send
@@ -116,11 +116,11 @@ namespace tcp {
                                               const std::error_code& error)> callback)
         {
             socket_.async_read_some(asio::buffer(data, data.size()),
-                                  [connection = shared_from_this(),
-                                   callback = std::move(callback)](const std::error_code& error,
-                                                                   size_t bytes_transferred) {
-                                      connection->handle_read(bytes_transferred, error, callback);
-                                  });
+                                    [connection = shared_from_this(),
+                                     callback = std::move(callback)](const std::error_code& error,
+                                                                     size_t bytes_transferred) {
+                                        connection->handle_read(bytes_transferred, error, callback);
+                                    });
         }
         /** check if the socket has finished the connection process*/
         bool isConnected() const
