@@ -45,11 +45,11 @@ namespace tcp {
             return pointer(new TcpConnection(io_context, bufferSize));
         }
         /** get the underlying socket object*/
-        asio::ip::tcp::socket& socket() { return socket_; }
+        auto& socket() { return socket_.lowest_layer(); }
         /** start the receiving loop*/
         void startReceive();
         /** cancel ongoing socket operations*/
-        void cancel() { socket_.cancel(); }
+        void cancel() { socket_.lowest_layer().cancel(); }
         /** close the socket*/
         void close();
         /** perform the close actions but don't wait for them to be processed*/
@@ -90,7 +90,7 @@ namespace tcp {
         template<typename Process>
         void send_async(const void* buffer, size_t dataLength, Process callback)
         {
-            socket_.async_send(asio::buffer(buffer, dataLength), callback);
+		socket_.async_write_some(asio::buffer(buffer, dataLength), callback);
         }
         /**perform an asynchronous receive operation
     @param buffer the data to send
@@ -103,7 +103,7 @@ namespace tcp {
         template<typename Process>
         void async_receive(void* buffer, size_t dataLength, Process callback)
         {
-            socket_.async_receive(asio::buffer(buffer, dataLength), callback);
+            socket_.async_read_some(asio::buffer(buffer, dataLength), callback);
         }
 
         /**perform an asynchronous receive operation
@@ -115,7 +115,7 @@ namespace tcp {
                                               size_t dataLength,
                                               const std::error_code& error)> callback)
         {
-            socket_.async_receive(asio::buffer(data, data.size()),
+            socket_.async_read_some(asio::buffer(data, data.size()),
                                   [connection = shared_from_this(),
                                    callback = std::move(callback)](const std::error_code& error,
                                                                    size_t bytes_transferred) {
