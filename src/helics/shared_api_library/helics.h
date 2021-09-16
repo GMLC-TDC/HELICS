@@ -852,6 +852,22 @@ HELICS_EXPORT void helicsFederateFinalizeAsync(helics_federate fed, helics_error
 HELICS_EXPORT void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err);
 
 /**
+ * Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it
+ * from the core.  This call is identical to helicsFederateFinalize.
+ */
+HELICS_EXPORT void helicsFederateDisconnect(helics_federate fed, helics_error* err);
+
+/**
+ * Disconnect/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync.
+ */
+HELICS_EXPORT void helicsFederateDisconnectAsync(helics_federate fed, helics_error* err);
+
+/**
+ * Complete the asynchronous disconnect/finalize call.  This call is identical to helicsFederateFinalizeComplete
+ */
+HELICS_EXPORT void helicsFederateDisconnectComplete(helics_federate fed, helics_error* err);
+
+/**
  * Release the memory associated with a federate.
  */
 HELICS_EXPORT void helicsFederateFree(helics_federate fed);

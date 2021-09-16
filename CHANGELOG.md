@@ -8,18 +8,30 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.8.0][] - 2021-09-10
+## [2.8.0][] - 2021-09-17
 
-Final Minor release in the 2.X series of HELICS. This includes a compatibility layer for future compatibility through the "--json" flag. There may be more bug fix releases
+Final Minor release in the 2.X series of HELICS. This includes profiling capabilities and a compatibility layer for future compatibility through the "--json" flag. There may be more bug fix releases but no major new features will be added to HELICS 2. 
 
 ### Changed
 
 - Upgraded Units library to 0.5.0
 - CMAKE 3.20 was tested and verified and used as the baseline version when available.
+- updated to a newer custom version of JSONCPP to support the json compatibility layer
 
 ### Fixed
 
+- The uninterruptible flag now works with iterations
+- a compile issue with C++20 requiring `#include <thread>` in a number of files
+
 ### Added
+
+- Added json data type and flag to support interoperability between HELICS 2 and 3
+- added `helicsEndpointPendingMessageCount`, `elicsFederatePendingMessageCount`, and `helicsFederateDisconnect(Async|Complete)`
+- added a [profiling capability](https://docs.helics.org/en/latest/user-guide/advanced_topics/profiling.html)
+
+### Deprecated
+
+- `helicsEndpointPendingMessages` and `helicsFederatePendingMessages` replaced by `helicsEndpointPendingMessageCount` and`elicsFederatePendingMessageCount` to match HELICS 3 functions
 
 ## [2.7.1][] - 2021-06-03
 
