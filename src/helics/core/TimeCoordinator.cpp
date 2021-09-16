@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-    static const Time bigTime(HELICS_BIG_NUMBER);
+static const Time bigTime(HELICS_BIG_NUMBER);
 
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
@@ -467,7 +467,7 @@ bool TimeCoordinator::updateTimeFactors()
     if (upstream.minDe < maxTime && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (info.event_triggered||time_requested>=bigTime) {
+    if (info.event_triggered || time_requested >= bigTime) {
         if (upstream.Te < maxTime) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
@@ -589,12 +589,12 @@ void TimeCoordinator::sendTimeRequest() const
         setActionFlag(upd, delayed_timing_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (info.event_triggered||time_requested>=bigTime) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (info.event_triggered || time_requested>=bigTime) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
 
         if (upd.Tdemin < upd.actionTime) {
@@ -615,7 +615,7 @@ void TimeCoordinator::sendTimeRequest() const
         if (upstream.minFed.isValid()) {
             upd.dest_id = upstream.minFed;
             upd.setExtraData(GlobalFederateId{}.baseValue());
-            if (info.event_triggered || time_requested>=bigTime) {
+            if (info.event_triggered || time_requested >= bigTime) {
                 upd.Te = checkAdd(time_exec, info.outputDelay);
                 upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
             }
