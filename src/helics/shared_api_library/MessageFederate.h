@@ -238,7 +238,10 @@ HELICS_EXPORT helics_bool helicsFederateHasMessage(helics_federate fed);
 HELICS_EXPORT helics_bool helicsEndpointHasMessage(helics_endpoint endpoint);
 
 /**
- * Deprecated please use helicsFederatePendingMessageCount instead
+ * Deprecated, please use helicsFederatePendingMessageCount instead.
+ * Returns the number of pending receives for the specified destination endpoint.
+ *
+ * @param fed The federate to get the number of waiting messages from.
  */
 HELICS_DEPRECATED_EXPORT int helicsFederatePendingMessages(helics_federate fed);
 
@@ -250,6 +253,7 @@ HELICS_DEPRECATED_EXPORT int helicsFederatePendingMessages(helics_federate fed);
 HELICS_EXPORT int helicsFederatePendingMessageCount(helics_federate fed);
 
 /**
+ * Deprecated, please use helicsEndpointPendingMessageCount instead.
  * Returns the number of pending receives for all endpoints of a particular federate.
  *
  * @param endpoint The endpoint to query.

@@ -16,22 +16,22 @@ Final Minor release in the 2.X series of HELICS. This includes profiling capabil
 
 - Upgraded Units library to 0.5.0
 - CMAKE 3.20 was tested and verified and used as the baseline version when available.
-- updated to a newer custom version of JSONCPP to support the json compatibility layer
+- Updated to a newer custom version of JSONCPP to support the json compatibility layer
 
 ### Fixed
 
 - The uninterruptible flag now works with iterations
-- a compile issue with C++20 requiring `#include <thread>` in a number of files
+- A compile issue with C++20 requiring `#include <thread>` in a number of files
 
 ### Added
 
 - Added json data type and flag to support interoperability between HELICS 2 and 3
-- added `helicsEndpointPendingMessageCount`, `elicsFederatePendingMessageCount`, and `helicsFederateDisconnect(Async|Complete)`
-- added a [profiling capability](https://docs.helics.org/en/latest/user-guide/advanced_topics/profiling.html)
+- Added `helicsEndpointPendingMessageCount`, `helicsFederatePendingMessageCount`, and `helicsFederateDisconnect[Async|Complete]`
+- Added a [profiling capability](https://docs.helics.org/en/latest/user-guide/advanced_topics/profiling.html)
 
 ### Deprecated
 
-- `helicsEndpointPendingMessages` and `helicsFederatePendingMessages` replaced by `helicsEndpointPendingMessageCount` and`elicsFederatePendingMessageCount` to match HELICS 3 functions
+- `helicsEndpointPendingMessages` and `helicsFederatePendingMessages` are replaced by `helicsEndpointPendingMessageCount` and`helicsFederatePendingMessageCount` to match HELICS 3 functions
 
 ## [2.7.1][] - 2021-06-03
 
