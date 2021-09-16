@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [2.8.0][] - 2021-09-17
 
-Final Minor release in the 2.X series of HELICS. This includes profiling capabilities and a compatibility layer for future compatibility through the "--json" flag. There may be more bug fix releases but no major new features will be added to HELICS 2. 
+Final Minor release in the 2.X series of HELICS. This includes profiling capabilities and a compatibility layer for future compatibility through the "--json" flag. There may be more bug fix releases but no major new features will be added to HELICS 2.
 
 ### Changed
 
