@@ -263,7 +263,6 @@ HELICS_DEPRECATED_EXPORT int helicsEndpointPendingMessages(helics_endpoint endpo
  */
 HELICS_EXPORT int helicsEndpointPendingMessageCount(helics_endpoint endpoint);
 
-
 /**
  * Receive a packet from a particular endpoint.
  *
