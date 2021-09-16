@@ -363,6 +363,8 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
+const double HELICS_BIG_NUMBER = 9223372036.854774;
+
 #ifdef __cplusplus
 } /* end of extern "C" { */
 #endif

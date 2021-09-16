@@ -72,6 +72,7 @@ class TimeCoordinator {
     time(usually time granted unless values are changing) */
     Time time_grantBase = Time::minVal();
     Time time_block = Time::maxVal();  //!< a blocking time to not grant time >= the specified time
+    Time maxTime = Time::maxVal();
     /// these are to maintain an accessible record of dependent federates
     shared_guarded_m<std::vector<GlobalFederateId>> dependent_federates;
     /// these are to maintain an accessible record of dependency federates
