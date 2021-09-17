@@ -1352,6 +1352,21 @@ def helicsFederateFinalizeComplete(fed: "helics_federate") -> "void":
     r"""Complete the asynchronous finalize call."""
     return _helics.helicsFederateFinalizeComplete(fed)
 
+def helicsFederateDisconnect(fed: "helics_federate") -> "void":
+    r"""
+    Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it
+    from the core.  This call is identical to helicsFederateFinalize.
+    """
+    return _helics.helicsFederateDisconnect(fed)
+
+def helicsFederateDisconnectAsync(fed: "helics_federate") -> "void":
+    r"""Disconnect/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync."""
+    return _helics.helicsFederateDisconnectAsync(fed)
+
+def helicsFederateDisconnectComplete(fed: "helics_federate") -> "void":
+    r"""Complete the asynchronous disconnect/finalize call.  This call is identical to helicsFederateFinalizeComplete."""
+    return _helics.helicsFederateDisconnectComplete(fed)
+
 def helicsFederateFree(fed: "helics_federate") -> "void":
     r"""Release the memory associated with a federate."""
     return _helics.helicsFederateFree(fed)
@@ -3357,6 +3372,7 @@ def helicsEndpointHasMessage(endpoint: "helics_endpoint") -> "helics_bool":
 
 def helicsFederatePendingMessages(fed: "helics_federate") -> "int":
     r"""
+    Deprecated, please use helicsFederatePendingMessageCount instead.
     Returns the number of pending receives for the specified destination endpoint.
 
     :type fed: void
@@ -3364,14 +3380,33 @@ def helicsFederatePendingMessages(fed: "helics_federate") -> "int":
     """
     return _helics.helicsFederatePendingMessages(fed)
 
+def helicsFederatePendingMessageCount(fed: "helics_federate") -> "int":
+    r"""
+    Returns the number of pending receives for the specified destination endpoint.
+
+    :type fed: void
+    :param fed: The federate to get the number of waiting messages from.
+    """
+    return _helics.helicsFederatePendingMessageCount(fed)
+
 def helicsEndpointPendingMessages(endpoint: "helics_endpoint") -> "int":
     r"""
+    Deprecated, please use helicsEndpointPendingMessageCount instead.
     Returns the number of pending receives for all endpoints of a particular federate.
 
     :type endpoint: void
     :param endpoint: The endpoint to query.
     """
     return _helics.helicsEndpointPendingMessages(endpoint)
+
+def helicsEndpointPendingMessageCount(endpoint: "helics_endpoint") -> "int":
+    r"""
+    Returns the number of pending receives for all endpoints of a particular federate.
+
+    :type endpoint: void
+    :param endpoint: The endpoint to query.
+    """
+    return _helics.helicsEndpointPendingMessageCount(endpoint)
 
 def helicsEndpointGetMessage(endpoint: "helics_endpoint") -> "helics_message":
     r"""

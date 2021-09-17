@@ -1,3 +1,3 @@
 function varargout = helicsEndpointGetMessage(varargin)
-  [varargout{1:nargout}] = helicsMEX(264, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(269, varargin{:});
 end
