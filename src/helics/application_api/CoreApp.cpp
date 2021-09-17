@@ -166,6 +166,13 @@ bool CoreApp::waitForDisconnect(std::chrono::milliseconds waitTime)
     return true;
 }
 
+void CoreApp::linkEndpoints(const std::string& source, const std::string& target)
+{
+    if (core) {
+        core->linkEndpoints(source, target);
+    }
+}
+
 void CoreApp::dataLink(const std::string& source, const std::string& target)
 {
     if (core) {

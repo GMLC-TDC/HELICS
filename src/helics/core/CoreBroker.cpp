@@ -168,6 +168,14 @@ void CoreBroker::makeConnections(const std::string& file)
     }
 }
 
+void CoreBroker::linkEndpoints(const std::string& source, const std::string& dest)
+{
+    ActionMessage M(CMD_ENDPOINT_LINK);
+    M.name(source);
+    M.setStringData(dest);
+    addActionMessage(std::move(M));
+}
+
 void CoreBroker::dataLink(const std::string& publication, const std::string& input)
 {
     ActionMessage M(CMD_DATA_LINK);
