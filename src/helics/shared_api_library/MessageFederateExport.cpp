@@ -353,7 +353,7 @@ helics_bool helicsEndpointHasMessage(helics_endpoint endpoint)
     return (endObj->endPtr->hasMessage()) ? helics_true : helics_false;
 }
 
-int helicsFederatePendingMessages(helics_federate fed)
+int helicsFederatePendingMessageCount(helics_federate fed)
 {
     auto* mFed = getMessageFed(fed, nullptr);
     if (mFed == nullptr) {
@@ -362,7 +362,12 @@ int helicsFederatePendingMessages(helics_federate fed)
     return static_cast<int>(mFed->pendingMessages());
 }
 
-int helicsEndpointPendingMessages(helics_endpoint endpoint)
+int helicsFederatePendingMessages(helics_federate fed)
+{
+    return helicsFederatePendingMessageCount(fed);
+}
+
+int helicsEndpointPendingMessageCount(helics_endpoint endpoint)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
@@ -370,6 +375,12 @@ int helicsEndpointPendingMessages(helics_endpoint endpoint)
     }
     return static_cast<int>(endObj->endPtr->pendingMessages());
 }
+
+int helicsEndpointPendingMessages(helics_endpoint endpoint)
+{
+    return helicsEndpointPendingMessageCount(endpoint);
+}
+
 static constexpr uint16_t messageKeyCode = 0xB3;
 
 namespace helics {

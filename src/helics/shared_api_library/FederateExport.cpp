@@ -650,6 +650,21 @@ void helicsFederateFinalizeComplete(helics_federate fed, helics_error* err)
     // LCOV_EXCL_STOP
 }
 
+void helicsFederateDisconnect(helics_federate fed, helics_error* err)
+{
+    helicsFederateFinalize(fed, err);
+}
+
+void helicsFederateDisconnectAsync(helics_federate fed, helics_error* err)
+{
+    helicsFederateFinalizeAsync(fed, err);
+}
+
+void helicsFederateDisconnectComplete(helics_federate fed, helics_error* err)
+{
+    helicsFederateFinalizeComplete(fed, err);
+}
+
 /* initialization, execution, and time requests */
 void helicsFederateEnterInitializingMode(helics_federate fed, helics_error* err)
 {

@@ -342,10 +342,10 @@ TEST_P(mfed_type_tests, send_receive_2fed_multisend)
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(time, 1.0);
 
-    auto res = helicsEndpointPendingMessages(epid2);
+    auto res = helicsEndpointPendingMessageCount(epid2);
     EXPECT_EQ(res, 3);
 
-    res = helicsFederatePendingMessages(mFed2);
+    res = helicsFederatePendingMessageCount(mFed2);
     EXPECT_EQ(res, 3);
 
     EXPECT_STREQ(helicsEndpointGetDefaultDestination(epid), "ep2");
