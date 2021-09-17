@@ -918,6 +918,28 @@ public class helics {
   }
 
   /**
+   * Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it<br>
+   * from the core.  This call is identical to helicsFederateFinalize.
+   */
+  public static void helicsFederateDisconnect(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateDisconnect(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
+   * Disconnect/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync.
+   */
+  public static void helicsFederateDisconnectAsync(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateDisconnectAsync(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
+   * Complete the asynchronous disconnect/finalize call.  This call is identical to helicsFederateFinalizeComplete.
+   */
+  public static void helicsFederateDisconnectComplete(SWIGTYPE_p_void fed) {
+    helicsJNI.helicsFederateDisconnectComplete(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
    * Release the memory associated with a federate.
    */
   public static void helicsFederateFree(SWIGTYPE_p_void fed) {
@@ -2754,6 +2776,7 @@ public class helics {
   }
 
   /**
+   * Deprecated, please use helicsFederatePendingMessageCount instead.<br>
    * Returns the number of pending receives for the specified destination endpoint.<br>
    * <br>
    * @param fed The federate to get the number of waiting messages from.
@@ -2763,12 +2786,31 @@ public class helics {
   }
 
   /**
+   * Returns the number of pending receives for the specified destination endpoint.<br>
+   * <br>
+   * @param fed The federate to get the number of waiting messages from.
+   */
+  public static int helicsFederatePendingMessageCount(SWIGTYPE_p_void fed) {
+    return helicsJNI.helicsFederatePendingMessageCount(SWIGTYPE_p_void.getCPtr(fed));
+  }
+
+  /**
+   * Deprecated, please use helicsEndpointPendingMessageCount instead.<br>
    * Returns the number of pending receives for all endpoints of a particular federate.<br>
    * <br>
    * @param endpoint The endpoint to query.
    */
   public static int helicsEndpointPendingMessages(SWIGTYPE_p_void endpoint) {
     return helicsJNI.helicsEndpointPendingMessages(SWIGTYPE_p_void.getCPtr(endpoint));
+  }
+
+  /**
+   * Returns the number of pending receives for all endpoints of a particular federate.<br>
+   * <br>
+   * @param endpoint The endpoint to query.
+   */
+  public static int helicsEndpointPendingMessageCount(SWIGTYPE_p_void endpoint) {
+    return helicsJNI.helicsEndpointPendingMessageCount(SWIGTYPE_p_void.getCPtr(endpoint));
   }
 
   /**

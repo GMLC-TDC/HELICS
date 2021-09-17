@@ -262,6 +262,9 @@ public class helicsJNI {
   public final static native void helicsFederateFinalize(long jarg1);
   public final static native void helicsFederateFinalizeAsync(long jarg1);
   public final static native void helicsFederateFinalizeComplete(long jarg1);
+  public final static native void helicsFederateDisconnect(long jarg1);
+  public final static native void helicsFederateDisconnectAsync(long jarg1);
+  public final static native void helicsFederateDisconnectComplete(long jarg1);
   public final static native void helicsFederateFree(long jarg1);
   public final static native void helicsCloseLibrary();
   public final static native void helicsFederateEnterInitializingMode(long jarg1);
@@ -417,7 +420,9 @@ public class helicsJNI {
   public final static native int helicsFederateHasMessage(long jarg1);
   public final static native int helicsEndpointHasMessage(long jarg1);
   public final static native int helicsFederatePendingMessages(long jarg1);
+  public final static native int helicsFederatePendingMessageCount(long jarg1);
   public final static native int helicsEndpointPendingMessages(long jarg1);
+  public final static native int helicsEndpointPendingMessageCount(long jarg1);
   public final static native long helicsEndpointGetMessage(long jarg1);
   public final static native long helicsEndpointGetMessageObject(long jarg1);
   public final static native long helicsEndpointCreateMessageObject(long jarg1);

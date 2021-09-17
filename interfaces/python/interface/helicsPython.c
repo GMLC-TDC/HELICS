@@ -7078,6 +7078,126 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederateDisconnect(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDisconnect" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateDisconnect(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateDisconnectAsync(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDisconnectAsync" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateDisconnectAsync(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsFederateDisconnectComplete(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  helics_error *arg2 = (helics_error *) 0 ;
+  int res1 ;
+  helics_error etemp2 ;
+  PyObject *swig_obj[1] ;
+  
+  {
+    etemp2=helicsErrorInitialize();
+    arg2=&etemp2;
+  }
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateDisconnectComplete" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  helicsFederateDisconnectComplete(arg1,arg2);
+  resultobj = SWIG_Py_Void();
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return resultobj;
+fail:
+  {
+    if (arg2->error_code!=helics_ok)
+    {
+      throwHelicsPythonException(arg2);
+      return NULL;
+    }
+  }
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsFederateFree(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_federate arg1 = (helics_federate) 0 ;
@@ -14032,6 +14152,27 @@ fail:
 }
 
 
+SWIGINTERN PyObject *_wrap_helicsFederatePendingMessageCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_federate arg1 = (helics_federate) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederatePendingMessageCount" "', argument " "1"" of type '" "helics_federate""'"); 
+  }
+  result = (int)helicsFederatePendingMessageCount(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
 SWIGINTERN PyObject *_wrap_helicsEndpointPendingMessages(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
   PyObject *resultobj = 0;
   helics_endpoint arg1 = (helics_endpoint) 0 ;
@@ -14046,6 +14187,27 @@ SWIGINTERN PyObject *_wrap_helicsEndpointPendingMessages(PyObject *SWIGUNUSEDPAR
     SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointPendingMessages" "', argument " "1"" of type '" "helics_endpoint""'"); 
   }
   result = (int)helicsEndpointPendingMessages(arg1);
+  resultobj = SWIG_From_int((int)(result));
+  return resultobj;
+fail:
+  return NULL;
+}
+
+
+SWIGINTERN PyObject *_wrap_helicsEndpointPendingMessageCount(PyObject *SWIGUNUSEDPARM(self), PyObject *args) {
+  PyObject *resultobj = 0;
+  helics_endpoint arg1 = (helics_endpoint) 0 ;
+  int res1 ;
+  PyObject *swig_obj[1] ;
+  int result;
+  
+  if (!args) SWIG_fail;
+  swig_obj[0] = args;
+  res1 = SWIG_ConvertPtr(swig_obj[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsEndpointPendingMessageCount" "', argument " "1"" of type '" "helics_endpoint""'"); 
+  }
+  result = (int)helicsEndpointPendingMessageCount(arg1);
   resultobj = SWIG_From_int((int)(result));
   return resultobj;
 fail:
@@ -17209,6 +17371,12 @@ static PyMethodDef SwigMethods[] = {
 	 { "helicsFederateFinalize", _wrap_helicsFederateFinalize, METH_O, "Finalize the federate. This function halts all communication in the federate and disconnects it from the core."},
 	 { "helicsFederateFinalizeAsync", _wrap_helicsFederateFinalizeAsync, METH_O, "Finalize the federate in an async call."},
 	 { "helicsFederateFinalizeComplete", _wrap_helicsFederateFinalizeComplete, METH_O, "Complete the asynchronous finalize call."},
+	 { "helicsFederateDisconnect", _wrap_helicsFederateDisconnect, METH_O, "\n"
+		"Disconnect/finalize the federate. This function halts all communication in the federate and disconnects it\n"
+		"from the core.  This call is identical to helicsFederateFinalize.\n"
+		""},
+	 { "helicsFederateDisconnectAsync", _wrap_helicsFederateDisconnectAsync, METH_O, "Disconnect/finalize the federate in an async call.  This call is identical to helicsFederateFinalizeAsync."},
+	 { "helicsFederateDisconnectComplete", _wrap_helicsFederateDisconnectComplete, METH_O, "Complete the asynchronous disconnect/finalize call.  This call is identical to helicsFederateFinalizeComplete."},
 	 { "helicsFederateFree", _wrap_helicsFederateFree, METH_O, "Release the memory associated with a federate."},
 	 { "helicsCloseLibrary", _wrap_helicsCloseLibrary, METH_NOARGS, "\n"
 		"Call when done using the helics library.\n"
@@ -18751,12 +18919,26 @@ static PyMethodDef SwigMethods[] = {
 		":return: helics_true if the endpoint has a message, helics_false otherwise.\n"
 		""},
 	 { "helicsFederatePendingMessages", _wrap_helicsFederatePendingMessages, METH_O, "\n"
+		"Deprecated, please use helicsFederatePendingMessageCount instead.\n"
+		"Returns the number of pending receives for the specified destination endpoint.\n"
+		"\n"
+		":type fed: void\n"
+		":param fed: The federate to get the number of waiting messages from.\n"
+		""},
+	 { "helicsFederatePendingMessageCount", _wrap_helicsFederatePendingMessageCount, METH_O, "\n"
 		"Returns the number of pending receives for the specified destination endpoint.\n"
 		"\n"
 		":type fed: void\n"
 		":param fed: The federate to get the number of waiting messages from.\n"
 		""},
 	 { "helicsEndpointPendingMessages", _wrap_helicsEndpointPendingMessages, METH_O, "\n"
+		"Deprecated, please use helicsEndpointPendingMessageCount instead.\n"
+		"Returns the number of pending receives for all endpoints of a particular federate.\n"
+		"\n"
+		":type endpoint: void\n"
+		":param endpoint: The endpoint to query.\n"
+		""},
+	 { "helicsEndpointPendingMessageCount", _wrap_helicsEndpointPendingMessageCount, METH_O, "\n"
 		"Returns the number of pending receives for all endpoints of a particular federate.\n"
 		"\n"
 		":type endpoint: void\n"
