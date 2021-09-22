@@ -976,6 +976,32 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 }
             }
         } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = handles.getEndpoint(command.name());
+            if (ept != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                setActionFlag(command, destination_target);
+                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                command.setSource(ept->handle);
+                checkForNamedInterface(command);
+            } else {
+                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
+                if (target == nullptr) {
+                    if (isRootc) {
+                        unknownHandles.addEndpointLink(std::string(command.name()),
+                                                   command.getString(targetStringLoc));
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    command.setSource(target->handle);
+                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
         case CMD_FILTER_LINK: {
             auto* filt = handles.getFilter(command.name());
             if (filt != nullptr) {
@@ -2243,7 +2269,16 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
     }
-
+    auto EptTargets = unknownHandles.checkForEndpointLinks(handleInfo.key);
+    for (const auto& ept : EptTargets) {
+        ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
+        m.name(ept);
+        m.setSource(handleInfo.handle);
+        setActionFlag(m, destination_target);
+        m.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+        checkForNamedInterface(m);
+    }
+    
     if (!Handles.empty()) {
         unknownHandles.clearEndpoint(handleInfo.key);
     }

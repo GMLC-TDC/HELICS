@@ -48,9 +48,62 @@ namespace fileops {
                         });
                     } else {
                         std::string ipt = getOrDefault(conn, "input", std::string());
-                        addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
-                            brk->dataLink(target, ipt);
+                        if (!ipt.empty()) {
+                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                            addTargets(conn, "sources", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                        } else {
+                            std::string ept = getOrDefault(conn, "endpoint", std::string());
+                            if (!ept.empty()) {
+                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(ept,target);
+                                });
+                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(target, ept);
+                                });
+                            }
+                        }
+                       
+                    }
+                }
+            }
+        }
+        auto lnks = toml::find_or(doc, "links", uVal);
+        if (!lnks.is_uninitialized()) {
+            auto& connArray = lnks.as_array();
+            for (const auto& conn : connArray) {
+                if (conn.is_array()) {
+                    auto& connAct = conn.as_array();
+                    brk->linkEndpoints(connAct[0].as_string(), connAct[1].as_string());
+                } else {
+                    std::string pub = getOrDefault(conn, "publication", std::string());
+                    if (!pub.empty()) {
+                        addTargets(conn, "targets", [brk, &pub](const std::string& target) {
+                            brk->dataLink(pub, target);
                         });
+                    } else {
+                        std::string ipt = getOrDefault(conn, "input", std::string());
+                        if (!ipt.empty()) {
+                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                            addTargets(conn, "sources", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                        } else {
+                            std::string ept = getOrDefault(conn, "endpoint", std::string());
+                            if (!ept.empty()) {
+                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(ept, target);
+                                });
+                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(target, ept);
+                                });
+                            }
+                        }
                     }
                 }
             }
@@ -109,7 +162,7 @@ namespace fileops {
 
         if (doc.isMember("connections")) {
             for (const auto& conn : doc["connections"]) {
-                if (conn.isArray()) {
+                if (conn.isArray() && conn.size()>=2) {
                     brk->dataLink(conn[0].asString(), conn[1].asString());
                 } else {
                     std::string pub = fileops::getOrDefault(conn, "publication", std::string());
@@ -119,9 +172,60 @@ namespace fileops {
                         });
                     } else {
                         std::string ipt = fileops::getOrDefault(conn, "input", std::string());
-                        addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
-                            brk->dataLink(target, ipt);
+                        if (!ipt.empty()) {
+                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                            addTargets(conn, "sources", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                        } else {
+                            std::string ept = fileops::getOrDefault(conn, "endpoint", std::string());
+                            if (!ept.empty()) {
+                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(ept, target);
+                                });
+                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(target, ept);
+                                });
+                            }
+                        }
+                        
+                    }
+                }
+            }
+        }
+        if (doc.isMember("links")) {
+            for (const auto& conn : doc["links"]) {
+                if (conn.isArray() && conn.size() >= 2) {
+                    brk->linkEndpoints(conn[0].asString(), conn[1].asString());
+                } else {
+                    std::string pub = fileops::getOrDefault(conn, "publication", std::string());
+                    if (!pub.empty()) {
+                        addTargets(conn, "targets", [brk, &pub](const std::string& target) {
+                            brk->dataLink(pub, target);
                         });
+                    } else {
+                        std::string ipt = fileops::getOrDefault(conn, "input", std::string());
+                        if (!ipt.empty()) {
+                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                            addTargets(conn, "sources", [brk, &ipt](const std::string& target) {
+                                brk->dataLink(target, ipt);
+                            });
+                        } else {
+                            std::string ept =
+                                fileops::getOrDefault(conn, "endpoint", std::string());
+                            if (!ipt.empty()) {
+                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(ept, target);
+                                });
+                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
+                                    brk->linkEndpoints(target, ept);
+                                });
+                            }
+                        }
                     }
                 }
             }

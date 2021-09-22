@@ -7,6 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/CombinationFederate.hpp"
+#include "helics/application_api/CoreApp.hpp"
+#include "helics/application_api/BrokerApp.hpp"
+#include "helics/core/Core.hpp"
 
 #include <gtest/gtest.h>
 #ifndef HELICS_SHARED_LIBRARY
@@ -420,6 +424,320 @@ TEST_P(mfed_all_type_tests, time_interruptions)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
+static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFederate>& vFed1,
+                              std::shared_ptr<helics::CombinationFederate>& vFed2,
+                              helics::Endpoint& ept1,
+                              helics::Endpoint& ept2)
+{
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+
+    bool correct = true;
+
+    auto f1finish = std::async(std::launch::async, [&]() { vFed1->enterExecutingMode(); });
+    vFed2->enterExecutingMode();
+    f1finish.wait();
+    // publish string1 at time=0.0;
+   ept1.send("string1");
+    auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
+    auto gtime = vFed2->requestTime(1.0);
+
+    EXPECT_EQ(gtime, 1.0);
+    if (gtime != 1.0) {
+        correct = false;
+    }
+    gtime = f1time.get();
+    EXPECT_EQ(gtime, 1.0);
+    if (gtime != 1.0) {
+        correct = false;
+    }
+    // get the value
+    auto s = ept2.getMessage();
+    if (s) {
+        // make sure the string is what we expect
+        EXPECT_EQ(s->to_string(), "string1");
+        if (s->to_string() != "string1") {
+            correct = false;
+        }
+    }
+else
+{
+    correct = false;
+}
+    
+    // publish a second string
+    ept1.send("string2");
+    // make sure the value is still what we expect
+    s = ept2.getMessage();
+    EXPECT_FALSE(s);
+    if (s) {
+        correct = false;
+    }
+    // advance time
+    f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(2.0); });
+    gtime = vFed2->requestTime(2.0);
+
+    EXPECT_EQ(gtime, 2.0);
+    if (gtime != 2.0) {
+        correct = false;
+    }
+    gtime = f1time.get();
+    EXPECT_EQ(gtime, 2.0);
+    if (gtime != 2.0) {
+        correct = false;
+    }
+    // make sure the value was updated
+
+    s = ept2.getMessage();
+    if (s) {
+        EXPECT_EQ(s->to_string(), "string2");
+        if (s->to_string() != "string2") {
+            correct = false;
+        }
+    } else {
+        correct = false;
+    }
+    vFed1->finalizeAsync();
+    vFed2->finalize();
+    vFed1->finalizeComplete();
+    return correct;
+}
+
+TEST_F(mfed_tests, dual_transfer_message_coreApp_link)
+{
+    SetupTest<helics::CombinationFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    helics::CoreApp cr(vFed1->getCorePointer());
+    cr.linkEndpoints("ept1", "ept2");
+    // register the endpoints
+
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_broker_link_late)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& broker = brokers[0];
+
+    // register the publications
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    broker->linkEndpoints("ept1", "ept2");
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_all_type_tests, dual_transfer_message_broker_link_direct)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& broker = brokers[0];
+
+    // register the endpoints
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    broker->linkEndpoints("ept1", "ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+static constexpr const char* simple_connection_files[] = {"example_connections5.json",
+                                                          "example_connections6.json",
+                                                          "example_connections5.toml",
+                                                          "example_connections6.toml"};
+
+class mfed_link_file: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
+};
+
+TEST_P(mfed_link_file, dual_transfer_message_broker_link_file)
+{
+    SetupTest<helics::CombinationFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& broker = brokers[0];
+
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    auto testFile = std::string(TEST_DIR) + GetParam();
+    broker->makeConnections(testFile);
+    // register the publications
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_F(mfed_tests, dual_transfer_message_broker_link_json_string)
+{
+    SetupTest<helics::CombinationFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& broker = brokers[0];
+
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    broker->makeConnections(R"({"links":[["ept1", "ept2"]]})");
+
+    // register the endpoints
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_core_link)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+    core->linkEndpoints("ept1", "ept2");
+    core = nullptr;
+    // register the endpoints
+    auto& ept1 = vFed1->registerGlobalTargetedEndpoint("ept1");
+    auto& ept2 = vFed2->registerGlobalTargetedEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    // register the publications
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+   
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    core->linkEndpoints("ept1", "ept2");
+    core = nullptr;
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late_switch)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    core->linkEndpoints("ept1", "ept2");
+    core = nullptr;
+    // register the publications
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_direct1)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    // register the publications
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    core->linkEndpoints("ept1", "ept2");
+    core = nullptr;
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_direct2)
+{
+    SetupTest<helics::CombinationFederate>(GetParam(), 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed2->getCorePointer();
+
+    // register the publications
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    core->linkEndpoints("ept1", "ept2");
+    core = nullptr;
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+TEST_P(mfed_link_file, dual_transfer_message_core_link_file)
+{
+    SetupTest<helics::CombinationFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    vFed2->registerGlobalInput<std::string>("inp1");
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    auto testFile = std::string(TEST_DIR) + GetParam();
+    core->makeConnections(testFile);
+    core = nullptr;
+    // register the publications
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    vFed1->registerGlobalPublication<std::string>("pub1");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+INSTANTIATE_TEST_SUITE_P(mfed_tests,
+                         mfed_link_file,
+                         ::testing::ValuesIn(simple_connection_files));
+
+TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
+{
+    SetupTest<helics::CombinationFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto core = vFed1->getCorePointer();
+
+    auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    core->makeConnections(R"({"links":[["ept1", "ept2"]]})");
+    core = nullptr;
+    // register the publications
+    auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
+    bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
+    EXPECT_TRUE(res);
+}
+
+
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_single_type_tests, ::testing::ValuesIn(CoreTypes_single));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_all_type_tests, ::testing::ValuesIn(CoreTypes_all));
+
+
