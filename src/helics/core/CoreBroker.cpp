@@ -990,7 +990,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 if (target == nullptr) {
                     if (isRootc) {
                         unknownHandles.addEndpointLink(std::string(command.name()),
-                                                   command.getString(targetStringLoc));
+                                                       command.getString(targetStringLoc));
                     } else {
                         routeMessage(command);
                     }
@@ -2278,7 +2278,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         m.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
         checkForNamedInterface(m);
     }
-    
+
     if (!Handles.empty()) {
         unknownHandles.clearEndpoint(handleInfo.key);
     }

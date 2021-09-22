@@ -5,11 +5,11 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/Endpoints.hpp"
-#include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api/BrokerApp.hpp"
+#include "helics/application_api/Endpoints.hpp"
+#include "helics/application_api/MessageFederate.hpp"
 #include "helics/core/Core.hpp"
 
 #include <gtest/gtest.h>
@@ -425,9 +425,9 @@ TEST_P(mfed_all_type_tests, time_interruptions)
 }
 
 static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFederate>& vFed1,
-                              std::shared_ptr<helics::CombinationFederate>& vFed2,
-                              helics::Endpoint& ept1,
-                              helics::Endpoint& ept2)
+                                       std::shared_ptr<helics::CombinationFederate>& vFed2,
+                                       helics::Endpoint& ept1,
+                                       helics::Endpoint& ept2)
 {
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -438,7 +438,7 @@ static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFedera
     vFed2->enterExecutingMode();
     f1finish.wait();
     // publish string1 at time=0.0;
-   ept1.send("string1");
+    ept1.send("string1");
     auto f1time = std::async(std::launch::async, [&]() { return vFed1->requestTime(1.0); });
     auto gtime = vFed2->requestTime(1.0);
 
@@ -459,12 +459,10 @@ static bool dual_transfer_test_message(std::shared_ptr<helics::CombinationFedera
         if (s->to_string() != "string1") {
             correct = false;
         }
+    } else {
+        correct = false;
     }
-else
-{
-    correct = false;
-}
-    
+
     // publish a second string
     ept1.send("string2");
     // make sure the value is still what we expect
@@ -531,7 +529,6 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_broker_link_late)
     // register the publications
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
 
-    
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->linkEndpoints("ept1", "ept2");
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
@@ -626,7 +623,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late)
 
     // register the publications
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
-   
+
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->linkEndpoints("ept1", "ept2");
     core = nullptr;
@@ -644,7 +641,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link_late_switch)
     auto core = vFed1->getCorePointer();
 
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     core->linkEndpoints("ept1", "ept2");
     core = nullptr;
@@ -700,7 +697,7 @@ TEST_P(mfed_link_file, dual_transfer_message_core_link_file)
 
     vFed2->registerGlobalInput<std::string>("inp1");
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     auto testFile = std::string(TEST_DIR) + GetParam();
     core->makeConnections(testFile);
@@ -712,9 +709,7 @@ TEST_P(mfed_link_file, dual_transfer_message_core_link_file)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests,
-                         mfed_link_file,
-                         ::testing::ValuesIn(simple_connection_files));
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_link_file, ::testing::ValuesIn(simple_connection_files));
 
 TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
 {
@@ -725,7 +720,7 @@ TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
     auto core = vFed1->getCorePointer();
 
     auto& ept1 = vFed1->registerGlobalEndpoint("ept1");
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     core->makeConnections(R"({"links":[["ept1", "ept2"]]})");
     core = nullptr;
@@ -735,9 +730,6 @@ TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
     EXPECT_TRUE(res);
 }
 
-
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_single_type_tests, ::testing::ValuesIn(CoreTypes_single));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_all_type_tests, ::testing::ValuesIn(CoreTypes_all));
-
-

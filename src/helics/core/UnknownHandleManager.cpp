@@ -49,7 +49,6 @@ void UnknownHandleManager::addEndpointLink(const std::string& source, const std:
     unknown_endpoint_links.emplace(source, target);
 }
 
-
 void UnknownHandleManager::addSourceFilterLink(const std::string& filter,
                                                const std::string& endpoint)
 {
@@ -111,7 +110,8 @@ std::vector<std::string> UnknownHandleManager::checkForLinks(const std::string& 
     return getTargets(unknown_links, newSource);
 }
 
-std::vector<std::string> UnknownHandleManager::checkForEndpointLinks(const std::string& newSource) const
+std::vector<std::string>
+    UnknownHandleManager::checkForEndpointLinks(const std::string& newSource) const
 {
     return getTargets(unknown_endpoint_links, newSource);
 }
@@ -146,13 +146,13 @@ bool UnknownHandleManager::hasUnknowns() const
 {
     return (!(unknown_publications.empty() && unknown_endpoints.empty() && unknown_inputs.empty() &&
               unknown_filters.empty() && unknown_links.empty() && unknown_endpoint_links.empty() &&
-              unknown_dest_filters.empty() &&
-              unknown_src_filters.empty()));
+              unknown_dest_filters.empty() && unknown_src_filters.empty()));
 }
 
 bool UnknownHandleManager::hasNonOptionalUnknowns() const
 {
-    if (!(unknown_links.empty() && unknown_endpoint_links.empty() && unknown_dest_filters.empty() && unknown_src_filters.empty())) {
+    if (!(unknown_links.empty() && unknown_endpoint_links.empty() && unknown_dest_filters.empty() &&
+          unknown_src_filters.empty())) {
         return true;
     }
     for (auto& upub : unknown_publications) {

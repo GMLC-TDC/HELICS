@@ -59,14 +59,13 @@ namespace fileops {
                             std::string ept = getOrDefault(conn, "endpoint", std::string());
                             if (!ept.empty()) {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
-                                    brk->linkEndpoints(ept,target);
+                                    brk->linkEndpoints(ept, target);
                                 });
                                 addTargets(conn, "sources", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(target, ept);
                                 });
                             }
                         }
-                       
                     }
                 }
             }
@@ -162,7 +161,7 @@ namespace fileops {
 
         if (doc.isMember("connections")) {
             for (const auto& conn : doc["connections"]) {
-                if (conn.isArray() && conn.size()>=2) {
+                if (conn.isArray() && conn.size() >= 2) {
                     brk->dataLink(conn[0].asString(), conn[1].asString());
                 } else {
                     std::string pub = fileops::getOrDefault(conn, "publication", std::string());
@@ -180,7 +179,8 @@ namespace fileops {
                                 brk->dataLink(target, ipt);
                             });
                         } else {
-                            std::string ept = fileops::getOrDefault(conn, "endpoint", std::string());
+                            std::string ept =
+                                fileops::getOrDefault(conn, "endpoint", std::string());
                             if (!ept.empty()) {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(ept, target);
@@ -190,7 +190,6 @@ namespace fileops {
                                 });
                             }
                         }
-                        
                     }
                 }
             }
