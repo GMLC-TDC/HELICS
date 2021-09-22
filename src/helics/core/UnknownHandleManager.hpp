@@ -32,6 +32,8 @@ class UnknownHandleManager {
     std::unordered_multimap<std::string, std::string>
         unknown_links;  //!< map where links on either side is not known
     std::unordered_multimap<std::string, std::string>
+        unknown_endpoint_links;  //!< map where endpoint links on either side is not known
+    std::unordered_multimap<std::string, std::string>
         unknown_src_filters;  //!< map connecting source filters to endpoints
     std::unordered_multimap<std::string, std::string>
         unknown_dest_filters;  //!< map connecting destination filters to endpoints
@@ -49,6 +51,9 @@ class UnknownHandleManager {
     void addUnknownFilter(const std::string& key, GlobalHandle target, uint16_t flags);
     /** add a data link where neither side is known*/
     void addDataLink(const std::string& source, const std::string& target);
+    /** add an endpoint link where neither side is known*/
+    void addEndpointLink(const std::string& source, const std::string& target);
+
     void addSourceFilterLink(const std::string& filter, const std::string& endpoint);
     void addDestinationFilterLink(const std::string& filter, const std::string& endpoint);
     /** specify a found input*/
@@ -63,6 +68,9 @@ class UnknownHandleManager {
 
     /** specify found data links*/
     std::vector<std::string> checkForLinks(const std::string& newSource) const;
+
+    /** specify found endpoint links*/
+    std::vector<std::string> checkForEndpointLinks(const std::string& newSource) const;
 
     std::vector<std::string> checkForFilterSourceTargets(const std::string& newFilter) const;
     std::vector<std::string> checkForFilterDestTargets(const std::string& newFilter) const;

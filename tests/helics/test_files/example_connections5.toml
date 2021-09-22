@@ -2,4 +2,6 @@
 connections=[
 ["pub1", "inp1"]
 ]
-
+links=[
+["ept1", "ept2"]
+]
