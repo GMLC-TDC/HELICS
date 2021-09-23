@@ -209,8 +209,8 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
     return false;
 }
 
-void UnknownHandleManager::processNonOptionalUnknowns( const 
-    std::function<void(const std::string&, char, GlobalHandle handle)> &cfunc) const
+void UnknownHandleManager::processNonOptionalUnknowns(
+    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(optional_flag)) != 0) {
@@ -239,8 +239,8 @@ void UnknownHandleManager::processNonOptionalUnknowns( const
     }
 }
 
-void UnknownHandleManager::processRequiredUnknowns( const
-    std::function<void(const std::string&, char, GlobalHandle handle)> &cfunc) const
+void UnknownHandleManager::processRequiredUnknowns(
+    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(required_flag)) != 0) {
