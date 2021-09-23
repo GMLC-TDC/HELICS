@@ -168,11 +168,11 @@ void CoreBroker::makeConnections(const std::string& file)
     }
 }
 
-void CoreBroker::linkEndpoints(const std::string& source, const std::string& dest)
+void CoreBroker::linkEndpoints(const std::string& source, const std::string& target)
 {
     ActionMessage M(CMD_ENDPOINT_LINK);
     M.name(source);
-    M.setStringData(dest);
+    M.setStringData(target);
     addActionMessage(std::move(M));
 }
 

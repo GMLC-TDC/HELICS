@@ -155,26 +155,26 @@ bool UnknownHandleManager::hasNonOptionalUnknowns() const
           unknown_src_filters.empty())) {
         return true;
     }
-    for (auto& upub : unknown_publications) {
+    for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         return true;
     }
-    for (auto& uept : unknown_endpoints) {
+    for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         return true;
     }
-    for (auto& uinp : unknown_inputs) {
+    for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         return true;
     }
 
-    for (auto& ufilt : unknown_filters) {
+    for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
@@ -185,23 +185,23 @@ bool UnknownHandleManager::hasNonOptionalUnknowns() const
 
 bool UnknownHandleManager::hasRequiredUnknowns() const
 {
-    for (auto& upub : unknown_publications) {
+    for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(required_flag)) != 0) {
             return true;
         }
     }
-    for (auto& uept : unknown_endpoints) {
+    for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(required_flag)) != 0) {
             return true;
         }
     }
-    for (auto& uinp : unknown_inputs) {
+    for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(required_flag)) != 0) {
             return true;
         }
     }
 
-    for (auto& ufilt : unknown_filters) {
+    for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(required_flag)) != 0) {
             return true;
         }
@@ -209,29 +209,29 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
     return false;
 }
 
-void UnknownHandleManager::processNonOptionalUnknowns(
-    std::function<void(const std::string&, char, GlobalHandle handle)> cfunc) const
+void UnknownHandleManager::processNonOptionalUnknowns( const 
+    std::function<void(const std::string&, char, GlobalHandle handle)> &cfunc) const
 {
-    for (auto& upub : unknown_publications) {
+    for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         cfunc(upub.first, 'p', upub.second.first);
     }
-    for (auto& uept : unknown_endpoints) {
+    for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         cfunc(uept.first, 'e', uept.second.first);
     }
-    for (auto& uinp : unknown_inputs) {
+    for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
         cfunc(uinp.first, 'i', uinp.second.first);
     }
 
-    for (auto& ufilt : unknown_filters) {
+    for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
@@ -239,26 +239,26 @@ void UnknownHandleManager::processNonOptionalUnknowns(
     }
 }
 
-void UnknownHandleManager::processRequiredUnknowns(
-    std::function<void(const std::string&, char, GlobalHandle handle)> cfunc) const
+void UnknownHandleManager::processRequiredUnknowns( const
+    std::function<void(const std::string&, char, GlobalHandle handle)> &cfunc) const
 {
-    for (auto& upub : unknown_publications) {
+    for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(required_flag)) != 0) {
             cfunc(upub.first, 'p', upub.second.first);
         }
     }
-    for (auto& uept : unknown_endpoints) {
+    for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(required_flag)) != 0) {
             cfunc(uept.first, 'e', uept.second.first);
         }
     }
-    for (auto& uinp : unknown_inputs) {
+    for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(required_flag)) != 0) {
             cfunc(uinp.first, 'i', uinp.second.first);
         }
     }
 
-    for (auto& ufilt : unknown_filters) {
+    for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(required_flag)) != 0) {
             cfunc(ufilt.first, 'f', ufilt.second.first);
         }
