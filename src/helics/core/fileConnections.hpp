@@ -216,7 +216,7 @@ namespace fileops {
                         } else {
                             std::string ept =
                                 fileops::getOrDefault(conn, "endpoint", std::string());
-                            if (!ipt.empty()) {
+                            if (!ept.empty()) {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(ept, target);
                                 });
