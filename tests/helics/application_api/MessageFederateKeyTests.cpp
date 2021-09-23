@@ -609,6 +609,7 @@ TEST_P(mfed_single_type_tests, dual_transfer_message_core_link)
     // register the endpoints
     auto& ept1 = vFed1->registerGlobalTargetedEndpoint("ept1");
     auto& ept2 = vFed2->registerGlobalTargetedEndpoint("ept2");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
