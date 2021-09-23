@@ -1246,6 +1246,7 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             if (handleInfo->key.empty()) {
                 cmd.setStringData(handleInfo->type, handleInfo->units);
@@ -1296,6 +1297,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             break;
         case InterfaceType::FILTER:
@@ -3210,6 +3212,29 @@ void CommonCore::processCommand(ActionMessage&& command)
                 } else {
                     command.setAction(CMD_ADD_NAMED_PUBLICATION);
                     command.setSource(input->handle);
+                    command.clearStringData();
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = loopHandles.getEndpoint(command.name());
+            if (ept != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                command.setSource(ept->handle);
+                setActionFlag(command, destination_target);
+                command.clearStringData();
+                checkForNamedInterface(command);
+            } else {
+                auto* target = loopHandles.getEndpoint(command.getString(targetStringLoc));
+                if (target == nullptr) {
+                    routeMessage(command);
+                } else {
+                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    command.setSource(target->handle);
+                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
                     command.clearStringData();
                     checkForNamedInterface(command);
                 }

@@ -566,7 +566,7 @@ class Core {
     virtual void addDependency(LocalFederateId federateID, const std::string& federateName) = 0;
 
     /**
-     * Register communicating source/destination end points targets.
+     * Register communicating source/destination endpoint targets.
      * @param source the endpoint that is sending data
      * @param dest the endpoint receiving the data
      *
