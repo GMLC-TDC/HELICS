@@ -613,7 +613,8 @@ namespace apps {
                         mapfile,
                         "write progress to a map file for concurrent progress monitoring");
 
-        app->add_option("--output,-o", outFileName, "the output file for recording the data", true);
+        app->add_option("--output,-o", outFileName, "the output file for recording the data")
+            ->capture_default_str();
 
         auto* clone_group = app->add_option_group(
             "cloning", "Options related to endpoint cloning operations and specifications");
