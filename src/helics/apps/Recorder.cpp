@@ -518,16 +518,16 @@ namespace apps {
         }
     }
     /** add a subscription to record*/
-    void Recorder::addSubscription(const std::string& name)
+    void Recorder::addSubscription(const std::string& key)
     {
-        auto res = subkeys.find(name);
+        auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
-            subscriptions.emplace_back(fed->registerSubscription(name));
-            targets.emplace_back(name);
+            subscriptions.emplace_back(fed->registerSubscription(key));
+            targets.emplace_back(key);
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
             subids[id] = index;  // this is a new element
-            subkeys[name] = index;  // this is a potential replacement
+            subkeys[key] = index;  // this is a potential replacement
         }
     }
     /** add an endpoint*/

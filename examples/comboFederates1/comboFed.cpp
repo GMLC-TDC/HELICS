@@ -12,7 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
-int main(int argc, char* argv[])
+// NOLINTNEXTLINE
+int main(int argc, char* argv[])  
 {
     helics::helicsCLI11App app("Combination Fed", "ComboFed");
     std::string targetEndpoint = "endpoint";
