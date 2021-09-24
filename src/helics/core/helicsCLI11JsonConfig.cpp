@@ -50,7 +50,7 @@ std::vector<CLI::ConfigItem>
     std::vector<CLI::ConfigItem> results;
 
     if (j.isObject()) {
-        if (prefix.size() > maxLayers_) {
+        if (prefix.size() > maximumLayers) {
             return results;
         }
         auto fields = j.getMemberNames();
