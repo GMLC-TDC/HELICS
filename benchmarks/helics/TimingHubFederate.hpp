@@ -31,10 +31,8 @@ class TimingHub: public BenchmarkFederate {
     {
         finalTime = helics::Time(100, time_units::ms);
 
-        app->add_option("--num_leafs",
-                        num_leafs,
-                        "the number of timingleaf federates to expect",
-                        true);
+        app->add_option("--num_leafs", num_leafs, "the number of timingleaf federates to expect")
+            ->capture_default_str();
     }
 
     void doFedInit() override
