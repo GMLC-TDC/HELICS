@@ -3398,10 +3398,32 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_SET_PROFILER_FLAG:
             routeMessage(command);
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            if (isLocal(command.dest_id)) {
+                auto* fed = getFederateCore(command.dest_id);
+                if (fed != nullptr) {
+                    if ((fed->getState() != FederateStates::HELICS_FINISHED) &&
+                        (fed->getState() != FederateStates::HELICS_ERROR)) {
+                        fed->forceProcessMessage(command);
+                    } else {
+                        auto rep = fed->processPostTerminationAction(command);
+                        if (rep) {
+                            routeMessage(*rep);
+                        }
+                    }
+                }
+            } else {
+                    routeMessage(command);
+                }
+                break;
         default:
             if (isPriorityCommand(command)) {
                 // this is a backup if somehow one of these message got here
                 processPriorityCommand(std::move(command));
+            }
+            else if (isLocal(command.dest_id))
+            {
+                routeMessage(command);
             }
             break;
     }

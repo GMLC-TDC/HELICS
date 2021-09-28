@@ -381,6 +381,10 @@ class FederateState {
     void addAction(ActionMessage&& action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
     opt<ActionMessage> processPostTerminationAction(const ActionMessage& action);
+
+    /** force processing of a specific message out of order*/
+    void forceProcessMessage(ActionMessage& action);
+
     /** log a message to the federate Logger
     @param level the logging level of the message
     @param logMessageSource the name of the object that sent the message

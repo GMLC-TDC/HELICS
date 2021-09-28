@@ -927,13 +927,13 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             if (disconnected)
             {
                 ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
-                transmitTimingMessages(treq);
+                sendMessageFunction(treq);
             }
             else if (lastSend.time_state == time_state_t::time_granted)
             {
                 ActionMessage treq(CMD_TIME_GRANT,source_id,cmd.source_id);
                 treq.actionTime = lastSend.next;
-                transmitTimingMessages(treq);
+                sendMessageFunction(treq);
             }
             else
             {
@@ -942,7 +942,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 treq.Tdemin = lastSend.minDe;
                 treq.Te = lastSend.Te;
                 treq.setExtraData(lastSend.minFed.baseValue());
-                transmitTimingMessages(treq);
+                sendMessageFunction(treq);
 
             }
             return message_process_result::processed;

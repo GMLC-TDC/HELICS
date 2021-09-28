@@ -1198,6 +1198,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
+        case CMD_REQUEST_CURRENT_TIME:
             if ((command.source_id == global_broker_id_local) &&
                 (command.dest_id == parent_broker_id)) {
                 LOG_TIMING(global_broker_id_local,

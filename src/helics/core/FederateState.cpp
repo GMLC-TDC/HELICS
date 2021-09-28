@@ -389,9 +389,30 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
 }
 
 std::optional<ActionMessage>
-    FederateState::processPostTerminationAction(const ActionMessage& /*action*/)  // NOLINT
+    FederateState::processPostTerminationAction(const ActionMessage& action)  // NOLINT
 {
-    return {};
+    std::optional<ActionMessage> optAct;
+    switch (action.action())
+    {
+        case CMD_REQUEST_CURRENT_TIME:
+            optAct->setAction(CMD_DISCONNECT);
+            optAct->dest_id=action.source_id;
+            optAct->source_id = global_id.load();
+            break;
+        default:
+            break;
+    }
+    return optAct;
+}
+
+void FederateState::forceProcessMessage(ActionMessage& action)
+{
+    if (try_lock()) {
+        processActionMessage(action);
+        unlock();
+    } else {
+        addAction(action);
+    }
 }
 
 IterationResult FederateState::waitSetup()
