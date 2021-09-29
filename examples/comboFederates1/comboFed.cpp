@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <thread>
 
+// NOLINTNEXTLINE
 int main(int argc, char* argv[])
 {
     helics::helicsCLI11App app("Combination Fed", "ComboFed");
@@ -29,10 +30,13 @@ int main(int argc, char* argv[])
             mtarget = name;
         },
         "name of the federate to target");
-    app.add_option("--valuetarget", vtarget, "name of the value federate to target", true);
-    app.add_option("--messagetarget", mtarget, "name of the message federate to target", true);
-    app.add_option("--endpoint,-e", targetEndpoint, "name of the target endpoint", true);
-    app.add_option("--source,-s", myendpoint, "name of the source endpoint", true);
+    app.add_option("--valuetarget", vtarget, "name of the value federate to target")
+        ->capture_default_str();
+    app.add_option("--messagetarget", mtarget, "name of the message federate to target")
+        ->capture_default_str();
+    app.add_option("--endpoint,-e", targetEndpoint, "name of the target endpoint")
+        ->capture_default_str();
+    app.add_option("--source,-s", myendpoint, "name of the source endpoint")->capture_default_str();
     app.add_option("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
     auto ret = app.helics_parse(argc, argv);
