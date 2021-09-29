@@ -1,3 +1,3 @@
 function varargout = helicsBrokerDestroy(varargin)
-  [varargout{1:nargout}] = helicsMEX(56, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(57, varargin{:});
 end

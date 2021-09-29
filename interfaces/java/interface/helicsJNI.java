@@ -138,6 +138,7 @@ public class helicsJNI {
   public final static native int HELICS_SEQUENCING_MODE_FAST_get();
   public final static native int HELICS_SEQUENCING_MODE_ORDERED_get();
   public final static native int HELICS_SEQUENCING_MODE_DEFAULT_get();
+  public final static native double HELICS_BIG_NUMBER_get();
   public final static native double HELICS_TIME_ZERO_get();
   public final static native double HELICS_TIME_EPSILON_get();
   public final static native double HELICS_TIME_INVALID_get();

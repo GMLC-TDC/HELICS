@@ -20,6 +20,10 @@ public class helics {
     return helicsJNI.HELICS_INVALID_PROPERTY_VALUE_get();
   }
 
+  public static double getHELICS_BIG_NUMBER() {
+    return helicsJNI.HELICS_BIG_NUMBER_get();
+  }
+
   /**
    *  definition of time zero-the beginning of simulation 
    */
@@ -43,7 +47,7 @@ public class helics {
 
   /**
    *  definition of time signifying the federate has<br>
-   *                                                              terminated or to run until the end of the simulation
+   *                                                              terminated or run until the end of the simulation
    */
   public static double getHELICS_TIME_MAXTIME() {
     return helicsJNI.HELICS_TIME_MAXTIME_get();

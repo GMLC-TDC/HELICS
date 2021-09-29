@@ -1767,6 +1767,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1SEQUENCING_1MODE_
 }
 
 
+SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1BIG_1NUMBER_1get(JNIEnv *jenv, jclass jcls) {
+  jdouble jresult = 0 ;
+  double result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (double)(double)HELICS_BIG_NUMBER;
+  jresult = (jdouble)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_HELICS_1TIME_1ZERO_1get(JNIEnv *jenv, jclass jcls) {
   jdouble jresult = 0 ;
   HelicsTime result;
