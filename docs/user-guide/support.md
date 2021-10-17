@@ -8,7 +8,7 @@ If you're having trouble with understanding what HELICS does, how to use HELICS,
   - [User Guide](./index.md) - Comprehensive guide to understanding and using HELICS covering both the [fundamentals](./fundamental_topics/fundamental_topics_index) as well as more [advanced topics](./advanced_topics/advanced_topics_index.md).
   - [API reference](../references/api-reference/index.md) - HELICS is written in C++ with many supported language bindings. The C++ Doxygen is the most comprehensive reference for the HELICS API
 
-- **User Forum (forthcoming)** - Once Github moves their forums feature out of beta we'll implement it to provide a space where user's can discuss their HELICS use cases and get support on how to use HELICS.
+- [**User Forum**](https://github.com/GMLC-TDC/HELICS/discussions) - A space where user's can discuss their HELICS use cases and get support on how to use HELICS.
 
 - [**Bug Reports/Support**](https://github.com/GMLC-TDC/HELICS/issues) - If HELICS doesn't appear to be working as expected, this is the place to file a bug report and get some help.
 
