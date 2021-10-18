@@ -58,8 +58,8 @@ jobs:
           vmImage: 'macOS-latest'
         XCode-oldest:
           test_config: 'ci'
-          vmImage: 'macOS-10.14'
-          xcode_path: '/Applications/Xcode_10.1.app'
+          vmImage: 'macOS-10.15'
+          xcode_path: '/Applications/Xcode_10.3.app'
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 90
