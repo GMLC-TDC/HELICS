@@ -1,8 +1,9 @@
 <!-- identify two options for testing this example:
-1. manual 
+1. manual
 2. Merlin spec for Cosimulation
  -->
-# Monte Carlo Co-Simulations 
+
+# Monte Carlo Co-Simulations
 
 ```{eval-rst}
 .. toctree::
@@ -35,18 +36,15 @@ The necessary files are:
 - Python program for Charger federate
 - Python program to generate `helics_cli` JSON files and execute
 
-
-
 ## What is this co-simulation doing?
 
-This example walks through how to set up a probabilistic model with Monte Carlo simulations. This Monte Carlo co-simulation is built from a simple two federate example, based on the [Endpoint Federates Example](../fundamental_examples/fundamental_endpoints.md). In this example, there is a Charger federate which publishes voltage and a Battery federate which publishes current.  
+This example walks through how to set up a probabilistic model with Monte Carlo simulations. This Monte Carlo co-simulation is built from a simple two federate example, based on the [Endpoint Federates Example](../fundamental_examples/fundamental_endpoints.md). In this example, there is a Charger federate which publishes voltage and a Battery federate which publishes current.
 
-All of the HELICS configurations are the same as in the Endpoint example. The internal logic of the federates has been changed for this implementation. The Charger federate assumes the role of *deciding* if the Battery should continue to charge. The Battery sends a message of its current state of charge (soc, a number between 0 and 1). If the soc is less than 0.9, the Battery is instructed to continue charging, otherwise, it is instructed to cease charging. The Battery federate has all the logic internal for adding energy and selecting a new "battery" (charging rate) if the soc is deemed sufficient.  Energy is added to the "battery" according to the previous time interval and the charge rate of the battery. In this way, the only stochastic component to the system is the **selected charge rate**.  For example, the Endpoint Example allowed the Battery federate to randomly select batteries of different sizes, and the Charger to select charge rates from a list of options.  In this implementation, the battery size (capacity in kWh) is constant.
+All of the HELICS configurations are the same as in the Endpoint example. The internal logic of the federates has been changed for this implementation. The Charger federate assumes the role of _deciding_ if the Battery should continue to charge. The Battery sends a message of its current state of charge (soc, a number between 0 and 1). If the soc is less than 0.9, the Battery is instructed to continue charging, otherwise, it is instructed to cease charging. The Battery federate has all the logic internal for adding energy and selecting a new "battery" (charging rate) if the soc is deemed sufficient. Energy is added to the "battery" according to the previous time interval and the charge rate of the battery. In this way, the only stochastic component to the system is the **selected charge rate**. For example, the Endpoint Example allowed the Battery federate to randomly select batteries of different sizes, and the Charger to select charge rates from a list of options. In this implementation, the battery size (capacity in kWh) is constant.
 
-This simplification allows us to isolate a single source of uncertainty: the charge rate.  
+This simplification allows us to isolate a single source of uncertainty: the charge rate.
 
-The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a **posterior distribution* of the instantaneous power draw over a desired period of time.
-
+The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage. We want to ensure that we are not overly reliant on any one iteration of the co-simulation. To manage this, we can run the co-simulation _N_ times, or a Monte Carlo co-simulation. The result will be a \*_posterior distribution_ of the instantaneous power draw over a desired period of time.
 
 ## Probabilistic Uncertainty Estimation
 
@@ -121,7 +119,6 @@ At the beginning of the co-simulation, the distributions defined above will be s
 
 After the two federates pass information between each other -- EV Battery sends SOC, EV Charger instructs whether to keep charging or resample the distributions -- the EV Battery calculates the total power demanded in the last time interval.
 
-
 ## Execution and Results
 
 Execution can be done with either a simple script (provided on the repo), or with Merlin.
@@ -135,7 +132,7 @@ $ python make_samples.py
 
 ```
 
-This implementation will run a default co-simulation.  The default parameters are:
+This implementation will run a default co-simulation. The default parameters are:
 
 ```
     samples = 30
@@ -157,7 +154,7 @@ $ python make_samples.py 10 . 100 24*7 0 0
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execution JSONs with `helics_cli`.
 
-You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files.  If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
+You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
 
 ```
     out_json = output_path+'/cli_runner_scripts'
@@ -200,7 +197,7 @@ The final result of the default Monte Carlo co-simulation is shown below.
 
 ![](./MonteCarlo_manual.png)
 
-This is a time series density plot.  Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW.  We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period.  This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW.  The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
+This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
 
 ### Merlin Orchestration Execution
 
@@ -227,9 +224,6 @@ parser.add_argument('--port', type=int, default=-1,
 args = parser.parse_args()
 np.random.seed(args.seed)
 ```
-
-
-
 
 #### helics_cli in Merlin
 
