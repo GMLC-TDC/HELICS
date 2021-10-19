@@ -1,4 +1,4 @@
-# Monte Carlo Simulations 
+# Monte Carlo Simulations
 
 ```eval_rst
 .. toctree::

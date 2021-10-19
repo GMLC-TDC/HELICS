@@ -131,6 +131,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     useOsPortAllocation = netInfo.use_os_port;
     appendNameToAddress = netInfo.appendNameToAddress;
     noAckConnection = netInfo.noAckConnection;
+    useJsonSerialization = netInfo.useJsonSerialization;
     propertyUnLock();
 }
 

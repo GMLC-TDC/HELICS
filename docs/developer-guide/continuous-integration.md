@@ -12,8 +12,8 @@ Travis-ci runs many of the primary checks In 3 different stages
 Push tests run on all pushes to any branch in the main repository, there are 4 tests that run regularly
 
 - GCC 6: Test the GCC 6.0 compiler and the CI labeled Tests BOOST 1.61, SWIG, MPI
-- Clang 5: Test the clang compiler and run the CI labeled Tests, along with python and Java interface generation and Tests Using C++17
-- GCC 4.9: Test the oldest supported compiler in GCC, Test the included interface files(SWIG OFF) for Java and python, and test a packaging build. The main tests are disabled, BOOST 1.61
+- Clang 5: Test the clang compiler and run the CI labeled Tests, along with Java interface generation and Tests Using C++17
+- GCC 4.9: Test the oldest supported compiler in GCC, Test the included interface files(SWIG OFF) for Java, and test a packaging build. The main tests are disabled, BOOST 1.61
 - XCode 10.2: Test a recent XCode compiler with the Shared API library tests
 
 ### PR tests and develop branch Tests
@@ -35,7 +35,7 @@ On the develop branch a few additional tests are run on a daily basis. These wil
 
 ## Appveyor tests
 
-- MSVC 2015 CMake 3.13, python and JAVA builds
+- MSVC 2015 CMake 3.13, and JAVA builds
 
 ## Azure tests
 

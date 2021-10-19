@@ -175,11 +175,16 @@ class ActionMessage {
     void to_string(std::string& data) const;
     /** convert to a byte string*/
     std::string to_string() const;
+    /** convert to a json string*/
+    std::string to_json_string() const;
     /** packetize the message with a simple header and tail sequence
      */
     std::string packetize() const;
     void packetize(std::string& data) const;
-    /** covert to a byte vector using a reference*/
+    /** packetize the message with a simple header and tail sequence using json serialization
+     */
+    std::string packetize_json() const;
+    /** convert to a byte vector using a reference*/
     void to_vector(std::vector<char>& data) const;
     /** convert a command to a byte vector*/
     std::vector<char> to_vector() const;
@@ -188,11 +193,15 @@ class ActionMessage {
     /** load a command from a packetized stream /ref packetize
     @return the number of bytes used
     */
-    int depacketize(const void* data, std::size_t buffer_size);
-    /** read a command from a string*/
-    void from_string(std::string_view data);
+    std::size_t depacketize(const void* data, std::size_t buffer_size);
+    /** read a command from a string
+    @return number of bytes read*/
+    std::size_t from_string(std::string_view data);
+    /** read a command from a json string
+    @return true if successful*/
+    bool from_json_string(std::string_view data);
     /** read a command from a char vector*/
-    void from_vector(const std::vector<char>& data);
+    std::size_t from_vector(const std::vector<char>& data);
 
     friend std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd);
     friend std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd);

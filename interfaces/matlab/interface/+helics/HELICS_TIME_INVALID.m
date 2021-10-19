@@ -1,3 +1,3 @@
 function v = HELICS_TIME_INVALID()
-  v = helicsMEX(8);
+  v = helicsMEX(9);
 end

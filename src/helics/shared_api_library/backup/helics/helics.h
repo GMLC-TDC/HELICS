@@ -105,6 +105,8 @@ typedef enum {
     HELICS_DATA_TYPE_TIME = 8,
     /** raw data type*/
     HELICS_DATA_TYPE_RAW = 25,
+    /** type converts to a valid json string*/
+    HELICS_DATA_TYPE_JSON = 30,
     /** the data type can change*/
     HELICS_DATA_TYPE_MULTI = 33,
     /** open type that can be anything*/
@@ -151,9 +153,14 @@ typedef enum {
     /** specify that checking on configuration files should be strict and throw and error on any
    invalid values */
     HELICS_FLAG_STRICT_CONFIG_CHECKING = 75,
+    /** specify that the federate should use json serialization for all data types*/
+    HELICS_FLAG_USE_JSON_SERIALIZATION = 79,
     /** specify that the federate is event triggered-meaning (all/most) events are triggered by
        incoming events*/
-    HELICS_FLAG_EVENT_TRIGGERED = 81
+    HELICS_FLAG_EVENT_TRIGGERED = 81,
+    /** specify that that federate should capture the profiling data to the local federate logging
+       system*/
+    HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
@@ -161,7 +168,9 @@ typedef enum {
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     HELICS_FLAG_DELAY_INIT_ENTRY = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
-    HELICS_FLAG_ENABLE_INIT_ENTRY = 47
+    HELICS_FLAG_ENABLE_INIT_ENTRY = 47,
+    /** ignored flag used to test some code paths*/
+    HELICS_FLAG_IGNORE = 999
 } HelicsCoreFlags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
@@ -179,7 +188,11 @@ typedef enum {
     /** specify that the log files should be flushed on every log message*/
     HELICS_FLAG_FORCE_LOGGING_FLUSH = 88,
     /** specify that a full log should be dumped into a file*/
-    HELICS_FLAG_DUMPLOG = 89
+    HELICS_FLAG_DUMPLOG = 89,
+    /** specify that helics should capture profiling data*/
+    HELICS_FLAG_PROFILING = 93,
+    /** flag trigger for generating a profiling marker*/
+    HELICS_FLAG_PROFILING_MARKER = 95
 } HelicsFlags;
 
 /** log level definitions
@@ -189,6 +202,8 @@ typedef enum {
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     /** only print error level indicators*/
     HELICS_LOG_LEVEL_ERROR = 0,
+    /** profiling log level*/
+    HELICS_LOG_LEVEL_PROFILING = 2,
     /** only print warnings and errors*/
     HELICS_LOG_LEVEL_WARNING = 3,
     /** warning errors and summary level information*/
@@ -279,6 +294,9 @@ typedef enum {
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274
 } HelicsProperties;
 
+/** result returned for requesting the value of an invalid/unknown property */
+const int HELICS_INVALID_PROPERTY_VALUE = -972;
+
 /** enumeration of the multi_input operations*/
 typedef enum {
     /** time and priority order the inputs from the core library*/
@@ -363,8 +381,12 @@ existing messages; ordered means it follows normal priority patterns and will be
 existing messages
 */
 typedef enum {
+    /** sequencing mode to operate on priority channels*/
     HELICS_SEQUENCING_MODE_FAST = 0,
-    HELICS_SEQUENCING_MODE_ORDERED = 1
+    /** sequencing mode to operate on the normal channels*/
+    HELICS_SEQUENCING_MODE_ORDERED = 1,
+    /** select the default channel*/
+    HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
 /**
@@ -1755,7 +1777,6 @@ HELICS_EXPORT void helicsFederateSetTag(HelicsFederate fed, const char* tagName,
  *
  * @param fed The federate to get the tag for.
  * @param tagName The name of the tag to query.
- * @param value The value of the tag.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
  */

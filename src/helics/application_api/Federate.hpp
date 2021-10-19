@@ -76,8 +76,11 @@ class HELICS_CXX_EXPORT Federate {
   protected:
     std::atomic<Modes> currentMode{Modes::STARTUP};  //!< the current state of the simulation
     char nameSegmentSeparator = '/';  //!< the separator between automatically prependend names
-    bool strictConfigChecking =
-        true;  //!< set to false to allow some invalid configurations to be ignored instead of error
+    /** set to false to allow some invalid configurations to be ignored instead of error */
+    bool strictConfigChecking{true};
+    /** set to true to force all outgoing data to json serialization*/
+    bool useJsonSerialization{true};
+
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:
@@ -145,7 +148,7 @@ class HELICS_CXX_EXPORT Federate {
     /** called after one of the async calls and will indicate true if an async operation has
     completed
     @details only call from the same thread as the one that called the initial async call and will
-    return false if called when no aysnc operation is in flight*/
+    return false if called when no async operation is in flight*/
     bool isAsyncOperationCompleted() const;
     /** second part of the async process for entering initializationState call after a call to
     enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
