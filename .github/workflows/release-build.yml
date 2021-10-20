@@ -130,7 +130,7 @@ jobs:
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: macos-x64
-            os: macos-2019
+            os: macos-latest
             arch: x64
             cpack_gen: ZIP
             macos_target_ver: '10.14'
