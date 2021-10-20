@@ -6,7 +6,7 @@ schedules:
         - develop
 
 jobs:
-  - job: Daily Linux
+  - job: daily_linux
     strategy:
       matrix:
         all-tests:
