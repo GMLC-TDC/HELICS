@@ -1,10 +1,10 @@
 {
   "name": "helics",
-  "version-string": "3.0.0",
+  "version-string": "3.0.1",
   "description": "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)",
   "homepage": "https://helics.org/",
   "default-features": ["zeromq", "ipc", "webserver"],
-  "dependencies": ["boost-core"],
+  "dependencies": ["boost-core", "boost-spirit"],
   "features": {
     "zeromq": {
       "description": "Build ZeroMQ core",
@@ -25,7 +25,7 @@
     },
     "webserver": {
       "description": "Build webserver in broker_server",
-      "dependencies": ["boost-beast"]
+      "dependencies": ["boost-beast", "boost-uuid"]
     }
   }
 }
