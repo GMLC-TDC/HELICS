@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcQueueHelper.h"
 
-#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 #include <thread>
 
@@ -117,7 +117,8 @@ namespace ipc {
             if (timeout >= 0) {
                 boost::posix_time::ptime abs_time =
 #if BOOST_VERSION >= 107700
-                    boost::interprocess::ipcdetail::microsec_clock<boost::posix_time::ptime>::universal_time();
+                    boost::interprocess::ipcdetail::microsec_clock<
+                        boost::posix_time::ptime>::universal_time();
 #else
                     boost::date_time::microsec_clock<boost::posix_time::ptime>::universal_time();
 #endif
