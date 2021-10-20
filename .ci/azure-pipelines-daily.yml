@@ -40,102 +40,102 @@ jobs:
         workingDirectory: 'build'
         displayName: 'Test HELICS'
         
-    - job: Daily Windows
-      strategy:
-        matrix:
-          VS2022-64bit:
-            imageName: 'windows-2022'
-            langArch: 'x64'
-            vsArch: 'x64'
-            extraFlags: ''
-      pool:
-        vmImage: $(imageName)
-      variables:
-        BOOST_ROOT: $(Pipeline.Workspace)/ci-libs/boost
-        BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
+  - job: Daily Windows
+    strategy:
+      matrix:
+        VS2022-64bit:
+          imageName: 'windows-2022'
+          langArch: 'x64'
+          vsArch: 'x64'
+          extraFlags: ''
+    pool:
+      vmImage: $(imageName)
+    variables:
+      BOOST_ROOT: $(Pipeline.Workspace)/ci-libs/boost
+      BOOST_URL: https://sourceforge.net/projects/boost/files/boost/1.74.0/boost_1_74_0.tar.bz2/download
 
-      steps:
-        # -----------------------
-        # Install dependencies
-        # -----------------------
-        - task: Cache@2
-          inputs:
-            path: $(BOOST_ROOT)
-            key: boost
-            cacheHitVar: BOOST_CACHE_RESTORED
-          displayName: Restore Boost cache
-        - bash: |
-            cd $(mktemp -d)
-            curl --location --output "download.tar.bz2" "$BOOST_URL"
-            tar xfvj "download.tar.bz2"
-            mkdir -p "$BOOST_ROOT"
-            cp -r boost_*/* "$BOOST_ROOT"
-          condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
-          displayName: Install Boost
-        - bash: choco install swig --yes --limit-output
-          condition: eq( variables['Agent.OS'], 'Windows_NT' )
-          displayName: Install swig
+    steps:
+      # -----------------------
+      # Install dependencies
+      # -----------------------
+      - task: Cache@2
+        inputs:
+          path: $(BOOST_ROOT)
+          key: boost
+          cacheHitVar: BOOST_CACHE_RESTORED
+        displayName: Restore Boost cache
+      - bash: |
+          cd $(mktemp -d)
+          curl --location --output "download.tar.bz2" "$BOOST_URL"
+          tar xfvj "download.tar.bz2"
+          mkdir -p "$BOOST_ROOT"
+          cp -r boost_*/* "$BOOST_ROOT"
+        condition: ne(variables.BOOST_CACHE_RESTORED, 'true')
+        displayName: Install Boost
+      - bash: choco install swig --yes --limit-output
+        condition: eq( variables['Agent.OS'], 'Windows_NT' )
+        displayName: Install swig
 
-        # -----------------------
-        # Configure HELICS
-        # -----------------------
-        - bash: |
-            echo "BOOST_ROOT=$BOOST_ROOT"
-            env
-          displayName: Show environment info
-        - task: CMake@1
-          inputs:
-            cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON $(extraFlags) ..
-          displayName: 'Configure HELICS'
-          condition: eq( variables['Agent.OS'], 'Windows_NT' )
+      # -----------------------
+      # Configure HELICS
+      # -----------------------
+      - bash: |
+          echo "BOOST_ROOT=$BOOST_ROOT"
+          env
+        displayName: Show environment info
+      - task: CMake@1
+        inputs:
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON $(extraFlags) ..
+        displayName: 'Configure HELICS'
+        condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
-        #  - task: CMake@1
-        #    inputs:
-        #      cmakeArgs: -DHELICS_BUILD_JAVA_INTERFACE=ON .
-        #    displayName: 'Configure Java interface'
-        #    condition: eq( variables['langArch'], 'x64' )
+      #  - task: CMake@1
+      #    inputs:
+      #      cmakeArgs: -DHELICS_BUILD_JAVA_INTERFACE=ON .
+      #    displayName: 'Configure Java interface'
+      #    condition: eq( variables['langArch'], 'x64' )
 
-        # -----------------------
-        # Build HELICS
-        # -----------------------
-        - bash: cmake --build . --config Release
-          displayName: 'Build HELICS'
-          workingDirectory: build
+      # -----------------------
+      # Build HELICS
+      # -----------------------
+      - bash: cmake --build . --config Release
+        displayName: 'Build HELICS'
+        workingDirectory: build
 
-        # -----------------------
-        # Package HELICS
-        # -----------------------
-        - bash: |
-            cpack_dir="$(which cmake)"
-            cpack_dir="${cpack_dir%/cmake}"
-            "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
-          displayName: 'Package HELICS'
-          workingDirectory: build
-        - task: CopyFiles@2
-          inputs:
-            sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
-            contents: '*.exe'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)'
+      # -----------------------
+      # Package HELICS
+      # -----------------------
+      - bash: |
+          cpack_dir="$(which cmake)"
+          cpack_dir="${cpack_dir%/cmake}"
+          "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
+        displayName: 'Package HELICS'
+        workingDirectory: build
+      - task: CopyFiles@2
+        inputs:
+          sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
+          contents: '*.exe'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)'
 
-        - task: PublishBuildArtifacts@1
-          inputs:
-            pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            artifactName: installer
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: installer
 
-        # -----------------------
-        # Test HELICS
-        # -----------------------
-        - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
-          displayName: 'Test HELICS'
-          workingDirectory: build
+      # -----------------------
+      # Test HELICS
+      # -----------------------
+      - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
+        displayName: 'Test HELICS'
+        workingDirectory: build
 
-        # Packaging tests
-        - bash: ctest --output-on-failure --timeout 200 -C Release -L "PackagingFast"
-          displayName: 'Test HELICS packaging'
-          workingDirectory: build
+      # Packaging tests
+      - bash: ctest --output-on-failure --timeout 200 -C Release -L "PackagingFast"
+        displayName: 'Test HELICS packaging'
+        workingDirectory: build
 
-        - task: PublishBuildArtifacts@1
-          condition: failed()
-          inputs:
-            pathtoPublish: '$(Build.SourcesDirectory)/build'
-            artifactName: buildDirContents
+      - task: PublishBuildArtifacts@1
+        condition: failed()
+        inputs:
+          pathtoPublish: '$(Build.SourcesDirectory)/build'
+          artifactName: buildDirContents
