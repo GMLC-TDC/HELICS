@@ -108,7 +108,7 @@ jobs:
       - bash: |
           cpack_dir="$(which cmake)"
           cpack_dir="${cpack_dir%/cmake}"
-          "${cpack_dir}/cpack" -G "NSIS" -C Release -B "$PWD/installer-output"
+          "${cpack_dir}/cpack" -G "ZIP" -C Release -B "$PWD/installer-output"
         displayName: 'Package HELICS'
         workingDirectory: build
       - task: CopyFiles@2
