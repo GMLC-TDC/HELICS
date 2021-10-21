@@ -1107,11 +1107,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     if(APPLE)
         if("arm64" IN_LIST CMAKE_OSX_ARCHITECTURES AND "x86_64" IN_LIST CMAKE_OSX_ARCHITECTURES)
             set(CPACK_SYSTEM_NAME "macOS-universal2")
-<<<<<<< HEAD
-        else()
-=======
         else() 
->>>>>>> 00251752d66d8dc8e0359c363bf28fba7fa6b132
             set(CPACK_SYSTEM_NAME "macOS-${CMAKE_SYSTEM_PROCESSOR}")
         endif()
         set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
