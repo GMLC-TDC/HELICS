@@ -6,7 +6,7 @@ schedules:
         - develop
 
 jobs:
-  - job: Daily Linux
+  - job: Linux
     strategy:
       matrix:
         all-tests:
@@ -39,8 +39,8 @@ jobs:
           TEST_CONFIG: $[variables['test_config']]
         workingDirectory: 'build'
         displayName: 'Test HELICS'
-        
-  - job: Daily Windows
+
+  - job: Windows
     strategy:
       matrix:
         VS2022-64bit:
