@@ -49,11 +49,11 @@ namespace fileops {
                     } else {
                         std::string ipt = getOrDefault(conn, "input", std::string());
                         if (!ipt.empty()) {
-                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
-                                brk->dataLink(target, ipt);
+                            addTargets(conn, "targets", [brk, &ipt](const std::string& pub) {
+                                brk->dataLink(pub, ipt);
                             });
-                            addTargets(conn, "sources", [brk, &ipt](const std::string& target) {
-                                brk->dataLink(target, ipt);
+                            addTargets(conn, "sources", [brk, &ipt](const std::string& pub) {
+                                brk->dataLink(pub, ipt);
                             });
                         } else {
                             std::string ept = getOrDefault(conn, "endpoint", std::string());
@@ -61,8 +61,8 @@ namespace fileops {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(ept, target);
                                 });
-                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
-                                    brk->linkEndpoints(target, ept);
+                                addTargets(conn, "sources", [brk, &ept](const std::string& source) {
+                                    brk->linkEndpoints(source, ept);
                                 });
                             }
                         }
@@ -98,8 +98,8 @@ namespace fileops {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(ept, target);
                                 });
-                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
-                                    brk->linkEndpoints(target, ept);
+                                addTargets(conn, "sources", [brk, &ept](const std::string& source) {
+                                    brk->linkEndpoints(source, ept);
                                 });
                             }
                         }
@@ -185,8 +185,8 @@ namespace fileops {
                                 addTargets(conn, "targets", [brk, &ept](const std::string& target) {
                                     brk->linkEndpoints(ept, target);
                                 });
-                                addTargets(conn, "sources", [brk, &ept](const std::string& target) {
-                                    brk->linkEndpoints(target, ept);
+                                addTargets(conn, "sources", [brk, &ept](const std::string& source) {
+                                    brk->linkEndpoints(source, ept);
                                 });
                             }
                         }
