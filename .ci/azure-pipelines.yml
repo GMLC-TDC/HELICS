@@ -17,8 +17,8 @@ jobs:
         gcc11:
           containerImage: 'helics/buildenv:gcc11-builder'
           test_config: 'ci'
-        clang12:
-          containerImage: 'helics/buildenv:clang12-builder'
+        clang13:
+          containerImage: 'helics/buildenv:clang13-builder'
           test_config: 'ci'
         clang5:
           containerImage: 'helics/buildenv:clang5-builder'
