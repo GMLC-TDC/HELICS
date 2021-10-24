@@ -144,7 +144,7 @@ class HELICS_CXX_EXPORT BrokerApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
-    auto* operator-> () const { return broker.operator->(); }
+    auto* operator->() const { return broker.operator->(); }
 #else
     BrokerApp* operator->() { return this; }
     const BrokerApp* operator->() const { return this; }

@@ -162,7 +162,7 @@ class HELICS_CXX_EXPORT CoreApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so core functions can be called if needed
      */
-    auto* operator-> () const { return core.operator->(); }
+    auto* operator->() const { return core.operator->(); }
 #else
     CoreApp* operator->() { return this; }
     const CoreApp* operator->() const { return this; }
