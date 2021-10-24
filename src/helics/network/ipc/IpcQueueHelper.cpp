@@ -14,6 +14,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace boostipc = boost::interprocess;
 
+using timetype = boost::posix_time::ptime;
+
+#if BOOST_VERSION >= 107700
+using clocktype = boost::interprocess::ipcdetail::microsec_clock<timetype>;
+#else
+using clocktype = boost::date_time::microsec_clock<timetype>;
+#endif
+
 namespace helics {
 namespace ipc {
     OwnedQueue::~OwnedQueue()
@@ -115,13 +123,7 @@ namespace ipc {
         unsigned int priority{0};
         while (true) {
             if (timeout >= 0) {
-                boost::posix_time::ptime abs_time =
-#if BOOST_VERSION >= 107700
-                    boost::interprocess::ipcdetail::microsec_clock<
-                        boost::posix_time::ptime>::universal_time();
-#else
-                    boost::date_time::microsec_clock<boost::posix_time::ptime>::universal_time();
-#endif
+                timetype abs_time = clocktype::universal_time();
                 abs_time += boost::posix_time::milliseconds(timeout);
                 bool res =
                     rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
