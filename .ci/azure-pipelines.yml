@@ -14,15 +14,19 @@ jobs:
         ubuntuDefault:
           containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
           test_config: 'ci'
+          use_mpi: 'true'
         gcc11:
           containerImage: 'helics/buildenv:gcc11-builder'
           test_config: 'ci'
+          use_mpi: 'true'
         clang13:
           containerImage: 'helics/buildenv:clang13-builder'
           test_config: 'ci'
+          use_mpi: ''
         clang5:
           containerImage: 'helics/buildenv:clang5-builder'
           test_config: 'ci'
+          use_mpi: ''
 
     pool:
       vmImage: 'ubuntu-latest'
@@ -38,7 +42,7 @@ jobs:
           MAKEFLAGS: '-j 4'
           CMAKE_GENERATOR: 'Unix Makefiles'
           USE_SWIG: 'true'
-          USE_MPI: 'true'
+          USE_MPI: $[variables['use_mpi']]
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
         displayName: 'Build HELICS'
