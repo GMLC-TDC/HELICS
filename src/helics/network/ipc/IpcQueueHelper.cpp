@@ -7,11 +7,20 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcQueueHelper.h"
 
+#include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 #include <thread>
 
 namespace boostipc = boost::interprocess;
+
+using timetype = boost::posix_time::ptime;
+
+#if BOOST_VERSION >= 107700
+using clocktype = boost::interprocess::ipcdetail::microsec_clock<timetype>;
+#else
+using clocktype = boost::date_time::microsec_clock<timetype>;
+#endif
 
 namespace helics {
 namespace ipc {
@@ -114,8 +123,7 @@ namespace ipc {
         unsigned int priority{0};
         while (true) {
             if (timeout >= 0) {
-                boost::posix_time::ptime abs_time =
-                    boost::date_time::microsec_clock<boost::posix_time::ptime>::universal_time();
+                timetype abs_time = clocktype::universal_time();
                 abs_time += boost::posix_time::milliseconds(timeout);
                 bool res =
                     rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
