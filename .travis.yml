@@ -50,48 +50,6 @@ jobs:
       install: echo 'Install'
       script: echo 'Script'
 
-    - os: windows
-      name: 'MinGW'
-      if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(mingw)/) OR (commit_message =~ /(mingw)/)
-      env:
-        - DISABLE_INTERFACES="Java"
-        - CI_TEST_MATCH="core-ci-tests"
-        - ZMQ_SUBPROJECT=true
-        - ZMQ_FORCE_SUBPROJECT=true
-        - DISABLE_EXAMPLES=true
-        - JOB_OPTION_FLAGS=' -DCMAKE_SH=CMAKE_SH-NOTFOUND'
-        - CMAKE_GENERATOR="MinGW Makefiles"
-        - HELICS_DEPENDENCY_FLAGS="-DBOOST_INSTALL_PATH=/c/local/boost_1_58_0 -DCMAKE_C_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/gcc.exe -DCMAKE_CXX_COMPILER=/c/ProgramData/chocolatey/lib/mingw/tools/install/mingw64/bin/g++.exe"
-      install:
-        - echo $PATH
-        - export SHELL=cmd
-        - source scripts/setup-helics-ci-options.sh
-        - choco install boost-msvc-12
-
-    - os: windows
-      name: 'MSYS'
-      if: (branch = develop AND type IN (cron)) OR (branch = helics3 AND type IN (cron)) OR (branch = master AND type IN (push, pull_request)) OR (branch =~ /(msys)/) OR (commit_message =~ /(msys)/)
-      env:
-        - DISABLE_INTERFACES="Java"
-        - CI_TEST_MATCH="core-ci-tests"
-        - DISABLE_EXAMPLES=true
-        - CMAKE_GENERATOR="MSYS Makefiles"
-        - SET_MSYS_PATH=true
-      install:
-        - source scripts/setup-helics-ci-options.sh
-        # See https://docs.travis-ci.com/user/reference/windows/#how-do-i-use-msys2 for details on the following
-        # Exporting PATH with /c/tools/msys64/mingw64/bin added did not work
-        # As a workaround, we run scripts for builds + tests that setup the right PATH if SET_MSYS_PATH=true
-        # The rm line below is to work with caching by removing the empty cache folder Travis creates
-        - if [[ ! -f /c/tools/msys64/msys2_shell.cmd ]]; then rm -rf /c/tools/msys64 ; fi
-        - choco uninstall -y mingw
-        - choco upgrade --no-progress -y msys2
-        - export SHELL_CMD='cmd //C RefreshEnv.cmd '
-        - export SHELL_CMD+='& set MSYS=winsymlinks:nativestrict '
-        - export SHELL_CMD+='& C:\\tools\\msys64\\msys2_shell.cmd -defterm -no-start'
-        - export SHELL_CMD+=" -msys2 -c \$\* --"
-        - $SHELL_CMD pacman -Sy --noconfirm --needed base-devel mingw-w64-x86_64-gcc mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-zeromq
-
     # ------------------------------------------------
     # Jobs for daily valgrind and code coverage tests
     # ------------------------------------------------
