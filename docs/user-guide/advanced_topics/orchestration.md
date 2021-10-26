@@ -86,7 +86,7 @@ pi-recievers.
 Merlin has a description and an environment block. The `description` block
 provides the name and a short description about the study.
 
-```
+```yaml
 description:
     name: Test helics
     description: Juggle helics data
@@ -97,7 +97,7 @@ in. This is a place where you can set environment variables to control
 the number of federates you may need in your co-simulation. In this example, `N_SAMPLES` will be used to describe how many
 pi-senders and pi-receivers (total federates) we want in our co-simulation.
 
-```
+```yaml
 env:
   variables:
     OUTPUT_PATH: ./helics_juggle_output
@@ -112,7 +112,7 @@ co-simulation so that subsequent steps can use this input to start the
 co-simulation. Below is how we might describe the Merlin step for our
 pi-exchange study.
 
-```
+```yaml
 merlin:
   samples:
     generate:
@@ -141,7 +141,7 @@ contains the names of the json files that were generated. The
 variable in the study step. Below is an example of one of the json files that is
 created.
 
-```
+```json
 {
     "federates": [
         {
@@ -166,7 +166,7 @@ the block. Each step is denoted by a name and has a run segment. The
 run segment is where you will tell Merlin what commands need to be
 executed.
 
-```
+```yaml
     - name: start_federates <-- Name of the step
       description: say Hello
       run:
@@ -185,7 +185,7 @@ this command will get executed for each index in `FED`.
 Below is the full Merlin spec that was created to make 8 pi-receivers
 and pi-senders and execute it as a Merlin workflow.
 
-```
+```yaml
 description:
     name: Test helics
     description: Juggle helics data
