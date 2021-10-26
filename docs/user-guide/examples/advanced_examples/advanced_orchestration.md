@@ -127,14 +127,14 @@ Execution can be done with either a simple script (provided on the repo), or wit
 
 Manual implementation of the co-simulation is done with the helper script `make_samples_manual.py`, with command line execution:
 
-```
+```shell session
 $ python make_samples.py
 
 ```
 
 This implementation will run a default co-simulation. The default parameters are:
 
-```
+```python
     samples = 30
     output_path = os.getcwd()
     numEVs = 10
@@ -147,7 +147,7 @@ This means that we are generating 30 JSON files with unique seeds, we are using 
 
 If we wanted to run a Monte Carlo co-sim with different parameters, this would be:
 
-```
+```shell session
 $ python make_samples.py 10 . 100 24*7 0 0
 
 ```
@@ -156,14 +156,14 @@ This execution would create 10 JSON files with unique seeds, set the current dir
 
 You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
 
-```
+```python
     out_json = output_path+'/cli_runner_scripts'
     out_data = output_path+'/results'
 ```
 
 In the runner scripts directory, there will be 30 JSONs. Each will have a unique `seed` parameter, otherwise they will all look identical:
 
-```
+```json
 {
     "federates": [
         {
