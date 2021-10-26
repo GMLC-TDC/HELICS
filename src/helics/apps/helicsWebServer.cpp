@@ -35,7 +35,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // but it isn't in environments that use MSVCRT/UCRT; we're undefine it so that
 // asio won't rely on the function
 #if defined(_LIBCPP_HAS_ALIGNED_ALLOC) && (defined(_LIBCPP_MSVCRT) || defined(__MINGW32__))
-#undef _LIBCPP_HAS_ALIGNED_ALLOC
+#    undef _LIBCPP_HAS_ALIGNED_ALLOC
 #endif
 #include <boost/asio/dispatch.hpp>
 #include <boost/asio/strand.hpp>
