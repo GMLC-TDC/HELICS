@@ -300,6 +300,8 @@ TEST_F(vfed_single_tests, default_value_tests)
     EXPECT_STREQ(helicsInputGetType(inp_double), "double");
     EXPECT_STREQ(helicsInputGetPublicationType(inp_double), "int64");
 
+    EXPECT_EQ(helicsInputGetPublicationDataType(inp_double), HELICS_DATA_TYPE_INT);
+
     auto c2 = helicsInputGetChar(inp_char, &err);
     EXPECT_EQ(c2, 'q');
     int actSize = 56;
