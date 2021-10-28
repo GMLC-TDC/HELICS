@@ -27,7 +27,7 @@ This section introduces the simplest broker topology for integrating federates i
 
 **todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

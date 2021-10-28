@@ -2,7 +2,7 @@
 
 Included with HELICS are a number of apps that provide useful utilities and test programs for getting started and running with HELICS
 
-```eval_rst
+```{eval-rst}
 .. toctree::
   :maxdepth: 1
 

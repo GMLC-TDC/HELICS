@@ -1,6 +1,6 @@
 # OS Specific installation from source
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

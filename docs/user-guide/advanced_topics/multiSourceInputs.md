@@ -30,7 +30,7 @@ The default priority of the inputs if they are published at the same time and on
 The priority of the inputs is only applicable if the default operation to retrieve a single value is used. The option
 `helics_handle_option_multi_input_handling_method` can be used to specify a reduction operation on all the inputs to process them in some fashion a number of operations are available.
 
-```eval_rst
+```{eval-rst}
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | method                                    | Description                                                                                                                                  |
 +===========================================+==============================================================================================================================================+

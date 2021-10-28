@@ -70,6 +70,7 @@ if read_the_docs_build:
     html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -78,14 +79,12 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
+    "sphinxcontrib.rsvgconverter",
     "sphinx_markdown_tables",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
 ]
-
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
@@ -94,16 +93,8 @@ breathe_projects = {
 breathe_default_project = "helics"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = []
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-
-source_parsers = {
-    ".md": CommonMarkParser,
-}
-source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
@@ -242,12 +233,4 @@ texinfo_documents = [
 
 
 def setup(app):
-    app.add_stylesheet("css/custom.css")  # may also be an URL
-    app.add_config_value(
-        "recommonmark_config",
-        {
-            "enable_eval_rst": True,
-        },
-        True,
-    )
-    app.add_transform(AutoStructify)
+    app.add_css_file("css/custom.css")  # may also be an URL

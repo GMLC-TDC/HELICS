@@ -1,6 +1,6 @@
 # Integrating Advanced Setup Options
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

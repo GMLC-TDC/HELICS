@@ -20,7 +20,7 @@ query_result = h.helicsCreateQuery(traget_string, query_string)
 
 Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._ "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it will not be queries by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker.
 
-```eval_rst
+```{eval-rst}
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | target                                   | Description                                                                           |
 +==========================================+=======================================================================================+
@@ -54,7 +54,7 @@ The `queryStr` is the specific data being requested; the tables below show the v
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +--------------------+------------------------------------------------------------+
 | queryString        | Description                                                |
 +====================+============================================================+
@@ -106,7 +106,7 @@ The `global_time_debugging` and `global_flush` queries are also acknowledged by 
 
 The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries.
 
-```eval_rst
+```{eval-rst}
 +---------------------------+------------------------------------------------------------+
 | queryString               | Description                                                |
 +===========================+============================================================+
@@ -126,7 +126,7 @@ The following queries are defined for federates but can only be queried on the l
 
 The following queries will be answered by a core:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+-------------------------------------------------------------------------------------+
 | queryString              | Description                                                                         |
 +==========================+=====================================================================================+
@@ -198,7 +198,7 @@ The `version` and `version_all` queries are valid but are not usually queried di
 
 The following queries will be answered by a broker:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | queryString              | Description                                                                                       |
 +==========================+===================================================================================================+

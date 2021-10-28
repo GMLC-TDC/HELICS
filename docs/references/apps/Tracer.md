@@ -86,7 +86,7 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-```eval_rst
+```{eval-rst}
 +------------------------------+------------------------------------------------------------+
 | interface                    | description                                                |
 +==============================+============================================================+

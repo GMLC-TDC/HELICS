@@ -1,6 +1,6 @@
 # Advanced Examples
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
     :hidden:
