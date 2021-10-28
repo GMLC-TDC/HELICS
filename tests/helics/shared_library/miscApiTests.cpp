@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ctestFixtures.hpp"
+
+#include <complex>
 #include <gtest/gtest.h>
 #include <thread>
-#include <complex>
 #include <vector>
 // misc test copying some of the JAVA/Python tests
 
@@ -213,7 +214,6 @@ TEST(misc_tests, misc_tests)
 
 TEST(type_conversion, namedType)
 {
-    
     EXPECT_TRUE(helicsGetDataType("int") == HELICS_DATA_TYPE_INT);
     EXPECT_TRUE(helicsGetDataType("INT") == HELICS_DATA_TYPE_INT);
     EXPECT_TRUE(helicsGetDataType("char") == HELICS_DATA_TYPE_STRING);

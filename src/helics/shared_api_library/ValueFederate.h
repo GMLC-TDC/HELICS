@@ -770,7 +770,6 @@ HELICS_EXPORT int helicsInputGetPublicationDataType(HelicsInput ipt);
  */
 HELICS_EXPORT const char* helicsPublicationGetType(HelicsPublication pub);
 
-
 /**
  * Get the key of an input.
  *
