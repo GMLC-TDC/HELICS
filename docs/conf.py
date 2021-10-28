@@ -66,8 +66,12 @@ read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
-    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
-    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
+    checkout_dir = os.path.realpath(os.path.join(dir_name, os.pardir))
+    doxygen_build_dir = os.path.realpath(os.path.join(checkout_dir, "build-doxygen"))
+    if not os.path.isdir(doxygen_build_dir):
+        os.makedirs(os.path.join(doxygen_build_dir, "docs", "html"))
+        subprocess.call("cd {dir_name} && python ./scripts/render-doxyfile.py && doxygen Doxyfile;".format(dir_name=checkout_dir), shell=True)
+    html_extra_path = [os.path.abspath(os.path.join(doxygen_build_dir, "docs", "html"))]
 
 extensions = [
     "myst_parser",
