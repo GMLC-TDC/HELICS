@@ -87,9 +87,9 @@ double vectorNorm(const std::vector<double>& vec)
     return std::sqrt(std::inner_product(vec.begin(), vec.end(), vec.begin(), 0.0));
 }
 
-double vectorNorm(const double *vec, std::size_t size)
+double vectorNorm(const double* vec, std::size_t size)
 {
-    return std::sqrt(std::inner_product(vec, vec+size, vec, 0.0));
+    return std::sqrt(std::inner_product(vec, vec + size, vec, 0.0));
 }
 
 double vectorNorm(const std::vector<std::complex<double>>& vec)
@@ -802,31 +802,31 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
     if ((vals == nullptr) || (size == 0)) {
         return emptyBlock(type, DataType::HELICS_VECTOR);
     }
-    if (size==1) {
+    if (size == 1) {
         // treat like a single double
         return typeConvert(type, vals[0]);
     }
     switch (type) {
         case DataType::HELICS_DOUBLE:
-            return ValueConverter<double>::convert(vectorNorm(vals,size));
+            return ValueConverter<double>::convert(vectorNorm(vals, size));
 
         case DataType::HELICS_INT:
-            return ValueConverter<int64_t>::convert(
-                static_cast<int64_t>(vectorNorm(vals,size)));
+            return ValueConverter<int64_t>::convert(static_cast<int64_t>(vectorNorm(vals, size)));
         case DataType::HELICS_COMPLEX: {
             std::complex<double> V(vals[0], vals[1]);
             return ValueConverter<std::complex<double>>::convert(V);
         }
         case DataType::HELICS_BOOL:
-            return ValueConverter<std::string_view>::convert((vectorNorm(vals,size) != 0.0) ? "1" : "0");
+            return ValueConverter<std::string_view>::convert((vectorNorm(vals, size) != 0.0) ? "1" :
+                                                                                               "0");
         case DataType::HELICS_STRING:
             return ValueConverter<std::string_view>::convert(helicsVectorString(vals, size));
         case DataType::HELICS_NAMED_POINT:
-                return ValueConverter<NamedPoint>::convert(
-                    NamedPoint{helicsVectorString(vals, size), std::nan("0")});
+            return ValueConverter<NamedPoint>::convert(
+                NamedPoint{helicsVectorString(vals, size), std::nan("0")});
         case DataType::HELICS_COMPLEX_VECTOR: {
             std::vector<std::complex<double>> CD;
-            CD.reserve((size+1) / 2);
+            CD.reserve((size + 1) / 2);
             for (size_t ii = 0; ii < size - 1; ii += 2) {
                 CD.emplace_back(vals[ii], vals[ii + 1]);
             }
@@ -853,7 +853,7 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
     if (val.empty()) {
         return emptyBlock(type, DataType::HELICS_COMPLEX_VECTOR);
     }
-    if (val.size()==1) {
+    if (val.size() == 1) {
         return typeConvert(type, val[0]);
     }
     switch (type) {
@@ -898,15 +898,14 @@ SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& 
 }
 SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
 {
-    if (val.imag()==0.0) {
+    if (val.imag() == 0.0) {
         return typeConvert(type, val.real());
     }
     switch (type) {
         case DataType::HELICS_DOUBLE:
             return ValueConverter<double>::convert(std::abs(val));
         case DataType::HELICS_INT:
-            return ValueConverter<int64_t>::convert(
-                static_cast<int64_t>(std::abs(val)));
+            return ValueConverter<int64_t>::convert(static_cast<int64_t>(std::abs(val)));
         case DataType::HELICS_COMPLEX:
         default:
             return ValueConverter<std::complex<double>>::convert(val);
@@ -915,8 +914,8 @@ SmallBuffer typeConvert(DataType type, const std::complex<double>& val)
         case DataType::HELICS_STRING:
             return ValueConverter<std::string_view>::convert(helicsComplexString(val));
         case DataType::HELICS_NAMED_POINT:
-                return ValueConverter<NamedPoint>::convert(
-                    NamedPoint{helicsComplexString(val), std::nan("0")});
+            return ValueConverter<NamedPoint>::convert(
+                NamedPoint{helicsComplexString(val), std::nan("0")});
         case DataType::HELICS_COMPLEX_VECTOR:
             return ValueConverter<std::complex<double>>::convert(&val, 1);
         case DataType::HELICS_VECTOR: {
