@@ -12,7 +12,7 @@ steps:
       - uname -a
 
   - name: submodules
-    image: docker:git
+    image: alpine/git
     commands:
       # for updating submodules to latest upstream, add --remote
       - git submodule update --init --recursive
@@ -55,7 +55,7 @@ steps:
       - uname -a
 
   - name: submodules
-    image: docker:git
+    image: alpine/git
     commands:
       # for updating submodules to latest upstream, add --remote
       - git submodule update --init --recursive
