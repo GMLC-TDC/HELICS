@@ -28,6 +28,8 @@ bool checkTypeConversion1(const T1& val1, const T2& exp)
     return (v2 == exp);
 }
 
+
+
 TEST(type_conversion, vectorNorm)
 {
     using c = std::complex<double>;
@@ -66,6 +68,7 @@ TEST(type_conversion, string_converstion)
     EXPECT_TRUE(
         checkTypeConversion1(vstr,
                              std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
+
     EXPECT_TRUE(checkTypeConversion1(vstr, true));
     EXPECT_TRUE(checkTypeConversion1(vstr, NamedPoint{"value", val}));
     std::string test1("test1");
@@ -248,4 +251,49 @@ TEST(type_conversion, bool_conversion)
     EXPECT_TRUE(checkTypeConversion1(std::vector<double>{0.0, 1.0}, val));
     EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, 1.0}, val));
     EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, -0.5}, val));
+}
+
+
+template<class T1>
+bool roundTripTest1(const T1& val1, DataType type1)
+{
+    auto buffer = typeConvert(type1, val1);
+    T1 out;
+    valueExtract(buffer, type1, out);
+    return out == val1;
+}
+
+// test to make sure the type conversion round trip works as expected
+template<class T1>
+bool roundTripTest2(const T1& val1, DataType type1)
+{
+    auto buffer = typeConvert(type1, val1);
+    T1 out;
+    defV dv;
+    valueExtract(buffer, type1, dv);
+    valueExtract(dv, out);
+    return out == val1;
+}
+
+TEST(roundTripConversions, integer) {
+    std::vector<std::int64_t> vals{10, 256161341561, -3637, 0};
+    std::vector<DataType> ctypes{DataType::HELICS_STRING,
+                          DataType::HELICS_DOUBLE,
+                          DataType::HELICS_INT,
+
+                          DataType::HELICS_COMPLEX,
+                          DataType::HELICS_VECTOR,
+                          DataType::HELICS_COMPLEX_VECTOR,
+                          DataType::HELICS_NAMED_POINT,
+                          DataType::HELICS_TIME,
+                          DataType::HELICS_JSON};
+
+    for (auto &cval:vals) {
+        for (auto &ttype:ctypes) {
+            EXPECT_TRUE(roundTripTest1(cval, ttype))
+                << typeNameStringRef(ttype) << ": error val " << cval;
+            EXPECT_TRUE(roundTripTest2(cval, ttype))
+                << typeNameStringRef(ttype) << ": error val " << cval;
+        }
+    }
 }

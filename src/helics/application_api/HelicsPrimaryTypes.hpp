@@ -179,18 +179,32 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             val = static_cast<X>(getDoubleFromString(std::get<std::string>(dv)));
             break;
         case complex_loc:  // complex
-            val = static_cast<X>(std::abs(std::get<std::complex<double>>(dv)));
+        {
+            auto cv = std::get<std::complex<double>>(dv);
+            val = static_cast<X>((cv.imag()!=0.0)?std::abs(cv):cv.real());
+        }
+            
             break;
         case vector_loc:  // vector
         {
             const auto& vec = std::get<std::vector<double>>(dv);
-            val = static_cast<X>(vectorNorm(vec));
+            val = static_cast<X>((vec.size()==1)?vec[0]:vectorNorm(vec));
             break;
         }
         case complex_vector_loc:  // complex vector
         {
             const auto& vec = std::get<std::vector<std::complex<double>>>(dv);
-            val = static_cast<X>(vectorNorm(vec));
+            double vald{0.0};
+            if (vec.size()==1) {
+                if (vec[0].imag()==0.0) {
+                    vald = vec[0].real();
+                } else {
+                    vald = std::abs(vec[0]);
+                }
+            } else {
+                vald = vectorNorm(vec);
+            }
+            val = static_cast<X>(vald);
             break;
         }
         case named_point_loc: {
@@ -256,17 +270,31 @@ std::enable_if_t<std::is_arithmetic<X>::value>
 
         case DataType::HELICS_VECTOR: {
             auto V = ValueConverter<std::vector<double>>::interpret(dv);
-            val = static_cast<X>(vectorNorm(V));
+            if (V.size() == 1) {
+                val = static_cast<X>(V[0]);
+            } else {
+                val = static_cast<X>(vectorNorm(V));
+            }
             break;
         }
         case DataType::HELICS_COMPLEX: {
             auto V = ValueConverter<std::complex<double>>::interpret(dv);
-            val = static_cast<X>(std::abs(V));
+
+            val = static_cast<X>((V.imag() != 0) ? std::abs(V) : V.real());
             break;
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
             auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
-            val = static_cast<X>(vectorNorm(V));
+            if (V.size()==1) {
+                if (V[0].imag()==0) {
+                    val = static_cast<X>(V[0].real());
+                } else {
+                    val = static_cast<X>(std::abs(V[0]));
+                }
+            } else {
+                val = static_cast<X>(vectorNorm(V));
+            }
+            
             break;
         }
         case DataType::HELICS_JSON:
