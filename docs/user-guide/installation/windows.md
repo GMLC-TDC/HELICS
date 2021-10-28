@@ -269,7 +269,7 @@ Clang does not work to compile on MSYS2 at this time. It has in the past but the
 HELICS can also be built with the standalone MinGW
 
 - We assume you have MinGW installed or know how to install it.
-- [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html); you can use the [Windows installer](https://dl.bintray.com/boostorg/release/1.70.0/binaries/) for Boost installed in the default location
+- [Boost](https://www.boost.org/doc/libs/1_75_0/more/getting_started/windows.html); you can use the [Windows installer](https://sourceforge.net/projects/boost/files/boost-binaries/) for Boost installed in the default location
 - Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator,
 - Run mingw32-make -j to build
 

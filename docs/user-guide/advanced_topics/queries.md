@@ -302,7 +302,7 @@ In the header [`<helics\queryFunctions.hpp>`](https://docs.helics.org/en/latest/
 
 ### C API and interface API's
 
-Queries in the [`C API`](https://docs.helics.org/en/latest/c-api-reference/index.html#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
+Queries in the [C API](../../api-reference/C_API.md#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
 
 This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`, to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use `helicsQueryFree()`.

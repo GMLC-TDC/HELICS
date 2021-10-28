@@ -50,4 +50,4 @@ This means you can pass it configurations settings as a key value pair by adding
 For example, to build the Java extension all you need to do is pass in `-DHELICS_BUILD_JAVA_INTERFACE=ON`.
 You can also run `ccmake .` in the build folder, to get a command line interactive prompt to change configuration settings.
 On Windows, you can use the cmake GUI to do the same.
-Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](https://helics.readthedocs.io/en/latest/installation/helics_cmake_options.html).
+Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](helics_cmake_options.md).

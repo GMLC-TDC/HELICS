@@ -60,7 +60,7 @@ Commands that must traverse the network travel along priority paths.
 
 ### Application API
 
-There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html).
+There are two basic calls in the application API as part of a [federate object](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Federate.html).
 To retrieve a command addressed to a federate there are two commands
 
 ```cpp
