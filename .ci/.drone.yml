@@ -7,7 +7,7 @@ platform:
 
 steps:
   - name: uname
-    image: alpine:3.12
+    image: alpine
     commands:
       - uname -a
 
@@ -18,7 +18,7 @@ steps:
       - git submodule update --init --recursive
 
   - name: build
-    image: alpine:3.12
+    image: alpine
     commands:
       - apk update
       - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
