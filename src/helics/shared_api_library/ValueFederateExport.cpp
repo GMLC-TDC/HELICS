@@ -1132,6 +1132,10 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
     // LCOV_EXCL_STOP
 }
 
+int helicsInputGetPublicationDataType(HelicsInput ipt) {
+    return helicsGetDataType(helicsInputGetPublicationType(ipt));
+}
+
 const char* helicsPublicationGetType(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);

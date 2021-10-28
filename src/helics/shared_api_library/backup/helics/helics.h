@@ -85,6 +85,7 @@ typedef enum {
 
 /** enumeration of allowable data types for publications and inputs*/
 typedef enum {
+    HELICS_DATA_TYPE_UNKNOWN = -1,
     /** a sequence of characters*/
     HELICS_DATA_TYPE_STRING = 0,
     /** a double precision floating point number*/
@@ -389,6 +390,8 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
+const double HELICS_BIG_NUMBER = 9223372036.854774;
+
 /**
  * @file
  * @brief Data structures for the C api
@@ -466,8 +469,8 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
 const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of time signifying the federate has
-                                                             terminated or to run until the end of the simulation*/
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER; /*!< definition of time signifying the federate has
+                                                             terminated or run until the end of the simulation*/
 
 /**
  * defining a boolean type for use in the helics interface
@@ -1267,6 +1270,16 @@ HELICS_EXPORT int helicsGetOptionIndex(const char* val);
  * @return An int with the option value or (-1) if not a valid value.
  */
 HELICS_EXPORT int helicsGetOptionValue(const char* val);
+
+/**
+ * Get the data type for use in /ref helicsFederateRegisterPublication, /ref helicsFederateRegisterInput,
+ * /ref helicsFilterSetOption.
+ *
+ * @param val A string representing a data Type.
+ *
+ * @return an int with the data type or HELICS_DATA_TYPE_UNKNOWN(-1) if not a valid value.
+ */
+HELICS_EXPORT int helicsGetDataType(const char* val);
 
 /**
  * Set a flag in the info structure.
@@ -2877,6 +2890,15 @@ HELICS_EXPORT const char* helicsInputGetType(HelicsInput ipt);
  * @return A const char * with the type name.
  */
 HELICS_EXPORT const char* helicsInputGetPublicationType(HelicsInput ipt);
+
+/**
+ * Get the type the publisher to an input is sending.
+ *
+ * @param ipt The input to query.
+ *
+ * @return A int containing the enumeration value of the publication type.
+ */
+HELICS_EXPORT int helicsInputGetPublicationDataType(HelicsInput ipt);
 
 /**
  * Get the type of a publication.

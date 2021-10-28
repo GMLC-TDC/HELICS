@@ -270,6 +270,7 @@ inline constexpr const char* typeNameString<NamedPoint>()
 }
 /** the base types for  helics*/
 enum class DataType : int {
+    HELICS_UNKNOWN = HELICS_DATA_TYPE_UNKNOWN,
     HELICS_STRING = HELICS_DATA_TYPE_STRING,
     HELICS_DOUBLE = HELICS_DATA_TYPE_DOUBLE,
     HELICS_INT = HELICS_DATA_TYPE_INT,
@@ -284,7 +285,6 @@ enum class DataType : int {
     HELICS_ANY = HELICS_DATA_TYPE_ANY,
     HELICS_JSON = HELICS_DATA_TYPE_JSON,
     HELICS_MULTI = HELICS_DATA_TYPE_MULTI,
-    HELICS_UNKNOWN = 262355
 };
 
 inline constexpr bool isBytesType(DataType type)

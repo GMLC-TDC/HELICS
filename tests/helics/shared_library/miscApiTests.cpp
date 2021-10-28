@@ -6,9 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "ctestFixtures.hpp"
-
 #include <gtest/gtest.h>
 #include <thread>
+#include <complex>
+#include <vector>
 // misc test copying some of the JAVA/Python tests
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
@@ -209,3 +210,30 @@ TEST(misc_tests, misc_tests)
 }
 
 #endif
+
+TEST(type_conversion, namedType)
+{
+    
+    EXPECT_TRUE(helicsGetDataType("int") == HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(helicsGetDataType("INT") == HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(helicsGetDataType("char") == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(int).name()) == HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(helicsGetDataType(typeid(float).name()) == HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_TRUE(helicsGetDataType(typeid(std::string).name()) == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(char*).name()) == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(const char*).name()) == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(double).name()) == HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_TRUE(helicsGetDataType(typeid(bool).name()) == HELICS_DATA_TYPE_BOOLEAN);
+    EXPECT_TRUE(helicsGetDataType(typeid(int64_t).name()) == HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(helicsGetDataType(typeid(char).name()) == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(std::complex<double>).name()) == HELICS_DATA_TYPE_COMPLEX);
+    EXPECT_TRUE(helicsGetDataType("COMPLEX") == HELICS_DATA_TYPE_COMPLEX);
+    EXPECT_TRUE(helicsGetDataType("map") == HELICS_DATA_TYPE_RAW);
+    EXPECT_TRUE(helicsGetDataType("any") == HELICS_DATA_TYPE_ANY);
+    EXPECT_TRUE(helicsGetDataType("json") == HELICS_DATA_TYPE_JSON);
+    EXPECT_TRUE(helicsGetDataType("JSON") == HELICS_DATA_TYPE_JSON);
+    EXPECT_TRUE(helicsGetDataType("namedpoint") == HELICS_DATA_TYPE_NAMED_POINT);
+    EXPECT_TRUE(helicsGetDataType("") == HELICS_DATA_TYPE_ANY);
+    EXPECT_TRUE(helicsGetDataType(typeid(std::vector<std::complex<double>>).name()) ==
+                HELICS_DATA_TYPE_COMPLEX_VECTOR);
+}
