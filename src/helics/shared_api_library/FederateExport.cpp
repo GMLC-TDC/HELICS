@@ -342,6 +342,14 @@ int helicsGetOptionValue(const char* val)
     return helics::getOptionValue(val);
 }
 
+int helicsGetDataType(const char* val)
+{
+    if (val == nullptr) {
+        return -1;
+    }
+    return static_cast<int>(helics::getTypeFromString(val));
+}
+
 void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err)
 {
     auto* info = getFedInfo(fi, err);

@@ -27,6 +27,7 @@ typedef enum {
 } HelicsCoreTypes;
 
 typedef enum {
+    HELICS_DATA_TYPE_UNKNOWN = -1,
     HELICS_DATA_TYPE_STRING = 0,
     HELICS_DATA_TYPE_DOUBLE = 1,
     HELICS_DATA_TYPE_INT = 2,
@@ -174,6 +175,8 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
+const double HELICS_BIG_NUMBER = 9223372036.854774;
+
 typedef void* HelicsInput;
 
 typedef void* HelicsPublication;
@@ -201,7 +204,7 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0;
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9;
 const HelicsTime HELICS_TIME_INVALID = -1.785e39;
-const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774;
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER;
 
 typedef int HelicsBool;
 
@@ -316,6 +319,7 @@ int helicsGetPropertyIndex(const char* val);
 int helicsGetFlagIndex(const char* val);
 int helicsGetOptionIndex(const char* val);
 int helicsGetOptionValue(const char* val);
+int helicsGetDataType(const char* val);
 void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
 void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
 void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
@@ -469,6 +473,7 @@ void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double va
 
 const char* helicsInputGetType(HelicsInput ipt);
 const char* helicsInputGetPublicationType(HelicsInput ipt);
+int helicsInputGetPublicationDataType(HelicsInput ipt);
 const char* helicsPublicationGetType(HelicsPublication pub);
 const char* helicsInputGetName(HelicsInput ipt);
 const char* helicsSubscriptionGetTarget(HelicsInput ipt);
