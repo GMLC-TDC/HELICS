@@ -1,6 +1,6 @@
 # API Reference
 
-## [C++ API (doxygen)](../../doxygen/index.html)
+## [C++ API (doxygen)](../../doxygen/index.md)
 
 ## [C API](./C_API.md)
 

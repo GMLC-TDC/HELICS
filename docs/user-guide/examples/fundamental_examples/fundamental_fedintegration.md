@@ -141,7 +141,7 @@ If you find yourself wanting to set additional properties, there are a handful o
 
 - [C++ source code](https://docs.helics.org/en/latest/doxygen/helics__enums_8h_source.html): Do a string search for the JSON property. This can provide clarity into which `enum` to use from the API.
 - [PyHELICS API methods](https://python.helics.org/api/capi-py): API methods specific to PyHELICS, with suggestions for making the calls pythonic.
-- [Configuration Options Reference](../../../references/configuration_options_reference.html): API calls for C++, C, Python, and Julia
+- [Configuration Options Reference](../../../references/configuration_options_reference.md): API calls for C++, C, Python, and Julia
 
 ### Federate Integration with API calls
 

@@ -1,6 +1,6 @@
 # Brokers - Hierarchies
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
