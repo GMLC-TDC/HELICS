@@ -7,18 +7,18 @@ platform:
 
 steps:
   - name: uname
-    image: alpine
+    image: alpine:3.12
     commands:
       - uname -a
 
   - name: submodules
-    image: alpine/git
+    image: alpine/git:1.0.32
     commands:
       # for updating submodules to latest upstream, add --remote
       - git submodule update --init --recursive
 
   - name: build
-    image: alpine
+    image: alpine:3.12
     commands:
       - apk update
       - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
