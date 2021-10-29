@@ -12,9 +12,10 @@ steps:
       - uname -a
 
   - name: submodules
-    image: alpine/git:1.0.32
+    image: alpine:3.12
     commands:
       # for updating submodules to latest upstream, add --remote
+      - apk add --no-cache git
       - git submodule update --init --recursive
 
   - name: build
