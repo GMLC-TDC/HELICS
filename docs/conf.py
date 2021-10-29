@@ -70,7 +70,12 @@ if read_the_docs_build:
     doxygen_build_dir = os.path.realpath(os.path.join(checkout_dir, "build-doxygen"))
     if not os.path.isdir(doxygen_build_dir):
         os.makedirs(os.path.join(doxygen_build_dir, "docs", "html"))
-        subprocess.call("cd {dir_name} && python ./scripts/render-doxyfile.py && doxygen Doxyfile;".format(dir_name=checkout_dir), shell=True)
+        subprocess.call(
+            "cd {dir_name} && python ./scripts/render-doxyfile.py && doxygen Doxyfile;".format(
+                dir_name=checkout_dir
+            ),
+            shell=True,
+        )
     html_extra_path = [os.path.abspath(os.path.join(doxygen_build_dir, "docs", "html"))]
 
 extensions = [
