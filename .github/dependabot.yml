@@ -5,3 +5,7 @@ updates:
     schedule:
       interval: "daily"
     target-branch: "develop"
+  - package-ecosystem: "pip"
+    directory: "/docs"
+    schedule:
+      interval: "daily"
