@@ -179,33 +179,33 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         case string_loc:  // string
         default: {
             const auto& v = std::get<std::string>(dv);
-            if (v.find_first_of(".eE[]")==std::string::npos) {
+            if (v.find_first_of(".eE[]") == std::string::npos) {
                 val = static_cast<X>(getIntFromString(v));
             } else {
                 val = static_cast<X>(getDoubleFromString(v));
             }
         }
-            
-            break;
+
+        break;
         case complex_loc:  // complex
         {
             auto cv = std::get<std::complex<double>>(dv);
-            val = static_cast<X>((cv.imag()!=0.0)?std::abs(cv):cv.real());
+            val = static_cast<X>((cv.imag() != 0.0) ? std::abs(cv) : cv.real());
         }
-            
-            break;
+
+        break;
         case vector_loc:  // vector
         {
             const auto& vec = std::get<std::vector<double>>(dv);
-            val = static_cast<X>((vec.size()==1)?vec[0]:vectorNorm(vec));
+            val = static_cast<X>((vec.size() == 1) ? vec[0] : vectorNorm(vec));
             break;
         }
         case complex_vector_loc:  // complex vector
         {
             const auto& vec = std::get<std::vector<std::complex<double>>>(dv);
             double vald{0.0};
-            if (vec.size()==1) {
-                if (vec[0].imag()==0.0) {
+            if (vec.size() == 1) {
+                if (vec[0].imag() == 0.0) {
                     vald = vec[0].real();
                 } else {
                     vald = std::abs(vec[0]);
@@ -247,14 +247,14 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         case DataType::HELICS_STRING:
         default: {
             const auto v = ValueConverter<std::string_view>::interpret(dv);
-            if (v.find_first_of(".eE[]")==std::string_view::npos) {
+            if (v.find_first_of(".eE[]") == std::string_view::npos) {
                 val = static_cast<X>(getIntFromString(v));
             } else {
                 val = static_cast<X>(getDoubleFromString(v));
             }
         }
-            
-            break;
+
+        break;
         case DataType::HELICS_BOOL:
             val = static_cast<X>((ValueConverter<std::string_view>::interpret(dv) != "0"));
             break;
@@ -284,8 +284,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             val = static_cast<X>(V);
             break;
         }
-        case DataType::HELICS_INT:
-        {
+        case DataType::HELICS_INT: {
             auto V = ValueConverter<int64_t>::interpret(dv);
             val = static_cast<X>(V);
             break;
@@ -314,8 +313,8 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
             auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
-            if (V.size()==1) {
-                if (V[0].imag()==0) {
+            if (V.size() == 1) {
+                if (V[0].imag() == 0) {
                     val = static_cast<X>(V[0].real());
                 } else {
                     val = static_cast<X>(std::abs(V[0]));
@@ -323,7 +322,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             } else {
                 val = static_cast<X>(vectorNorm(V));
             }
-            
+
             break;
         }
         case DataType::HELICS_JSON:
