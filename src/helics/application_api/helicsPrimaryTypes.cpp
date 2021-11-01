@@ -222,7 +222,7 @@ void valueExtract(const defV& dv, std::complex<double>& val)
             const auto& vec = std::get<std::vector<double>>(dv);
             if (vec.size() == 1) {
                 val = std::complex<double>(vec[0], 0.0);
-            } else if (vec.size() > 2) {
+            } else if (vec.size() >= 2) {
                 val = std::complex<double>(vec[0], vec[1]);
             }
             break;
@@ -263,7 +263,9 @@ void valueExtract(const defV& dv, std::vector<double>& val)
         {
             auto cval = std::get<std::complex<double>>(dv);
             val.push_back(cval.real());
-            val.push_back(cval.imag());
+            if (cval.imag()!=0.0) {
+                val.push_back(cval.imag());
+            }
         } break;
         case vector_loc:  // vector
             val = std::get<std::vector<double>>(dv);
@@ -271,11 +273,14 @@ void valueExtract(const defV& dv, std::vector<double>& val)
         case complex_vector_loc:  // complex
         {
             const auto& cv = std::get<std::vector<std::complex<double>>>(dv);
-            val.reserve(2 * cv.size());
+            val.reserve(cv.size());
             val.clear();
             for (const auto& cval : cv) {
-                val.push_back(cval.real());
-                val.push_back(cval.imag());
+                if (cval.imag()==0.0) {
+                    val.push_back(cval.real());
+                } else {
+                    val.push_back(std::abs(cval));
+                }
             }
         } break;
         case named_point_loc:  // named point
@@ -313,10 +318,13 @@ void valueExtract(const defV& dv, std::vector<std::complex<double>>& val)
         case vector_loc:  // vector
         {
             const auto& v = std::get<std::vector<double>>(dv);
-            val.reserve(v.size() / 2);
+            val.reserve(v.size()+1 / 2);
             val.clear();
             for (size_t ii = 0; ii < v.size() - 1; ii += 2) {
                 val.emplace_back(v[ii], v[ii + 1]);
+            }
+            if (v.size()%2==1) {
+                val.emplace_back(v.back(),0.0);
             }
             break;
         }
@@ -428,7 +436,17 @@ void valueExtract(const defV& dv, Time& val)
             break;
         }
         case named_point_loc:
-            val = std::get<NamedPoint>(dv).value;
+            auto np = std::get<NamedPoint>(dv);
+            if (std::isnan(np.value)) {
+                if (np.name.find(".[eE") == std::string::npos) {
+                    std::int64_t v = getIntFromString(np.name);
+                    val.setBaseTimeCode(v);
+                } else {
+                    val = getDoubleFromString(np.name);
+                }
+            } else {
+                val = np.value;
+            }
             break;
     }
 }
@@ -465,7 +483,16 @@ void valueExtract(const defV& dv, char& val)
         }
         case named_point_loc: {
             const auto& np = std::get<NamedPoint>(dv);
-            val = np.name.empty() ? (static_cast<char>(np.value)) : np.name[0];
+            if (std::isnan(np.value)) {
+                double vald = getDoubleFromString(np.name);
+                if (vald!=invalidDouble) {
+                    val = static_cast<char>(vald);
+                } else {
+                    val = np.name.size() >= 1 ? np.name[0] : 0;
+                }
+            } else {
+                val = static_cast<char>(np.value);
+            }
         } break;
     }
 }
@@ -544,6 +571,7 @@ defV readJsonValue(const data_view& dv)
                 result = std::move(res);
             } break;
             case DataType::HELICS_INT:
+            case DataType::HELICS_TIME:
                 result = jv["value"].asInt64();
                 break;
             case DataType::HELICS_STRING:
@@ -567,22 +595,24 @@ void valueExtract(const data_view& dv, DataType baseType, std::string& val)
     switch (baseType) {
         case DataType::HELICS_DOUBLE: {
             auto V = ValueConverter<double>::interpret(dv);
-            val = std::to_string(V);
+            val = helicsDoubleString(V);
             break;
         }
         case DataType::HELICS_INT:
         case DataType::HELICS_TIME: {
             auto V = ValueConverter<int64_t>::interpret(dv);
-            val = std::to_string(V);
+            val = helicsIntString(V);
             break;
         }
         case DataType::HELICS_STRING:
         default:
             val = ValueConverter<std::string_view>::interpret(dv);
             break;
-        case DataType::HELICS_NAMED_POINT:
-            val = helicsNamedPointString(ValueConverter<NamedPoint>::interpret(dv));
+        case DataType::HELICS_NAMED_POINT: {
+            auto npv = ValueConverter<NamedPoint>::interpret(dv);
+            val = std::isnan(npv.value) ? npv.name : helicsNamedPointString(npv);
             break;
+        }
         case DataType::HELICS_VECTOR:
             val = helicsVectorString(ValueConverter<std::vector<double>>::interpret(dv));
             break;
@@ -623,7 +653,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::vector<double>& v
         case DataType::HELICS_NAMED_POINT: {
             auto npval = ValueConverter<NamedPoint>::interpret(dv);
             if (std::isnan(npval.value)) {
-                val = helicsGetVector(dv.string());
+                val = helicsGetVector(npval.name);
             } else {
                 val.push_back(npval.value);
             }
@@ -636,15 +666,20 @@ void valueExtract(const data_view& dv, DataType baseType, std::vector<double>& v
         case DataType::HELICS_COMPLEX: {
             auto cval = ValueConverter<std::complex<double>>::interpret(dv);
             val.push_back(cval.real());
-            val.push_back(cval.imag());
+            if (cval.imag()!=0.0) {
+                val.push_back(cval.imag());
+            }
             break;
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
             auto cv = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
-            val.reserve(2 * cv.size());
+            val.reserve(cv.size());
             for (auto& cval : cv) {
-                val.push_back(cval.real());
-                val.push_back(cval.imag());
+                if (cval.imag()==0.0) {
+                    val.push_back(cval.real());
+                } else {
+                    val.push_back(std::abs(cval));
+                }
             }
             break;
         }
@@ -680,6 +715,10 @@ void valueExtract(const data_view& dv, DataType baseType, std::vector<std::compl
             for (size_t ii = 0; ii < V.size() - 1; ii += 2) {
                 val.emplace_back(V[ii], V[ii + 1]);
             }
+            if (V.size()%2==1) {
+                val.emplace_back(V.back(), 0.0);
+            }
+            
             break;
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
@@ -723,7 +762,8 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
             val = std::complex<double>(static_cast<double>(tm), 0.0);
         } break;
         case DataType::HELICS_STRING:
-        default: {
+        default:
+        {
             val = helicsGetComplex(ValueConverter<std::string_view>::interpret(dv));
             break;
         }
@@ -740,7 +780,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
             auto vec = ValueConverter<std::vector<double>>::interpret(dv);
             if (vec.size() == 1) {
                 val = std::complex<double>(vec[0], 0.0);
-            } else if (vec.size() > 2) {
+            } else if (vec.size() >= 2) {
                 val = std::complex<double>(vec[0], vec[1]);
             }
             break;
@@ -748,6 +788,13 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
         case DataType::HELICS_COMPLEX:
             val = ValueConverter<std::complex<double>>::interpret(dv);
             break;
+        case DataType::HELICS_COMPLEX_VECTOR: {
+            auto cvec = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
+            if (cvec.size() >= 1) {
+                val = cvec[0];
+            }
+            break;
+        }
         case DataType::HELICS_JSON:
             valueExtract(readJsonValue(dv), val);
             break;
@@ -870,7 +917,16 @@ void valueExtract(const data_view& dv, DataType baseType, Time& val)
         }
         case DataType::HELICS_NAMED_POINT: {
             auto np = ValueConverter<NamedPoint>::interpret(dv);
-            val = np.value;
+            if (std::isnan(np.value)) {
+                if (np.name.find(".[eE")==std::string::npos) {
+                    std::int64_t v = getIntFromString(np.name);
+                    val.setBaseTimeCode(v);
+                } else {
+                    val = getDoubleFromString(np.name);
+                }
+            } else {
+                val = np.value;
+            }
             break;
         }
         case DataType::HELICS_JSON:
@@ -941,6 +997,87 @@ void valueExtract(const data_view& dv, DataType baseType, bool& val)
             throw(std::invalid_argument("unrecognized helics type"));
     }
 }
+
+void valueExtract(const data_view& dv, DataType baseType, char& val)
+{
+    switch (baseType) {
+        case DataType::HELICS_ANY: {
+            defV val_dv;
+            valueExtract(dv, baseType, val_dv);
+            valueExtract(val_dv, val);
+            break;
+        }
+        case DataType::HELICS_STRING:
+        default: {
+            auto sv=ValueConverter<std::string_view>::interpret(dv);
+            if (sv.size()==1) {
+                val = sv[0];
+            } else {
+                double v = getDoubleFromString(sv);
+                if (v!=invalidDouble) {
+                    val = static_cast<char>(v);
+                } else {
+                    val = sv[0];
+                }
+            }
+        }
+            
+            break;
+        case DataType::HELICS_BOOL:
+            val = ValueConverter<std::string_view>::interpret(dv)[0];
+            break;
+        case DataType::HELICS_NAMED_POINT: {
+            auto npval = ValueConverter<NamedPoint>::interpret(dv);
+            if (std::isnan(npval.value)) {
+                if (npval.name.size() == 1) {
+                    val = npval.name[0];
+                } else {
+                    double v = getDoubleFromString(npval.name);
+                    if (v != invalidDouble) {
+                        val = static_cast<char>(v);
+                    } else {
+                        val = npval.name[0];
+                    }
+                }
+            } else {
+                val = static_cast<char>(npval.value);
+            }
+            break;
+        }
+        case DataType::HELICS_DOUBLE: {
+            val = static_cast<char>(ValueConverter<double>::interpret(dv));
+            break;
+        }
+        case DataType::HELICS_INT:
+        case DataType::HELICS_TIME: {
+            auto V = ValueConverter<int64_t>::interpret(dv);
+            val = static_cast<char>(V);
+            break;
+        }
+
+        case DataType::HELICS_VECTOR: {
+            auto V = ValueConverter<std::vector<double>>::interpret(dv);
+            val = static_cast<char>((V.size()==1)?V[0]:vectorNorm(V));
+            break;
+        }
+        case DataType::HELICS_COMPLEX: {
+            auto V = ValueConverter<std::complex<double>>::interpret(dv);
+            val = static_cast<char>((V.imag()==0.0)?V.real():std::abs(V));
+            break;
+        }
+        case DataType::HELICS_COMPLEX_VECTOR: {
+            auto V = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
+            val = static_cast<char>((V.size()==1)?((V[0].imag()==0.0)?V[0].real():std::abs(V[0])):vectorNorm(V));
+            break;
+        }
+        case DataType::HELICS_JSON:
+            valueExtract(readJsonValue(dv), val);
+            break;
+        case DataType::HELICS_CUSTOM:
+            throw(std::invalid_argument("unrecognized helics type"));
+    }
+}
+
 void valueExtract(const data_view& dv, DataType baseType, defV& val)
 {
     if (baseType == DataType::HELICS_ANY || baseType == DataType::HELICS_UNKNOWN) {

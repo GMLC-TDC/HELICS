@@ -68,8 +68,9 @@ Publication::Publication(InterfaceVisibility locality,
     }
 }
 
+
 void Publication::publish(double val)
-{
+    {
     bool doPublish = true;
     if (changeDetectionEnabled) {
         if (changeDetected(prevValue, val, delta)) {
