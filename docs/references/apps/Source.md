@@ -45,7 +45,7 @@ federate configuration
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the player executable also takes an untagged argument of a file name for example
 
@@ -86,7 +86,7 @@ time specifications are typically numerical with optional units
 if no units are specified the time defaults to units specified via `--time_units` or seconds if none were specified
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
-```eval_rst
+```{eval-rst}
 +--------------------+---------------------------+-----------------------+
 | identifier         | type                      | Example               |
 +====================+===========================+=======================+

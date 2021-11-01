@@ -2,7 +2,7 @@
 
 The Fundamental Examples teach three concepts to build on a default setup:
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

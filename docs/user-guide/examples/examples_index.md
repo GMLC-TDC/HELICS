@@ -18,7 +18,7 @@ There are two learning tracks available to those hoping to improve their HELICS 
 
 These two learning tracks each start with a "base" model, which should also be considered the recommended default settings. Examples beyond the base model within a track are modular, not sequential, allowing the user to self-guide towards concepts in which they want to gain skill.
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

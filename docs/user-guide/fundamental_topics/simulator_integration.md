@@ -27,7 +27,7 @@ This section introduces the simplest broker topology for integrating federates i
 
 **todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -107,7 +107,7 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 For the remainder of this section of the guide, we'll walk through the typical stages of co-simulation, providing examples of how these might be implemented using HELICS API calls. For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../../references/api-reference/index.md) to get the details you need.
 
-To begin, at the top of your Python module ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to import the HELICS library, which will look something like this:
+To begin, at the top of your Python module ([after installing the Python HELICS module](../installation/index.md)), you'll have to import the HELICS library, which will look something like this:
 
 ```python
 import helics as h

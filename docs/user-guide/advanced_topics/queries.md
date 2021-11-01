@@ -20,7 +20,7 @@ query_result = h.helicsCreateQuery(traget_string, query_string)
 
 Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._ "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it will not be queries by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker.
 
-```eval_rst
+```{eval-rst}
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | target                                   | Description                                                                           |
 +==========================================+=======================================================================================+
@@ -54,7 +54,7 @@ The `queryStr` is the specific data being requested; the tables below show the v
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +--------------------+------------------------------------------------------------+
 | queryString        | Description                                                |
 +====================+============================================================+
@@ -106,7 +106,7 @@ The `global_time_debugging` and `global_flush` queries are also acknowledged by 
 
 The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries.
 
-```eval_rst
+```{eval-rst}
 +---------------------------+------------------------------------------------------------+
 | queryString               | Description                                                |
 +===========================+============================================================+
@@ -126,7 +126,7 @@ The following queries are defined for federates but can only be queried on the l
 
 The following queries will be answered by a core:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+-------------------------------------------------------------------------------------+
 | queryString              | Description                                                                         |
 +==========================+=====================================================================================+
@@ -198,7 +198,7 @@ The `version` and `version_all` queries are valid but are not usually queried di
 
 The following queries will be answered by a broker:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | queryString              | Description                                                                                       |
 +==========================+===================================================================================================+
@@ -302,7 +302,7 @@ In the header [`<helics\queryFunctions.hpp>`](https://docs.helics.org/en/latest/
 
 ### C API and interface API's
 
-Queries in the [`C API`](https://docs.helics.org/en/latest/c-api-reference/index.html#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
+Queries in the [C API](../../api-reference/C_API.md#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
 
 This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`, to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use `helicsQueryFree()`.

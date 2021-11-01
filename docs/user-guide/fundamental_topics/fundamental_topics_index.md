@@ -1,6 +1,6 @@
 # Fundamental Topics
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :hidden:
     :maxdepth: 1
