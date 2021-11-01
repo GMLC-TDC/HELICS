@@ -162,6 +162,8 @@ HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, bool
 
 HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, defV& val);
 
+HELICS_CXX_EXPORT void valueExtract(const data_view& dv, DataType baseType, char& val);
+
 /** extract the value from a variant to a numerical type*/
 template<class X>
 std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)>
@@ -175,8 +177,15 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             val = static_cast<X>(std::get<int64_t>(dv));
             break;
         case string_loc:  // string
-        default:
-            val = static_cast<X>(getDoubleFromString(std::get<std::string>(dv)));
+        default: {
+            const auto& v = std::get<std::string>(dv);
+            if (v.find_first_of(".eE[]")==std::string::npos) {
+                val = static_cast<X>(getIntFromString(v));
+            } else {
+                val = static_cast<X>(getDoubleFromString(v));
+            }
+        }
+            
             break;
         case complex_loc:  // complex
         {
@@ -210,7 +219,11 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         case named_point_loc: {
             const auto& np = std::get<NamedPoint>(dv);
             if (std::isnan(np.value)) {
-                val = static_cast<X>(getDoubleFromString(np.name));
+                if (np.name.find_first_of(".eE[]") == std::string::npos) {
+                    val = static_cast<X>(getIntFromString(np.name));
+                } else {
+                    val = static_cast<X>(getDoubleFromString(np.name));
+                }
             } else {
                 val = static_cast<X>(np.value);
             }
@@ -221,7 +234,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
 
 /** assume it is some numeric type (int or double)*/
 template<class X>
-std::enable_if_t<std::is_arithmetic<X>::value>
+std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)>
     valueExtract(const data_view& dv, DataType baseType, X& val)
 {
     switch (baseType) {
@@ -232,9 +245,15 @@ std::enable_if_t<std::is_arithmetic<X>::value>
             break;
         }
         case DataType::HELICS_STRING:
-        default:
-            val = static_cast<X>(
-                getDoubleFromString(ValueConverter<std::string_view>::interpret(dv)));
+        default: {
+            const auto v = ValueConverter<std::string_view>::interpret(dv);
+            if (v.find_first_of(".eE[]")==std::string_view::npos) {
+                val = static_cast<X>(getIntFromString(v));
+            } else {
+                val = static_cast<X>(getDoubleFromString(v));
+            }
+        }
+            
             break;
         case DataType::HELICS_BOOL:
             val = static_cast<X>((ValueConverter<std::string_view>::interpret(dv) != "0"));
@@ -243,7 +262,11 @@ std::enable_if_t<std::is_arithmetic<X>::value>
             auto npval = ValueConverter<NamedPoint>::interpret(dv);
             if (std::isnan(npval.value)) {
                 try {
-                    val = static_cast<X>(getDoubleFromString(npval.name));
+                    if (npval.name.find_first_of(".eE[]") == std::string::npos) {
+                        val = static_cast<X>(getIntFromString(npval.name));
+                    } else {
+                        val = static_cast<X>(getDoubleFromString(npval.name));
+                    }
                 }
                 catch (const std::invalid_argument&) {
                     val = static_cast<X>(
@@ -262,12 +285,18 @@ std::enable_if_t<std::is_arithmetic<X>::value>
             break;
         }
         case DataType::HELICS_INT:
-        case DataType::HELICS_TIME: {
+        {
             auto V = ValueConverter<int64_t>::interpret(dv);
             val = static_cast<X>(V);
             break;
         }
-
+        case DataType::HELICS_TIME: {
+            Time vtime;
+            vtime.setBaseTimeCode(ValueConverter<int64_t>::interpret(dv));
+            val = std::is_integral<X>::value ? static_cast<X>(vtime.getBaseTimeCode()) :
+                                               static_cast<X>(static_cast<double>(vtime));
+            break;
+        }
         case DataType::HELICS_VECTOR: {
             auto V = ValueConverter<std::vector<double>>::interpret(dv);
             if (V.size() == 1) {
