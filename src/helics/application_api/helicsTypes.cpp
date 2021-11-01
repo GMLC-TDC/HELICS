@@ -461,8 +461,8 @@ std::complex<double> getComplexFromString(std::string_view val)
 
 std::int64_t getIntFromString(std::string_view val)
 {
-    auto ival = numeric_conversionComplete<std::int64_t>(val, invalidValue<std::int64_t>()-3);
-    if (ival == invalidValue<std::int64_t>()-3) {
+    auto ival = numeric_conversionComplete<std::int64_t>(val, invalidValue<std::int64_t>() - 3);
+    if (ival == invalidValue<std::int64_t>() - 3) {
         return static_cast<int64_t>(getDoubleFromString(val));
     }
     return ival;
@@ -716,8 +716,7 @@ SmallBuffer typeConvert(DataType type, double val)
         case DataType::HELICS_INT:
             return ValueConverter<int64_t>::convert(static_cast<int64_t>(val));
         case DataType::HELICS_TIME:
-            return ValueConverter<int64_t>::convert(
-                Time(val).getBaseTimeCode());
+            return ValueConverter<int64_t>::convert(Time(val).getBaseTimeCode());
         case DataType::HELICS_COMPLEX:
             return ValueConverter<std::complex<double>>::convert(std::complex<double>(val, 0.0));
         case DataType::HELICS_BOOL:
@@ -839,7 +838,7 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
         case DataType::HELICS_DOUBLE:
             return ValueConverter<double>::convert(vectorNorm(vals, size));
         case DataType::HELICS_TIME:
-            return ValueConverter<int64_t>::convert(Time(vectorNorm(vals,size)).getBaseTimeCode());
+            return ValueConverter<int64_t>::convert(Time(vectorNorm(vals, size)).getBaseTimeCode());
         case DataType::HELICS_INT:
             return ValueConverter<int64_t>::convert(static_cast<int64_t>(vectorNorm(vals, size)));
         case DataType::HELICS_COMPLEX: {
@@ -858,7 +857,7 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
             std::vector<std::complex<double>> CD;
             CD.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {
-                CD.emplace_back(vals[ii],0.0);
+                CD.emplace_back(vals[ii], 0.0);
             }
             return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
         } break;
@@ -1102,7 +1101,7 @@ SmallBuffer typeConvert(DataType type, char val)
         case DataType::HELICS_STRING:
         case DataType::HELICS_BOOL:
         default:
-            return ValueConverter<std::string_view>::convert(std::string_view(&val,1));
+            return ValueConverter<std::string_view>::convert(std::string_view(&val, 1));
         case DataType::HELICS_NAMED_POINT: {
             NamedPoint np{"value", static_cast<double>(val)};
             return ValueConverter<NamedPoint>::convert(np);
@@ -1134,11 +1133,13 @@ SmallBuffer typeConvert(DataType type, Time val)
             return ValueConverter<int64_t>::convert(val.getBaseTimeCode());
         case DataType::HELICS_COMPLEX:
         default:
-            return ValueConverter<std::complex<double>>::convert(std::complex<double>(static_cast<double>(val),0.0));
+            return ValueConverter<std::complex<double>>::convert(
+                std::complex<double>(static_cast<double>(val), 0.0));
         case DataType::HELICS_BOOL:
             return ValueConverter<std::string_view>::convert((val != timeZero) ? "1" : "0");
         case DataType::HELICS_STRING:
-            return ValueConverter<std::string_view>::convert(helicsIntString(val.getBaseTimeCode()));
+            return ValueConverter<std::string_view>::convert(
+                helicsIntString(val.getBaseTimeCode()));
         case DataType::HELICS_NAMED_POINT:
             if (static_cast<uint64_t>(val.getBaseTimeCode()) >
                 (2ULL << 51U))  // this checks whether the actual value will fit in a double
