@@ -28,8 +28,6 @@ bool checkTypeConversion1(const T1& val1, const T2& exp)
     return (v2 == exp);
 }
 
-
-
 TEST(type_conversion, vectorNorm)
 {
     using c = std::complex<double>;
@@ -253,14 +251,15 @@ TEST(type_conversion, bool_conversion)
     EXPECT_TRUE(checkTypeConversion1(std::complex<double>{0.0, -0.5}, val));
 }
 
-
 template<class T1>
-bool roundTripTest1(const T1& val1, DataType type1, const std::function<bool(const T1&v1, const T1&v2)> &comp)
+bool roundTripTest1(const T1& val1,
+                    DataType type1,
+                    const std::function<bool(const T1& v1, const T1& v2)>& comp)
 {
     auto buffer = typeConvert(type1, val1);
     T1 out;
     valueExtract(buffer, type1, out);
-    return comp(val1,out);
+    return comp(val1, out);
 }
 
 // test to make sure the type conversion round trip works as expected
@@ -274,26 +273,27 @@ bool roundTripTest2(const T1& val1,
     defV dv;
     valueExtract(buffer, type1, dv);
     valueExtract(dv, out);
-    return comp(val1,out);
+    return comp(val1, out);
 }
 
-TEST(roundTripConversions, integer) {
+TEST(roundTripConversions, integer)
+{
     std::vector<std::int64_t> vals{10, 256161341561, -3637, 0};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
-                          DataType::HELICS_DOUBLE,
-                          DataType::HELICS_INT,
+                                 DataType::HELICS_DOUBLE,
+                                 DataType::HELICS_INT,
 
-                          DataType::HELICS_COMPLEX,
-                          DataType::HELICS_VECTOR,
-                          DataType::HELICS_COMPLEX_VECTOR,
-                          DataType::HELICS_NAMED_POINT,
-                          DataType::HELICS_TIME,
-                          DataType::HELICS_JSON};
+                                 DataType::HELICS_COMPLEX,
+                                 DataType::HELICS_VECTOR,
+                                 DataType::HELICS_COMPLEX_VECTOR,
+                                 DataType::HELICS_NAMED_POINT,
+                                 DataType::HELICS_TIME,
+                                 DataType::HELICS_JSON};
 
     std::function<bool(const std::int64_t& v1, const std::int64_t& v2)> comp =
         [](const std::int64_t& v1, const std::int64_t& v2) { return (v1 == v2); };
-    for (auto &cval:vals) {
-        for (auto &ttype:ctypes) {
+    for (auto& cval : vals) {
+        for (auto& ttype : ctypes) {
             bool rt1 = roundTripTest1(cval, ttype, comp);
             EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error1 val " << cval;
             if (!rt1) {
@@ -310,7 +310,7 @@ TEST(roundTripConversions, integer) {
 
 TEST(roundTripConversions, BigInteger)
 {
-    std::vector<std::int64_t> vals{0x7FE4'7FE4'7FE4'7FE4,-265262626261771716};
+    std::vector<std::int64_t> vals{0x7FE4'7FE4'7FE4'7FE4, -265262626261771716};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_INT,
                                  DataType::HELICS_NAMED_POINT,
@@ -337,7 +337,7 @@ TEST(roundTripConversions, BigInteger)
 
 TEST(roundTripConversions, double)
 {
-    std::vector<double> vals{10.0, 2.56161341561, -3637.2365, 0.0,5.1e7,-4.5e-7};
+    std::vector<double> vals{10.0, 2.56161341561, -3637.2365, 0.0, 5.1e7, -4.5e-7};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_DOUBLE,
 
@@ -347,7 +347,7 @@ TEST(roundTripConversions, double)
                                  DataType::HELICS_NAMED_POINT,
                                  DataType::HELICS_JSON};
     std::function<bool(const double& a, const double& b)> comp = [](const double& a,
-                                                                      const double& b) {
+                                                                    const double& b) {
         return fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
     };
     for (auto& cval : vals) {
@@ -366,7 +366,6 @@ TEST(roundTripConversions, double)
     }
 }
 
-
 TEST(roundTripConversions, complex)
 {
     using cp = std::complex<double>;
@@ -375,18 +374,17 @@ TEST(roundTripConversions, complex)
                          cp{-3637.2365, 0.0},
                          cp{0.0, 0.0},
                          cp{0.0, 5.62e34},
-        cp{-4.5e-7, -4.52525e-9}};
+                         cp{-4.5e-7, -4.52525e-9}};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_COMPLEX,
                                  DataType::HELICS_VECTOR,
                                  DataType::HELICS_COMPLEX_VECTOR,
                                  DataType::HELICS_NAMED_POINT,
                                  DataType::HELICS_JSON};
-    std::function<bool(const cp& a, const cp& b)> comp = [](const cp& v1,
-                                                                    const cp& v2) {
+    std::function<bool(const cp& a, const cp& b)> comp = [](const cp& v1, const cp& v2) {
         double a = v1.real();
         double b = v2.real();
-        bool rcomp= fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
+        bool rcomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
         a = v1.imag();
         b = v2.imag();
         bool icomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
@@ -396,14 +394,12 @@ TEST(roundTripConversions, complex)
     for (auto& cval : vals) {
         for (auto& ttype : ctypes) {
             bool rt1 = roundTripTest1(cval, ttype, comp);
-            EXPECT_TRUE(rt1)
-                << typeNameStringRef(ttype) << ": error val " << cval;
+            EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error val " << cval;
             if (!rt1) {
                 roundTripTest1(cval, ttype, comp);
             }
             bool rt2 = roundTripTest2(cval, ttype, comp);
-            EXPECT_TRUE(rt2)
-                << typeNameStringRef(ttype) << ": error val " << cval;
+            EXPECT_TRUE(rt2) << typeNameStringRef(ttype) << ": error val " << cval;
             if (!rt2) {
                 roundTripTest2(cval, ttype, comp);
             }
@@ -415,14 +411,13 @@ TEST(roundTripConversions, vector)
 {
     using vd = std::vector<double>;
     std::vector<vd> vals{vd{-10.0},
-        vd{10.0},
+                         vd{10.0},
                          vd{10.0, 5.0},
-                         vd{2.56161341561, -5.256261541414,5.62248785566332},
-                         vd{-3637.2365, 0.0,6.7},
-                         vd{-3637.2365, 0.0, 6.7,9.7},
-                         std::vector<double>(151,4.5),
-        std::vector<double>(35, 27.35)
-    };
+                         vd{2.56161341561, -5.256261541414, 5.62248785566332},
+                         vd{-3637.2365, 0.0, 6.7},
+                         vd{-3637.2365, 0.0, 6.7, 9.7},
+                         std::vector<double>(151, 4.5),
+                         std::vector<double>(35, 27.35)};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_VECTOR,
                                  DataType::HELICS_COMPLEX_VECTOR,
@@ -430,16 +425,15 @@ TEST(roundTripConversions, vector)
                                  DataType::HELICS_JSON};
     std::function<bool(const vd& a, const vd& b)> comp = [](const vd& v1, const vd& v2) {
         if (v1.size() != v2.size()) {
-                return false;
+            return false;
         }
-        for (size_t ii = 0; ii < v1.size();++ii) {
+        for (size_t ii = 0; ii < v1.size(); ++ii) {
             auto a = v1[ii];
-           auto b = v2[ii];
-        bool rcomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
-           if (!rcomp) {
-               return false;
-           }
-        
+            auto b = v2[ii];
+            bool rcomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
+            if (!rcomp) {
+                return false;
+            }
         }
         return true;
     };
@@ -447,12 +441,14 @@ TEST(roundTripConversions, vector)
     for (auto& cval : vals) {
         for (auto& ttype : ctypes) {
             bool rt1 = roundTripTest1(cval, ttype, comp);
-            EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error val " << helicsVectorString(cval);
+            EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error val "
+                             << helicsVectorString(cval);
             if (!rt1) {
                 roundTripTest1(cval, ttype, comp);
             }
             bool rt2 = roundTripTest2(cval, ttype, comp);
-            EXPECT_TRUE(rt2) << typeNameStringRef(ttype) << ": error val " << helicsVectorString(cval);
+            EXPECT_TRUE(rt2) << typeNameStringRef(ttype) << ": error val "
+                             << helicsVectorString(cval);
             if (!rt2) {
                 roundTripTest2(cval, ttype, comp);
             }
@@ -503,7 +499,8 @@ TEST(roundTripConversions, complex_vector)
     for (auto& cval : vals) {
         for (auto& ttype : ctypes) {
             bool rt1 = roundTripTest1(cval, ttype, comp);
-            EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error val " << helicsComplexVectorString(cval);
+            EXPECT_TRUE(rt1) << typeNameStringRef(ttype) << ": error val "
+                             << helicsComplexVectorString(cval);
             if (!rt1) {
                 roundTripTest1(cval, ttype, comp);
             }
@@ -517,10 +514,9 @@ TEST(roundTripConversions, complex_vector)
     }
 }
 
-
 TEST(roundTripConversions, boolean)
 {
-    std::vector<int> vals{1,0};
+    std::vector<int> vals{1, 0};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_DOUBLE,
                                  DataType::HELICS_INT,
@@ -532,8 +528,9 @@ TEST(roundTripConversions, boolean)
                                  DataType::HELICS_TIME,
                                  DataType::HELICS_JSON};
 
-    std::function<bool(const bool& v1, const bool& v2)> comp =
-        [](const bool& v1, const bool& v2) { return (v1 == v2); };
+    std::function<bool(const bool& v1, const bool& v2)> comp = [](const bool& v1, const bool& v2) {
+        return (v1 == v2);
+    };
     for (auto cval : vals) {
         for (auto& ttype : ctypes) {
             EXPECT_TRUE(roundTripTest1(static_cast<bool>(cval), ttype, comp))
@@ -546,7 +543,7 @@ TEST(roundTripConversions, boolean)
 
 TEST(roundTripConversions, char)
 {
-    std::vector<char> vals{0, 1, 5, 7, -9, 14, 'a', 'X',127};
+    std::vector<char> vals{0, 1, 5, 7, -9, 14, 'a', 'X', 127};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_DOUBLE,
                                  DataType::HELICS_INT,
@@ -576,17 +573,15 @@ TEST(roundTripConversions, char)
     }
 }
 
-
 TEST(roundTripConversions, string)
 {
-    std::vector<std::string> vals{"string1", " this is a test string", std::string(200,'a')};
+    std::vector<std::string> vals{"string1", " this is a test string", std::string(200, 'a')};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_NAMED_POINT,
                                  DataType::HELICS_JSON};
 
-    std::function<bool(const std::string& v1, const std::string& v2)> comp = [](const std::string& v1, const std::string& v2) {
-        return (v1 == v2);
-    };
+    std::function<bool(const std::string& v1, const std::string& v2)> comp =
+        [](const std::string& v1, const std::string& v2) { return (v1 == v2); };
     for (auto cval : vals) {
         for (auto& ttype : ctypes) {
             EXPECT_TRUE(roundTripTest1(cval, ttype, comp))
@@ -597,27 +592,24 @@ TEST(roundTripConversions, string)
     }
 }
 
-
 TEST(roundTripConversions, named_point)
 {
-
     std::vector<NamedPoint> vals{NamedPoint{"test1", 45.662},
                                  NamedPoint{"", -2352.235265622},
                                  NamedPoint{"this is a longer tag", 45.662},
-                                 NamedPoint{std::string(564,'b'), 5e-7},
+                                 NamedPoint{std::string(564, 'b'), 5e-7},
                                  NamedPoint{"test b", -99.99e99}};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_NAMED_POINT,
                                  DataType::HELICS_JSON};
-    std::function<bool(const NamedPoint& a, const NamedPoint& b)> comp = [](const NamedPoint& v1, const NamedPoint& v2) {
-       
-       
-            double a = v1.value;
-            double b = v2.value;
-            bool rcomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
-            
-            bool icomp = v1.name == v2.name;
-            return rcomp && icomp;
+    std::function<bool(const NamedPoint& a, const NamedPoint& b)> comp = [](const NamedPoint& v1,
+                                                                            const NamedPoint& v2) {
+        double a = v1.value;
+        double b = v2.value;
+        bool rcomp = fabs(a - b) <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * 0.0000000001);
+
+        bool icomp = v1.name == v2.name;
+        return rcomp && icomp;
     };
 
     for (auto& cval : vals) {
@@ -640,7 +632,7 @@ TEST(roundTripConversions, named_point)
 
 TEST(roundTripConversions, time)
 {
-    std::vector<Time> vals{45.7,timeZero,Time::maxVal(), Time::epsilon(), -10.5, 23526262};
+    std::vector<Time> vals{45.7, timeZero, Time::maxVal(), Time::epsilon(), -10.5, 23526262};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_DOUBLE,
                                  DataType::HELICS_INT,
@@ -652,8 +644,9 @@ TEST(roundTripConversions, time)
                                  DataType::HELICS_TIME,
                                  DataType::HELICS_JSON};
 
-    std::function<bool(const Time& v1, const Time& v2)> comp =
-        [](const Time& v1, const Time& v2) { return (v1 == v2); };
+    std::function<bool(const Time& v1, const Time& v2)> comp = [](const Time& v1, const Time& v2) {
+        return (v1 == v2);
+    };
     for (auto& cval : vals) {
         for (auto& ttype : ctypes) {
             bool rt1 = roundTripTest1(cval, ttype, comp);
