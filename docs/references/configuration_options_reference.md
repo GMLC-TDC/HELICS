@@ -1,6 +1,6 @@
 # Configuration Options Reference
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :hidden:
     :maxdepth: 2

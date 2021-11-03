@@ -14,15 +14,19 @@ jobs:
         ubuntuDefault:
           containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
           test_config: 'ci'
+          use_mpi: 'true'
         gcc11:
           containerImage: 'helics/buildenv:gcc11-builder'
           test_config: 'ci'
-        clang12:
-          containerImage: 'helics/buildenv:clang12-builder'
+          use_mpi: 'true'
+        clang13:
+          containerImage: 'helics/buildenv:clang13-builder'
           test_config: 'ci'
+          use_mpi: ''
         clang5:
           containerImage: 'helics/buildenv:clang5-builder'
           test_config: 'ci'
+          use_mpi: ''
 
     pool:
       vmImage: 'ubuntu-latest'
@@ -38,7 +42,7 @@ jobs:
           MAKEFLAGS: '-j 4'
           CMAKE_GENERATOR: 'Unix Makefiles'
           USE_SWIG: 'true'
-          USE_MPI: 'true'
+          USE_MPI: $[variables['use_mpi']]
           ZMQ_SUBPROJECT: $[variables['zmq_subproject']]
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
         displayName: 'Build HELICS'
@@ -57,8 +61,8 @@ jobs:
           vmImage: 'macOS-latest'
         XCode-oldest:
           test_config: 'ci'
-          vmImage: 'macOS-10.14'
-          xcode_path: '/Applications/Xcode_10.1.app'
+          vmImage: 'macOS-10.15'
+          xcode_path: '/Applications/Xcode_10.3.app'
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 90
@@ -125,7 +129,7 @@ jobs:
       - bash: |
           cd $(mktemp -d)
           curl --location --output "download.tar.bz2" "$BOOST_URL"
-          tar xfvj "download.tar.bz2"
+          tar xfj "download.tar.bz2"
           mkdir -p "$BOOST_ROOT"
           cp -r boost_*/* "$BOOST_ROOT"
         condition: ne(variables.BOOST_CACHE_RESTORED, 'true')

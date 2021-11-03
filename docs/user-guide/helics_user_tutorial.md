@@ -1,6 +1,6 @@
 # HELICS User Tutorial
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

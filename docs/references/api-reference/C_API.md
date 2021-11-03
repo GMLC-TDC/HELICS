@@ -21,7 +21,7 @@
 
 ## Enums
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenenumvalue:: HELICS_ITERATION_REQUEST_NO_ITERATION
     :project: helics
@@ -456,7 +456,7 @@
 
 ### General
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsGetVersion
     :project: helics
@@ -513,7 +513,7 @@
 
 ### Creation
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsCreateCore
     :project: helics
@@ -555,7 +555,7 @@
 
 ### Broker
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsBrokerClone
     :project: helics
@@ -621,7 +621,7 @@
 
 ### Core
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsCoreClone
     :project: helics
@@ -693,7 +693,7 @@
 
 ### FederateInfo
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateInfoClone
     :project: helics
@@ -747,7 +747,7 @@
 
 ### Federate
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateDestroy
     :project: helics
@@ -927,7 +927,7 @@
 
 ### ValueFederate
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateRegisterSubscription
     :project: helics
@@ -990,7 +990,7 @@
 
 ### Publication
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsPublicationIsValid
     :project: helics
@@ -1062,7 +1062,7 @@
 
 ### Input
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsInputIsValid
     :project: helics
@@ -1197,7 +1197,7 @@
 
 ### MessageFederate
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateRegisterEndpoint
     :project: helics
@@ -1239,7 +1239,7 @@
 
 ### Endpoint
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsEndpointIsValid
     :project: helics
@@ -1326,7 +1326,7 @@
 
 ### Message
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsMessageGetSource
     :project: helics
@@ -1416,7 +1416,7 @@
 
 ### FilterFederate
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateRegisterFilter
     :project: helics
@@ -1443,7 +1443,7 @@
 
 ### Filter
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFilterSetCustomCallback
     :project: helics
@@ -1496,7 +1496,7 @@
 
 ### Query
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsQueryExecute
     :project: helics

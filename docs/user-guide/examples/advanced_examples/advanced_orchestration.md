@@ -5,7 +5,7 @@
 
 # Monte Carlo Co-Simulations
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 

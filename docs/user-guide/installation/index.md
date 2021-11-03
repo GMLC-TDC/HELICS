@@ -1,6 +1,6 @@
 # HELICS Installation
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 2
 

@@ -28,7 +28,7 @@ ou could manage the timing of the federation to use the `initialize` mode in HEL
 
 For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../../references/api-reference/index.md) to get the details you need.
 
-To begin, at the top of your Python module ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to import the HELICS library, which will look something like this:
+To begin, at the top of your Python module ([after installing the Python HELICS module](../installation/index.md)), you'll have to import the HELICS library, which will look something like this:
 
 ```python
 import helics as h

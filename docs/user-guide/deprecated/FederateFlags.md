@@ -1,6 +1,6 @@
 # Federate flags
 
-There are a number of flags which control how a federate acts with respect to timing and its interfaces. The Timing flags and controls are described [here](./Timing.html). There are also a number of other flags which control some aspects of the interfaces, and a few other flags which can be applied to specific interfaces.
+There are a number of flags which control how a federate acts with respect to timing and its interfaces. The Timing flags and controls are described [here](../fundamental_topics/timing_configuration.md). There are also a number of other flags which control some aspects of the interfaces, and a few other flags which can be applied to specific interfaces.
 
 ## single_thread_federate
 

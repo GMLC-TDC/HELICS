@@ -19,6 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+static const Time bigTime(HELICS_BIG_NUMBER);
+
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 
@@ -191,8 +194,8 @@ bool TimeCoordinator::updateNextExecutionTime()
             if (time_exec < Time::maxVal()) {
                 time_exec += info.inputDelay;
             }
-            time_exec = (time_exec <= time_granted) ? time_exec = time_granted :
-                                                      generateAllowedTime(time_requested);
+            time_exec =
+                (time_exec <= time_granted) ? time_granted : generateAllowedTime(time_requested);
         }
     } else {
         time_exec = std::min(time_message, time_value);
@@ -446,6 +449,7 @@ bool TimeCoordinator::updateTimeFactors()
     upstream =
         generateMinTimeUpstream(dependencies, info.restrictive_time_policy, GlobalFederateId{});
 
+    maxTime = Time::maxVal() - info.outputDelay - (std::max)(info.period, info.timeDelta);
     bool update = false;
     time_minminDe = total.minDe;
     Time prev_next = time_next;
@@ -457,14 +461,14 @@ bool TimeCoordinator::updateTimeFactors()
     if (prev_next != time_next) {
         update = true;
     }
-    if (total.minDe < Time::maxVal()) {
+    if (total.minDe < maxTime) {
         total.minDe = generateAllowedTime(total.minDe) + info.outputDelay;
     }
-    if (upstream.minDe < Time::maxVal() && upstream.minDe > total.minDe) {
+    if (upstream.minDe < maxTime && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (info.event_triggered) {
-        if (upstream.Te < Time::maxVal()) {
+    if (info.event_triggered || time_requested >= bigTime) {
+        if (upstream.Te < maxTime) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
     }
@@ -472,7 +476,7 @@ bool TimeCoordinator::updateTimeFactors()
         update = true;
         time_minDe = total.minDe;
     }
-    time_allow = (total.next < Time::maxVal()) ? info.inputDelay + total.next : Time::maxVal();
+    time_allow = (total.next < maxTime) ? info.inputDelay + total.next : Time::maxVal();
 
     updateNextExecutionTime();
     return update;
@@ -585,12 +589,12 @@ void TimeCoordinator::sendTimeRequest() const
         setActionFlag(upd, delayed_timing_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (info.event_triggered) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (info.event_triggered) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
 
         if (upd.Tdemin < upd.actionTime) {
@@ -611,7 +615,7 @@ void TimeCoordinator::sendTimeRequest() const
         if (upstream.minFed.isValid()) {
             upd.dest_id = upstream.minFed;
             upd.setExtraData(GlobalFederateId{}.baseValue());
-            if (info.event_triggered) {
+            if (info.event_triggered || time_requested >= bigTime) {
                 upd.Te = checkAdd(time_exec, info.outputDelay);
                 upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
             }
