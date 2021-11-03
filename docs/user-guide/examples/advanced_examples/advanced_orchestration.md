@@ -129,7 +129,6 @@ Manual implementation of the co-simulation is done with the helper script `make_
 
 ```shell session
 $ python make_samples.py
-
 ```
 
 This implementation will run a default co-simulation. The default parameters are:
@@ -149,7 +148,6 @@ If we wanted to run a Monte Carlo co-sim with different parameters, this would b
 
 ```shell session
 $ python make_samples.py 10 . 100 24*7 0 0
-
 ```
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execution JSONs with `helics_cli`.
