@@ -217,12 +217,25 @@ class SmallBuffer {
 
     void push_back(char c) { append(&c, 1); }
 
+    void pop_back() { bufferSize > 0 ? --bufferSize : 0; }
     /** interpret the data as a string*/
     std::string_view to_string() const
     {
         return std::string_view{reinterpret_cast<const char*>(heap), bufferSize};
     }
 
+    /** ensure there is a null terminator after the last buffer character*/
+    void null_terminate()
+    {
+        if (bufferCapacity > bufferSize) {
+            heap[bufferSize] = std::byte(0);
+        }
+        else
+        {
+            push_back('\0');
+            pop_back();
+        }
+    }
     /** get a pointer to the data as a `char *`*/
     const char* char_data() const { return reinterpret_cast<const char*>(heap); }
     /** move raw memory into the buffer and give it a preallocated buffer*/
@@ -279,7 +292,7 @@ class SmallBuffer {
             if (size > 0x010'0000'0000U) {
                 throw(std::bad_alloc());
             }
-            auto* ndata = new std::byte[size];
+            auto* ndata = new std::byte[size+8];
             std::memcpy(ndata, heap, bufferSize);
             if (usingAllocatedBuffer && !nonOwning) {
                 delete[] heap;
@@ -287,7 +300,7 @@ class SmallBuffer {
             heap = ndata;
             nonOwning = false;
             usingAllocatedBuffer = true;
-            bufferCapacity = size;
+            bufferCapacity = size+8;
         }
     }
     /** check if the buffer is empty*/
