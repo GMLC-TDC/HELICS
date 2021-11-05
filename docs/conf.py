@@ -95,6 +95,11 @@ extensions = [
     "breathe",
 ]
 
+myst_enable_extensions = [
+    "amsmath",
+    "dollarmath",
+]
+
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
 }
