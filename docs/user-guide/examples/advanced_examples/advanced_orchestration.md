@@ -165,21 +165,21 @@ In the runner scripts directory, there will be 30 JSONs. Each will have a unique
 {
   "federates": [
     {
-      "directory": "/Users/camp426/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
+      "directory": "/home/username/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
       "exec": "helics_broker --federates=2 --loglevel=data --coretype=tcpss --port 12345",
       "host": "localhost",
       "loglevel": "data",
       "name": "broker_0"
     },
     {
-      "directory": "/Users/camp426/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
+      "directory": "/home/username/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
       "exec": "python3 Battery.py --port 12345 --seed 10 --numEVs 10 --hours 24 --plot 0 --outdir ~/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration/results",
       "host": "localhost",
       "loglevel": "data",
       "name": "Battery_0"
     },
     {
-      "directory": "/Users/camp426/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
+      "directory": "/home/username/github/HELICS-Examples/user_guide_examples/advanced/advanced_orchestration",
       "exec": "python3 Charger.py --port 12345 --numEVs 10 --hours 24",
       "host": "localhost",
       "loglevel": "data",
