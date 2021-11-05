@@ -757,7 +757,7 @@ HELICS_EXPORT const char* helicsInputGetPublicationType(HelicsInput ipt);
  *
  * @param ipt The input to query.
  *
- * @return A int containing the enumeration value of the publication type.
+ * @return An int containing the enumeration value of the publication type.
  */
 HELICS_EXPORT int helicsInputGetPublicationDataType(HelicsInput ipt);
 

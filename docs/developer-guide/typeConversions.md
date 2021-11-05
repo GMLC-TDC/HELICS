@@ -4,7 +4,7 @@ HELICS has the ability to convert data between different types. In the C api met
 
 ## Available types
 
-The specification of publication allows setting the publication to one of following enum values
+The specification of publication allows setting the publication to one of following enum values:
 
 ```c++
     HELICS_DATA_TYPE_UNKNOWN = -1,
@@ -36,13 +36,13 @@ The specification of publication allows setting the publication to one of follow
     HELICS_DATA_TYPE_ANY = 25262
 ```
 
-When this data is received it can be received as any of the available types, thus there are no restrictions on which function is used based on the data that was sent. That being said not all conversions are lossless. The following image shows which conversions are lossless through round trip operations. On the sending side the same is also true in that in any of the setValue methods may be used regardless of which the actual transmission data type is set to.
+When this data is received it can be received as any of the available types, thus there are no restrictions on which function is used based on the data that was sent. That being said not all conversions are lossless. The following image shows which conversions are lossless through round trip operations. On the sending side the same is also true in that any of the setValue methods may be used regardless of what the actual transmission data type is set to.
 
 ![Lossless type conversion](../img/LossLessConversion_chart.svg)
 
-For the remaining conversions the loss it typically numerical or comes with conditions. For example Converting a vector to a complex number you can think of a complex number as a two element vector. Thus for 1 or 2 element vectors the conversion will be lossless. For 3 or more element vectors the remaining elements are discarded. For conversion of any vector to a single value, double or integral the value is collapsed using the vector norm. Thus for single element vectors or real valued complex numbers the result is equivalent for others there is a reductions in information. Which may be desired in some cases. Bool values get reduced to `false` is the numerical value is anything but `0` and true otherwise.
+For the remaining conversions the loss is typically numerical or comes with conditions. For example converting a vector to a complex number you can think of a complex number as a two element vector. Thus for 1 or 2 element vectors the conversion will be lossless. For 3 or more element vectors the remaining elements are discarded. For conversion of any vector to a single value, double, or integral the value is collapsed using vector normalization. Thus for single element vectors or real valued complex numbers the result is equivalent, whereas for others there is a reduction in information, which may be desired in some cases. Bool values get reduced to `false` if the numerical value is anything but `0`, and true otherwise.
 
-Conversion from strings to numeric values assume the string encodes a number otherwise it results in an invalid value.
+Conversion from strings to numeric values assume the string encodes a number, otherwise it results in an invalid value.
 
 ### Invalid Values
 
@@ -62,7 +62,7 @@ Invalid values are returned if there is no value or the conversion is invalid fo
 
 ### Interface specification
 
-For Value based interfaces types are used in a number of locations. For publications the most important part is specifying the type of the publication. This determines the type of data that gets transmitted. It can be a specific known type, a custom type string that is user defined or an `any` type.
+For Value based interfaces types are used in a number of locations. For publications the most important part is specifying the type of the publication. This determines the type of data that gets transmitted. It can be a specific known type, a custom type string that is user defined, or an `any` type.
 
 Inputs or subscriptions may also optionally specify a type as well. The use of this is for information to other federates, and for some type compatibility checking. It defaults to an "any" type so if nothing is specified it will match to any publication type.
 
@@ -70,13 +70,13 @@ Inputs or subscriptions may also optionally specify a type as well. The use of t
 
 As mentioned before when using any of the `publication` methods the extraction method call is not limited based on the type given in the interface specification. What the publication type does is define a conversion if necessary. The same is true on the output.
 
-SetVelueType -> PublicationType -> GetValueType
+SetValueType -> PublicationType -> GetValueType
 
 Thus there are always two conversions occurring in the data translation pipeline. The first from the setValue to the type specified in the publication registration. The second is from the publish transmission type to the value requested in a respective getValue method.
 
 ## Data Representation
 
-`int` and `double` are base level types in C++. `complex` is two doubles, `vector` and `complex_vector` are variable length arrays of doubles. `named_point` is `string` and double. String is a variable length sequence of 8 bit values. `char` is a string of length 1, `boolean` is a single char either `0` or `1`. Time is representation of internal HELICS time as a 64 bit integer (most commonly number of nanoseconds). The JSON type is a string compatible with JSON with two fields "type" and "value" The custom type is variable length sequence of bytes which HELICS will not attempt to convert it transmits a sequence of bytes it would be up to the user to define any conversions or endianness concerns.
+`int` and `double` are base level types in C++. `complex` is two doubles, `vector` and `complex_vector` are variable length arrays of doubles. `named_point` is `string` and double. String is a variable length sequence of 8 bit values. `char` is a string of length 1, `boolean` is a single char either `0` or `1`. Time is a representation of internal HELICS time as a 64 bit integer (most commonly number of nanoseconds). The JSON type is a string compatible with JSON with two fields "type" and "value". The custom type is a variable length sequence of bytes which HELICS will not attempt to convert, it transmits a sequence of bytes and it would be up to the user to define any conversions or endianness concerns.
 
 ## Data conversions
 
@@ -87,36 +87,36 @@ There are defined conversions from all known available types to all others.
 - INT -> trunc(val)
 - DOUBLE -> val
 - COMPLEX -> val+0j
-- VECTOR - > [val]
+- VECTOR -> [val]
 - COMPLEX_VECTOR -> [val+0j]
-- NAMED_POINT ->{"value", val}
+- NAMED_POINT -> {"value", val}
 - STRING -> string representation such that all required bits are included
-- BOOL ->(val!=0)?"1":"0"
+- BOOL -> (val!=0)?"1":"0"
 
 ### Conversion from INT
 
 - INT -> val
 - DOUBLE -> val [^1]
 - COMPLEX -> val+0j
-- VECTOR - > [val]
+- VECTOR -> [val]
 - COMPLEX_VECTOR -> [val+0j]
-- NAMED_POINT ->{"value", val} [^2]
+- NAMED_POINT -> {"value", val} [^2]
 - STRING -> std::to_string(val)
-- BOOL ->(val!=0)?"1":"0"
+- BOOL -> (val!=0)?"1":"0"
 
-[^1]: for conversion to double lossless only if value actually fits in a double mantissa value.
-[^2]: For a named point conversion. If the value doesn't fit in double the string translation is placed in the string field and a NAN value in the value segment to ensure no data loss.
+[^1]: conversion to double is lossless only if the value actually fits in a double mantissa value.
+[^2]: for a named point conversion, if the value doesn't fit in double the string translation is placed in the string field and a NAN value in the value segment to ensure no data loss.
 
 ### Conversion from String
 
 - INT -> `getIntFromString(val)`
 - DOUBLE -> `getDoubleFromString(val)`
 - COMPLEX -> `getComplexFromString(val)`
-- VECTOR - > `helicsGetVector(val)`
+- VECTOR -> `helicsGetVector(val)`
 - COMPLEX_VECTOR -> `helicsGetComplexVector(val)`
-- NAMED_POINT ->{val, NAN}
+- NAMED_POINT -> {val, NAN}
 - STRING -> val
-- BOOL ->(helicsBoolValue(val))?"1":"0"
+- BOOL -> (helicsBoolValue(val))?"1":"0"
 
 #### helicsGetComplexVector
 
@@ -137,25 +137,25 @@ Converts a string into a double value, a complex, or a vector of real or complex
 
 #### helicsGetComplexFromString
 
-Similar to getDoubleFromString in conversion of vectors. It will convert most representations of complex number patterns using a trailing `i` or `j` for the imaginary component and assumes the imaginary component is last. The real component can be omitted if not present. For Example `4.7+2.7j`or`99.453i`
+Similar to getDoubleFromString in conversion of vectors. It will convert most representations of complex number patterns using a trailing `i` or `j` for the imaginary component and assumes the imaginary component is last. The real component can be omitted if not present, for example `4.7+2.7j`or`99.453i`
 
 #### helicsBoolValue
 
-"0", "00","0000", "\0","false","f","F","FALSE","N","no","n","OFF","off","","disable","disabled" all return false everything else return true
+"0", "00","0000", "\0","false","f","F","FALSE","N","no","n","OFF","off","","disable","disabled" all return false, everything else returns true.
 
 ### Conversion from vector double
 
 - INT -> trunc(vectorNorm(val)) [^1]
 - DOUBLE -> vectorNorm(val)
 - COMPLEX -> val[0]+val[1]j
-- VECTOR - > val
+- VECTOR -> val
 - COMPLEX_VECTOR -> [val[0],val[1],...,val[N]]
 - STRING -> vectorString(val) [^2]
-- NAMED_POINT ->{vectorString(val), NAN} [^3]
-- BOOL ->(vectorNorm(val)!=0)?"1":"0"
+- NAMED_POINT -> {vectorString(val), NAN} [^3]
+- BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
 [^1]: vectorNorm is the sqrt of the inner product of the vector.
-[^2]: vectorString is comma separated string of the numerical values enclosed in `[]` for example `[45.7,22.7,17.8]` this is a JSON compatible string format.
+[^2]: vectorString is comma separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
 [^3]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
 
 ### Conversion from Complex Vector
@@ -163,43 +163,43 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - INT -> trunc(vectorNorm(val))
 - DOUBLE -> vectorNorm(val)
 - COMPLEX -> val[0]
-- VECTOR - > [abs(val[0]),abs(val[1]),...abs(val[N])][^1]
+- VECTOR -> [abs(val[0]),abs(val[1]),...abs(val[N])][^1]
 - COMPLEX_VECTOR -> val
-- NAMED_POINT ->{vectorString(val), NAN}
+- NAMED_POINT -> {vectorString(val), NAN}
 - STRING -> complexVectorString(val)
-- BOOL ->(vectorNorm(val)!=0)?"1":"0"
+- BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
-See Conversion from double for definitions of vector Norm
-[^1]: if the imaginary part of these values is 0, then the real part is used otherwise it uses the absolute value;
+See [Conversion from vector double](#conversion-from-vector-double) for definitions of vectorNorm.
+[^1]: if the imaginary part of these values is 0, then the real part is used; otherwise it uses the absolute value.
 
 ### Conversion from Complex
 
 - INT -> trunc((val.imag() == 0)?val.real(): std::abs(val))
 - DOUBLE -> val.imag() == 0)?val.real(): std::abs(val)
 - COMPLEX -> val
-- VECTOR - > [val.real,val.imag]
+- VECTOR -> [val.real,val.imag]
 - COMPLEX_VECTOR -> [val]
-- NAMED_POINT ->{helicsComplexString(val), NAN}
+- NAMED_POINT -> {helicsComplexString(val), NAN}
 - STRING -> helicsComplexString(val)
-- BOOL ->(std::abs(val)!=0)?"1":"0"
+- BOOL -> (std::abs(val)!=0)?"1":"0"
 
-If the imaginary value == 0, the value is treated the same as a double
+If the imaginary value == 0, the value is treated the same as a double.
 
-### Conversion from a NamedPoint
+### Conversion from a Named Point
 
-if the value of the named point is a `NAN` treat the name part the same as a string
-otherwise use the numerical value as a double and convert appropriately. The exception is a string which has a dedicated operation to generate a JSON string with two fields {"name" and "value"}
+If the value of the named point is `NAN` then treat the name part the same as a string,
+otherwise use the numerical value as a double and convert appropriately. The exception is a string which has a dedicated operation to generate a JSON string with two fields {"name" and "value"}.
 
 ### Conversion from Bool
 
 - INT -> (val)?1:0
 - DOUBLE -> (val)?1.0:0.0
 - COMPLEX -> (val)?1.0:0.0 + 0.0j
-- VECTOR - > [(val)?1.0:0.0]
+- VECTOR -> [(val)?1.0:0.0]
 - COMPLEX_VECTOR -> [(val)?1.0:0.0 +0.0j]
-- NAMED_POINT ->{"value",(val)?1.0:0.0}
+- NAMED_POINT -> {"value",(val)?1.0:0.0}
 - STRING ->val?"1":"0";
-- BOOL ->val?"1":"0";
+- BOOL -> val?"1":"0";
 
 ### Conversion from Time
 

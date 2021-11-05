@@ -309,7 +309,7 @@ HELICS_CXX_EXPORT std::string helicsComplexString(std::complex<double> val);
 /** generate a string representation of a vector
 @details string will look like v[1.02,45]*/
 HELICS_CXX_EXPORT std::string helicsVectorString(const std::vector<double>& val);
-/** generate a string representation of a double */
+/** generate a string representation of an int */
 HELICS_CXX_EXPORT std::string helicsIntString(std::int64_t val);
 /** generate a string representation of a double */
 HELICS_CXX_EXPORT std::string helicsDoubleString(double val);
@@ -340,7 +340,7 @@ HELICS_CXX_EXPORT void helicsGetComplexVector(std::string_view val,
 
 /** convert a string to a named point*/
 HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint(std::string_view val);
-/** get a double from a string*/
+/** get an int from a string*/
 HELICS_CXX_EXPORT std::int64_t getIntFromString(std::string_view val);
 /** get a double from a string*/
 HELICS_CXX_EXPORT double getDoubleFromString(std::string_view val);
