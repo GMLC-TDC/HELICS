@@ -89,7 +89,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
     "sphinxcontrib.rsvgconverter",
-    "sphinx_markdown_tables",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
