@@ -239,7 +239,7 @@ generated helics_cli runner files.
 In the Merlin spec we will instruct Merlin to execute N number of the
 Monte Carlo co-simulations. The number of samples is the number
 specified as the `N_SAMPLES` env variable in the env section of the
-merlin spec.
+Merlin spec.
 
 ```yaml
 env:
