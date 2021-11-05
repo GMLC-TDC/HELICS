@@ -250,7 +250,7 @@ env:
 
 We set the output directory to UQ_EV_Study, this is where all the
 output files will be stored. Every co-simulation run executed by
-merlin will have it's own subdirectory in `./UQ_EV_Study`.
+Merlin will have it's own subdirectory in `./UQ_EV_Study`.
 
 ##### Merlin Step
 
