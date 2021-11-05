@@ -582,7 +582,7 @@ TEST(roundTripConversions, string)
 
     std::function<bool(const std::string& v1, const std::string& v2)> comp =
         [](const std::string& v1, const std::string& v2) { return (v1 == v2); };
-    for (auto cval : vals) {
+    for (const auto& cval : vals) {
         for (auto& ttype : ctypes) {
             EXPECT_TRUE(roundTripTest1(cval, ttype, comp))
                 << typeNameStringRef(ttype) << ": error val " << cval;

@@ -488,7 +488,7 @@ void valueExtract(const defV& dv, char& val)
                 if (vald != invalidDouble) {
                     val = static_cast<char>(vald);
                 } else {
-                    val = np.name.size() >= 1 ? np.name[0] : 0;
+                    val = !np.name.empty() ? np.name[0] : 0;
                 }
             } else {
                 val = static_cast<char>(np.value);
@@ -789,7 +789,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
             break;
         case DataType::HELICS_COMPLEX_VECTOR: {
             auto cvec = ValueConverter<std::vector<std::complex<double>>>::interpret(dv);
-            if (cvec.size() >= 1) {
+            if (!cvec.empty()) {
                 val = cvec[0];
             }
             break;
