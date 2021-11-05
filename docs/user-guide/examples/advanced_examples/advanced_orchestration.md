@@ -133,12 +133,12 @@ $ python make_samples.py
 This implementation will run a default co-simulation. The default parameters are:
 
 ```python
-    samples = 30
-    output_path = os.getcwd()
-    numEVs = 10
-    hours = 24
-    plot = 0
-    run = 1
+samples = 30
+output_path = os.getcwd()
+numEVs = 10
+hours = 24
+plot = 0
+run = 1
 ```
 
 This means that we are generating 30 JSON files with unique seeds, we are using the current operating directory as the head for the output path, we are simulating 10 EVs in the co-simulation for one day, we are not running individual plots for each simulation, and we are executing the JSON files with `helics_cli` after they have been created.
