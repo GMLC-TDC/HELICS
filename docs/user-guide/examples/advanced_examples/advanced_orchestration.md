@@ -5,13 +5,6 @@
 
 # Monte Carlo Co-Simulations
 
-```{eval-rst}
-.. toctree::
-    :maxdepth: 1
-
-
-```
-
 This tutorial will walk through how to set up a HELICS Monte Carlo simulation using two techniques: (1) in series on a single machine, and (2) in parallel on an HPC cluster using Merlin. We assume that you have already completed the
 [**orchestration tutorial with Merlin**](../../advanced_topics/orchestration.md) and have some
 familiarity with how Merlin works.
