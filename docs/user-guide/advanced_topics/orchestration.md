@@ -45,8 +45,8 @@ or scripts need to be executed in the command line in order to execute
 your workflow. The study step is made up of multiple run steps that
 are represented as the nodes in the DAG.
 
-<--! For a more in-depth explanation on how Merlin works, take a look at
-their documentation [here](https://merlin.readthedocs.io/en/latest/index.html) -->
+For a more in-depth explanation on how Merlin works, take a look at
+their documentation [here](https://merlin.readthedocs.io/en/latest/index.html)
 
 ### Why Merlin
 
