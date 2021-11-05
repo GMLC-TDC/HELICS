@@ -84,7 +84,7 @@ pi-receivers.
 #### Merlin workflow description and environment
 
 Merlin has a description and an environment block. The `description` block
-provides the name and a short description about the study.
+provides the name and a short description of the study.
 
 ```yaml
 description:
