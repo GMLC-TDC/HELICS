@@ -28,13 +28,12 @@ familiarity with how Merlin works.
 Code for the Monte Carlo simulation and the
 full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
-[![](../../../img/advanced_orchestration_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_orchestration)
-
 The necessary files are:
 
-- Python program for Battery federate
-- Python program for Charger federate
-- Python program to generate `helics_cli` JSON files and execute
+- Python program for Battery federate ([Battery.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/Battery.py))
+- Python program for Charger federate ([Charger.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/Charger.py))
+- Python program to generate `helics_cli` JSON files and execute ([make_samples_manual.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/make_samples_manual.py))
+
 
 ## What is this co-simulation doing?
 
@@ -328,7 +327,7 @@ study:
     run:
       cmd: |
         spack load helics
-        /home/yee29/projects/helics/helics-cli/bin/helics run --path=$(MERLIN_INFO)/$(FED)
+        helics run --path=$(MERLIN_INFO)/$(FED)
         echo "DONE"
   - name: cleanup
     description: Clean up
