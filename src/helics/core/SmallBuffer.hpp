@@ -229,9 +229,7 @@ class SmallBuffer {
     {
         if (bufferCapacity > bufferSize) {
             heap[bufferSize] = std::byte(0);
-        }
-        else
-        {
+        } else {
             push_back('\0');
             pop_back();
         }
@@ -293,7 +291,7 @@ class SmallBuffer {
             if (size > bigSize) {
                 throw(std::bad_alloc());
             }
-            auto* ndata = new std::byte[size+8];
+            auto* ndata = new std::byte[size + 8];
             std::memcpy(ndata, heap, bufferSize);
             if (usingAllocatedBuffer && !nonOwning) {
                 delete[] heap;
@@ -301,7 +299,7 @@ class SmallBuffer {
             heap = ndata;
             nonOwning = false;
             usingAllocatedBuffer = true;
-            bufferCapacity = size+8;
+            bufferCapacity = size + 8;
         }
     }
     /** check if the buffer is empty*/
