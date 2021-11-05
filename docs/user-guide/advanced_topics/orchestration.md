@@ -63,8 +63,8 @@ Another benefit of using Merlin for HELICS co-simulation is its
 flexibility to manage complex co-simulations. Another tool that you may
 have heard of is helics_cli. `helics_cli` is a command-line tool to launch
 HELICS co-simulations. It currently as of this writing does not have
-the ability to analyze the data and launch subsequent co-simulations
-if need. In this type of scenario a user could use Merlin to setup a
+the ability to analyze the data and launch subsequent co-simulations.
+In this type of scenario a user could use Merlin to setup a
 specification that included an analyze step in the Study step of
 Merlin. The analysis step would determine the input of the next
 co-simulation if another co-simulation was needed and would then
