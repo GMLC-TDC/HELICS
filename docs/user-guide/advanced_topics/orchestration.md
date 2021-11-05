@@ -50,7 +50,7 @@ their documentation [here](https://merlin.readthedocs.io/en/latest/index.html)
 
 ### Why Merlin
 
-The biggest feature that Merlin will give HELICS users it ability to
+The biggest feature that Merlin will give HELICS users is its ability to
 deploy co-simulations in an HPC environment. Merlin has the ability to
 interface with both FLUX and SLURM workload managers that are
 installed on HPC machines. Merlin will handle the request for
