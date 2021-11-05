@@ -60,7 +60,7 @@ all resource allocation calls to the workload manager, the user will
 only need to provide the number of nodes they need for their study.
 
 Another benefit of using Merlin for HELICS co-simulation is its
-flexibility to manage complex co-simulation. Another tool that you may
+flexibility to manage complex co-simulations. Another tool that you may
 have heard of is helics_cli. `helics_cli` is a command-line tool to launch
 HELICS co-simulations. It currently as of this writing does not have
 the ability to analyze the data and launch subsequent co-simulations
