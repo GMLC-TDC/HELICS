@@ -54,7 +54,7 @@ The biggest feature that Merlin will give HELICS users is its ability to
 deploy co-simulations in an HPC environment. Merlin has the ability to
 interface with both FLUX and SLURM workload managers that are
 installed on HPC machines. Merlin will handle the request for
-allocation and job and task distribution amongst the nodes. Users will
+resource allocation, and take care of job and task distribution amongst the nodes. Users will
 not need to know how to use SLURM or FLUX because Merlin will handle
 all resource allocation calls to the workload manager, the user will
 only need to provide the number of nodes they need for their study.
