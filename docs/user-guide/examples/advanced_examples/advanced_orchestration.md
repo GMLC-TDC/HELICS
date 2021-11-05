@@ -159,7 +159,7 @@ You may decide to adapt `make_samples_manual.py` to suite your needs within the 
     out_data = output_path+'/results'
 ```
 
-In the runner scripts directory, there will be 30 JSONs. Each will have a unique `seed` parameter, otherwise they will all look identical:
+In the runner scripts directory, there will be 30 JSON files. Each will have a unique `seed` parameter, otherwise they will all look identical:
 
 ```json
 {
