@@ -1,6 +1,6 @@
 # Orchestration for HPC systems
 
-The goal of this guide is to show and guide you how to handle
+The goal of this guide is to show and guide you on how to handle
 co-simulation orchestration on high-performance computing systems. We will walk through using a specific
 tool ([Merlin](https://github.com/LLNL/merlin)) that has been tested with
 HELICS co-simulations. This is not the only tool that exists that has
