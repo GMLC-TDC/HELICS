@@ -79,7 +79,7 @@ a HELICS co-simulation workflow. For the sake of simplicity we are
 using the the pi-exchange python example that can be found
 [here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/python/pi-exchange). The
 goal will be to have Merlin launch multiple pi-senders and
-pi-recievers.
+pi-receivers.
 
 #### Merlin workflow description and environment
 
