@@ -1,4 +1,4 @@
-# Orchestration on HPCs
+# Orchestration for HPC systems
 
 The goal of this guide is to show and guide you how to handle
 co-simulation orchestration on high performance computers. We will walk through using a specific
