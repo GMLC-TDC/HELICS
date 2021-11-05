@@ -227,4 +227,4 @@ Finally, we can look at the DAG of the spec to visualize the steps in the Study.
 
 ### Orchestration Example
 
-An example of orchestrating multiple simulation runs (e.g., Monte Carlo co-simulation) is given in the [Advanced Examples](../examples/advanced_examples/advanced_orchestration.md) Section.
+An example of orchestrating multiple simulation runs (e.g. Monte Carlo co-simulation) is given in the [Advanced Examples](../examples/advanced_examples/advanced_orchestration.md) Section.
