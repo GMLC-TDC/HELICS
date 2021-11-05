@@ -204,7 +204,7 @@ TEST(subscriptionObject, vector_tests_ci_skip)
 
     runPubSubTypeTests<c, v>(c{3.14159, -2}, v{3.14159, -2});
     runPubSubTypeTests<c, v>(c{-3.14159, -2}, v{-3.14159, -2});
-    runPubSubTypeTests<c, v>(c{-3.14159, 0.0}, v{-3.14159, 0.0});
+    runPubSubTypeTests<c, v>(c{-3.14159, 0.0}, v{-3.14159});
 
     runPubSubTypeTests<c, v>(c{0.0, 2}, v{0, 2});
 
