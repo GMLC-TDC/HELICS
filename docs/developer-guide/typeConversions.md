@@ -40,13 +40,13 @@ When this data is received it can be received as any of the available types, thu
 
 ![Lossless type conversion](../img/LossLessConversion_chart.svg)
 
-For the remaining conversions the loss it typically numerical or comes with conditions.  For example Converting a vector to a complex number you can think of a complex number as a two element vector.  Thus for 1 or 2 element vectors the conversion will be lossless.  For 3 or more element vectors the remaining elements are discarded.  For conversion of any vector to a single value, double or integral the value is collapsed using the vector norm.  Thus for single element vectors or real valued complex numbers the result is equivalent for others there is a reductions in information.  Which may be desired in some cases.  Bool values get reduced to `false` is the numerical value is anything but `0` and true otherwise.  
+For the remaining conversions the loss it typically numerical or comes with conditions. For example Converting a vector to a complex number you can think of a complex number as a two element vector. Thus for 1 or 2 element vectors the conversion will be lossless. For 3 or more element vectors the remaining elements are discarded. For conversion of any vector to a single value, double or integral the value is collapsed using the vector norm. Thus for single element vectors or real valued complex numbers the result is equivalent for others there is a reductions in information. Which may be desired in some cases. Bool values get reduced to `false` is the numerical value is anything but `0` and true otherwise.
 
-Conversion from strings to numeric values assume the string encodes a number otherwise it results in an invalid value.  
+Conversion from strings to numeric values assume the string encodes a number otherwise it results in an invalid value.
 
 ### Invalid Values
 
-Invalid values are returned if there is no value or the conversion is invalid for some reason,  typically string to numeric value failures, in most cases an empty value equivalent is returned.
+Invalid values are returned if there is no value or the conversion is invalid for some reason, typically string to numeric value failures, in most cases an empty value equivalent is returned.
 
 - INT -> -9,223,372,036,854,775,808 ( `numeric_limits<std::int64_t>::min()`)
 - DOUBLE -> `-1e49`
@@ -76,7 +76,7 @@ Thus there are always two conversions occurring in the data translation pipeline
 
 ## Data Representation
 
-`int` and `double` are base level types in C++. `complex` is two doubles, `vector` and `complex_vector` are variable length arrays of doubles. `named_point` is `string` and double. String is a variable length sequence of 8 bit values. `char` is a string of length 1, `boolean` is a single char either `0` or `1`. Time is representation of internal HELICS time as a 64 bit integer (most commonly number of nanoseconds). The JSON type is a string compatible with JSON with two fields "type" and "value" The custom type is variable length sequence of bytes which HELICS will not attempt to convert it transmits a sequence of bytes it would be up to the user to define any conversions or endianness concerns.  
+`int` and `double` are base level types in C++. `complex` is two doubles, `vector` and `complex_vector` are variable length arrays of doubles. `named_point` is `string` and double. String is a variable length sequence of 8 bit values. `char` is a string of length 1, `boolean` is a single char either `0` or `1`. Time is representation of internal HELICS time as a 64 bit integer (most commonly number of nanoseconds). The JSON type is a string compatible with JSON with two fields "type" and "value" The custom type is variable length sequence of bytes which HELICS will not attempt to convert it transmits a sequence of bytes it would be up to the user to define any conversions or endianness concerns.
 
 ## Data conversions
 
@@ -129,7 +129,7 @@ This function is similar to `helicsGetComplexVector` with distinction that strin
 
 #### getIntFromString
 
-Converts a string into 64 bit integer.  If the string has properties of a double or vector it will truncate the values from `getDoubleFromString`.
+Converts a string into 64 bit integer. If the string has properties of a double or vector it will truncate the values from `getDoubleFromString`.
 
 #### getDoubleFromString
 
@@ -155,9 +155,7 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - BOOL ->(vectorNorm(val)!=0)?"1":"0"
 
 [^1]: vectorNorm is the sqrt of the inner product of the vector.
-
 [^2]: vectorString is comma separated string of the numerical values enclosed in `[]` for example `[45.7,22.7,17.8]` this is a JSON compatible string format.
-
 [^3]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
 
 ### Conversion from Complex Vector
@@ -165,7 +163,7 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - INT -> trunc(vectorNorm(val))
 - DOUBLE -> vectorNorm(val)
 - COMPLEX -> val[0]
-- VECTOR - > [abs(val[0]),abs(val[1]),...abs(val[N])] [^1]
+- VECTOR - > [abs(val[0]),abs(val[1]),...abs(val[N])][^1]
 - COMPLEX_VECTOR -> val
 - NAMED_POINT ->{vectorString(val), NAN}
 - STRING -> complexVectorString(val)
@@ -207,8 +205,7 @@ otherwise use the numerical value as a double and convert appropriately. The exc
 
 Time is transmitted as a 64 bit integer so conversion rules of an integer apply with the note that a double as a time is assumed as seconds and the integer represents nanoseconds so a double (as long as not too big) will be transmitted without loss as long as the precision is 9 decimal digits or less.
 
-
 ## Unit conversions
 
-HELICS also handles unit conversions if units are specified on the publication and subscription and can be understood by the units library.  This applies primarily for pub/sub of numerical types.
-HELICS uses [Units](https://github.com/LLNL/units) as the units library.  
+HELICS also handles unit conversions if units are specified on the publication and subscription and can be understood by the units library. This applies primarily for pub/sub of numerical types.
+HELICS uses [Units](https://github.com/LLNL/units) as the units library.
