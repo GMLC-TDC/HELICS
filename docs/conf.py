@@ -99,6 +99,7 @@ myst_enable_extensions = [
     "amsmath",
     "dollarmath",
 ]
+myst_dmath_double_inline = True
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
