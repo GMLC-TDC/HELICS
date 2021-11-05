@@ -141,7 +141,7 @@ plot = 0
 run = 1
 ```
 
-This means that we are generating 30 JSON files with unique seeds, we are using the current operating directory as the head for the output path, we are simulating 10 EVs in the co-simulation for one day, we are not running individual plots for each simulation, and we are executing the JSON files with `helics_cli` after they have been created.
+This means that we are generating 30 JSON files with unique seeds, we are using the current operating directory as the head for the output path, we are simulating 10 EVs in the co-simulation for one day, we are not running individual plots for each simulation, and we are running `helics_cli` with the JSON files after they have been created.
 
 If we wanted to run a Monte Carlo co-sim with different parameters, this would be:
 
