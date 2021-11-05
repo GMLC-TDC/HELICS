@@ -6,7 +6,7 @@
     :maxdepth: 2
 ```
 
-Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSONs for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](https://docs.helics.org/en/latest/c-api-reference/index.html) to set the logging level, among other things). As such
+Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSONs for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things). As such
 
 ## Configuration methods
 
@@ -26,17 +26,17 @@ Which method you use to configure your federate and co-simulation significantly 
   To use the JSON file for configuration, one of three specific APIs needs to be called: in the file:
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
-    | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#others)
+    | [C](api-references/C_API.md#others)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateValueFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateValueFederateFromConfig-Tuple{String})
   - `helicsCreateMessageFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a8d992360400e996c083c0b3a1d75b8f0)
-    | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#others)
+    | [C](api-reference/C_API.md#others)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateMessageFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateMessageFederateFromConfig-Tuple{String})
   - `helicsCreateCombinationFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a758381aad8bd5f9d0925a8b13ee04a1d)
-    | [C](https://docs.helics.org/en/latest/c-api-reference/index.html#others)
+    | [C](api-reference/C_API.md#others)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateCombinationFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateCombinationFederateFromConfig-Tuple{String})
 - **JSON configuration produces a natural artifact that defines the co-simulation** - Another advantage of the external configuration in the JSON file is that it is a human-readable artifact that can be distributed separately from the source code that provides a lot of information about how the co-simulation was run. In fact, its possible to just look at the configuration files of a federation and do some high-level debugging (checking to see that the subscriptions and publications are aligned, for example).
