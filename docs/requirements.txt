@@ -5,5 +5,4 @@ ipython==7.28.0
 ipykernel==6.4.2
 nbsphinx==0.8.7
 breathe==4.31.0
-sphinx-markdown-tables==0.0.15
 sphinxcontrib-svg2pdfconverter==1.1.1
