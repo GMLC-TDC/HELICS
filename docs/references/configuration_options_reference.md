@@ -637,7 +637,7 @@ If applied to a core or broker (`--slow_responding` in the `core_init_string` or
 
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
-| [C](https://docs.helics.org/en/latest/c-api-reference/index.html#federateinfo)
+| [C](api-reference/C_API.md#federateinfo)
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Union{Float64,%20Int64}})
 
