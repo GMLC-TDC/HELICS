@@ -228,7 +228,7 @@ Since we are using the helics_cli to manage and execute all the
 federates, we need to create these runner files for helics_cli.
 There is a provided python script called `make_samples_merlin.py` that will
 generate the runner file and a csv file that will be used in the
-study step. Helics_cli will start each of these federates. In the Merlin
+study step. helics_cli will start each of these federates. In the Merlin
 spec, Merlin will be instructed to execute the helics_cli with all the
 generated helics_cli runner files.
 
