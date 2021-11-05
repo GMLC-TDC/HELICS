@@ -26,7 +26,7 @@ Which method you use to configure your federate and co-simulation significantly 
   To use the JSON file for configuration, one of three specific APIs needs to be called: in the file:
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
-    | [C](api-references/C_API.md#others)
+    | [C](api-reference/C_API.md#others)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateValueFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateValueFederateFromConfig-Tuple{String})
   - `helicsCreateMessageFederateFromConfig`
