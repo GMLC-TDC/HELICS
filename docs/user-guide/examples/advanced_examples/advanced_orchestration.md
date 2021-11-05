@@ -151,7 +151,7 @@ $ python make_samples.py 10 . 100 24*7 0 0
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not run `helics-cli` with the generated JSON files.
 
-You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
+You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSON files using the helper script, sub directories are created for the `helics_cli` runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
 
 ```python
 out_json = output_path+'/cli_runner_scripts'
