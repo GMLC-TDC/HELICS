@@ -77,7 +77,7 @@ Though not shown in the Federation diagram, the use of native HELICS filters is 
 
 The filter federate will now be granted time whenever a message is sent from any of the existing federation endpoints shown in the `sourcetargets` list. The filter federate has only a single endpoint which it uses to receive the rerouted messages and send on any modified messages.
 
-Additionally, all filter federates should set the `event_triggered` flag as shown above. This increases the timing efficiency managed by HELICS and avoid potential timing lock-ups.
+Additionally, all filter federates should set the `event_triggered` flag as shown above. This increases the timing efficiency managed by HELICS and avoids potential timing lock-ups.
 
 ### Filter Federate Operations
 
