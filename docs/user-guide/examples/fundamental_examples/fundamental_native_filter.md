@@ -13,9 +13,9 @@ This tutorial is organized as follows:
 
 ## Example files
 
-All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_message_comm/combo)
+All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
-[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_message_comm/combo)
+[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
@@ -24,7 +24,7 @@ All files necessary to run the Federate Integration Example can be found in the 
 
 ## Combination Federates
 
-A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done.
+A quick glance at the [Fundamental examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/) on github will show that almost all these introductory examples are mocked up with two federates. These two federates pass information back and forth, and the examples show different ways this can be done.
 
 This is the only example in the Fundamental series which models three federates -- it is also exactly the same model as the [Base Example](../advanced_examples/advanced_default.md) in the Advanced series. Why are we introducing a third federate?
 

@@ -13,9 +13,9 @@ This tutorial is organized as follows:
 
 ## Example files
 
-All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_message_comm/filter_federate)
+All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/filter_federate)
 
-[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_message_comm/combo)
+[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
@@ -46,6 +46,7 @@ Though not shown in the Federation diagram, the use of native HELICS filters is 
 ```json
  {
   "name": "Filter",
+  "event_triggered": true,
   ...
   "endpoints": [
     {
@@ -75,6 +76,8 @@ Though not shown in the Federation diagram, the use of native HELICS filters is 
 ```
 
 The filter federate will now be granted time whenever a message is sent from any of the existing federation endpoints shown in the `sourcetargets` list. The filter federate has only a single endpoint which it uses to receive the rerouted messages and send on any modified messages.
+
+Additionally, all filter federates should set the `event_triggered` flag as shown above. This increases the timing efficiency managed by HELICS and avoids potential timing lock-ups.
 
 ### Filter Federate Operations
 
