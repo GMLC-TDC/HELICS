@@ -355,6 +355,8 @@ class HELICS_CXX_EXPORT Input: public Interface {
   public:
     /** get double vector value functions to retrieve data by a C array of doubles*/
     int getValue(double* data, int maxsize);
+    /** get a complex double vector value functions to retrieve data by a C array of doubles*/
+    int getComplexValue(double* data, int maxsize);
     /** get string value functions to retrieve data by a C string*/
     int getValue(char* str, int maxsize);
     /** get the latest value for the input

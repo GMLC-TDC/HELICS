@@ -683,7 +683,7 @@ size_t Input::getVectorSize()
         case vector_loc:
             return std::get<std::vector<double>>(lastValue).size();
         case complex_vector_loc:
-            return std::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+            return std::get<std::vector<std::complex<double>>>(lastValue).size();
         default:
             break;
     }
@@ -822,11 +822,24 @@ char Input::getValueChar()
 
 int Input::getValue(double* data, int maxsize)
 {
-    auto V = getValueRef<std::vector<double>>();
+    const auto &V = getValueRef<std::vector<double>>();
     int length = 0;
     if (data != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(V.size()), maxsize);
         std::memmove(data, V.data(), length * sizeof(double));
+    }
+
+    hasUpdate = false;
+    return length;
+}
+
+int Input::getComplexValue(double* data, int maxsize)
+{
+    const auto &CV = getValueRef<std::vector<std::complex<double>>>();
+    int length = 0;
+    if (data != nullptr && maxsize > 0) {
+        length = std::min(static_cast<int>(CV.size()), maxsize);
+        std::memmove(data, reinterpret_cast<const double *>(CV.data()), length * sizeof(double)*2);
     }
 
     hasUpdate = false;

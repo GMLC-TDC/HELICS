@@ -361,6 +361,7 @@ HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, int64_t val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, std::string_view val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const std::vector<double>& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const double* vals, size_t size);
+HELICS_CXX_EXPORT SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type,
                                           const std::vector<std::complex<double>>& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const std::complex<double>& val);

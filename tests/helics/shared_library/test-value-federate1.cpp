@@ -259,6 +259,7 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     auto inp_vect = helicsFederateRegisterInput(vFed1, "key6", HELICS_DATA_TYPE_VECTOR, "V", &err);
 
+
     auto inp_double =
         helicsFederateRegisterInput(vFed1, "key7", HELICS_DATA_TYPE_DOUBLE, "kW", &err);
 
@@ -267,6 +268,9 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     auto inp_np =
         helicsFederateRegisterInput(vFed1, "key9", HELICS_DATA_TYPE_NAMED_POINT, "", &err);
+
+    auto inp_cvect =
+        helicsFederateRegisterInput(vFed1, "key10", HELICS_DATA_TYPE_COMPLEX_VECTOR, "V", &err);
 
     helicsInputSetMinimumChange(inp_double, 1100.0, &err);
     helicsInputSetDefaultDouble(inp_double, 10000.0, &err);
@@ -291,6 +295,7 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsInputSetDefaultChar(inp_char, 'q', &err);
     // this should be ok since the data is NULL regardless of specified length
     helicsInputSetDefaultVector(inp_vect, nullptr, 7, &err);
+    helicsInputSetDefaultComplexVector(inp_cvect, nullptr, 7, &err);
     helicsInputSetDefaultNamedPoint(inp_np, data, 15.7, &err);
 
     helicsFederateEnterExecutingMode(vFed1, &err);
@@ -822,6 +827,94 @@ void runFederateTestVectorD(const char* core,
     delete[] val;
 }
 
+
+void runFederateTestVectorCD(const char* core,
+                            const double defaultValue[],
+                            const double testValue1[],
+                            const double testValue2[],
+                            int len,
+                            int len1,
+                            int len2)
+{
+    HelicsTime gtime;
+    int maxlen = (len1 > len2) ? len1 : len2;
+    maxlen = (maxlen > len) ? maxlen : len;
+    auto* val = new double[maxlen*2];
+    HelicsError err = helicsErrorInitialize();
+    FederateTestFixture fixture;
+    fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
+    auto vFed = fixture.GetFederateAt(0);
+    // register the interfaces
+    auto pubid =
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_COMPLEX_VECTOR, "", &err);
+    auto subid = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
+    CE(helicsInputSetDefaultComplexVector(subid, defaultValue, len, &err));
+    CE(helicsFederateEnterExecutingMode(vFed, &err));
+
+    // publish string1 at time=0.0;
+    CE(helicsPublicationPublishComplexVector(pubid, testValue1, len1, &err));
+
+    int actualLen = helicsInputGetVectorSize(subid);
+    EXPECT_EQ(actualLen, len);
+
+    CE(helicsInputGetComplexVector(subid, val, maxlen, &actualLen, &err));
+
+    EXPECT_EQ(actualLen, len);
+    for (int i = 0; i < len; i++) {
+        EXPECT_EQ(val[i], defaultValue[i]);
+        // std::cout << defaultValue[i] << "\n";
+    }
+
+    CE(gtime = helicsFederateRequestTime(vFed, 1.0, &err));
+    EXPECT_EQ(gtime, 1.0);
+
+    // get the value
+
+    CE(helicsInputGetComplexVector(subid, val, maxlen, &actualLen, &err));
+    EXPECT_EQ(actualLen, len1);
+    // make sure the vector is what we expect
+    for (int i = 0; i < len1; i++) {
+        EXPECT_EQ(val[i], testValue1[i]);
+        // std::cout << testValue1[i] << "\n";
+    }
+
+    // test getting a complex vector as a string
+    actualLen = helicsInputGetStringSize(subid);
+    std::string buf;
+    buf.resize(static_cast<size_t>(actualLen) + 2);
+    CE(helicsInputGetString(subid, &(buf[0]), static_cast<int>(buf.size()), &actualLen, &err));
+    buf.resize(static_cast<size_t>(actualLen) - 1);
+    EXPECT_EQ(buf[0], '[');
+    EXPECT_EQ(buf.back(), ']');
+
+    // publish a second vector
+    CE(helicsPublicationPublishComplexVector(pubid, testValue2, len2, &err));
+
+    // make sure the value is still what we expect
+    CE(helicsInputGetComplexVector(subid, val, maxlen, &actualLen, &err));
+    EXPECT_EQ(actualLen, len1);
+    for (int i = 0; i < len1; i++) {
+        EXPECT_NEAR(val[i], testValue1[i], 0.0001);
+        //  std::cout << testValue1[i] << "\n";
+    }
+
+    // advance time
+    CE(gtime = helicsFederateRequestTime(vFed, 2.0, &err));
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+
+    CE(helicsInputGetComplexVector(subid, val, maxlen, &actualLen, &err));
+
+    EXPECT_EQ(actualLen, len2);
+    for (int i = 0; i < len2; i++) {
+        EXPECT_EQ(val[i], testValue2[i]);
+        //  std::cout << testValue2[i] << "\n";
+    }
+
+    CE(helicsFederateFinalize(vFed, &err));
+    delete[] val;
+}
+
 void runFederateTestNamedPoint(const char* core,
                                const char* defaultValue,
                                double defVal,
@@ -952,6 +1045,14 @@ TEST_P(vfed_type_tests, single_transfer_vector2)
     std::vector<double> V2(100, 45.236262626221);
     std::vector<double> V3(452, -25.25263858741);
     runFederateTestVectorD(GetParam(), V1.data(), V2.data(), V3.data(), 34, 100, 452);
+}
+
+TEST_P(vfed_type_tests, single_transfer_complex_vector)
+{
+    const double val1[] = {34.3, -24.2};
+    const double val2[] = {12.4, 14.7, 16.34, -18.17};
+    const double val3[] = {9.9999, 8.8888, 7.7777,-1e3,-1e-7,2e-14};
+    runFederateTestVectorCD(GetParam(), val1, val2, val3, 1, 2, 3);
 }
 
 TEST_P(vfed_type_tests, subscriber_and_publisher_registration)

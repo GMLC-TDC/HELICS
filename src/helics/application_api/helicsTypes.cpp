@@ -877,6 +877,64 @@ SmallBuffer typeConvert(DataType type, const double* vals, size_t size)
     }
 }
 
+SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
+{
+    if ((vals == nullptr) || (size == 0)) {
+        return emptyBlock(type, DataType::HELICS_COMPLEX_VECTOR);
+    }
+    if (size == 1) {
+        // treat like a single complex
+        return typeConvert(type, std::complex<double>{vals[0], vals[1]});
+    }
+    switch (type) {
+        case DataType::HELICS_DOUBLE:
+            return ValueConverter<double>::convert(vectorNorm(vals, size));
+        case DataType::HELICS_TIME:
+            return ValueConverter<int64_t>::convert(Time(vectorNorm(vals, size)).getBaseTimeCode());
+        case DataType::HELICS_INT:
+            return ValueConverter<int64_t>::convert(static_cast<int64_t>(vectorNorm(vals, size)));
+        case DataType::HELICS_COMPLEX: {
+            std::complex<double> V(vals[0], vals[1]);
+            return ValueConverter<std::complex<double>>::convert(V);
+        }
+        case DataType::HELICS_BOOL:
+            return ValueConverter<std::string_view>::convert((vectorNorm(vals, size) != 0.0) ? "1" :
+                                                                                               "0");
+        case DataType::HELICS_STRING: {
+            std::vector<std::complex<double>> CD;
+            CD.reserve(size);
+            for (size_t ii = 0; ii < size; ++ii) {
+                CD.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
+            }
+            return ValueConverter<std::string_view>::convert(helicsComplexVectorString(CD));
+        }
+        case DataType::HELICS_NAMED_POINT:
+            return ValueConverter<NamedPoint>::convert(
+                NamedPoint{helicsVectorString(vals, size), std::nan("0")});
+        case DataType::HELICS_COMPLEX_VECTOR: {
+            std::vector<std::complex<double>> CD;
+            CD.reserve(size);
+            for (size_t ii = 0; ii < size; ++ii) {
+                CD.emplace_back(vals[2*ii], vals[2*ii+1]);
+            }
+            return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
+        } break;
+        case DataType::HELICS_VECTOR:
+        default:
+            return ValueConverter<double>::convert(vals, size);
+        case DataType::HELICS_JSON: {
+            Json::Value jv;
+            jv["type"] = typeNameStringRef(DataType::HELICS_VECTOR);
+            Json::Value vv = Json::arrayValue;
+            for (size_t ii = 0; ii < size; ++ii) {
+                vv.append(vals[ii]);
+            }
+            jv["value"] = std::move(vv);
+            return fileops::generateJsonString(jv);
+        }
+    }
+}
+
 SmallBuffer typeConvert(DataType type, const std::vector<std::complex<double>>& val)
 {
     if (val.empty()) {

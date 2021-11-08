@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <vector>
+#include <complex>
 
 namespace helicscpp {
 /** C++98 interface for a helics Input*/
@@ -66,15 +67,25 @@ class Input {
     {
         helicsInputSetDefaultComplex(inp, cmplx.real(), cmplx.imag(), HELICS_IGNORE_ERROR);
     }
-    /** set the default vector data value*/
+    
+
+    /** set the default complex vector data value*/
     void setDefault(const std::vector<double>& data)
     {
         helicsInputSetDefaultVector(inp,
                                     data.data(),
-                                    static_cast<int>(data.size() * sizeof(double)),
+                                    static_cast<int>(data.size()),
                                     HELICS_IGNORE_ERROR);
     }
 
+    /** set the default complex vector data value*/
+    void setDefault(const std::vector<std::complex<double>>& data)
+    {
+        helicsInputSetDefaultComplexVector(inp,
+                                           reinterpret_cast<const double *>(data.data()),
+                                           static_cast<int>(data.size()),
+                                           HELICS_IGNORE_ERROR);
+    }
     /** Methods to get subscription values **/
     /** get a raw value as a character vector*/
     int getBytes(std::vector<char>& data)
@@ -160,6 +171,7 @@ class Input {
     int getVector(double* data, int maxlen)
     {
         helicsInputGetVector(inp, data, maxlen, &maxlen, hThrowOnError());
+        //maxlen contains the actual length now
         return maxlen;
     }
     /** get the current value and store it in a std::vector<double>*/
@@ -170,6 +182,23 @@ class Input {
         helicsInputGetVector(inp, data.data(), actualSize, HELICS_NULL_POINTER, hThrowOnError());
     }
 
+    /** get the current value as a vector of doubles in alternating real and imaginary
+    @param data pointer to space to store the current values
+    @param maxlen the maximum size of the allowed vector
+    @return the actual size of the vector stored*/
+    int getComplexVector(double* data, int maxlen)
+    {
+        helicsInputGetComplexVector(inp, data, maxlen, &maxlen, hThrowOnError());
+        // maxlen contains the actual length now
+        return maxlen;
+    }
+    /** get the current value and store it in a std::vector<std::complex<double>>*/
+    void getComplexVector(std::vector<std::complex<double>>& data)
+    {
+        int actualSize = helicsInputGetVectorSize(inp);
+        data.resize(actualSize);
+        helicsInputGetComplexVector(inp, reinterpret_cast<double *>(data.data()), actualSize, HELICS_NULL_POINTER, hThrowOnError());
+    }
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
