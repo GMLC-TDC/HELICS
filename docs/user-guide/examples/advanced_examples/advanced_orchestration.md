@@ -19,13 +19,13 @@ familiarity with how Merlin works.
 ## Where is the code?
 
 Code for the Monte Carlo simulation and the
-full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
 
 The necessary files are:
 
-- Python program for Battery federate ([Battery.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/Battery.py))
-- Python program for Charger federate ([Charger.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/Charger.py))
-- Python program to generate `helics_cli` JSON files and execute ([make_samples_manual.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_orchestration/make_samples_manual.py))
+- Python program for Battery federate ([Battery.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/Battery.py))
+- Python program for Charger federate ([Charger.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/Charger.py))
+- Python program to generate `helics_cli` JSON files and execute ([make_samples_manual.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/make_samples_manual.py))
 
 
 ## What is this co-simulation doing?
