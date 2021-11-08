@@ -27,7 +27,6 @@ The necessary files are:
 - Python program for Charger federate ([Charger.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/Charger.py))
 - Python program to generate `helics_cli` JSON files and execute ([make_samples_manual.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/make_samples_manual.py))
 
-
 ## What is this co-simulation doing?
 
 This example walks through how to set up a probabilistic model with Monte Carlo simulations. This Monte Carlo co-simulation is built from a simple two federate example, based on the [Endpoint Federates Example](../fundamental_examples/fundamental_endpoints.md). In this example, there is a Charger federate which publishes voltage and a Battery federate which publishes current.

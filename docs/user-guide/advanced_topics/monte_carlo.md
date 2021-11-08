@@ -18,3 +18,4 @@ is distributed uniformly with bounds $a$ and $b$."
 ![](../../img/uniform_dist.png)
 
 The uniform distribution is among the most simple of probability distributions. Additional resources on probability and statistics are plentiful; [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/) is highly recommended.
+```
