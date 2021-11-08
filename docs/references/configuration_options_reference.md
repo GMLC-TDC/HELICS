@@ -848,7 +848,7 @@ When an interface requests a target it tries to find a match in the federation. 
 
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Publication.html#abb36f297be67589f7a73c4c1fc39240b)
 | [C](api-reference/C_API.md#publication)
-| [Python](https://python.helics.org/api/capi-py.html#helicsPublicationAddTarget) 
+| [Python](https://python.helics.org/api/capi-py.html#helicsPublicationAddTarget)
 | [Julia](https://julia.helics.org/latest/api/#Publication)
 Used to specify which inputs should receive the values from this output. This can be a list of output keys/names.
 
