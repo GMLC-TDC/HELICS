@@ -55,14 +55,14 @@ In most of the examples presented here, the configuration of the federation is d
 
 - The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
 
-```python
-for core in graph["cores"]:
-    if core["federates"][0]["name"] == "Charger":
-        for pub in core["federates"][0]["publications"]:
-            key = pub["key"]
-            sub = h.helicsFederateRegisterSubscription(fed, key)
-            logger.debug(f"Added subscription {key}")
-````
+  ```python
+  for core in graph["cores"]:
+      if core["federates"][0]["name"] == "Charger":
+          for pub in core["federates"][0]["publications"]:
+              key = pub["key"]
+              sub = h.helicsFederateRegisterSubscription(fed, key)
+              logger.debug(f"Added subscription {key}")
+  ```
 
 - After making the subscription, the Battery federate re-evaulates the data flow graph and updates its own internal record of the configuration
 
