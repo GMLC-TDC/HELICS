@@ -749,6 +749,16 @@ HELICS_EXPORT int helicsGetOptionIndex(const char* val);
 HELICS_EXPORT int helicsGetOptionValue(const char* val);
 
 /**
+ * Get the data type for use in /ref helicsFederateRegisterPublication, /ref helicsFederateRegisterInput,
+ * /ref helicsFilterSetOption.
+ *
+ * @param val A string representing a data type.
+ *
+ * @return An int with the data type or HELICS_DATA_TYPE_UNKNOWN(-1) if not a valid value.
+ */
+HELICS_EXPORT int helicsGetDataType(const char* val);
+
+/**
  * Set a flag in the info structure.
  *
  * @details Valid flags are available /ref helics_federate_flags.

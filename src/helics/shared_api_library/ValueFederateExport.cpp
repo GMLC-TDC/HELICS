@@ -605,6 +605,24 @@ void helicsPublicationPublishVector(HelicsPublication pub, const double* vectorI
     }
 }
 
+void helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err)
+{
+    auto* pubObj = verifyPublication(pub, err);
+    if (pubObj == nullptr) {
+        return;
+    }
+    try {
+        if ((vectorInput == nullptr) || (vectorLength <= 0)) {
+            pubObj->pubPtr->publish(std::vector<double>());
+        } else {
+            pubObj->pubPtr->publishComplex(vectorInput, vectorLength);
+        }
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
 void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err)
 {
     auto* pubObj = verifyPublication(pub, err);
@@ -926,6 +944,33 @@ void helicsInputGetVector(HelicsInput inp, double data[], int maxlen, int* actua
     // LCOV_EXCL_STOP
 }
 
+void helicsInputGetComplexVector(HelicsInput inp, double data[], int maxlen, int* actualSize, HelicsError* err)
+{
+    auto* inpObj = verifyInput(inp, err);
+    if (actualSize != nullptr) {
+        *actualSize = 0;
+    }
+    if (inpObj == nullptr) {
+        return;
+    }
+    if ((data == nullptr) || (maxlen <= 0)) {
+        inpObj->inputPtr->clearUpdate();
+        // this isn't an error, just no data retrieved
+        return;
+    }
+    try {
+        int length = inpObj->inputPtr->getComplexValue(data, maxlen);
+        if (actualSize != nullptr) {
+            *actualSize = length;
+        }
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
 void helicsInputGetNamedPoint(HelicsInput inp, char* outputString, int maxStringLen, int* actualLength, double* val, HelicsError* err)
 {
     auto* inpObj = verifyInput(inp, err);
@@ -1080,6 +1125,30 @@ void helicsInputSetDefaultVector(HelicsInput inp, const double* vectorInput, int
     // LCOV_EXCL_STOP
 }
 
+void helicsInputSetDefaultComplexVector(HelicsInput inp, const double* vectorInput, int vectorLength, HelicsError* err)
+{
+    auto* inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return;
+    }
+    try {
+        if ((vectorInput == nullptr) || (vectorLength <= 0)) {
+            inpObj->inputPtr->setDefault(std::vector<std::complex<double>>{});
+        } else {
+            std::vector<std::complex<double>> CV;
+            for (int ii=0; ii < vectorLength; ++ii) {
+                CV.emplace_back(vectorInput[2*ii], vectorInput[2*ii + 1]);
+            }
+            inpObj->inputPtr->setDefault(std::move(CV));
+        }
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
 void helicsInputSetDefaultNamedPoint(HelicsInput inp, const char* str, double val, HelicsError* err)
 {
     auto* inpObj = verifyInput(inp, err);
@@ -1130,6 +1199,11 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
         return gEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
+}
+
+int helicsInputGetPublicationDataType(HelicsInput ipt)
+{
+    return helicsGetDataType(helicsInputGetPublicationType(ipt));
 }
 
 const char* helicsPublicationGetType(HelicsPublication pub)

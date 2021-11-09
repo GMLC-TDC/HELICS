@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <utility>
 
-#if defined(__APPLE__) && defined(__clang__)
+#if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wuninitialized"
 #endif
@@ -352,7 +352,7 @@ class SmallBuffer {
     }
 
   private:
-    std::array<std::byte, 64> buffer{std::byte{0}};
+    std::array<std::byte, 64> buffer{{std::byte{0}}};
     std::size_t bufferSize{0};
     std::size_t bufferCapacity{64};
     std::byte* heap;
@@ -372,7 +372,7 @@ inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
     return (sb1.to_string() != sb2.to_string());
 }
 
-#if defined(__APPLE__) && defined(__clang__)
+#if defined(__clang__)
 #    pragma clang diagnostic pop
 #endif
 
