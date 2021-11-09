@@ -47,7 +47,6 @@ In most of the examples presented here, the configuration of the federation is d
   def eval_data_flow_graph(fed):
       query = h.helicsCreateQuery("broker", "data_flow_graph")
       graph = h.helicsQueryExecute(query, fed)
-  ...
   ```
 
 - The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
