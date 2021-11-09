@@ -774,6 +774,15 @@ data_view Input::checkAndGetFedUpdate()
                                                                     data_view{};
 }
 
+void Input::forceCoreDataUpdate() {
+    auto dv = fed->getBytes(*this);
+    if (!dv.empty()) {
+        valueExtract(dv, injectionType, lastValue);
+    } else if (getMultiInputMode() != MultiInputHandlingMethod::NO_OP) {
+        fed->forceCoreUpdate(*this);
+    }
+}
+
 bool checkForNeededCoreRetrieval(const defV& lastValue,
                                  DataType injectionType,
                                  DataType conversionType)

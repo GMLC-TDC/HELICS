@@ -423,6 +423,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
             inputVectorOp == MultiInputHandlingMethod::NO_OP;
     }
     data_view checkAndGetFedUpdate();
+    void forceCoreDataUpdate();
     friend class ValueFederateManager;
 };
 
@@ -526,12 +527,7 @@ template<class X>
         }
     } else {
         if (checkForNeededCoreRetrieval(lastValue, injectionType, helicsType<remove_cv_ref<X>>())) {
-            dv=fed->getBytes(*this);
-            if (!dv.empty()) {
-                valueExtract(dv, injectionType, lastValue);
-            } else if (getMultiInputMode()!=MultiInputHandlingMethod::NO_OP) {
-                fed->forceCoreUpdate(*this);
-            }
+            forceCoreDataUpdate();
         }
     }
 
