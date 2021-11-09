@@ -83,11 +83,10 @@ Now we can use the `logger` to print different levels of detail about the co-sim
 A set of functions are available for individual federates to generate log messages. These functions must be placed in the simulator. In the [Fundamental Base Example](../examples/fundamental_examples/fundamental_default.md), the `logger.info()` and `logger.debug()` methods are used. Stipulating different types of log messages allows the user to change the output of the log files in one location -- the config file for the federate. These will log a message at the `log_level` specified in the config file.
 
 ```python
-logger.info('Only prints to log file if log_level = 2 or summary')
-logger.debug('Only prints to log file if log_level = 6 or data')
-logger.error('Only prints to log file if log_level = 0 or error')
-logger.warning('Only prints to log file if log_level = 1 or warning')
-
+logger.info("Only prints to log file if log_level = 2 or summary")
+logger.debug("Only prints to log file if log_level = 6 or data")
+logger.error("Only prints to log file if log_level = 0 or error")
+logger.warning("Only prints to log file if log_level = 1 or warning")
 ```
 
 ## Setting up the Federate for Logging
@@ -113,7 +112,7 @@ These properties can be set using the JSON configuration for each federate:
 Or with the API interface functions for each federate:
 
 ```python
-h.helicsFederateInfoSetIntegerProperty(fed,h.helics_property_int_log_level, 1)
+h.helicsFederateInfoSetIntegerProperty(fed, h.helics_property_int_log_level, 1)
 ```
 
 ## Setting up the Core/Broker for Logging
@@ -124,7 +123,7 @@ This can be specified through the coreinit string `--logfile logfile.txt`
 or on a core object
 
 ```python
-h.helicsCoreSetLogFile(core,"logfile.txt");
+h.helicsCoreSetLogFile(core, "logfile.txt")
 ```
 
 A similar function is available for a broker. The Federate version will set the logFile on the connected core.
@@ -132,7 +131,7 @@ A similar function is available for a broker. The Federate version will set the 
 With the API:
 
 ```python
-h.helicsFederateSetLogFile(fed,"logfile.txt");
+h.helicsFederateSetLogFile(fed, "logfile.txt")
 ```
 
 Within the `helics_cli` runner JSON:
@@ -163,7 +162,7 @@ setLoggingCallback (const std::function<void(int, const std::string &, const std
 In PyHELICS:
 
 ```python
-h.helicsFederateSetLoggingCallback (fed, logger, user_data)
+h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 ```
 
 The callback take 3 parameters about a message and in the case of `C` callbacks a pointer to user data.
