@@ -146,8 +146,8 @@ This execution would create 10 JSON files with unique seeds, set the current dir
 You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSON files using the helper script, sub directories are created for the `helics_cli` runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
 
 ```python
-out_json = output_path+'/cli_runner_scripts'
-out_data = output_path+'/results'
+out_json = output_path + "/cli_runner_scripts"
+out_data = output_path + "/results"
 ```
 
 In the runner scripts directory, there will be 30 JSON files. Each will have a unique `seed` parameter, otherwise they will all look identical:
@@ -202,11 +202,14 @@ Management of multiple iterations of the co-simulation can be done by setting th
 ```python
 import argparse
 
-parser = argparse.ArgumentParser(description='EV simulator')
-parser.add_argument('--seed', type=int, default=0,
-                help='The seed that will be used for our random distribution')
-parser.add_argument('--port', type=int, default=-1,
-                help='port of the HELICS broker')
+parser = argparse.ArgumentParser(description="EV simulator")
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=0,
+    help="The seed that will be used for our random distribution",
+)
+parser.add_argument("--port", type=int, default=-1, help="port of the HELICS broker")
 
 
 args = parser.parse_args()
