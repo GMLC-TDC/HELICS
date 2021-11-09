@@ -19,7 +19,7 @@ familiarity with how Merlin works.
 ## Where is the code?
 
 Code for the Monte Carlo simulation and the
-full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [discussion forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 The necessary files are:
 
