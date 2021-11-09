@@ -142,15 +142,14 @@ Federates which are abstractions of reality (e.g., controllers) do not need regu
 **shouldn't we also show how this federate is configured? where is best for that?**
 
 ```python
-        hours = 24*7 # one week
-        total_interval = int(60 * 60 * hours)
-        grantedtime = 0
-        fake_max_time = int(h.HELICS_TIME_MAXTIME/1000)
-        starttime = fake_max_time
-        logger.debug(f'Requesting initial time {starttime}')
-        grantedtime = h.helicsFederateRequestTime (fed, starttime)
-        logger.debug(f'Granted time {grantedtime}')
-
+hours = 24 * 7  # one week
+total_interval = int(60 * 60 * hours)
+grantedtime = 0
+fake_max_time = int(h.HELICS_TIME_MAXTIME / 1000)
+starttime = fake_max_time
+logger.debug(f"Requesting initial time {starttime}")
+grantedtime = h.helicsFederateRequestTime(fed, starttime)
+logger.debug(f"Granted time {grantedtime}")
 ```
 
 <a name="initial-time-requests-and-model-initialization">

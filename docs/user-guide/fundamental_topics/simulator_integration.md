@@ -138,19 +138,19 @@ In HELICS there is a single API call that can be used to read in all of the nece
 For a value federate:
 
 ```python
-fed = h.helicsCreateValueFederateFromConfig('fed_config.json')
+fed = h.helicsCreateValueFederateFromConfig("fed_config.json")
 ```
 
 For a message federate:
 
 ```python
-fed = h.helicsCreateMessageFederateFromConfig('fed_config.json')
+fed = h.helicsCreateMessageFederateFromConfig("fed_config.json")
 ```
 
 For a combination federate:
 
 ```python
-fed = h.helicsCreateCombinationFederateFromConfig('fed_config.json')
+fed = h.helicsCreateCombinationFederateFromConfig("fed_config.json")
 ```
 
 In all instances, this function returns the federate object `fed` and requires a path to the JSON configuration file as an input.
@@ -230,7 +230,7 @@ At this point, each federate will now set through time, exchanging values with o
 ```python
 t = 0
 while t < end_time:
-    # cosimulate
+    pass  # cosimulation code would go here
 ```
 
 Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step.
@@ -245,7 +245,6 @@ float_value = h.helicsInputGetDouble(sub)
 real_value, imag_value = h.helicsInputGetComplex(sub)
 string_value = h.helicsInputGetChar(sub)
 ...
-
 ```
 
 It may also be worth noting that it is possible on receipt to check whether an input has been updated before retrieving values. That can be done using the following call:

@@ -86,12 +86,15 @@ helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics
 **Python**
 
 ```python
-in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
-h.helicsInputAddTarget(in1,"pub1");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation);
-
+in1 = h.helicsFederateRegisterInput("", h.helics_data_type_double, "")
+h.helicsInputAddTarget(in1, "pub1")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputSetOption(
+    in1,
+    helics_handle_option_multi_input_handling_method,
+    helics_multi_input_average_operation,
+)
 ```
 
 The handling can also be configured in the configuration file for the federate
