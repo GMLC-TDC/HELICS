@@ -187,6 +187,7 @@ The Controller federate only operates when it receives a message -- it is a _pas
 
    ```python
    while h.helicsEndpointHasMessage(endid):
+       pass # placeholder for loop body
    ```
 
 4. Re-request the `h.HELICS_TIME_MAXTIME` after a message has been received:

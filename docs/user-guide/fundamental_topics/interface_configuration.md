@@ -113,7 +113,7 @@ The following example of a federate interface configuration with the PyHELICS AP
 In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 
 ```python
-def create_combo_federate(fedinitstring,name,period):
+def create_combo_federate(fedinitstring, name, period):
     fedinfo = h.helicsCreateFederateInfo()
     # "coreType": "zmq",
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -134,33 +134,33 @@ def create_combo_federate(fedinitstring,name,period):
 The interface configurations are finalized and registered in one step using the following APIs:
 
 ```python
-    fedinitstring = " --federates=1"
-    name = "Charger"
-    period = 60
-    fed = create_combo_federate(fedinitstring,name,period)
+fedinitstring = " --federates=1"
+name = "Charger"
+period = 60
+fed = create_combo_federate(fedinitstring, name, period)
 
-    num_EVs = 5
-    end_count = num_EVs
-    endid = {}
-    for i in range(0,end_count):
-        end_name = f'Charger/EV{i+1}.so'
-        endid[i] = h.helicsFederateRegisterGlobalEndpoint(fed, end_name, 'double')
-        dest_name = f'Controller/ep'
-        h.helicsEndpointSetDefaultDestination(endid[i], dest_name)
+num_EVs = 5
+end_count = num_EVs
+endid = {}
+for i in range(0, end_count):
+    end_name = f"Charger/EV{i+1}.so"
+    endid[i] = h.helicsFederateRegisterGlobalEndpoint(fed, end_name, "double")
+    dest_name = f"Controller/ep"
+    h.helicsEndpointSetDefaultDestination(endid[i], dest_name)
 
-    pub_count = num_EVs
-    pubid = {}
-    for i in range(0,pub_count):
-        pub_name = f'Charger/EV{i+1}_voltage'
-        pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
-                    fed, pub_name, 'double', 'V')
+pub_count = num_EVs
+pubid = {}
+for i in range(0, pub_count):
+    pub_name = f"Charger/EV{i+1}_voltage"
+    pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
+        fed, pub_name, "double", "V"
+    )
 
-    sub_count = num_EVs
-    subid = {}
-    for i in range(0,sub_count):
-        sub_name = f'Battery/EV{i+1}_current'
-        subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, 'A')
-
+sub_count = num_EVs
+subid = {}
+for i in range(0, sub_count):
+    sub_name = f"Battery/EV{i+1}_current"
+    subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "A")
 ```
 
 ### PyHELICS API configuration explanation

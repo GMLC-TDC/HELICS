@@ -127,14 +127,15 @@ Configuration with the API is done within the federate, where an API call sets t
 
 ```python
 h.helicsCreateValueFederate("Battery", fedinfo)
-h.helicsFederateInfoSetIntegerProperty(fedinfo,h.HELICS_PROPERTY_INT_LOG_LEVEL, 1)
+h.helicsFederateInfoSetIntegerProperty(fedinfo, h.HELICS_PROPERTY_INT_LOG_LEVEL, 1)
 h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
 h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
 h.helicsFederateInfoSetTimeProperty(fedinfo, h.HELICS_PROPERTY_TIME_PERIOD, 60)
 h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_UNINTERRUPTIBLE, False)
 h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_TERMINATE_ON_ERROR, True)
-h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE, True)
-
+h.helicsFederateInfoSetFlagOption(
+    fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE, True
+)
 ```
 
 If you find yourself wanting to set additional properties, there are a handful of places you can look:
@@ -150,7 +151,7 @@ We now know which API calls are analogous to the JSON configurations -- how shou
 It's common practice to rely on a helper function to integrate the federate using API calls. With our Battery/Controller co-simulation, this is done by defining a `create_value_federate` function (named for the fact that the messages passed between the two federates are physical values). In `Battery.py` this function is:
 
 ```python
-def create_value_federate(fedinitstring,name,period):
+def create_value_federate(fedinitstring, name, period):
     fedinfo = h.helicsCreateFederateInfo()
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
     h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
@@ -158,10 +159,11 @@ def create_value_federate(fedinitstring,name,period):
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.HELICS_PROPERTY_TIME_PERIOD, period)
     h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_UNINTERRUPTIBLE, False)
     h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_TERMINATE_ON_ERROR, True)
-    h.helicsFederateInfoSetFlagOption(fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE, True)
+    h.helicsFederateInfoSetFlagOption(
+        fedinfo, h.HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE, True
+    )
     fed = h.helicsCreateValueFederate(name, fedinfo)
     return fed
-
 ```
 
 Notice that we have passed three items to this function: `fedinitstring`, `name`, and `period`. This allows us to flexibly reuse this function if we decide later to change the name or the period (the most common values to change).
@@ -169,11 +171,10 @@ Notice that we have passed three items to this function: `fedinitstring`, `name`
 We create the federate and integrate it into the co-simulation by calling this function at the beginning of the program main loop:
 
 ```python
-    fedinitstring = " --federates=1"
-    name = "Battery"
-    period = 60
-    fed = create_value_federate(fedinitstring,name,period)
-
+fedinitstring = " --federates=1"
+name = "Battery"
+period = 60
+fed = create_value_federate(fedinitstring, name, period)
 ```
 
 What step created the value federate?
@@ -222,21 +223,20 @@ With the PyHELICS API methods, you have the flexibility to define the connection
 Using the PyHELICS API methods, we can register any number of publications and subscriptions. This example sets up pub/sub registration using for loops:
 
 ```python
-    num_EVs = 5
-    pub_count = num_EVs
-    pubid = {}
-    for i in range(0,pub_count):
-        pub_name = f'Battery/EV{i+1}_current'
-        pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
-                    fed, pub_name, 'double', 'A')
+num_EVs = 5
+pub_count = num_EVs
+pubid = {}
+for i in range(0, pub_count):
+    pub_name = f"Battery/EV{i+1}_current"
+    pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
+        fed, pub_name, "double", "A"
+    )
 
-    sub_count = num_EVs
-    subid = {}
-    for i in range(0,sub_count):
-        sub_name = f'Charger/EV{i+1}_voltage'
-        subid[i] = h.helicsFederateRegisterSubscription(
-                    fed, sub_name, 'V')
-
+sub_count = num_EVs
+subid = {}
+for i in range(0, sub_count):
+    sub_name = f"Charger/EV{i+1}_voltage"
+    subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "V")
 ```
 
 Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../inputs.md), and as such retain similar properties.

@@ -151,7 +151,7 @@ At this point, each federate will now set through time, exchanging values with o
 ```python
 t = 0
 while t < end_time:
-    # cosimulate
+    pass # cosimulation code would go here
 ```
 
 Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step.
