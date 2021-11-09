@@ -49,10 +49,6 @@ In most of the examples presented here, the configuration of the federation is d
       graph = h.helicsQueryExecute(query, fed)
   ```
 
-...
-
-````
-
 - The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
 
   ```python
