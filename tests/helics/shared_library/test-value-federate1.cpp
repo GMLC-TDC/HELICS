@@ -259,7 +259,6 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     auto inp_vect = helicsFederateRegisterInput(vFed1, "key6", HELICS_DATA_TYPE_VECTOR, "V", &err);
 
-
     auto inp_double =
         helicsFederateRegisterInput(vFed1, "key7", HELICS_DATA_TYPE_DOUBLE, "kW", &err);
 
@@ -827,26 +826,25 @@ void runFederateTestVectorD(const char* core,
     delete[] val;
 }
 
-
 void runFederateTestVectorCD(const char* core,
-                            const double defaultValue[],
-                            const double testValue1[],
-                            const double testValue2[],
-                            int len,
-                            int len1,
-                            int len2)
+                             const double defaultValue[],
+                             const double testValue1[],
+                             const double testValue2[],
+                             int len,
+                             int len1,
+                             int len2)
 {
     HelicsTime gtime;
     int maxlen = (len1 > len2) ? len1 : len2;
     maxlen = (maxlen > len) ? maxlen : len;
-    auto* val = new double[maxlen*2];
+    auto* val = new double[maxlen * 2];
     HelicsError err = helicsErrorInitialize();
     FederateTestFixture fixture;
     fixture.SetupTest(helicsCreateValueFederate, core, 1, 1.0);
     auto vFed = fixture.GetFederateAt(0);
     // register the interfaces
-    auto pubid =
-        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_COMPLEX_VECTOR, "", &err);
+    auto pubid = helicsFederateRegisterGlobalPublication(
+        vFed, "pub1", HELICS_DATA_TYPE_COMPLEX_VECTOR, "", &err);
     auto subid = helicsFederateRegisterSubscription(vFed, "pub1", nullptr, &err);
     CE(helicsInputSetDefaultComplexVector(subid, defaultValue, len, &err));
     CE(helicsFederateEnterExecutingMode(vFed, &err));
@@ -1051,7 +1049,7 @@ TEST_P(vfed_type_tests, single_transfer_complex_vector)
 {
     const double val1[] = {34.3, -24.2};
     const double val2[] = {12.4, 14.7, 16.34, -18.17};
-    const double val3[] = {9.9999, 8.8888, 7.7777,-1e3,-1e-7,2e-14};
+    const double val3[] = {9.9999, 8.8888, 7.7777, -1e3, -1e-7, 2e-14};
     runFederateTestVectorCD(GetParam(), val1, val2, val3, 1, 2, 3);
 }
 

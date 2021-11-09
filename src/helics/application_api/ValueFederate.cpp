@@ -396,7 +396,8 @@ data_view ValueFederate::getBytes(const Input& inp)
     return vfManager->getValue(inp);
 }
 
-bool ValueFederate::forceCoreUpdate(Input& inp) {
+bool ValueFederate::forceCoreUpdate(Input& inp)
+{
     return vfManager->getUpdateFromCore(inp);
 }
 

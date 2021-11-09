@@ -517,7 +517,6 @@ TEST_F(multiInput, vectorizeComplex)
     EXPECT_DOUBLE_EQ(val[1], 3.0);
     EXPECT_DOUBLE_EQ(val[2], 4.0);
     EXPECT_DOUBLE_EQ(val[3], 4.0);
-    
 }
 
 TEST_F(multiInput, max_units)

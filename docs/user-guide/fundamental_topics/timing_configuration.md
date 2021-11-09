@@ -14,7 +14,7 @@ Sometimes this timing configuration is determined by the construction of the sim
 In most federates there will be a line of code that look like this (at least if their [using the C API](../../references/api-reference/index.md)):
 
 ```python
-t = h.helicsFederateRequestTime (fed, time_requested)
+t = h.helicsFederateRequestTime(fed, time_requested)
 ```
 
 It is the role of each federate to determine which time it should request and it is the job of those integrating the simulator with HELICS to determine how best to estimate that value. For some simulators, `time_requested` will be the current simulated time (`t`) plus a time step. For other simulators, `time_requested` may be the final time (`HELICS_TIME_MAXTIME`) (see the example on [Combination Federates](../examples/fundamental_examples/fundamental_combo.md) for more details on this), and it will only be granted time (interrupted, configured as `"uninterruptible": false`) when there are relevant updates provided by other federates in the co-simulation. Generally, time requests are blocking calls and our federate will do nothing until the HELICS core has granted a time to it.

@@ -422,8 +422,8 @@ HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const d
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
-
+HELICS_EXPORT void
+    helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Publish a named point.
@@ -740,7 +740,6 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, do
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
-
 
 /**
  * Set the default as a vector of complex doubles Format is alternating real, imag doubles

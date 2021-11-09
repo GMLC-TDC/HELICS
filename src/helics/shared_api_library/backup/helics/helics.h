@@ -2561,7 +2561,8 @@ HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const d
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
+HELICS_EXPORT void
+    helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Publish a named point.

@@ -492,12 +492,10 @@ inline const std::string& getValueRefImpl(defV& val)
 }
 
 HELICS_CXX_EXPORT bool
-    checkForNeededCoreRetrieval(const defV& lastValue,
-                                 DataType injectionType,
-                                 DataType conversion);
+    checkForNeededCoreRetrieval(const defV& lastValue, DataType injectionType, DataType conversion);
 
 template<class X>
-    const X& Input::getValueRef()
+const X& Input::getValueRef()
 {
     static_assert(std::is_same<typeCategory<X>, std::integral_constant<int, primaryType>>::value,
                   "calling getValue By ref must be with a primary type");
