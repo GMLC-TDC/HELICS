@@ -66,17 +66,16 @@ The Charger federate is now a combination federate -- it will communicate via pu
 Since this federate also communicated via endpoints, we need to register them along with the existing pub/subs:
 
 ```python
-    ##############  Registering  federate from json  ##########################
-    fed = h.helicsCreateCombinationFederateFromConfig("ChargerConfig.json")
-    federate_name = h.helicsFederateGetName(fed)
-    logger.info(f'Created federate {federate_name}')
-    end_count = h.helicsFederateGetEndpointCount(fed)
-    logger.info(f'\tNumber of endpoints: {end_count}')
-    sub_count = h.helicsFederateGetInputCount(fed)
-    logger.info(f'\tNumber of subscriptions: {sub_count}')
-    pub_count = h.helicsFederateGetPublicationCount(fed)
-    logger.info(f'\tNumber of publications: {pub_count}')
-
+##############  Registering  federate from json  ##########################
+fed = h.helicsCreateCombinationFederateFromConfig("ChargerConfig.json")
+federate_name = h.helicsFederateGetName(fed)
+logger.info(f"Created federate {federate_name}")
+end_count = h.helicsFederateGetEndpointCount(fed)
+logger.info(f"\tNumber of endpoints: {end_count}")
+sub_count = h.helicsFederateGetInputCount(fed)
+logger.info(f"\tNumber of subscriptions: {sub_count}")
+pub_count = h.helicsFederateGetPublicationCount(fed)
+logger.info(f"\tNumber of publications: {pub_count}")
 ```
 
 The Charger federate is gaining the new role of _estimating the Battery's current_ and shifting the role of _deciding when to stop charging_ to the Controller federate.
@@ -106,7 +105,7 @@ The estimated SOC is sent to the Controller every 15 minutes -- this mimics an o
 ```python
 # Send message to Controller with SOC every 15 minutes
 if grantedtime % 900 == 0:
-    h.helicsEndpointSendBytesTo(endid[j], "",f'{currentsoc[j]:4f}'.encode())
+    h.helicsEndpointSendBytesTo(endid[j], "", f"{currentsoc[j]:4f}".encode())
 ```
 
 The Charger federate is allowed to be interrupted if there is a message from the Controller.
@@ -125,8 +124,7 @@ The Charger will receive a message every 15 minutes as well, however it will onl
 if int(instructions) == 0:
     # Stop charging this EV
     charging_voltage[j] = 0
-    logger.info(f'\tEV full; removing charging voltage')
-
+    logger.info(f"\tEV full; removing charging voltage")
 ```
 
 #### Controller
@@ -165,10 +163,10 @@ The Controller federate only operates when it receives a message -- it is a _pas
 1. Initializing the start time of the federate to `h.HELICS_TIME_MAXTIME`:
 
    ```python
-       fake_max_time = int(h.HELICS_TIME_MAXTIME)
-       starttime = fake_max_time
-       logger.debug(f'Requesting initial time {starttime}')
-       grantedtime = h.helicsFederateRequestTime (fed, starttime)
+   fake_max_time = int(h.HELICS_TIME_MAXTIME)
+   starttime = fake_max_time
+   logger.debug(f"Requesting initial time {starttime}")
+   grantedtime = h.helicsFederateRequestTime(fed, starttime)
    ```
 
 2. Allow the federate to be interrupted and set a minimum `timedelta` (`ControllerConfig.json`):
@@ -187,13 +185,13 @@ The Controller federate only operates when it receives a message -- it is a _pas
 
    ```python
    while h.helicsEndpointHasMessage(endid):
-       pass # placeholder for loop body
+       pass  # placeholder for loop body
    ```
 
 4. Re-request the `h.HELICS_TIME_MAXTIME` after a message has been received:
 
    ```python
-   grantedtime = h.helicsFederateRequestTime (fed, fake_max_time)
+   grantedtime = h.helicsFederateRequestTime(fed, fake_max_time)
    ```
 
 The message the Controller receives is the SOC estimated by the Charger. If the estimated SOC is greater than 95%, the Controller sends the message back to stop charging.
