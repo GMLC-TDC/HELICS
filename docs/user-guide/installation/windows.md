@@ -264,13 +264,15 @@ If you want to build Gridlab-d on Windows with HELICS see [Building with HELICS]
 
 Clang does not work to compile on MSYS2 at this time. It has in the past but there are various issues with the clang standard library on MSYS yet so this will be updated if the situation changes. It is getting closer as of (1/30/2020) Mostly it compiles when linked with Libc++ and libc++abi, but there seems to be some missing functions as of yet, so cannot be used other than for some warning checks.
 
+For building with clang using libc++, CMake 3.18+ must be used.
+
 ## Building with mingw
 
 HELICS can also be built with the standalone MinGW
 
 - We assume you have MinGW installed or know how to install it.
 - [Boost](https://www.boost.org/doc/libs/1_70_0/more/getting_started/windows.html); you can use the [Windows installer](https://dl.bintray.com/boostorg/release/1.70.0/binaries/) for Boost installed in the default location
-- Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator,
+- Run CMake to configure and generate build files, using "MinGW Makefiles" as the generator
 - Run mingw32-make -j to build
 
 ## Building with cygwin
