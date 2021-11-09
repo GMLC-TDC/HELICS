@@ -37,9 +37,9 @@ Where is the code?
 </strong>
 </a>
 
-The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
 
-[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental)
+[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental)
 
 <a name="what-is-this-co-simulation-doing">
 <strong>
