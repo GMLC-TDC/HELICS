@@ -239,7 +239,8 @@ Time ValueFederateManager::getLastUpdateTime(const Input& inp)
     return Time::minVal();
 }
 
-bool ValueFederateManager::getUpdateFromCore(Input& inp) {
+bool ValueFederateManager::getUpdateFromCore(Input& inp)
+{
     auto* iData = static_cast<input_info*>(inp.dataReference);
     if (inp.getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
         const auto& data = coreObject->getValue(inp.handle);

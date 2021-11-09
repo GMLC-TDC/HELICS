@@ -11,9 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
+#include <complex>
 #include <string>
 #include <vector>
-#include <complex>
 
 namespace helicscpp {
 /** C++98 interface for a helics Input*/
@@ -67,7 +67,6 @@ class Input {
     {
         helicsInputSetDefaultComplex(inp, cmplx.real(), cmplx.imag(), HELICS_IGNORE_ERROR);
     }
-    
 
     /** set the default complex vector data value*/
     void setDefault(const std::vector<double>& data)
@@ -79,10 +78,10 @@ class Input {
     }
 
     /** set the default complex vector data value*/
-    void setDefault(const std::vector<std::complex<double> >& data)
+    void setDefault(const std::vector<std::complex<double>>& data)
     {
         helicsInputSetDefaultComplexVector(inp,
-                                           reinterpret_cast<const double *>(data.data()),
+                                           reinterpret_cast<const double*>(data.data()),
                                            static_cast<int>(data.size()),
                                            HELICS_IGNORE_ERROR);
     }
@@ -171,7 +170,7 @@ class Input {
     int getVector(double* data, int maxlen)
     {
         helicsInputGetVector(inp, data, maxlen, &maxlen, hThrowOnError());
-        //maxlen contains the actual length now
+        // maxlen contains the actual length now
         return maxlen;
     }
     /** get the current value and store it in a std::vector<double>*/
@@ -193,11 +192,15 @@ class Input {
         return maxlen;
     }
     /** get the current value and store it in a std::vector<std::complex<double>>*/
-    void getComplexVector(std::vector<std::complex<double> >& data)
+    void getComplexVector(std::vector<std::complex<double>>& data)
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
-        helicsInputGetComplexVector(inp, reinterpret_cast<double *>(data.data()), actualSize, HELICS_NULL_POINTER, hThrowOnError());
+        helicsInputGetComplexVector(inp,
+                                    reinterpret_cast<double*>(data.data()),
+                                    actualSize,
+                                    HELICS_NULL_POINTER,
+                                    hThrowOnError());
     }
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }

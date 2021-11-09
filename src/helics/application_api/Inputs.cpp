@@ -774,7 +774,8 @@ data_view Input::checkAndGetFedUpdate()
                                                                     data_view{};
 }
 
-void Input::forceCoreDataUpdate() {
+void Input::forceCoreDataUpdate()
+{
     auto dv = fed->getBytes(*this);
     if (!dv.empty()) {
         valueExtract(dv, injectionType, lastValue);
@@ -795,10 +796,11 @@ bool checkForNeededCoreRetrieval(const defV& lastValue,
                                     DataType::HELICS_COMPLEX_VECTOR,
                                     DataType::HELICS_NAMED_POINT};
 
-    if(locType[lastValue.index()]==injectionType || locType[lastValue.index()]==conversionType) {
+    if (locType[lastValue.index()] == injectionType ||
+        locType[lastValue.index()] == conversionType) {
         return false;
     }
-    
+
     return true;
 }
 
@@ -845,7 +847,7 @@ char Input::getValueChar()
 
 int Input::getValue(double* data, int maxsize)
 {
-    const auto &V = getValueRef<std::vector<double>>();
+    const auto& V = getValueRef<std::vector<double>>();
     int length = 0;
     if (data != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(V.size()), maxsize);
@@ -858,11 +860,11 @@ int Input::getValue(double* data, int maxsize)
 
 int Input::getComplexValue(double* data, int maxsize)
 {
-    const auto &CV = getValueRef<std::vector<std::complex<double>>>();
+    const auto& CV = getValueRef<std::vector<std::complex<double>>>();
     int length = 0;
     if (data != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(CV.size()), maxsize);
-        std::memmove(data, reinterpret_cast<const double *>(CV.data()), length * sizeof(double)*2);
+        std::memmove(data, reinterpret_cast<const double*>(CV.data()), length * sizeof(double) * 2);
     }
 
     hasUpdate = false;

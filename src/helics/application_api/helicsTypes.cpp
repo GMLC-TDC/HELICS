@@ -463,7 +463,7 @@ std::int64_t getIntFromString(std::string_view val)
 {
     static constexpr std::int64_t conversionFailValue{invalidValue<std::int64_t>() + 3};
 
-    auto ival = numeric_conversionComplete<std::int64_t>(val,  conversionFailValue);
+    auto ival = numeric_conversionComplete<std::int64_t>(val, conversionFailValue);
     if (ival == conversionFailValue) {
         return static_cast<int64_t>(getDoubleFromString(val));
     }
@@ -917,7 +917,7 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
             std::vector<std::complex<double>> CD;
             CD.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {
-                CD.emplace_back(vals[2*ii], vals[2*ii+1]);
+                CD.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
             }
             return ValueConverter<std::vector<std::complex<double>>>::convert(CD);
         } break;

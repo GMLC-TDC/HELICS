@@ -85,12 +85,12 @@ class Publication {
     }
 
     /** publish a vector of doubles*/
-    void publish(const std::vector<std::complex<double> >& data)
+    void publish(const std::vector<std::complex<double>>& data)
     {
         helicsPublicationPublishComplexVector(pub,
-                                       reinterpret_cast<const double *>(data.data()),
-                                       static_cast<int>(data.size()),
-                                       HELICS_IGNORE_ERROR);
+                                              reinterpret_cast<const double*>(data.data()),
+                                              static_cast<int>(data.size()),
+                                              HELICS_IGNORE_ERROR);
     }
     /** publish a vector of doubles*/
     void publishComplex(const double* data, int length)
