@@ -461,8 +461,10 @@ std::complex<double> getComplexFromString(std::string_view val)
 
 std::int64_t getIntFromString(std::string_view val)
 {
-    auto ival = numeric_conversionComplete<std::int64_t>(val, invalidValue<std::int64_t>() - 3);
-    if (ival == invalidValue<std::int64_t>() - 3) {
+    static constexpr std::int64_t conversionFailValue{invalidValue<std::int64_t>() + 3};
+
+    auto ival = numeric_conversionComplete<std::int64_t>(val,  conversionFailValue);
+    if (ival == conversionFailValue) {
         return static_cast<int64_t>(getDoubleFromString(val));
     }
     return ival;

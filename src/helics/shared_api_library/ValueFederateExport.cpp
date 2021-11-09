@@ -1136,7 +1136,7 @@ void helicsInputSetDefaultComplexVector(HelicsInput inp, const double* vectorInp
             inpObj->inputPtr->setDefault(std::vector<std::complex<double>>{});
         } else {
             std::vector<std::complex<double>> CV;
-            for (std::size_t ii=0;ii<vectorLength;++ii) {
+            for (int ii=0; ii < vectorLength; ++ii) {
                 CV.emplace_back(vectorInput[2*ii], vectorInput[2*ii + 1]);
             }
             inpObj->inputPtr->setDefault(std::move(CV));

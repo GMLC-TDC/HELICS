@@ -396,6 +396,10 @@ data_view ValueFederate::getBytes(const Input& inp)
     return vfManager->getValue(inp);
 }
 
+bool ValueFederate::forceCoreUpdate(Input& inp) {
+    return vfManager->getUpdateFromCore(inp);
+}
+
 void ValueFederate::publishBytes(const Publication& pub, data_view block)  // NOLINT
 {
     if ((currentMode == Modes::EXECUTING) || (currentMode == Modes::INITIALIZING)) {

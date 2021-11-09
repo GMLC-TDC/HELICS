@@ -79,7 +79,7 @@ class Input {
     }
 
     /** set the default complex vector data value*/
-    void setDefault(const std::vector<std::complex<double>>& data)
+    void setDefault(const std::vector<std::complex<double> >& data)
     {
         helicsInputSetDefaultComplexVector(inp,
                                            reinterpret_cast<const double *>(data.data()),
@@ -193,7 +193,7 @@ class Input {
         return maxlen;
     }
     /** get the current value and store it in a std::vector<std::complex<double>>*/
-    void getComplexVector(std::vector<std::complex<double>>& data)
+    void getComplexVector(std::vector<std::complex<double> >& data)
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);

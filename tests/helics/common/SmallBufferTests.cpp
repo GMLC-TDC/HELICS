@@ -268,7 +268,16 @@ TEST(small_buffer_tests, move_assign_self)
 {
     SmallBuffer sb1(std::string(36214, 'e'));
     EXPECT_EQ(sb1.size(), 36214);
+#if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-move"
+#endif
     sb1 = std::move(sb1);
+
+#if defined(__clang__)
+#    pragma clang diagnostic pop
+#endif
+
     EXPECT_EQ(sb1[11], std::byte{'e'});  // NOLINT
 }
 

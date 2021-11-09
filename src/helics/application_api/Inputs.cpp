@@ -675,11 +675,6 @@ size_t Input::getVectorSize()
         return out.size();
     }
     switch (lastValue.index()) {
-        case double_loc:
-        case int_loc:
-            return 1;
-        case complex_loc:
-            return 2;
         case vector_loc:
             return std::get<std::vector<double>>(lastValue).size();
         case complex_vector_loc:
@@ -777,6 +772,25 @@ data_view Input::checkAndGetFedUpdate()
 {
     return (fed->isUpdated(*this) || allowDirectFederateUpdate()) ? (fed->getBytes(*this)) :
                                                                     data_view{};
+}
+
+bool checkForNeededCoreRetrieval(const defV& lastValue,
+                                 DataType injectionType,
+                                 DataType conversionType)
+{
+    std::array<DataType, 7> locType{DataType::HELICS_DOUBLE,
+                                    DataType::HELICS_INT,
+                                    DataType::HELICS_STRING,
+                                    DataType::HELICS_COMPLEX,
+                                    DataType::HELICS_VECTOR,
+                                    DataType::HELICS_COMPLEX_VECTOR,
+                                    DataType::HELICS_NAMED_POINT};
+
+    if(locType[lastValue.index()]==injectionType || locType[lastValue.index()]==conversionType) {
+        return false;
+    }
+    
+    return true;
 }
 
 char Input::getValueChar()

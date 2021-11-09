@@ -233,7 +233,7 @@ void Publication::publishComplex(const double* vals, int size)
 {
     if (changeDetectionEnabled) {
         std::vector<std::complex<double>> CV;
-        for (std::size_t ii =0 ;ii<size;++ii) {
+        for (int ii =0; ii<size;++ii) {
             CV.emplace_back(vals[2 * ii], vals[2 * ii + 1]);
         }
         if (changeDetected(prevValue, CV, delta)) {

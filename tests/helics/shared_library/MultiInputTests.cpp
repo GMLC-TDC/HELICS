@@ -503,7 +503,7 @@ TEST_F(multiInput, vectorizeComplex)
     std::vector<std::complex<double>> cval;
     in1.getComplexVector(cval);
     EXPECT_EQ(cval.size(), 6U);
-    EXPECT_EQ(cval[1], cvv);
+    EXPECT_EQ(cval[5], cvv);
 
     pub3.publish(4.0);
     pub2.publish(std::vector<double>{3.0, 4.0});

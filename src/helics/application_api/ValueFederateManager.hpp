@@ -202,7 +202,7 @@ class ValueFederateManager {
     @param inp the identifier for the subscription
     */
     static void clearUpdate(const Input& inp);
-
+    bool getUpdateFromCore(Input& inp);
   public:
     bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
@@ -230,6 +230,7 @@ class ValueFederateManager {
         inputTargets;  //!< container for the specified input targets
   private:
     void getUpdateFromCore(InterfaceHandle handle);
+    
 };
 
 }  // namespace helics

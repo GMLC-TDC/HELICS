@@ -85,7 +85,7 @@ class Publication {
     }
 
     /** publish a vector of doubles*/
-    void publish(const std::vector<std::complex<double>>& data)
+    void publish(const std::vector<std::complex<double> >& data)
     {
         helicsPublicationPublishComplexVector(pub,
                                        reinterpret_cast<const double *>(data.data()),
