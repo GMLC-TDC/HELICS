@@ -7,7 +7,7 @@ Windows installers are available with the different [releases](https://github.co
 ## Build Requirements
 
 - Microsoft Visual C++ 2017 or newer (MS Build Tools also works)
-- CMake 3.10 or newer (CMake should be newer than the Visual Studio and Boost version you are using)
+- CMake 3.10 or newer (CMake should be newer than the Visual Studio and Boost version you are using; if using clang with libc++ use 3.18+)
 - git
 - Boost 1.67 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
