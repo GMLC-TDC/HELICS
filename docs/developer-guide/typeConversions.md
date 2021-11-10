@@ -54,7 +54,7 @@ Invalid values are returned if there is no value or the conversion is invalid fo
 - VECTOR -> {}
 - COMPLEX_VECTOR -> {}
 - STRING -> ""
-- NAMED_POINT -> {"", nan}
+- NAMED_POINT -> {"", NaN}
 - BOOL -> false
 - TIME -> Time::minVal() = `Time(numeric_limits<std::int64_t>::min())`
 
@@ -105,7 +105,7 @@ There are defined conversions from all known available types to all others.
 - BOOL -> (val!=0)?"1":"0"
 
 [^1]: conversion to double is lossless only if the value actually fits in a double mantissa value.
-[^2]: for a named point conversion, if the value doesn't fit in double the string translation is placed in the string field and a NAN value in the value segment to ensure no data loss.
+[^2]: for a named point conversion, if the value doesn't fit in double the string translation is placed in the string field and a NaN value in the value segment to ensure no data loss.
 
 ### Conversion from String
 
@@ -114,7 +114,7 @@ There are defined conversions from all known available types to all others.
 - COMPLEX -> `getComplexFromString(val)`
 - VECTOR -> `helicsGetVector(val)`
 - COMPLEX_VECTOR -> `helicsGetComplexVector(val)`
-- NAMED_POINT -> {val, NAN}
+- NAMED_POINT -> {val, NaN}
 - STRING -> val
 - BOOL -> (helicsBoolValue(val))?"1":"0"
 
@@ -151,11 +151,11 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - VECTOR -> val
 - COMPLEX_VECTOR -> [val[0],val[1],...,val[N]]
 - STRING -> vectorString(val) [^2]
-- NAMED_POINT -> {vectorString(val), NAN} [^3]
+- NAMED_POINT -> {vectorString(val), NaN} [^3]
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
 [^1]: vectorNorm is the sqrt of the inner product of the vector.
-[^2]: vectorString is comma separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
+[^2]: vectorString is comma-separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
 [^3]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
 
 ### Conversion from Complex Vector
@@ -165,7 +165,7 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 - COMPLEX -> val[0]
 - VECTOR -> [abs(val[0]),abs(val[1]),...abs(val[N])][^1]
 - COMPLEX_VECTOR -> val
-- NAMED_POINT -> {vectorString(val), NAN}
+- NAMED_POINT -> {vectorString(val), NaN}
 - STRING -> complexVectorString(val)
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
@@ -179,7 +179,7 @@ See [Conversion from vector double](#conversion-from-vector-double) for definiti
 - COMPLEX -> val
 - VECTOR -> [val.real,val.imag]
 - COMPLEX_VECTOR -> [val]
-- NAMED_POINT -> {helicsComplexString(val), NAN}
+- NAMED_POINT -> {helicsComplexString(val), NaN}
 - STRING -> helicsComplexString(val)
 - BOOL -> (std::abs(val)!=0)?"1":"0"
 
@@ -187,7 +187,7 @@ If the imaginary value == 0, the value is treated the same as a double.
 
 ### Conversion from a Named Point
 
-If the value of the named point is `NAN` then treat the name part the same as a string,
+If the value of the named point is `NaN` then treat the name part the same as a string,
 otherwise use the numerical value as a double and convert appropriately. The exception is a string which has a dedicated operation to generate a JSON string with two fields {"name" and "value"}.
 
 ### Conversion from Bool
@@ -198,7 +198,7 @@ otherwise use the numerical value as a double and convert appropriately. The exc
 - VECTOR -> [(val)?1.0:0.0]
 - COMPLEX_VECTOR -> [(val)?1.0:0.0 +0.0j]
 - NAMED_POINT -> {"value",(val)?1.0:0.0}
-- STRING ->val?"1":"0";
+- STRING -> val?"1":"0";
 - BOOL -> val?"1":"0";
 
 ### Conversion from Time

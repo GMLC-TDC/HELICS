@@ -92,7 +92,7 @@ class Publication {
                                               static_cast<int>(data.size()),
                                               HELICS_IGNORE_ERROR);
     }
-    /** publish a vector of doubles*/
+    /** publish a vector of doubles with adjacent elements making up the real and imaginary parts of a complex number*/
     void publishComplex(const double* data, int length)
     {
         helicsPublicationPublishComplexVector(pub, data, length, HELICS_IGNORE_ERROR);

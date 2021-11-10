@@ -416,9 +416,9 @@ HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const d
  * Publish a vector of complex doubles.
  *
  * @param pub The publication to publish for.
- * @param vectorInput A pointer to an array of complex double data (alternating real and complex values)
+ * @param vectorInput A pointer to an array of complex double data (alternating real and imaginary values).
  *
- * @param vectorLength The number of values to publish. (vectorInput must constain 2xvectorLength values)
+ * @param vectorLength The number of values to publish; vectorInput must contain 2xvectorLength values.
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
@@ -619,9 +619,9 @@ HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxL
  *
  * @param ipt The input to get the result for.
  *
- * @param[out] data The location to store the data. The data will be stored in alternating real and complex values
+ * @param[out] data The location to store the data. The data will be stored in alternating real and imaginary values.
  * @param maxLength The maximum number of values data can hold.
- * @param[out] actualSize Location to place the actual length of the resulting complex vector (will be 1/2 the number of values assigned)
+ * @param[out] actualSize Location to place the actual length of the resulting complex vector (will be 1/2 the number of values assigned).
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsInputGetComplexVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
@@ -742,11 +742,11 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, do
 HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
- * Set the default as a vector of complex doubles Format is alternating real, imag doubles
+ * Set the default as a vector of complex doubles. The format is alternating real, imag doubles.
  *
  * @param ipt The input to set the default for.
- * @param vectorInput A pointer to an array of double data alternating between real and complex.
- * @param vectorLength the number of complex values in the publication( vectorInput must contain 2xvectorLenght elements).
+ * @param vectorInput A pointer to an array of double data alternating between real and imaginary.
+ * @param vectorLength the number of complex values in the publication (vectorInput must contain 2xvectorLength elements).
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
