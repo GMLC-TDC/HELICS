@@ -52,7 +52,7 @@ The running webserver will start a process that can respond to HTTP requests.
 
 ### HTTP actions
 
-```eval_rst
+```{eval-rst}
 +------------+---------------------------------------------------------------------------------------+
 | HTTP VERB  | Description                                                                           |
 +============+=======================================================================================+
@@ -70,7 +70,7 @@ The running webserver will start a process that can respond to HTTP requests.
 
 ### Parameters
 
-```eval_rst
+```{eval-rst}
 +-------------+---------------------------------------------------------------------------------------+
 | parameter   | Description                                                                           |
 +=============+=======================================================================================+

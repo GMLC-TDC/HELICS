@@ -88,11 +88,14 @@ As best practice, we recommend setting a seed for a single cosimulation. Managem
 ```python
 import argparse
 
-parser = argparse.ArgumentParser(description='EV simulator')
-parser.add_argument('--seed', type=int, default=0,
-                help='The seed that will be used for our random distribution')
-parser.add_argument('--port', type=int, default=-1,
-                help='port of the HELICS broker')
+parser = argparse.ArgumentParser(description="EV simulator")
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=0,
+    help="The seed that will be used for our random distribution",
+)
+parser.add_argument("--port", type=int, default=-1, help="port of the HELICS broker")
 
 
 args = parser.parse_args()

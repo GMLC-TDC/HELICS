@@ -54,7 +54,7 @@ federate configuration
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the tracer executable also takes an untagged argument of a file name for example
 
@@ -86,7 +86,7 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-```eval_rst
+```{eval-rst}
 +------------------------------+------------------------------------------------------------+
 | interface                    | description                                                |
 +==============================+============================================================+
