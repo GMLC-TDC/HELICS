@@ -9,7 +9,7 @@ instead when updating from HELICS 2.x to 3.
 Support for some older compilers and dependencies have been removed. The new minimum version are:
 
 - C++17 compatible-compiler (minimums: GCC 7.0, Clang 5.0, MSVC 2017 15.7, XCode 10, ICC 19)
-- CMake 3.10+
+- CMake 3.10+ (if using clang with libc++, use 3.18+)
 - ZeroMQ 4.2+
 - Boost 1.65.1+ (if building with Boost enabled)
 
