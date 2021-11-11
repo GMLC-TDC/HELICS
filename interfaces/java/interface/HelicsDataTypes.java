@@ -12,6 +12,7 @@ package com.java.helics;
  *  enumeration of allowable data types for publications and inputs
  */
 public final class HelicsDataTypes {
+  public final static HelicsDataTypes HELICS_DATA_TYPE_UNKNOWN = new HelicsDataTypes("HELICS_DATA_TYPE_UNKNOWN", helicsJNI.HELICS_DATA_TYPE_UNKNOWN_get());
   /**
    *  a sequence of characters
    */
@@ -99,7 +100,7 @@ public final class HelicsDataTypes {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsDataTypes[] swigValues = { HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_COMPLEX_VECTOR, HELICS_DATA_TYPE_NAMED_POINT, HELICS_DATA_TYPE_BOOLEAN, HELICS_DATA_TYPE_TIME, HELICS_DATA_TYPE_RAW, HELICS_DATA_TYPE_JSON, HELICS_DATA_TYPE_MULTI, HELICS_DATA_TYPE_ANY };
+  private static HelicsDataTypes[] swigValues = { HELICS_DATA_TYPE_UNKNOWN, HELICS_DATA_TYPE_STRING, HELICS_DATA_TYPE_DOUBLE, HELICS_DATA_TYPE_INT, HELICS_DATA_TYPE_COMPLEX, HELICS_DATA_TYPE_VECTOR, HELICS_DATA_TYPE_COMPLEX_VECTOR, HELICS_DATA_TYPE_NAMED_POINT, HELICS_DATA_TYPE_BOOLEAN, HELICS_DATA_TYPE_TIME, HELICS_DATA_TYPE_RAW, HELICS_DATA_TYPE_JSON, HELICS_DATA_TYPE_MULTI, HELICS_DATA_TYPE_ANY };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
