@@ -491,8 +491,9 @@ inline const std::string& getValueRefImpl(defV& val)
     return std::get<std::string>(val);
 }
 
-HELICS_CXX_EXPORT bool
-    checkForNeededCoreRetrieval(std::size_t currentIndex, DataType injectionType, DataType conversion);
+HELICS_CXX_EXPORT bool checkForNeededCoreRetrieval(std::size_t currentIndex,
+                                                   DataType injectionType,
+                                                   DataType conversion);
 
 template<class X>
 const X& Input::getValueRef()
@@ -524,7 +525,9 @@ const X& Input::getValueRef()
             valueExtract(dv, injectionType, lastValue);
         }
     } else {
-        if (checkForNeededCoreRetrieval(lastValue.index(), injectionType, helicsType<remove_cv_ref<X>>())) {
+        if (checkForNeededCoreRetrieval(lastValue.index(),
+                                        injectionType,
+                                        helicsType<remove_cv_ref<X>>())) {
             forceCoreDataUpdate();
         }
     }
