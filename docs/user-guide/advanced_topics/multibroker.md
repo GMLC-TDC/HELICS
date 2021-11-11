@@ -58,4 +58,4 @@ Programmatically multibrokers can also be started using the BrokerApp and giving
 
 ## Example
 
-An example implementation of a multi-protocol broker with explanation [can be found here](../examples/advanced_examples/advanced_brokers_multibroker.md) with the [source code over here in the repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker).
+An example implementation of a multi-protocol broker with explanation [can be found here](../examples/advanced_examples/advanced_brokers_multibroker.md) with the [source code over here in the repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/multi_broker).
