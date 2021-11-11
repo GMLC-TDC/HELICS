@@ -125,4 +125,4 @@ The priority of the inputs in most cases determined by the order of adding the p
 
 ## Example
 
-An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input).
+An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/multi_input).

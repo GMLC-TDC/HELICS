@@ -15,12 +15,12 @@ All of the builds on Linux use Docker containers. This has a number of advantage
 - The tests can be run locally on a developer machine in the same environment
 - Old build environments can be used for binary compatibility, such as CentOS 6 for releases.
 
-To avoid long build queues, commits to `master` and `develop` will be tested with more configurations,
+To avoid long build queues, commits to `main` and `develop` will be tested with more configurations,
 while PRs and commits to other branches may be tested on a smaller set of platforms. PRs and commits
-to `master` should run a full set of tests on all supported platforms to help ensure that it is always
+to `main` should run a full set of tests on all supported platforms to help ensure that it is always
 ready for a new release. Jobs that run for PRs and all commits are marked with `[commit]`, while jobs
-marked with `[daily]` are only run daily on the `develop` branch. A tag of `[master]` indicates that
-the job is only run for commits and PRs to master.
+marked with `[daily]` are only run daily on the `develop` branch. A tag of `[main]` indicates that
+the job is only run for commits and PRs to main.
 
 If more extensive testing is needed for a commit or branch, certain keywords can be included in the
 commit message to trigger additional builds for commits or in the branch name to trigger them for

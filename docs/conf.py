@@ -89,11 +89,16 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
     "sphinxcontrib.rsvgconverter",
-    "sphinx_markdown_tables",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
 ]
+
+myst_enable_extensions = [
+    "amsmath",
+    "dollarmath",
+]
+myst_dmath_double_inline = True
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
