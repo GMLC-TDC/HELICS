@@ -355,6 +355,8 @@ class HELICS_CXX_EXPORT Input: public Interface {
   public:
     /** get double vector value functions to retrieve data by a C array of doubles*/
     int getValue(double* data, int maxsize);
+    /** get a complex double vector value functions to retrieve data by a C array of doubles*/
+    int getComplexValue(double* data, int maxsize);
     /** get string value functions to retrieve data by a C string*/
     int getValue(char* str, int maxsize);
     /** get the latest value for the input
@@ -421,6 +423,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
             inputVectorOp == MultiInputHandlingMethod::NO_OP;
     }
     data_view checkAndGetFedUpdate();
+    void forceCoreDataUpdate();
     friend class ValueFederateManager;
 };
 
@@ -488,6 +491,9 @@ inline const std::string& getValueRefImpl(defV& val)
     return std::get<std::string>(val);
 }
 
+HELICS_CXX_EXPORT bool
+    checkForNeededCoreRetrieval(const defV& lastValue, DataType injectionType, DataType conversion);
+
 template<class X>
 const X& Input::getValueRef()
 {
@@ -518,8 +524,9 @@ const X& Input::getValueRef()
             valueExtract(dv, injectionType, lastValue);
         }
     } else {
-        // TODO(PT): make some logic that it can get the raw data from the core again if it was
-        // converted already
+        if (checkForNeededCoreRetrieval(lastValue, injectionType, helicsType<remove_cv_ref<X>>())) {
+            forceCoreDataUpdate();
+        }
     }
 
     return getValueRefImpl<remove_cv_ref<X>>(lastValue);

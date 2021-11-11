@@ -514,14 +514,14 @@ TEST_F(multiInput, vectorizeComplex)
 
     vFed1->requestNextStep();
     val = in1.getValue<std::vector<std::complex<double>>>();
-    EXPECT_EQ(val.size(), 4U);
+    EXPECT_EQ(val.size(), 6U);
     pub3.publish(4.0);
     pub2.publish(std::vector<double>{3.0, 4.0});
     pub1.publish(5.0);
 
     vFed1->requestNextStep();
     val = in1.getValue<std::vector<std::complex<double>>>();
-    EXPECT_EQ(val.size(), 3U);
+    EXPECT_EQ(val.size(), 4U);
     vFed1->finalize();
 }
 

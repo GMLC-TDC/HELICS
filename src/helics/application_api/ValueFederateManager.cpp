@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id):
-    coreObject(coreOb), fedID(id), fed(vfed)
+    fedID(id), coreObject(coreOb), fed(vfed)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
@@ -239,6 +239,21 @@ Time ValueFederateManager::getLastUpdateTime(const Input& inp)
     return Time::minVal();
 }
 
+bool ValueFederateManager::getUpdateFromCore(Input& inp)
+{
+    auto* iData = static_cast<input_info*>(inp.dataReference);
+    if (inp.getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
+        const auto& data = coreObject->getValue(inp.handle);
+        iData->lastData = data;
+        iData->hasUpdate = true;
+        return inp.checkUpdate(true);
+    } else {
+        const auto& dataV = coreObject->getAllValues(inp.handle);
+        iData->hasUpdate = false;
+        return inp.vectorDataProcess(dataV);
+    }
+}
+
 void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
@@ -256,17 +271,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             auto* iData = static_cast<input_info*>(fid->dataReference);
             iData->lastUpdate = CurrentTime;
 
-            bool updated = false;
-            if (fid->getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
-                const auto& data = coreObject->getValue(handle);
-                iData->lastData = data;
-                iData->hasUpdate = true;
-                updated = fid->checkUpdate(true);
-            } else {
-                const auto& dataV = coreObject->getAllValues(handle);
-                iData->hasUpdate = false;
-                updated = fid->vectorDataProcess(dataV);
-            }
+            bool updated = getUpdateFromCore(*fid);
 
             if (updated) {
                 if (iData->callback) {

@@ -185,8 +185,7 @@ namespace details {
 #endif
 
 /** an iteration time structure */
-typedef struct {
-  public:
+typedef struct HelicsIterationTime {
     HelicsTime grantedTime;  //!< the time of the granted step
     HelicsIterationResult status;  //!< the convergence state
 } HelicsIterationTime;

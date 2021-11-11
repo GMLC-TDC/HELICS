@@ -332,6 +332,13 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     data_view getBytes(const Input& inp);
 
+    /** force an input to get Data From the Core
+    @param inp an input object to get the data from
+    @return true if the value was registered as an update, which will be true in most cases
+    @throw std::invalid_argument if id is invalid
+    */
+    bool forceCoreUpdate(Input& inp);
+
     /** publish a value
     @param pub the publication identifier
     @param block a data block containing the data
