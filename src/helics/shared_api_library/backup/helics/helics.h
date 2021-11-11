@@ -390,7 +390,8 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
-const double HELICS_BIG_NUMBER = 9223372036.854774;
+#define HELICS_BIG_NUMBER 9223372036.854774
+const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
 /**
  * @file
@@ -2557,12 +2558,11 @@ HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const d
  * @param pub The publication to publish for.
  * @param vectorInput A pointer to an array of complex double data (alternating real and complex values)
  *
- * @param vectorLength The number of values to publish. (vectorInput must constain 2xvectorLength values)
+ * @param vectorLength The number of values to publish. (vectorInput must contain 2*vectorLength values)
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void
-    helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Publish a named point.
