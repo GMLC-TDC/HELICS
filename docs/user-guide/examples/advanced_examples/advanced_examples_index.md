@@ -38,7 +38,7 @@ Where is the code?
 </strong>
 </a>
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 **TODO: UPDATE IMAGE**
 
