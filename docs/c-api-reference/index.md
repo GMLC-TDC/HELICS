@@ -2,7 +2,7 @@
 
 ## Enum
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenenumvalue:: helics_core_type_default
     :project: helics
@@ -472,7 +472,7 @@
 
 ### Broker
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsBrokerAddDestinationFilterToEndpoint
     :project: helics
@@ -541,7 +541,7 @@
 
 ### Core
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsCoreAddDestinationFilterToEndpoint
     :project: helics
@@ -626,7 +626,7 @@
 
 ### Endpoint
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsEndpointClearMessages
     :project: helics
@@ -715,7 +715,7 @@
 
 ### FederateInfo
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateInfoClone
     :project: helics
@@ -784,7 +784,7 @@
 
 ### Federate
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFederateAddDependency
     :project: helics
@@ -1133,7 +1133,7 @@
 
 ### Filter
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsFilterAddDeliveryEndpoint
     :project: helics
@@ -1194,7 +1194,7 @@
 
 ### Input
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsInputAddTarget
     :project: helics
@@ -1359,7 +1359,7 @@
 
 ### Message
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsMessageAppendData
     :project: helics
@@ -1480,7 +1480,7 @@
 
 ### Publication
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsPublicationAddTarget
     :project: helics
@@ -1565,7 +1565,7 @@
 
 ### Query
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsQueryBrokerExecute
     :project: helics
@@ -1610,7 +1610,7 @@
 
 ### Others
 
-```eval_rst
+```{eval-rst}
 
 .. doxygenfunction:: helicsCleanupLibrary
     :project: helics

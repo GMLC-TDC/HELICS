@@ -30,7 +30,7 @@ This includes port numbers, addresses, and the minimum number of federates. This
 
 There are a number of parameters related to timing information in HELICS.
 These determine what times the request time returns and how a federate handles interruptions and interacts with other federates.
-For a detailed description of the timing parameters see [Timing in Helics](./Timing.html).
+For a detailed description of the timing parameters see [Timing in Helics](Timing.md).
 
 ## Interface configuration
 

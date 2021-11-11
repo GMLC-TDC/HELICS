@@ -1,6 +1,6 @@
 # Inputs
 
-Inputs are part of a matching pair with [Publications](./Publications). They are the input side of a federate for data exchange.
+Inputs are part of a matching pair with [Publications](Publications.md). They are the input side of a federate for data exchange.
 
 The definition consists of a name, a type, and a unit.
 
@@ -24,4 +24,4 @@ The type of input is represented as an open string but the Application API recog
 Inputs that just target a single publication (or any for that matter) can leave the type empty and it will take on the type of the publication.
 These are all convertible and known to the Application API. The data can be retrieved as any of these types though some are lossy. There are API functions to query the type of the input and the type of the publication that sends it data.
 
-Inputs can add a target which is a [Publication](./Publications). An input can be targeted by multiple publications though the interface for dealing with this is not well developed and will be undergoing development in the coming revisions, currently the latest update in time from any publication is used as the value. Other options will be available in the future.
+Inputs can add a target which is a [Publication](Publications.md). An input can be targeted by multiple publications though the interface for dealing with this is not well developed and will be undergoing development in the coming revisions, currently the latest update in time from any publication is used as the value. Other options will be available in the future.

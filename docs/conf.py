@@ -66,10 +66,20 @@ read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
-    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
-    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
+    checkout_dir = os.path.realpath(os.path.join(dir_name, os.pardir))
+    doxygen_build_dir = os.path.realpath(os.path.join(checkout_dir, "build-doxygen"))
+    if not os.path.isdir(doxygen_build_dir):
+        os.makedirs(os.path.join(doxygen_build_dir, "docs", "html"))
+        subprocess.call(
+            "cd {dir_name} && python ./scripts/render-doxyfile.py && doxygen Doxyfile;".format(
+                dir_name=checkout_dir
+            ),
+            shell=True,
+        )
+    html_extra_path = [os.path.abspath(os.path.join(doxygen_build_dir, "docs", "html"))]
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -78,14 +88,11 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
-    "sphinx_markdown_tables",
+    "sphinxcontrib.rsvgconverter",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
 ]
-
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
@@ -94,23 +101,14 @@ breathe_projects = {
 breathe_default_project = "helics"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-
-source_parsers = {
-    ".md": CommonMarkParser,
-}
-source_suffix = [".rst", ".md"]
+templates_path = []
 
 # The master toctree document.
 master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "Copyright (c) 2017-2020,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n"
+copyright = "Copyright (c) 2017-2021,\nBattelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.See the top-level NOTICE for additional details.\nAll rights reserved.\nSPDX-License-Identifier: BSD-3-Clause\n"
 author = "Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -237,6 +235,4 @@ texinfo_documents = [
 
 
 def setup(app):
-    app.add_stylesheet("css/custom.css")  # may also be an URL
-    app.add_config_value("recommonmark_config", {"enable_eval_rst": True,}, True)
-    app.add_transform(AutoStructify)
+    app.add_css_file("css/custom.css")  # may also be an URL

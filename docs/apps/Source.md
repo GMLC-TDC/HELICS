@@ -45,7 +45,7 @@ federate configuration
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the player executable also takes an untagged argument of a file name for example
 
@@ -55,7 +55,7 @@ helics_player player_file.txt --stop 5
 
 Players support both delimited text files and JSON files some examples can be found in
 
-[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/helics2/tests/helics/apps/test_files)
 
 ## Config File Detail
 
@@ -86,7 +86,7 @@ time specifications are typically numerical with optional units
 if no units are specified the time defaults to units specified via `--time_units` or seconds if none were specified
 valid units are "s", "ms", "us", "min", "day", "hr", "ns", "ps" the default precision in HELICS is ns so time specified in ps is not guaranteed to be precise
 
-```eval_rst
+```{eval-rst}
 +--------------------+---------------------------+-----------------------+
 | identifier         | type                      | Example               |
 +====================+===========================+=======================+

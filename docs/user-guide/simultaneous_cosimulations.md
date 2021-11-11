@@ -64,7 +64,7 @@ this is a json file. The sections in the json file include the server type For e
 }
 ```
 
-There is also a [webserver](./webserver.md) that can be run with the other broker servers.
+There is also a [webserver](webserver.md) that can be run with the other broker servers.
 
 ## Use of keys
 

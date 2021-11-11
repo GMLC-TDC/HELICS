@@ -109,7 +109,7 @@ make install
 Run the following:
 
 ```bash
-cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
+cmake -DBUILD_PYTHON_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-main/ ..
 make -j8
 make install
 ```
@@ -117,7 +117,7 @@ make install
 Add the following to your `~/.bashrc` file.
 
 ```bash
-export PYTHONPATH=$HOME/local/helics-master/python:$PYTHONPATH
+export PYTHONPATH=$HOME/local/helics-main/python:$PYTHONPATH
 ```
 
 ### Building HELICS with MATLAB support
@@ -144,7 +144,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
+cmake -DBUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-main/ ..
 make -j8
 make install
 ```

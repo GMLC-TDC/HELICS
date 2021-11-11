@@ -18,7 +18,7 @@ Push tests run on all pushes to any branch in the main repository, there are 4 t
 
 ### PR tests and develop branch Tests
 
-Pull request tests run on every pull request to develop or master. In addition to the previous 4 tests 2 additional tests are run.
+Pull request tests run on every pull request to develop or main. In addition to the previous 4 tests 2 additional tests are run.
 
 - Clang 3.6: which is the oldest fully supported clang compiler, with boost 1.58 (Build only)
 - XCode 10.2
@@ -39,7 +39,7 @@ On the develop branch a few additional tests are run on a daily basis. These wil
 
 ## Azure tests
 
-PRs and commits to the master and develop branches that pass the tests on Travis will trigger builds on Azure for several other HELICS related repositories (such as HELICS-Examples). The result of the builds for those repositories will be reported as a comment on the PR (if any) that triggered the build.
+PRs and commits to the main and develop branches that pass the tests on Travis will trigger builds on Azure for several other HELICS related repositories (such as HELICS-Examples). The result of the builds for those repositories will be reported as a comment on the PR (if any) that triggered the build.
 
 On the Primary HELICS repository there are 4 Azure builds:
 
