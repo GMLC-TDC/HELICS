@@ -85,6 +85,7 @@ typedef enum {
 
 /** enumeration of allowable data types for publications and inputs*/
 typedef enum {
+    HELICS_DATA_TYPE_UNKNOWN = -1,
     /** a sequence of characters*/
     HELICS_DATA_TYPE_STRING = 0,
     /** a double precision floating point number*/
@@ -389,6 +390,9 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
+#define HELICS_BIG_NUMBER 9223372036.854774
+const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+
 /**
  * @file
  * @brief Data structures for the C api
@@ -466,8 +470,8 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0; /*!< definition of time zero-the beginning of simulation */
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9; /*!< definition of the minimum time resolution */
 const HelicsTime HELICS_TIME_INVALID = -1.785e39; /*!< definition of an invalid time that has no meaning */
-const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774; /*!< definition of time signifying the federate has
-                                                             terminated or to run until the end of the simulation*/
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER; /*!< definition of time signifying the federate has
+                                                             terminated or run until the end of the simulation*/
 
 /**
  * defining a boolean type for use in the helics interface
@@ -1267,6 +1271,16 @@ HELICS_EXPORT int helicsGetOptionIndex(const char* val);
  * @return An int with the option value or (-1) if not a valid value.
  */
 HELICS_EXPORT int helicsGetOptionValue(const char* val);
+
+/**
+ * Get the data type for use in /ref helicsFederateRegisterPublication, /ref helicsFederateRegisterInput,
+ * /ref helicsFilterSetOption.
+ *
+ * @param val A string representing a data type.
+ *
+ * @return An int with the data type or HELICS_DATA_TYPE_UNKNOWN(-1) if not a valid value.
+ */
+HELICS_EXPORT int helicsGetDataType(const char* val);
 
 /**
  * Set a flag in the info structure.
@@ -2539,6 +2553,19 @@ HELICS_EXPORT void helicsPublicationPublishComplex(HelicsPublication pub, double
 HELICS_EXPORT void helicsPublicationPublishVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
+ * Publish a vector of complex doubles.
+ *
+ * @param pub The publication to publish for.
+ * @param vectorInput A pointer to an array of complex double data (alternating real and complex values)
+ *
+ * @param vectorLength The number of values to publish. (vectorInput must contain 2*vectorLength values)
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void
+    helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
+
+/**
  * Publish a named point.
  *
  * @param pub The publication to publish for.
@@ -2728,6 +2755,18 @@ HELICS_EXPORT int helicsInputGetVectorSize(HelicsInput ipt);
 HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
 
 /**
+ * Get a complex vector from an input.
+ *
+ * @param ipt The input to get the result for.
+ *
+ * @param[out] data The location to store the data. The data will be stored in alternating real and complex values
+ * @param maxLength The maximum number of values data can hold.
+ * @param[out] actualSize Location to place the actual length of the resulting complex vector (will be 1/2 the number of values assigned)
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsInputGetComplexVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
+
+/**
  * Get a named point from a subscription.
  *
  * @param ipt The input to get the result for.
@@ -2836,11 +2875,22 @@ HELICS_EXPORT void helicsInputSetDefaultComplex(HelicsInput ipt, double real, do
  *
  * @param ipt The input to set the default for.
  * @param vectorInput A pointer to an array of double data.
- * @param vectorLength The number of points to publish.
+ * @param vectorLength The number of doubles in the vector.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
+
+/**
+ * Set the default as a vector of complex doubles Format is alternating real, imag doubles
+ *
+ * @param ipt The input to set the default for.
+ * @param vectorInput A pointer to an array of double data alternating between real and complex.
+ * @param vectorLength the number of complex values in the publication( vectorInput must contain 2xvectorLenght elements).
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsInputSetDefaultComplexVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 
 /**
  * Set the default as a NamedPoint.
@@ -2877,6 +2927,15 @@ HELICS_EXPORT const char* helicsInputGetType(HelicsInput ipt);
  * @return A const char * with the type name.
  */
 HELICS_EXPORT const char* helicsInputGetPublicationType(HelicsInput ipt);
+
+/**
+ * Get the type the publisher to an input is sending.
+ *
+ * @param ipt The input to query.
+ *
+ * @return An int containing the enumeration value of the publication type.
+ */
+HELICS_EXPORT int helicsInputGetPublicationDataType(HelicsInput ipt);
 
 /**
  * Get the type of a publication.

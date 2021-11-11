@@ -773,9 +773,6 @@ TEST_F(filter_tests, many_filters)
         ffed->requestTimeAsync(50);
     }
 
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
-
     t1.join();
     t2.join();
     EXPECT_EQ(p2.pendingMessageCount(), 0U);
@@ -849,9 +846,6 @@ TEST_F(filter_tests, many_filters_multi)
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
 
     t1.join();
     t2.join();
@@ -936,9 +930,6 @@ TEST_F(filter_tests, reroute_cascade)
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
 
     t1.join();
     t2.join();
