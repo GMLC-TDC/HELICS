@@ -496,7 +496,7 @@ TEST(small_buffer_tests, release)
     (*sb1)[57515] = std::byte{'q'};
 
     auto* buffer = sb1->release();
-
+    ASSERT_FALSE(buffer == nullptr);
     buffer[13] = std::byte{'r'};
     EXPECT_EQ(buffer[57515], std::byte{'q'});
     EXPECT_EQ(buffer[13], std::byte{'r'});

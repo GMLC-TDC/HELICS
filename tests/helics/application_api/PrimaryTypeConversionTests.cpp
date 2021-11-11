@@ -543,7 +543,7 @@ TEST(roundTripConversions, boolean)
 
 TEST(roundTripConversions, char)
 {
-    std::vector<char> vals{0, 1, 5, 7, -9, 14, 'a', 'X', 127};
+    std::vector<char> vals{0, 1, 5, 7, static_cast<char>(-9), 14, 'a', 'X', 127};
     std::vector<DataType> ctypes{DataType::HELICS_STRING,
                                  DataType::HELICS_DOUBLE,
                                  DataType::HELICS_INT,

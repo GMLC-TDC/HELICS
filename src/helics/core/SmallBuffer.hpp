@@ -275,8 +275,9 @@ class SmallBuffer {
     }
     void reserve(size_t size)
     {
+        static constexpr size_t bigSize{sizeof(size_t) == 8 ? 0x010'0000'0000U : 0xFFFF'0000U};
         if (size > bufferCapacity) {
-            if (size > 0x010'0000'0000U) {
+            if (size > bigSize) {
                 throw(std::bad_alloc());
             }
             auto* ndata = new std::byte[size];

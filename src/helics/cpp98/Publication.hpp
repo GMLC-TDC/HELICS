@@ -84,14 +84,24 @@ class Publication {
         helicsPublicationPublishVector(pub, data, length, HELICS_IGNORE_ERROR);
     }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
+    typedef std::complex<double> complex_double;
     /** publish a vector of doubles*/
-    void publish(const std::vector<std::complex<double>>& data)
+    void publish(const std::vector<complex_double>& data)
     {
         helicsPublicationPublishComplexVector(pub,
                                               reinterpret_cast<const double*>(data.data()),
                                               static_cast<int>(data.size()),
                                               HELICS_IGNORE_ERROR);
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
+
     /** publish a vector of doubles with adjacent elements making up the real and imaginary parts of
      * a complex number*/
     void publishComplex(const double* data, int length)

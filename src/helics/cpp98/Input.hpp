@@ -15,6 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
+typedef std::complex<double> complex_double;
+
 namespace helicscpp {
 /** C++98 interface for a helics Input*/
 class Input {
@@ -77,14 +79,22 @@ class Input {
                                     HELICS_IGNORE_ERROR);
     }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     /** set the default complex vector data value*/
-    void setDefault(const std::vector<std::complex<double>>& data)
+    void setDefault(const std::vector<complex_double>& data)
     {
         helicsInputSetDefaultComplexVector(inp,
                                            reinterpret_cast<const double*>(data.data()),
                                            static_cast<int>(data.size()),
                                            HELICS_IGNORE_ERROR);
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
     /** Methods to get subscription values **/
     /** get a raw value as a character vector*/
     int getBytes(std::vector<char>& data)
@@ -157,10 +167,10 @@ class Input {
     /** get the value as a double*/
     double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a complex number*/
-    std::complex<double> getComplex()
+    complex_double getComplex()
     {
         HelicsComplex hc = helicsInputGetComplexObject(inp, HELICS_IGNORE_ERROR);
-        std::complex<double> result(hc.real, hc.imag);
+        complex_double result(hc.real, hc.imag);
         return result;
     }
     /** get the current value as a vector of doubles
@@ -191,8 +201,13 @@ class Input {
         // maxlen contains the actual length now
         return maxlen;
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     /** get the current value and store it in a std::vector<std::complex<double>>*/
-    void getComplexVector(std::vector<std::complex<double>>& data)
+    void getComplexVector(std::vector<complex_double>& data)
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);
@@ -202,6 +217,10 @@ class Input {
                                     HELICS_NULL_POINTER,
                                     hThrowOnError());
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
+
     /** Check if an input is updated **/
     bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
