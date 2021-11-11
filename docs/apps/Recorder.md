@@ -69,7 +69,7 @@ configuration:
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the player executable also takes an untagged argument of a file name for example
 
@@ -79,7 +79,7 @@ helics_recorder record_file.txt --stop 5
 
 Recorders support both delimited text files and json files some examples can be found in
 
-[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
+[Player configuration examples](https://github.com/GMLC-TDC/HELICS/tree/helics2/tests/helics/apps/test_files)
 
 ## config file detail
 
@@ -101,7 +101,7 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-```eval_rst
+```{eval-rst}
 +------------------------------+------------------------------------------------------------+
 | interface                    | description                                                |
 +==============================+============================================================+

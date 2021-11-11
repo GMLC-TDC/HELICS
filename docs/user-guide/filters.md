@@ -1,6 +1,6 @@
 # HELICS Messages and Filters
 
-As was introduced in the [introductory section on federates](./federates.md), message federates (and combo federates) are used to send messages (control signals, measurements, anything traveling over some kind of communication network) via HELICS to other federates. Though they seem very similar, the way messages and values are handled by HELICS is very different and is motivated by the underlying reality they are being used to model.
+As was introduced in the [introductory section on federates](federates.md), message federates (and combo federates) are used to send messages (control signals, measurements, anything traveling over some kind of communication network) via HELICS to other federates. Though they seem very similar, the way messages and values are handled by HELICS is very different and is motivated by the underlying reality they are being used to model.
 
 1. **Messages are directed and unique, values are persistent.** - Because HELICS values are used to represent physical reality, they are available to any subscribing federate at any time. If the publishing federate only updates the value, say, once every minute, any subscribing federates that are granted a time during that minute window will all receive the same value regardless of when they requested it.
 
@@ -22,7 +22,7 @@ The figure below is an example of a representation of the message topology of a 
 
 ## Example 1c - EV charge controller with HELICS filters
 
-To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](./message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
+To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
 
 ![Ex. 1c message topology](../img/Ex1c_Message_topology.png)
 
@@ -68,7 +68,7 @@ Let's run [this co-simulation](https://github.com/GMLC-TDC/HELICS/tree/319de2b12
 
 ![Ex. 1c EV charge pattern](../img/Ex1c_EV_outputs.png)
 
-Granted that the charge controller communication system is ridiculously poor, this example does show that communication system effects can have a significant impact on system operation. For more realistic example, the HELICS Use Case repository has [an example](https://github.com/GMLC-TDC/HELICS-Use-Cases/tree/master/PNNL-Wide-Area-Control) of frequency control using real-time PMU measurements that shows the impact of imperfect communication systems.
+Granted that the charge controller communication system is ridiculously poor, this example does show that communication system effects can have a significant impact on system operation. For more realistic example, the HELICS Use Case repository has [an example](https://github.com/GMLC-TDC/HELICS-Use-Cases/tree/main/PNNL-Wide-Area-Control) of frequency control using real-time PMU measurements that shows the impact of imperfect communication systems.
 
 ## Explicit Communication System Modeling
 

@@ -5,7 +5,7 @@
 - To get to the installer you can access it through either of the following links:
 
   - [https://github.com/GMLC-TDC/HELICS/releases](https://github.com/GMLC-TDC/HELICS/releases)
-  - [https://docs.helics.org/en/latest/installation/index.html](https://docs.helics.org/en/latest/installation/index.html) - where you will see this:
+  - [https://docs.helics.org/en/latest/installation/index.html](../installation/index.md) - where you will see this:
 
   ![](./visuals/releases.JPG)
 

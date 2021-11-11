@@ -5,7 +5,7 @@ Enhancing the tools for debugging a HELICS based co-simulation is one area of fo
 
 ## Logging
 
-HELICS provides built-in support for various types of logging from federates, brokers, and more. See [Logging](./logging.md) for more details on how to enable and use.
+HELICS provides built-in support for various types of logging from federates, brokers, and more. See [Logging](logging.md) for more details on how to enable and use.
 
 ## Players and Recorders
 
@@ -18,11 +18,11 @@ Players and recorders can also complement each other, since the files created by
 
 ## Queries
 
-Queries are regarded as a key component of debugging. They are asynchronous from the main simulation timing and can be used from anywhere in the co-simulation. There are a number of queries that can be used to get the publications, inputs, endpoints, and filters in a co-simulation and get structures with the connections between them. See [Queries](./queries.md) for more details on the specific queries and how to execute them.
+Queries are regarded as a key component of debugging. They are asynchronous from the main simulation timing and can be used from anywhere in the co-simulation. There are a number of queries that can be used to get the publications, inputs, endpoints, and filters in a co-simulation and get structures with the connections between them. See [Queries](queries.md) for more details on the specific queries and how to execute them.
 
 ## HELICS-CLI
 
-The [HELICS CLI tool](./helics_cli.md) is a tool that can help set up a co-simulation and will eventually have significant debugging capabilities which make use of the underlying capabilities documented here. It is recommended that this tool be used to help with debugging.
+The [HELICS CLI tool](helics_cli.md) is a tool that can help set up a co-simulation and will eventually have significant debugging capabilities which make use of the underlying capabilities documented here. It is recommended that this tool be used to help with debugging.
 
 ## Global Time Barrier
 
@@ -56,7 +56,7 @@ The second clears it. There are no restrictions on what can be done. Simulations
 
 ### Webbserver interface
 
-Barriers can also be created and updated through the [Webserver](./webserver.md). This includes the websocket server and the HTTP REST API components of the webserver.
+Barriers can also be created and updated through the [Webserver](webserver.md). This includes the websocket server and the HTTP REST API components of the webserver.
 
 Barriers can be created or updated with an HTTP post command
 `<webserver>\<broker_name>\barrier` with `time=<value>` in the body. The time can be specified as decimal seconds of simulation or as a value+unit such as "15 ms" or "34 min"

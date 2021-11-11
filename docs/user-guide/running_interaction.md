@@ -1,3 +1,3 @@
 # Webserver
 
-[**See Webserver**](./webserver.md)
+[**See Webserver**](webserver.md)

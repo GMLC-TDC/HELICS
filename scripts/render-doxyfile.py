@@ -30,6 +30,7 @@ def main():
         l = l.replace("@HELICS_VERSION@", helics_version)
         l = l.replace("@CMAKE_CURRENT_SOURCE_DIR@", current_source_dir)
         l = l.replace("@DOXYGEN_OUTPUT_DIR@", output_dir)
+        l = l.replace("HTML_OUTPUT            = html", "HTML_OUTPUT            = html/doxygen")
         doxyfile.append(l)
 
     with open(os.path.join(dirname, "../Doxyfile"), "w") as f:
