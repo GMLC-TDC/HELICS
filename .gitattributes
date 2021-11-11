@@ -9,6 +9,7 @@
 *.JPG binary
 *.png binary
 *.mat binary
+*.svg binary
 
 *.cpp  diff=cpp
 *.hpp  diff=cpp
