@@ -784,7 +784,7 @@ void Input::forceCoreDataUpdate()
     }
 }
 
-bool checkForNeededCoreRetrieval(const defV& lastValue,
+bool checkForNeededCoreRetrieval(std::size_t currentIndex,
                                  DataType injectionType,
                                  DataType conversionType)
 {
@@ -796,12 +796,11 @@ bool checkForNeededCoreRetrieval(const defV& lastValue,
                                     DataType::HELICS_COMPLEX_VECTOR,
                                     DataType::HELICS_NAMED_POINT};
 
-    if (locType[lastValue.index()] == injectionType ||
-        locType[lastValue.index()] == conversionType) {
+    if (locType[currentIndex] == injectionType || locType[currentIndex] == conversionType) {
         return false;
     }
 
-    return true;
+    return !(currentIndex != int_loc && conversionType == DataType::HELICS_DOUBLE);
 }
 
 char Input::getValueChar()

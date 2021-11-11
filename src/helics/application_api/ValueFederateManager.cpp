@@ -242,16 +242,15 @@ Time ValueFederateManager::getLastUpdateTime(const Input& inp)
 bool ValueFederateManager::getUpdateFromCore(Input& inp)
 {
     auto* iData = static_cast<input_info*>(inp.dataReference);
-    if (inp.getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
-        const auto& data = coreObject->getValue(inp.handle);
-        iData->lastData = data;
-        iData->hasUpdate = true;
-        return inp.checkUpdate(true);
-    } else {
+    if (inp.getMultiInputMode() != MultiInputHandlingMethod::NO_OP) {
         const auto& dataV = coreObject->getAllValues(inp.handle);
         iData->hasUpdate = false;
         return inp.vectorDataProcess(dataV);
     }
+    const auto& data = coreObject->getValue(inp.handle);
+    iData->lastData = data;
+    iData->hasUpdate = true;
+    return inp.checkUpdate(true);
 }
 
 void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
