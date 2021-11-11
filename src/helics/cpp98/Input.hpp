@@ -15,8 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-typedef std::complex<double> complex_double;
-
 namespace helicscpp {
 /** C++98 interface for a helics Input*/
 class Input {
@@ -85,7 +83,7 @@ class Input {
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
     /** set the default complex vector data value*/
-    void setDefault(const std::vector<complex_double>& data)
+    void setDefault(const std::vector<std::complex<double> >& data)
     {
         helicsInputSetDefaultComplexVector(inp,
                                            reinterpret_cast<const double*>(data.data()),
@@ -167,10 +165,10 @@ class Input {
     /** get the value as a double*/
     double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a complex number*/
-    complex_double getComplex()
+    std::complex<double> getComplex()
     {
         HelicsComplex hc = helicsInputGetComplexObject(inp, HELICS_IGNORE_ERROR);
-        complex_double result(hc.real, hc.imag);
+        std::complex<double> result(hc.real, hc.imag);
         return result;
     }
     /** get the current value as a vector of doubles
@@ -207,7 +205,7 @@ class Input {
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
     /** get the current value and store it in a std::vector<std::complex<double>>*/
-    void getComplexVector(std::vector<complex_double>& data)
+    void getComplexVector(std::vector<std::complex<double> >& data)
     {
         int actualSize = helicsInputGetVectorSize(inp);
         data.resize(actualSize);

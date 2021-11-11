@@ -89,9 +89,8 @@ class Publication {
 #    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
-    typedef std::complex<double> complex_double;
     /** publish a vector of doubles*/
-    void publish(const std::vector<complex_double>& data)
+    void publish(const std::vector<std::complex<double> >& data)
     {
         helicsPublicationPublishComplexVector(pub,
                                               reinterpret_cast<const double*>(data.data()),
