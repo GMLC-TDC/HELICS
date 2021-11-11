@@ -86,7 +86,7 @@ class Publication {
 
 #if defined(__GNUC__)
 #    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
     /** publish a vector of doubles*/

@@ -79,7 +79,7 @@ class Input {
 
 #if defined(__GNUC__)
 #    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
     /** set the default complex vector data value*/
@@ -201,7 +201,7 @@ class Input {
     }
 #if defined(__GNUC__)
 #    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wno-strict-aliasing"
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
     // std::complex is explicitly allowed to alias like this in the standard
 #endif
     /** get the current value and store it in a std::vector<std::complex<double>>*/
