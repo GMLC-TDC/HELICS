@@ -33,14 +33,6 @@ jobs:
         path: ~/.cache/pre-commit
         key: pre-commit|${{ env.PY }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
-    # Run clang-format on helics.h and helics_api.h
-    - name: clang-format
-      uses: pre-commit/action@v2.0.3
-      # Failure is expected, since we know it will be fixing up the generated helics header files
-      continue-on-error: true
-      with:
-        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
-     
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
