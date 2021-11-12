@@ -120,10 +120,10 @@ The HELICS components introduced in the Fundamental Examples are extended in the
 2. <span style="color:red">Initialization</span>
 3. Enter Execution Mode
 4. Define Time Variables
-   4. <span style="color:red">Tell Controller federates to request `h.HELICS_TIME_MAXTIME`</span>
-5. Initiate Time Steps for the Time Loop
-6. Send and Receive Communication between Federates
-7. Finalize Co-simulation
+5. <span style="color:red">Tell Controller federates to request `h.HELICS_TIME_MAXTIME`</span>
+6. Initiate Time Steps for the Time Loop
+7. Send and Receive Communication between Federates
+8. Finalize Co-simulation
 
 <a name="federates-with-infinite-time">
 <strong>

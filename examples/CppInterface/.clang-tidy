@@ -4,40 +4,40 @@
 FormatStyle: file
 
 Checks: '
--*,
-google-*,
--google-runtime-int,
--google-runtime-references,
--google-build-using-namespace,
--google-readability-avoid-underscore-in-googletest-name,
-clang-analyzer-*,
-bugprone-*,
--bugprone-narrowing-conversions,
-cert-*,
--cert-err58-cpp,
-portability-*,
-readability-*,
--readability-magic-numbers,
--readability-qualified-auto,
-performance-*
-'
+   -*,
+   google-*,
+   -google-runtime-int,
+   -google-runtime-references,
+   -google-build-using-namespace,
+   -google-readability-avoid-underscore-in-googletest-name,
+   clang-analyzer-*,
+   bugprone-*,
+   -bugprone-narrowing-conversions,
+   cert-*,
+   -cert-err58-cpp,
+   portability-*,
+   readability-*,
+   -readability-magic-numbers,
+   -readability-qualified-auto,
+   performance-*
+  '
 
 WarningsAsErrors: '
--*,
-google-*,
--google-runtime-int,
--google-runtime-references,
--google-build-using-namespace,
--google-readability-avoid-underscore-in-googletest-name,
-clang-analyzer-*,
-bugprone-*,
--bugprone-narrowing-conversions,
-portability-*,
-readability-*,
--readability-magic-numbers,
--readability-qualified-auto,
-performance-*
-'
+   -*,
+   google-*,
+   -google-runtime-int,
+   -google-runtime-references,
+   -google-build-using-namespace,
+   -google-readability-avoid-underscore-in-googletest-name,
+   clang-analyzer-*,
+   bugprone-*,
+   -bugprone-narrowing-conversions,
+   portability-*,
+   readability-*,
+   -readability-magic-numbers,
+   -readability-qualified-auto,
+   performance-*
+  '
 
 HeaderFilterRegex: '*test.*cpp'
 

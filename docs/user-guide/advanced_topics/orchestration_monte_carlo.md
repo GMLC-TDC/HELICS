@@ -50,7 +50,7 @@ Which means that the input to $L$ is distributed normally with average $\mu$ and
 Our final distribution for modeling the anticipated need for each level of charging port in our $k = 100$ EV garage can be written as:
 
 $$ L \sim P(k,\lambda) $$
-$$ \lambda \sim N(\mu,\sigma)  $$
+$$ \lambda \sim N(\mu,\sigma) $$
 
 <center>
 
