@@ -141,7 +141,7 @@ for file in files:
     contents = re.sub("\n\s*\n}", "\n}", contents)
     contents = re.sub("=\n       ", "=", contents)
     contents = re.sub("\n\n\n", "\n\n", contents)
-    #contents = re.sub("\n ", "\n", contents)
+    # contents = re.sub("\n ", "\n", contents)
     contents = re.sub("^\n", "", contents)
     contents = re.sub(" \n", "\n", contents)
     contents = re.sub("\n\s+\n", "\n\n", contents)
