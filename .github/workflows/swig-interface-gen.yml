@@ -39,8 +39,8 @@ jobs:
       # Failure is expected, since we know it will be fixing up the generated helics header files
       continue-on-error: true
       with:
-        extra_args: docker-clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
-     
+        extra_args: clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
+
     - name: Stage changed interface files
       shell: bash --noprofile --norc {0}
       run: git add interfaces/ src/helics/shared_api_library/backup/
