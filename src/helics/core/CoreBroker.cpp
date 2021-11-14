@@ -284,9 +284,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             noInit.source_id = global_broker_id_local;
             transmit(parent_route_id, noInit);
         }
-    } else if (currentBrokerState==BrokerState::operating) {
+    } else if (currentBrokerState == BrokerState::operating) {
         // we are initialized already
-        if (!checkActionFlag(command,observer_flag)) {
+        if (!checkActionFlag(command, observer_flag)) {
             route_id newroute;
             bool route_created = false;
             if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
@@ -309,8 +309,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             return;
         }
         // can't add a non observer federate in operating mode
-    }
-    else {
+    } else {
         route_id newroute;
         bool route_created = false;
         if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
@@ -332,7 +331,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             removeRoute(newroute);
         }
         return;
-   }
+    }
     if (!verifyBrokerKey(command)) {
         route_id newroute;
         bool route_created = false;
@@ -433,10 +432,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     }
 }
 
-
 // Handle the registration of new federates;
-void CoreBroker::fedRegistration(ActionMessage&& command) {
-
+void CoreBroker::fedRegistration(ActionMessage&& command)
+{
     if (!connectionEstablished) {
         earlyMessages.push_back(std::move(command));
         return;
@@ -457,8 +455,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command) {
             noInit.source_id = global_broker_id_local;
             transmit(parent_route_id, noInit);
         }
-    } else if (getBrokerState()==BrokerState::operating){
-        if (!checkActionFlag(command,observer_flag)) {
+    } else if (getBrokerState() == BrokerState::operating) {
+        if (!checkActionFlag(command, observer_flag)) {
             // we are initialized already
             ActionMessage badInit(CMD_FED_ACK);
             setActionFlag(badInit, error_flag);
@@ -545,7 +543,6 @@ void CoreBroker::fedRegistration(ActionMessage&& command) {
     }
 }
 
-
 void CoreBroker::processPriorityCommand(ActionMessage&& command)
 {
     // deal with a few types of message immediately
@@ -584,10 +581,10 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         }
         case CMD_REG_FED:
             fedRegistration(std::move(command));
-        break;
+            break;
         case CMD_REG_BROKER:
             brokerRegistration(std::move(command));
-             break;
+            break;
         case CMD_FED_ACK: {  // we can't be root if we got one of these
             auto fed = _federates.find(std::string(command.name()));
             if (fed != _federates.end()) {
@@ -942,8 +939,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 break;
             }
             brk->state = connection_state::init_requested;
-            if (brk->_observer && getBrokerState() >= BrokerState::operating)
-            {
+            if (brk->_observer && getBrokerState() >= BrokerState::operating) {
                 if (isRootc) {
                     ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, command.source_id);
                     setActionFlag(grant, observer_flag);
@@ -951,9 +947,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 } else {
                     transmit(parent_route_id, command);
                 }
-            }
-            else
-            {
+            } else {
                 if (allInitReady()) {
                     if (isRootc) {
                         LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
@@ -969,7 +963,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
                 }
             }
-            
+
         } break;
         case CMD_INIT_NOT_READY: {
             if (allInitReady()) {
@@ -981,8 +975,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_INIT_GRANT:
-            if (!checkActionFlag(command, observer_flag))
-            {
+            if (!checkActionFlag(command, observer_flag)) {
                 if (brokerKey == universalKey) {
                     LOG_SUMMARY(global_broker_id_local,
                                 getIdentifier(),
@@ -999,9 +992,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         enteredExecutionMode = true;
                     }
                 }
-            }
-            else
-            {
+            } else {
                 routeMessage(std::move(command));
             }
             break;

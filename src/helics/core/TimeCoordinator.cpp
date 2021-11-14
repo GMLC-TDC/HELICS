@@ -366,8 +366,7 @@ GlobalFederateId TimeCoordinator::getMinDependency() const
 
 void TimeCoordinator::enterInitialization()
 {
-    if (dynamicJoining)
-    {
+    if (dynamicJoining) {
         ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
         timeUpdateRequest.source_id = source_id;
         for (const auto& dep : dependencies) {
@@ -381,11 +380,10 @@ void TimeCoordinator::enterInitialization()
             }
         }
     }
-   
 }
 
 Time TimeCoordinator::getNextPossibleTime() const
-    {
+{
     if (time_granted == timeZero) {
         if (info.offset > info.timeDelta) {
             return info.offset;
@@ -856,24 +854,20 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
             setActionFlag(execgrant, iteration_requested_flag);
             transmitTimingMessages(execgrant);
         }
-    }
-    else {
-        if (ret == MessageProcessingResult::NEXT_STEP)
-        {
+    } else {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
             updateTimeFactors();
-            if (dependencyCount() > 0)
-            {
+            if (dependencyCount() > 0) {
                 time_granted =
                     generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
-            }
-            else {
+            } else {
                 time_granted = timeZero;
             }
             time_grantBase = time_granted;
-            executionMode=true;
+            executionMode = true;
             iteration = 0;
 
-            ActionMessage execgrant(time_granted>timeZero?CMD_TIME_GRANT:CMD_EXEC_GRANT);
+            ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             execgrant.actionTime = time_granted;
             transmitTimingMessages(execgrant);
@@ -924,26 +918,20 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
         case CMD_REQUEST_CURRENT_TIME:
-            if (disconnected)
-            {
+            if (disconnected) {
                 ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
                 sendMessageFunction(treq);
-            }
-            else if (lastSend.time_state == time_state_t::time_granted)
-            {
-                ActionMessage treq(CMD_TIME_GRANT,source_id,cmd.source_id);
+            } else if (lastSend.time_state == time_state_t::time_granted) {
+                ActionMessage treq(CMD_TIME_GRANT, source_id, cmd.source_id);
                 treq.actionTime = lastSend.next;
                 sendMessageFunction(treq);
-            }
-            else
-            {
-                ActionMessage treq(CMD_TIME_REQUEST,source_id,cmd.source_id);
+            } else {
+                ActionMessage treq(CMD_TIME_REQUEST, source_id, cmd.source_id);
                 treq.actionTime = lastSend.next;
                 treq.Tdemin = lastSend.minDe;
                 treq.Te = lastSend.Te;
                 treq.setExtraData(lastSend.minFed.baseValue());
                 sendMessageFunction(treq);
-
             }
             return message_process_result::processed;
         default:

@@ -150,8 +150,7 @@ bool CommonCore::connect()
                 if (no_ping) {
                     setActionFlag(m, slow_responding_flag);
                 }
-                if (observer)
-                {
+                if (observer) {
                     setActionFlag(m, observer_flag);
                 }
                 transmit(parent_route_id, m);
@@ -629,8 +628,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
-    if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER))
-    {
+    if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
         setActionFlag(m, observer_flag);
     }
     addActionMessage(m);
@@ -2283,8 +2281,10 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                     queryReq.dest_id = fed.fed->global_id;
                     fed.fed->addAction(queryReq);
                 } else {
-                    // the federate has terminated or errored so is waiting, global_state doesn't block
-                    builder.addComponent(federateQuery(fed.fed, "global_state", force_ordering), brkindex);
+                    // the federate has terminated or errored so is waiting, global_state doesn't
+                    // block
+                    builder.addComponent(federateQuery(fed.fed, "global_state", force_ordering),
+                                         brkindex);
                 }
             } else {
                 builder.addComponent(ret, brkindex);
@@ -3329,28 +3329,25 @@ void CommonCore::processCommand(ActionMessage&& command)
         }
         case CMD_INIT: {
             auto* fed = getFederateCore(command.source_id);
-            if (fed == nullptr)
-            {
+            if (fed == nullptr) {
                 break;
             }
-            
-                fed->init_transmitted = true;
-                
-                if (allInitReady()) {
-                    if (transitionBrokerState(BrokerState::connected,
-                                              BrokerState::initializing)) {  // make sure we only
-                                                                             // do this once
-                        checkDependencies();
-                        command.source_id = global_broker_id_local;
-                        transmit(parent_route_id, command);
-                    }
-                    else if (checkActionFlag(command, observer))
-                    {
-                        command.source_id = global_broker_id_local;
-                        transmit(parent_route_id, command);
-                    }
+
+            fed->init_transmitted = true;
+
+            if (allInitReady()) {
+                if (transitionBrokerState(BrokerState::connected,
+                                          BrokerState::initializing)) {  // make sure we only
+                                                                         // do this once
+                    checkDependencies();
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, command);
+                } else if (checkActionFlag(command, observer)) {
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, command);
                 }
-            
+            }
+
         } break;
         case CMD_INIT_GRANT:
             if (transitionBrokerState(
@@ -3372,9 +3369,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (!timeCoord->hasActiveTimeDependencies()) {
                     timeCoord->disconnect();
                 }
-            }
-            else if (checkActionFlag(command, observer_flag))
-            {
+            } else if (checkActionFlag(command, observer_flag)) {
                 routeMessage(command);
             }
             break;
@@ -3413,16 +3408,14 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
             } else {
-                    routeMessage(command);
-                }
-                break;
+                routeMessage(command);
+            }
+            break;
         default:
             if (isPriorityCommand(command)) {
                 // this is a backup if somehow one of these message got here
                 processPriorityCommand(std::move(command));
-            }
-            else if (isLocal(command.dest_id))
-            {
+            } else if (isLocal(command.dest_id)) {
                 routeMessage(command);
             }
             break;

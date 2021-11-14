@@ -49,7 +49,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         }
         case CMD_INIT_GRANT:
             if (state == HELICS_CREATED) {
-                if (checkActionFlag(cmd,observer_flag)) {
+                if (checkActionFlag(cmd, observer_flag)) {
                     timeCoord->setDynamicJoining();
                 }
                 newState = HELICS_INITIALIZING;

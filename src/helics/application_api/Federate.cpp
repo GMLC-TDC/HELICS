@@ -327,7 +327,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                     } else {
                         currentTime = timeZero;
                     }
-                    
+
                     initializeToExecuteStateTransition(res);
                     break;
                 case IterationResult::ITERATING:
@@ -488,7 +488,7 @@ void Federate::setLoggingCallback(
 
 void Federate::setFlagOption(int flag, bool flagValue)
 {
-    if (flag==HELICS_FLAG_OBSERVER && currentMode<Modes::INITIALIZING) {
+    if (flag == HELICS_FLAG_OBSERVER && currentMode < Modes::INITIALIZING) {
         observerMode = flagValue;
     }
     coreObject->setFlagOption(fedID, flag, flagValue);
