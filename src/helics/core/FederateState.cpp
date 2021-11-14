@@ -489,7 +489,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
 
         auto ret = processQueue();
         if (ret == MessageProcessingResult::NEXT_STEP) {
-            time_granted = timeZero;
+            time_granted = timeCoord->getGrantedTime();
             allowed_send_time = timeCoord->allowedSendTime();
         } else if (ret == MessageProcessingResult::ITERATING) {
             time_granted = initializationTime;
