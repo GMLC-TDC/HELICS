@@ -78,7 +78,7 @@ class BasicBrokerInfo {
     bool _route_key{false};  //!< indicator that the broker has a unique route id
     bool _sent_disconnect_ack{false};  //!< indicator that the disconnect ack has been sent
     bool _disable_ping{false};  //!< indicator that the broker doesn't respond to pings
-    bool _observer{false}; // indicator that the broker is an observer
+    bool _observer{false};  // indicator that the broker is an observer
     // 1 byte gap
     std::string routeInfo;  //!< string describing the connection information for the route
     explicit BasicBrokerInfo(std::string_view brokerName): name(brokerName) {}
@@ -366,7 +366,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void addInput(ActionMessage& m);
     void addEndpoint(ActionMessage& m);
     void addFilter(ActionMessage& m);
-    //Handle the registration of new brokers;
+    // Handle the registration of new brokers;
     void brokerRegistration(ActionMessage&& command);
 
     // Handle the registration of new federates;

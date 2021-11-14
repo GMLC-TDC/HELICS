@@ -392,11 +392,10 @@ std::optional<ActionMessage>
     FederateState::processPostTerminationAction(const ActionMessage& action)  // NOLINT
 {
     std::optional<ActionMessage> optAct;
-    switch (action.action())
-    {
+    switch (action.action()) {
         case CMD_REQUEST_CURRENT_TIME:
             optAct->setAction(CMD_DISCONNECT);
-            optAct->dest_id=action.source_id;
+            optAct->dest_id = action.source_id;
             optAct->source_id = global_id.load();
             break;
         default:

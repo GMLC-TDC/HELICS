@@ -97,7 +97,7 @@ namespace inproc {
                         totalSleep += milliseconds(200);
                     }
                 } else {
-                    if (!tbroker->isOpenToNewFederates()&&!observer) {
+                    if (!tbroker->isOpenToNewFederates() && !observer) {
                         logError("broker is not open to new federates " + brokerName);
                         tbroker = nullptr;
                         broker = nullptr;

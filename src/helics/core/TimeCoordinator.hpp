@@ -101,7 +101,8 @@ class TimeCoordinator {
     bool nonGranting{false};  // specify that the timeCoordinator should not grant times and
                               // instead operate in a continuous manner until completion
     /// if set to true the time coordinator is joining an ongoing co-simulation
-    bool dynamicJoining {false};
+    bool dynamicJoining{false};
+
   public:
     /** default constructor*/
     TimeCoordinator();

@@ -309,7 +309,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "observer") {
             fi.observer = true;
-            //purposely not continuing here so the setFlagOption gets called
+            // purposely not continuing here so the setFlagOption gets called
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
