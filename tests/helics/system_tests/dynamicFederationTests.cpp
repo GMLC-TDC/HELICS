@@ -126,7 +126,7 @@ TEST_F(dynFed, observer_subscriber)
 
         EXPECT_NO_THROW(fobs->enterExecutingMode());
 
-        EXPECT_EQ(fobs->getCurrentTime(), helics::timeZero);
+        EXPECT_EQ(fobs->getCurrentTime(), helics::Time(2.0));
         fobs->disconnect();
     }
 
