@@ -49,6 +49,9 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         }
         case CMD_INIT_GRANT:
             if (state == HELICS_CREATED) {
+                if (checkActionFlag(cmd,observer_flag)) {
+                    timeCoord->setDynamicJoining();
+                }
                 newState = HELICS_INITIALIZING;
                 newMode = true;
                 proc = MessageProcessingResult::NEXT_STEP;
@@ -133,6 +136,9 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 newState = HELICS_FINISHED;
                 proc = MessageProcessingResult::HALTED;
             }
+            break;
+        case CMD_REQUEST_CURRENT_TIME:
+            timeCoord->processTimeMessage(cmd);
             break;
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:

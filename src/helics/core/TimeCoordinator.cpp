@@ -364,8 +364,28 @@ GlobalFederateId TimeCoordinator::getMinDependency() const
     return dependencies.getMinDependency();
 }
 
-Time TimeCoordinator::getNextPossibleTime() const
+void TimeCoordinator::enterInitialization()
 {
+    if (dynamicJoining)
+    {
+        ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
+        timeUpdateRequest.source_id = source_id;
+        for (const auto& dep : dependencies) {
+            // send to all dependencies
+            if (dep.dependency) {
+                if (dep.fedID == source_id) {
+                    continue;
+                }
+                timeUpdateRequest.dest_id = dep.fedID;
+                sendMessageFunction(timeUpdateRequest);
+            }
+        }
+    }
+   
+}
+
+Time TimeCoordinator::getNextPossibleTime() const
+    {
     if (time_granted == timeZero) {
         if (info.offset > info.timeDelta) {
             return info.offset;
@@ -816,25 +836,48 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
             ret = MessageProcessingResult::ITERATING;
             break;
     }
+    if (!dynamicJoining) {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
+            time_granted = timeZero;
+            time_grantBase = time_granted;
+            executionMode = true;
+            iteration = 0;
 
-    if (ret == MessageProcessingResult::NEXT_STEP) {
-        time_granted = timeZero;
-        time_grantBase = time_granted;
-        executionMode = true;
-        iteration = 0;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            transmitTimingMessages(execgrant);
+        } else if (ret == MessageProcessingResult::ITERATING) {
+            dependencies.resetIteratingExecRequests();
+            hasInitUpdates = false;
+            ++iteration;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.counter = iteration;
+            setActionFlag(execgrant, iteration_requested_flag);
+            transmitTimingMessages(execgrant);
+        }
+    }
+    else {
+        if (ret == MessageProcessingResult::NEXT_STEP)
+        {
+            updateTimeFactors();
+            if (dependencyCount() > 0)
+            {
+                time_granted =
+                    generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
+            }
+            else {
+                time_granted = timeZero;
+            }
+            time_grantBase = time_granted;
+            executionMode=true;
+            iteration = 0;
 
-        ActionMessage execgrant(CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        transmitTimingMessages(execgrant);
-    } else if (ret == MessageProcessingResult::ITERATING) {
-        dependencies.resetIteratingExecRequests();
-        hasInitUpdates = false;
-        ++iteration;
-        ActionMessage execgrant(CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        execgrant.counter = iteration;
-        setActionFlag(execgrant, iteration_requested_flag);
-        transmitTimingMessages(execgrant);
+            ActionMessage execgrant(time_granted>timeZero?CMD_TIME_GRANT:CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.actionTime = time_granted;
+            transmitTimingMessages(execgrant);
+        }
     }
     return ret;
 }
@@ -880,7 +923,29 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             // processing
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            if (disconnected)
+            {
+                ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
+                sendMessageFunction(treq);
+            }
+            else if (lastSend.time_state == time_state_t::time_granted)
+            {
+                ActionMessage treq(CMD_TIME_GRANT,source_id,cmd.source_id);
+                treq.actionTime = lastSend.next;
+                sendMessageFunction(treq);
+            }
+            else
+            {
+                ActionMessage treq(CMD_TIME_REQUEST,source_id,cmd.source_id);
+                treq.actionTime = lastSend.next;
+                treq.Tdemin = lastSend.minDe;
+                treq.Te = lastSend.Te;
+                treq.setExtraData(lastSend.minFed.baseValue());
+                sendMessageFunction(treq);
 
+            }
+            return message_process_result::processed;
         default:
             break;
     }

@@ -100,6 +100,8 @@ class TimeCoordinator {
     bool disconnected{false};
     bool nonGranting{false};  // specify that the timeCoordinator should not grant times and
                               // instead operate in a continuous manner until completion
+    /// if set to true the time coordinator is joining an ongoing co-simulation
+    bool dynamicJoining {false};
   public:
     /** default constructor*/
     TimeCoordinator();
@@ -112,6 +114,9 @@ class TimeCoordinator {
     void setProperty(int intProperty, int propertyVal);
     /** set an option Flag for a the coordinator*/
     void setOptionFlag(int optionFlag, bool value);
+    /** set dynamic joining flag to true*/
+    void setDynamicJoining() { dynamicJoining = true; }
+
     /** get a time Property*/
     Time getTimeProperty(int timeProperty) const;
     /** get an option flag value*/
@@ -247,5 +252,7 @@ class TimeCoordinator {
     int dependencyCount() const;
     /** get a count of the active dependencies*/
     GlobalFederateId getMinDependency() const;
+    /** enter initialization*/
+    void enterInitialization();
 };
 }  // namespace helics

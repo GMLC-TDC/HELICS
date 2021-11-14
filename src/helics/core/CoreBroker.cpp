@@ -225,6 +225,327 @@ bool CoreBroker::isOpenToNewFederates() const
              getCountableFederates() < maxFederateCount));
 }
 
+void CoreBroker::brokerRegistration(ActionMessage&& command)
+{
+    if (!connectionEstablished) {
+        earlyMessages.push_back(std::move(command));
+        return;
+    }
+    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
+    if (command.counter > 0) {  // this indicates it is a resend
+        auto brk = _brokers.find(std::string(command.name()));
+        if (brk != _brokers.end()) {
+            // we would get this if the ack didn't go through for some reason
+            brk->route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+            addRoute(brk->route, command.getExtraData(), command.getString(targetStringLoc));
+            routing_table[brk->global_id] = brk->route;
+
+            // sending the response message
+            ActionMessage brokerReply(CMD_BROKER_ACK);
+            brokerReply.source_id = global_broker_id_local;  // source is global root
+            brokerReply.dest_id = brk->global_id;  // the new id
+            brokerReply.name(command.name());  // the identifier of the broker
+            if (no_ping) {
+                setActionFlag(brokerReply, slow_responding_flag);
+            }
+            transmit(brk->route, brokerReply);
+            return;
+        }
+    }
+    // check the max broker count
+    if (static_cast<decltype(maxBrokerCount)>(_brokers.size()) >= maxBrokerCount) {
+        route_id newroute;
+        bool route_created = false;
+        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+            route_created = true;
+        } else {
+            newroute = getRoute(command.source_id);
+        }
+        ActionMessage badInit(CMD_BROKER_ACK);
+        setActionFlag(badInit, error_flag);
+        badInit.source_id = global_broker_id_local;
+        badInit.name(command.name());
+        badInit.messageID = max_broker_count_exceeded;
+        transmit(newroute, badInit);
+
+        if (route_created) {
+            removeRoute(newroute);
+        }
+        return;
+    }
+
+    auto currentBrokerState = getBrokerState();
+    if (currentBrokerState < BrokerState::operating) {
+        if (allInitReady()) {
+            // send an init not ready as we were ready now we are not
+            ActionMessage noInit(CMD_INIT_NOT_READY);
+            noInit.source_id = global_broker_id_local;
+            transmit(parent_route_id, noInit);
+        }
+    } else if (currentBrokerState==BrokerState::operating) {
+        // we are initialized already
+        if (!checkActionFlag(command,observer_flag)) {
+            route_id newroute;
+            bool route_created = false;
+            if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+                newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+                addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+                route_created = true;
+            } else {
+                newroute = getRoute(command.source_id);
+            }
+            ActionMessage badInit(CMD_BROKER_ACK);
+            setActionFlag(badInit, error_flag);
+            badInit.source_id = global_broker_id_local;
+            badInit.name(command.name());
+            badInit.messageID = already_init_error_code;
+            transmit(newroute, badInit);
+
+            if (route_created) {
+                removeRoute(newroute);
+            }
+            return;
+        }
+        // can't add a non observer federate in operating mode
+    }
+    else {
+        route_id newroute;
+        bool route_created = false;
+        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+            route_created = true;
+        } else {
+            newroute = getRoute(command.source_id);
+        }
+        ActionMessage badInit(CMD_BROKER_ACK);
+        setActionFlag(badInit, error_flag);
+        badInit.source_id = global_broker_id_local;
+        badInit.name(command.name());
+        badInit.setString(0, "broker is terminating");
+        badInit.messageID = broker_terminating;
+        transmit(newroute, badInit);
+
+        if (route_created) {
+            removeRoute(newroute);
+        }
+        return;
+   }
+    if (!verifyBrokerKey(command)) {
+        route_id newroute;
+        bool route_created = false;
+        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+            route_created = true;
+        } else {
+            newroute = getRoute(command.source_id);
+        }
+        ActionMessage badKey(CMD_BROKER_ACK);
+        setActionFlag(badKey, error_flag);
+        badKey.source_id = global_broker_id_local;
+        badKey.messageID = mismatch_broker_key_error_code;
+        badKey.name(command.name());
+        badKey.setString(0, "broker key does not match");
+        transmit(newroute, badKey);
+        if (route_created) {
+            removeRoute(newroute);
+        }
+        return;
+    }
+    auto inserted = _brokers.insert(std::string(command.name()), no_search, command.name());
+    if (!inserted) {
+        route_id newroute;
+        bool route_created = false;
+        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+            route_created = true;
+        } else {
+            newroute = getRoute(command.source_id);
+        }
+        ActionMessage badName(CMD_BROKER_ACK);
+        setActionFlag(badName, error_flag);
+        badName.source_id = global_broker_id_local;
+        badName.messageID = duplicate_broker_name_error_code;
+        badName.name(command.name());
+        transmit(newroute, badName);
+        if (route_created) {
+            removeRoute(newroute);
+        }
+        return;
+    }
+    if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+        // TODO(PT): this will need to be updated when we enable mesh routing
+        _brokers.back().route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+        addRoute(_brokers.back().route, command.getExtraData(), command.getString(targetStringLoc));
+        _brokers.back().parent = global_broker_id_local;
+        _brokers.back()._nonLocal = false;
+        _brokers.back()._route_key = true;
+        _brokers.back()._observer = checkActionFlag(command, observer_flag);
+    } else {
+        _brokers.back().route = getRoute(command.source_id);
+        if (_brokers.back().route == parent_route_id) {
+            std::cout << " invalid route to parent broker or reg broker" << std::endl;
+        }
+        _brokers.back().parent = command.source_id;
+        _brokers.back()._nonLocal = true;
+        _brokers.back()._observer = checkActionFlag(command, observer_flag);
+    }
+    _brokers.back()._core = checkActionFlag(command, core_flag);
+    if (!isRootc) {
+        if ((global_broker_id_local.isValid()) && (global_broker_id_local != parent_broker_id)) {
+            command.source_id = global_broker_id_local;
+            transmit(parent_route_id, command);
+        } else {
+            // delay the response if we are not fully registered yet
+            delayTransmitQueue.push(command);
+        }
+    } else {
+        _brokers.back().global_id = GlobalBrokerId(
+            static_cast<GlobalBrokerId::BaseType>(_brokers.size()) - 1 + gGlobalBrokerIdShift);
+        _brokers.addSearchTermForIndex(_brokers.back().global_id, _brokers.size() - 1);
+        auto global_brkid = _brokers.back().global_id;
+        auto route = _brokers.back().route;
+        if (checkActionFlag(command, slow_responding_flag)) {
+            _brokers.back()._disable_ping = true;
+        }
+        routing_table.emplace(global_brkid, route);
+        // don't bother with the broker_table for root broker
+
+        // sending the response message
+        ActionMessage brokerReply(CMD_BROKER_ACK);
+        brokerReply.source_id = global_broker_id_local;  // source is global root
+        brokerReply.dest_id = global_brkid;  // the new id
+        brokerReply.name(command.name());  // the identifier of the broker
+        if (no_ping) {
+            setActionFlag(brokerReply, slow_responding_flag);
+        }
+        transmit(route, brokerReply);
+        LOG_CONNECTIONS(global_broker_id_local,
+                        getIdentifier(),
+                        fmt::format("registering broker {}({}) on route {}",
+                                    command.name(),
+                                    global_brkid.baseValue(),
+                                    route.baseValue()));
+    }
+}
+
+
+// Handle the registration of new federates;
+void CoreBroker::fedRegistration(ActionMessage&& command) {
+
+    if (!connectionEstablished) {
+        earlyMessages.push_back(std::move(command));
+        return;
+    }
+    if (!checkActionFlag(command, non_counting_flag) &&
+        getCountableFederates() >= maxFederateCount) {
+        ActionMessage badInit(CMD_FED_ACK);
+        setActionFlag(badInit, error_flag);
+        badInit.source_id = global_broker_id_local;
+        badInit.messageID = max_federate_count_exceeded;
+        badInit.name(command.name());
+        transmit(getRoute(command.source_id), badInit);
+        return;
+    }
+    if (getBrokerState() < BrokerState::operating) {
+        if (allInitReady()) {
+            ActionMessage noInit(CMD_INIT_NOT_READY);
+            noInit.source_id = global_broker_id_local;
+            transmit(parent_route_id, noInit);
+        }
+    } else if (getBrokerState()==BrokerState::operating){
+        if (!checkActionFlag(command,observer_flag)) {
+            // we are initialized already
+            ActionMessage badInit(CMD_FED_ACK);
+            setActionFlag(badInit, error_flag);
+            badInit.source_id = global_broker_id_local;
+            badInit.messageID = already_init_error_code;
+            badInit.name(command.name());
+            transmit(getRoute(command.source_id), badInit);
+            return;
+        }
+    } else {
+        // we are initialized already
+        ActionMessage badInit(CMD_FED_ACK);
+        setActionFlag(badInit, error_flag);
+        badInit.source_id = global_broker_id_local;
+        badInit.messageID = broker_terminating;
+        badInit.name(command.name());
+        transmit(getRoute(command.source_id), badInit);
+        return;
+    }
+    // this checks for duplicate federate names
+    if (_federates.find(std::string(command.name())) != _federates.end()) {
+        ActionMessage badName(CMD_FED_ACK);
+        setActionFlag(badName, error_flag);
+        badName.source_id = global_broker_id_local;
+        badName.messageID = duplicate_federate_name_error_code;
+        badName.name(command.name());
+        transmit(getRoute(command.source_id), badName);
+        return;
+    }
+    _federates.insert(std::string(command.name()), no_search, std::string(command.name()));
+    _federates.back().route = getRoute(command.source_id);
+    _federates.back().parent = command.source_id;
+    if (checkActionFlag(command, non_counting_flag)) {
+        _federates.back().nonCounting = true;
+    }
+    if (checkActionFlag(command, child_flag)) {
+        _federates.back().global_id = GlobalFederateId(command.getExtraData());
+        _federates.addSearchTermForIndex(_federates.back().global_id, _federates.size() - 1);
+    } else if (isRootc) {
+        _federates.back().global_id =
+            GlobalFederateId(static_cast<GlobalFederateId::BaseType>(_federates.size()) - 1 +
+                             gGlobalFederateIdShift);
+        _federates.addSearchTermForIndex(_federates.back().global_id,
+                                         static_cast<size_t>(
+                                             _federates.back().global_id.baseValue()) -
+                                             gGlobalFederateIdShift);
+    }
+    if (!isRootc) {
+        if (global_broker_id_local.isValid()) {
+            command.source_id = global_broker_id_local;
+            transmit(parent_route_id, command);
+        } else {
+            // delay the response if we are not fully registered yet
+            delayTransmitQueue.push(command);
+        }
+    } else {
+        auto route_id = _federates.back().route;
+        auto global_fedid = _federates.back().global_id;
+
+        routing_table.emplace(global_fedid, route_id);
+        // don't bother with the federate_table
+        // transmit the response
+        ActionMessage fedReply(CMD_FED_ACK);
+        fedReply.source_id = global_broker_id_local;
+        fedReply.dest_id = global_fedid;
+        fedReply.name(command.name());
+        if (checkActionFlag(command, child_flag)) {
+            setActionFlag(fedReply, child_flag);
+        }
+        transmit(route_id, fedReply);
+        LOG_CONNECTIONS(global_broker_id_local,
+                        getIdentifier(),
+                        fmt::format("registering federate {}({}) on route {}",
+                                    command.name(),
+                                    global_fedid.baseValue(),
+                                    route_id.baseValue()));
+        if (enable_profiling) {
+            ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG,
+                                             global_broker_id_local,
+                                             global_fedid);
+            setActionFlag(fedEnableProfiling, indicator_flag);
+            transmit(route_id, fedEnableProfiling);
+        }
+    }
+}
+
+
 void CoreBroker::processPriorityCommand(ActionMessage&& command)
 {
     // deal with a few types of message immediately
@@ -261,286 +582,12 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             }
             break;
         }
-        case CMD_REG_FED: {
-            if (!connectionEstablished) {
-                earlyMessages.push_back(std::move(command));
-                break;
-            }
-            if (!checkActionFlag(command, non_counting_flag) &&
-                getCountableFederates() >= maxFederateCount) {
-                ActionMessage badInit(CMD_FED_ACK);
-                setActionFlag(badInit, error_flag);
-                badInit.source_id = global_broker_id_local;
-                badInit.messageID = max_federate_count_exceeded;
-                badInit.name(command.name());
-                transmit(getRoute(command.source_id), badInit);
-                return;
-            }
-            if (getBrokerState() != BrokerState::operating) {
-                if (allInitReady()) {
-                    ActionMessage noInit(CMD_INIT_NOT_READY);
-                    noInit.source_id = global_broker_id_local;
-                    transmit(parent_route_id, noInit);
-                }
-            } else {
-                // we are initialized already
-                ActionMessage badInit(CMD_FED_ACK);
-                setActionFlag(badInit, error_flag);
-                badInit.source_id = global_broker_id_local;
-                badInit.messageID = already_init_error_code;
-                badInit.name(command.name());
-                transmit(getRoute(command.source_id), badInit);
-                return;
-            }
-            // this checks for duplicate federate names
-            if (_federates.find(std::string(command.name())) != _federates.end()) {
-                ActionMessage badName(CMD_FED_ACK);
-                setActionFlag(badName, error_flag);
-                badName.source_id = global_broker_id_local;
-                badName.messageID = duplicate_federate_name_error_code;
-                badName.name(command.name());
-                transmit(getRoute(command.source_id), badName);
-                return;
-            }
-            _federates.insert(std::string(command.name()), no_search, std::string(command.name()));
-            _federates.back().route = getRoute(command.source_id);
-            _federates.back().parent = command.source_id;
-            if (checkActionFlag(command, non_counting_flag)) {
-                _federates.back().nonCounting = true;
-            }
-            if (checkActionFlag(command, child_flag)) {
-                _federates.back().global_id = GlobalFederateId(command.getExtraData());
-                _federates.addSearchTermForIndex(_federates.back().global_id,
-                                                 _federates.size() - 1);
-            } else if (isRootc) {
-                _federates.back().global_id =
-                    GlobalFederateId(static_cast<GlobalFederateId::BaseType>(_federates.size()) -
-                                     1 + gGlobalFederateIdShift);
-                _federates.addSearchTermForIndex(_federates.back().global_id,
-                                                 static_cast<size_t>(
-                                                     _federates.back().global_id.baseValue()) -
-                                                     gGlobalFederateIdShift);
-            }
-            if (!isRootc) {
-                if (global_broker_id_local.isValid()) {
-                    command.source_id = global_broker_id_local;
-                    transmit(parent_route_id, command);
-                } else {
-                    // delay the response if we are not fully registered yet
-                    delayTransmitQueue.push(command);
-                }
-            } else {
-                auto route_id = _federates.back().route;
-                auto global_fedid = _federates.back().global_id;
-
-                routing_table.emplace(global_fedid, route_id);
-                // don't bother with the federate_table
-                // transmit the response
-                ActionMessage fedReply(CMD_FED_ACK);
-                fedReply.source_id = global_broker_id_local;
-                fedReply.dest_id = global_fedid;
-                fedReply.name(command.name());
-                if (checkActionFlag(command, child_flag)) {
-                    setActionFlag(fedReply, child_flag);
-                }
-                transmit(route_id, fedReply);
-                LOG_CONNECTIONS(global_broker_id_local,
-                                getIdentifier(),
-                                fmt::format("registering federate {}({}) on route {}",
-                                            command.name(),
-                                            global_fedid.baseValue(),
-                                            route_id.baseValue()));
-                if (enable_profiling) {
-                    ActionMessage fedEnableProfiling(CMD_SET_PROFILER_FLAG,
-                                                     global_broker_id_local,
-                                                     global_fedid);
-                    setActionFlag(fedEnableProfiling, indicator_flag);
-                    transmit(route_id, fedEnableProfiling);
-                }
-            }
-        } break;
-        case CMD_REG_BROKER: {
-            if (!connectionEstablished) {
-                earlyMessages.push_back(std::move(command));
-                break;
-            }
-            bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
-            if (command.counter > 0) {  // this indicates it is a resend
-                auto brk = _brokers.find(std::string(command.name()));
-                if (brk != _brokers.end()) {
-                    // we would get this if the ack didn't go through for some reason
-                    brk->route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                    addRoute(brk->route,
-                             command.getExtraData(),
-                             command.getString(targetStringLoc));
-                    routing_table[brk->global_id] = brk->route;
-
-                    // sending the response message
-                    ActionMessage brokerReply(CMD_BROKER_ACK);
-                    brokerReply.source_id = global_broker_id_local;  // source is global root
-                    brokerReply.dest_id = brk->global_id;  // the new id
-                    brokerReply.name(command.name());  // the identifier of the broker
-                    if (no_ping) {
-                        setActionFlag(brokerReply, slow_responding_flag);
-                    }
-                    transmit(brk->route, brokerReply);
-                    return;
-                }
-            }
-            if (static_cast<decltype(maxBrokerCount)>(_brokers.size()) >= maxBrokerCount) {
-                route_id newroute;
-                bool route_created = false;
-                if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-                    route_created = true;
-                } else {
-                    newroute = getRoute(command.source_id);
-                }
-                ActionMessage badInit(CMD_BROKER_ACK);
-                setActionFlag(badInit, error_flag);
-                badInit.source_id = global_broker_id_local;
-                badInit.name(command.name());
-                badInit.messageID = max_broker_count_exceeded;
-                transmit(newroute, badInit);
-
-                if (route_created) {
-                    removeRoute(newroute);
-                }
-                return;
-            }
-            if (getBrokerState() != BrokerState::operating) {
-                if (allInitReady()) {
-                    // send an init not ready as we were ready now we are not
-                    ActionMessage noInit(CMD_INIT_NOT_READY);
-                    noInit.source_id = global_broker_id_local;
-                    transmit(parent_route_id, noInit);
-                }
-            } else {
-                // we are initialized already
-                route_id newroute;
-                bool route_created = false;
-                if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-                    route_created = true;
-                } else {
-                    newroute = getRoute(command.source_id);
-                }
-                ActionMessage badInit(CMD_BROKER_ACK);
-                setActionFlag(badInit, error_flag);
-                badInit.source_id = global_broker_id_local;
-                badInit.name(command.name());
-                badInit.messageID = already_init_error_code;
-                transmit(newroute, badInit);
-
-                if (route_created) {
-                    removeRoute(newroute);
-                }
-                return;
-            }
-            if (!verifyBrokerKey(command)) {
-                route_id newroute;
-                bool route_created = false;
-                if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-                    route_created = true;
-                } else {
-                    newroute = getRoute(command.source_id);
-                }
-                ActionMessage badKey(CMD_BROKER_ACK);
-                setActionFlag(badKey, error_flag);
-                badKey.source_id = global_broker_id_local;
-                badKey.messageID = mismatch_broker_key_error_code;
-                badKey.name(command.name());
-                badKey.setString(0, "broker key does not match");
-                transmit(newroute, badKey);
-                if (route_created) {
-                    removeRoute(newroute);
-                }
-                return;
-            }
-            auto inserted = _brokers.insert(std::string(command.name()), no_search, command.name());
-            if (!inserted) {
-                route_id newroute;
-                bool route_created = false;
-                if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                    newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                    addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-                    route_created = true;
-                } else {
-                    newroute = getRoute(command.source_id);
-                }
-                ActionMessage badName(CMD_BROKER_ACK);
-                setActionFlag(badName, error_flag);
-                badName.source_id = global_broker_id_local;
-                badName.messageID = duplicate_broker_name_error_code;
-                badName.name(command.name());
-                transmit(newroute, badName);
-                if (route_created) {
-                    removeRoute(newroute);
-                }
-                return;
-            }
-            if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                // TODO(PT): this will need to be updated when we enable mesh routing
-                _brokers.back().route =
-                    generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                addRoute(_brokers.back().route,
-                         command.getExtraData(),
-                         command.getString(targetStringLoc));
-                _brokers.back().parent = global_broker_id_local;
-                _brokers.back()._nonLocal = false;
-                _brokers.back()._route_key = true;
-            } else {
-                _brokers.back().route = getRoute(command.source_id);
-                if (_brokers.back().route == parent_route_id) {
-                    std::cout << " invalid route to parent broker or reg broker" << std::endl;
-                }
-                _brokers.back().parent = command.source_id;
-                _brokers.back()._nonLocal = true;
-            }
-            _brokers.back()._core = checkActionFlag(command, core_flag);
-            if (!isRootc) {
-                if ((global_broker_id_local.isValid()) &&
-                    (global_broker_id_local != parent_broker_id)) {
-                    command.source_id = global_broker_id_local;
-                    transmit(parent_route_id, command);
-                } else {
-                    // delay the response if we are not fully registered yet
-                    delayTransmitQueue.push(command);
-                }
-            } else {
-                _brokers.back().global_id =
-                    GlobalBrokerId(static_cast<GlobalBrokerId::BaseType>(_brokers.size()) - 1 +
-                                   gGlobalBrokerIdShift);
-                _brokers.addSearchTermForIndex(_brokers.back().global_id, _brokers.size() - 1);
-                auto global_brkid = _brokers.back().global_id;
-                auto route = _brokers.back().route;
-                if (checkActionFlag(command, slow_responding_flag)) {
-                    _brokers.back()._disable_ping = true;
-                }
-                routing_table.emplace(global_brkid, route);
-                // don't bother with the broker_table for root broker
-
-                // sending the response message
-                ActionMessage brokerReply(CMD_BROKER_ACK);
-                brokerReply.source_id = global_broker_id_local;  // source is global root
-                brokerReply.dest_id = global_brkid;  // the new id
-                brokerReply.name(command.name());  // the identifier of the broker
-                if (no_ping) {
-                    setActionFlag(brokerReply, slow_responding_flag);
-                }
-                transmit(route, brokerReply);
-                LOG_CONNECTIONS(global_broker_id_local,
-                                getIdentifier(),
-                                fmt::format("registering broker {}({}) on route {}",
-                                            command.name(),
-                                            global_brkid.baseValue(),
-                                            route.baseValue()));
-            }
-        } break;
+        case CMD_REG_FED:
+            fedRegistration(std::move(command));
+        break;
+        case CMD_REG_BROKER:
+            brokerRegistration(std::move(command));
+             break;
         case CMD_FED_ACK: {  // we can't be root if we got one of these
             auto fed = _federates.find(std::string(command.name()));
             if (fed != _federates.end()) {
@@ -890,23 +937,39 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_INIT: {
             auto* brk = getBrokerById(static_cast<GlobalBrokerId>(command.source_id));
-            if (brk != nullptr) {
-                brk->state = connection_state::init_requested;
+
+            if (brk == nullptr) {
+                break;
             }
-            if (allInitReady()) {
+            brk->state = connection_state::init_requested;
+            if (brk->_observer && getBrokerState() >= BrokerState::operating)
+            {
                 if (isRootc) {
-                    LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
-                    LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
-                    executeInitializationOperations();
+                    ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, command.source_id);
+                    setActionFlag(grant, observer_flag);
+                    transmit(brk->route, grant);
                 } else {
-                    LOG_TIMING(global_broker_id_local,
-                               getIdentifier(),
-                               "entering initialization mode");
-                    checkDependencies();
-                    command.source_id = global_broker_id_local;
                     transmit(parent_route_id, command);
                 }
             }
+            else
+            {
+                if (allInitReady()) {
+                    if (isRootc) {
+                        LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
+                        LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
+                        executeInitializationOperations();
+                    } else {
+                        LOG_TIMING(global_broker_id_local,
+                                   getIdentifier(),
+                                   "entering initialization mode");
+                        checkDependencies();
+                        command.source_id = global_broker_id_local;
+                        transmit(parent_route_id, command);
+                    }
+                }
+            }
+            
         } break;
         case CMD_INIT_NOT_READY: {
             if (allInitReady()) {
@@ -918,21 +981,28 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
         } break;
         case CMD_INIT_GRANT:
-            if (brokerKey == universalKey) {
-                LOG_SUMMARY(global_broker_id_local,
-                            getIdentifier(),
-                            " Broker started with universal key");
-            }
-            setBrokerState(BrokerState::operating);
-            for (const auto& brk : _brokers) {
-                transmit(brk.route, command);
-            }
+            if (!checkActionFlag(command, observer_flag))
             {
-                timeCoord->enteringExecMode();
-                auto res = timeCoord->checkExecEntry();
-                if (res == MessageProcessingResult::NEXT_STEP) {
-                    enteredExecutionMode = true;
+                if (brokerKey == universalKey) {
+                    LOG_SUMMARY(global_broker_id_local,
+                                getIdentifier(),
+                                " Broker started with universal key");
                 }
+                setBrokerState(BrokerState::operating);
+                for (const auto& brk : _brokers) {
+                    transmit(brk.route, command);
+                }
+                {
+                    timeCoord->enteringExecMode();
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == MessageProcessingResult::NEXT_STEP) {
+                        enteredExecutionMode = true;
+                    }
+                }
+            }
+            else
+            {
+                routeMessage(std::move(command));
             }
             break;
         case CMD_SEARCH_DEPENDENCY: {
@@ -1128,6 +1198,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_TIME_REQUEST:
         case CMD_TIME_GRANT:
+        case CMD_REQUEST_CURRENT_TIME:
             if ((command.source_id == global_broker_id_local) &&
                 (command.dest_id == parent_broker_id)) {
                 LOG_TIMING(global_broker_id_local,

@@ -150,6 +150,10 @@ bool CommonCore::connect()
                 if (no_ping) {
                     setActionFlag(m, slow_responding_flag);
                 }
+                if (observer)
+                {
+                    setActionFlag(m, observer_flag);
+                }
                 transmit(parent_route_id, m);
                 setBrokerState(BrokerState::connected);
                 disconnection.activate();
@@ -625,6 +629,10 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
+    if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER))
+    {
+        setActionFlag(m, observer_flag);
+    }
     addActionMessage(m);
     // check some properties that should be inherited from the federate if it is the first one
     if (checkProperties) {
@@ -2275,7 +2283,8 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                     queryReq.dest_id = fed.fed->global_id;
                     fed.fed->addAction(queryReq);
                 } else {
-                    builder.addComponent("", brkindex);
+                    // the federate has terminated or errored so is waiting, global_state doesn't block
+                    builder.addComponent(federateQuery(fed.fed, "global_state", force_ordering), brkindex);
                 }
             } else {
                 builder.addComponent(ret, brkindex);
@@ -2484,7 +2493,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
         return "#wait";
     }
-    if (queryStr == "global_time") {
+    /* if (queryStr == "global_time") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
             val["granted_time"] = static_cast<double>(fed->grantedTime());
@@ -2493,6 +2502,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
 
         return fileops::generateJsonString(base);
     }
+    */
     if (queryStr == "dependencies") {
         Json::Value base;
         loadBasicJsonInfo(base, nullptr);
@@ -3319,8 +3329,13 @@ void CommonCore::processCommand(ActionMessage&& command)
         }
         case CMD_INIT: {
             auto* fed = getFederateCore(command.source_id);
-            if (fed != nullptr) {
+            if (fed == nullptr)
+            {
+                break;
+            }
+            
                 fed->init_transmitted = true;
+                
                 if (allInitReady()) {
                     if (transitionBrokerState(BrokerState::connected,
                                               BrokerState::initializing)) {  // make sure we only
@@ -3329,8 +3344,13 @@ void CommonCore::processCommand(ActionMessage&& command)
                         command.source_id = global_broker_id_local;
                         transmit(parent_route_id, command);
                     }
+                    else if (checkActionFlag(command, observer))
+                    {
+                        command.source_id = global_broker_id_local;
+                        transmit(parent_route_id, command);
+                    }
                 }
-            }
+            
         } break;
         case CMD_INIT_GRANT:
             if (transitionBrokerState(
@@ -3353,6 +3373,10 @@ void CommonCore::processCommand(ActionMessage&& command)
                     timeCoord->disconnect();
                 }
             }
+            else if (checkActionFlag(command, observer_flag))
+            {
+                routeMessage(command);
+            }
             break;
 
         case CMD_SEND_MESSAGE:
@@ -3374,10 +3398,32 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_SET_PROFILER_FLAG:
             routeMessage(command);
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            if (isLocal(command.dest_id)) {
+                auto* fed = getFederateCore(command.dest_id);
+                if (fed != nullptr) {
+                    if ((fed->getState() != FederateStates::HELICS_FINISHED) &&
+                        (fed->getState() != FederateStates::HELICS_ERROR)) {
+                        fed->forceProcessMessage(command);
+                    } else {
+                        auto rep = fed->processPostTerminationAction(command);
+                        if (rep) {
+                            routeMessage(*rep);
+                        }
+                    }
+                }
+            } else {
+                    routeMessage(command);
+                }
+                break;
         default:
             if (isPriorityCommand(command)) {
                 // this is a backup if somehow one of these message got here
                 processPriorityCommand(std::move(command));
+            }
+            else if (isLocal(command.dest_id))
+            {
+                routeMessage(command);
             }
             break;
     }
