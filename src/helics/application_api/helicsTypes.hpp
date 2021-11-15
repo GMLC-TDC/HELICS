@@ -270,6 +270,7 @@ inline constexpr const char* typeNameString<NamedPoint>()
 }
 /** the base types for  helics*/
 enum class DataType : int {
+    HELICS_UNKNOWN = HELICS_DATA_TYPE_UNKNOWN,
     HELICS_STRING = HELICS_DATA_TYPE_STRING,
     HELICS_DOUBLE = HELICS_DATA_TYPE_DOUBLE,
     HELICS_INT = HELICS_DATA_TYPE_INT,
@@ -284,7 +285,6 @@ enum class DataType : int {
     HELICS_ANY = HELICS_DATA_TYPE_ANY,
     HELICS_JSON = HELICS_DATA_TYPE_JSON,
     HELICS_MULTI = HELICS_DATA_TYPE_MULTI,
-    HELICS_UNKNOWN = 262355
 };
 
 inline constexpr bool isBytesType(DataType type)
@@ -309,6 +309,10 @@ HELICS_CXX_EXPORT std::string helicsComplexString(std::complex<double> val);
 /** generate a string representation of a vector
 @details string will look like v[1.02,45]*/
 HELICS_CXX_EXPORT std::string helicsVectorString(const std::vector<double>& val);
+/** generate a string representation of an int */
+HELICS_CXX_EXPORT std::string helicsIntString(std::int64_t val);
+/** generate a string representation of a double */
+HELICS_CXX_EXPORT std::string helicsDoubleString(double val);
 /** generate a string representation of a vector from pointer and size
 @details string will look like v[1.02,45]*/
 HELICS_CXX_EXPORT std::string helicsVectorString(const double* vals, size_t size);
@@ -336,6 +340,8 @@ HELICS_CXX_EXPORT void helicsGetComplexVector(std::string_view val,
 
 /** convert a string to a named point*/
 HELICS_CXX_EXPORT NamedPoint helicsGetNamedPoint(std::string_view val);
+/** get an int from a string*/
+HELICS_CXX_EXPORT std::int64_t getIntFromString(std::string_view val);
 /** get a double from a string*/
 HELICS_CXX_EXPORT double getDoubleFromString(std::string_view val);
 /** get a complex number from a string*/
@@ -355,12 +361,15 @@ HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, int64_t val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, std::string_view val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const std::vector<double>& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const double* vals, size_t size);
+HELICS_CXX_EXPORT SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type,
                                           const std::vector<std::complex<double>>& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const std::complex<double>& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, const NamedPoint& val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, std::string_view str, double val);
 HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, bool val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, char val);
+HELICS_CXX_EXPORT SmallBuffer typeConvert(DataType type, Time val);
 
 /** template function for generating a known name of a type*/
 template<class X>

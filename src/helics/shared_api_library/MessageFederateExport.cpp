@@ -911,6 +911,8 @@ const char* helicsMessageGetString(HelicsMessage message)
     if (mess == nullptr) {
         return nullcstr;
     }
+    // enforce the null termination
+    mess->data.null_terminate();
     return mess->data.char_data();
 }
 
@@ -1078,6 +1080,7 @@ void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError*
         return;
     }
     mess->data = AS_STRING(str);
+    mess->data.null_terminate();
 }
 
 void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err)

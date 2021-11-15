@@ -6,7 +6,7 @@
 
 - Ubuntu 18 or newer
 - C++17 compiler (GCC 7.4 or newer -- GCC 7.3.1 has a bug and won't work)
-- CMake 3.10 or newer
+- CMake 3.10 or newer (if using clang with libc++, use 3.18+)
 - git
 - Boost 1.67 or newer
 - ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
