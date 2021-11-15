@@ -56,7 +56,7 @@ In a Monte Carlo co-simulation, a probability distribution of possible values ca
 
 *M ~ U(a,b)*
 
-Where $M$ is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
+Where *M* is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
 is distributed uniformly with bounds *a* and *b*."
 
 ![](../../../img/uniform_dist.png)
