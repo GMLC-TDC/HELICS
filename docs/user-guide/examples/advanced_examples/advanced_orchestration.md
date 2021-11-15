@@ -119,14 +119,15 @@ Execution can be done with either a simple script (provided on the repo), or wit
 Manual implementation of the co-simulation is done with the helper script `advanced_orchestration.py`, with command line execution:
 
 <<<<<<< HEAD
-```
+
+````
 $ python advanced_orchestration.py
 
 =======
 ```shell session
 $ python make_samples.py
 >>>>>>> 72254da8735e905701b5864fdb54bbf214576a77
-```
+````
 
 This implementation will run a default co-simulation. The default parameters are:
 
@@ -144,6 +145,7 @@ This means that we are generating 30 JSON files with unique seeds, we are using 
 If we wanted to run a Monte Carlo co-sim with different parameters, this would be:
 
 <<<<<<< HEAD
+
 ```
 $ python advanced_orchestration.py 10 . 100 24*7 0 0
 
@@ -151,8 +153,8 @@ $ python advanced_orchestration.py 10 . 100 24*7 0 0
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSONs (meaning that `helics_cli` will not be called -- the user will need to execute the JSONs manually).
 
-You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files.  If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
-=======
+# You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
+
 ```shell session
 $ python make_samples.py 10 . 100 24*7 0 0
 ```
@@ -160,7 +162,8 @@ $ python make_samples.py 10 . 100 24*7 0 0
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not run `helics-cli` with the generated JSON files.
 
 You may decide to adapt `make_samples_manual.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSON files using the helper script, sub directories are created for the `helics_cli` runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
->>>>>>> 72254da8735e905701b5864fdb54bbf214576a77
+
+> > > > > > > 72254da8735e905701b5864fdb54bbf214576a77
 
 ```python
 out_json = output_path + "/cli_runner_scripts"
@@ -231,7 +234,8 @@ The final result of the default Monte Carlo co-simulation is shown below.
 ![](./MonteCarlo_Manual_small.png)
 =======
 ![](https://raw.githubusercontent.com/GMLC-TDC/HELICS-Examples/main/user_guide_examples/advanced/advanced_orchestration/montecarlo-ev-peak-power.png)
->>>>>>> 72254da8735e905701b5864fdb54bbf214576a77
+
+> > > > > > > 72254da8735e905701b5864fdb54bbf214576a77
 
 This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.md#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
 
