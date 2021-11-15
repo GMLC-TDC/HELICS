@@ -45,7 +45,7 @@ All of the HELICS configurations are the same as in the Endpoint example. The in
 
 This simplification allows us to isolate a single source of uncertainty: the charge rate.  
 
-The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a **posterior distribution* of the instantaneous power draw over a desired period of time.
+The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a *posterior distribution* of the instantaneous power draw over a desired period of time.
 
 
 ## Probabilistic Uncertainty Estimation
