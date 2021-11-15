@@ -100,7 +100,7 @@ Our final distribution for modeling the anticipated need for each level of charg
 |          | *L1*          |     *L2*      |                *L3* |
 | -------- | :------------ | :-----------: | ------------------: |
 |*μ*   | 0.3           |      0.5      |                 0.2 |
-| *σ* | *~ N(1,3)* | *~ N(1,2)* | *~ N(0.05,0.25)* |
+| *σ* | ~ N(1,3) | ~ N(1,2) | ~ N(0.05,0.25) |
 
 </center>
 
