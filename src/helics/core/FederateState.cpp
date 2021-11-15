@@ -1423,6 +1423,9 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             rt_lag = propertyVal;
             rt_lead = propertyVal;
             break;
+        case defs::Properties::GRANT_TIMEOUT:
+            grantTimeOutPeriod = propertyVal;
+            break;
         default:
             timeCoord->setProperty(timeProperty, propertyVal);
             break;

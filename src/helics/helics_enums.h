@@ -257,6 +257,8 @@ typedef enum {
     HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
     /** the property controlling output delay for a federate*/
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+    /** the property specifying a timeout to trigger actions if the time for granting exceeds a certain threshold*/
+    HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
     /** integer property controlling the maximum number of iterations in a federate*/
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     /** integer property controlling the log level in a federate see \ref HelicsLogLevels*/

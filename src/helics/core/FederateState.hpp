@@ -88,14 +88,18 @@ class FederateState {
     int errorCode{0};  //!< storage for an error code
     CommonCore* parent_{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
+    /** time the initialization mode started for real time capture */
     decltype(std::chrono::steady_clock::now())
-        start_clock_time;  //!< time the initialization mode started for real time capture
+        start_clock_time;  
     Time rt_lag{timeZero};  //!< max lag for the rt control
     Time rt_lead{timeZero};  //!< min lag for the realtime control
-    int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
+    Time grantTimeOutPeriod{timeZero}; //!< period to raise an inquiry about lack of grant
+    std::int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
+    std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
+    /** atomic flag indicating this federate has requested entry to initialization */
     std::atomic<bool> init_requested{
-        false};  //!< this federate has requested entry to initialization
+        false};  
     // temporary
     std::atomic<bool> requestingMode{false};
 
@@ -107,16 +111,21 @@ class FederateState {
                                      //!< error it should cause a co-simulation abort
     int logLevel{HELICS_LOG_LEVEL_WARNING};  //!< the level of logging used in the federate
 
+    /** message timer object for real time operations and timeouts */
     std::shared_ptr<MessageTimer>
-        mTimer;  //!< message timer object for real time operations and timeouts
+        mTimer;
+    /** processing queue for messages incoming to a federate */
     gmlc::containers::BlockingQueue<ActionMessage>
-        queue;  //!< processing queue for messages incoming to a federate
+        queue;
+    /** processing queue for messages incoming to a federate */
     gmlc::containers::BlockingQueue<std::pair<std::string, std::string>>
-        commandQueue;  //!< processing queue for messages incoming to a federate
+        commandQueue;
+    /** current defaults for operational flags of interfaces for this federate */
     std::atomic<uint16_t> interfaceFlags{
-        0};  //!< current defaults for operational flags of interfaces for this federate
+        0};
+    /** queue for delaying processing of messages for a time */
     std::map<GlobalFederateId, std::deque<ActionMessage>>
-        delayQueues;  //!< queue for delaying processing of messages for a time
+        delayQueues;  
     std::vector<InterfaceHandle> events;  //!< list of value events to process
     std::vector<InterfaceHandle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
@@ -126,9 +135,10 @@ class FederateState {
 
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)>
-        loggerFunction;  //!< callback for logging functions
+        loggerFunction;
+    /** a callback for additional queries */
     std::function<std::string(std::string_view)>
-        queryCallback;  //!< a callback for additional queries
+        queryCallback;  
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     /** find the next Value Event*/
