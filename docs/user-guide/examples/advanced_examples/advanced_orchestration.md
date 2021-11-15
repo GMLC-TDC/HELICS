@@ -54,10 +54,10 @@ A Monte Carlo simulation allows a researcher to sample random numbers repeatedly
 
 In a Monte Carlo co-simulation, a probability distribution of possible values can be used in the place of **any** static value in **any** of the simulators. For example, a co-simulation may include a simulator (federate) which measures the voltage across a distribution transformer. We can quantify measurement error by replacing the deterministic (static) value of the measurement with a random value from a uniform distribution. Probabilistic distributions are typically described with the following notation:
 
-$$ M \sim U(a,b) $$
+*M ~ U(a,b)*
 
-Where $M$ is the measured voltage, $a$ is the lower bound for possible values, and $b$ is the upper bound for possible values. This is read as, "$M$
-is distributed uniformly with bounds $a$ and $b$."
+Where $M$ is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
+is distributed uniformly with bounds *a* and *b*."
 
 ![](../../../img/uniform_dist.png)
 
@@ -69,35 +69,38 @@ The example co-simulation to demonstrate Monte Carlo distribution sampling is th
 
 #### Probability Distributions
 
-_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value $\lambda$ and the number of samples $k$. Then we can write the distribution for the number of chargers in each level, $L$, as
+_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value λ and the number of samples *k*. Then we can write the distribution for the number of chargers in each level, *L*, as
 
-$$ L \sim P(k,\lambda) $$
+*L ~ P(k,λ)*
 
 Let's extend our original assumption that the distribution of chargers is static to Poisson distributed, and let's assume that there are 100 total charging ports:
 
-$$ L1 \sim P(100,0.3) $$
-$$ L2 \sim P(100,0.5) $$
-$$ L3 \sim P(100,0.2) $$
+*L1 ~ P(100,0.3)*
+
+*L2 ~ P(100,0.5)*
+
+*L3 ~ P(100,0.2)*
 
 ![](../../../img/EVPoisson.png)
 
-What if we weren't entirely certain that the average values for $L1, L2, L3$ are $0.3, 0.5, 0.2$, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
+What if we weren't entirely certain that the average values for *L1, L2, L3* are *0.3, 0.5, 0.2*, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
 
-$$ \lambda \sim N(\mu,\sigma) $$
+*λ ~ N(μ,σ)*
 
-Which means that the input to $L$ is distributed normally with average $\mu$ and standard deviation $\sigma$.
+Which means that the input to *L* is distributed normally with average *μ* and standard deviation *σ*.
 
-Our final distribution for modeling the anticipated need for each level of charging port in our $k = 100$ EV garage can be written as:
+Our final distribution for modeling the anticipated need for each level of charging port in our *k = 100* EV garage can be written as:
 
-$$ L \sim P(k,\lambda) $$
-$$ \lambda \sim N(\mu,\sigma)  $$
+*L ~ P(k,λ)*
+
+*λ ~ N(μ,σ)*
 
 <center>
 
-|          | $L1$          |     $L2$      |                $L3$ |
+|          | *L1*          |     *L2*      |                *L3* |
 | -------- | :------------ | :-----------: | ------------------: |
-| $\mu$    | 0.3           |      0.5      |                 0.2 |
-| $\sigma$ | $\sim N(1,3)$ | $\sim N(1,2)$ | $\sim N(0.05,0.25)$ |
+|*μ*   | 0.3           |      0.5      |                 0.2 |
+| *σ* | *~ N(1,3)* | *~ N(1,2)* | *~ N(0.05,0.25)* |
 
 </center>
 
@@ -233,13 +236,13 @@ np.random.seed(args.seed)
 
 #### helics_cli in Merlin
 
-Since we are using the helics_cli to manage and execute all the
-federates, we need to create these runner files for helics_cli.
+Since we are using the `helics_cli` to manage and execute all the
+federates, we need to create these runner files for `helics_cli`.
 There is a provided python script called `make_samples_merlin.py` that will
 generate the runner file and a csv file that will be used in the
-study step. Helics_cli will start each of these federates. In the Merlin
-spec, Merlin will be instructed to execute the helics_cli with all the
-generated helics_cli runner files.
+study step. `Helics_cli` will start each of these federates. In the Merlin
+spec, Merlin will be instructed to execute the `helics_cli` with all the
+generated `helics_cli` runner files.
 
 #### Merlin Specification
 
