@@ -297,6 +297,7 @@ class CoreBroker: public Broker, public BrokerBase {
                              const std::string& commandStr,
                              HelicsSequencingModes mode) override final;
     virtual void makeConnections(const std::string& file) override final;
+    virtual void linkEndpoints(const std::string& source, const std::string& target) override final;
     virtual void dataLink(const std::string& publication, const std::string& input) override final;
 
     virtual void addSourceFilterToEndpoint(const std::string& filter,

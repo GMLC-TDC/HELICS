@@ -1,6 +1,6 @@
 # OS Specific installation from source
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -18,8 +18,8 @@ The following are a few things that could be useful to know before starting out.
 Firstly, you can follow HELICS development on our [GitHub](https://github.com/GMLC-TDC/HELICS) page.
 HELICS is open-source. The development team uses `git` for version control, and GitHub to host the code publicly.
 The latest HELICS will be on the `develop` branch.
-Tagged releases occur on the `master` branch.
-If you clone the HELICS repository, you will be placed in the `master` branch by default.
+Tagged releases occur on the `main` branch.
+If you clone the HELICS repository, you will be placed in the `main` branch by default.
 To switch to the `develop` branch, you can type the following:
 
 ```bash
@@ -29,7 +29,7 @@ git checkout develop
 To switch to a tagged release, you can type the following:
 
 ```bash
-git checkout v2.3.0
+git checkout v3.0.1
 ```
 
 You will not need a full understanding of how `git` works for installing HELICS, but if you are interested you can find a good `git` resource in [this page](https://git-scm.com/book/en/v2).
@@ -50,4 +50,4 @@ This means you can pass it configurations settings as a key value pair by adding
 For example, to build the Java extension all you need to do is pass in `-DHELICS_BUILD_JAVA_INTERFACE=ON`.
 You can also run `ccmake .` in the build folder, to get a command line interactive prompt to change configuration settings.
 On Windows, you can use the cmake GUI to do the same.
-Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](https://helics.readthedocs.io/en/latest/installation/helics_cmake_options.html).
+Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](helics_cmake_options.md).

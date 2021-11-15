@@ -1786,7 +1786,7 @@ void FederateState::sendCommand(ActionMessage& command)
 std::pair<std::string, std::string> FederateState::getCommand()
 {
     auto val = commandQueue.try_pop();
-    if (val->first == "notify") {
+    while (val && val->first == "notify") {
         if (parent_ != nullptr) {
             parent_->sendCommand(val->second,
                                  "notify_response",

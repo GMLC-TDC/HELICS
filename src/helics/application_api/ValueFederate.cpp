@@ -159,6 +159,16 @@ void ValueFederate::removeTarget(const Input& inp, const std::string& target)
     vfManager->removeTarget(inp, target);
 }
 
+void ValueFederate::setFlagOption(int flag, bool flagValue)
+{
+    if (flag == HELICS_FLAG_USE_JSON_SERIALIZATION) {
+        useJsonSerialization = flagValue;
+        vfManager->useJsonSerialization = flagValue;
+    } else {
+        Federate::setFlagOption(flag, flagValue);
+    }
+}
+
 void ValueFederate::addAlias(const Publication& pub, const std::string& shortcutName)
 {
     vfManager->addAlias(pub, shortcutName);
@@ -384,6 +394,11 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 data_view ValueFederate::getBytes(const Input& inp)
 {
     return vfManager->getValue(inp);
+}
+
+bool ValueFederate::forceCoreUpdate(Input& inp)
+{
+    return vfManager->getUpdateFromCore(inp);
 }
 
 void ValueFederate::publishBytes(const Publication& pub, data_view block)  // NOLINT

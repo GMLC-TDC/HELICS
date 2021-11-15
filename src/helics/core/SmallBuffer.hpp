@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <utility>
 
-#if defined(__APPLE__) && defined(__clang__)
+#if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wuninitialized"
 #endif
@@ -217,12 +217,23 @@ class SmallBuffer {
 
     void push_back(char c) { append(&c, 1); }
 
+    void pop_back() { bufferSize > 0 ? --bufferSize : 0; }
     /** interpret the data as a string*/
     std::string_view to_string() const
     {
         return std::string_view{reinterpret_cast<const char*>(heap), bufferSize};
     }
 
+    /** ensure there is a null terminator after the last buffer character*/
+    void null_terminate()
+    {
+        if (bufferCapacity > bufferSize) {
+            heap[bufferSize] = std::byte(0);
+        } else {
+            push_back('\0');
+            pop_back();
+        }
+    }
     /** get a pointer to the data as a `char *`*/
     const char* char_data() const { return reinterpret_cast<const char*>(heap); }
     /** move raw memory into the buffer and give it a preallocated buffer*/
@@ -275,11 +286,12 @@ class SmallBuffer {
     }
     void reserve(size_t size)
     {
+        static constexpr size_t bigSize{sizeof(size_t) == 8 ? 0x010'0000'0000U : 0xFFFF'0000U};
         if (size > bufferCapacity) {
-            if (size > 0x010'0000'0000U) {
+            if (size > bigSize) {
                 throw(std::bad_alloc());
             }
-            auto* ndata = new std::byte[size];
+            auto* ndata = new std::byte[size + 8];
             std::memcpy(ndata, heap, bufferSize);
             if (usingAllocatedBuffer && !nonOwning) {
                 delete[] heap;
@@ -287,7 +299,7 @@ class SmallBuffer {
             heap = ndata;
             nonOwning = false;
             usingAllocatedBuffer = true;
-            bufferCapacity = size;
+            bufferCapacity = size + 8;
         }
     }
     /** check if the buffer is empty*/
@@ -352,7 +364,7 @@ class SmallBuffer {
     }
 
   private:
-    std::array<std::byte, 64> buffer{std::byte{0}};
+    std::array<std::byte, 64> buffer{{std::byte{0}}};
     std::size_t bufferSize{0};
     std::size_t bufferCapacity{64};
     std::byte* heap;
@@ -372,7 +384,7 @@ inline bool operator!=(const SmallBuffer& sb1, const SmallBuffer& sb2)
     return (sb1.to_string() != sb2.to_string());
 }
 
-#if defined(__APPLE__) && defined(__clang__)
+#if defined(__clang__)
 #    pragma clang diagnostic pop
 #endif
 

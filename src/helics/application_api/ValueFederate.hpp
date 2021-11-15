@@ -292,6 +292,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     void addAlias(const Publication& pub, const std::string& shortcutName);
 
+    virtual void setFlagOption(int flag, bool flagValue = true) override;
+
     /** set the default value for a subscription
     @details this is the value returned prior to any publications
     @param inp the subscription identifier
@@ -329,6 +331,13 @@ class HELICS_CXX_EXPORT ValueFederate:
     @throw std::invalid_argument if id is invalid
     */
     data_view getBytes(const Input& inp);
+
+    /** force an input to get Data From the Core
+    @param inp an input object to get the data from
+    @return true if the value was registered as an update, which will be true in most cases
+    @throw std::invalid_argument if id is invalid
+    */
+    bool forceCoreUpdate(Input& inp);
 
     /** publish a value
     @param pub the publication identifier

@@ -50,4 +50,4 @@ Lastly, the JSON config file for the Transmission and Generation System federate
 
 ## Example
 
-A full co-simulation example showing how to implement a broker hierarchy [has been written up over here](../examples/advanced_examples/advanced_brokers_multibroker.md) (and the source code is in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/hierarchies)).
+A full co-simulation example showing how to implement a broker hierarchy [has been written up over here](../examples/advanced_examples/advanced_brokers_multibroker.md) (and the source code is in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/hierarchies)).

@@ -13,9 +13,9 @@ This demonstrates the use of federation queries and performs dynamic configurati
 
 ## Where is the code?
 
-This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -37,7 +37,7 @@ In most of the examples presented here, the configuration of the federation is d
 
   ```python
   sleep_time = 5
-  logger.debug(f'Sleeping for {sleep_time} seconds')
+  logger.debug(f"Sleeping for {sleep_time} seconds")
   time.sleep(sleep_time)
   ```
 
@@ -47,18 +47,17 @@ In most of the examples presented here, the configuration of the federation is d
   def eval_data_flow_graph(fed):
       query = h.helicsCreateQuery("broker", "data_flow_graph")
       graph = h.helicsQueryExecute(query, fed)
-  ...
   ```
 
 - The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
 
   ```python
-  for core in graph['cores']:
-      if core['federates'][0]['name'] == 'Charger':
-          for pub in core['federates'][0]['publications']:
-              key = pub['key']
+  for core in graph["cores"]:
+      if core["federates"][0]["name"] == "Charger":
+          for pub in core["federates"][0]["publications"]:
+              key = pub["key"]
               sub = h.helicsFederateRegisterSubscription(fed, key)
-              logger.debug(f'Added subscription {key}')
+              logger.debug(f"Added subscription {key}")
   ```
 
 - After making the subscription, the Battery federate re-evaulates the data flow graph and updates its own internal record of the configuration
@@ -70,13 +69,13 @@ In most of the examples presented here, the configuration of the federation is d
   graph, federates_lut, handle_lut = eval_data_flow_graph(fed)
   # logger.debug(pp.pformat(graph))
   sub_count = h.helicsFederateGetInputCount(fed)
-  logger.debug(f'Number of subscriptions: {sub_count}')
+  logger.debug(f"Number of subscriptions: {sub_count}")
   subid = {}
   sub_name = {}
   for i in range(0, sub_count):
       subid[i] = h.helicsFederateGetInputByIndex(fed, i)
       sub_name[i] = h.helicsSubscriptionGetKey(subid[i])
-      logger.debug(f'\tRegistered subscription---> {sub_name[i]}')
+      logger.debug(f"\tRegistered subscription---> {sub_name[i]}")
   ```
 
 ## Execution and Results

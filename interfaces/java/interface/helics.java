@@ -8,7 +8,7 @@
 
 package com.java.helics;
 
-public class helics {
+public class helics implements helicsConstants {
   public static int getHELICS_INVALID_OPTION_INDEX() {
     return helicsJNI.HELICS_INVALID_OPTION_INDEX_get();
   }
@@ -18,6 +18,10 @@ public class helics {
    */
   public static int getHELICS_INVALID_PROPERTY_VALUE() {
     return helicsJNI.HELICS_INVALID_PROPERTY_VALUE_get();
+  }
+
+  public static double getCHelicsBigNumber() {
+    return helicsJNI.cHelicsBigNumber_get();
   }
 
   /**
@@ -43,7 +47,7 @@ public class helics {
 
   /**
    *  definition of time signifying the federate has<br>
-   *                                                              terminated or to run until the end of the simulation
+   *                                                              terminated or run until the end of the simulation
    */
   public static double getHELICS_TIME_MAXTIME() {
     return helicsJNI.HELICS_TIME_MAXTIME_get();
@@ -888,6 +892,18 @@ public class helics {
    */
   public static int helicsGetOptionValue(String val) {
     return helicsJNI.helicsGetOptionValue(val);
+  }
+
+  /**
+   * Get the data type for use in /ref helicsFederateRegisterPublication, /ref helicsFederateRegisterInput,<br>
+   * /ref helicsFilterSetOption.<br>
+   * <br>
+   * @param val A string representing a data type.<br>
+   * <br>
+   * @return An int with the data type or HELICS_DATA_TYPE_UNKNOWN(-1) if not a valid value.
+   */
+  public static int helicsGetDataType(String val) {
+    return helicsJNI.helicsGetDataType(val);
   }
 
   /**
@@ -2351,6 +2367,19 @@ public class helics {
   }
 
   /**
+   * Publish a vector of complex doubles.<br>
+   * <br>
+   * @param pub The publication to publish for.<br>
+   * @param vectorInput A pointer to an array of complex double data (alternating real and imaginary values).<br>
+   * <br>
+   * @param vectorLength The number of values to publish; vectorInput must contain 2xvectorLength values.<br>
+   * ,out] err A pointer to an error object for catching errors.
+   */
+  public static void helicsPublicationPublishComplexVector(SWIGTYPE_p_void pub, double[] vectorInput, int vectorLength) {
+    helicsJNI.helicsPublicationPublishComplexVector(SWIGTYPE_p_void.getCPtr(pub), vectorInput, vectorLength);
+  }
+
+  /**
    * Publish a named point.<br>
    * <br>
    * @param pub The publication to publish for.<br>
@@ -2563,6 +2592,20 @@ public class helics {
   }
 
   /**
+   * Get a complex vector from an input.<br>
+   * <br>
+   * @param ipt The input to get the result for.<br>
+   * <br>
+   * data The location to store the data. The data will be stored in alternating real and imaginary values.<br>
+   * @param maxLength The maximum number of values data can hold.<br>
+   * actualSize Location to place the actual length of the resulting complex vector (will be 1/2 the number of values assigned).<br>
+   * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsInputGetComplexVector(SWIGTYPE_p_void ipt, SWIGTYPE_p_double data, int maxLength, int[] actualSize) {
+    helicsJNI.helicsInputGetComplexVector(SWIGTYPE_p_void.getCPtr(ipt), SWIGTYPE_p_double.getCPtr(data), maxLength, actualSize);
+  }
+
+  /**
    * Get a named point from a subscription.<br>
    * <br>
    * @param ipt The input to get the result for.<br>
@@ -2681,12 +2724,25 @@ public class helics {
    * <br>
    * @param ipt The input to set the default for.<br>
    * @param vectorInput A pointer to an array of double data.<br>
-   * @param vectorLength The number of points to publish.<br>
+   * @param vectorLength The number of doubles in the vector.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
    */
   public static void helicsInputSetDefaultVector(SWIGTYPE_p_void ipt, double[] vectorInput, int vectorLength) {
     helicsJNI.helicsInputSetDefaultVector(SWIGTYPE_p_void.getCPtr(ipt), vectorInput, vectorLength);
+  }
+
+  /**
+   * Set the default as a vector of complex doubles. The format is alternating real, imag doubles.<br>
+   * <br>
+   * @param ipt The input to set the default for.<br>
+   * @param vectorInput A pointer to an array of double data alternating between real and imaginary.<br>
+   * @param vectorLength the number of complex values in the publication (vectorInput must contain 2xvectorLength elements).<br>
+   * <br>
+   * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsInputSetDefaultComplexVector(SWIGTYPE_p_void ipt, double[] vectorInput, int vectorLength) {
+    helicsJNI.helicsInputSetDefaultComplexVector(SWIGTYPE_p_void.getCPtr(ipt), vectorInput, vectorLength);
   }
 
   /**
@@ -2723,6 +2779,17 @@ public class helics {
    */
   public static String helicsInputGetPublicationType(SWIGTYPE_p_void ipt) {
     return helicsJNI.helicsInputGetPublicationType(SWIGTYPE_p_void.getCPtr(ipt));
+  }
+
+  /**
+   * Get the type the publisher to an input is sending.<br>
+   * <br>
+   * @param ipt The input to query.<br>
+   * <br>
+   * @return An int containing the enumeration value of the publication type.
+   */
+  public static int helicsInputGetPublicationDataType(SWIGTYPE_p_void ipt) {
+    return helicsJNI.helicsInputGetPublicationDataType(SWIGTYPE_p_void.getCPtr(ipt));
   }
 
   /**

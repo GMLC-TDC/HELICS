@@ -2,7 +2,7 @@
 
 The Fundamental Examples teach three concepts to build on a default setup:
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -37,9 +37,9 @@ Where is the code?
 </strong>
 </a>
 
-The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental)
+[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental)
 
 <a name="what-is-this-co-simulation-doing">
 <strong>
@@ -75,8 +75,9 @@ def get_new_battery(numBattery):
 
     # Batteries have different sizes:
     # [25,62,100]
-    listOfBatts = np.random.choice([25,62,100],numBattery,p=[lvl1,lvl2,
-                                                       lvl3]).tolist()
+    listOfBatts = np.random.choice(
+        [25, 62, 100], numBattery, p=[lvl1, lvl2, lvl3]
+    ).tolist()
     return listOfBatts
 ```
 
@@ -88,15 +89,15 @@ def get_new_EV(numEVs):
     lvl1 = 0.05
     lvl2 = 0.6
     lvl3 = 0.35
-    listOfEVs = np.random.choice([1,2,3],numEVs,p=[lvl1,lvl2,lvl3]).tolist()
+    listOfEVs = np.random.choice([1, 2, 3], numEVs, p=[lvl1, lvl2, lvl3]).tolist()
     numLvl1 = listOfEVs.count(1)
     numLvl2 = listOfEVs.count(2)
     numLvl3 = listOfEVs.count(3)
 
-    return numLvl1,numLvl2,numLvl3,listOfEVs
+    return numLvl1, numLvl2, numLvl3, listOfEVs
 ```
 
-The probabilities assigned to each of these functions are placeholders -- a more advanced application can be found in the [Orchestration Tutorial](../../advanced_topics/orchestration_monte_carlo.md).
+The probabilities assigned to each of these functions are placeholders -- a more advanced application can be found in the [Orchestration Tutorial](../advanced_examples/advanced_orchestration.md).
 
 Now that we know these three quantities -- the number of EVs, the capacity of their batteries, and their charge rates, we can build a co-simulation from the two federates. The `Battery.py` federate will update the SOC of each EV after it receives the voltage from the `Charger.py` federate. The `Charger.py` federate will send a voltage signal to the EV until it tells the Charger it has reached its full capacity.
 
@@ -123,12 +124,11 @@ Register and Configure Federates
 The first task is to register and configure the federates with HELICS within each python program:
 
 ```python
-    ##########  Registering  federate and configuring from JSON################
-    fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
-    federate_name = h.helicsFederateGetName(fed)
-    logger.info(f'Created federate {federate_name}')
-    print(f'Created federate {federate_name}')
-
+##########  Registering  federate and configuring from JSON################
+fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
+federate_name = h.helicsFederateGetName(fed)
+logger.info(f"Created federate {federate_name}")
+print(f"Created federate {federate_name}")
 ```
 
 Since we are configuring with external JSON files, this is done in one line!
@@ -144,10 +144,9 @@ Enter Execution Mode
 The HELICS co-simulation starts by instructing each federate to enter execution mode.
 
 ```python
-    ##############  Entering Execution Mode  ##################################
-    h.helicsFederateEnterExecutingMode(fed)
-    logger.info('Entered HELICS execution mode')
-
+##############  Entering Execution Mode  ##################################
+h.helicsFederateEnterExecutingMode(fed)
+logger.info("Entered HELICS execution mode")
 ```
 
 <a name="define-time-variables">
@@ -161,13 +160,12 @@ Define Time Variables
 Time management is a vital component to HELICS co-simulations. Every HELICS co-simulation needs to be provided information about the start time (`grantedtime`), the end time (`total_interval`) and the time step (`update_interval`). Federates can step through time at different rates [LINK TO TIME MD], and it is allowable to have federates start and stop at different times, but this must be curated to meet the needs of the research question.
 
 ```python
-    hours = 24 * 7
-    total_interval = int(60 * 60 * hours)
-    update_interval = int(h.helicsFederateGetTimeProperty(
-                                fed,
-                                h.helics_property_time_period))
-    grantedtime = 0
-
+hours = 24 * 7
+total_interval = int(60 * 60 * hours)
+update_interval = int(
+    h.helicsFederateGetTimeProperty(fed, h.helics_property_time_period)
+)
+grantedtime = 0
 ```
 
 <a name="initiate-time-steps-for-the-time-loop">
@@ -183,42 +181,43 @@ Starting the co-simulation time sequence is also a function of the needs of the 
 In the `Battery.py` federate, Time is initiated by starting a `while` loop and requesting the first time stamp:
 
 ```python
-    while grantedtime < total_interval:
+while grantedtime < total_interval:
 
-        # Time request for the next physical interval to be simulated
-        requested_time = (grantedtime+update_interval)
-        logger.debug(f'Requesting time {requested_time}')
-        grantedtime = h.helicsFederateRequestTime (fed, requested_time)
-        logger.debug(f'Granted time {grantedtime}')
+    # Time request for the next physical interval to be simulated
+    requested_time = grantedtime + update_interval
+    logger.debug(f"Requesting time {requested_time}")
+    grantedtime = h.helicsFederateRequestTime(fed, requested_time)
+    logger.debug(f"Granted time {grantedtime}")
 ```
 
 In the `Charger.py` federate, we need to send the first signal **before** entering the time `while` loop. This is accomplished by requesting an initial time (outside the `while` loop), sending the signal, and then starting the time `while` loop:
 
 ```python
-    # Blocking call for a time request at simulation time 0
-    initial_time = 60
-    logger.debug(f'Requesting initial time {initial_time}')
-    grantedtime = h.helicsFederateRequestTime(fed, initial_time )
-    logger.debug(f'Granted time {grantedtime}')
+# Blocking call for a time request at simulation time 0
+initial_time = 60
+logger.debug(f"Requesting initial time {initial_time}")
+grantedtime = h.helicsFederateRequestTime(fed, initial_time)
+logger.debug(f"Granted time {grantedtime}")
 
 
-    # Apply initial charging voltage
-    for j in range(0, pub_count):
-        h.helicsPublicationPublishDouble(pubid[j], charging_voltage[j])
-        logger.debug(f'\tPublishing charging voltage of {charging_voltage[j]} '
-                     f' at time {grantedtime}')
+# Apply initial charging voltage
+for j in range(0, pub_count):
+    h.helicsPublicationPublishDouble(pubid[j], charging_voltage[j])
+    logger.debug(
+        f"\tPublishing charging voltage of {charging_voltage[j]} "
+        f" at time {grantedtime}"
+    )
 
 
-    ########## Main co-simulation loop ########################################
-    # As long as granted time is in the time range to be simulated...
-    while grantedtime < total_interval:
+########## Main co-simulation loop ########################################
+# As long as granted time is in the time range to be simulated...
+while grantedtime < total_interval:
 
-        # Time request for the next physical interval to be simulated
-        requested_time = (grantedtime + update_interval)
-        logger.debug(f'Requesting time {requested_time}')
-        grantedtime = h.helicsFederateRequestTime (fed, requested_time)
-        logger.debug(f'Granted time {grantedtime}')
-
+    # Time request for the next physical interval to be simulated
+    requested_time = grantedtime + update_interval
+    logger.debug(f"Requesting time {requested_time}")
+    grantedtime = h.helicsFederateRequestTime(fed, requested_time)
+    logger.debug(f"Granted time {grantedtime}")
 ```
 
 <a name="send-receive-communication-between-federates">
@@ -234,38 +233,40 @@ Once inside the time loop, information is requested and sent between federates a
 The `Battery.py` federate first asks for voltage information from the handles to which it subscribes:
 
 ```python
-            # Get the applied charging voltage from the EV
-            charging_voltage = h.helicsInputGetDouble((subid[0]))
-            logger.debug(f'\tReceived voltage {charging_voltage:.2f} from input'
-                         f' {h.helicsSubscriptionGetKey(subid[0])}')
+# Get the applied charging voltage from the EV
+charging_voltage = h.helicsInputGetDouble((subid[0]))
+logger.debug(
+    f"\tReceived voltage {charging_voltage:.2f} from input"
+    f" {h.helicsSubscriptionGetKey(subid[0])}"
+)
 ```
 
 And then (after doing some internal calculations) publishes the charging current of the battery at its publication handle:
 
 ```python
-            # Publish out charging current
-            h.helicsPublicationPublishDouble(pubid[j], charging_current)
-            logger.debug(f'\tPublished {pub_name[j]} with value '
-                         f'{charging_current:.2f}')
+# Publish out charging current
+h.helicsPublicationPublishDouble(pubid[j], charging_current)
+logger.debug(f"\tPublished {pub_name[j]} with value " f"{charging_current:.2f}")
 ```
 
 Meanwhile, the `Charger.py` federate asks for charging current from the handles to which it subscribes:
 
 ```python
-            charging_current[j] = h.helicsInputGetDouble((subid[j]))
-            logger.debug(f'\tCharging current: {charging_current[j]:.2f} from '
-                         f'input {h.helicsSubscriptionGetKey(subid[j])}')
-
+charging_current[j] = h.helicsInputGetDouble((subid[j]))
+logger.debug(
+    f"\tCharging current: {charging_current[j]:.2f} from "
+    f"input {h.helicsSubscriptionGetKey(subid[j])}"
+)
 ```
 
 And publishes the charging voltage at its publication handle:
 
 ```python
-            # Publish updated charging voltage
-            h.helicsPublicationPublishDouble(pubid[j], charging_voltage[j])
-            logger.debug(
-                f'\tPublishing charging voltage of {charging_voltage[j]} '
-                f' at time {grantedtime}')
+# Publish updated charging voltage
+h.helicsPublicationPublishDouble(pubid[j], charging_voltage[j])
+logger.debug(
+    f"\tPublishing charging voltage of {charging_voltage[j]} " f" at time {grantedtime}"
+)
 ```
 
 <a name="finalize-co-simulation">
@@ -282,5 +283,4 @@ After all the time steps have completed, it's good practice to finalize the co-s
 status = h.helicsFederateFinalize(fed)
 h.helicsFederateFree(fed)
 h.helicsCloseLibrary()
-
 ```

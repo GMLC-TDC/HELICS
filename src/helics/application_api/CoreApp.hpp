@@ -91,6 +91,8 @@ class HELICS_CXX_EXPORT CoreApp {
     void forceTerminate();
     /** wait for the core to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
+    /** link two endpoints together with source and destination*/
+    void linkEndpoints(const std::string& source, const std::string& target);
     /** link a publication and input*/
     void dataLink(const std::string& source, const std::string& target);
     /** add a source Filter to an endpoint*/
@@ -162,7 +164,7 @@ class HELICS_CXX_EXPORT CoreApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so core functions can be called if needed
      */
-    auto* operator-> () const { return core.operator->(); }
+    auto* operator->() const { return core.operator->(); }
 #else
     CoreApp* operator->() { return this; }
     const CoreApp* operator->() const { return this; }

@@ -30,7 +30,7 @@ The default priority of the inputs if they are published at the same time and on
 The priority of the inputs is only applicable if the default operation to retrieve a single value is used. The option
 `helics_handle_option_multi_input_handling_method` can be used to specify a reduction operation on all the inputs to process them in some fashion a number of operations are available.
 
-```eval_rst
+```{eval-rst}
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | method                                    | Description                                                                                                                                  |
 +===========================================+==============================================================================================================================================+
@@ -86,12 +86,15 @@ helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics
 **Python**
 
 ```python
-in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
-h.helicsInputAddTarget(in1,"pub1");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation);
-
+in1 = h.helicsFederateRegisterInput("", h.helics_data_type_double, "")
+h.helicsInputAddTarget(in1, "pub1")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputSetOption(
+    in1,
+    helics_handle_option_multi_input_handling_method,
+    helics_multi_input_average_operation,
+)
 ```
 
 The handling can also be configured in the configuration file for the federate
@@ -122,4 +125,4 @@ The priority of the inputs in most cases determined by the order of adding the p
 
 ## Example
 
-An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input).
+An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/multi_input).

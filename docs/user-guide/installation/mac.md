@@ -2,8 +2,8 @@
 
 ## Requirements
 
-- C++17 compiler.
-- CMake 3.10 or newer
+- C++17 compiler
+- CMake 3.10 or newer (if using clang with libc++, use 3.18+)
 - git
 - Boost 1.67 or newer
 - ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
@@ -128,7 +128,7 @@ git clone https://github.com/GMLC-TDC/HELICS
 cd HELICS
 mkdir build-osx
 cd build-osx
-cmake -DHELICS_BUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-master/ ..
+cmake -DHELICS_BUILD_MATLAB_INTERFACE=ON -DCMAKE_INSTALL_PREFIX=$HOME/local/helics-main/ ..
 make -j8
 make install
 ```

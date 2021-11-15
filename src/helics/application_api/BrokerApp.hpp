@@ -91,6 +91,8 @@ class HELICS_CXX_EXPORT BrokerApp {
     void forceTerminate();
     /** wait for the broker to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
+    /** link two endpoints source to destination*/
+    void linkEndpoints(const std::string& source, const std::string& target);
     /** link a publication and input*/
     void dataLink(const std::string& source, const std::string& target);
     /** add a source Filter to an endpoint*/
@@ -144,7 +146,7 @@ class HELICS_CXX_EXPORT BrokerApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
-    auto* operator-> () const { return broker.operator->(); }
+    auto* operator->() const { return broker.operator->(); }
 #else
     BrokerApp* operator->() { return this; }
     const BrokerApp* operator->() const { return this; }

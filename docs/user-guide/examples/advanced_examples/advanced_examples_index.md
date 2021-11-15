@@ -1,6 +1,6 @@
 # Advanced Examples
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
     :hidden:
@@ -38,11 +38,11 @@ Where is the code?
 </strong>
 </a>
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating to the examples, visit the HELICS gitter page or the user forum on github.
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 **TODO: UPDATE IMAGE**
 
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 <a name="what-is-this-co-simulation-doing">
 <strong>
@@ -120,10 +120,10 @@ The HELICS components introduced in the Fundamental Examples are extended in the
 2. <span style="color:red">Initialization</span>
 3. Enter Execution Mode
 4. Define Time Variables
-   4. <span style="color:red">Tell Controller federates to request `h.HELICS_TIME_MAXTIME`</span>
-5. Initiate Time Steps for the Time Loop
-6. Send and Receive Communication between Federates
-7. Finalize Co-simulation
+5. <span style="color:red">Tell Controller federates to request `h.HELICS_TIME_MAXTIME`</span>
+6. Initiate Time Steps for the Time Loop
+7. Send and Receive Communication between Federates
+8. Finalize Co-simulation
 
 <a name="federates-with-infinite-time">
 <strong>
@@ -142,15 +142,14 @@ Federates which are abstractions of reality (e.g., controllers) do not need regu
 **shouldn't we also show how this federate is configured? where is best for that?**
 
 ```python
-        hours = 24*7 # one week
-        total_interval = int(60 * 60 * hours)
-        grantedtime = 0
-        fake_max_time = int(h.HELICS_TIME_MAXTIME/1000)
-        starttime = fake_max_time
-        logger.debug(f'Requesting initial time {starttime}')
-        grantedtime = h.helicsFederateRequestTime (fed, starttime)
-        logger.debug(f'Granted time {grantedtime}')
-
+hours = 24 * 7  # one week
+total_interval = int(60 * 60 * hours)
+grantedtime = 0
+fake_max_time = int(h.HELICS_TIME_MAXTIME / 1000)
+starttime = fake_max_time
+logger.debug(f"Requesting initial time {starttime}")
+grantedtime = h.helicsFederateRequestTime(fed, starttime)
+logger.debug(f"Granted time {grantedtime}")
 ```
 
 <a name="initial-time-requests-and-model-initialization">

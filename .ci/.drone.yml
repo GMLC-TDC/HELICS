@@ -12,9 +12,10 @@ steps:
       - uname -a
 
   - name: submodules
-    image: docker:git
+    image: alpine:3.12
     commands:
       # for updating submodules to latest upstream, add --remote
+      - apk add --no-cache git
       - git submodule update --init --recursive
 
   - name: build
@@ -55,7 +56,7 @@ steps:
       - uname -a
 
   - name: submodules
-    image: docker:git
+    image: alpine/git
     commands:
       # for updating submodules to latest upstream, add --remote
       - git submodule update --init --recursive

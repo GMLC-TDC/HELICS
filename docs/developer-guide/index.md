@@ -1,6 +1,6 @@
 # Developer Guide
 
-```eval_rst
+```{eval-rst}
 .. toctree::
    :maxdepth: 1
 
@@ -14,4 +14,5 @@
    porting-2-to-3
    Public_API
    ROADMAP
+   typeConversions
 ```
