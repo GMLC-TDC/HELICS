@@ -45,7 +45,7 @@ All of the HELICS configurations are the same as in the Endpoint example. The in
 
 This simplification allows us to isolate a single source of uncertainty: the charge rate.  
 
-The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a *posterior distribution* of the instantaneous power draw over a desired period of time.
+The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a **posterior distribution* of the instantaneous power draw over a desired period of time.
 
 
 ## Probabilistic Uncertainty Estimation
@@ -54,7 +54,7 @@ A Monte Carlo simulation allows a researcher to sample random numbers repeatedly
 
 In a Monte Carlo co-simulation, a probability distribution of possible values can be used in the place of **any** static value in **any** of the simulators. For example, a co-simulation may include a simulator (federate) which measures the voltage across a distribution transformer. We can quantify measurement error by replacing the deterministic (static) value of the measurement with a random value from a uniform distribution. Probabilistic distributions are typically described with the following notation:
 
-*M ~ U(a,b)*
+* M ~ U(a,b) *
 
 Where *M* is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
 is distributed uniformly with bounds *a* and *b*."
@@ -69,37 +69,34 @@ The example co-simulation to demonstrate Monte Carlo distribution sampling is th
 
 #### Probability Distributions
 
-_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value λ and the number of samples *k*. Then we can write the distribution for the number of chargers in each level, *L*, as
+_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value *λ* and the number of samples *k*. Then we can write the distribution for the number of chargers in each level, *L*, as
 
-*L ~ P(k,λ)*
+* L ~ P(k,λ) *
 
 Let's extend our original assumption that the distribution of chargers is static to Poisson distributed, and let's assume that there are 100 total charging ports:
 
-*L1 ~ P(100,0.3)*
-
-*L2 ~ P(100,0.5)*
-
-*L3 ~ P(100,0.2)*
+* L1 ~ P(100,0.3) *
+* L2 ~ P(100,0.5) *
+* L3 ~ P(100,0.2) *
 
 ![](../../../img/EVPoisson.png)
 
 What if we weren't entirely certain that the average values for *L1, L2, L3* are *0.3, 0.5, 0.2*, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
 
-*λ ~ N(μ,σ)*
+* λ ~ N(μ,σ) *
 
 Which means that the input to *L* is distributed normally with average *μ* and standard deviation *σ*.
 
 Our final distribution for modeling the anticipated need for each level of charging port in our *k = 100* EV garage can be written as:
 
-*L ~ P(k,λ)*
-
-*λ ~ N(μ,σ)*
+* L ~ P(k,λ) *
+* λ ~ N(μ,σ)  *
 
 <center>
 
 |          | *L1*          |     *L2*      |                *L3* |
 | -------- | :------------ | :-----------: | ------------------: |
-|*μ*   | 0.3           |      0.5      |                 0.2 |
+| *μ*    | 0.3           |      0.5      |                 0.2 |
 | *σ* | ~ N(1,3) | ~ N(1,2) | ~ N(0.05,0.25) |
 
 </center>
@@ -120,7 +117,7 @@ We have described the individual distributions for each level of charging port. 
 
 We want to address the research question: What is the likely power draw that EVs will demand?
 
-At the beginning of the co-simulation, the distributions defined above will be sampled $N$ times within the EV federate, where $N =$ the number of parking spots/charging ports in the garage. The output of the initial sampling is the number of requested Level 1, 2, and 3 charging ports. The soc for the batteries on board are initialized to a uniform random number between 0.05 and 0.5, and these SOC are sent to the Charger federate. If the SOC of an EV battery is less than 0.9, the EV Controller federate tells the EV battery in the EV federate to continue charging. Otherwise, the EV Charger disconnects the EV battery, and instructs the it to sample a new EV battery from the distributions (one sample).
+At the beginning of the co-simulation, the distributions defined above will be sampled *N* times within the EV federate, where *N =* the number of parking spots/charging ports in the garage. The output of the initial sampling is the number of requested Level 1, 2, and 3 charging ports. The soc for the batteries on board are initialized to a uniform random number between 0.05 and 0.5, and these SOC are sent to the Charger federate. If the SOC of an EV battery is less than 0.9, the EV Controller federate tells the EV battery in the EV federate to continue charging. Otherwise, the EV Charger disconnects the EV battery, and instructs the it to sample a new EV battery from the distributions (one sample).
 
 After the two federates pass information between each other -- EV Battery sends SOC, EV Charger instructs whether to keep charging or resample the distributions -- the EV Battery calculates the total power demanded in the last time interval.
 
@@ -211,7 +208,7 @@ In this specification we will be using the
 [helics_cli](https://github.com/GMLC-TDC/helics-cli) to execute each
 co-simulation run since this is a Monte Carlo simulation. This means
 that `helics_cli` will be executed multiple times with different
-helics_cli runner files.
+`helics_cli` runner files.
 
 #### Co-simulation Reproduction
 
@@ -234,13 +231,13 @@ np.random.seed(args.seed)
 
 
 
-#### helics_cli in Merlin
+#### `helics_cli` in Merlin
 
 Since we are using the `helics_cli` to manage and execute all the
 federates, we need to create these runner files for `helics_cli`.
 There is a provided python script called `make_samples_merlin.py` that will
 generate the runner file and a csv file that will be used in the
-study step. `Helics_cli` will start each of these federates. In the Merlin
+study step. `helics_cli` will start each of these federates. In the Merlin
 spec, Merlin will be instructed to execute the `helics_cli` with all the
 generated `helics_cli` runner files.
 
@@ -268,11 +265,11 @@ merlin will have it's own subdirectory in `./UQ_EV_Study`.
 
 Remember this step is for Merlin to setup all the files and data it
 needs to execute it's jobs. In the Monte Carlo co-simulation there is
-a python script we created that will generated the helics_cli runner
-files that Merlin will use when it executes the helics_cli. The
+a python script we created that will generated the `helics_cli` runner
+files that Merlin will use when it executes the `helics_cli`. The
 `make_samples_merlin.py` script will also output a csv file that Merlin will
 use. The csv file contains all the names of the runner files. Merlin
-will go down this list of file names and execute the helics_cli for
+will go down this list of file names and execute the `helics_cli` for
 each file name.
 
 ```yaml
@@ -288,7 +285,7 @@ merlin:
 ```
 
 The samples the get generated should look something like below. This
-is the runner file that helics_cli will use to start the
+is the runner file that `helics_cli` will use to start the
 co-simulation.
 
 ```json
@@ -328,7 +325,7 @@ Once the samples have been created, we copy the 2 federates to the
 We have made it to the study step. This step will execute all 10 Monte
 Carlo co-simulations. There are 2 steps in the study step. The first
 step is the `start_parallel_sims` step. This step will use the
-helics_cli to execute each co-simulation. The second step, `cleanup`
+`helics_cli` to execute each co-simulation. The second step, `cleanup`
 depends on the first step. Once `start_parallel_sims` is complete the
 `cleanup` step will remove any temporary data that is no longer
 needed.
