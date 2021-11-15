@@ -54,7 +54,7 @@ A Monte Carlo simulation allows a researcher to sample random numbers repeatedly
 
 In a Monte Carlo co-simulation, a probability distribution of possible values can be used in the place of **any** static value in **any** of the simulators. For example, a co-simulation may include a simulator (federate) which measures the voltage across a distribution transformer. We can quantify measurement error by replacing the deterministic (static) value of the measurement with a random value from a uniform distribution. Probabilistic distributions are typically described with the following notation:
 
-* M ~ U(a,b) *
+*M ~ U(a,b)*
 
 Where *M* is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
 is distributed uniformly with bounds *a* and *b*."
@@ -76,7 +76,9 @@ _Likely_ is synonymous for _probability_. As we are interested in a probability,
 Let's extend our original assumption that the distribution of chargers is static to Poisson distributed, and let's assume that there are 100 total charging ports:
 
 *L1 ~ P(100,0.3)*
+
 *L2 ~ P(100,0.5)*
+
 *L3 ~ P(100,0.2)*
 
 ![](../../../img/EVPoisson.png)
@@ -90,6 +92,7 @@ Which means that the input to *L* is distributed normally with average *μ* and 
 Our final distribution for modeling the anticipated need for each level of charging port in our *k = 100* EV garage can be written as:
 
 *L ~ P(k,λ)*
+
 *λ ~ N(μ,σ)*
 
 <center>
