@@ -356,6 +356,20 @@ void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool
     if (info == nullptr) {
         return;
     }
+    switch (flag) {
+        case HELICS_FLAG_OBSERVER:
+            info->observer = (value != HELICS_FALSE);
+            break;
+        case HELICS_FLAG_DEBUGGING:
+            info->debugging = (value != HELICS_FALSE);
+            break;
+        case HELICS_FLAG_USE_JSON_SERIALIZATION:
+            info->useJsonSerialization = (value != HELICS_FALSE);
+            break;
+        default:
+            break;
+    }
+
     info->setFlagOption(flag, (value != HELICS_FALSE));
 }
 

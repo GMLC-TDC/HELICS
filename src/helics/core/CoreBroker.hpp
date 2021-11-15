@@ -338,6 +338,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void processQueryCommand(ActionMessage& cmd);
     /** answer a query or route the message the appropriate location*/
     void processQuery(ActionMessage& m);
+    /** process and init related command*/
+    void processInitCommand(ActionMessage& cmd);
     /** manage query timeouts*/
     void checkQueryTimeouts();
     /** answer a query or route the message the appropriate location*/

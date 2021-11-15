@@ -932,69 +932,10 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 routeMessage(command);
             }
             break;
-        case CMD_INIT: {
-            auto* brk = getBrokerById(static_cast<GlobalBrokerId>(command.source_id));
-
-            if (brk == nullptr) {
-                break;
-            }
-            brk->state = connection_state::init_requested;
-            if (brk->_observer && getBrokerState() >= BrokerState::operating) {
-                if (isRootc) {
-                    ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, command.source_id);
-                    setActionFlag(grant, observer_flag);
-                    transmit(brk->route, grant);
-                } else {
-                    transmit(parent_route_id, command);
-                }
-            } else {
-                if (allInitReady()) {
-                    if (isRootc) {
-                        LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
-                        LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
-                        executeInitializationOperations();
-                    } else {
-                        LOG_TIMING(global_broker_id_local,
-                                   getIdentifier(),
-                                   "entering initialization mode");
-                        checkDependencies();
-                        command.source_id = global_broker_id_local;
-                        transmit(parent_route_id, command);
-                    }
-                }
-            }
-
-        } break;
-        case CMD_INIT_NOT_READY: {
-            if (allInitReady()) {
-                transmit(parent_route_id, command);
-            }
-            auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
-            if (brk != nullptr) {
-                brk->state = connection_state::connected;
-            }
-        } break;
+        case CMD_INIT:
+        case CMD_INIT_NOT_READY:
         case CMD_INIT_GRANT:
-            if (!checkActionFlag(command, observer_flag)) {
-                if (brokerKey == universalKey) {
-                    LOG_SUMMARY(global_broker_id_local,
-                                getIdentifier(),
-                                " Broker started with universal key");
-                }
-                setBrokerState(BrokerState::operating);
-                for (const auto& brk : _brokers) {
-                    transmit(brk.route, command);
-                }
-                {
-                    timeCoord->enteringExecMode();
-                    auto res = timeCoord->checkExecEntry();
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
-                    }
-                }
-            } else {
-                routeMessage(std::move(command));
-            }
+            processInitCommand(command);
             break;
         case CMD_SEARCH_DEPENDENCY: {
             auto fed = _federates.find(std::string(command.name()));
@@ -1353,6 +1294,78 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (command.dest_id != global_broker_id_local) {
                 routeMessage(command);
             }
+    }
+}
+
+void CoreBroker::processInitCommand(ActionMessage& cmd)
+{
+    switch (cmd.action()) {
+        case CMD_INIT: {
+            auto* brk = getBrokerById(static_cast<GlobalBrokerId>(cmd.source_id));
+
+            if (brk == nullptr) {
+                break;
+            }
+            brk->state = connection_state::init_requested;
+            if (brk->_observer && getBrokerState() >= BrokerState::operating) {
+                if (isRootc) {
+                    ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, cmd.source_id);
+                    setActionFlag(grant, observer_flag);
+                    transmit(brk->route, grant);
+                } else {
+                    transmit(parent_route_id, cmd);
+                }
+            } else {
+                if (allInitReady()) {
+                    if (isRootc) {
+                        LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
+                        LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
+                        executeInitializationOperations();
+                    } else {
+                        LOG_TIMING(global_broker_id_local,
+                                   getIdentifier(),
+                                   "entering initialization mode");
+                        checkDependencies();
+                        cmd.source_id = global_broker_id_local;
+                        transmit(parent_route_id, cmd);
+                    }
+                }
+            }
+
+        } break;
+        case CMD_INIT_NOT_READY: {
+            if (allInitReady()) {
+                transmit(parent_route_id, cmd);
+            }
+            auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
+            if (brk != nullptr) {
+                brk->state = connection_state::connected;
+            }
+        } break;
+        case CMD_INIT_GRANT:
+            if (!checkActionFlag(cmd, observer_flag)) {
+                if (brokerKey == universalKey) {
+                    LOG_SUMMARY(global_broker_id_local,
+                                getIdentifier(),
+                                " Broker started with universal key");
+                }
+                setBrokerState(BrokerState::operating);
+                for (const auto& brk : _brokers) {
+                    transmit(brk.route, cmd);
+                }
+                {
+                    timeCoord->enteringExecMode();
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == MessageProcessingResult::NEXT_STEP) {
+                        enteredExecutionMode = true;
+                    }
+                }
+            } else {
+                routeMessage(std::move(cmd));
+            }
+            break;
+        default:
+            break;
     }
 }
 
