@@ -1,8 +1,9 @@
 <!-- identify two options for testing this example:
-1. manual 
+1. manual
 2. Merlin spec for Cosimulation
  -->
-# Monte Carlo Co-Simulations 
+
+# Monte Carlo Co-Simulations
 
 ```eval_rst
 .. toctree::
@@ -35,18 +36,15 @@ The necessary files are:
 - Python program for Charger federate
 - Python program to generate `helics_cli` JSON files and execute
 
-
-
 ## What is this co-simulation doing?
 
-This example walks through how to set up a probabilistic model with Monte Carlo simulations. This Monte Carlo co-simulation is built from a simple two federate example, based on the [Endpoint Federates Example](../fundamental_examples/fundamental_endpoints.md). In this example, there is a Charger federate which publishes voltage and a Battery federate which publishes current.  
+This example walks through how to set up a probabilistic model with Monte Carlo simulations. This Monte Carlo co-simulation is built from a simple two federate example, based on the [Endpoint Federates Example](../fundamental_examples/fundamental_endpoints.md). In this example, there is a Charger federate which publishes voltage and a Battery federate which publishes current.
 
-All of the HELICS configurations are the same as in the Endpoint example. The internal logic of the federates has been changed for this implementation. The Charger federate assumes the role of *deciding* if the Battery should continue to charge. The Battery sends a message of its current state of charge (soc, a number between 0 and 1). If the soc is less than 0.9, the Battery is instructed to continue charging, otherwise, it is instructed to cease charging. The Battery federate has all the logic internal for adding energy and selecting a new "battery" (charging rate) if the soc is deemed sufficient.  Energy is added to the "battery" according to the previous time interval and the charge rate of the battery. In this way, the only stochastic component to the system is the **selected charge rate**.  For example, the Endpoint Example allowed the Battery federate to randomly select batteries of different sizes, and the Charger to select charge rates from a list of options.  In this implementation, the battery size (capacity in kWh) is constant.
+All of the HELICS configurations are the same as in the Endpoint example. The internal logic of the federates has been changed for this implementation. The Charger federate assumes the role of _deciding_ if the Battery should continue to charge. The Battery sends a message of its current state of charge (soc, a number between 0 and 1). If the soc is less than 0.9, the Battery is instructed to continue charging, otherwise, it is instructed to cease charging. The Battery federate has all the logic internal for adding energy and selecting a new "battery" (charging rate) if the soc is deemed sufficient. Energy is added to the "battery" according to the previous time interval and the charge rate of the battery. In this way, the only stochastic component to the system is the **selected charge rate**. For example, the Endpoint Example allowed the Battery federate to randomly select batteries of different sizes, and the Charger to select charge rates from a list of options. In this implementation, the battery size (capacity in kWh) is constant.
 
-This simplification allows us to isolate a single source of uncertainty: the charge rate.  
+This simplification allows us to isolate a single source of uncertainty: the charge rate.
 
-The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage.  We want to ensure that we are not overly reliant on any one iteration of the co-simulation.  To manage this, we can run the co-simulation *N* times, or a Monte Carlo co-simulation. The result will be a **posterior distribution* of the instantaneous power draw over a desired period of time.
-
+The co-simulation relies on stochastic sampling of distributions -- an initial selection of vehicles for the EV charging garage. We want to ensure that we are not overly reliant on any one iteration of the co-simulation. To manage this, we can run the co-simulation _N_ times, or a Monte Carlo co-simulation. The result will be a \*_posterior distribution_ of the instantaneous power draw over a desired period of time.
 
 ## Probabilistic Uncertainty Estimation
 
@@ -54,10 +52,10 @@ A Monte Carlo simulation allows a researcher to sample random numbers repeatedly
 
 In a Monte Carlo co-simulation, a probability distribution of possible values can be used in the place of **any** static value in **any** of the simulators. For example, a co-simulation may include a simulator (federate) which measures the voltage across a distribution transformer. We can quantify measurement error by replacing the deterministic (static) value of the measurement with a random value from a uniform distribution. Probabilistic distributions are typically described with the following notation:
 
-*M ~ U(a,b)*
+_M ~ U(a,b)_
 
-Where $M$ is the measured voltage, *a* is the lower bound for possible values, and *b* is the upper bound for possible values. This is read as, "*M*
-is distributed uniformly with bounds *a* and *b*."
+Where $M$ is the measured voltage, _a_ is the lower bound for possible values, and _b_ is the upper bound for possible values. This is read as, "_M_
+is distributed uniformly with bounds _a_ and _b_."
 
 ![](../../../img/uniform_dist.png)
 
@@ -69,38 +67,38 @@ The example co-simulation to demonstrate Monte Carlo distribution sampling is th
 
 #### Probability Distributions
 
-_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value λ and the number of samples *k*. Then we can write the distribution for the number of chargers in each level, *L*, as
+_Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value λ and the number of samples _k_. Then we can write the distribution for the number of chargers in each level, _L_, as
 
-*L ~ P(k,λ)*
+_L ~ P(k,λ)_
 
 Let's extend our original assumption that the distribution of chargers is static to Poisson distributed, and let's assume that there are 100 total charging ports:
 
-*L1 ~ P(100,0.3)*
+_L1 ~ P(100,0.3)_
 
-*L2 ~ P(100,0.5)*
+_L2 ~ P(100,0.5)_
 
-*L3 ~ P(100,0.2)*
+_L3 ~ P(100,0.2)_
 
 ![](../../../img/EVPoisson.png)
 
-What if we weren't entirely certain that the average values for *L1, L2, L3* are *0.3, 0.5, 0.2*, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
+What if we weren't entirely certain that the average values for _L1, L2, L3_ are _0.3, 0.5, 0.2_, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
 
-*λ ~ N(μ,σ)*
+_λ ~ N(μ,σ)_
 
-Which means that the input to *L* is distributed normally with average *μ* and standard deviation *σ*.
+Which means that the input to _L_ is distributed normally with average _μ_ and standard deviation _σ_.
 
-Our final distribution for modeling the anticipated need for each level of charging port in our *k = 100* EV garage can be written as:
+Our final distribution for modeling the anticipated need for each level of charging port in our _k = 100_ EV garage can be written as:
 
-*L ~ P(k,λ)*
+_L ~ P(k,λ)_
 
-*λ ~ N(μ,σ)*
+_λ ~ N(μ,σ)_
 
 <center>
 
-|          | *L1*          |     *L2*      |                *L3* |
-| -------- | :------------ | :-----------: | ------------------: |
-|*μ*   | 0.3           |      0.5      |                 0.2 |
-| *σ* | ~ N(1,3) | ~ N(1,2) | ~ N(0.05,0.25) |
+|     | _L1_     |   _L2_   |           _L3_ |
+| --- | :------- | :------: | -------------: |
+| _μ_ | 0.3      |   0.5    |            0.2 |
+| _σ_ | ~ N(1,3) | ~ N(1,2) | ~ N(0.05,0.25) |
 
 </center>
 
@@ -124,7 +122,6 @@ At the beginning of the co-simulation, the distributions defined above will be s
 
 After the two federates pass information between each other -- EV Battery sends SOC, EV Charger instructs whether to keep charging or resample the distributions -- the EV Battery calculates the total power demanded in the last time interval.
 
-
 ## Execution and Results
 
 Execution can be done with either a simple script (provided on the repo), or with Merlin.
@@ -138,7 +135,7 @@ $ python advanced_orchestration.py
 
 ```
 
-This implementation will run a default co-simulation.  The default parameters are:
+This implementation will run a default co-simulation. The default parameters are:
 
 ```
     samples = 30
@@ -160,7 +157,7 @@ $ python advanced_orchestration.py 10 . 100 24*7 0 0
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSONs (meaning that `helics_cli` will not be called -- the user will need to execute the JSONs manually).
 
-You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files.  If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
+You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute the JSONs using the helper script, sub directories are created for the `helics_cli` runner JSONs and for the csv results. Results for the default simulation are on the repo and can be used for confirming accurate execution.
 
 ```
     out_json = output_path+'/cli_runner_scripts'
@@ -203,7 +200,7 @@ The final result of the default Monte Carlo co-simulation is shown below.
 
 ![](./MonteCarlo_Manual_small.png)
 
-This is a time series density plot.  Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW.  We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period.  This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW.  The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
+This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
 
 ### Merlin Orchestration Execution
 
@@ -220,19 +217,19 @@ Management of multiple iterations of the co-simulation can be done by setting th
 ```python
 import argparse
 
-parser = argparse.ArgumentParser(description='EV simulator')
-parser.add_argument('--seed', type=int, default=0,
-                help='The seed that will be used for our random distribution')
-parser.add_argument('--port', type=int, default=-1,
-                help='port of the HELICS broker')
+parser = argparse.ArgumentParser(description="EV simulator")
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=0,
+    help="The seed that will be used for our random distribution",
+)
+parser.add_argument("--port", type=int, default=-1, help="port of the HELICS broker")
 
 
 args = parser.parse_args()
 np.random.seed(args.seed)
 ```
-
-
-
 
 #### helics_cli in Merlin
 
