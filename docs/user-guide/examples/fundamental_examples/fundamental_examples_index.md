@@ -97,7 +97,7 @@ def get_new_EV(numEVs):
     return numLvl1, numLvl2, numLvl3, listOfEVs
 ```
 
-The probabilities assigned to each of these functions are placeholders -- a more advanced application can be found in the [Orchestration Tutorial](../../advanced_topics/orchestration_monte_carlo.md).
+The probabilities assigned to each of these functions are placeholders -- a more advanced application can be found in the [Orchestration Tutorial](../advanced_examples/advanced_orchestration.md).
 
 Now that we know these three quantities -- the number of EVs, the capacity of their batteries, and their charge rates, we can build a co-simulation from the two federates. The `Battery.py` federate will update the SOC of each EV after it receives the voltage from the `Charger.py` federate. The `Charger.py` federate will send a voltage signal to the EV until it tells the Charger it has reached its full capacity.
 
