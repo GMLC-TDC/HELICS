@@ -120,17 +120,17 @@ TEST_F(dynFed, observer_subscriber)
 
         EXPECT_NO_THROW(fobs->enterExecutingMode());
 
-        EXPECT_NEAR(static_cast<double>(fobs->getCurrentTime()), static_cast<double>(helics::Time(2.0)),0.000000002);
+        EXPECT_NEAR(static_cast<double>(fobs->getCurrentTime()),
+                    static_cast<double>(helics::Time(2.0)),
+                    0.000000002);
         fobs->disconnect();
     }
 
     cdyn->disconnect();
 
-    
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 /** now make sure we can get the values properly*/
 TEST_F(dynFed, observer_subscriber_value)
@@ -142,7 +142,7 @@ TEST_F(dynFed, observer_subscriber_value)
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
     auto& pub = vFed1->registerGlobalPublication<double>("pub1");
-    auto&sub = vFed2->registerSubscription("pub1");
+    auto& sub = vFed2->registerSubscription("pub1");
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();

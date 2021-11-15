@@ -49,4 +49,4 @@ The Advanced Topics will cover:
 - [**Program termination**](./program_termination.md) - Some additional features in HELICS related to program shutdown and co-simulation termination.
 - [**Profiling**](./profiling.md) - Some profiling capability for co-simulations.
 - [**Targeted Endpoints**](./targeted_endpoints.md) - details on the new targeted endpoints in HELICS 3.
-- [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation.  This is a dynamic federation.  There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.  
+- [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation. This is a dynamic federation. There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.
