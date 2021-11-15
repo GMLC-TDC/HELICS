@@ -71,26 +71,26 @@ The example co-simulation to demonstrate Monte Carlo distribution sampling is th
 
 _Likely_ is synonymous for _probability_. As we are interested in a probability, we cannot rely on a deterministic framework for modeling the power draw from EVs. I.e., we cannot assume that we know a priori the exact demand for Level 1, Level 2, and Level 3 chargers in the garage. A deterministic assumption would be equivalent to stating, e.g., that 30% of customers will need Level 1 charge ports, 50% will need Level 2, and 20% will need Level 3. What if, instead of static proportions, we assign a distribution to the need for each level of charge port. The number of each level port is discrete (there can't be 0.23 charge ports), and we want the number to be positive (no negative charge ports), so we will use the [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). The Poisson distribution is a function of the anticipated average of the value *λ* and the number of samples *k*. Then we can write the distribution for the number of chargers in each level, *L*, as
 
-* L ~ P(k,λ) *
+*L ~ P(k,λ)*
 
 Let's extend our original assumption that the distribution of chargers is static to Poisson distributed, and let's assume that there are 100 total charging ports:
 
-* L1 ~ P(100,0.3) *
-* L2 ~ P(100,0.5) *
-* L3 ~ P(100,0.2) *
+*L1 ~ P(100,0.3)*
+*L2 ~ P(100,0.5)*
+*L3 ~ P(100,0.2)*
 
 ![](../../../img/EVPoisson.png)
 
 What if we weren't entirely certain that the average values for *L1, L2, L3* are *0.3, 0.5, 0.2*, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
 
-* λ ~ N(μ,σ) *
+*λ ~ N(μ,σ)*
 
 Which means that the input to *L* is distributed normally with average *μ* and standard deviation *σ*.
 
 Our final distribution for modeling the anticipated need for each level of charging port in our *k = 100* EV garage can be written as:
 
-* L ~ P(k,λ) *
-* λ ~ N(μ,σ)  *
+*L ~ P(k,λ)*
+*λ ~ N(μ,σ)*
 
 <center>
 
