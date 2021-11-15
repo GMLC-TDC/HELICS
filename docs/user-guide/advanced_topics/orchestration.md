@@ -128,7 +128,7 @@ samples.csv is a name of one of the json files that is created.
 
 ```
 
-There is a [python script called `make_samples.py` located on the HELICS repository](https://github.com/GMLC-TDC/HELICS/tree/main/docs/user-guide/orchestration_samples/simple) that generates
+There is a [python script called `make_samples.py` located in the HELICS repository](https://github.com/GMLC-TDC/HELICS/tree/main/docs/user-guide/orchestration_samples/simple) that generates
 all helics-cli json configs that will be executed by helics-cli that
 will be used to execute the co-simulations. `N_SAMPLES` is an
 environment variable that is set to 8, so in this example 8
