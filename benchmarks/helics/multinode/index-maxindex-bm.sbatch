@@ -8,7 +8,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 if [ -n "$SLURM_JOB_ID" ]; then
-    sbatch_orig_file="$(scontrol show job "$SLURM_JOBID" | awk -F= '/Command=/{print $2}')"
+    sbatch_orig_file="$(scontrol show job "$SLURM_JOB_ID" | awk -F= '/Command=/{print $2}')"
     SCRIPT_DIR="$(cd "$(dirname "${sbatch_orig_file}")" >/dev/null 2>&1 && pwd)"
 fi
 echo "sbatch script location: $SCRIPT_DIR"

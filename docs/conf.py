@@ -110,8 +110,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "HELICS"
-copyright = "2017-2020 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
-author = "Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller"
+copyright = "2017-2021 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC. See the top-level NOTICE for additional details. All rights reserved. SPDX-License-Identifier: BSD-3-Clause. Documentation source in https://github.com/GMLC-TDC/HELICS"
+author = "Philip Top, Trevor Hardy, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -159,7 +159,7 @@ html_theme_options = {"navigation_depth": 4, "collapse_navigation": False}
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
 
-html_logo = "./img/HELICS_Logo.png"
+html_logo = "./logos/helics-logo-stacked-onWhite.png"
 html_favicon = html_logo
 
 # Custom sidebar templates, must be a dictionary that maps document names
@@ -212,7 +212,7 @@ latex_documents = [
         master_doc,
         "HELICS.tex",
         "HELICS Documentation",
-        "Philip Top, Jeff Daily, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Himanshu Jain, Bryan Palmintier, Jason Fuller",
+        "Philip Top, Trevor Hardy, Ryan Mast, Dheepak Krishnamurthy, Andrew Fisher, Bryan Palmintier, Jason Fuller",
         "manual",
     ),
 ]
@@ -243,5 +243,11 @@ texinfo_documents = [
 
 def setup(app):
     app.add_stylesheet("css/custom.css")  # may also be an URL
-    app.add_config_value("recommonmark_config", {"enable_eval_rst": True,}, True)
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            "enable_eval_rst": True,
+        },
+        True,
+    )
     app.add_transform(AutoStructify)

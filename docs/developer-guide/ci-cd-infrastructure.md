@@ -27,7 +27,7 @@ commit message to trigger additional builds for commits or in the branch name to
 a particular branch. At some point in the future, the community server may provide ways to trigger
 extra builds in other circumstances.
 
-Unless otherwise mentioned, jobs will typically generate Java and Python interfaces, run the CI/nightly
+Unless otherwise mentioned, jobs will typically generate the Java interface, run the CI/nightly
 test suite, and run some brief packaging tests.
 
 ### Linux
@@ -53,8 +53,8 @@ The MINGW/MSYS builds can be triggered by including `mingw`, `msys`, and/or `cyg
 branch name.
 
 - MSVC2017 32bit Build and test
-- MSVC2017 64bit Build and test with Java and Python
-- MSVC2019 64bit Build and test with Java and Python [commit]
+- MSVC2017 64bit Build and test with Java
+- MSVC2019 64bit Build and test with Java [commit]
 - MinGW [daily]
 - MSYS [daily]
 - Cygwin 32-bit [daily]

@@ -14,6 +14,13 @@ public class helics {
   }
 
   /**
+   *  result returned for requesting the value of an invalid/unknown property 
+   */
+  public static int getHELICS_INVALID_PROPERTY_VALUE() {
+    return helicsJNI.HELICS_INVALID_PROPERTY_VALUE_get();
+  }
+
+  /**
    *  definition of time zero-the beginning of simulation 
    */
   public static double getHELICS_TIME_ZERO() {
@@ -1471,7 +1478,6 @@ public class helics {
    * <br>
    * @param fed The federate to get the tag for.<br>
    * @param tagName The name of the tag to query.<br>
-   * <br>
    * <br>
    * ,out] err A pointer to an error object for catching errors.
    */

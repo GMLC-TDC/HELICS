@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
@@ -52,6 +53,34 @@ TEST(federate_tests, federate_initialize_tests)
     // EXPECT_EQ(fedName+"_core", coreName);
     Fed = nullptr;  // force the destructor
 }
+
+#ifdef HELICS_ENABLE_ZMQ_CORE
+TEST(federate_tests, federate_initialize_tests_json)
+{
+    helics::BrokerApp brk(helics::CoreType::ZMQ);
+
+    helics::FederateInfo fi(helics::CoreType::ZMQ);
+    fi.coreInitString = "--json";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto name = std::string(core->getFederateName(Fed->getID()));
+
+    EXPECT_EQ(name, Fed->getName());
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    Fed->enterInitializingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    Fed->enterExecutingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    Fed = nullptr;  // force the destructor
+    brk.waitForDisconnect();
+}
+
+#endif
 
 TEST(federate_tests, federate_initialize_tests_env)
 {

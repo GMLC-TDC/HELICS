@@ -28,7 +28,7 @@ def main():
 
     for l in doxyfile_template.splitlines():
         l = l.replace("@HELICS_VERSION@", helics_version)
-        l = l.replace("@CMAKE_CURRENT_SOURCE_DIR@", current_source_dir)
+        l = l.replace("@PROJECT_SOURCE_DIR@", current_source_dir)
         l = l.replace("@DOXYGEN_OUTPUT_DIR@", output_dir)
         doxyfile.append(l)
 

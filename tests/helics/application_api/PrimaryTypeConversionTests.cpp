@@ -28,7 +28,7 @@ bool checkTypeConversion1(const T1& val1, const T2& exp)
     return (v2 == exp);
 }
 
-TEST(type_conversion_tests, vectorNorm_tests)
+TEST(type_conversion, vectorNorm)
 {
     using c = std::complex<double>;
     using cv = std::vector<c>;
@@ -47,13 +47,13 @@ TEST(type_conversion_tests, vectorNorm_tests)
               std::sqrt(25.0 * 5.0));
 }
 
-TEST(type_conversion_tests, string_type_tests)
+TEST(type_conversion, string_type_tests)
 {
     EXPECT_TRUE(helicsType<std::string>() == DataType::HELICS_STRING);
     // EXPECT_TRUE(helicsType<char *>() == DataType::HELICS_STRING);
 }
 
-TEST(type_conversion_tests, string_converstion_tests)
+TEST(type_conversion, string_converstion)
 {
     std::string vstr("45.786");
     double val = 45.786;
@@ -72,7 +72,7 @@ TEST(type_conversion_tests, string_converstion_tests)
     EXPECT_TRUE(checkTypeConversion1(test1, NamedPoint{test1, std::nan("0")}));
 }
 
-TEST(type_conversion_tests, string_converstion_tests_negative)
+TEST(type_conversion, string_converstion_negative)
 {
     std::string vstr("-15.212");
     double val = -15.212;
@@ -91,7 +91,7 @@ TEST(type_conversion_tests, string_converstion_tests_negative)
     EXPECT_TRUE(checkTypeConversion1(test1, NamedPoint{test1, std::nan("0")}));
 }
 
-TEST(type_conversion_tests, double_type_tests)
+TEST(type_conversion, double_type)
 {
     EXPECT_TRUE(helicsType<double>() == DataType::HELICS_DOUBLE);
     EXPECT_TRUE(helicsType<float>() == DataType::HELICS_CUSTOM);
@@ -99,7 +99,7 @@ TEST(type_conversion_tests, double_type_tests)
     EXPECT_TRUE(isConvertableType<double>() == false);
 }
 
-TEST(type_conversion_tests, double_conversion_tests)
+TEST(type_conversion, double_conversion)
 {
     double val = 45.786;
     EXPECT_TRUE(checkTypeConversion1(val, val));
@@ -115,23 +115,7 @@ TEST(type_conversion_tests, double_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", val}));
 }
 
-TEST(type_conversion_tests, double_conversion_tests3)
-{
-    double val = -17.786;
-    EXPECT_TRUE(checkTypeConversion1(val, val));
-    EXPECT_TRUE(checkTypeConversion1(val, std::to_string(val)));
-    EXPECT_TRUE(checkTypeConversion1(val, static_cast<int64_t>(val)));
-    EXPECT_TRUE(checkTypeConversion1(val, static_cast<float>(val)));
-    EXPECT_TRUE(checkTypeConversion1(val, std::complex<double>(val, 0)));
-    EXPECT_TRUE(checkTypeConversion1(val, std::vector<double>{val}));
-    EXPECT_TRUE(
-        checkTypeConversion1(val,
-                             std::vector<std::complex<double>>{std::complex<double>(val, 0.0)}));
-    EXPECT_TRUE(checkTypeConversion1(val, true));
-    EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", val}));
-}
-
-TEST(type_conversion_tests, integer_type_tests)
+TEST(type_conversion, integer_type)
 {
     EXPECT_TRUE(helicsType<int64_t>() == DataType::HELICS_INT);
     EXPECT_TRUE(helicsType<int>() == DataType::HELICS_CUSTOM);
@@ -147,7 +131,7 @@ TEST(type_conversion_tests, integer_type_tests)
     EXPECT_TRUE(isConvertableType<unsigned char>() == true);
 }
 
-TEST(type_conversion_tests, namedType_tests)
+TEST(type_conversion, namedType)
 {
     EXPECT_TRUE(getTypeFromString("int") == DataType::HELICS_INT);
     EXPECT_TRUE(getTypeFromString("INT") == DataType::HELICS_INT);
@@ -165,13 +149,15 @@ TEST(type_conversion_tests, namedType_tests)
     EXPECT_TRUE(getTypeFromString("COMPLEX") == DataType::HELICS_COMPLEX);
     EXPECT_TRUE(getTypeFromString("map") == DataType::HELICS_CUSTOM);
     EXPECT_TRUE(getTypeFromString("any") == DataType::HELICS_ANY);
+    EXPECT_TRUE(getTypeFromString("json") == DataType::HELICS_JSON);
+    EXPECT_TRUE(getTypeFromString("JSON") == DataType::HELICS_JSON);
     EXPECT_TRUE(getTypeFromString("") == DataType::HELICS_ANY);
     EXPECT_TRUE(getTypeFromString(typeid(std::vector<std::complex<double>>).name()) ==
                 DataType::HELICS_COMPLEX_VECTOR);
     EXPECT_TRUE(getTypeFromString(typeid(Time).name()) == DataType::HELICS_TIME);
 }
 
-TEST(type_conversion_tests, integer_conversion_tests)
+TEST(type_conversion, integer_conversion)
 {
     int64_t val = -10;
     EXPECT_TRUE(checkTypeConversion1(val, val));
@@ -190,13 +176,13 @@ TEST(type_conversion_tests, integer_conversion_tests)
     EXPECT_TRUE(checkTypeConversion1(val, NamedPoint{"value", static_cast<double>(val)}));
 }
 
-TEST(type_conversion_tests, namedpoint_type_tests)
+TEST(type_conversion, namedpoint_type)
 {
     EXPECT_TRUE(helicsType<NamedPoint>() == DataType::HELICS_NAMED_POINT);
     // EXPECT_TRUE(helicsType<char *>() == DataType::HELICS_STRING);
 }
 
-TEST(type_conversion_tests, namedpoint_conversion_tests)
+TEST(type_conversion, namedpoint_conversion)
 {
     double val = 45.786;
     NamedPoint vp{"point", val};
@@ -236,7 +222,7 @@ TEST(type_conversion_tests, namedpoint_conversion_tests)
     EXPECT_NEAR(t1.value, t2.value, 0.00001);
 }
 
-TEST(type_conversion_tests, bool_conversion_tests)
+TEST(type_conversion, bool_conversion)
 {
     bool val{false};
     EXPECT_TRUE(checkTypeConversion1(std::string{"false"}, val));
