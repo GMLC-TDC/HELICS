@@ -188,8 +188,10 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     void publish(double val);
     void publish(const std::vector<std::string>& val);
     void publish(const std::vector<double>& val);
-    void publish(const std::vector<std::complex<double>>& val);
     void publish(const double* vals, int size);
+    void publish(const std::vector<std::complex<double>>& val);
+    /** interpret as a vector of alternating real and imag values*/
+    void publishComplex(const double* vals, int size);
     void publish(std::complex<double> val);
 
     void publish(bool val);

@@ -172,10 +172,10 @@ else()
     set(zmq_target_output "libzmq")
 endif()
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         target_compile_options(
                 ${zmq_target_output}
-                INTERFACE  $<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>
+                PRIVATE  $<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>
             )
 endif()
 
