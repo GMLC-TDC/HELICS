@@ -247,6 +247,8 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
 static const std::map<std::string, int> option_value_map{
     {"0", 0},
     {"1", 1},
+    {"-", 0},
+    {"+", 1},
     {"false", 0},
     {"true", 1},
     {"on", 1},
@@ -568,6 +570,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--outputdelay",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
+           "--grant_timeout",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, val); },
+           "timeout to trigger diagnostic action when a federate time grant is not available with a the timeout (default in ms)")
         ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",

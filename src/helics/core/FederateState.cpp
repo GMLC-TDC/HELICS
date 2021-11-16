@@ -487,6 +487,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
         }
 
         auto ret = processQueue();
+        ++mGrantCount;
         if (ret == MessageProcessingResult::NEXT_STEP) {
             time_granted = timeCoord->getGrantedTime();
             allowed_send_time = timeCoord->allowedSendTime();
@@ -523,6 +524,11 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
                     [this](ActionMessage&& mess) { return this->addAction(std::move(mess)); });
             }
             start_clock_time = std::chrono::steady_clock::now();
+        } else if (grantTimeOutPeriod>timeZero) {
+            if (!mTimer) {
+                mTimer = std::make_shared<MessageTimer>(
+                    [this](ActionMessage&& mess) { return this->addAction(std::move(mess)); });
+            }
         }
 #endif
         return static_cast<IterationResult>(ret);
@@ -612,9 +618,21 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
                 tforce.actionTime = nextTime;
                 addAction(tforce);
             }
+        } else if (grantTimeOutPeriod>timeZero) {
+            ActionMessage grantCheck(CMD_GRANT_TIMEOUT_CHECK);
+            grantCheck.setExtraData(static_cast<std::int32_t>(mGrantCount));
+            if (grantTimeoutTimeIndex < 0) {
+                grantTimeoutTimeIndex =
+                    mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(), std::move(grantCheck));
+            } else {
+                mTimer->updateTimerFromNow(realTimeTimerIndex,
+                                           grantTimeOutPeriod.to_ms(),
+                                           std::move(grantCheck));
+            }
         }
 #endif
         auto ret = processQueue();
+        ++mGrantCount;
         if (ret == MessageProcessingResult::HALTED) {
             time_granted = Time::maxVal();
             allowed_send_time = Time::maxVal();
@@ -1425,6 +1443,17 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             break;
         case defs::Properties::GRANT_TIMEOUT:
             grantTimeOutPeriod = propertyVal;
+#ifndef HELICS_DISABLE_ASIO
+            if (getState()>=HELICS_INITIALIZING && grantTimeOutPeriod > timeZero) {
+                if (!mTimer) {
+                    if (!mTimer) {
+                        mTimer = std::make_shared<MessageTimer>([this](ActionMessage&& mess) {
+                            return this->addAction(std::move(mess));
+                        });
+                    }
+                }
+            }
+#endif
             break;
         default:
             timeCoord->setProperty(timeProperty, propertyVal);
@@ -1560,6 +1589,8 @@ Time FederateState::getTimeProperty(int timeProperty) const
             return rt_lag;
         case defs::Properties::RT_LEAD:
             return rt_lead;
+        case defs::Properties::GRANT_TIMEOUT:
+            return grantTimeOutPeriod;
         default:
             return timeCoord->getTimeProperty(timeProperty);
     }
@@ -1798,6 +1829,8 @@ void FederateState::sendCommand(ActionMessage& command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
+    } else if (cmd == "timeout_monitor") {
+        setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);
     } else if (cmd.compare(0, 4, "log ") == 0) {
         logMessage(HELICS_LOG_LEVEL_SUMMARY,
                    command.getString(sourceStringLoc),

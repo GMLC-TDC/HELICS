@@ -263,6 +263,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         queryTimeout,
         "time to wait for a query to be answered default unit is in  ms default 15s(can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--granttimeout",
+        grantTimeout,
+        "time to wait for a timeRequest to be granted before triggering diagnostic actions default is in ms (can also be entered as a time "
+        "like '10s' or '45ms')");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,

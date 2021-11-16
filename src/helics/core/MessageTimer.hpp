@@ -33,6 +33,8 @@ class MessageTimer: public std::enable_shared_from_this<MessageTimer> {
     void cancelAll();
     /** update the message time of a timer and its message*/
     void updateTimer(int32_t timerIndex, time_type expirationTime, ActionMessage mess);
+    /** update the message time of a timer and its message*/
+    void updateTimerFromNow(int32_t timerIndex, std::chrono::nanoseconds time, ActionMessage mess);
     /** update the message time of a timer keeping its message the same
     if the message has been sent already the message stored is invalid
     @return true if the update was successful and false if not*/

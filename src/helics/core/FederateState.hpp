@@ -110,22 +110,18 @@ class FederateState {
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
     int logLevel{HELICS_LOG_LEVEL_WARNING};  //!< the level of logging used in the federate
-
+    /** counter for the number of times time or execution mode has been granted */
+    std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */
-    std::shared_ptr<MessageTimer>
-        mTimer;
+    std::shared_ptr<MessageTimer> mTimer;
     /** processing queue for messages incoming to a federate */
-    gmlc::containers::BlockingQueue<ActionMessage>
-        queue;
+    gmlc::containers::BlockingQueue<ActionMessage> queue;
     /** processing queue for messages incoming to a federate */
-    gmlc::containers::BlockingQueue<std::pair<std::string, std::string>>
-        commandQueue;
+    gmlc::containers::BlockingQueue<std::pair<std::string, std::string>> commandQueue;
     /** current defaults for operational flags of interfaces for this federate */
-    std::atomic<uint16_t> interfaceFlags{
-        0};
+    std::atomic<uint16_t> interfaceFlags{0};
     /** queue for delaying processing of messages for a time */
-    std::map<GlobalFederateId, std::deque<ActionMessage>>
-        delayQueues;  
+    std::map<GlobalFederateId, std::deque<ActionMessage>> delayQueues;
     std::vector<InterfaceHandle> events;  //!< list of value events to process
     std::vector<InterfaceHandle> eventMessages;  //!< list of endpoints with messages to process
     std::vector<GlobalFederateId> delayedFederates;  //!< list of federates to delay messages from
@@ -134,11 +130,9 @@ class FederateState {
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 
     /** a logging function for logging or printing messages*/
-    std::function<void(int, std::string_view, std::string_view)>
-        loggerFunction;
+    std::function<void(int, std::string_view, std::string_view)> loggerFunction;
     /** a callback for additional queries */
-    std::function<std::string(std::string_view)>
-        queryCallback;  
+    std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     /** find the next Value Event*/
