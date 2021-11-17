@@ -104,7 +104,7 @@ void MessageTimer::updateTimerFromNow(int32_t timerIndex,
     updateTimer(timerIndex, std::chrono::steady_clock::now() + time, std::move(mess));
 }
 
-    bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds time)
+bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds time)
 {
     std::lock_guard<std::mutex> lock(timerLock);
     if ((timerIndex >= 0) && (timerIndex < static_cast<int32_t>(timers.size()))) {

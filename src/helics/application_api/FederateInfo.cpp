@@ -85,7 +85,7 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"timeoutputdelay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
     {"time_input_delay", HELICS_PROPERTY_TIME_INPUT_DELAY},
     {"time_output_delay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
-    {"granttimeout",HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
+    {"granttimeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
     {"grant_timeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
     {"loglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},

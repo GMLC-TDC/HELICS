@@ -58,7 +58,7 @@ class BrokerBase {
     Time queryTimeout{15.0};  //!< timeout for queries, if the query isn't answered within this time
                               //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
-    Time grantTimeout{-1.0}; //!< timeout for triggering diagnostic action waiting for a time grant
+    Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
                             //!< key is required

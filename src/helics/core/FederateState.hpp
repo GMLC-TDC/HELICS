@@ -89,17 +89,15 @@ class FederateState {
     CommonCore* parent_{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
     /** time the initialization mode started for real time capture */
-    decltype(std::chrono::steady_clock::now())
-        start_clock_time;  
+    decltype(std::chrono::steady_clock::now()) start_clock_time;
     Time rt_lag{timeZero};  //!< max lag for the rt control
     Time rt_lead{timeZero};  //!< min lag for the realtime control
-    Time grantTimeOutPeriod{timeZero}; //!< period to raise an inquiry about lack of grant
+    Time grantTimeOutPeriod{timeZero};  //!< period to raise an inquiry about lack of grant
     std::int32_t realTimeTimerIndex{-1};  //!< the timer index for the real time timer;
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
     /** atomic flag indicating this federate has requested entry to initialization */
-    std::atomic<bool> init_requested{
-        false};  
+    std::atomic<bool> init_requested{false};
     // temporary
     std::atomic<bool> requestingMode{false};
 
