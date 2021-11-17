@@ -533,8 +533,9 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
 #endif
         return static_cast<IterationResult>(ret);
     }
-    // the following code is for situation which this has been called multiple times, which really
-    // shouldn't be done but it isn't really an error so we need to deal with it.
+    // the following code is for a situation in which this method has been called multiple times
+    // from different threads, which really shouldn't be done but it isn't really an error so we
+    // need to deal with it.
     std::lock_guard<FederateState> plock(*this);
     IterationResult ret;
     switch (getState()) {
@@ -621,6 +622,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         } else if (grantTimeOutPeriod>timeZero) {
             ActionMessage grantCheck(CMD_GRANT_TIMEOUT_CHECK);
             grantCheck.setExtraData(static_cast<std::int32_t>(mGrantCount));
+            grantCheck.counter = 0;
             if (grantTimeoutTimeIndex < 0) {
                 grantTimeoutTimeIndex =
                     mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(), std::move(grantCheck));
@@ -680,20 +682,22 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
                     }
                 }
             }
+        } else if (grantTimeOutPeriod > timeZero) {
+            mTimer->cancelTimer(grantTimeoutTimeIndex);
         }
 #endif
 
-        unlock();
-        if (retTime.grantedTime > nextTime && nextTime > lastTime &&
-            retTime.grantedTime < Time::maxVal()) {
-            if (!ignore_time_mismatch_warnings) {
-                LOG_WARNING(fmt::format(
-                    "Time mismatch detected: granted time greater than requested time {} vs {}",
-                    static_cast<double>(retTime.grantedTime),
-                    static_cast<double>(nextTime)));
-            }
+    unlock();
+    if (retTime.grantedTime > nextTime && nextTime > lastTime &&
+        retTime.grantedTime < Time::maxVal()) {
+        if (!ignore_time_mismatch_warnings) {
+            LOG_WARNING(fmt::format(
+                "Time mismatch detected: granted time greater than requested time {} vs {}",
+                static_cast<double>(retTime.grantedTime),
+                static_cast<double>(nextTime)));
         }
-        return retTime;
+    }
+    return retTime;
     }
     // this would not be good practice to get into this part of the function
     // but the area must protect itself against the possibility and should return something sensible
@@ -1205,6 +1209,31 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             }
             LOG_WARNING(cmd.payload.to_string());
             break;
+        case CMD_GRANT_TIMEOUT_CHECK:
+            if (timeGranted_mode)
+            {
+                break;
+            }
+            if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
+                //time has been granted since this was triggered
+                break;
+            }
+            if (cmd.counter==0) {
+                LOG_WARNING(
+                    fmt::format("grant timeout exceeded triggering diagnostic action sim time {}",
+                                time_granted));
+            } else if (cmd.counter==3) {
+
+            } else if (cmd.counter==10) {
+
+            }
+            if (mTimer) {
+                ++cmd.counter;
+                mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
+                                           grantTimeOutPeriod.to_ms(),
+                                           std::move(cmd));
+            }
+            break;
         case CMD_ADD_PUBLISHER: {
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
@@ -1441,19 +1470,35 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             rt_lag = propertyVal;
             rt_lead = propertyVal;
             break;
-        case defs::Properties::GRANT_TIMEOUT:
+        case defs::Properties::GRANT_TIMEOUT: {
+            auto prevTimeout = grantTimeOutPeriod;
             grantTimeOutPeriod = propertyVal;
 #ifndef HELICS_DISABLE_ASIO
-            if (getState()>=HELICS_INITIALIZING && grantTimeOutPeriod > timeZero) {
-                if (!mTimer) {
+            if (prevTimeout==timeZero ) {
+                if (getState() >= HELICS_INITIALIZING && grantTimeOutPeriod > timeZero) {
                     if (!mTimer) {
-                        mTimer = std::make_shared<MessageTimer>([this](ActionMessage&& mess) {
-                            return this->addAction(std::move(mess));
-                        });
+                        if (!mTimer) {
+                            mTimer = std::make_shared<MessageTimer>([this](ActionMessage&& mess) {
+                                return this->addAction(std::move(mess));
+                            });
+                        }
                     }
                 }
-            }
+                //if we are currently waiting for a grant trigger the timer
+                if (getState()==HELICS_EXECUTING && !timeGranted_mode) {
+                    ActionMessage grantCheck(CMD_GRANT_TIMEOUT_CHECK);
+                    grantCheck.setExtraData(static_cast<std::int32_t>(mGrantCount));
+                    grantCheck.counter = 0;
+                    if (grantTimeoutTimeIndex < 0) {
+                        grantTimeoutTimeIndex = mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(),
+                                                                        std::move(grantCheck));
+                    }
+                }
+             } else if (grantTimeOutPeriod <= timeZero && grantTimeoutTimeIndex >= 0) {
+                mTimer->cancelTimer(grantTimeoutTimeIndex);
+             }
 #endif
+        }
             break;
         default:
             timeCoord->setProperty(timeProperty, propertyVal);

@@ -52,12 +52,12 @@ class MessageTimer: public std::enable_shared_from_this<MessageTimer> {
     std::mutex timerLock;  //!< lock protecting the timer buffers
     std::vector<ActionMessage> buffers;
     std::vector<time_type> expirationTimes;
-    const std::function<void(ActionMessage&&)>
-        sendFunction;  //!< the callback to use when sending a message
+    /** the callback to use when sending a message */
+    const std::function<void(ActionMessage&&)> sendFunction;
     std::vector<std::shared_ptr<asio::steady_timer>> timers;
-    std::shared_ptr<AsioContextManager>
-        contextPtr;  //!< context manager to for handling real time operations
-    decltype(contextPtr->startContextLoop())
-        loopHandle;  //!< loop controller for async real time operations
+    /** context manager to for handling real time operations */
+    std::shared_ptr<AsioContextManager> contextPtr;
+    /** loop controller for async real time operations */
+    decltype(contextPtr->startContextLoop()) loopHandle;
 };
 }  // namespace helics
