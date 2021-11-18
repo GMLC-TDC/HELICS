@@ -2493,16 +2493,6 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
         return "#wait";
     }
-    /* if (queryStr == "global_time") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
-            val["granted_time"] = static_cast<double>(fed->grantedTime());
-            val["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
-        });
-
-        return fileops::generateJsonString(base);
-    }
-    */
     if (queryStr == "dependencies") {
         Json::Value base;
         loadBasicJsonInfo(base, nullptr);

@@ -47,7 +47,7 @@ TEST_F(dynFed, simple_observer)
 
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.observer = true;
-
+    // now we try to join the federation with an observer
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
                                             "coredyn",
@@ -70,7 +70,7 @@ TEST_F(dynFed, simple_observer)
 
     cdyn->disconnect();
 
-    // now we try to join the federation with an observer
+    
     vFed1->finalize();
     vFed2->finalize();
 }
@@ -119,7 +119,7 @@ TEST_F(dynFed, observer_subscriber)
         EXPECT_NO_THROW(fobs->enterInitializingMode());
 
         EXPECT_NO_THROW(fobs->enterExecutingMode());
-
+        // should be a 1 time delta(1 ns) before 2.0
         EXPECT_NEAR(static_cast<double>(fobs->getCurrentTime()),
                     static_cast<double>(helics::Time(2.0)),
                     0.000000002);
