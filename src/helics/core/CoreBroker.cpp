@@ -1347,7 +1347,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                 if (brokerKey == universalKey) {
                     LOG_SUMMARY(global_broker_id_local,
                                 getIdentifier(),
-                                " Broker started with universal key");
+                                "Broker started with universal key");
                 }
                 setBrokerState(BrokerState::operating);
                 for (const auto& brk : _brokers) {
