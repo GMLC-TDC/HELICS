@@ -754,7 +754,7 @@ Time Federate::requestTimeComplete()
         return newTime;
     }
     throw(InvalidFunctionCall(
-        "cannot call finalize requestTime without first calling requestTimeIterative function"));
+        "cannot call requestTimeComplete without first calling requestTimeAsync function"));
 }
 
 /** finalize the time advancement request
