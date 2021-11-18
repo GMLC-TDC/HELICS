@@ -70,7 +70,6 @@ TEST_F(dynFed, simple_observer)
 
     cdyn->disconnect();
 
-    
     vFed1->finalize();
     vFed2->finalize();
 }
