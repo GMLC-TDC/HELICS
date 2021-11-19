@@ -61,7 +61,7 @@ TEST_P(BrokerServerTests, startup_tests)
     if (!crdisconnect) {
         crdisconnect = cr->waitForDisconnect(std::chrono::milliseconds(1000));
     }
-    if (!cr2) {
+    if (!cr2disconnect) {
         cr2disconnect = cr2->waitForDisconnect(std::chrono::milliseconds(1000));
     }
     EXPECT_TRUE(crdisconnect);
