@@ -173,6 +173,7 @@ else()
 endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        message(STATUS "clang compiling for ZMQ")
         target_compile_options(
                 ${zmq_target_output}
                 PRIVATE  $<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>

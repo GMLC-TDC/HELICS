@@ -94,7 +94,7 @@ namespace udp {
 
         asio::ip::udp::socket mSocket;
         asio::ip::udp::endpoint mRemoteEndpoint;
-        std::array<char, 1024> mRecvBuffer{0};
+        std::array<char, 1024> mRecvBuffer{{0}};
         std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> mDataCall;
     };
 }  // namespace udp

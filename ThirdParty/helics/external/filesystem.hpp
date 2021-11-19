@@ -2211,7 +2211,7 @@ template <typename INFO>
 GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::error_code& ec, uintmax_t* sz = nullptr, time_t* lwt = nullptr)
 {
     file_type ft = file_type::unknown;
-    if (sizeof(INFO) == sizeof(WIN32_FIND_DATAW)) {
+    if constexpr (sizeof(INFO) == sizeof(WIN32_FIND_DATAW)) {
         if (detail::reparse_tag_from_INFO(info) == IO_REPARSE_TAG_SYMLINK) {
             ft = file_type::symlink;
         }
