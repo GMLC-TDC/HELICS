@@ -130,9 +130,7 @@ endif()
 
 add_library(helics_network STATIC ${NETWORK_SRC_FILES} ${NETWORK_INCLUDE_FILES})
 
-target_link_libraries(
-    helics_network PUBLIC HELICS::core PRIVATE fmt::fmt compile_flags_target
-)
+target_link_libraries(helics_network PUBLIC HELICS::core PRIVATE fmt::fmt compile_flags_target)
 
 if(HELICS_ENABLE_ZMQ_CORE)
     target_link_libraries(helics_network PRIVATE helics::zmq)
