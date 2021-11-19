@@ -2,7 +2,7 @@
 
 The two fundamental roles of a co-simulation platform are to provide a means of data exchange between members of the co-simulation (federates) and a means of keeping the federation synchronized in simulated time.
 
-In HELICS, time synchronization across the federates is managed by each federate requesting a time (via a HELICS API call). When granted a time, the federate will:
+In HELICS, time synchronization across the federates is managed by each federate requesting a time (via a HELICS API call). When granted a time, the federate generally does the following:
 
 1. Checks all its inputs and grab any new signals (values or messages) that have been sent to it,
 2. Execute its native simulation code and update its state to the current simulated time (_e.g._ solving equations governing the behavior of a physical model, calculating a control action, processing and logging data, etc),
@@ -53,25 +53,25 @@ Below is an example of how the most common of these are implemented in a federat
 }
 ```
 
-`period`, `offset`, and `time_delta` are all related in units of seconds.
+`period`, `offset`, and `time_delta` are all related and defined with units of seconds.
 
-- `period`: Defines the resolution of the federate and is often tied to the underlying simulation tool. Period forces time grants to intervals.
-- `offset`: Requires all time grants to be offset in time by the amount indicated.
+- `period`: Defines the resolution of the federate and is often tied to the underlying simulation tool. Period forces time grants to specific intervals.
+- `offset`: Requires all time grants to be offset in time from the intervals defined by `period` by the amount indicated.
 - `time_delta`: Forces the granted time to a minimum interval from the last granted time.
 
 The granted time will be of value `n*period + offset` and it must be later than the last grant by time `time_delta`.
 
-The other two options are flags which may be invoked:
+The other two options are common flags which may be invoked:
 
-- `uninterruptible`: Forces the granted time to be the requested time. Generally HELICS will grant a federate a time when it receives new values on any of its inputs under the assumption that it is inherently interested in responding to new information that the federate has explicitly subscribed to. If that is not the case, setting this flag will reduce nuisance grants and move the federate forward in a predictable manner.
-- `wait_for_current_time_update`: Force the federate with this flag set to be the last one granted a given time and thereby ensures that all other federates have produced outputs for that time. By being last, a federate will have updated outputs from all other federates and have the most comprehensive understanding of the system state at that time.
+- `uninterruptible`: Forces the granted time to be the requested time. Generally HELICS will grant a federate a time when it receives new values on any of its inputs under the assumption that the federate is inherently interested in responding to new information to which it has subscribed. If that is not the case, setting this flag will reduce nuisance grants and move the federate forward in a predictable manner.
+- `wait_for_current_time_update`: Force the federate with this flag set to be the last one granted a given time and thereby ensures that all other federates have produced outputs for that time. By being last, the federate in question will have updated outputs from all other federates and have the most comprehensive understanding of the system state at that simulated time.
 
 ## Example: Timing in a Small Federation
 
 For the purposes of illustration, let's suppose that a co-simulation federation with the following timing parameters has been assembled:
 
 - **Logger** - This federate is a results logger and simply writes out to files the current values of various publications made by the other federates in the co-simulation. This logging simulator will record values every 1 ms and as such, the JSON config sets `period` to this value and sets the `uninterruptible` flag.
-- **Generator** - This is a generator simulator that specializes in comprehensive modeling of the machine dynamics. The Generator will have an endpoint used to receive commands from the Generator Controller subscriptions to the Power System to provide the inputs necessary to replicate the physics of its system.
+- **Generator** - This is a generator simulator that specializes in comprehensive modeling of the machine dynamics. The Generator will have an endpoint used to receive commands from the Generator Controller and subscriptions to outputs from the Power System that provide inputs necessary to calculate its internal dynamics.
 
   The models of the generator are valid at a time-step of 0.1 ms and thus the simulator integrator requires that the `period` of the HELICS interface be set to some multiple of 0.1. In this case we'll use 1 ms and to ease integration with the Power System federate, it will also have an `offset` of 0.5 ms.
 

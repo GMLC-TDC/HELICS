@@ -179,7 +179,7 @@ import helics as h
 - **`h.helicsFederateInfoSetIntegerProperty()`** - Sets log level calling another API, `h.helics_property_int_log_level`
 - **`h.helicsFederateInfoSetTimeProperty()`** - Sets time information. This API must receive another API to distinguish which type of time property to set. The period is set with `h.helics_property_time_period`, and `period` has been pass to this function
 - **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are setting is `h.helics_flag_uninterruptible` to `False`, to mirror the JSON configuration
-- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are wetting is `h.HELICS_FLAG_TERMINATE_ON_ERROR` to `True`
+- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are setting is `h.HELICS_FLAG_TERMINATE_ON_ERROR` to `True`
 - **`fed = h.helicsCreateCombinationFederate(name, fedinfo)`** - Creates the combination federate with the name passed to this function (`Charger`) and the information set above for `fedinfo`
 
 #### Federate Interface Configuration and Registration

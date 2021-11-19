@@ -1,6 +1,6 @@
 # Combination Federation with Native HELICS Filters
 
-This custom filter federate example expands the TODO example to demonstrate . This example assumes the user has already worked through the [TODO]().
+This custom filter federate example expands the [combination federation example](./fundamental_combo.md) to demonstrate how HELICS filters can be added to endpoints.
 
 This tutorial is organized as follows:
 

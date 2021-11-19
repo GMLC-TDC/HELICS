@@ -45,7 +45,7 @@ There are several levels used inside HELICS for logging. The level can be set wi
 - `helics_log_level_data` Log messages related to data passage and information being sent or received
 - `helics_log_level_trace` Log all internal message being sent
 
-NOTE: these levels currently correspond to (-1 through 7) but this may change in future major version numbers to allow more fine grained control
+NOTE: these levels currently correspond to (-1 through 7) but this may change in future major version numbers to allow more fine grained control.
 
 `timing`, `data` and `trace` log levels can generate a large number of messages and should primarily be used for debugging. `trace` will produce a very large number of messages most of which deal with internal communications and is primarily for debugging timing in HELICS.
 

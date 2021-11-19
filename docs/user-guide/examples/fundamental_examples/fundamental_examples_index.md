@@ -157,7 +157,7 @@ Define Time Variables
 </strong>
 </a>
 
-Time management is a vital component to HELICS co-simulations. Every HELICS co-simulation needs to be provided information about the start time (`grantedtime`), the end time (`total_interval`) and the time step (`update_interval`). Federates can step through time at different rates [LINK TO TIME MD], and it is allowable to have federates start and stop at different times, but this must be curated to meet the needs of the research question.
+Time management is a vital component to HELICS co-simulations. Every HELICS co-simulation needs to be provided information about the start time (`grantedtime`), the end time (`total_interval`) and the time step (`update_interval`). Federates can [step through time at different rates](../../fundamental_topics/timing_configuration.md), and it is allowable to have federates start and stop at different times, but this must be curated to meet the needs of the research question.
 
 ```python
 hours = 24 * 7

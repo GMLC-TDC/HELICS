@@ -137,7 +137,7 @@ The status code corresponds to the most appropriate html error codes.
 
 ## Making queries
 
-As a demo case there is a `brokerServerTestCase` executable built as part of the HELICS_EXAMPLES.
+As a demo case there is a [`brokerServerTestCase` executable](../../../examples/BrokerServerTestCase.cpp) built as part of the the main HELICS library.
 Running this example starts a webserver on the localhost using port 80.
 
 The response to queries is a string either in plain text or json.
