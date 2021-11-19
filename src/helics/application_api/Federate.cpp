@@ -46,6 +46,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     if (mName.empty()) {
         mName = fi.defName;
     }
+
     if (fi.coreName.empty()) {
         if (!fi.forceNewCore) {
             coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
@@ -108,6 +109,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     useJsonSerialization = fi.useJsonSerialization;
+    observerMode = fi.observer;
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
@@ -145,6 +147,7 @@ Federate::Federate(const std::string& fedName,
     }
     fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
+    observerMode = fi.observer;
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
@@ -176,6 +179,7 @@ Federate::Federate(Federate&& fed) noexcept
     currentTime = fed.currentTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
+    observerMode = fed.observerMode;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     fManager = std::move(fed.fManager);
     mName = std::move(fed.mName);
@@ -191,6 +195,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
+    observerMode = fed.observerMode;
     fManager = std::move(fed.fManager);
     mName = std::move(fed.mName);
     return *this;
@@ -317,7 +322,12 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             switch (res) {
                 case IterationResult::NEXT_STEP:
                     currentMode = Modes::EXECUTING;
-                    currentTime = timeZero;
+                    if (observerMode) {
+                        currentTime = coreObject->getCurrentTime(fedID);
+                    } else {
+                        currentTime = timeZero;
+                    }
+
                     initializeToExecuteStateTransition(res);
                     break;
                 case IterationResult::ITERATING:
@@ -401,7 +411,11 @@ IterationResult Federate::enterExecutingModeComplete()
                 switch (res) {
                     case IterationResult::NEXT_STEP:
                         currentMode = Modes::EXECUTING;
-                        currentTime = timeZero;
+                        if (observerMode) {
+                            currentTime = coreObject->getCurrentTime(fedID);
+                        } else {
+                            currentTime = timeZero;
+                        }
                         initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
                         break;
                     case IterationResult::ITERATING:
@@ -474,6 +488,9 @@ void Federate::setLoggingCallback(
 
 void Federate::setFlagOption(int flag, bool flagValue)
 {
+    if (flag == HELICS_FLAG_OBSERVER && currentMode < Modes::INITIALIZING) {
+        observerMode = flagValue;
+    }
     coreObject->setFlagOption(fedID, flag, flagValue);
 }
 

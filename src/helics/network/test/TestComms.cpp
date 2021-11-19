@@ -101,7 +101,7 @@ namespace testcore {
                         totalSleep += milliseconds(200);
                     }
                 } else {
-                    if (!tbroker->isOpenToNewFederates()) {
+                    if (!tbroker->isOpenToNewFederates() && !observer) {
                         logError("broker is not open to new federates " + brokerName);
                         tbroker = nullptr;
                         broker = nullptr;
@@ -141,7 +141,7 @@ namespace testcore {
             if (tbroker->getIdentifier() == localTargetAddress) {
                 logError("broker == target");
             }
-            if (!tbroker->isOpenToNewFederates()) {
+            if (!tbroker->isOpenToNewFederates() && !observer) {
                 logError("broker is not open to new federates");
             }
         }

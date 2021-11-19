@@ -389,9 +389,29 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
 }
 
 std::optional<ActionMessage>
-    FederateState::processPostTerminationAction(const ActionMessage& /*action*/)  // NOLINT
+    FederateState::processPostTerminationAction(const ActionMessage& action)  // NOLINT
 {
-    return {};
+    std::optional<ActionMessage> optAct;
+    switch (action.action()) {
+        case CMD_REQUEST_CURRENT_TIME:
+            optAct->setAction(CMD_DISCONNECT);
+            optAct->dest_id = action.source_id;
+            optAct->source_id = global_id.load();
+            break;
+        default:
+            break;
+    }
+    return optAct;
+}
+
+void FederateState::forceProcessMessage(ActionMessage& action)
+{
+    if (try_lock()) {
+        processActionMessage(action);
+        unlock();
+    } else {
+        addAction(action);
+    }
 }
 
 IterationResult FederateState::waitSetup()
@@ -468,7 +488,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
 
         auto ret = processQueue();
         if (ret == MessageProcessingResult::NEXT_STEP) {
-            time_granted = timeZero;
+            time_granted = timeCoord->getGrantedTime();
             allowed_send_time = timeCoord->allowedSendTime();
         } else if (ret == MessageProcessingResult::ITERATING) {
             time_granted = initializationTime;
@@ -964,6 +984,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     setState(HELICS_ERROR);
                     return MessageProcessingResult::ERROR_RESULT;
                 }
+                timeCoord->enterInitialization();
                 break;
             case HELICS_EXECUTING:
                 timeCoord->updateTimeFactors();
@@ -1976,7 +1997,7 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time")";
+            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
     } else {  // the rest might to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

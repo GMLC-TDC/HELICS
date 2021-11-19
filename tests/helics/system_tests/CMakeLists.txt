@@ -20,6 +20,7 @@ set(system_test_sources
     networkTests.cpp
     commandInterfaceTests.cpp
     profilingTests.cpp
+    dynamicFederationTests.cpp
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
 )
