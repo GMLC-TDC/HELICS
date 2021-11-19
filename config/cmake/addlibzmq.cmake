@@ -174,11 +174,10 @@ endif()
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
-        target_compile_options(
-                object
-                # PRIVATE  $<$<COMPILE_LANGUAGE:CXX>:-Wno-inconsistent-missing-override>
-                PRIVATE  -Wno-inconsistent-missing-override
-            )
+        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/channel.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
+        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/client.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
+        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/ctx.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
+        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/curve_mechanism_Base.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
 endif()
 
 if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_LIB)
