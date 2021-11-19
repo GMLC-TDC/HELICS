@@ -262,5 +262,7 @@ class TimeCoordinator {
     std::pair<GlobalFederateId, Time> getMinGrantedDependency() const;
     /** enter initialization*/
     void enterInitialization();
+    /** request a resend of the time message for certain federates currently blocking*/
+    void requestTimeCheck();
 };
 }  // namespace helics

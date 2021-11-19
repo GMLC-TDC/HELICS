@@ -1232,15 +1232,16 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
                 
             } else if (cmd.counter == 3) {
-                LOG_WARNING(
-                    "grant timeout stage 2 requesting time resend");
-                //timeCoord->generateResendRequest();
+                LOG_WARNING("grant timeout stage 2 requesting time resend");
+                   timeCoord->requestTimeCheck();
             } else if (cmd.counter == 6) {
-                LOG_WARNING("grant timeout stage 3 requesting time resend and diagnostics");
-                // timeCoord->generateResendRequest();
+                LOG_WARNING("grant timeout stage 3 diagnostics");
+                auto qres = processQueryActual("global_time_debugging");
+                qres.insert(0, "TIME DEBUGGING::");
+                LOG_WARNING(qres);
             } else if (cmd.counter == 10) {
-                LOG_WARNING("grant timeout stage 4 requesting time resend and diagnostics");
-                // timeCoord->generateResendRequest();
+                LOG_WARNING("grant timeout stage 4 error actions(none available)");
+                
             }
             if (mTimer) {
                 ++cmd.counter;

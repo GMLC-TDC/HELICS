@@ -436,13 +436,14 @@ TEST(logging_tests, grant_timeout_phase3)
     std::this_thread::sleep_for(std::chrono::milliseconds(600));
 
     auto llock = mlog.lock();
-    while (llock->size() < 3) {
+    while (llock->size() < 4) {
         llock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         llock = mlog.lock();
     }
 
     EXPECT_NE((*llock)[2].second.find("stage 3"), std::string::npos);
+    EXPECT_NE((*llock)[3].second.find("TIME DEBUGGING"), std::string::npos);
     Fed1->requestTime(3.0);
     auto res = Fed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
@@ -478,13 +479,13 @@ TEST(logging_tests, grant_timeout_phase4)
     std::this_thread::sleep_for(std::chrono::milliseconds(700));
 
     auto llock = mlog.lock();
-    while (llock->size() < 4) {
+    while (llock->size() < 5) {
         llock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         llock = mlog.lock();
     }
 
-    EXPECT_NE((*llock)[3].second.find("stage 4"), std::string::npos);
+    EXPECT_NE((*llock)[4].second.find("stage 4"), std::string::npos);
     Fed1->requestTime(3.0);
     auto res = Fed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);

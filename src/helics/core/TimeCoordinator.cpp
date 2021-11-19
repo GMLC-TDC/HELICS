@@ -382,6 +382,28 @@ void TimeCoordinator::enterInitialization()
     }
 }
 
+void TimeCoordinator::requestTimeCheck()
+{
+    if (dynamicJoining) {
+        ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
+        timeUpdateRequest.source_id = source_id;
+        for (const auto& dep : dependencies) {
+            // send to all dependencies
+            if (dep.dependency) {
+                if (dep.fedID == source_id) {
+                    continue;
+                }
+                //only send the request if it is blocking the current grant
+                if (dep.next<time_exec) {
+                    timeUpdateRequest.dest_id = dep.fedID;
+                    sendMessageFunction(timeUpdateRequest);
+                }
+            }
+        }
+    }
+}
+
+
 Time TimeCoordinator::getNextPossibleTime() const
 {
     if (time_granted == timeZero) {
