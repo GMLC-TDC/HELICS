@@ -438,7 +438,7 @@ TEST(ActionMessage, check_json_packetization)
     EXPECT_GE(cmdStringNormal.size() + 6, cmdString.size());
     helics::ActionMessage cmd2;
     auto res = cmd2.depacketize(reinterpret_cast<std::byte*>(cmdString.data()), cmdString.size());
-    EXPECT_EQ(res, static_cast<int>(cmdString.size()));
+    EXPECT_EQ(res, cmdString.size());
     EXPECT_TRUE(cmd.action() == cmd2.action());
     EXPECT_EQ(cmd.actionTime, cmd2.actionTime);
     EXPECT_EQ(cmd.source_id, cmd2.source_id);

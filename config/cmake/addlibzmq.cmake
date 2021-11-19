@@ -130,7 +130,18 @@ set(ZEROMQ_CMAKECONFIG_INSTALL_DIR
 set(COMPILER_SUPPORTS_CXX11 ON)
 set(ZMQ_HAVE_NOEXCEPT ON)
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
+        set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wno-inconsistent-missing-override")
+endif()
+
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_ALL)
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(CMAKE_CXX_FLAGS ${OLDCMAKE_CXX_FLAGS})
+endif()
+
 
 set(ZeroMQ_FOUND TRUE)
 
@@ -170,14 +181,6 @@ if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
     set(zmq_target_output "libzmq-static")
 else()
     set(zmq_target_output "libzmq")
-endif()
-
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
-        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/channel.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
-        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/client.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
-        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/ctx.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
-        set_source_files_properties(${${lcName}_SOURCE_DIR}/src/curve_mechanism_Base.cpp PROPERTIES COMPILE_FLAGS -Wno-inconsistent-missing-override)
 endif()
 
 if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_LIB)

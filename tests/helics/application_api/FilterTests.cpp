@@ -830,7 +830,7 @@ TEST_F(filter_tests, many_filters_multi)
             while (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
-                EXPECT_EQ(m->data.size(), 18 + 8);
+                EXPECT_EQ(m->data.size(), 18U + 8U);
             }
         }
         rec->finalize();
@@ -914,7 +914,7 @@ TEST_F(filter_tests, reroute_cascade)
             while (r9.hasMessage()) {
                 ++cntb;
                 auto m = r9.getMessage();
-                EXPECT_EQ(m->data.size(), 18);
+                EXPECT_EQ(m->data.size(), 18U);
             }
         }
         rec->finalize();
@@ -975,7 +975,7 @@ class rfcheck {
                 while (r1.hasMessage()) {
                     ++mCnt;
                     auto m = r1.getMessage();
-                    EXPECT_EQ(m->data.size(), 18);
+                    EXPECT_EQ(m->data.size(), 18U);
                 }
             }
             mFed->finalize();

@@ -2215,6 +2215,7 @@ GHC_INLINE file_status status_from_INFO(const path& p, const INFO* info, std::er
         if (detail::reparse_tag_from_INFO(info) == IO_REPARSE_TAG_SYMLINK) {
             ft = file_type::symlink;
         }
+        (void)ec;
     }
     else {
         if ((info->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)) {
