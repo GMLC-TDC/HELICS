@@ -393,8 +393,8 @@ void TimeCoordinator::requestTimeCheck()
                 if (dep.fedID == source_id) {
                     continue;
                 }
-                //only send the request if it is blocking the current grant
-                if (dep.next<time_exec) {
+                // only send the request if it is blocking the current grant
+                if (dep.next < time_exec) {
                     timeUpdateRequest.dest_id = dep.fedID;
                     sendMessageFunction(timeUpdateRequest);
                 }
@@ -402,7 +402,6 @@ void TimeCoordinator::requestTimeCheck()
         }
     }
 }
-
 
 Time TimeCoordinator::getNextPossibleTime() const
 {
@@ -906,15 +905,14 @@ static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localI
 
 std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() const
 {
-
     Time minTime = Time::maxVal();
     GlobalFederateId minID;
-    for (auto &dep:dependencies) {
+    for (auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
         }
-        if (dep.time_state!=time_state_t::time_requested) {
-            if (dep.next<minTime) {
+        if (dep.time_state != time_state_t::time_requested) {
+            if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;
             }

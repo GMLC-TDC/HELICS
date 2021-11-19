@@ -355,12 +355,12 @@ TEST(logging_tests, grant_timeout)
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         llock = mlog.lock();
     }
-    
+
     EXPECT_NE((*llock)[0].second.find("grant timeout"), std::string::npos);
     EXPECT_NE((*llock)[0].second.find("131072"), std::string::npos);
 
     Fed1->requestTime(3.0);
-    auto res=Fed2->requestTimeComplete();
+    auto res = Fed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
     Fed1->finalize();
     Fed2->finalize();
@@ -393,7 +393,7 @@ TEST(logging_tests, grant_timeout_phase2)
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     auto llock = mlog.lock();
-    while (llock->size()<2) {
+    while (llock->size() < 2) {
         llock.unlock();
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         llock = mlog.lock();
@@ -450,7 +450,6 @@ TEST(logging_tests, grant_timeout_phase3)
     Fed1->finalize();
     Fed2->finalize();
 }
-
 
 TEST(logging_tests, grant_timeout_phase4)
 {

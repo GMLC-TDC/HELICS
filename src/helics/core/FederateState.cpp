@@ -1222,18 +1222,17 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (blockFed.first.isValid()) {
                     LOG_WARNING(fmt::format(
                         "grant timeout exceeded triggering diagnostic action sim time {} waiting on {}",
-                        time_granted,blockFed.first.baseValue()));
-                }
-                else
-                {
+                        time_granted,
+                        blockFed.first.baseValue()));
+                } else {
                     LOG_WARNING(fmt::format(
                         "grant timeout exceeded triggering diagnostic action sim time {}",
                         time_granted));
                 }
-                
+
             } else if (cmd.counter == 3) {
                 LOG_WARNING("grant timeout stage 2 requesting time resend");
-                   timeCoord->requestTimeCheck();
+                timeCoord->requestTimeCheck();
             } else if (cmd.counter == 6) {
                 LOG_WARNING("grant timeout stage 3 diagnostics");
                 auto qres = processQueryActual("global_time_debugging");
@@ -1241,7 +1240,6 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 LOG_WARNING(qres);
             } else if (cmd.counter == 10) {
                 LOG_WARNING("grant timeout stage 4 error actions(none available)");
-                
             }
             if (mTimer) {
                 ++cmd.counter;
