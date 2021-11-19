@@ -756,7 +756,7 @@ TEST_F(filter_tests, many_filters)
             if (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
-                EXPECT_EQ(m->data.size(), 17 + 18);
+                EXPECT_EQ(m->data.size(), 17U + 18U);
             }
         }
         rec->finalize();

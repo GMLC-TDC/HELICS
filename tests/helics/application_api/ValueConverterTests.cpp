@@ -154,7 +154,7 @@ TEST_P(new_converter_tests_double, double_tests)
     auto sz = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(convString.data()), v2);
     EXPECT_EQ(helics::detail::detectType(reinterpret_cast<std::byte*>(convString.data())),
               helics::DataType::HELICS_DOUBLE);
-    EXPECT_EQ(sz, 16);
+    EXPECT_EQ(sz, 16U);
     double v3;
     helics::detail::convertFromBinary(reinterpret_cast<std::byte*>(convString.data()), v3);
     if (std::isnan(v2)) {

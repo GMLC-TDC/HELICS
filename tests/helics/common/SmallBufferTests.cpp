@@ -28,9 +28,9 @@ TEST(small_buffer_tests, resize)
     sb.resize(35);
     EXPECT_EQ(sb.size(), 35U);
     sb.resize(135121);
-    EXPECT_EQ(sb.size(), 135121);
+    EXPECT_EQ(sb.size(), 135121U);
     sb.resize(1541);
-    EXPECT_EQ(sb.size(), 1541);
+    EXPECT_EQ(sb.size(), 1541U);
 }
 
 TEST(small_buffer_tests, resize_assign)
@@ -115,11 +115,11 @@ TEST(small_buffer_tests, capacity)
 {
     SmallBuffer sb;
     sb.reserve(450);
-    EXPECT_GE(sb.capacity(), 450);
+    EXPECT_GE(sb.capacity(), 450U);
     sb.reserve(12514);
-    EXPECT_GE(sb.capacity(), 12514);
+    EXPECT_GE(sb.capacity(), 12514U);
     sb.reserve(400);
-    EXPECT_GE(sb.capacity(), 12514);
+    EXPECT_GE(sb.capacity(), 12514U);
 }
 
 TEST(small_buffer_tests, equality)
@@ -268,6 +268,7 @@ TEST(small_buffer_tests, move_assign_self)
 {
     SmallBuffer sb1(std::string(36214, 'e'));
     EXPECT_EQ(sb1.size(), 36214);
+    //this is testing self move so ignore the warning about
 #if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wself-move"

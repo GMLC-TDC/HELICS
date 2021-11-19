@@ -34,14 +34,14 @@ using defV = std::variant<double,
                           NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
-enum type_location {
-    double_loc = 0,
-    int_loc = 1,
-    string_loc = 2,
-    complex_loc = 3,
-    vector_loc = 4,
-    complex_vector_loc = 5,
-    named_point_loc = 6
+enum type_location:std::uint32_t {
+    double_loc = 0U,
+    int_loc = 1U,
+    string_loc = 2U,
+    complex_loc = 3U,
+    vector_loc = 4U,
+    complex_vector_loc = 5U,
+    named_point_loc = 6U
 };
 /** detect a change from the previous values*/
 HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const std::string& val, double deltaV);

@@ -235,7 +235,7 @@ TEST(clone_tests, simple_clone_test_combo)
 
     EXPECT_EQ(p1.messageCount(), 2U);
     EXPECT_EQ(p1.endpointCount(), 3U);
-    EXPECT_EQ(p1.pointCount(), pcnt);
+    EXPECT_EQ(static_cast<int>(p1.pointCount()), pcnt);
     EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
     ghc::filesystem::remove("combsave.json");
