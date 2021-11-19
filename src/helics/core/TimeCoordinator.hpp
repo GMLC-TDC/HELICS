@@ -161,6 +161,8 @@ class TimeCoordinator {
     void updateMessageTime(Time messageUpdateTime, bool allowRequestSend);
 
     void specifyNonGranting(bool value = true) { nonGranting = value; }
+    /** get the id of the federate that has the earliest time dependency*/
+    GlobalFederateId getMinDependency() const;
 
   private:
     /** take a global id and get a pointer to the dependencyInfo for the other fed
@@ -257,7 +259,7 @@ class TimeCoordinator {
     /** get a count of the active dependencies*/
     int dependencyCount() const;
     /** get a count of the active dependencies*/
-    GlobalFederateId getMinDependency() const;
+    std::pair<GlobalFederateId, Time> getMinGrantedDependency() const;
     /** enter initialization*/
     void enterInitialization();
 };

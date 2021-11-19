@@ -356,11 +356,137 @@ TEST(logging_tests, grant_timeout)
         llock = mlog.lock();
     }
     
-        EXPECT_NE((*llock)[0].second.find("grant timeout"), std::string::npos);
-    
+    EXPECT_NE((*llock)[0].second.find("grant timeout"), std::string::npos);
+    EXPECT_NE((*llock)[0].second.find("131072"), std::string::npos);
 
     Fed1->requestTime(3.0);
     auto res=Fed2->requestTimeComplete();
+    EXPECT_EQ(res, 2.0);
+    Fed1->finalize();
+    Fed2->finalize();
+}
+
+TEST(logging_tests, grant_timeout_phase2)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --name gtcore1";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
+    fi.coreInitString.clear();
+    fi.coreName = "gtcore1";
+    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.2);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed2->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+    Fed1->registerGlobalPublication<double>("pub1");
+    Fed2->registerSubscription("pub1");
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    Fed2->requestTimeAsync(2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+    auto llock = mlog.lock();
+    while (llock->size()<2) {
+        llock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        llock = mlog.lock();
+    }
+
+    EXPECT_NE((*llock)[0].second.find("grant timeout"), std::string::npos);
+    EXPECT_NE((*llock)[0].second.find("131072"), std::string::npos);
+    EXPECT_NE((*llock)[1].second.find("stage 2"), std::string::npos);
+    Fed1->requestTime(3.0);
+    auto res = Fed2->requestTimeComplete();
+    EXPECT_EQ(res, 2.0);
+    Fed1->finalize();
+    Fed2->finalize();
+}
+
+TEST(logging_tests, grant_timeout_phase3)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --name gtcore1";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
+    fi.coreInitString.clear();
+    fi.coreName = "gtcore1";
+    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed2->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+    Fed1->registerGlobalPublication<double>("pub1");
+    Fed2->registerSubscription("pub1");
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    Fed2->requestTimeAsync(2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(600));
+
+    auto llock = mlog.lock();
+    while (llock->size() < 3) {
+        llock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        llock = mlog.lock();
+    }
+
+    EXPECT_NE((*llock)[2].second.find("stage 3"), std::string::npos);
+    Fed1->requestTime(3.0);
+    auto res = Fed2->requestTimeComplete();
+    EXPECT_EQ(res, 2.0);
+    Fed1->finalize();
+    Fed2->finalize();
+}
+
+
+TEST(logging_tests, grant_timeout_phase4)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --name gtcore1";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_SUMMARY);
+
+    auto Fed1 = std::make_shared<helics::ValueFederate>("test1", fi);
+    fi.coreInitString.clear();
+    fi.coreName = "gtcore1";
+    fi.setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.1);
+    auto Fed2 = std::make_shared<helics::ValueFederate>("test2", fi);
+    gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
+    Fed2->setLoggingCallback(
+        [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
+            mlog.lock()->emplace_back(level, message);
+        });
+    Fed1->registerGlobalPublication<double>("pub1");
+    Fed2->registerSubscription("pub1");
+
+    Fed1->enterExecutingModeAsync();
+    Fed2->enterExecutingMode();
+    Fed1->enterExecutingModeComplete();
+
+    Fed2->requestTimeAsync(2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(700));
+
+    auto llock = mlog.lock();
+    while (llock->size() < 4) {
+        llock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        llock = mlog.lock();
+    }
+
+    EXPECT_NE((*llock)[3].second.find("stage 4"), std::string::npos);
+    Fed1->requestTime(3.0);
+    auto res = Fed2->requestTimeComplete();
     EXPECT_EQ(res, 2.0);
     Fed1->finalize();
     Fed2->finalize();

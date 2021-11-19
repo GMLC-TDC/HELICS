@@ -1218,11 +1218,29 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 break;
             }
             if (cmd.counter == 0) {
-                LOG_WARNING(
-                    fmt::format("grant timeout exceeded triggering diagnostic action sim time {}",
-                                time_granted));
+                auto blockFed = timeCoord->getMinGrantedDependency();
+                if (blockFed.first.isValid()) {
+                    LOG_WARNING(fmt::format(
+                        "grant timeout exceeded triggering diagnostic action sim time {} waiting on {}",
+                        time_granted,blockFed.first.baseValue()));
+                }
+                else
+                {
+                    LOG_WARNING(fmt::format(
+                        "grant timeout exceeded triggering diagnostic action sim time {}",
+                        time_granted));
+                }
+                
             } else if (cmd.counter == 3) {
+                LOG_WARNING(
+                    "grant timeout stage 2 requesting time resend");
+                //timeCoord->generateResendRequest();
+            } else if (cmd.counter == 6) {
+                LOG_WARNING("grant timeout stage 3 requesting time resend and diagnostics");
+                // timeCoord->generateResendRequest();
             } else if (cmd.counter == 10) {
+                LOG_WARNING("grant timeout stage 4 requesting time resend and diagnostics");
+                // timeCoord->generateResendRequest();
             }
             if (mTimer) {
                 ++cmd.counter;

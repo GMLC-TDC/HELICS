@@ -882,6 +882,25 @@ static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localI
             (cmd.source_id != localId));
 }
 
+std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() const
+{
+
+    Time minTime = Time::maxVal();
+    GlobalFederateId minID;
+    for (auto &dep:dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.time_state!=time_state_t::time_requested) {
+            if (dep.next<minTime) {
+                minTime = dep.next;
+                minID = dep.fedID;
+            }
+        }
+    }
+    return {minID, minTime};
+}
+
 message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
