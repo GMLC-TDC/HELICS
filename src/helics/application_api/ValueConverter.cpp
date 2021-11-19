@@ -207,6 +207,11 @@ namespace detail {
         }
     }
 
+    #if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     void convertFromBinary(const std::byte* data, std::complex<double>& val)
     {
         // https://en.cppreference.com/w/cpp/numeric/complex
@@ -218,6 +223,9 @@ namespace detail {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val) + 8);
         }
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
     void convertFromBinary(const std::byte* data, std::string& val)
     {
@@ -277,7 +285,11 @@ namespace detail {
             }
         }
     }
-
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val)
     {
         std::size_t size = getDataSize(data);
@@ -296,6 +308,9 @@ namespace detail {
             }
         }
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 }  // namespace detail
 
 void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,

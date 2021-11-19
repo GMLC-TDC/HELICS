@@ -857,6 +857,12 @@ int Input::getValue(double* data, int maxsize)
     return length;
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
 int Input::getComplexValue(double* data, int maxsize)
 {
     const auto& CV = getValueRef<std::vector<std::complex<double>>>();
@@ -869,6 +875,10 @@ int Input::getComplexValue(double* data, int maxsize)
     hasUpdate = false;
     return length;
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 int Input::getValue(char* str, int maxsize)
 {
