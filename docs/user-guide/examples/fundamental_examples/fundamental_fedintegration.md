@@ -119,7 +119,7 @@ Configuration with the API is done within the federate, where an API call sets t
 1. `name`
 2. `loglevel`
 3. `coreType`
-4. (additional core configurations)
+4. Additional core configurations
 5. `period`
 6. `uninterruptible`
 7. `terminate_on_error`
@@ -178,8 +178,6 @@ fed = create_value_federate(fedinitstring, name, period)
 ```
 
 What step created the value federate?
-
-> ! fed = h.helicsCreateValueFederate(name, fedinfo)
 
 <details><summary>Click for answer</summary>
 <p>
@@ -247,34 +245,40 @@ In this tutorial, we have covered how to integrate federates into a co-simulatio
 
 ```json
 {
+  "name": "fundamental_integration",
   "federates": [
     {
       "directory": ".",
-      "exec": "helics_broker -f 2 --loglevel=7",
+      "exec": "helics_broker -f 3 --loglevel=warning",
       "host": "localhost",
       "name": "broker"
     },
     {
       "directory": ".",
-      "exec": "python -u Charger.py 1",
+      "exec": "python -u Charger.py",
       "host": "localhost",
       "name": "Charger"
     },
     {
       "directory": ".",
-      "exec": "python -u Battery.py 1",
+      "exec": "python -u Controller.py",
+      "host": "localhost",
+      "name": "Controller"
+    },
+    {
+      "directory": ".",
+      "exec": "python -u Battery.py",
       "host": "localhost",
       "name": "Battery"
     }
-  ],
-  "name": "EV_toy"
+  ]
 }
 ```
 
 Execute the co-simulation with the same command as the Base Example
 
 ```shell
->helics run --path=EVtoyrunner.json
+>helics run --path=fundamental_integration_runner.json
 ```
 
 This results in the same output; the only thing we have changed is the method of configuring the federates and integrating them.

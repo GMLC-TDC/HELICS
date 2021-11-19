@@ -25,9 +25,7 @@ Even after a simulator has been modified to support HELICS, users of that simula
 
 Thinking about HELICS co-simulation in general and about the nature of the simulators that have been or need to be integrated with HELICS, there are a few questions to consider. Though these questions have most immediate impact as you being planning on how to integrate a particular simulator they are also useful when thinking about how simulators in a federation need to be made to interact properly.
 
-1. **What is the nature of the code-base being integrated?** Is this open-source code that can be fully modified? Is it a simulator, perhaps commercial, that provides an API that will be used? How much control do you, the integrator, have in modifying the behavior of the simulator?
-
-A number of existing simulation tools have [already been integrated into HELICS](../references/Tools_using_HELICS.md) and can serve as good references when considering how an integration might be accomplished.
+1. **What is the nature of the code-base being integrated?** Is this open-source code that can be fully modified? Is it a simulator, perhaps commercial, that provides an API that will be used? How much control do you, the integrator, have in modifying the behavior of the simulator? A number of existing simulation tools have [already been integrated into HELICS](../references/Tools_using_HELICS.md) and can serve as good references when considering how an integration might be accomplished.
 
 2. **What programming language(s) will be used?** - HELICS has bindings for a number of languages and the one that is best to use may or may not be obvious. If your integration of the simulator will be through the API of the existing simulator, then you'll likely be writing a standalone executable that wraps that API. You may be constrained on the choice of languages based on the method of interaction with that API. If the API is accessed through a network socket then you likely have a lot of freedom in language choice. If the API is a library that you call from within wrapper, you will likely be best served using the language of that library.
 
