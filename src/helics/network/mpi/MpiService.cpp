@@ -264,7 +264,7 @@ namespace mpi {
             // std::string address;
             // std::tie (address, msg) = sendMsg.value ();
 
-            MPI_Request req{-1};
+            MPI_Request req{MPI_REQUEST_NULL};
             std::pair<MPI_Request, std::vector<char>> sendRequestData{req,
                                                                       std::move(sendMsg->second)};
 

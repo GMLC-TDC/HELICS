@@ -377,7 +377,7 @@ TEST(small_buffer_tests, assign)
     EXPECT_EQ(sb1[3333], std::byte{'g'});
 
     sb1.assign(t1.data(), t1.data());
-    EXPECT_EQ(sb1.size(), 0);
+    EXPECT_EQ(sb1.size(), 0U);
 }
 
 TEST(small_buffer_tests, assign_size)
