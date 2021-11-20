@@ -31,11 +31,11 @@ TEST_P(BrokerServerTests, startup_tests)
     brks.forceTerminate();
     cleanupHelicsLibrary();
 
-    bool active = brks.hasActiveBrokers();
+    bool active = apps::BrokerServer::hasActiveBrokers();
     if (active) {
         cleanupHelicsLibrary();
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        active = brks.hasActiveBrokers();
+        active = apps::BrokerServer::hasActiveBrokers();
     }
     EXPECT_TRUE(!active);
     brks.startServers();
@@ -51,7 +51,7 @@ TEST_P(BrokerServerTests, startup_tests)
     EXPECT_TRUE(cr2->isConnected());
 
     auto objs = helics::BrokerFactory::getAllBrokers();
-    EXPECT_EQ(objs.size(), 2u);
+    EXPECT_EQ(objs.size(), 2U);
 
     brks.forceTerminate();
     cr->disconnect();

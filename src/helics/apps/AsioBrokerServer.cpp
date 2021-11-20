@@ -270,12 +270,12 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
-// NOLINTBEGIN(*-unnecessary-value-param)
+
 #ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
-                
+                // NOLINTNEXTLINE
                 [this](tcp::TcpConnection::pointer connection, const char* data, size_t datasize) {
                     return tcpDataReceive(connection, data, datasize);
                 });
@@ -288,6 +288,7 @@ namespace apps {
         if (udp_enabled_) {
             udpserver = loadUDPserver(ioctx->getBaseContext());
             udpserver->setDataCall(
+                // NOLINTNEXTLINE
                 [this](std::shared_ptr<udp::UdpServer> server, const char* data, size_t datasize) {
                     return udpDataReceive(server, data, datasize);
                 });
@@ -296,7 +297,6 @@ namespace apps {
             udpserver->start_receive();
         }
 #endif
-// NOLINTEND((*-unnecessary-value-param)
     }
 }  // namespace apps
 }  // namespace helics
