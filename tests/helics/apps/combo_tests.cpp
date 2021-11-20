@@ -319,7 +319,12 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     fut.get();
     EXPECT_EQ(rec1.messageCount(), 2U);
     EXPECT_EQ(rec1.pointCount(), 3U);
-
+    if (rec1.pointCount()<3U) {
+        for (int ii=0;ii<rec1.pointCount();++ii) {
+            std::cout << "point " << ii << " time=" << std::get<0>(rec1.getValue(ii))
+                      << " value= " << std::get<2>(rec1.getValue(ii))<<std::endl;
+        }
+    }
     rec1.saveFile(f1.string());
 
     EXPECT_TRUE(ghc::filesystem::exists(f1));

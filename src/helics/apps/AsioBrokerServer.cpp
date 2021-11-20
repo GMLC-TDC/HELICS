@@ -270,10 +270,12 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
+// NOLINTBEGIN(*-unnecessary-value-param)
 #ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
+                
                 [this](tcp::TcpConnection::pointer connection, const char* data, size_t datasize) {
                     return tcpDataReceive(connection, data, datasize);
                 });
@@ -294,6 +296,7 @@ namespace apps {
             udpserver->start_receive();
         }
 #endif
+// NOLINTEND((*-unnecessary-value-param)
     }
 }  // namespace apps
 }  // namespace helics
