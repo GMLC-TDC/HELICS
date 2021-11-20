@@ -137,7 +137,7 @@ if(HELICS_ENABLE_SWIG AND SWIG_EXECUTABLE)
     set(CMAKE_SWIG_FLAGS "-package;com.java.helics")
 
     if(SWIG_VERSION VERSION_GREATER 4.0.0)
-        set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen -w560")
+        set(CMAKE_SWIG_FLAGS ${CMAKE_SWIG_FLAGS} "-doxygen" "-w560")
     endif()
 
     swig_add_library(
