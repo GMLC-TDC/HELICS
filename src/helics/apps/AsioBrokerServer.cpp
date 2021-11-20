@@ -275,7 +275,7 @@ namespace apps {
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
-                
+
                 [this](tcp::TcpConnection::pointer connection, const char* data, size_t datasize) {
                     return tcpDataReceive(connection, data, datasize);
                 });
@@ -296,7 +296,7 @@ namespace apps {
             udpserver->start_receive();
         }
 #endif
-// NOLINTEND((*-unnecessary-value-param)
+        // NOLINTEND((*-unnecessary-value-param)
     }
 }  // namespace apps
 }  // namespace helics
