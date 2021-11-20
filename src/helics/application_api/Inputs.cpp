@@ -789,12 +789,12 @@ bool checkForNeededCoreRetrieval(std::size_t currentIndex,
                                  DataType conversionType)
 {
     static constexpr std::array<DataType, 7> locType{{DataType::HELICS_DOUBLE,
-                                     DataType::HELICS_INT,
-                                     DataType::HELICS_STRING,
-                                     DataType::HELICS_COMPLEX,
-                                     DataType::HELICS_VECTOR,
-                                     DataType::HELICS_COMPLEX_VECTOR,
-                                     DataType::HELICS_NAMED_POINT}};
+                                                      DataType::HELICS_INT,
+                                                      DataType::HELICS_STRING,
+                                                      DataType::HELICS_COMPLEX,
+                                                      DataType::HELICS_VECTOR,
+                                                      DataType::HELICS_COMPLEX_VECTOR,
+                                                      DataType::HELICS_NAMED_POINT}};
 
     if (locType[currentIndex] == injectionType || locType[currentIndex] == conversionType) {
         return false;

@@ -34,7 +34,7 @@ using defV = std::variant<double,
                           NamedPoint>;
 
 /**enumeration of the order inside the variant so the Which function returns match the enumeration*/
-enum type_location:std::uint32_t {
+enum type_location : std::uint32_t {
     double_loc = 0U,
     int_loc = 1U,
     string_loc = 2U,

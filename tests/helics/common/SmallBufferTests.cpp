@@ -268,7 +268,7 @@ TEST(small_buffer_tests, move_assign_self)
 {
     SmallBuffer sb1(std::string(36214, 'e'));
     EXPECT_EQ(sb1.size(), 36214U);
-    //this is testing self move so ignore the warning about
+    // this is testing self move so ignore the warning about
 #if defined(__clang__)
 #    pragma clang diagnostic push
 #    pragma clang diagnostic ignored "-Wself-move"

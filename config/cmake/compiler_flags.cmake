@@ -170,7 +170,7 @@ if(MSVC)
             "Detected _WIN32_WINNT from CMAKE_SYSTEM_VERSION: ${COPTION_WIN32_WINNT_DEFAULT}"
     )
     if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-         # disable some irrelevent integer overflow warnings on 32 bit systems
+         # disable some irrelevant integer overflow warnings on 32 bit systems
          target_compile_options(compile_flags_target INTERFACE /wd4307 /wd4309)
     endif()
 else(MSVC)
