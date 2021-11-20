@@ -249,7 +249,7 @@ TEST(small_buffer_tests, move_assign_full)
     SmallBuffer sb1(std::string(400, 'a'));
     EXPECT_EQ(sb1[234], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = std::move(sb1);
     EXPECT_EQ(sb2[219], std::byte{'a'});
 }
@@ -259,7 +259,7 @@ TEST(small_buffer_tests, move_assign_full2)
     SmallBuffer sb1(std::string(16, 'a'));
     EXPECT_EQ(sb1[13], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = std::move(sb1);
     EXPECT_EQ(sb2[11], std::byte{'a'});
 }

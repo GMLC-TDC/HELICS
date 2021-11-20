@@ -133,7 +133,7 @@ set(ZMQ_HAVE_NOEXCEPT ON)
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
         message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
         set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wno-inconsistent-missing-override")
+        set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-Wno-inconsistent-missing-override -Wno-unused-parameter")
 endif()
 
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_ALL)
