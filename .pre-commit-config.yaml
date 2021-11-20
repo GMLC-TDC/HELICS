@@ -1,4 +1,6 @@
 exclude: ^(ThirdParty/|interfaces/java/interface/|interfaces/matlab/interface/|.github/workflows/|docs/img/)
+ci:
+  autoupdate_branch: 'develop'
 repos:
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
     rev: v1.1.1
