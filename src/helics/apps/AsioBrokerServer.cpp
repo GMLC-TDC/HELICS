@@ -139,7 +139,7 @@ namespace apps {
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
-            auto &V = (*config_)["tcp"];
+            auto& V = (*config_)["tcp"];
             helics::fileops::replaceIfMember(V, "interface", ext_interface);
             helics::fileops::replaceIfMember(V, "port", tcpport);
         }
