@@ -33,8 +33,8 @@ using defV = std::variant<double,
                           std::vector<std::complex<double>>,
                           NamedPoint>;
 
-/**enumeration of the order inside the variant so the Which function returns match the enumeration*/
-enum type_location : std::uint32_t {
+/**enumeration of the index value of the types inside the defV variant*/
+enum TypeLocation : decltype(std::declval<defV>().index()) {
     double_loc = 0U,
     int_loc = 1U,
     string_loc = 2U,
@@ -189,7 +189,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         break;
         case complex_loc:  // complex
         {
-            auto cv = std::get<std::complex<double>>(dv);
+            auto &cv = std::get<std::complex<double>>(dv);
             val = static_cast<X>((cv.imag() != 0.0) ? std::abs(cv) : cv.real());
         }
 

@@ -89,12 +89,12 @@ namespace apps {
     @return a tuple with Time as the first element the tag as the 2nd element and the value as the
     third
     */
-        std::tuple<Time, std::string_view, std::string> getValue(int index) const;
+        std::tuple<Time, std::string_view, std::string> getValue(std::size_t index) const;
         /** get a message
     @details makes a copy of a message and returns it in a unique_ptr
     @param index the number of the message to retrieve
     */
-        std::unique_ptr<Message> getMessage(int index) const;
+        std::unique_ptr<Message> getMessage(std::size_t index) const;
 
       private:
         /** load from a jsonString

@@ -567,7 +567,7 @@ void Recorder::addCapture(const std::string& captureDesc)
     captureInterfaces.push_back(captureDesc);
 }
 
-std::tuple<Time, std::string_view, std::string> Recorder::getValue(int index) const
+std::tuple<Time, std::string_view, std::string> Recorder::getValue(std::size_t index) const
 {
     if (isValidIndex(index, points)) {
         return {points[index].time, targets[points[index].index], points[index].value};
@@ -575,7 +575,7 @@ std::tuple<Time, std::string_view, std::string> Recorder::getValue(int index) co
     return {Time(), std::string(), std::string()};
 }
 
-std::unique_ptr<Message> Recorder::getMessage(int index) const
+std::unique_ptr<Message> Recorder::getMessage(std::size_t index) const
 {
     if (isValidIndex(index, messages)) {
         return std::make_unique<Message>(*messages[index]);

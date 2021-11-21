@@ -513,7 +513,7 @@ void helicsGetVector(std::string_view val, std::vector<double>& data)
         }
     } else if (val.front() == 'c') {
         auto sz = readSize(val);
-        data.reserve(sz * 2);
+        data.reserve(static_cast<std::size_t>(sz) * 2);
         data.resize(0);
         auto fb = val.find_first_of('[');
         for (decltype(sz) ii = 0; ii < sz; ++ii) {
