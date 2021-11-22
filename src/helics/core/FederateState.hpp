@@ -114,7 +114,7 @@ class FederateState {
     std::shared_ptr<MessageTimer> mTimer;
     /** processing queue for messages incoming to a federate */
     gmlc::containers::BlockingQueue<ActionMessage> queue;
-    /** processing queue for messages incoming to a federate */
+    /** processing queue for commands incoming to a federate */
     gmlc::containers::BlockingQueue<std::pair<std::string, std::string>> commandQueue;
     /** current defaults for operational flags of interfaces for this federate */
     std::atomic<uint16_t> interfaceFlags{0};

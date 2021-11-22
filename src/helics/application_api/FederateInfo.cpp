@@ -574,7 +574,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option_function<Time>(
            "--grant_timeout",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, val); },
-           "timeout to trigger diagnostic action when a federate time grant is not available with a the timeout (default in ms)")
+           "timeout to trigger diagnostic action when a federate time grant is not available within the timeout period (default in ms)")
         ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",

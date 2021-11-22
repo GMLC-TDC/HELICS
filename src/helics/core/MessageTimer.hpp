@@ -55,7 +55,7 @@ class MessageTimer: public std::enable_shared_from_this<MessageTimer> {
     /** the callback to use when sending a message */
     const std::function<void(ActionMessage&&)> sendFunction;
     std::vector<std::shared_ptr<asio::steady_timer>> timers;
-    /** context manager to for handling real time operations */
+    /** context manager to use for handling real time operations */
     std::shared_ptr<AsioContextManager> contextPtr;
     /** loop controller for async real time operations */
     decltype(contextPtr->startContextLoop()) loopHandle;
