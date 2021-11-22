@@ -108,6 +108,7 @@ TEST_P(combofed_single_type_tests, single_transfer)
     s = subid.getString();
 
     EXPECT_EQ(s, "string2");
+    vFed1->disconnect();
 }
 
 TEST_P(combofed_single_type_tests, endpoint_registration)
