@@ -1201,7 +1201,9 @@ TEST_F(filter_tests, reroute_separate_dest_target)
     auto send = GetFederateAs<helics::MessageFederate>(0);
     auto rec = GetFederateAs<helics::MessageFederate>(1);
     auto filt = GetFederateAs<helics::MessageFederate>(2);
-
+    send->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    rec->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    filt->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     auto& p1 = send->registerGlobalEndpoint("send");
     auto& p2 = rec->registerGlobalEndpoint("rec");
     p1.setDefaultDestination("rec");

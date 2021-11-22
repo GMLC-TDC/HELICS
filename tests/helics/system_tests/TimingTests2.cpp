@@ -593,6 +593,9 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     mFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
 
+    mFed1->setProperty(helics::defs::GRANT_TIMEOUT, 1.0);
+    mFed2->setProperty(helics::defs::GRANT_TIMEOUT, 1.0);
+
     auto& ept1 = mFed1->registerGlobalEndpoint("ept1");
 
     auto& ept2 = mFed2->registerGlobalEndpoint("ept2");
