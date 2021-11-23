@@ -907,7 +907,7 @@ std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() con
 {
     Time minTime = Time::maxVal();
     GlobalFederateId minID;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
         }

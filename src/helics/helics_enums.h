@@ -54,7 +54,9 @@ typedef enum {
     HELICS_CORE_TYPE_INPROC = 18,
     /** an explicit core type that is recognized but explicitly doesn't
                                   exist, for testing and a few other assorted reasons*/
-    HELICS_CORE_TYPE_NULL = 66
+    HELICS_CORE_TYPE_NULL = 66,
+    /** an explicit core type exists but does nothing but return empty values or sink calls*/
+    HELICS_CORE_TYPE_EMPTY = 77,
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/

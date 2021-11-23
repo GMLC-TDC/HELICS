@@ -1485,9 +1485,9 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             rt_lead = propertyVal;
             break;
         case defs::Properties::GRANT_TIMEOUT: {
+#ifndef HELICS_DISABLE_ASIO
             auto prevTimeout = grantTimeOutPeriod;
             grantTimeOutPeriod = propertyVal;
-#ifndef HELICS_DISABLE_ASIO
             if (prevTimeout == timeZero) {
                 if (getState() >= HELICS_INITIALIZING && grantTimeOutPeriod > timeZero) {
                     if (!mTimer) {
@@ -1511,6 +1511,8 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             } else if (grantTimeOutPeriod <= timeZero && grantTimeoutTimeIndex >= 0) {
                 mTimer->cancelTimer(grantTimeoutTimeIndex);
             }
+#else
+            grantTimeOutPeriod = propertyVal;
 #endif
         } break;
         default:

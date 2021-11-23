@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
 #include "Publications.hpp"
+#include "../core/EmptyCore.hpp"
 
 #include <utility>
 namespace helics {
@@ -21,10 +22,12 @@ ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, Lo
 }
 ValueFederateManager::~ValueFederateManager() = default;
 
+static EmptyCore eCore;
+
 void ValueFederateManager::disconnect()
 {
-    // checks for the calls are handled in the MessageFederate itself
-    coreObject = nullptr;
+    /** disconnect to an empty Core which does nothing*/
+    coreObject = &eCore;
 }
 
 static const std::map<std::string, int> typeSizes = {

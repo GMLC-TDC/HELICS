@@ -203,7 +203,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
 
 Federate::~Federate()
 {
-    if (coreObject) {
+    if (currentMode != Modes::FINALIZE) {
         try {
             finalize();
         }
@@ -541,7 +541,9 @@ void Federate::finalize()
         default:
             throw(InvalidFunctionCall("cannot call finalize in present state"));  // LCOV_EXCL_LINE
     }
+
     coreObject->finalize(fedID);
+    
     if (fManager) {
         fManager->closeAllFilters();
     }
@@ -593,7 +595,7 @@ void Federate::disconnect()
 {
     finalize();
 
-    coreObject = nullptr;
+    coreObject = CoreFactory::getEmptyCore();
 }
 
 void Federate::completeOperation()
@@ -633,10 +635,6 @@ void Federate::globalError(int errorcode)
 
 void Federate::localError(int errorcode, const std::string& message)
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "cannot generate a federation error on uninitialized or disconnected Federate"));
-    }
     completeOperation();
     currentMode = Modes::ERROR_STATE;
     coreObject->localError(fedID, errorcode, message);
@@ -644,10 +642,6 @@ void Federate::localError(int errorcode, const std::string& message)
 
 void Federate::globalError(int errorcode, const std::string& message)
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "cannot generate a federation error on uninitialized or disconnected Federate"));
-    }
     completeOperation();
     currentMode = Modes::ERROR_STATE;
     coreObject->globalError(fedID, errorcode, message);
@@ -1164,24 +1158,14 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
     if (queryStr == "name") {
         res = generateJsonQuotedString(getName());
     } else if (queryStr == "corename") {
-        if (coreObject) {
-            res = generateJsonQuotedString(coreObject->getIdentifier());
-        } else {
-            res =
-                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
-        }
+       res = generateJsonQuotedString(coreObject->getIdentifier());
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
     } else {
         res = localQuery(queryStr);
     }
     if (res.empty()) {
-        if (coreObject) {
-            res = coreObject->query(getName(), queryStr, mode);
-        } else {
-            res =
-                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
-        }
+        res = coreObject->query(getName(), queryStr, mode);
     }
     return res;
 }
@@ -1194,12 +1178,7 @@ std::string Federate::query(const std::string& target,
     if ((target.empty()) || (target == "federate") || (target == getName())) {
         res = query(queryStr);
     } else {
-        if (coreObject) {
-            res = coreObject->query(target, queryStr, mode);
-        } else {
-            res =
-                generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
-        }
+        res = coreObject->query(target, queryStr, mode);
     }
     return res;
 }
@@ -1242,12 +1221,7 @@ std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 
 void Federate::setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction)
 {
-    if (coreObject) {
-        coreObject->setQueryCallback(fedID, queryFunction);
-    } else {
-        throw(InvalidFunctionCall(
-            " setQueryCallback cannot be called on uninitialized federate or after finalize call"));
-    }
+    coreObject->setQueryCallback(fedID, queryFunction);
 }
 
 bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
@@ -1262,10 +1236,6 @@ bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
 
 void Federate::setGlobal(const std::string& valueName, const std::string& value)
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            " setGlobal cannot be called on uninitialized federate or after finalize call"));
-    }
     coreObject->setGlobal(valueName, value);
 }
 
@@ -1273,37 +1243,21 @@ void Federate::sendCommand(const std::string& target,
                            const std::string& commandStr,
                            HelicsSequencingModes mode)
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "sendCommand cannot be called on uninitialized federate or after disconnect call"));
-    }
     coreObject->sendCommand(target, commandStr, getName(), mode);
 }
 
 std::pair<std::string, std::string> Federate::getCommand()
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "getCommand cannot be called on uninitialized federate or after disconnect call"));
-    }
     return coreObject->getCommand(fedID);
 }
 
 std::pair<std::string, std::string> Federate::waitCommand()
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "waitCommand cannot be called on uninitialized federate or after disconnect call"));
-    }
     return coreObject->waitCommand(fedID);
 }
 
 void Federate::addDependency(const std::string& fedName)
 {
-    if (!coreObject) {
-        throw(InvalidFunctionCall(
-            "addDependency cannot be called on uninitialized federate or after finalize call"));
-    }
     coreObject->addDependency(fedID, fedName);
 }
 
@@ -1368,17 +1322,12 @@ int Federate::getFilterCount() const
 
 void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op)
 {
-    if (coreObject) {
-        coreObject->setFilterOperator(filt.getHandle(), std::move(op));
-    } else {
-        throw(InvalidFunctionCall(
-            "set FilterOperator cannot be called on uninitialized federate or after finalize call"));
-    }
+    coreObject->setFilterOperator(filt.getHandle(), std::move(op));
 }
 
 void Federate::logMessage(int level, const std::string& message) const
 {
-    if (coreObject) {
+    if (coreObject->isConnected()) {
         coreObject->logMessage(fedID, level, message);
     } else if (level <= HELICS_LOG_LEVEL_WARNING) {
         std::cerr << message << std::endl;
