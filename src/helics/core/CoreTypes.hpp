@@ -55,7 +55,7 @@ enum class CoreType : int {
     WEBSOCKET = HELICS_CORE_TYPE_WEBSOCKET,  //!< core/broker using web sockets
     INPROC = HELICS_CORE_TYPE_INPROC,  //!< core/broker using a stripped down in process core type
     NULLCORE = HELICS_CORE_TYPE_NULL,  //!< explicit core type that doesn't exist
-    EMPTY = HELICS_CORE_TYPE_EMPTY, //!< core type that does nothing and can't communicate
+    EMPTY = HELICS_CORE_TYPE_EMPTY,  //!< core type that does nothing and can't communicate
     UNRECOGNIZED = 22,  //!< unknown
     MULTI = 45  //!< use the multi-broker
 };

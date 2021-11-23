@@ -543,7 +543,7 @@ void Federate::finalize()
     }
 
     coreObject->finalize(fedID);
-    
+
     if (fManager) {
         fManager->closeAllFilters();
     }
@@ -1158,7 +1158,7 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
     if (queryStr == "name") {
         res = generateJsonQuotedString(getName());
     } else if (queryStr == "corename") {
-       res = generateJsonQuotedString(coreObject->getIdentifier());
+        res = generateJsonQuotedString(coreObject->getIdentifier());
     } else if (queryStr == "time") {
         res = std::to_string(currentTime);
     } else {
