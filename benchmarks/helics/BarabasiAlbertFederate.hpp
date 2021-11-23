@@ -14,11 +14,10 @@
 #include <utility>
 #include <vector>
 
-
 /* class implementing nodes within a Barabasi-Albert network*/
 class BarabasiAlbertFederate: public BenchmarkFederate {
- public:
-    int initialMessageCount = 10;   //number of messages the federate should send when it starts 
+  public:
+    int initialMessageCount = 10;  // number of messages the federate should send when it starts
 
   private:
     helics::Endpoint* ept = nullptr;
@@ -31,7 +30,6 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
     std::string getName() override { return getNameForIndex(index); }
     static std::string getNameForIndex(int index) { return "BA_" + std::to_string(index); }
 
-
     void setupArgumentParsing() override
     {
         deltaTime = helics::Time(10, time_units::ns);
@@ -41,7 +39,8 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
         app->add_option("--targets", targets, "targets this node federate will form links with");
     }
 
-    void doFedInit() override {
+    void doFedInit() override
+    {
         ept = &fed->registerTargetedEndpoint("ept");
 
         if (targets.compare("None") == 0) {
@@ -56,7 +55,7 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
             targets_vector.push_back(sb);
         }
         for (size_t i = 0; i < targets_vector.size(); i++) {
-            cp->linkEndpoints(ept->getName(), targets_vector[i]);  
+            cp->linkEndpoints(ept->getName(), targets_vector[i]);
         }
     }
     void doMakeReady() override
@@ -69,10 +68,10 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
     }
     void doMainLoop() override
     {
-       auto nextTime = helics::timeZero;
+        auto nextTime = helics::timeZero;
 
-       while (nextTime < finalTime) {
-            nextTime = fed->requestTime(finalTime);     
+        while (nextTime < finalTime) {
+            nextTime = fed->requestTime(finalTime);
             while (ept->hasMessage()) {
                 auto m = fed->getMessage(*ept);
                 m->source = ept->getName();
