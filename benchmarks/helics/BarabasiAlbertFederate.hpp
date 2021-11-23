@@ -1,3 +1,10 @@
+/*
+Copyright (c) 2017-2021,
+Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
+Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
+SPDX-License-Identifier: BSD-3-Clause
+*/
+
 #pragma once
 #include "BenchmarkFederate.hpp"
 #include "helics/application_api/Endpoints.hpp"
@@ -8,9 +15,8 @@
 
 #include <algorithm>
 #include <random>
-#include <stdlib.h>
+#include <cstdlib>
 #include <string>
-#include <time.h>
 #include <utility>
 #include <vector>
 
@@ -44,7 +50,7 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
     void doFedInit() override {
         ept = &fed->registerTargetedEndpoint("ept");
 
-        if (targets.compare("None") == 0) {
+        if (targets=="None") {
             return;
         }
 

@@ -45,9 +45,9 @@ class Node {
     void setName(std::string nm) { name = nm; }                     // set node name
     void setNumLinks(int x) { num_links = x; }                      // set number of links connected to node
     std::string getName() { return name; }                          // get node name
-    int getNumLinks() { return num_links; }                         // get number of links connected to node
+    int const getNumLinks() { return num_links; }                         // get number of links connected to node
     std::vector<std::string> getTargets() { return targets; }       // get a list of target destinations node will link to
-    void pushTargets(std::string nm) { targets.push_back(nm); }     // add to targets list
+    void pushTargets(std::string &nm) { targets.push_back(nm); }     // add to targets list
 
   private:
     std::string name = "";
@@ -78,7 +78,7 @@ static std::vector<Node> createTopology(int n, int m)
         std::string name = "BA_"+ std::to_string(i);
         std::vector<std::string> t;
         targets_vector.push_back(t);
-        nodes.push_back(Node());
+        nodes.emplace_back(Node());
         nodes.at(i).setName(name);
         nodes.at(i).setNumLinks(0);
     }
@@ -310,5 +310,4 @@ BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, udpCore, CoreType::UDP)
 #endif
 
 
-// TODO register multicore benchmarks
 HELICS_BENCHMARK_MAIN(BarabasiAlbertBenchmark);
