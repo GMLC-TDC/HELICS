@@ -267,7 +267,7 @@ TEST(player_tests, bigfile)
 
     auto fut = std::async(std::launch::async, [&play1]() { play1.runTo(500.0); });
     vfed.enterExecutingMode();
-    helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
+    // helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
     helics::Time period = 60.0;
     auto retTime = vfed.requestTime(60.0);
     double val1{0.0};

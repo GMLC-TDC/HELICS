@@ -788,13 +788,13 @@ bool checkForNeededCoreRetrieval(std::size_t currentIndex,
                                  DataType injectionType,
                                  DataType conversionType)
 {
-    std::array<DataType, 7> locType{DataType::HELICS_DOUBLE,
-                                    DataType::HELICS_INT,
-                                    DataType::HELICS_STRING,
-                                    DataType::HELICS_COMPLEX,
-                                    DataType::HELICS_VECTOR,
-                                    DataType::HELICS_COMPLEX_VECTOR,
-                                    DataType::HELICS_NAMED_POINT};
+    static constexpr std::array<DataType, 7> locType{{DataType::HELICS_DOUBLE,
+                                                      DataType::HELICS_INT,
+                                                      DataType::HELICS_STRING,
+                                                      DataType::HELICS_COMPLEX,
+                                                      DataType::HELICS_VECTOR,
+                                                      DataType::HELICS_COMPLEX_VECTOR,
+                                                      DataType::HELICS_NAMED_POINT}};
 
     if (locType[currentIndex] == injectionType || locType[currentIndex] == conversionType) {
         return false;
@@ -857,6 +857,12 @@ int Input::getValue(double* data, int maxsize)
     return length;
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
 int Input::getComplexValue(double* data, int maxsize)
 {
     const auto& CV = getValueRef<std::vector<std::complex<double>>>();
@@ -869,6 +875,10 @@ int Input::getComplexValue(double* data, int maxsize)
     hasUpdate = false;
     return length;
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 int Input::getValue(char* str, int maxsize)
 {

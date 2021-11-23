@@ -33,15 +33,15 @@ using defV = std::variant<double,
                           std::vector<std::complex<double>>,
                           NamedPoint>;
 
-/**enumeration of the order inside the variant so the Which function returns match the enumeration*/
-enum type_location {
-    double_loc = 0,
-    int_loc = 1,
-    string_loc = 2,
-    complex_loc = 3,
-    vector_loc = 4,
-    complex_vector_loc = 5,
-    named_point_loc = 6
+/**enumeration of the index value of the types inside the defV variant*/
+enum TypeLocation : decltype(std::declval<defV>().index()) {
+    double_loc = 0U,
+    int_loc = 1U,
+    string_loc = 2U,
+    complex_loc = 3U,
+    vector_loc = 4U,
+    complex_vector_loc = 5U,
+    named_point_loc = 6U
 };
 /** detect a change from the previous values*/
 HELICS_CXX_EXPORT bool changeDetected(const defV& prevValue, const std::string& val, double deltaV);
@@ -189,7 +189,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
         break;
         case complex_loc:  // complex
         {
-            auto cv = std::get<std::complex<double>>(dv);
+            auto& cv = std::get<std::complex<double>>(dv);
             val = static_cast<X>((cv.imag() != 0.0) ? std::abs(cv) : cv.real());
         }
 

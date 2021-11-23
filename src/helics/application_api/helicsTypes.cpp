@@ -111,7 +111,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static constexpr frozen::unordered_map<frozen::string, DataType, 63> typeMap{
+static constexpr frozen::unordered_map<frozen::string, DataType, 64> typeMap{
     {"double", DataType::HELICS_DOUBLE},
     {"string", DataType::HELICS_STRING},
     {"binary", DataType::HELICS_BOOL},
@@ -513,7 +513,7 @@ void helicsGetVector(std::string_view val, std::vector<double>& data)
         }
     } else if (val.front() == 'c') {
         auto sz = readSize(val);
-        data.reserve(sz * 2);
+        data.reserve(static_cast<std::size_t>(sz) * 2);
         data.resize(0);
         auto fb = val.find_first_of('[');
         for (decltype(sz) ii = 0; ii < sz; ++ii) {
