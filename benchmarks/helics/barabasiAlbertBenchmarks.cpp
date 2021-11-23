@@ -40,12 +40,15 @@ static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 /* class implementing a node representation*/
 class Node {
   public:
-    void setName(std::string nm) { name = nm; }                     // set node name
-    void setNumLinks(int x) { num_links = x; }                      // set number of links connected to node
-    std::string getName() { return name; }                          // get node name
-    int const getNumLinks() { return num_links; }                         // get number of links connected to node
-    std::vector<std::string> getTargets() { return targets; }       // get a list of target destinations node will link to
-    void pushTargets(std::string &nm) { targets.push_back(nm); }     // add to targets list
+    void setName(std::string nm) { name = nm; }  // set node name
+    void setNumLinks(int x) { num_links = x; }  // set number of links connected to node
+    std::string getName() { return name; }  // get node name
+    int const getNumLinks() { return num_links; }  // get number of links connected to node
+    std::vector<std::string> getTargets()
+    {
+        return targets;
+    }  // get a list of target destinations node will link to
+    void pushTargets(std::string& nm) { targets.push_back(nm); }  // add to targets list
 
   private:
     std::string name = "";
