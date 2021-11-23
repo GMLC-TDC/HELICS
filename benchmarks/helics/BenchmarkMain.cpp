@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "BarabasiAlbertFederate.hpp"
 #include "BenchmarkFederate.hpp"
 #include "EchoHubFederate.hpp"
 #include "EchoLeafFederate.hpp"
@@ -78,6 +79,10 @@ int main(int argc, char* argv[])
         addBM<TimingHub>(app, "timinghub", "Timing Hub benchmark federate");
         addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
         addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
+
+        addBM<BarabasiAlbertFederate>(app,
+                                          "barabasi-albert",
+                                          "Barabasi-Albert benchmark federate");
 
         auto ret = app.helics_parse(argc, argv);
         if (ret != helics::helicsCLI11App::parse_output::ok) {
