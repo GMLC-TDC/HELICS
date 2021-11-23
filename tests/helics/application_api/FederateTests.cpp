@@ -1060,8 +1060,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
-                 helics::FederateError);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::FederateError);
 }
 
 TEST(federate_tests, federateGeneratedlocalErrorEscalation)
@@ -1081,8 +1080,7 @@ TEST(federate_tests, federateGeneratedlocalErrorEscalation)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
-                 helics::FederateError);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::FederateError);
 }
 
 TEST(federate_tests, queryTest1)
@@ -1106,7 +1104,7 @@ TEST(federate_tests, queryTest1)
     cr.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
-    //core name should be empty after disconnect
+    // core name should be empty after disconnect
     EXPECT_NE(qres.find("\"\""), std::string::npos);
     qres = Fed1->query("subscriptions");
     EXPECT_NE(qres.find("error"), std::string::npos);
@@ -1176,10 +1174,10 @@ TEST(federate_tests, error_after_disconnect)
     EXPECT_FALSE(fb3.isValid());
 
     EXPECT_NO_THROW(Fed1->setGlobal("global1", "global1"));
-    EXPECT_THROW(f1.addSourceTarget("ept"),helics::InvalidFunctionCall);
+    EXPECT_THROW(f1.addSourceTarget("ept"), helics::InvalidFunctionCall);
     EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
-    EXPECT_THROW(f1.addDestinationTarget("ept"),helics::InvalidFunctionCall);
+    EXPECT_THROW(f1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
     EXPECT_NO_THROW(Fed1->setFilterOperator(f1, {}));
 
     EXPECT_THROW(Fed1->localError(99), helics::FederateError);

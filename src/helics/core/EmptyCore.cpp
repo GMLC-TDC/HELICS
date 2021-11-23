@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "core-exceptions.hpp"
 #include "helicsVersion.hpp"
+
 #include <iostream>
 
 namespace helics {
