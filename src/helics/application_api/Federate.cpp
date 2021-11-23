@@ -174,8 +174,10 @@ Federate::Federate(Federate&& fed) noexcept
 {
     auto tmode = fed.currentMode.load();
     currentMode.store(tmode);
+    fed.currentMode.store(Modes::FINALIZE);
     fedID = fed.fedID;
     coreObject = std::move(fed.coreObject);
+    fed.coreObject = CoreFactory::getEmptyCore();
     currentTime = fed.currentTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
@@ -189,8 +191,10 @@ Federate& Federate::operator=(Federate&& fed) noexcept
 {
     auto tstate = fed.currentMode.load();
     currentMode.store(tstate);
+    fed.currentMode.store(Modes::FINALIZE);
     fedID = fed.fedID;
     coreObject = std::move(fed.coreObject);
+    fed.coreObject = CoreFactory::getEmptyCore();
     currentTime = fed.currentTime;
     nameSegmentSeparator = fed.nameSegmentSeparator;
     strictConfigChecking = fed.strictConfigChecking;
@@ -541,9 +545,10 @@ void Federate::finalize()
         default:
             throw(InvalidFunctionCall("cannot call finalize in present state"));  // LCOV_EXCL_LINE
     }
+    if (coreObject) {
+        coreObject->finalize(fedID);
+    }
 
-    coreObject->finalize(fedID);
-    
     if (fManager) {
         fManager->closeAllFilters();
     }
