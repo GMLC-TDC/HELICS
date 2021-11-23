@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "core-exceptions.hpp"
 #include "helicsVersion.hpp"
+#include <iostream>
 
 namespace helics {
 
@@ -33,13 +34,13 @@ bool EmptyCore::isConnected() const
 
 const std::string& EmptyCore::getIdentifier() const
 {
-    static const std::string nullStr{"empty"};
+    static const std::string nullStr{""};
     return nullStr;
 }
 
 const std::string& EmptyCore::getAddress() const
 {
-    static const std::string nullStr{"empty"};
+    static const std::string nullStr{""};
     return nullStr;
 }
 
@@ -67,15 +68,17 @@ bool EmptyCore::hasError() const
     return false;
 }
 void EmptyCore::globalError(LocalFederateId /*federateID*/,
-                            int /*errorCode*/,
-                            const std::string& /*errorString*/)
+                            int errorCode,
+                            const std::string& errorString)
 {
+    throw(FederateError(errorCode, errorString));
 }
 
 void EmptyCore::localError(LocalFederateId /*federateID*/,
-                           int /*errorCode*/,
-                           const std::string& /*errorString*/)
+                           int errorCode,
+                           const std::string& errorString)
 {
+    throw(FederateError(errorCode, errorString));
 }
 
 int EmptyCore::getErrorCode() const
@@ -400,9 +403,14 @@ uint64_t EmptyCore::receiveCountAny(LocalFederateId /*federateID*/)
 }
 
 void EmptyCore::logMessage(LocalFederateId /*federateID*/,
-                           int /*logLevel*/,
-                           const std::string& /*messageToLog*/)
+                           int logLevel,
+                           const std::string& messageToLog)
 {
+    if (logLevel <= HELICS_LOG_LEVEL_WARNING) {
+        std::cerr << messageToLog << std::endl;
+    } else {
+        std::cout << messageToLog << std::endl;
+    }
 }
 
 void EmptyCore::setLoggingLevel(int /*logLevel*/) {}

@@ -1332,7 +1332,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
 
 void Federate::logMessage(int level, const std::string& message) const
 {
-    if (coreObject->isConnected()) {
+    if (coreObject) {
         coreObject->logMessage(fedID, level, message);
     } else if (level <= HELICS_LOG_LEVEL_WARNING) {
         std::cerr << message << std::endl;
