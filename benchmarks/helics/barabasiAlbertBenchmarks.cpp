@@ -15,29 +15,27 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <gmlc/concurrency/Barrier.hpp>
 #include <iostream>
-#include <thread>
 #include <string>
-
+#include <thread>
 
 using helics::CoreType;
 
 static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 
 /*
-* In this benchmark # nodes (n) would be the # of federates
-* The Barabasi Albert algorithm starts with some m number
-* of conencted nodes. For the purpose of this benchmark
-* we start with nodes 0 & 1 connected to each other.
-* All subsequent nodes will have a probabiltiy of
-* connecting to the pre-existing nodes based on the following
-* probability: 
-*       p = ki/sum(kj)
-* where p is the probability of a link forming
-* ki is the degree of pre-existing node i
-* sum(kj) is the sum of the degrees of all pre-existing nodes
-* 
-*/
-
+ * In this benchmark # nodes (n) would be the # of federates
+ * The Barabasi Albert algorithm starts with some m number
+ * of connected nodes. For the purpose of this benchmark
+ * we start with nodes 0 & 1 connected to each other.
+ * All subsequent nodes will have a probabiltiy of
+ * connecting to the pre-existing nodes based on the following
+ * probability:
+ *       p = ki/sum(kj)
+ * where p is the probability of a link forming
+ * ki is the degree of pre-existing node i
+ * sum(kj) is the sum of the degrees of all pre-existing nodes
+ *
+ */
 
 /* class implementing a node representation*/
 class Node {
@@ -53,18 +51,18 @@ class Node {
     std::string name = "";
     int num_links = 0;
     std::vector<std::string> targets;
+
   public:
     Node() = default;
 };
 
-
 static std::vector<Node> createTopology(int n, int m)
 {
     if (m < 2 || m > n) {
-            std::cerr << "ERROR: M can't be less than 2 or more than the federate count"
+        std::cerr << "ERROR: M can't be less than 2 or more than the federate count"
 
-                      << std::endl;
-            exit(1);
+                  << std::endl;
+        exit(1);
     }
     std::default_random_engine generator;
     std::uniform_int_distribution<int> distribution(0, 99);
@@ -72,10 +70,9 @@ static std::vector<Node> createTopology(int n, int m)
     int total_links = 0;
     std::vector<Node> nodes;
     nodes.reserve(n);
-    std::vector< std::vector<std::string>> targets_vector;
-    for (int i=0; i<n; i++)
-    {
-        std::string name = "BA_"+ std::to_string(i);
+    std::vector<std::vector<std::string>> targets_vector;
+    for (int i = 0; i < n; i++) {
+        std::string name = "BA_" + std::to_string(i);
         std::vector<std::string> t;
         targets_vector.push_back(t);
         nodes.emplace_back(Node());
@@ -83,24 +80,21 @@ static std::vector<Node> createTopology(int n, int m)
         nodes.at(i).setNumLinks(0);
     }
 
-    for (int m1 = m-1; m1 > 0; m1--) {
+    for (int m1 = m - 1; m1 > 0; m1--) {
         // link m initial nodes together
         for (int m2 = m1 - 1; m2 >= 0; m2--) {
             // ADD TARGETS HERE
             nodes[m1].pushTargets(nodes[m2].getName() + "/ept,");
             nodes[m2].pushTargets(nodes[m1].getName() + "/ept,");
-            nodes[m1].setNumLinks(nodes[m1].getNumLinks()+1);
-            nodes[m2].setNumLinks(nodes[m2].getNumLinks()+1);
+            nodes[m1].setNumLinks(nodes[m1].getNumLinks() + 1);
+            nodes[m2].setNumLinks(nodes[m2].getNumLinks() + 1);
 
             total_links++;
-
         }
     }
     // the rest of the topology building here
     for (int i = m; i < n; i++) {
         for (int j = i - 1; j >= 0; j--) {
-
-
             int rnd = distribution(generator);
 
             int p = (float(nodes[j].getNumLinks()) / total_links) * 100;
@@ -117,20 +111,20 @@ static std::vector<Node> createTopology(int n, int m)
     return nodes;
 }
 
-
 static void BM_BarabasiAlbert_singleCore(benchmark::State& state)
 {
     for (auto _ : state) {
         state.PauseTiming();
         int feds = 2;
         int m = 2;
-        std::vector<Node> nodes = createTopology(feds,m);
+        std::vector<Node> nodes = createTopology(feds, m);
 
         gmlc::concurrency::Barrier brr(feds);
 
         auto wcore = helics::CoreFactory::create(
             CoreType::INPROC,  //||ZMQ core, TCP, UDP, MPI?
-            std::string("--autobroker --federates=2 --restrictive_time_policy --broker_init_string=\"--restrictive_time_policy\""));
+            std::string(
+                "--autobroker --federates=2 --restrictive_time_policy --broker_init_string=\"--restrictive_time_policy\""));
 
         std::vector<BarabasiAlbertFederate> links(feds);
         for (int i = 0; i < feds; i++) {
@@ -141,18 +135,14 @@ static void BM_BarabasiAlbert_singleCore(benchmark::State& state)
             for (auto t : nodes[i].getTargets()) {
                 s += t;
             }
-            std::string bmInit =
-                "--index=" + std::to_string(i) + " --max_index=" + std::to_string(feds) + " --targets=" + s;
+            std::string bmInit = "--index=" + std::to_string(i) +
+                " --max_index=" + std::to_string(feds) + " --targets=" + s;
             links[i].initialize(wcore->getIdentifier(), bmInit);
         }
 
         std::thread nodesThread(
-            [&](BarabasiAlbertFederate& link) {
-                link.run([&brr]() { brr.wait(); });
-            },
-            std::ref(links[1])
-        );
-
+            [&](BarabasiAlbertFederate& link) { link.run([&brr]() { brr.wait(); }); },
+            std::ref(links[1]));
 
         links[0].makeReady();
 
@@ -179,9 +169,8 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
         int feds = static_cast<int>(state.range(0));
         std::vector<Node> nodes = createTopology(feds, m);
 
-
         gmlc::concurrency::Barrier brr(feds);
-         auto broker =
+        auto broker =
             helics::BrokerFactory::create(cType,
                                           std::string("--restrictive_time_policy --federates=") +
                                               std::to_string(feds));
@@ -189,8 +178,6 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
 
         std::vector<BarabasiAlbertFederate> links(feds);
         std::vector<std::shared_ptr<helics::Core>> cores(feds);
-
-
 
         for (int ii = 0; ii < feds; ++ii) {
             cores[ii] = helics::CoreFactory::create(
@@ -210,12 +197,11 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
             links[ii].initialize(cores[ii]->getIdentifier(), bmInit);
         }
 
-
         std::vector<std::thread> threadlist(feds - 1);
         for (int ii = 0; ii < feds - 1; ++ii) {
             threadlist[ii] = std::thread(
                 [&](BarabasiAlbertFederate& link) { link.run([&brr]() { brr.wait(); }); },
-                    std::ref(links[ii + 1]));
+                std::ref(links[ii + 1]));
         }
 
         links[0].makeReady();
@@ -238,8 +224,7 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
 
 static void BarabasiAlbertArguments(benchmark::internal::Benchmark* b)
 {
-    for(int f=2; f <=maxscale; f *=2)
-    {
+    for (int f = 2; f <= maxscale; f *= 2) {
         b->Args({f});
     }
 }
@@ -251,12 +236,10 @@ BENCHMARK(BM_BarabasiAlbert_singleCore)
     ->UseRealTime()
     ->Iterations(3);
 
-
- BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, inprocCore, CoreType::INPROC)
+BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, inprocCore, CoreType::INPROC)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->Apply(BarabasiAlbertArguments)
     ->UseRealTime();
-    
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 // Register the ZMQ benchmarks
@@ -273,7 +256,6 @@ BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, zmqssCore, CoreType::ZMQ_SS)
     ->Apply(BarabasiAlbertArguments)
     ->UseRealTime();
 #endif
-
 
 #ifdef HELICS_ENABLE_IPC_CORE
 // Register the IPC benchmarks
@@ -308,6 +290,5 @@ BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, udpCore, CoreType::UDP)
     ->Apply(BarabasiAlbertArguments)
     ->UseRealTime();
 #endif
-
 
 HELICS_BENCHMARK_MAIN(BarabasiAlbertBenchmark);

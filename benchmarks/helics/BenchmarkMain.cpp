@@ -80,9 +80,7 @@ int main(int argc, char* argv[])
         addBM<TimingLeaf>(app, "timingleaf", "Timing Leaf benchmark federate");
         addBM<WattsStrogatzFederate>(app, "watts-strogatz", "Watts-Strogatz benchmark federate");
 
-        addBM<BarabasiAlbertFederate>(app,
-                                          "barabasi-albert",
-                                          "Barabasi-Albert benchmark federate");
+        addBM<BarabasiAlbertFederate>(app, "barabasi-albert", "Barabasi-Albert benchmark federate");
 
         auto ret = app.helics_parse(argc, argv);
         if (ret != helics::helicsCLI11App::parse_output::ok) {
