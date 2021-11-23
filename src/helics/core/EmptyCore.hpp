@@ -7,8 +7,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Core.hpp"
-#include <string>
+
 #include <memory>
+#include <string>
 #include <utility>
 #include <vector>
 
