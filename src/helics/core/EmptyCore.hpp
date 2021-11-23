@@ -35,9 +35,8 @@ class EmptyCore: public Core {
     virtual void finalize(LocalFederateId federateID) override;
     virtual void enterInitializingMode(LocalFederateId federateID) override;
     virtual void setCoreReadyToInit() override;
-    virtual IterationResult
-        enterExecutingMode(LocalFederateId federateID,
-                           IterationRequest iterate = NO_ITERATION) override;
+    virtual IterationResult enterExecutingMode(LocalFederateId federateID,
+                                               IterationRequest iterate = NO_ITERATION) override;
     virtual LocalFederateId registerFederate(const std::string& name,
                                              const CoreFederateInfo& info) override;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override;
@@ -49,17 +48,14 @@ class EmptyCore: public Core {
                                                 IterationRequest iterate) override;
     virtual Time getCurrentTime(LocalFederateId federateID) const override;
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override;
-    virtual void
-        setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override;
+    virtual void setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override;
     virtual void setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,
                                     int16_t propertyValue) override;
     virtual Time getTimeProperty(LocalFederateId federateID, int32_t property) const override;
-    virtual int16_t getIntegerProperty(LocalFederateId federateID,
-                                       int32_t property) const override;
-    virtual void setFlagOption(LocalFederateId federateID,
-                               int32_t flag,
-                               bool flagValue = true) override;
+    virtual int16_t getIntegerProperty(LocalFederateId federateID, int32_t property) const override;
+    virtual void
+        setFlagOption(LocalFederateId federateID, int32_t flag, bool flagValue = true) override;
     virtual bool getFlagOption(LocalFederateId federateID, int32_t flag) const override;
 
     virtual InterfaceHandle registerPublication(LocalFederateId federateID,
@@ -78,20 +74,17 @@ class EmptyCore: public Core {
 
     virtual const std::string& getHandleName(InterfaceHandle handle) const override;
 
-    virtual void setHandleOption(InterfaceHandle handle,
-                                 int32_t option,
-                                 int32_t option_value) override;
+    virtual void
+        setHandleOption(InterfaceHandle handle, int32_t option, int32_t option_value) override;
 
     virtual int32_t getHandleOption(InterfaceHandle handle, int32_t option) const override;
     virtual void closeHandle(InterfaceHandle handle) override;
-    virtual void removeTarget(InterfaceHandle handle,
-                              std::string_view targetToRemove) override;
+    virtual void removeTarget(InterfaceHandle handle, std::string_view targetToRemove) override;
     virtual void addDestinationTarget(InterfaceHandle handle,
                                       std::string_view dest,
                                       InterfaceType hint) override;
-    virtual void addSourceTarget(InterfaceHandle handle,
-                                 std::string_view name,
-                                 InterfaceType hint) override;
+    virtual void
+        addSourceTarget(InterfaceHandle handle, std::string_view name, InterfaceType hint) override;
     virtual const std::string& getDestinationTargets(InterfaceHandle handle) const override;
 
     virtual const std::string& getSourceTargets(InterfaceHandle handle) const override;
@@ -131,12 +124,9 @@ class EmptyCore: public Core {
                                            const std::string& endpoint) override;
     virtual void addDestinationFilterToEndpoint(const std::string& filter,
                                                 const std::string& endpoint) override;
+    virtual void send(InterfaceHandle sourceHandle, const void* data, uint64_t length) override;
     virtual void
-        send(InterfaceHandle sourceHandle, const void* data, uint64_t length) override;
-    virtual void sendAt(InterfaceHandle sourceHandle,
-                        const void* data,
-                        uint64_t length,
-                        Time time) override;
+        sendAt(InterfaceHandle sourceHandle, const void* data, uint64_t length, Time time) override;
     virtual void sendTo(InterfaceHandle sourceHandle,
                         const void* data,
                         uint64_t length,
@@ -162,7 +152,6 @@ class EmptyCore: public Core {
     /** get the local identifier for the core*/
     virtual const std::string& getIdentifier() const override;
     virtual const std::string& getAddress() const override;
-    
 
     /** set the core logging level*/
     virtual void setLoggingLevel(int logLevel) override;
@@ -192,7 +181,7 @@ class EmptyCore: public Core {
     virtual void disconnect() override;
     virtual bool waitForDisconnect(
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override;
-   
+
     /** set the local information field of the interface*/
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override;
     /** get the local information field of the interface*/
@@ -209,7 +198,6 @@ class EmptyCore: public Core {
                                 const std::string& value) override;
     virtual const std::string& getFederateTag(LocalFederateId fid,
                                               const std::string& tag) const override;
-
 };
 
 }  // namespace helics

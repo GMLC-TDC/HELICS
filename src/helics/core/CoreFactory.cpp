@@ -11,13 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommonCore.hpp"
 #include "CoreTypes.hpp"
+#include "EmptyCore.hpp"
 #include "core-exceptions.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
 #include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
-#include "EmptyCore.hpp"
 
 #include <cassert>
 #include <cstring>
@@ -92,7 +92,8 @@ std::shared_ptr<Core> makeCore(CoreType type, const std::string& name)
     return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
 }
 
-std::shared_ptr<Core> getEmptyCore() {
+std::shared_ptr<Core> getEmptyCore()
+{
     return emptyCore;
 }
 
