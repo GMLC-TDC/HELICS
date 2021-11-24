@@ -15,14 +15,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.0.1)
+project(HELICS VERSION 3.1.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-08-26")
+set(HELICS_DATE "2021-11-24")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -571,6 +571,8 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
+#this should be removed when we require a compiler with the filesystem header defined
+target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)

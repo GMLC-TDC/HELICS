@@ -28,10 +28,11 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Denis Nadeau](https://github.com/dnadeau4) (Now LANL)
 - [Ben Salazar](https://github.com/salazar33)
 - [Brian Kelley](https://github.com/bmkelley)
-- [Hoa Ngo](https://github.com/hgngo)
+- [Hoa Ngo](https://github.com/hgngo) (not currently at LLNL)
 - [Ai Enkoji](https://github.com/aenkoji1)
 - [Nan Duan](https://github.com/nan-duan)
-- [Nathan Yee](https://github.com/yee29)
+- [Nathan Yee](https://github.com/yee29) (not currently at LLNL)
+- [Ai Enkoji](https://github.com/aenkoji1)
 
 ### National Renewable Energy Lab
 
@@ -52,6 +53,8 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 - [Beroset](https://github.com/beroset)
 - [Nitin Barthwal](https://github.com/nitin-barthwal)
+- [Parth Bansal](https://github.com/parthb83)
+- [Gaurav Kumar](https://github.com/slashgk)
 
 ## Used Libraries or Code
 
@@ -69,7 +72,7 @@ JsonCpp is used for parsing json files. It is included as a submodule JsonCpp is
 
 ### [CLI11](https://github.com/CLIUtils/CLI11)
 
-CLI11 is a command line parser used throughout HELICS. Most modifications used in HELICS were merged to the CLI11 library and work continues to integrate the remaining modifications. The project was created by [Henry Schreiner](https://github.com/henryiii). A slightly modified version of 2.0 is included with the HELICS source code. CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
+CLI11 is a command line parser used throughout HELICS. Several modification used and tested in HELICS have been merged upstream. The project was created by [Henry Schreiner](https://github.com/henryiii). CLI11 is available under a [3-Clause BSD](https://github.com/CLIUtils/CLI11/blob/master/LICENSE) license.
 
 ### [toml11](https://github.com/ToruNiina/toml11)
 
