@@ -632,7 +632,7 @@ EXAMPLE_RECURSIVE      = NO
 # directories that contain image that are included in the documentation (see
 # the \image command).
 
-IMAGE_PATH             = "@PROJECT_SOURCE_DIR@/src/docs/img"
+IMAGE_PATH             = "@PROJECT_SOURCE_DIR@/docs/logos"
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -773,6 +773,12 @@ HTML_FOOTER            =
 # documentation will contain the timesstamp.
 
 HTML_TIMESTAMP         = NO
+
+# The HTML_EXTRA_FILES tag can be used to specify one or more extra
+# images or other source files which should be copied to the HTML output
+# directory.
+
+HTML_EXTRA_FILES       = "@PROJECT_SOURCE_DIR@/docs/logos/helics-logo-long-primary-black.svg"
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading
 # style sheet that is used by each HTML page. It can be used to
