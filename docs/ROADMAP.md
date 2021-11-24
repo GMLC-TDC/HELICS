@@ -6,7 +6,7 @@ This document contains tentative plans for changes and improvements of note in u
 
 This will be the last of the 2.X series releases
 
-Mainly including Any relevant bug fixes and other minor tweaks for compatibility, and a final refresh of the third-party libraries to bring them up to date.
+Mainly includes any relevant bug fixes and other minor tweaks for compatibility, and a final refresh of the third-party libraries to bring them up to date.
 
 ## \[3.2\] ~ 2022-02-15
 

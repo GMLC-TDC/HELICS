@@ -16,25 +16,25 @@ This release includes some bug fixes and enhancements to HELICS 3 which is now t
 
 - Fixed an issue with null strings lacking a null termination when retrieved from the C API. This primarily affected the Python and other language API's.
 - CMake fix for some older linkers.
-- A Fix for ASIO aligned when used with MINGW.
-- Fix to IPC core to support boost 1.77.
+- A fix for ASIO aligned_alloc when used with MinGW.
+- Fix to IPC core to support Boost 1.77.
 - A few issues around the JsonSerialization options for backwards compatibility with HELICS 2, and add some interoperability tests that can be used to check future versions.
-- Fix and issue with the timeCoordinator where is a large time value was requested and with certain other configuration parameters the time could overflow and cause a deadlock.
+- Fix an issue with the timeCoordinator where a large time value was requested and with certain other configuration parameters the time could overflow and cause a deadlock.
 
 ### Changed
 
-- precommit-ci now used in the CI chain and checks were updated and a check for python formatting inside the docs.
-- Update thirdParty library versions including ASIO, CLI11, toml11, FMT, spdlog, jsoncpp, filesystem.
+- precommit-ci now used in the CI chain, pre-commit checks were updated, and a check for python formatting inside the docs was added.
+- Update ThirdParty library versions including ASIO, CLI11, toml11, FMT, spdlog, jsoncpp, filesystem.
 - Mac binaries are now universal binaries to support ARM based CPU types.
-- Update some of the TCP helper classes to better support future encrypted communication efforts
+- Update some of the TCP helper classes to better support future encrypted communication efforts.
 
 ### Added
 
 - Add the ability to add observer federates which can join a federation after it has started and subscribe to values, or make queries of the federation while in progress.
-- Add a configurable grant timeout which will trigger diagnostic action if a federate has been waiting sufficiently long for a time grant
-- a document on the [Type conversion](./docs\developer-guide/typeConversion.md) that HELICS can perform and a series of tests to verify the correct operation of the type conversions
-- Additional missing functions related to linking targeted endpoints from a core, so it can work similar to dataLink methods. These methods were added to Core and Broker applications
-- New benchmark based on the Barabasi-Albert network
+- Add a configurable grant timeout which will trigger diagnostic action if a federate has been waiting sufficiently long for a time grant.
+- A document on the [Type conversion](./docs\developer-guide/typeConversion.md) that HELICS can perform and a series of tests to verify the correct operation of the type conversions.
+- Additional missing functions related to linking targeted endpoints from a core, so it can work similar to dataLink methods. These methods were added to Core and Broker applications.
+- New benchmark based on the Barabasi-Albert network.
 
 ### Deprecated
 
