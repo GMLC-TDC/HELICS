@@ -240,7 +240,7 @@ texinfo_documents = [
         "HELICS Documentation",
         author,
         "HELICS",
-        "One line description of project.",
+        "Hierarchical Engine for Large-scale Infrastructure Co-Simulation",
         "Miscellaneous",
     ),
 ]
