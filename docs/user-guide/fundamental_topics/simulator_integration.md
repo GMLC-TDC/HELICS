@@ -43,7 +43,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 
@@ -115,7 +115,7 @@ import helics as h
 
 ### Federate Information
 
-Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](./../configuration/FederateFlags.md).
+Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](../deprecated/FederateFlags.md).
 
 ### Publications, Subscriptions and Endpoints
 
@@ -163,7 +163,7 @@ Additionally, there are ways to create and configure the federate directly throu
 fi = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](./../configuration/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../deprecated/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fi, 6, True)

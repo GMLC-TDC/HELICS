@@ -29,7 +29,7 @@ The files include:
 
 ## Default Setup
 
-The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSONs and how to launch the co-simulation with `helics_cli`.
+The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSON files and how to launch the co-simulation with `helics_cli`.
 
 ### Messages + Communication: pub/sub
 

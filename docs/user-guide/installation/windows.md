@@ -46,7 +46,7 @@ To set up your environment:
     if you need MPI support.
 5.  _Optional_ Install
     [SWIG](http://www.swig.org/download.html)
-    if you wish to generate the interface libraries for MATLAB and Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you do need to regenerate the MATLAB interface a modified version of swig is necessary, see [MATLAB Swig](../introduction/matlab). For Octave and C\# a swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
+    if you wish to generate the interface libraries for MATLAB and Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you do need to regenerate the MATLAB interface a modified version of swig is necessary, see [MATLAB Swig](language.md#helics-with-matlab). For Octave and C\# a swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) and use
 
 ```shell
      choco install swig

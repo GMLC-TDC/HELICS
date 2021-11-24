@@ -6,7 +6,7 @@
     :maxdepth: 2
 ```
 
-Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSONs for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things). As such
+Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSON files for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things). As such
 
 ## Configuration methods
 
@@ -26,23 +26,23 @@ Which method you use to configure your federate and co-simulation significantly 
   To use the JSON file for configuration, one of three specific APIs needs to be called: in the file:
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
-    | [C](api-reference/C_API.md#others)
+    | [C](api-reference/C_API.md#creation)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateValueFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateValueFederateFromConfig-Tuple{String})
   - `helicsCreateMessageFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a8d992360400e996c083c0b3a1d75b8f0)
-    | [C](api-reference/C_API.md#others)
+    | [C](api-reference/C_API.md#creation)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateMessageFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateMessageFederateFromConfig-Tuple{String})
   - `helicsCreateCombinationFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a758381aad8bd5f9d0925a8b13ee04a1d)
-    | [C](api-reference/C_API.md#others)
+    | [C](api-reference/C_API.md#creation)
     | [Python](https://python.helics.org/api/capi-py.html#helicsCreateCombinationFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateCombinationFederateFromConfig-Tuple{String})
 - **JSON configuration produces a natural artifact that defines the co-simulation** - Another advantage of the external configuration in the JSON file is that it is a human-readable artifact that can be distributed separately from the source code that provides a lot of information about how the co-simulation was run. In fact, its possible to just look at the configuration files of a federation and do some high-level debugging (checking to see that the subscriptions and publications are aligned, for example).
 - **New federates in ill-defined use cases may benefit from API configuration** - The modularity that the JSON config provides may not offer many benefits if the federate is newly integrated into HELICS and/or is part of an evolving analysis. During these times the person(s) doing the integration may just want to make direct API calls instead of having to mess with writing the federate code and a configuration file. There will likely be a point in the future when the software is more codified and switching to a JSON configuration makes more sense.
 - **Command-line configuration (where possible) allows for small, quick changes to the configuration** - Because the command line doesn't provide comprehensive access to the necessary configuration, it will never be a stand-alone configuration option but it does have the advantage of providing quick access right as a user is instantiating the federate. This is an ideal place to make small changes to the configuration (e.g. changing the minimum time step) without having to edit any files.
-- **API configuration is most useful for dynamic configuration** - If there is a need to change the configuration of a given federate dynamically, the API is the only way to do that. Such needs are not common but there are cases where, for example, it may be necessary to define the configuration based on the participants in the federation (_e.g._ publications, subscriptions, timing). It's possible to use [queries](./user_guide/queries.md) to understand the composition and configuration of the federation and then use the APIs to define the configuration of the federate in question.
+- **API configuration is most useful for dynamic configuration** - If there is a need to change the configuration of a given federate dynamically, the API is the only way to do that. Such needs are not common but there are cases where, for example, it may be necessary to define the configuration based on the participants in the federation (_e.g._ publications, subscriptions, timing). It's possible to use [queries](../user-guide/advanced_topics/queries.md) to understand the composition and configuration of the federation and then use the APIs to define the configuration of the federate in question.
 
 ### How to Use This Reference
 
@@ -221,7 +221,7 @@ _API:_ `helicsFederateInfoSetCoreTypeFromString`
 | [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetCoreTypeFromString)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_core_type}})
 
-There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). See the [User Guide page on core types](./user-guide/CoreTypes.md) for more details.
+There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). See the [User Guide page on core types](../user-guide/advanced_topics/CoreTypes.md) for more details.
 
 ---
 
@@ -301,7 +301,7 @@ String used to define the configuration of the broker if one is autogenerated. S
 - `--grant_timeout=` - Time in ms to wait to allow a time request to wait before triggering diagnostic actions. Times can also be entered as strings such as "15s" or "75ms".
 - `--children=` - The minimum number of child objects the broker should expect before allowing entry to the initializing state.
 - `--subbrokers=` - The minimum number of child objects the broker should expect before allowing entry to the initializing state. Same as `--children` but might be clearer in some cases with multilevel hierarchies.
-- `--brokerkey=` - A broker key to use for connections to ensure federates are connecting with a specific broker and only appropriate federates connect with the broker. See [simultaneous co-simulations](../user_guide/advanced_topicc/simultaneous_cosimulations.md) for more information.
+- `--brokerkey=` - A broker key to use for connections to ensure federates are connecting with a specific broker and only appropriate federates connect with the broker. See [simultaneous co-simulations](../user-guide/advanced_topics/simultaneous_cosimulations.md) for more information.
 - `--profiler=log` - Send the profiling messages to the default logging file. `log` can be replaced with a path to an alternative file where only the profiling messages will be sent. See the [User Guide page on profiling](../user-guide/advanced_topics/profiling.md) for further details.
 
 ---
@@ -615,7 +615,7 @@ If set, a federate will not be granted the requested time until all other federa
 
 Using the option `restrictive-time-policy` forces HELICS to use a fully conservative mode in granting time. This can be useful in situations beyond the current reach of the distributed time algorithms. It is generally used in cases where it is known that some federate is executing and will trigger someone else, but most federates won't know who that might be. This prevents extra messages from being sent and a potential for time skips. It is not needed if some federates are periodic and execute every time step. The flag can be used for federates, brokers, and cores to force very conservative timing with the potential loss of performance as well.
 
-Only applicable to Named Input interfaces ([see section on value federate interface types](./user-guide/value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input.
+Only applicable to Named Input interfaces ([see section on value federate interface types](../user-guide/fundamental_topics/value_federates.md)), if enabled this flag checks that data type of the incoming signals match that specified for the input.
 
 ---
 
@@ -854,7 +854,7 @@ Used to specify which inputs should receive the values from this output. This ca
 
 ## Input-only Options
 
-Inputs can receive values from multiple sending handles and the means by which those multiple data points for a single handle are managed can be specified with several options. See the [User Guide entry](./user-guide/multiSourceInputs.md) for further details.
+Inputs can receive values from multiple sending handles and the means by which those multiple data points for a single handle are managed can be specified with several options. See the [User Guide entry](../user-guide/advanced_topics/multiSourceInputs.md) for further details.
 
 ### `targets`
 
@@ -1252,7 +1252,13 @@ HELICS 2.8 and v3.0.1 have a profiling capability that allows users to measure t
 
 ### `profiling` [false]
 
-**TODO** Add links to API references once they exist
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
+
+_Property's enumerated name:_ `HELICS_FLAG_PROFILING` [93]
 
 Setting this flag enables profiling for the federate.
 
@@ -1266,15 +1272,27 @@ Turns on profiling for the federate and allows the specification of the log file
 
 ### `local_profiling_capture` [false]
 
-**TODO** Add links to API references once they exist
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
+
+_Property's enumerated name:_ `HELICS_FLAG_LOCAL_PROFILING_CAPTURE` [96]
 
 Setting this flag sends the profiling messages to the local federate log rather than propagating them up to the core and/or broker.
 
 ---
 
-### `local_profiling_capture` [false]
+### `profiling_marker` [false]
 
-**TODO** Add links to API references once they exist
+_API:_ `helicsFederateInfoSetFlagOption`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
+
+_Property's enumerated name:_ `HELICS_FLAG_PROFILING_MARKER` [95]
 
 Generates an additional `marker` message if logging is enabled.
 
@@ -1285,6 +1303,7 @@ For most HELICS users, most of the time, the following network options are not n
 ### interface network
 
 _API:_
+
 See multiple options for --local, --ipv4, --ipv6, --all
 
 ---

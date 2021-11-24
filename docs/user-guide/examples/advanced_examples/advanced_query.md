@@ -1,6 +1,6 @@
 # Federation Queries
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
@@ -27,7 +27,7 @@ This example has the same federates interacting in the same ways as in the [Adva
 
 #### HELICS Differences
 
-In most of the examples presented here, the configuration of the federation is defined prior to executing the co-simulation via the configuration JSONs. It is possible, though, with extra effort and careful design, to write the federate code such that they self-configure based on the other participants in the co-simulation. This example provides a simple demonstration of this by having the Battery federate query the federation and look for the values that the Charger federate is publishing and subscribing to them.
+In most of the examples presented here, the configuration of the federation is defined prior to executing the co-simulation via the configuration JSON files. It is possible, though, with extra effort and careful design, to write the federate code such that they self-configure based on the other participants in the co-simulation. This example provides a simple demonstration of this by having the Battery federate query the federation and look for the values that the Charger federate is publishing and subscribing to them.
 
 ### HELICS components
 
@@ -86,11 +86,11 @@ Run the co-simulation:
 
 Since this is only a change to the configuration method of the federation, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![placeholder](../../../img/advanced_query_charging_power.png)
+![](../../../img/advanced_query_charging_power.png)
 
-![placeholder](../../../img/advanced_query_estimated_SOCs.png)
+![](../../../img/advanced_query_estimated_SOCs.png)
 
-![placeholder](../../../img/advanced_query_battery_SOCs.png)
+![](../../../img/advanced_query_battery_SOCs.png)
 
 The dynamic configuration can also been seen by looking at the log file for the Battery federate (`Battery.log`). The pre-configure data flow graph only showed five subscriptions, all made by the Charger federate of the Battery federates current
 

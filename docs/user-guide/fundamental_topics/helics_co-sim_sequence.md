@@ -9,9 +9,9 @@ This section provides an overview of the components, each of which are linked to
 
     simulator_integration
     federates
-    timing
+    timing_configuration
     helics_cli
-    simulate
+    stages
     logging
 
 ```

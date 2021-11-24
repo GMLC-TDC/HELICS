@@ -7,7 +7,7 @@
 
 ```
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This example shows how to configure a HELICS co-simulation to allow the use of multiple brokers in a single co-simulation.
 
@@ -82,11 +82,11 @@ Since this example requires three brokers and their respective federates to run 
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-![placeholder](../../../img/advanced_hierarchy_charging_power.png)
+![](../../../img/advanced_hierarchy_charging_power.png)
 
-![placeholder](../../../img/advanced_hierarchy_estimated_SOCs.png)
+![](../../../img/advanced_hierarchy_estimated_SOCs.png)
 
-![placeholder](../../../img/advanced_hierarchy_battery_SOCs.png)
+![](../../../img/advanced_hierarchy_battery_SOCs.png)
 
 These results are identical to those in the base [Advanced Default example](./advanced_default.md); this is expected as only the structure of the co-simulation has been changed and not any of the federate code itself.
 
