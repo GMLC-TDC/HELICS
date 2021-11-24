@@ -42,8 +42,8 @@ The public API includes the following
   - helics_definitions.hpp
   - NOTE: core headers in the public API are headers that need to be available for the Application API public headers. The core API can be used more directly with static linking but applications are generally recommended to use the application API or other higher level API's
 
-- C Shared Library headers (c) All C library operations are merged into a single header helics.h
-  A helics_api.h header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
+- C Shared Library headers (c) All C library operations are merged into a single header `helics.h`
+  A `helics_api.h` header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
 
 - App Library
 
