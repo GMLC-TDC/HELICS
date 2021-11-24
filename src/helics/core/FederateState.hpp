@@ -372,8 +372,9 @@ class FederateState {
 
     /** function to process the queue in a generic fashion used to just process messages
     with no specific end in mind
+    @param returnBusy if set to true will return if the federate is already processing
     */
-    IterationResult genericUnspecifiedQueueProcess();
+    MessageProcessingResult genericUnspecifiedQueueProcess(bool returnBusy);
     /** function to process the queue until a disconnect_fed_ack is received*/
     void finalize();
 

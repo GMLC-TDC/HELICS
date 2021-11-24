@@ -765,18 +765,34 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
     }
 }
 
-IterationResult FederateState::genericUnspecifiedQueueProcess()
+MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyReturn)
 {
     if (try_lock()) {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue();
         time_granted = timeCoord->getGrantedTime();
         allowed_send_time = timeCoord->allowedSendTime();
         unlock();
-        return static_cast<IterationResult>(ret);
+        return ret;
     }
 
-    std::lock_guard<FederateState> fedlock(*this);
-    return IterationResult::NEXT_STEP;
+    if (busyReturn) {
+        return MessageProcessingResult::BUSY;
+    }
+    sleeplock();
+    MessageProcessingResult ret;
+    switch (getState()) {
+        case HELICS_ERROR:
+            ret = MessageProcessingResult::ERROR_RESULT;
+            break;
+        case HELICS_FINISHED:
+            ret = MessageProcessingResult::HALTED;
+            break;
+        default:  // everything >= HELICS_INITIALIZING
+            ret = MessageProcessingResult::NEXT_STEP;
+            break;
+    }
+    unlock();
+    return ret;
 }
 
 void FederateState::finalize()
@@ -784,10 +800,10 @@ void FederateState::finalize()
     if ((state == FederateStates::HELICS_FINISHED) || (state == FederateStates::HELICS_ERROR)) {
         return;
     }
-    IterationResult ret = IterationResult::NEXT_STEP;
-    while (ret != IterationResult::HALTED) {
-        ret = genericUnspecifiedQueueProcess();
-        if (ret == IterationResult::ERROR_RESULT) {
+    auto ret = MessageProcessingResult::NEXT_STEP;
+    while (ret != MessageProcessingResult::HALTED) {
+        ret = genericUnspecifiedQueueProcess(false);
+        if (ret == MessageProcessingResult::ERROR_RESULT) {
             break;
         }
     }

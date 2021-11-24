@@ -69,7 +69,8 @@ enum class MessageProcessingResult : signed char {
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
     ERROR_RESULT = 7,  //!< indicator that an error has occurred
-    REPROCESS_MESSAGE = 8  // indicator that the message needs to be processed again
+    REPROCESS_MESSAGE = 8,  // indicator that the message needs to be processed again
+    BUSY = 10,  // indicator that processiong could not be done since the resource was busy
 };
 /** function to check if the message processing result should be returned or processing continued*/
 inline bool returnableResult(MessageProcessingResult result)
