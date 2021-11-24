@@ -14,7 +14,7 @@ This release includes some bug fixes and enhancements to HELICS 3 which is now t
 
 ### Fixed
 
-- Fixed an issue with null strings lacking a null termination when retrieved from the C API.  This primarily affected the Python and other language API's.
+- Fixed an issue with null strings lacking a null termination when retrieved from the C API. This primarily affected the Python and other language API's.
 - CMake fix for some older linkers.
 - A Fix for ASIO aligned when used with MINGW.
 - Fix to IPC core to support boost 1.77.
@@ -93,7 +93,6 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 - The separate headers for the C shared library are no longer installed. Instead only a single header (`helics.h`) is needed and includes all functions and operations.
 - The cereal library is no longer installed or used with HELICS
 - The C++ API no longer has generic type support through Cereal.
-
 
 [3.0.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.0
 [3.0.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.1

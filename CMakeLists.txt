@@ -571,7 +571,7 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
-#this should be removed when we require a compiler with the filesystem header defined
+# this should be removed when we require a compiler with the filesystem header defined
 target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
