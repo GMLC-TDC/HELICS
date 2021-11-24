@@ -196,7 +196,8 @@ TEST(clone_tests, simple_clone_test_combo)
     pub2.publish(3.3);
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
-
+    retTime = mfed.requestTime(5);
+    EXPECT_EQ(retTime, 5.0);
     mfed.finalize();
     fut.get();
     auto epts = c1.accessUnderlyingFederate().getEndpointCount();
