@@ -3,8 +3,6 @@
 ```{eval-rst}
 .. toctree::
     :maxdepth: 2
-
-
 ```
 
 ## HELICS Installation Methods
@@ -13,7 +11,7 @@ The first step to using HELICS is to install it. Since there are several ways to
 
 As of HELICS v3, the only supported language bindings that are included with the core HELICS library downloads are C and C++98, in addition to C++17 when building from source. If you end up needing to build from source AND use one of the supported language bindings you'll need to follow the instructions for installing HELICS for said language. This would also be the case if you were needing to run a co-simulation that used tools that provided their HELICS implementation in a variety of languages. Generally speaking, as long as all supported languages are on similar versions, each one can use it own installed version of HELICS without any trouble. The supported languages also have ways of being pointed towards a specific HELICS installation (rather than the one they install for themselves) if that is preferred or necessary for a particular use case.
 
-![](./images/install-decision-tree.png)
+![](../../../img/install-decision-tree.png)
 
 ### pip install
 

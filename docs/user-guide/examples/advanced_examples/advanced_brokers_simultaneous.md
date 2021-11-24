@@ -1,6 +1,6 @@
 # Brokers - Simultaneous Co-simulations
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This example shows how to configure a HELICS co-simulation so that multiple co-simulations can run simultaneously on one computer. Understanding this configuration is a pre-requisite to running the other advanced broker examples (which also involve multiple brokers running on one computer).
 
@@ -100,13 +100,11 @@ To run the co-simulations simultaneously, all that is required is having `helics
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-**TODO: make these links?**
+![](../../../img/advanced_simultaneous_power_1.png)
 
-![placeholder](../../../img/advanced_simultaneous_power_1.png)
+![](../../../img/advanced_simultaneous_power_2.png)
 
-![placeholder](../../../img/advanced_simultaneous_power_2.png)
-
-![placeholder](../../../img/advanced_simultaneous_power_3.png)
+![](../../../img/advanced_simultaneous_power_3.png)
 
 To do a more legitimate sensitivity analysis to the population of EVs that are being charged, a sample size larger than three is almost certainly necessary. [We've put together another example](./advanced_orchestration.md) to show how to orchestrate running larger sets of co-simulations to address exactly these kinds of needs.
 

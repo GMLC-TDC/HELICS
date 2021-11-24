@@ -125,7 +125,6 @@ Manual implementation of the co-simulation is done with the helper script `advan
 
 ```shell session
 $ python advanced_orchestration.py
-
 ```
 
 This implementation will run a default co-simulation. The default parameters are:
@@ -145,7 +144,6 @@ If we wanted to run a Monte Carlo co-sim with different parameters, this would b
 
 ```shell session
 $ python advanced_orchestration.py 10 . 100 24*7 0 0
-
 ```
 
 This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSON files with `helics_cli` (meaning that `helics_cli` will not be called automatically -- the user will need to manually execute `helics_cli` for each JSON file).

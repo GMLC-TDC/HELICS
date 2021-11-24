@@ -103,7 +103,7 @@ You might ask yourself: "How does HELICS know where to send the message?" There 
 1. Endpoints send messages as encoded strings
 2. Endpoints can have default destinations, but this is not required
 3. Endpoints should not be used to model physics
-4. Messages sent from endpoints are allowed to be corrupted (see [Filters](./fundamental_native_filters.md)!)
+4. Messages sent from endpoints are allowed to be corrupted (see [Filters](fundamental_native_filter.md)!)
 5. Messages sent from endpoints do not show up on a HELICS `dependency_graph`
    (A `dependency_graph` is a graph of dependencies in a federation. Because pub/subs have explicit connections, HELICS can establish when the information arrives through a `dependency_graph`. See [Queries](../../advanced_topics/queries.md) for more information.)
 

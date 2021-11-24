@@ -25,7 +25,7 @@ The format is json.
     "port": 8080,
     "interface": "0.0.0.0"
   },
-  "webscoket": {
+  "websocket": {
     "port": 8008,
     "interface": "0.0.0.0"
   }
@@ -137,7 +137,7 @@ The status code corresponds to the most appropriate html error codes.
 
 ## Making queries
 
-As a demo case there is a [`brokerServerTestCase` executable](../../../examples/BrokerServerTestCase.cpp) built as part of the the main HELICS library.
+As a demo case there is a [`brokerServerTestCase` executable](https://github.com/GMLC-TDC/HELICS/blob/46eb388ddddd6add8ab03a685ff4de60b88f9e89/examples/BrokerServerTestCase/brokerServerTest.cpp) that can be built when compiling the main HELICS library from source.
 Running this example starts a webserver on the localhost using port 80.
 
 The response to queries is a string either in plain text or json.
