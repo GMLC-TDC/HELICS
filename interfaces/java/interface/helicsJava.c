@@ -399,6 +399,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1CORE_1TYPE_1NULL_
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1CORE_1TYPE_1EMPTY_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsCoreTypes result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsCoreTypes)HELICS_CORE_TYPE_EMPTY;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1DATA_1TYPE_1UNKNOWN_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsDataTypes result;
@@ -1318,6 +1330,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1TIME_1O
   (void)jenv;
   (void)jcls;
   result = (HelicsProperties)HELICS_PROPERTY_TIME_OUTPUT_DELAY;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1TIME_1GRANT_1TIMEOUT_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsProperties result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsProperties)HELICS_PROPERTY_TIME_GRANT_TIMEOUT;
   jresult = (jint)result; 
   return jresult;
 }
