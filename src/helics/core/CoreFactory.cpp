@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "CommonCore.hpp"
 #include "CoreTypes.hpp"
+#include "EmptyCore.hpp"
 #include "core-exceptions.hpp"
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
@@ -75,6 +76,8 @@ void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name,
     MasterCoreBuilder::addBuilder(std::move(cb), name, code);
 }
 
+static std::shared_ptr<Core> emptyCore = std::make_shared<EmptyCore>();
+
 std::shared_ptr<Core> makeCore(CoreType type, const std::string& name)
 {
     if (type == CoreType::NULLCORE) {
@@ -83,7 +86,15 @@ std::shared_ptr<Core> makeCore(CoreType type, const std::string& name)
     if (type == CoreType::DEFAULT) {
         return MasterCoreBuilder::getIndexedBuilder(0)->build(name);
     }
+    if (type == CoreType::EMPTY) {
+        return emptyCore;
+    }
     return MasterCoreBuilder::getBuilder(static_cast<int>(type))->build(name);
+}
+
+std::shared_ptr<Core> getEmptyCore()
+{
+    return emptyCore;
 }
 
 std::shared_ptr<Core> create(const std::string& initializationString)

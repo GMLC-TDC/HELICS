@@ -176,6 +176,11 @@ bool CommonCore::isConnected() const
     return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
 }
 
+const std::string& CommonCore::getIdentifier() const
+{
+    return identifier;
+}
+
 const std::string& CommonCore::getAddress() const
 {
     if ((getBrokerState() != BrokerState::connected) || (address.empty())) {

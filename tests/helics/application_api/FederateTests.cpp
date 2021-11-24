@@ -1040,7 +1040,7 @@ TEST(federate_tests, federateGeneratedLocalError)
 
     Fed1->getCorePointer()->disconnect();
     Fed1->disconnect();
-    EXPECT_THROW(Fed1->localError(9827, "user generated error2"), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->localError(9827, "user generated error2"), helics::FederateError);
 }
 
 TEST(federate_tests, federateGeneratedGlobalError)
@@ -1060,8 +1060,7 @@ TEST(federate_tests, federateGeneratedGlobalError)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
-                 helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::FederateError);
 }
 
 TEST(federate_tests, federateGeneratedlocalErrorEscalation)
@@ -1081,8 +1080,7 @@ TEST(federate_tests, federateGeneratedlocalErrorEscalation)
     EXPECT_TRUE(Fed1->getCorePointer()->waitForDisconnect(std::chrono::milliseconds(300)));
 
     Fed1->disconnect();
-    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"),
-                 helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->globalError(9827, "user generated global error2"), helics::FederateError);
 }
 
 TEST(federate_tests, queryTest1)
@@ -1106,7 +1104,8 @@ TEST(federate_tests, queryTest1)
     cr.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
-    EXPECT_NE(qres.find("error"), std::string::npos);
+    // core name should be empty after disconnect
+    EXPECT_NE(qres.find("\"\""), std::string::npos);
     qres = Fed1->query("subscriptions");
     EXPECT_NE(qres.find("error"), std::string::npos);
     qres = Fed1->query("root", "subscriptions");
@@ -1174,15 +1173,15 @@ TEST(federate_tests, error_after_disconnect)
     EXPECT_EQ(fb4.getName(), f1.getName());
     EXPECT_FALSE(fb3.isValid());
 
-    EXPECT_THROW(Fed1->setGlobal("global1", "global1"), helics::InvalidFunctionCall);
+    EXPECT_NO_THROW(Fed1->setGlobal("global1", "global1"));
     EXPECT_THROW(f1.addSourceTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->addDependency("otherFed"), helics::InvalidFunctionCall);
+    EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
     EXPECT_THROW(f1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->setFilterOperator(f1, {}), helics::InvalidFunctionCall);
+    EXPECT_NO_THROW(Fed1->setFilterOperator(f1, {}));
 
-    EXPECT_THROW(Fed1->localError(99), helics::InvalidFunctionCall);
-    EXPECT_THROW(Fed1->globalError(99), helics::InvalidFunctionCall);
+    EXPECT_THROW(Fed1->localError(99), helics::FederateError);
+    EXPECT_THROW(Fed1->globalError(99), helics::FederateError);
 }
 
 static constexpr const char* simple_global_files[] = {"example_globals1.json",

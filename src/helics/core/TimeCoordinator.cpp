@@ -382,6 +382,27 @@ void TimeCoordinator::enterInitialization()
     }
 }
 
+void TimeCoordinator::requestTimeCheck()
+{
+    if (dynamicJoining) {
+        ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
+        timeUpdateRequest.source_id = source_id;
+        for (const auto& dep : dependencies) {
+            // send to all dependencies
+            if (dep.dependency) {
+                if (dep.fedID == source_id) {
+                    continue;
+                }
+                // only send the request if it is blocking the current grant
+                if (dep.next < time_exec) {
+                    timeUpdateRequest.dest_id = dep.fedID;
+                    sendMessageFunction(timeUpdateRequest);
+                }
+            }
+        }
+    }
+}
+
 Time TimeCoordinator::getNextPossibleTime() const
 {
     if (time_granted == timeZero) {
@@ -880,6 +901,24 @@ static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localI
 {
     return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
             (cmd.source_id != localId));
+}
+
+std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() const
+{
+    Time minTime = Time::maxVal();
+    GlobalFederateId minID;
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.time_state != time_state_t::time_requested) {
+            if (dep.next < minTime) {
+                minTime = dep.next;
+                minID = dep.fedID;
+            }
+        }
+    }
+    return {minID, minTime};
 }
 
 message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)

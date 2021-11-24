@@ -85,6 +85,8 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"timeoutputdelay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
     {"time_input_delay", HELICS_PROPERTY_TIME_INPUT_DELAY},
     {"time_output_delay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
+    {"granttimeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
+    {"grant_timeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
     {"loglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"logLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
@@ -245,6 +247,8 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
 static const std::map<std::string, int> option_value_map{
     {"0", 0},
     {"1", 1},
+    {"-", 0},
+    {"+", 1},
     {"false", 0},
     {"true", 1},
     {"on", 1},
@@ -566,6 +570,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--outputdelay",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
+           "--grant_timeout",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, val); },
+           "timeout to trigger diagnostic action when a federate time grant is not available within the timeout period (default in ms)")
         ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",
