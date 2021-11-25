@@ -28,10 +28,10 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 - [Denis Nadeau](https://github.com/dnadeau4) (Now LANL)
 - [Ben Salazar](https://github.com/salazar33)
 - [Brian Kelley](https://github.com/bmkelley)
-- [Hoa Ngo](https://github.com/hgngo) (not currently at LLNL)
+- [Hoa Ngo](https://github.com/hgngo) (Now SVB)
 - [Ai Enkoji](https://github.com/aenkoji1)
 - [Nan Duan](https://github.com/nan-duan)
-- [Nathan Yee](https://github.com/yee29) (not currently at LLNL)
+- [Nathan Yee](https://github.com/yee29) (Now Accenture)
 - [Ai Enkoji](https://github.com/aenkoji1)
 
 ### National Renewable Energy Lab
