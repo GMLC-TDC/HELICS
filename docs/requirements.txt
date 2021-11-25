@@ -6,3 +6,4 @@ ipykernel==6.4.2
 nbsphinx==0.8.7
 breathe==4.31.0
 sphinxcontrib-svg2pdfconverter==1.1.1
+requests==2.26.0
