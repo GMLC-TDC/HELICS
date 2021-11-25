@@ -421,8 +421,7 @@ void CommonCore::localError(LocalFederateId federateID,
             return;
         }
         ret = fed->genericUnspecifiedQueueProcess(false);
-        switch (ret)
-        {
+        switch (ret) {
             case MessageProcessingResult::ERROR_RESULT:
             case MessageProcessingResult::HALTED:
             case MessageProcessingResult::BUSY:
