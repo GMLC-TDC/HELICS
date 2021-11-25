@@ -1,7 +1,7 @@
 function v = HELICS_FILTER_TYPE_CUSTOM()
   persistent vInitialized;
   if isempty(vInitialized)
-    vInitialized = helicsMEX(0, 118);
+    vInitialized = helicsMEX(0, 120);
   end
   v = vInitialized;
 end

@@ -24,6 +24,7 @@ public class helicsJNI {
   public final static native int HELICS_CORE_TYPE_WEBSOCKET_get();
   public final static native int HELICS_CORE_TYPE_INPROC_get();
   public final static native int HELICS_CORE_TYPE_NULL_get();
+  public final static native int HELICS_CORE_TYPE_EMPTY_get();
   public final static native int HELICS_DATA_TYPE_UNKNOWN_get();
   public final static native int HELICS_DATA_TYPE_STRING_get();
   public final static native int HELICS_DATA_TYPE_DOUBLE_get();
@@ -101,6 +102,7 @@ public class helicsJNI {
   public final static native int HELICS_PROPERTY_TIME_RT_TOLERANCE_get();
   public final static native int HELICS_PROPERTY_TIME_INPUT_DELAY_get();
   public final static native int HELICS_PROPERTY_TIME_OUTPUT_DELAY_get();
+  public final static native int HELICS_PROPERTY_TIME_GRANT_TIMEOUT_get();
   public final static native int HELICS_PROPERTY_INT_MAX_ITERATIONS_get();
   public final static native int HELICS_PROPERTY_INT_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_FILE_LOG_LEVEL_get();
