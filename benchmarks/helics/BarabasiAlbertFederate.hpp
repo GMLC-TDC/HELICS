@@ -60,8 +60,8 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
         while (std::getline(ss, sb, ',')) {
             targets_vector.push_back(sb);
         }
-        for (size_t i = 0; i < targets_vector.size(); i++) {
-            cp->linkEndpoints(ept->getName(), targets_vector[i]);
+        for (auto &i : targets_vector){
+            cp->linkEndpoints(ept->getName(), i);
         }
     }
     void doMakeReady() override

@@ -40,12 +40,12 @@ static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 /* class implementing a node representation*/
 class Node {
   public:
-    void setName(std::string nm) { name = nm; }                     // set node name
+    void setName(std::string nm) { name = std::move(nm); }                     // set node name
     void setNumLinks(int x) { num_links = x; }                      // set number of links connected to node
     std::string getName() { return name; }                          // get node name
-    int const getNumLinks() { return num_links; }                         // get number of links connected to node
+    const int getNumLinks() { return num_links; }                         // get number of links connected to node
     std::vector<std::string> getTargets() { return targets; }       // get a list of target destinations node will link to
-    void pushTargets(std::string &nm) { targets.push_back(nm); }     // add to targets list
+    void pushTargets(const std::string& nm) { targets.push_back(nm); }     // add to targets list
 
   private:
     std::string name = "";
@@ -132,7 +132,7 @@ static void BM_BarabasiAlbert_singleCore(benchmark::State& state)
             if (nodes[i].getTargets().empty()) {
                 s = "None";
             }
-            for (auto t : nodes[i].getTargets()) {
+            for (auto const &t : nodes[i].getTargets()) {
                 s += t;
             }
             std::string bmInit = "--index=" + std::to_string(i) +
@@ -189,7 +189,7 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
             if (nodes[ii].getTargets().empty()) {
                 s = "None";
             }
-            for (auto t : nodes[ii].getTargets()) {
+            for (auto const &t : nodes[ii].getTargets()) {
                 s += t;
             }
             std::string bmInit = "--index=" + std::to_string(ii) +
@@ -230,7 +230,6 @@ static void BarabasiAlbertArguments(benchmark::internal::Benchmark* b)
 }
 
 // Single-core BM
-
 BENCHMARK(BM_BarabasiAlbert_singleCore)
     ->Unit(benchmark::TimeUnit::kMillisecond)
     ->UseRealTime()
@@ -282,7 +281,6 @@ BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, tcpssCore, CoreType::TCP_SS)
 #endif
 
 // Register the UDP benchmarks
-// The UDP benchmark starts hanging if too many messages are sent.
 #ifdef HELICS_ENABLE_UDP_CORE
 BENCHMARK_CAPTURE(BM_BarabasiAlbert_multicore, udpCore, CoreType::UDP)
     ->Unit(benchmark::TimeUnit::kMillisecond)
