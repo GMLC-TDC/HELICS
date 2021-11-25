@@ -20,6 +20,7 @@ set(HELICS_BENCHMARKS
     pholdBenchmarks
     timingBenchmarks
     wattsStrogatzBenchmarks
+    barabasiAlbertBenchmarks
 )
 
 set(HELICS_MULTINODE_BENCHMARKS
@@ -34,6 +35,7 @@ set(HELICS_MULTINODE_BENCHMARKS
     TimingHubFederate
     TimingLeafFederate
     WattsStrogatzFederate
+    BarabasiAlbertFederate
 )
 
 if(NOT DEFINED HELICS_BENCHMARK_SHIFT_FACTOR)
