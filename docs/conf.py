@@ -32,8 +32,30 @@
 # ones.
 import os
 import sphinx_rtd_theme
+import shutil
+import subprocess
+import requests
+import tempfile
+import zipfile
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
+
+
+def download_helics_images():
+    print("Downloading doc images from GMLC-TDC/helics_doc_resources")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        url = "https://github.com/GMLC-TDC/helics_doc_resources/archive/refs/heads/main.zip"
+        target_path = os.path.join(tmpdirname, "helics_docs_resources.zip")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(target_path, "wb") as f:
+                f.write(response.raw.read())
+        with zipfile.ZipFile(target_path, "r") as zip_ref:
+            zip_ref.extractall(tmpdirname)
+        if os.path.exists("img"):
+            shutil.rmtree("img")
+        shutil.move(os.path.join(tmpdirname, "helics_doc_resources-main/user_guide"), "img")
+    print("Doc images downloaded")
 
 
 def which(program):
@@ -60,10 +82,13 @@ def which(program):
     return None
 
 
-import subprocess
-
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
+# For RTD builds, only download the images once; for developers, always get the images
+if not read_the_docs_build or not os.path.exists("img"):
+    download_helics_images()
+
+# For RTD builds run doxygen once for all output formats
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
     checkout_dir = os.path.realpath(os.path.join(dir_name, os.pardir))
