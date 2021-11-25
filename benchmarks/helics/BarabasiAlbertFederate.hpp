@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 
 #include <algorithm>
-#include <random>
 #include <cstdlib>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -49,7 +49,7 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
     {
         ept = &fed->registerTargetedEndpoint("ept");
 
-        if (targets=="None") {
+        if (targets == "None") {
             return;
         }
 
