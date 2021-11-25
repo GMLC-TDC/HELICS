@@ -40,12 +40,15 @@ static constexpr int64_t maxscale{1 << (4 + HELICS_BENCHMARK_SHIFT_FACTOR)};
 /* class implementing a node representation*/
 class Node {
   public:
-    void setName(std::string nm) { name = std::move(nm); }                     // set node name
-    void setNumLinks(int x) { num_links = x; }                      // set number of links connected to node
-    std::string getName() { return name; }                          // get node name
-    const int getNumLinks() { return num_links; }                         // get number of links connected to node
-    std::vector<std::string> getTargets() { return targets; }       // get a list of target destinations node will link to
-    void pushTargets(const std::string& nm) { targets.push_back(nm); }     // add to targets list
+    void setName(std::string nm) { name = std::move(nm); }  // set node name
+    void setNumLinks(int x) { num_links = x; }  // set number of links connected to node
+    std::string getName() { return name; }  // get node name
+    const int getNumLinks() { return num_links; }  // get number of links connected to node
+    std::vector<std::string> getTargets()
+    {
+        return targets;
+    }  // get a list of target destinations node will link to
+    void pushTargets(const std::string& nm) { targets.push_back(nm); }  // add to targets list
 
   private:
     std::string name = "";
@@ -132,7 +135,7 @@ static void BM_BarabasiAlbert_singleCore(benchmark::State& state)
             if (nodes[i].getTargets().empty()) {
                 s = "None";
             }
-            for (auto const &t : nodes[i].getTargets()) {
+            for (auto const& t : nodes[i].getTargets()) {
                 s += t;
             }
             std::string bmInit = "--index=" + std::to_string(i) +
@@ -189,7 +192,7 @@ static void BM_BarabasiAlbert_multicore(benchmark::State& state, CoreType cType)
             if (nodes[ii].getTargets().empty()) {
                 s = "None";
             }
-            for (auto const &t : nodes[ii].getTargets()) {
+            for (auto const& t : nodes[ii].getTargets()) {
                 s += t;
             }
             std::string bmInit = "--index=" + std::to_string(ii) +

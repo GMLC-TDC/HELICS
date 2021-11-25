@@ -60,7 +60,7 @@ class BarabasiAlbertFederate: public BenchmarkFederate {
         while (std::getline(ss, sb, ',')) {
             targets_vector.push_back(sb);
         }
-        for (auto &i : targets_vector){
+        for (auto& i : targets_vector) {
             cp->linkEndpoints(ept->getName(), i);
         }
     }
