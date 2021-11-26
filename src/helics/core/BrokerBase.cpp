@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #    include <asio/steady_timer.hpp>
 #else
-#    if defined(_WIN32) || defined(WIN32) || defined(__MINGW32__) || defined(CYGWIN)
+#    if defined(_WIN32) || defined(WIN32)
 #        include <windows.h>
 #    else
 #        include <unistd.h>
