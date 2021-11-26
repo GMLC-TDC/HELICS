@@ -510,9 +510,7 @@ endif()
 
 if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
-     target_compile_definitions(
-        helics_base INTERFACE -D_WIN32_WINNT=0x0601
-    )
+    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
 endif()
 
 if(CYGWIN)
