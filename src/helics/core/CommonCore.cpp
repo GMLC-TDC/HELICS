@@ -382,11 +382,20 @@ void CommonCore::globalError(LocalFederateId federateID,
     m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
-    IterationResult ret = IterationResult::NEXT_STEP;
-    while (ret != IterationResult::ERROR_RESULT) {
-        ret = fed->genericUnspecifiedQueueProcess();
-        if (ret == IterationResult::HALTED) {
-            break;
+    MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
+    while (ret != MessageProcessingResult::ERROR_RESULT) {
+        if (fed->getState() == FederateStates::HELICS_FINISHED ||
+            fed->getState() == FederateStates::HELICS_ERROR) {
+            return;
+        }
+        ret = fed->genericUnspecifiedQueueProcess(false);
+        switch (ret) {
+            case MessageProcessingResult::ERROR_RESULT:
+            case MessageProcessingResult::HALTED:
+            case MessageProcessingResult::BUSY:
+                return;
+            default:
+                break;
         }
     }
 }
@@ -405,11 +414,20 @@ void CommonCore::localError(LocalFederateId federateID,
     m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
-    IterationResult ret = IterationResult::NEXT_STEP;
-    while (ret != IterationResult::ERROR_RESULT) {
-        ret = fed->genericUnspecifiedQueueProcess();
-        if (ret == IterationResult::HALTED) {
-            break;
+    MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
+    while (ret != MessageProcessingResult::ERROR_RESULT) {
+        if (fed->getState() == FederateStates::HELICS_FINISHED ||
+            fed->getState() == FederateStates::HELICS_ERROR) {
+            return;
+        }
+        ret = fed->genericUnspecifiedQueueProcess(false);
+        switch (ret) {
+            case MessageProcessingResult::ERROR_RESULT:
+            case MessageProcessingResult::HALTED:
+            case MessageProcessingResult::BUSY:
+                return;
+            default:
+                break;
         }
     }
 }

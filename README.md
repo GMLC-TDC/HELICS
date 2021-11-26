@@ -13,6 +13,7 @@ A multi-language, cross-platform library that enables different simulators to ea
 [![](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop/graph/badge.svg)](https://codecov.io/gh/GMLC-TDC/HELICS/branch/develop)
 [![Releases](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
 [![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/GMLC-TDC/HELICS/main.svg)](https://results.pre-commit.ci/latest/github/GMLC-TDC/HELICS/main)
 
 ## Table of contents
 
@@ -46,7 +47,7 @@ Previous and existing use cases have stretched across a wide range of scales in 
 
 ## Getting Started
 
-The users guide has been completely redone for the release of HELICS 3.0.0. The [docs](https://docs.helics.org/en/latest/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
+The users guide has been completely redone for the release of HELICS 3.0. The [docs](https://docs.helics.org/en/latest/) are mostly completed to align with this release. We suggest starting here if you are looking for more information on HELICS, whether it is for getting started, or learning about more advanced features, the new documentation should have something for everyone (Please let us know if it doesn't via [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS) or by [creating an issue on github](https://github.com/GMLC-TDC/HELICS/issues/new/choose)).
 
 The [Orientation](https://docs.helics.org/en/latest/user-guide/orientation.html) goes through a series of examples that step through the basic usage and concepts of HELICS.
 
