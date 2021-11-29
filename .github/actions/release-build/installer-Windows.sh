@@ -12,6 +12,10 @@ COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
 # shellcheck source=.github/actions/common/Windows/install-boost.sh
 source "${COMMON_SCRIPTS}/install-boost.sh"
 
+# Get the HELICS.ico in the correct format (not a renamed JPEG)
+rm docs/logos/HELICS.ico
+curl -o docs/logos/HELICS.ico https://raw.githubusercontent.com/GMLC-TDC/HELICS/v3.0.1/docs/img/HELICS.ico
+
 # Find cpack command (chocolatey has a command with the same name)
 cpack_dir="$(command -v cmake)"
 cpack_dir="${cpack_dir%/cmake}"
