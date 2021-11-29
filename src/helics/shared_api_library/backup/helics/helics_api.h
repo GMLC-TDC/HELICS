@@ -23,10 +23,12 @@ typedef enum {
     HELICS_CORE_TYPE_HTTP = 12,
     HELICS_CORE_TYPE_WEBSOCKET = 14,
     HELICS_CORE_TYPE_INPROC = 18,
-    HELICS_CORE_TYPE_NULL = 66
+    HELICS_CORE_TYPE_NULL = 66,
+    HELICS_CORE_TYPE_EMPTY = 77,
 } HelicsCoreTypes;
 
 typedef enum {
+    HELICS_DATA_TYPE_UNKNOWN = -1,
     HELICS_DATA_TYPE_STRING = 0,
     HELICS_DATA_TYPE_DOUBLE = 1,
     HELICS_DATA_TYPE_INT = 2,
@@ -121,6 +123,7 @@ typedef enum {
     HELICS_PROPERTY_TIME_RT_TOLERANCE = 145,
     HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+    HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
@@ -174,6 +177,8 @@ typedef enum {
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
 
+#define HELICS_BIG_NUMBER 9223372036.854774
+const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 typedef void* HelicsInput;
 
 typedef void* HelicsPublication;
@@ -201,7 +206,7 @@ typedef double HelicsTime;
 const HelicsTime HELICS_TIME_ZERO = 0.0;
 const HelicsTime HELICS_TIME_EPSILON = 1.0e-9;
 const HelicsTime HELICS_TIME_INVALID = -1.785e39;
-const HelicsTime HELICS_TIME_MAXTIME = 9223372036.854774;
+const HelicsTime HELICS_TIME_MAXTIME = HELICS_BIG_NUMBER;
 
 typedef int HelicsBool;
 
@@ -240,7 +245,6 @@ typedef struct HelicsComplex {
     double real;
     double imag;
 } HelicsComplex;
-
 typedef struct HelicsError {
     int32_t error_code;
     const char* message;
@@ -290,7 +294,6 @@ void helicsBrokerDestroy(HelicsBroker broker);
 void helicsCoreDestroy(HelicsCore core);
 void helicsCoreFree(HelicsCore core);
 void helicsBrokerFree(HelicsBroker broker);
-
 HelicsFederate helicsCreateValueFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 HelicsFederate helicsCreateValueFederateFromConfig(const char* configFile, HelicsError* err);
 HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
@@ -316,6 +319,7 @@ int helicsGetPropertyIndex(const char* val);
 int helicsGetFlagIndex(const char* val);
 int helicsGetOptionIndex(const char* val);
 int helicsGetOptionValue(const char* val);
+int helicsGetDataType(const char* val);
 void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err);
 void helicsFederateInfoSetSeparator(HelicsFederateInfo fi, char separator, HelicsError* err);
 void helicsFederateInfoSetTimeProperty(HelicsFederateInfo fi, int timeProperty, HelicsTime propertyValue, HelicsError* err);
@@ -331,7 +335,6 @@ void helicsFederateDisconnectAsync(HelicsFederate fed, HelicsError* err);
 void helicsFederateDisconnectComplete(HelicsFederate fed, HelicsError* err);
 void helicsFederateFree(HelicsFederate fed);
 void helicsCloseLibrary(void);
-
 void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
 HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
@@ -401,7 +404,6 @@ void helicsQuerySetQueryString(HelicsQuery query, const char* queryString, Helic
 void helicsQuerySetOrdering(HelicsQuery query, int32_t mode, HelicsError* err);
 void helicsQueryFree(HelicsQuery query);
 void helicsCleanupLibrary(void);
-
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err);
 HelicsPublication
     helicsFederateRegisterPublication(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
@@ -425,7 +427,6 @@ HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, H
 void helicsFederateClearUpdates(HelicsFederate fed);
 void helicsFederateRegisterFromPublicationJSON(HelicsFederate fed, const char* json, HelicsError* err);
 void helicsFederatePublishJSON(HelicsFederate fed, const char* json, HelicsError* err);
-
 HelicsBool helicsPublicationIsValid(HelicsPublication pub);
 void helicsPublicationPublishBytes(HelicsPublication pub, const void* data, int inputDataLength, HelicsError* err);
 void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
@@ -436,6 +437,7 @@ void helicsPublicationPublishTime(HelicsPublication pub, HelicsTime val, HelicsE
 void helicsPublicationPublishChar(HelicsPublication pub, char val, HelicsError* err);
 void helicsPublicationPublishComplex(HelicsPublication pub, double real, double imag, HelicsError* err);
 void helicsPublicationPublishVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
+void helicsPublicationPublishComplexVector(HelicsPublication pub, const double* vectorInput, int vectorLength, HelicsError* err);
 void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
 void helicsPublicationAddTarget(HelicsPublication pub, const char* target, HelicsError* err);
 HelicsBool helicsInputIsValid(HelicsInput ipt);
@@ -454,6 +456,7 @@ HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsError* err);
 void helicsInputGetComplex(HelicsInput ipt, double* real, double* imag, HelicsError* err);
 int helicsInputGetVectorSize(HelicsInput ipt);
 void helicsInputGetVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
+void helicsInputGetComplexVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
 void helicsInputGetNamedPoint(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, double* val, HelicsError* err);
 
 void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data, int inputDataLength, HelicsError* err);
@@ -465,10 +468,12 @@ void helicsInputSetDefaultChar(HelicsInput ipt, char val, HelicsError* err);
 void helicsInputSetDefaultDouble(HelicsInput ipt, double val, HelicsError* err);
 void helicsInputSetDefaultComplex(HelicsInput ipt, double real, double imag, HelicsError* err);
 void helicsInputSetDefaultVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
+void helicsInputSetDefaultComplexVector(HelicsInput ipt, const double* vectorInput, int vectorLength, HelicsError* err);
 void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
 
 const char* helicsInputGetType(HelicsInput ipt);
 const char* helicsInputGetPublicationType(HelicsInput ipt);
+int helicsInputGetPublicationDataType(HelicsInput ipt);
 const char* helicsPublicationGetType(HelicsPublication pub);
 const char* helicsInputGetName(HelicsInput ipt);
 const char* helicsSubscriptionGetTarget(HelicsInput ipt);
@@ -491,13 +496,11 @@ int helicsPublicationGetOption(HelicsPublication pub, int option);
 void helicsPublicationSetOption(HelicsPublication pub, int option, int val, HelicsError* err);
 void helicsPublicationSetMinimumChange(HelicsPublication pub, double tolerance, HelicsError* err);
 void helicsInputSetMinimumChange(HelicsInput inp, double tolerance, HelicsError* err);
-
 HelicsBool helicsInputIsUpdated(HelicsInput ipt);
 HelicsTime helicsInputLastUpdateTime(HelicsInput ipt);
 void helicsInputClearUpdate(HelicsInput ipt);
 int helicsFederateGetPublicationCount(HelicsFederate fed);
 int helicsFederateGetInputCount(HelicsFederate fed);
-
 HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
@@ -542,7 +545,6 @@ void helicsEndpointAddDestinationTarget(HelicsEndpoint endpoint, const char* tar
 void helicsEndpointRemoveTarget(HelicsEndpoint endpoint, const char* targetEndpoint, HelicsError* err);
 void helicsEndpointAddSourceFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
 void helicsEndpointAddDestinationFilter(HelicsEndpoint endpoint, const char* filterName, HelicsError* err);
-
 const char* helicsMessageGetSource(HelicsMessage message);
 const char* helicsMessageGetDestination(HelicsMessage message);
 const char* helicsMessageGetOriginalSource(HelicsMessage message);
@@ -572,7 +574,6 @@ void helicsMessageCopy(HelicsMessage src_message, HelicsMessage dst_message, Hel
 HelicsMessage helicsMessageClone(HelicsMessage message, HelicsError* err);
 void helicsMessageFree(HelicsMessage message);
 void helicsMessageClear(HelicsMessage message, HelicsError* err);
-
 HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err);
 HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err);
 HelicsFilter helicsFederateRegisterCloningFilter(HelicsFederate fed, const char* name, HelicsError* err);
@@ -588,7 +589,6 @@ void helicsFilterSet(HelicsFilter filt, const char* prop, double val, HelicsErro
 void helicsFilterSetString(HelicsFilter filt, const char* prop, const char* val, HelicsError* err);
 void helicsFilterAddDestinationTarget(HelicsFilter filt, const char* dst, HelicsError* err);
 void helicsFilterAddSourceTarget(HelicsFilter filt, const char* source, HelicsError* err);
-
 void helicsFilterAddDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);
 void helicsFilterRemoveTarget(HelicsFilter filt, const char* target, HelicsError* err);
 void helicsFilterRemoveDeliveryEndpoint(HelicsFilter filt, const char* deliveryEndpoint, HelicsError* err);

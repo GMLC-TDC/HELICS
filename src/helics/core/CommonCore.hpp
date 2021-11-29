@@ -225,7 +225,7 @@ class CommonCore: public Core, public BrokerBase {
     /** set the local identification for the core*/
     void setIdentifier(const std::string& name);
     /** get the local identifier for the core*/
-    virtual const std::string& getIdentifier() const override final { return identifier; }
+    virtual const std::string& getIdentifier() const override final;
     virtual const std::string& getAddress() const override final;
     const std::string& getFederateNameNoThrow(GlobalFederateId federateID) const noexcept;
 

@@ -15,14 +15,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.0.1)
+project(HELICS VERSION 3.1.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-08-26")
+set(HELICS_DATE "2021-11-24")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -510,6 +510,7 @@ endif()
 
 if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
+    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
 endif()
 
 if(CYGWIN)
@@ -571,6 +572,8 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
+# TODO: this should be removed when we require a compiler with the filesystem header defined
+target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
@@ -1078,8 +1081,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         set(CPACK_NSIS_PACKAGE_NAME "HELICS v${HELICS_VERSION}")
         # name shown in the add/remove program control panel
         set(CPACK_NSIS_DISPLAY_NAME "HELICS v${HELICS_VERSION}")
-        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}\\\\docs\\\\img\\\\HELICS.ico")
-        set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}\\\\docs\\\\logos\\\\HELICS.ico")
+        set(CPACK_NSIS_MUI_ICON "${HELICS_SOURCE_DIR}/docs/logos/HELICS.ico")
         set(CPACK_NSIS_INSTALL_ROOT "C:\\\\local")
         set(CPACK_NSIS_URL_INFO_ABOUT "https://www.github.com/GMLC-TDC/HELICS")
         set(CPACK_NSIS_HELP_LINK "https://helics.readthedocs.io/en/latest")
@@ -1101,13 +1104,17 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
             "TDC YouTube channel"
         )
     else(WIN32)
-        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/logos/HELICS.ico")
     endif(WIN32)
 
     if(APPLE)
-        set(CPACK_SYSTEM_NAME "macOS-${CMAKE_SYSTEM_PROCESSOR}")
+        if("arm64" IN_LIST CMAKE_OSX_ARCHITECTURES AND "x86_64" IN_LIST CMAKE_OSX_ARCHITECTURES)
+            set(CPACK_SYSTEM_NAME "macOS-universal2")
+        else()
+            set(CPACK_SYSTEM_NAME "macOS-${CMAKE_SYSTEM_PROCESSOR}")
+        endif()
         set(CPACK_DMG_DISABLE_APPLICATIONS_SYMLINK ON)
-        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/img/HELICS.ico")
+        set(CPACK_PACKAGE_ICON "${HELICS_SOURCE_DIR}/docs/logos/HELICS.ico")
     elseif(NOT WIN32 AND NOT CYGWIN)
         set(CPACK_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}-${CMAKE_SYSTEM_PROCESSOR}")
     endif()

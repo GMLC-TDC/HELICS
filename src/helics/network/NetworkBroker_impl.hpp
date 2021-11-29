@@ -74,6 +74,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
         CoreBroker::setAsRoot();
     }
     netInfo.useJsonSerialization = BrokerBase::useJsonSerialization;
+    netInfo.observer = BrokerBase::observer;
     CommsBroker<COMMS, CoreBroker>::comms->setName(CoreBroker::getIdentifier());
     CommsBroker<COMMS, CoreBroker>::comms->loadNetworkInfo(netInfo);
     CommsBroker<COMMS, CoreBroker>::comms->setTimeout(BrokerBase::networkTimeout.to_ms());

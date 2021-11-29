@@ -106,7 +106,7 @@ TEST_F(command_tests, core_federate_command)
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
 
-    auto cmd2 = vFed2->getCommand();
+    auto cmd2 = vFed2->waitCommand();
     EXPECT_EQ(cmd2.first, "test");
     cmd2 = vFed2->getCommand();
     EXPECT_TRUE(cmd2.first.empty());

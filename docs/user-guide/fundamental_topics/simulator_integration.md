@@ -27,7 +27,7 @@ This section introduces the simplest broker topology for integrating federates i
 
 **todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -43,7 +43,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 
@@ -107,7 +107,7 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 For the remainder of this section of the guide, we'll walk through the typical stages of co-simulation, providing examples of how these might be implemented using HELICS API calls. For the purposes of these examples, we will assume the use of a Python binding. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../../references/api-reference/index.md) to get the details you need.
 
-To begin, at the top of your Python module ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to import the HELICS library, which will look something like this:
+To begin, at the top of your Python module ([after installing the Python HELICS module](../installation/index.md)), you'll have to import the HELICS library, which will look something like this:
 
 ```python
 import helics as h
@@ -115,7 +115,7 @@ import helics as h
 
 ### Federate Information
 
-Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](./../configuration/FederateFlags.md).
+Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](../deprecated/FederateFlags.md).
 
 ### Publications, Subscriptions and Endpoints
 
@@ -138,19 +138,19 @@ In HELICS there is a single API call that can be used to read in all of the nece
 For a value federate:
 
 ```python
-fed = h.helicsCreateValueFederateFromConfig('fed_config.json')
+fed = h.helicsCreateValueFederateFromConfig("fed_config.json")
 ```
 
 For a message federate:
 
 ```python
-fed = h.helicsCreateMessageFederateFromConfig('fed_config.json')
+fed = h.helicsCreateMessageFederateFromConfig("fed_config.json")
 ```
 
 For a combination federate:
 
 ```python
-fed = h.helicsCreateCombinationFederateFromConfig('fed_config.json')
+fed = h.helicsCreateCombinationFederateFromConfig("fed_config.json")
 ```
 
 In all instances, this function returns the federate object `fed` and requires a path to the JSON configuration file as an input.
@@ -163,7 +163,7 @@ Additionally, there are ways to create and configure the federate directly throu
 fi = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](./../configuration/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../deprecated/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fi, 6, True)
@@ -230,7 +230,7 @@ At this point, each federate will now set through time, exchanging values with o
 ```python
 t = 0
 while t < end_time:
-    # cosimulate
+    pass  # cosimulation code would go here
 ```
 
 Now, the federate begins to step through time. For the purposes of this example, we will assume that during every time step, the federate will first take inputs in from the rest of the cosimulation, then make internal updates and calculations and finish the time step by publishing values back to the rest of the cosimulation before requesting the next time step.
@@ -245,7 +245,6 @@ float_value = h.helicsInputGetDouble(sub)
 real_value, imag_value = h.helicsInputGetComplex(sub)
 string_value = h.helicsInputGetChar(sub)
 ...
-
 ```
 
 It may also be worth noting that it is possible on receipt to check whether an input has been updated before retrieving values. That can be done using the following call:

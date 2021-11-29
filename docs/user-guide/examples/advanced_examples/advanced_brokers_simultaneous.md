@@ -1,6 +1,6 @@
 # Brokers - Simultaneous Co-simulations
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This example shows how to configure a HELICS co-simulation so that multiple co-simulations can run simultaneously on one computer. Understanding this configuration is a pre-requisite to running the other advanced broker examples (which also involve multiple brokers running on one computer).
 
@@ -13,9 +13,9 @@ This example shows how to configure a HELICS co-simulation so that multiple co-s
 
 ## Where is the code?
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [simultaneous co-simulations can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [simultaneous co-simulations can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/simultaneous). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_simultaneous_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_simultaneous_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     np.random.seed(1490)
 ```
 
-The values shown above are from [federation_1](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_1). Identical lines with alternative values can be found in [federation_2](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_2) and [federation_3.](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_3)
+The values shown above are from [federation_1](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_1). Identical lines with alternative values can be found in [federation_2](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_2) and [federation_3.](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_3)
 
 2. The brokers are configured to ensure that messages from one federation do not get routed to federates in another federation.
 
@@ -47,7 +47,7 @@ The values shown above are from [federation_1](https://github.com/GMLC-TDC/HELIC
 
 With no extra configuration, it is only possible to run one HELICS co-simulation on a given computer. In the most popular HELICS cores (ZMQ being the most common, by far), messages are sent between federates using the networking stack. (There are other ways, though. For example, the IPC core uses the Boost library inter-process communication.). If you want to run multiple co-simulations on one compute need, an extra step needs to be taken to keep the messages from each federation separate from each other and non-interfering. Since we're using the network stack, this can be easily accomplished by assigning each broker a unique port to use. Looking at the federation launch config files, you can see this clearly expressed:
 
-[federation_1_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_1/federation_1_runner.json)
+[federation_1_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_1/federation_1_runner.json)
 
 ```json
 {
@@ -60,7 +60,7 @@ With no extra configuration, it is only possible to run one HELICS co-simulation
     },
 ```
 
-[federation_2_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_2/federation_2_runner.json)
+[federation_2_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_2/federation_2_runner.json)
 
 ```json
 {
@@ -73,7 +73,7 @@ With no extra configuration, it is only possible to run one HELICS co-simulation
     },
 ```
 
-[federation_3_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_3/federation_3_runner.json)
+[federation_3_runner.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_brokers/simultaneous/federation_3/federation_3_runner.json)
 
 ```json
 {
@@ -100,13 +100,11 @@ To run the co-simulations simultaneously, all that is required is having `helics
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-**TODO: make these links?**
+![](../../../img/advanced_simultaneous_power_1.png)
 
-![placeholder](../../../img/advanced_simultaneous_power_1.png)
+![](../../../img/advanced_simultaneous_power_2.png)
 
-![placeholder](../../../img/advanced_simultaneous_power_2.png)
-
-![placeholder](../../../img/advanced_simultaneous_power_3.png)
+![](../../../img/advanced_simultaneous_power_3.png)
 
 To do a more legitimate sensitivity analysis to the population of EVs that are being charged, a sample size larger than three is almost certainly necessary. [We've put together another example](./advanced_orchestration.md) to show how to orchestrate running larger sets of co-simulations to address exactly these kinds of needs.
 

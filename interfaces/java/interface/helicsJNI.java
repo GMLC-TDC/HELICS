@@ -24,6 +24,8 @@ public class helicsJNI {
   public final static native int HELICS_CORE_TYPE_WEBSOCKET_get();
   public final static native int HELICS_CORE_TYPE_INPROC_get();
   public final static native int HELICS_CORE_TYPE_NULL_get();
+  public final static native int HELICS_CORE_TYPE_EMPTY_get();
+  public final static native int HELICS_DATA_TYPE_UNKNOWN_get();
   public final static native int HELICS_DATA_TYPE_STRING_get();
   public final static native int HELICS_DATA_TYPE_DOUBLE_get();
   public final static native int HELICS_DATA_TYPE_INT_get();
@@ -100,6 +102,7 @@ public class helicsJNI {
   public final static native int HELICS_PROPERTY_TIME_RT_TOLERANCE_get();
   public final static native int HELICS_PROPERTY_TIME_INPUT_DELAY_get();
   public final static native int HELICS_PROPERTY_TIME_OUTPUT_DELAY_get();
+  public final static native int HELICS_PROPERTY_TIME_GRANT_TIMEOUT_get();
   public final static native int HELICS_PROPERTY_INT_MAX_ITERATIONS_get();
   public final static native int HELICS_PROPERTY_INT_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_FILE_LOG_LEVEL_get();
@@ -138,6 +141,8 @@ public class helicsJNI {
   public final static native int HELICS_SEQUENCING_MODE_FAST_get();
   public final static native int HELICS_SEQUENCING_MODE_ORDERED_get();
   public final static native int HELICS_SEQUENCING_MODE_DEFAULT_get();
+  public final static native double HELICS_BIG_NUMBER_get();
+  public final static native double cHelicsBigNumber_get();
   public final static native double HELICS_TIME_ZERO_get();
   public final static native double HELICS_TIME_EPSILON_get();
   public final static native double HELICS_TIME_INVALID_get();
@@ -234,6 +239,7 @@ public class helicsJNI {
   public final static native int helicsGetFlagIndex(String jarg1);
   public final static native int helicsGetOptionIndex(String jarg1);
   public final static native int helicsGetOptionValue(String jarg1);
+  public final static native int helicsGetDataType(String jarg1);
   public final static native void helicsFederateInfoSetFlagOption(long jarg1, int jarg2, int jarg3);
   public final static native void helicsFederateInfoSetSeparator(long jarg1, char jarg2);
   public final static native void helicsFederateInfoSetTimeProperty(long jarg1, int jarg2, double jarg3);
@@ -341,6 +347,7 @@ public class helicsJNI {
   public final static native void helicsPublicationPublishChar(long jarg1, char jarg2);
   public final static native void helicsPublicationPublishComplex(long jarg1, double jarg2, double jarg3);
   public final static native void helicsPublicationPublishVector(long jarg1, double[] jarg2, int jarg3);
+  public final static native void helicsPublicationPublishComplexVector(long jarg1, double[] jarg2, int jarg3);
   public final static native void helicsPublicationPublishNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native void helicsPublicationAddTarget(long jarg1, String jarg2);
   public final static native int helicsInputIsValid(long jarg1);
@@ -358,6 +365,7 @@ public class helicsJNI {
   public final static native void helicsInputGetComplex(long jarg1, double[] jarg2, double[] jarg3);
   public final static native int helicsInputGetVectorSize(long jarg1);
   public final static native void helicsInputGetVector(long jarg1, long jarg2, int jarg3, int[] jarg4);
+  public final static native void helicsInputGetComplexVector(long jarg1, long jarg2, int jarg3, int[] jarg4);
   public final static native void helicsInputGetNamedPoint(long jarg1, byte[] jarg2, int[] jarg4, double[] jarg5);
   public final static native void helicsInputSetDefaultBytes(long jarg1, long jarg2, int jarg3);
   public final static native void helicsInputSetDefaultString(long jarg1, String jarg2);
@@ -368,9 +376,11 @@ public class helicsJNI {
   public final static native void helicsInputSetDefaultDouble(long jarg1, double jarg2);
   public final static native void helicsInputSetDefaultComplex(long jarg1, double jarg2, double jarg3);
   public final static native void helicsInputSetDefaultVector(long jarg1, double[] jarg2, int jarg3);
+  public final static native void helicsInputSetDefaultComplexVector(long jarg1, double[] jarg2, int jarg3);
   public final static native void helicsInputSetDefaultNamedPoint(long jarg1, String jarg2, double jarg3);
   public final static native String helicsInputGetType(long jarg1);
   public final static native String helicsInputGetPublicationType(long jarg1);
+  public final static native int helicsInputGetPublicationDataType(long jarg1);
   public final static native String helicsPublicationGetType(long jarg1);
   public final static native String helicsInputGetName(long jarg1);
   public final static native String helicsSubscriptionGetTarget(long jarg1);

@@ -35,15 +35,15 @@ void TcpConnection::startReceive()
             receivingHalt.activate();
         }
         if (!triggerhalt) {
-            socket_.async_receive(asio::buffer(data.data() + residBufferSize,
-                                               data.size() - residBufferSize),
-                                  [ptr = shared_from_this()](const std::error_code& err,
-                                                             size_t bytes) {
-                                      ptr->handle_read(err, bytes);
-                                  });
+            socket_.async_read_some(asio::buffer(data.data() + residBufferSize,
+                                                 data.size() - residBufferSize),
+                                    [ptr = shared_from_this()](const std::error_code& err,
+                                                               size_t bytes) {
+                                        ptr->handle_read(err, bytes);
+                                    });
             if (triggerhalt) {
                 // cancel previous operation if triggerhalt is now active
-                socket_.cancel();
+                socket_.lowest_layer().cancel();
                 // receivingHalt.trigger();
             }
         } else {
@@ -149,7 +149,7 @@ void TcpConnection::handle_read(const std::error_code& error, size_t bytes_trans
 }
 
 // asio::socket_base::linger optionLinger(true, 2);
-// socket_.set_option(optionLinger, ec);
+// socket_.lowest_layer().set_option(optionLinger, ec);
 void TcpConnection::close()
 {
     closeNoWait();
@@ -174,8 +174,8 @@ void TcpConnection::closeNoWait()
     }
 
     std::error_code ec;
-    if (socket_.is_open()) {
-        socket_.shutdown(tcp::socket::shutdown_both, ec);
+    if (socket_.lowest_layer().is_open()) {
+        socket_.lowest_layer().shutdown(tcp::socket::shutdown_both, ec);
         if (ec) {
             if ((ec.value() != asio::error::not_connected) &&
                 (ec.value() != asio::error::connection_reset)) {
@@ -184,9 +184,9 @@ void TcpConnection::closeNoWait()
             }
             ec.clear();
         }
-        socket_.close(ec);
+        socket_.lowest_layer().close(ec);
     } else {
-        socket_.close(ec);
+        socket_.lowest_layer().close(ec);
     }
 }
 
@@ -200,7 +200,8 @@ void TcpConnection::waitOnClose()
 
         while (!receivingHalt.wait_for(std::chrono::milliseconds(200))) {
             std::cout << "wait timeout " << static_cast<int>(state.load()) << " "
-                      << socket_.is_open() << " " << receivingHalt.isTriggered() << std::endl;
+                      << socket_.lowest_layer().is_open() << " " << receivingHalt.isTriggered()
+                      << std::endl;
 
             std::cout << "wait info " << context_.stopped() << " " << connecting << std::endl;
         }
@@ -228,15 +229,16 @@ TcpConnection::TcpConnection(asio::io_context& io_context,
     tcp::resolver resolver(io_context);
     tcp::resolver::query query(tcp::v4(), connection, port);
     tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-    socket_.async_connect(*endpoint_iterator,
-                          [this](const std::error_code& error) { connect_handler(error); });
+    socket_.lowest_layer().async_connect(*endpoint_iterator, [this](const std::error_code& error) {
+        connect_handler(error);
+    });
 }
 
 void TcpConnection::connect_handler(const std::error_code& error)
 {
     if (!error) {
         connected.activate();
-        socket_.set_option(asio::ip::tcp::no_delay(true));
+        socket_.lowest_layer().set_option(asio::ip::tcp::no_delay(true));
     } else {
         std::cerr << "connection error " << error.message() << ": code =" << error.value() << '\n';
         connectionError = true;
@@ -260,7 +262,7 @@ size_t TcpConnection::send(const void* buffer, size_t dataLength)
     size_t p{0};
     int count{0};
     while (count++ < 5 &&
-           (sz = socket_.send(
+           (sz = socket_.write_some(
                 asio::buffer(reinterpret_cast<const char*>(buffer) + p, sent_size))) != sent_size) {
         sent_size -= sz;
         p += sz;
@@ -291,7 +293,7 @@ size_t TcpConnection::send(const std::string& dataString)
                     return 0;
                 }
             }
-            auto sz = socket_.send(asio::buffer(dataString));
+            auto sz = socket_.write_some(asio::buffer(dataString));
             assert(sz == dataString.size());
             return sz;
     */
@@ -299,7 +301,7 @@ size_t TcpConnection::send(const std::string& dataString)
 
 size_t TcpConnection::receive(void* buffer, size_t maxDataSize)
 {
-    return socket_.receive(asio::buffer(buffer, maxDataSize));
+    return socket_.read_some(asio::buffer(buffer, maxDataSize));
 }
 
 bool TcpConnection::waitUntilConnected(std::chrono::milliseconds timeOut)

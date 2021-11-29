@@ -94,7 +94,7 @@ namespace udp {
 
         asio::ip::udp::socket mSocket;
         asio::ip::udp::endpoint mRemoteEndpoint;
-        std::array<char, 1024> mRecvBuffer{0};
+        std::array<char, 1024> mRecvBuffer{{0}};
         std::function<bool(std::shared_ptr<UdpServer>, const char*, size_t)> mDataCall;
     };
 }  // namespace udp
@@ -139,7 +139,7 @@ namespace apps {
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
-            auto V = (*config_)["tcp"];
+            const auto& V = (*config_)["tcp"];
             helics::fileops::replaceIfMember(V, "interface", ext_interface);
             helics::fileops::replaceIfMember(V, "port", tcpport);
         }
@@ -270,10 +270,12 @@ namespace apps {
     void AsioBrokerServer::mainLoop()
     {
         auto ioctx = AsioContextManager::getContextPointer();
+
 #ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
+                // NOLINTNEXTLINE
                 [this](tcp::TcpConnection::pointer connection, const char* data, size_t datasize) {
                     return tcpDataReceive(connection, data, datasize);
                 });
@@ -286,6 +288,7 @@ namespace apps {
         if (udp_enabled_) {
             udpserver = loadUDPserver(ioctx->getBaseContext());
             udpserver->setDataCall(
+                // NOLINTNEXTLINE
                 [this](std::shared_ptr<udp::UdpServer> server, const char* data, size_t datasize) {
                     return udpDataReceive(server, data, datasize);
                 });

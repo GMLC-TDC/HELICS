@@ -2,11 +2,11 @@
 
 Once a federate has been granted the ability to move forward to a specific time (the granted time), the federate will execute its simulation, calculating its new state, behavior, or control action to advance to that time. Prior to these calculations, it will receive any messages that have been sent to it by other federates and after simulating up to the granted time, may send out messages with new values other federates may need.
 
-Using the webserver that HELICS provides to access data about a cosimulation (without having to using the [HELICS APIs](file:///Users/hard312/source/HELICS-src/docs/doxygen/index.html) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
+Using the webserver that HELICS provides to access data about a cosimulation (without having to using the [HELICS APIs](../../doxygen/index.md) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
 
 ## Launching Web Interface
 
-The web interface requires the use of [helics_cli](./helics_cli.md) to run the co-simulation and is created by the following command:
+The web interface requires the use of [helics_cli](helics_cli.md) to run the co-simulation and is created by the following command:
 
 ```sh
 $ helics_cli server
@@ -17,7 +17,7 @@ The response from helics_cli is the address of the web interface that can be use
 
 ## Web Interface Overview
 
-![Ex. 1a message topology](../img/web_interface_overview.png)
+![Ex. 1a message topology](../../img/web_interface_overview.png)
 
 1. **Load web interface configuration** - A configuration file is provided to allow the user to be more specific about which federates and publications are of interest. Particularly for federations with large numbers of federates and/or large numbers of publications, it may not be desirable to display all of that information in the web interface, especially if it isn't needed. A configuration file can be loaded that will allow the user to restrict which federates and publications are added to the respective tables. xxxxxxx - Do we need to advise users to limit the size of these tables for performance reasons. Or is this largely expected to be a convenience for them? At what point does size become a problem?
 2. **Run co-simulation** - This button will launch the co-simulation via helics_cli and run it to completion. The values in the "Federate Configuration" and "Publication" fields will update periodically to reflect the current state of the federation. This allows for some degree of monitoring while the co-simulation runs.

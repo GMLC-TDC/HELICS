@@ -2,16 +2,16 @@
 
 This section provides an overview of the components, each of which are linked to separate sections for more detail. The components discussed are:
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :hidden:
     :maxdepth: 1
 
     simulator_integration
     federates
-    timing
+    timing_configuration
     helics_cli
-    simulate
+    stages
     logging
 
 ```

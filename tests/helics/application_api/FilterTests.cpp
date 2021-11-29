@@ -756,7 +756,7 @@ TEST_F(filter_tests, many_filters)
             if (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
-                EXPECT_EQ(m->data.size(), 17 + 18);
+                EXPECT_EQ(m->data.size(), 17U + 18U);
             }
         }
         rec->finalize();
@@ -772,9 +772,6 @@ TEST_F(filter_tests, many_filters)
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
 
     t1.join();
     t2.join();
@@ -833,7 +830,7 @@ TEST_F(filter_tests, many_filters_multi)
             while (p2.hasMessage()) {
                 ++cntb;
                 auto m = p2.getMessage();
-                EXPECT_EQ(m->data.size(), 18 + 8);
+                EXPECT_EQ(m->data.size(), 18U + 8U);
             }
         }
         rec->finalize();
@@ -849,9 +846,6 @@ TEST_F(filter_tests, many_filters_multi)
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
 
     t1.join();
     t2.join();
@@ -920,7 +914,7 @@ TEST_F(filter_tests, reroute_cascade)
             while (r9.hasMessage()) {
                 ++cntb;
                 auto m = r9.getMessage();
-                EXPECT_EQ(m->data.size(), 18);
+                EXPECT_EQ(m->data.size(), 18U);
             }
         }
         rec->finalize();
@@ -936,9 +930,6 @@ TEST_F(filter_tests, reroute_cascade)
         ffed->enterExecutingModeComplete();
         ffed->requestTimeAsync(50);
     }
-
-    helics::Time tr = helics::timeZero;
-    helics::Time ptr = helics::timeZero;
 
     t1.join();
     t2.join();
@@ -984,7 +975,7 @@ class rfcheck {
                 while (r1.hasMessage()) {
                     ++mCnt;
                     auto m = r1.getMessage();
-                    EXPECT_EQ(m->data.size(), 18);
+                    EXPECT_EQ(m->data.size(), 18U);
                 }
             }
             mFed->finalize();
@@ -1210,7 +1201,9 @@ TEST_F(filter_tests, reroute_separate_dest_target)
     auto send = GetFederateAs<helics::MessageFederate>(0);
     auto rec = GetFederateAs<helics::MessageFederate>(1);
     auto filt = GetFederateAs<helics::MessageFederate>(2);
-
+    send->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    rec->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    filt->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     auto& p1 = send->registerGlobalEndpoint("send");
     auto& p2 = rec->registerGlobalEndpoint("rec");
     p1.setDefaultDestination("rec");

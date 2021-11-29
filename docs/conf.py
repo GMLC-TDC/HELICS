@@ -32,8 +32,30 @@
 # ones.
 import os
 import sphinx_rtd_theme
+import shutil
+import subprocess
+import requests
+import tempfile
+import zipfile
 
 current_directory = os.path.dirname(os.path.realpath(__file__))
+
+
+def download_helics_images():
+    print("Downloading doc images from GMLC-TDC/helics_doc_resources")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        url = "https://github.com/GMLC-TDC/helics_doc_resources/archive/refs/heads/main.zip"
+        target_path = os.path.join(tmpdirname, "helics_docs_resources.zip")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(target_path, "wb") as f:
+                f.write(response.raw.read())
+        with zipfile.ZipFile(target_path, "r") as zip_ref:
+            zip_ref.extractall(tmpdirname)
+        if os.path.exists("img"):
+            shutil.rmtree("img")
+        shutil.move(os.path.join(tmpdirname, "helics_doc_resources-main/user_guide"), "img")
+    print("Doc images downloaded")
 
 
 def which(program):
@@ -60,16 +82,29 @@ def which(program):
     return None
 
 
-import subprocess
-
 read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
 
+# For RTD builds, only download the images once; for developers, always get the images
+if not read_the_docs_build or not os.path.exists("img"):
+    download_helics_images()
+
+# For RTD builds run doxygen once for all output formats
 if read_the_docs_build:
     dir_name = os.path.realpath(os.path.dirname(__file__))
-    subprocess.call("cd {dir_name} && make rtddoxygen".format(dir_name=dir_name), shell=True)
-    html_extra_path = [os.path.abspath(os.path.join(dir_name, "../rtd-doxygen"))]
+    checkout_dir = os.path.realpath(os.path.join(dir_name, os.pardir))
+    doxygen_build_dir = os.path.realpath(os.path.join(checkout_dir, "build-doxygen"))
+    if not os.path.isdir(doxygen_build_dir):
+        os.makedirs(os.path.join(doxygen_build_dir, "docs", "html"))
+        subprocess.call(
+            "cd {dir_name} && python ./scripts/render-doxyfile.py && doxygen Doxyfile;".format(
+                dir_name=checkout_dir
+            ),
+            shell=True,
+        )
+    html_extra_path = [os.path.abspath(os.path.join(doxygen_build_dir, "docs", "html"))]
 
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
@@ -78,14 +113,17 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
-    "sphinx_markdown_tables",
+    "sphinxcontrib.rsvgconverter",
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
 ]
 
-from recommonmark.parser import CommonMarkParser
-from recommonmark.transform import AutoStructify
+myst_enable_extensions = [
+    "amsmath",
+    "dollarmath",
+]
+myst_dmath_double_inline = True
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
@@ -94,16 +132,8 @@ breathe_projects = {
 breathe_default_project = "helics"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = []
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-
-source_parsers = {
-    ".md": CommonMarkParser,
-}
-source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
@@ -235,19 +265,11 @@ texinfo_documents = [
         "HELICS Documentation",
         author,
         "HELICS",
-        "One line description of project.",
+        "Hierarchical Engine for Large-scale Infrastructure Co-Simulation",
         "Miscellaneous",
     ),
 ]
 
 
 def setup(app):
-    app.add_stylesheet("css/custom.css")  # may also be an URL
-    app.add_config_value(
-        "recommonmark_config",
-        {
-            "enable_eval_rst": True,
-        },
-        True,
-    )
-    app.add_transform(AutoStructify)
+    app.add_css_file("css/custom.css")  # may also be an URL

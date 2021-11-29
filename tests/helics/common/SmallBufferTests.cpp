@@ -28,9 +28,9 @@ TEST(small_buffer_tests, resize)
     sb.resize(35);
     EXPECT_EQ(sb.size(), 35U);
     sb.resize(135121);
-    EXPECT_EQ(sb.size(), 135121);
+    EXPECT_EQ(sb.size(), 135121U);
     sb.resize(1541);
-    EXPECT_EQ(sb.size(), 1541);
+    EXPECT_EQ(sb.size(), 1541U);
 }
 
 TEST(small_buffer_tests, resize_assign)
@@ -115,11 +115,11 @@ TEST(small_buffer_tests, capacity)
 {
     SmallBuffer sb;
     sb.reserve(450);
-    EXPECT_GE(sb.capacity(), 450);
+    EXPECT_GE(sb.capacity(), 450U);
     sb.reserve(12514);
-    EXPECT_GE(sb.capacity(), 12514);
+    EXPECT_GE(sb.capacity(), 12514U);
     sb.reserve(400);
-    EXPECT_GE(sb.capacity(), 12514);
+    EXPECT_GE(sb.capacity(), 12514U);
 }
 
 TEST(small_buffer_tests, equality)
@@ -197,7 +197,7 @@ TEST(small_buffer_tests, copy_assign_full)
     SmallBuffer sb1(std::string(400, 'a'));
     EXPECT_EQ(sb1[234], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = sb1;
     EXPECT_EQ(sb1, sb2);
     EXPECT_EQ(sb2[219], std::byte{'a'});
@@ -208,7 +208,7 @@ TEST(small_buffer_tests, copy_assign_full2)
     SmallBuffer sb1(std::string(16, 'a'));
     EXPECT_EQ(sb1[13], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = sb1;
     EXPECT_EQ(sb1, sb2);
     EXPECT_EQ(sb2[11], std::byte{'a'});
@@ -249,7 +249,7 @@ TEST(small_buffer_tests, move_assign_full)
     SmallBuffer sb1(std::string(400, 'a'));
     EXPECT_EQ(sb1[234], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = std::move(sb1);
     EXPECT_EQ(sb2[219], std::byte{'a'});
 }
@@ -259,7 +259,7 @@ TEST(small_buffer_tests, move_assign_full2)
     SmallBuffer sb1(std::string(16, 'a'));
     EXPECT_EQ(sb1[13], std::byte{'a'});
     SmallBuffer sb2(std::string(36223, 'b'));
-    EXPECT_EQ(sb2.size(), 36223);
+    EXPECT_EQ(sb2.size(), 36223U);
     sb2 = std::move(sb1);
     EXPECT_EQ(sb2[11], std::byte{'a'});
 }
@@ -267,8 +267,18 @@ TEST(small_buffer_tests, move_assign_full2)
 TEST(small_buffer_tests, move_assign_self)
 {
     SmallBuffer sb1(std::string(36214, 'e'));
-    EXPECT_EQ(sb1.size(), 36214);
+    EXPECT_EQ(sb1.size(), 36214U);
+    // this is testing self move so ignore the warning about
+#if defined(__clang__)
+#    pragma clang diagnostic push
+#    pragma clang diagnostic ignored "-Wself-move"
+#endif
     sb1 = std::move(sb1);
+
+#if defined(__clang__)
+#    pragma clang diagnostic pop
+#endif
+
     EXPECT_EQ(sb1[11], std::byte{'e'});  // NOLINT
 }
 
@@ -279,7 +289,7 @@ TEST(small_buffer_tests, buffer_transfer)
 
     sb1.moveAssign(buffer, 4567, 5000);
     EXPECT_EQ(sb1.size(), 4567U);
-    EXPECT_EQ(sb1.capacity(), 5000);
+    EXPECT_EQ(sb1.capacity(), 5000U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
@@ -293,7 +303,7 @@ TEST(small_buffer_tests, buffer_transfer_full)
 
     sb1.moveAssign(buffer, 4567, 5000);
     EXPECT_EQ(sb1.size(), 4567U);
-    EXPECT_EQ(sb1.capacity(), 5000);
+    EXPECT_EQ(sb1.capacity(), 5000U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
@@ -306,7 +316,7 @@ TEST(small_buffer_tests, buffer_transfer_self_assign)
 
     sb1.moveAssign(sb1.data(), 2314, 2354);
     EXPECT_EQ(sb1.size(), 2314U);
-    EXPECT_GE(sb1.capacity(), 2354);
+    EXPECT_GE(sb1.capacity(), 2354U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(sb1[27], std::byte{15});
@@ -322,7 +332,7 @@ TEST(small_buffer_tests, buffer_borrow)
 
     sb1.spanAssign(buffer.data(), 4567, 5000);
     EXPECT_EQ(sb1.size(), 4567U);
-    EXPECT_EQ(sb1.capacity(), 5000);
+    EXPECT_EQ(sb1.capacity(), 5000U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
@@ -337,7 +347,7 @@ TEST(small_buffer_tests, buffer_borrow_full)
 
     sb1.spanAssign(buffer.data(), 4567, 5000);
     EXPECT_EQ(sb1.size(), 4567U);
-    EXPECT_EQ(sb1.capacity(), 5000);
+    EXPECT_EQ(sb1.capacity(), 5000U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(buffer[27], std::byte{15});
@@ -350,7 +360,7 @@ TEST(small_buffer_tests, buffer_borrow_self_assign)
 
     sb1.spanAssign(sb1.data(), 1986, 2000);
     EXPECT_EQ(sb1.size(), 1986U);
-    EXPECT_GE(sb1.capacity(), 2000);
+    EXPECT_GE(sb1.capacity(), 2000U);
     sb1[27] = std::byte{15};
 
     EXPECT_EQ(sb1[27], std::byte{15});
@@ -367,7 +377,7 @@ TEST(small_buffer_tests, assign)
     EXPECT_EQ(sb1[3333], std::byte{'g'});
 
     sb1.assign(t1.data(), t1.data());
-    EXPECT_EQ(sb1.size(), 0);
+    EXPECT_EQ(sb1.size(), 0U);
 }
 
 TEST(small_buffer_tests, assign_size)
@@ -487,7 +497,7 @@ TEST(small_buffer_tests, release)
     (*sb1)[57515] = std::byte{'q'};
 
     auto* buffer = sb1->release();
-
+    ASSERT_FALSE(buffer == nullptr);
     buffer[13] = std::byte{'r'};
     EXPECT_EQ(buffer[57515], std::byte{'q'});
     EXPECT_EQ(buffer[13], std::byte{'r'});

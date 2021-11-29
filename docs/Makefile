@@ -21,7 +21,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 rtddoxygen:
-	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; python ./scripts/render-doxyfile.py; doxygen Doxyfile; mkdir -p rtd-doxygen; cp -r ./build-doxygen/docs/html ./rtd-doxygen/doxygen;
+	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; python ./scripts/render-doxyfile.py; doxygen Doxyfile;
 
 doxygen:
 	cd ../; mkdir -p build-doxygen; rm -rf build-doxygen; mkdir -p build-doxygen; cd build-doxygen; cmake -DCMAKE_INSTALL_PREFIX=./install/helics_install -DGENERATE_DOXYGEN_DOC=ON ../; make doc;
@@ -48,18 +48,18 @@ alldocs:
 	echo "Ensure that you've run the targets v1.3.1 and v2.0.0 manually."
 	mkdir -p _build
 	rm -rf _build/index.html
-	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/404.html
+	echo "<link rel='canonical' href='https://docs.helics.org/en/latest'/>" > _build/404.html
 	echo "<script>" >> _build/404.html
 	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS') === 0) {" >> _build/404.html
-	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS', 'helics.readthedocs.io/en/latest')" >> _build/404.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS', 'docs.helics.org/en/latest')" >> _build/404.html
 	echo "window.location.href = url_link;" >> _build/404.html
 	echo "}" >> _build/404.html
 	echo "</script>" >> _build/404.html
 
-	echo "<link rel='canonical' href='https://helics.readthedocs.io/en/latest'/>" > _build/index.html
+	echo "<link rel='canonical' href='https://docs.helics.org/en/latest'/>" > _build/index.html
 	echo "<script>" >> _build/index.html
 	echo "if (window.location.href.indexOf('https://gmlc-tdc.github.io/HELICS') === 0) {" >> _build/index.html
-	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS', 'helics.readthedocs.io/en/latest')" >> _build/index.html
+	echo "url_link = window.location.href.replace('gmlc-tdc.github.io/HELICS', 'docs.helics.org/en/latest')" >> _build/index.html
 	echo "window.location.href = url_link;" >> _build/index.html
 	echo "}" >> _build/index.html
 	echo "</script>" >> _build/index.html

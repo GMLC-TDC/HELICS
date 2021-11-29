@@ -25,7 +25,7 @@ The format is json.
     "port": 8080,
     "interface": "0.0.0.0"
   },
-  "webscoket": {
+  "websocket": {
     "port": 8008,
     "interface": "0.0.0.0"
   }
@@ -52,7 +52,7 @@ The running webserver will start a process that can respond to HTTP requests.
 
 ### HTTP actions
 
-```eval_rst
+```{eval-rst}
 +------------+---------------------------------------------------------------------------------------+
 | HTTP VERB  | Description                                                                           |
 +============+=======================================================================================+
@@ -70,7 +70,7 @@ The running webserver will start a process that can respond to HTTP requests.
 
 ### Parameters
 
-```eval_rst
+```{eval-rst}
 +-------------+---------------------------------------------------------------------------------------+
 | parameter   | Description                                                                           |
 +=============+=======================================================================================+
@@ -137,7 +137,7 @@ The status code corresponds to the most appropriate html error codes.
 
 ## Making queries
 
-As a demo case there is a `brokerServerTestCase` executable built as part of the HELICS_EXAMPLES.
+As a demo case there is a [`brokerServerTestCase` executable](https://github.com/GMLC-TDC/HELICS/blob/46eb388ddddd6add8ab03a685ff4de60b88f9e89/examples/BrokerServerTestCase/brokerServerTest.cpp) that can be built when compiling the main HELICS library from source.
 Running this example starts a webserver on the localhost using port 80.
 
 The response to queries is a string either in plain text or json.

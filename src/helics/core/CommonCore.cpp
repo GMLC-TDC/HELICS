@@ -150,6 +150,9 @@ bool CommonCore::connect()
                 if (no_ping) {
                     setActionFlag(m, slow_responding_flag);
                 }
+                if (observer) {
+                    setActionFlag(m, observer_flag);
+                }
                 transmit(parent_route_id, m);
                 setBrokerState(BrokerState::connected);
                 disconnection.activate();
@@ -171,6 +174,11 @@ bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
     return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
+}
+
+const std::string& CommonCore::getIdentifier() const
+{
+    return identifier;
 }
 
 const std::string& CommonCore::getAddress() const
@@ -374,11 +382,20 @@ void CommonCore::globalError(LocalFederateId federateID,
     m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
-    IterationResult ret = IterationResult::NEXT_STEP;
-    while (ret != IterationResult::ERROR_RESULT) {
-        ret = fed->genericUnspecifiedQueueProcess();
-        if (ret == IterationResult::HALTED) {
-            break;
+    MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
+    while (ret != MessageProcessingResult::ERROR_RESULT) {
+        if (fed->getState() == FederateStates::HELICS_FINISHED ||
+            fed->getState() == FederateStates::HELICS_ERROR) {
+            return;
+        }
+        ret = fed->genericUnspecifiedQueueProcess(false);
+        switch (ret) {
+            case MessageProcessingResult::ERROR_RESULT:
+            case MessageProcessingResult::HALTED:
+            case MessageProcessingResult::BUSY:
+                return;
+            default:
+                break;
         }
     }
 }
@@ -397,11 +414,20 @@ void CommonCore::localError(LocalFederateId federateID,
     m.payload = errorString;
     addActionMessage(m);
     fed->addAction(m);
-    IterationResult ret = IterationResult::NEXT_STEP;
-    while (ret != IterationResult::ERROR_RESULT) {
-        ret = fed->genericUnspecifiedQueueProcess();
-        if (ret == IterationResult::HALTED) {
-            break;
+    MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
+    while (ret != MessageProcessingResult::ERROR_RESULT) {
+        if (fed->getState() == FederateStates::HELICS_FINISHED ||
+            fed->getState() == FederateStates::HELICS_ERROR) {
+            return;
+        }
+        ret = fed->genericUnspecifiedQueueProcess(false);
+        switch (ret) {
+            case MessageProcessingResult::ERROR_RESULT:
+            case MessageProcessingResult::HALTED:
+            case MessageProcessingResult::BUSY:
+                return;
+            default:
+                break;
         }
     }
 }
@@ -625,6 +651,9 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
     }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
+    if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
+        setActionFlag(m, observer_flag);
+    }
     addActionMessage(m);
     // check some properties that should be inherited from the federate if it is the first one
     if (checkProperties) {
@@ -1246,6 +1275,7 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             if (handleInfo->key.empty()) {
                 cmd.setStringData(handleInfo->type, handleInfo->units);
@@ -1296,6 +1326,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             break;
         case InterfaceType::FILTER:
@@ -2273,7 +2304,10 @@ void CommonCore::initializeMapBuilder(const std::string& request,
                     queryReq.dest_id = fed.fed->global_id;
                     fed.fed->addAction(queryReq);
                 } else {
-                    builder.addComponent("", brkindex);
+                    // the federate has terminated or errored so is waiting, global_state doesn't
+                    // block
+                    builder.addComponent(federateQuery(fed.fed, "global_state", force_ordering),
+                                         brkindex);
                 }
             } else {
                 builder.addComponent(ret, brkindex);
@@ -2481,15 +2515,6 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
             return std::get<0>(mapBuilders[index]).generate();
         }
         return "#wait";
-    }
-    if (queryStr == "global_time") {
-        Json::Value base;
-        loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
-            val["granted_time"] = static_cast<double>(fed->grantedTime());
-            val["send_time"] = static_cast<double>(fed->nextAllowedSendTime());
-        });
-
-        return fileops::generateJsonString(base);
     }
     if (queryStr == "dependencies") {
         Json::Value base;
@@ -3215,6 +3240,29 @@ void CommonCore::processCommand(ActionMessage&& command)
                 }
             }
         } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = loopHandles.getEndpoint(command.name());
+            if (ept != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                command.setSource(ept->handle);
+                setActionFlag(command, destination_target);
+                command.clearStringData();
+                checkForNamedInterface(command);
+            } else {
+                auto* target = loopHandles.getEndpoint(command.getString(targetStringLoc));
+                if (target == nullptr) {
+                    routeMessage(command);
+                } else {
+                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    command.setSource(target->handle);
+                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    command.clearStringData();
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
         case CMD_FILTER_LINK: {
             auto* filt = loopHandles.getFilter(command.name());
             if (filt != nullptr) {
@@ -3294,18 +3342,25 @@ void CommonCore::processCommand(ActionMessage&& command)
         }
         case CMD_INIT: {
             auto* fed = getFederateCore(command.source_id);
-            if (fed != nullptr) {
-                fed->init_transmitted = true;
-                if (allInitReady()) {
-                    if (transitionBrokerState(BrokerState::connected,
-                                              BrokerState::initializing)) {  // make sure we only
-                                                                             // do this once
-                        checkDependencies();
-                        command.source_id = global_broker_id_local;
-                        transmit(parent_route_id, command);
-                    }
+            if (fed == nullptr) {
+                break;
+            }
+
+            fed->init_transmitted = true;
+
+            if (allInitReady()) {
+                if (transitionBrokerState(BrokerState::connected,
+                                          BrokerState::initializing)) {  // make sure we only
+                                                                         // do this once
+                    checkDependencies();
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, command);
+                } else if (checkActionFlag(command, observer)) {
+                    command.source_id = global_broker_id_local;
+                    transmit(parent_route_id, command);
                 }
             }
+
         } break;
         case CMD_INIT_GRANT:
             if (transitionBrokerState(
@@ -3327,6 +3382,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (!timeCoord->hasActiveTimeDependencies()) {
                     timeCoord->disconnect();
                 }
+            } else if (checkActionFlag(command, observer_flag)) {
+                routeMessage(command);
             }
             break;
 
@@ -3349,10 +3406,30 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_SET_PROFILER_FLAG:
             routeMessage(command);
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            if (isLocal(command.dest_id)) {
+                auto* fed = getFederateCore(command.dest_id);
+                if (fed != nullptr) {
+                    if ((fed->getState() != FederateStates::HELICS_FINISHED) &&
+                        (fed->getState() != FederateStates::HELICS_ERROR)) {
+                        fed->forceProcessMessage(command);
+                    } else {
+                        auto rep = fed->processPostTerminationAction(command);
+                        if (rep) {
+                            routeMessage(*rep);
+                        }
+                    }
+                }
+            } else {
+                routeMessage(command);
+            }
+            break;
         default:
             if (isPriorityCommand(command)) {
                 // this is a backup if somehow one of these message got here
                 processPriorityCommand(std::move(command));
+            } else if (isLocal(command.dest_id)) {
+                routeMessage(command);
             }
             break;
     }

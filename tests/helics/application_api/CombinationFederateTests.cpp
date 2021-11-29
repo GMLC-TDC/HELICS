@@ -108,6 +108,7 @@ TEST_P(combofed_single_type_tests, single_transfer)
     s = subid.getString();
 
     EXPECT_EQ(s, "string2");
+    vFed1->disconnect();
 }
 
 TEST_P(combofed_single_type_tests, endpoint_registration)
@@ -197,6 +198,9 @@ TEST_P(combofed_type_tests, multimode_transfer)
     SetupTest<helics::CombinationFederate>(GetParam(), 2);
     auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto cFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    cFed1->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    cFed2->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
 
     auto& epid = cFed1->registerEndpoint("ep1");
     auto& epid2 = cFed2->registerGlobalEndpoint("ep2", "random");

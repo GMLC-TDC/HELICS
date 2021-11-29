@@ -1,0 +1,79 @@
+name: MSYS2 CI
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
+  push:
+    branches:
+      - 'msys2/**'
+      - 'msys/**'
+      - 'msys2-**'
+      - 'msys-**'
+      - 'mingw64/**'
+      - 'mingw/**'
+      - 'mingw64-**'
+      - 'mingw-**'
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - { msystem: MINGW64, env: x86_64, gen: "MinGW Makefiles" }
+          - { msystem: MINGW64, env: x86_64, gen: "MSYS Makefiles" }
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{matrix.msystem}}
+        install: >-
+          git
+          make
+          cmake
+          mingw-w64-${{matrix.env}}-toolchain
+          mingw-w64-${{matrix.env}}-cmake
+          mingw-w64-${{matrix.env}}-ninja
+          mingw-w64-${{matrix.env}}-zeromq
+          mingw-w64-${{matrix.env}}-boost
+
+    - uses: actions/checkout@v2
+      with:
+        submodules: true
+      if: github.event_name != 'schedule'
+
+    - name: Checkout develop branch
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+        ref: develop
+      if: github.event_name == 'schedule'
+
+    - name: Build HELICS
+      env:
+        CMAKE_GENERATOR: ${{matrix.gen}}
+        DISABLE_INTERFACES: "Java"
+        DISABLE_EXAMPLES: "true"
+        #ZMQ_SUBPROJECT: "true"
+        #ZMQ_FORCE_SUBPROJECT: "true"
+      run: |
+        source scripts/setup-helics-ci-options.sh
+        mkdir -p build && cd build
+        ../scripts/ci-build.sh
+
+    - name: Run tests
+      working-directory: build
+      env:
+        TEST_TYPE: "ci"
+        CI_TEST_MATCH: "core-ci-tests"
+      run: |
+        source ../scripts/setup-helics-ci-options.sh
+        export CTEST_OPTIONS="--output-on-failure"
+        echo "Running CI tests with flags ${CI_TEST_FLAGS}"
+        ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+      

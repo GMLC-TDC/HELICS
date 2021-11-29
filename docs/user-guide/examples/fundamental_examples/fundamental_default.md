@@ -17,9 +17,9 @@ The Base Example tutorial is organized as follows:
 
 ## Example files
 
-All files necessary to run the Base Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_default)
+All files necessary to run the Base Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_default)
 
-[![](../../../img/fund_default_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/fundamental/fundamental_default)
+[![](../../../img/fund_default_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_default)
 
 The files include:
 
@@ -29,7 +29,7 @@ The files include:
 
 ## Default Setup
 
-The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSONs and how to launch the co-simulation with `helics_cli`.
+The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSON files and how to launch the co-simulation with `helics_cli`.
 
 ### Messages + Communication: pub/sub
 
@@ -61,7 +61,7 @@ With a better understanding of how we want to configure the pubs and subs, we ca
 
 Configuration of federates may be done with JSON files. Each federate will have its own configuration ("config") file. It's good practice to mirror the name of the federate with the config file. For example, the `Battery.py` federate will have a config file named `BatteryConfig.json`.
 
-There are [extensive ways](../../../references/configuration_options_reference.html) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
+There are [extensive ways](../../../references/configuration_options_reference.md) to configure federates in HELICS. The `BatteryConfig.json` file contains the most common as defaults:
 
 ```json
 {
@@ -78,7 +78,7 @@ There are [extensive ways](../../../references/configuration_options_reference.h
 
 ```
 
-In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../../../references/configuration_options_reference.html#logging-options)), and set the `core_type` to `zmq` ([the most common](../../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
+In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../../../references/configuration_options_reference.md#logging-options)), and set the `core_type` to `zmq` ([the most common](../../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
 
 This federate is configured with pubs and subs, so it will need an option to indicate the publication and the subscription configurations (for brevity, only the first pub and sub are printed below):
 
@@ -112,9 +112,6 @@ fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 ```
 
 Recall that federate registration and configuration is typically done **before** entering execution mode.
-
-<!-- **outstanding allison question:**
-(can you create a new configuration after entering execution mode?) -->
 
 ### Co-simulation Execution: `helics_cli`
 

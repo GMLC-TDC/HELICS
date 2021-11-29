@@ -202,6 +202,7 @@ class ValueFederateManager {
     @param inp the identifier for the subscription
     */
     static void clearUpdate(const Input& inp);
+    bool getUpdateFromCore(Input& inp);
 
   public:
     bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
@@ -217,7 +218,7 @@ class ValueFederateManager {
                                                         reference_stability::stable>>
         publications;
     Time CurrentTime{-1.0};  //!< the current simulation time
-    Core* coreObject;  //!< the pointer to the actual core
+    Core* coreObject{nullptr};  //!< the pointer to the actual core
     /** pointer back to the value Federate for creation of the Publication/Inputs */
     ValueFederate* fed{nullptr};
     atomic_guarded<std::function<void(Input&, Time)>>

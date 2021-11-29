@@ -36,7 +36,8 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
-
+    fFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    mFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("port2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");

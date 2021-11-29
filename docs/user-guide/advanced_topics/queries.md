@@ -18,9 +18,9 @@ query_result = h.helicsCreateQuery(traget_string, query_string)
 
 ## Targets
 
-Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._ "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it will not be queries by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker.
+Each query must define a "target", the component in the federation that is being queried. The target is either specified in terms of the relationship to the querying federate (_e.g._ "broker", "core") or by name of the federation component (_e.g._ "dist_system_1_fed"). The table below lists the valid query targets; if a federate happens to be named one of the target names listed below, it can not be queried by that name. For example, naming one of your brokers "broker" will prevent it being a valid target of a query by name. Instead, any federate that queries "broker" will end up targeting their broker.
 
-```eval_rst
+```{eval-rst}
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | target                                   | Description                                                                           |
 +==========================================+=======================================================================================+
@@ -42,31 +42,27 @@ Each query must define a "target", the component in the federation that is being
 
 ## Query String
 
-The `queryStr` is the specific data being requested; the tables below show the valid data provided by each queryable federation component. All queries return a valid JSON string with invalid queries returning a JSON with an error code and error message. (The only exception is the `global_value` query which just returns a string that is the value stored in the global directly.)
+The `queryStr` is the specific data being requested; the tables below show the valid data provided by each queryable federation component. All queries return a valid JSON string with invalid queries returning a JSON with an error code and error message. (The only exception is the `global_value` query which just returns a string containing global value.)
 
-- true/false \[T/F\]
-- a single quoted string `"answer"` \[string\]
-- a vector of quoted strings delimited by `','` `["answer1","answer"","answer3"]` \[sv\] this is a JSON compliant string vector
-- a JSON string with an object structure \[structure\]
-  As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes, `HELICS_SEQUENCING_MODE_FAST` which travels along priority channels and is identical to previous versions in which all queries traveled along those channels. The other mode is `HELICS_SEQUENCING_MODE_ORDERED` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least until after it gets to the specified target.
+As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing mode. There are currently two modes, `HELICS_SEQUENCING_MODE_FAST` which travels along priority channels and is identical to previous versions in which all queries traveled along those channels. The other mode is `HELICS_SEQUENCING_MODE_ORDERED` which travels along lower priority channels but is ordered with all other messages in the system. This can be useful in some situations where you want previous messages to be acknowledged as part of the federation before the query is run. The `global_flush` query is forced to run in ordered mode at least until after it gets to the specified target.
 
 ### Federate Queries
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +--------------------+------------------------------------------------------------+
 | queryString        | Description                                                |
 +====================+============================================================+
 | ``name``           | the identifier of the federate [string]                    |
 +--------------------+------------------------------------------------------------+
-| ``exists``         | Basic query if the federate exists in the Federation [T/F] |
+| ``exists``         | basic query if the federate exists in the Federation [T/F] |
 +--------------------+------------------------------------------------------------+
-| ``isinit``         | If the federate has entered init mode [T/F]                |
+| ``isinit``         | federate has entered init mode? [T/F]                |
 +--------------------+------------------------------------------------------------+
-| ``state``          | Current state of the federate as a string [string]         |
+| ``state``          | current state of the federate as a string [string]         |
 +--------------------+------------------------------------------------------------+
-| ``global_state``   | Current state of the federate as a string [structure]      |
+| ``global_state``   | current state of the federate as a string [structure]      |
 +--------------------+------------------------------------------------------------+
 | ``publications``   | current publications of a federate [sv]                    |
 +--------------------+------------------------------------------------------------+
@@ -106,7 +102,7 @@ The `global_time_debugging` and `global_flush` queries are also acknowledged by 
 
 The following queries are defined for federates but can only be queried on the local federate, that is, the federate making the query. Federates may specify a callback function which allows arbitrary user defined Queries.
 
-```eval_rst
+```{eval-rst}
 +---------------------------+------------------------------------------------------------+
 | queryString               | Description                                                |
 +===========================+============================================================+
@@ -126,7 +122,7 @@ The following queries are defined for federates but can only be queried on the l
 
 The following queries will be answered by a core:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+-------------------------------------------------------------------------------------+
 | queryString              | Description                                                                         |
 +==========================+=====================================================================================+
@@ -198,7 +194,7 @@ The `version` and `version_all` queries are valid but are not usually queried di
 
 The following queries will be answered by a broker:
 
-```eval_rst
+```{eval-rst}
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | queryString              | Description                                                                                       |
 +==========================+===================================================================================================+
@@ -258,9 +254,7 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower.
-
-error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
+`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower. Error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
 
 ## Usage Notes
 
@@ -302,7 +296,7 @@ In the header [`<helics\queryFunctions.hpp>`](https://docs.helics.org/en/latest/
 
 ### C API and interface API's
 
-Queries in the [`C API`](https://docs.helics.org/en/latest/c-api-reference/index.html#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
+Queries in the [C API](../../api-reference/C_API.md#query) have the same valid targets and properties that can be queried but the construction of the query is slightly different. The basic operation is to create a query using `helicsQueryCreate(target,query)`. Once created, the target or query string can be changed with `helicsQuerySetTarget()` and `helicsQuerySetQueryString()`, respectively.
 
 This function returns a query object that can be used in one of the execute functions (`helicsQueryExecute()`, `helicsQueryExecuteAsync()`, `helicsQueryBrokerExecute()`, `helicsQueryCoreExecute()`, to perform the query and receive back results. The query can be called asynchronously on a federate. The target field may be empty if the query is intended to be used on a local federate, in which case the target is assumed to be the federate itself.
 A query must be freed after use `helicsQueryFree()`.
@@ -313,4 +307,4 @@ As long as timeouts are enabled in the library itself, queries have a timeout sy
 
 ## Example
 
-A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query)).
+A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query)).

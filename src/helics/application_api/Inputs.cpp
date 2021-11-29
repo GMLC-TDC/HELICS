@@ -675,15 +675,10 @@ size_t Input::getVectorSize()
         return out.size();
     }
     switch (lastValue.index()) {
-        case double_loc:
-        case int_loc:
-            return 1;
-        case complex_loc:
-            return 2;
         case vector_loc:
             return std::get<std::vector<double>>(lastValue).size();
         case complex_vector_loc:
-            return std::get<std::vector<std::complex<double>>>(lastValue).size() * 2;
+            return std::get<std::vector<std::complex<double>>>(lastValue).size();
         default:
             break;
     }
@@ -779,6 +774,35 @@ data_view Input::checkAndGetFedUpdate()
                                                                     data_view{};
 }
 
+void Input::forceCoreDataUpdate()
+{
+    auto dv = fed->getBytes(*this);
+    if (!dv.empty()) {
+        valueExtract(dv, injectionType, lastValue);
+    } else if (getMultiInputMode() != MultiInputHandlingMethod::NO_OP) {
+        fed->forceCoreUpdate(*this);
+    }
+}
+
+bool checkForNeededCoreRetrieval(std::size_t currentIndex,
+                                 DataType injectionType,
+                                 DataType conversionType)
+{
+    static constexpr std::array<DataType, 7> locType{{DataType::HELICS_DOUBLE,
+                                                      DataType::HELICS_INT,
+                                                      DataType::HELICS_STRING,
+                                                      DataType::HELICS_COMPLEX,
+                                                      DataType::HELICS_VECTOR,
+                                                      DataType::HELICS_COMPLEX_VECTOR,
+                                                      DataType::HELICS_NAMED_POINT}};
+
+    if (locType[currentIndex] == injectionType || locType[currentIndex] == conversionType) {
+        return false;
+    }
+
+    return !(currentIndex != int_loc && conversionType == DataType::HELICS_DOUBLE);
+}
+
 char Input::getValueChar()
 {
     auto dv = checkAndGetFedUpdate();
@@ -822,7 +846,7 @@ char Input::getValueChar()
 
 int Input::getValue(double* data, int maxsize)
 {
-    auto V = getValueRef<std::vector<double>>();
+    const auto& V = getValueRef<std::vector<double>>();
     int length = 0;
     if (data != nullptr && maxsize > 0) {
         length = std::min(static_cast<int>(V.size()), maxsize);
@@ -832,6 +856,29 @@ int Input::getValue(double* data, int maxsize)
     hasUpdate = false;
     return length;
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
+int Input::getComplexValue(double* data, int maxsize)
+{
+    const auto& CV = getValueRef<std::vector<std::complex<double>>>();
+    int length = 0;
+    if (data != nullptr && maxsize > 0) {
+        length = std::min(static_cast<int>(CV.size()), maxsize);
+        std::memmove(data, reinterpret_cast<const double*>(CV.data()), length * sizeof(double) * 2);
+    }
+
+    hasUpdate = false;
+    return length;
+}
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 int Input::getValue(char* str, int maxsize)
 {

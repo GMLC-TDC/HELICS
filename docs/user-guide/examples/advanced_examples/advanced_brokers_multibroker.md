@@ -1,6 +1,6 @@
 # Brokers - Multi-Protocol Brokers
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This example shows how to configure a HELICS co-simulation to implement a broker structure that utilizes multiple core types in a single co-simulation. Typically, all federates in a single federation use the same core type (ZMQ by default) but HELICS can be set up to utilize different core types in the same federation
 
@@ -13,9 +13,9 @@ This example shows how to configure a HELICS co-simulation to implement a broker
 
 ## Where is the code?
 
-This example on [multibrokerscan be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/multi_broker). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+This example on [multiple brokers can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/multi_broker). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_multi_broker_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_multi_broker_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -108,11 +108,11 @@ Unlike the other advanced broker examples, this one can be run with a single hel
 
 As has been mentioned, since this is just a change to the co-simulation architecture, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![placeholder](../../../img/advanced_multibroker_charging_power.png)
+![](../../../img/advanced_multibroker_charging_power.png)
 
-![placeholder](../../../img/advanced_multibroker_estimated_SOCs.png)
+![](../../../img/advanced_multibroker_estimated_SOCs.png)
 
-![placeholder](../../../img/advanced_multibroker_battery_SOCs.png)
+![](../../../img/advanced_multibroker_battery_SOCs.png)
 
 ## [Questions and Help](../../support.md)
 

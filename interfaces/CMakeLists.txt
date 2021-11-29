@@ -7,6 +7,28 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if(BUILD_PYTHON_INTERFACE
+   OR BUILD_PYTHON2_INTERFACE
+   OR HELICS_BUILD_PYTHON_INTERFACE
+   OR HELICS_BUILD_PYTHON2_INTERFACE
+)
+    set(tmp_py_interface_option "")
+    if(BUILD_PYTHON_INTERFACE)
+        set(tmp_py_interface_option "BUILD_PYTHON_INTERFACE")
+    elseif(HELICS_BUILD_PYTHON_INTERFACE)
+        set(tmp_py_interface_option "HELICS_BUILD_PYTHON_INTERFACE")
+    elseif(BUILD_PYTHON2_INTERFACE)
+        set(tmp_py_interface_option "BUILD_PYTHON2_INTERFACE")
+    elseif(HELICS_BUILD_PYTHON2_INTERFACE)
+        set(tmp_py_interface_option "HELICS_BUILD_PYTHON2_INTERFACE")
+    endif()
+    message(
+        FATAL_ERROR
+            "The Python interface is no longer compiled as part of building HELICS. On most platforms, it is enough to install with `pip install helics`. For more complex needs such as using a custom build of the HELICS library with pyhelics, see the installation docs at https://python.helics.org/installation/ and the new repository at https://github.com/gmlc-tdc/pyhelics for details.
+Re-run cmake with the `-U${tmp_py_interface_option}` option to get rid of this error message."
+    )
+endif()
+
 cmake_dependent_option(
     HELICS_BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
     OFF

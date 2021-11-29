@@ -264,9 +264,9 @@ namespace mpi {
             // std::string address;
             // std::tie (address, msg) = sendMsg.value ();
 
-            MPI_Request req;
-            auto sendRequestData =
-                std::pair<MPI_Request, std::vector<char>>(req, std::move(sendMsg->second));
+            MPI_Request req{MPI_REQUEST_NULL};
+            std::pair<MPI_Request, std::vector<char>> sendRequestData{req,
+                                                                      std::move(sendMsg->second)};
 
             int destRank = sendMsg->first.first;
             int destTag = sendMsg->first.second;

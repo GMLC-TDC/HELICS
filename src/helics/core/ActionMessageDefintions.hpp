@@ -85,7 +85,8 @@ across different compilers*/
         cmd_time_check = 36,  //!< command to run a check on whether time can be granted
         cmd_request_current_time =
             38,  //!< command to request the current time status of a federate
-
+        cmd_grant_timeout_check = 439,  //!< command to run a check on whether a timeout has been
+                                        //!< exceeded for granting time
         cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
         cmd_time_unblock = 41,  //!< clear a time block
         cmd_time_barrier_request = 42,  //!< request a time barrier
@@ -147,6 +148,7 @@ across different compilers*/
         cmd_time_request = 500,  //!< request a time or iteration
         cmd_force_time_grant =
             525,  //!< command to force grant a time regardless of other considerations
+
         cmd_send_message = cmd_info_basis + 20,  //!< send a message
         cmd_null_message = 726,  //!< used when a filter drops a message but it needs to return
         cmd_null_dest_message = 730,  //!< used when a destination filter drops a message
@@ -242,6 +244,7 @@ across different compilers*/
 #define CMD_TIME_GRANT action_message_def::action_t::cmd_time_grant
 #define CMD_FORCE_TIME_GRANT action_message_def::action_t::cmd_force_time_grant
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
+#define CMD_GRANT_TIMEOUT_CHECK action_message_def::action_t::cmd_grant_timeout_check
 #define CMD_REQUEST_CURRENT_TIME action_message_def::action_t::cmd_request_current_time
 
 #define CMD_TIME_BLOCK action_message_def::action_t::cmd_time_block
@@ -395,7 +398,7 @@ across different compilers*/
 */
 const char* actionMessageType(action_message_def::action_t action);
 
-enum cmd_error_codes : int {
+enum CommandErrorCodes : int {
     lost_server_connection_code = -5,
     connection_error_code = -2,
     already_init_error_code = 5,
@@ -404,6 +407,7 @@ enum cmd_error_codes : int {
     mismatch_broker_key_error_code = 9,
     max_federate_count_exceeded = 11,
     max_broker_count_exceeded = 13,
+    broker_terminating = 14,
     multiple_wait_for_current_time_flags = 15
 };
 

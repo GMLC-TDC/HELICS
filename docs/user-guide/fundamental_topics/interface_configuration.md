@@ -102,7 +102,7 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
 
 ## API Configuration
 
-Configuring the federate interface with the API is done internal to a user-written simulator. The specific API used will depend on the language the simulator is written in. Native APIs for HELICS are available in [C++](https://docs.helics.org/en/latest/doxygen/index.html) and [C](../../references/api-reference/C_API.md). MATLAB, Java, Julia, Nim, and Python all support the C API calls (ex: `helicsFederateEnterExecutionMode()`). Python and Julia also have native APIs (see: [Python (PyHELICS)](https://python.helics.org/api/), [Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)) that wrap the C APIs to better support the conventions of their languages. The [API References](../../references/api-reference/index.md) page contains links to the APIs.
+Configuring the federate interface with the API is done internal to a user-written simulator. The specific API used will depend on the language the simulator is written in. Native APIs for HELICS are available in [C++](../../doxygen/index.md) and [C](../../references/api-reference/C_API.md). MATLAB, Java, Julia, Nim, and Python all support the C API calls (ex: `helicsFederateEnterExecutionMode()`). Python and Julia also have native APIs (see: [Python (PyHELICS)](https://python.helics.org/api/), [Julia](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)) that wrap the C APIs to better support the conventions of their languages. The [API References](../../references/api-reference/index.md) page contains links to the APIs.
 
 The [Examples](../examples/examples_index.md) in this User Guide are written in Python -- the following federate interface configuration guidance will use the [PyHELICS](https://python.helics.org/api/) API, but can easily be adapted to other C-based HELICS APIs.
 
@@ -113,7 +113,7 @@ The following example of a federate interface configuration with the PyHELICS AP
 In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 
 ```python
-def create_combo_federate(fedinitstring,name,period):
+def create_combo_federate(fedinitstring, name, period):
     fedinfo = h.helicsCreateFederateInfo()
     # "coreType": "zmq",
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
@@ -134,33 +134,33 @@ def create_combo_federate(fedinitstring,name,period):
 The interface configurations are finalized and registered in one step using the following APIs:
 
 ```python
-    fedinitstring = " --federates=1"
-    name = "Charger"
-    period = 60
-    fed = create_combo_federate(fedinitstring,name,period)
+fedinitstring = " --federates=1"
+name = "Charger"
+period = 60
+fed = create_combo_federate(fedinitstring, name, period)
 
-    num_EVs = 5
-    end_count = num_EVs
-    endid = {}
-    for i in range(0,end_count):
-        end_name = f'Charger/EV{i+1}.so'
-        endid[i] = h.helicsFederateRegisterGlobalEndpoint(fed, end_name, 'double')
-        dest_name = f'Controller/ep'
-        h.helicsEndpointSetDefaultDestination(endid[i], dest_name)
+num_EVs = 5
+end_count = num_EVs
+endid = {}
+for i in range(0, end_count):
+    end_name = f"Charger/EV{i+1}.so"
+    endid[i] = h.helicsFederateRegisterGlobalEndpoint(fed, end_name, "double")
+    dest_name = f"Controller/ep"
+    h.helicsEndpointSetDefaultDestination(endid[i], dest_name)
 
-    pub_count = num_EVs
-    pubid = {}
-    for i in range(0,pub_count):
-        pub_name = f'Charger/EV{i+1}_voltage'
-        pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
-                    fed, pub_name, 'double', 'V')
+pub_count = num_EVs
+pubid = {}
+for i in range(0, pub_count):
+    pub_name = f"Charger/EV{i+1}_voltage"
+    pubid[i] = h.helicsFederateRegisterGlobalTypePublication(
+        fed, pub_name, "double", "V"
+    )
 
-    sub_count = num_EVs
-    subid = {}
-    for i in range(0,sub_count):
-        sub_name = f'Battery/EV{i+1}_current'
-        subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, 'A')
-
+sub_count = num_EVs
+subid = {}
+for i in range(0, sub_count):
+    sub_name = f"Battery/EV{i+1}_current"
+    subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "A")
 ```
 
 ### PyHELICS API configuration explanation
@@ -179,7 +179,7 @@ import helics as h
 - **`h.helicsFederateInfoSetIntegerProperty()`** - Sets log level calling another API, `h.helics_property_int_log_level`
 - **`h.helicsFederateInfoSetTimeProperty()`** - Sets time information. This API must receive another API to distinguish which type of time property to set. The period is set with `h.helics_property_time_period`, and `period` has been pass to this function
 - **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are setting is `h.helics_flag_uninterruptible` to `False`, to mirror the JSON configuration
-- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are wetting is `h.HELICS_FLAG_TERMINATE_ON_ERROR` to `True`
+- **`h.helicsFederateInfoSetFlagOption()`** - API to set a flag for the federate. The flag we are setting is `h.HELICS_FLAG_TERMINATE_ON_ERROR` to `True`
 - **`fed = h.helicsCreateCombinationFederate(name, fedinfo)`** - Creates the combination federate with the name passed to this function (`Charger`) and the information set above for `fedinfo`
 
 #### Federate Interface Configuration and Registration

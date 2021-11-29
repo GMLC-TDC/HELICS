@@ -196,7 +196,8 @@ TEST(clone_tests, simple_clone_test_combo)
     pub2.publish(3.3);
     retTime = mfed.requestTime(5);
     EXPECT_EQ(retTime, 3.0);
-
+    retTime = mfed.requestTime(5);
+    EXPECT_EQ(retTime, 5.0);
     mfed.finalize();
     fut.get();
     auto epts = c1.accessUnderlyingFederate().getEndpointCount();
@@ -235,7 +236,7 @@ TEST(clone_tests, simple_clone_test_combo)
 
     EXPECT_EQ(p1.messageCount(), 2U);
     EXPECT_EQ(p1.endpointCount(), 3U);
-    EXPECT_EQ(p1.pointCount(), pcnt);
+    EXPECT_EQ(static_cast<int>(p1.pointCount()), pcnt);
     EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
     ghc::filesystem::remove("combsave.json");

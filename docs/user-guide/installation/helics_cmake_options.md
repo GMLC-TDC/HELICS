@@ -3,7 +3,7 @@
 ## Main Options
 
 - `CMake_INSTALL_PREFIX`: CMake variable listing where to install the files
-- `HELICS_BUILD_APP_LIBRARY` : \[Default=ON\] Tell HELICS to build the [app]() Library
+- `HELICS_BUILD_APP_LIBRARY` : \[Default=ON\] Tell HELICS to build the helics apps shared library
 - `HELICS_BUILD_APP_EXECUTABLES` : \[Default=ON\] Build some executables associated with the apps
 - `HELICS_BUILD_BENCHMARKS` : \[Default=OFF\] Build some timing benchmarks associated with HELICS
 - `HELICS_BUILD_CXX_SHARED_LIB` : \[Default=OFF\] Build C++ shared libraries of the Application API C++ interface to HELICS and if `HELICS_BUILD_APP_LIBRARY` is also enabled another C++ shared library with the APP library
@@ -16,7 +16,7 @@
 - `HELICS_BUILD_OCTAVE_INTERACE` : \[Default=OFF\] Build the HELICS Octave Interface
 - `HELICS_BUILD_JAVA_INTERACE` : \[Default=OFF\] Build the HELICS Java Interface
 - `HELICS_BUILD_MATLAB_INTERACE` : \[Default=OFF\] Build the HELICS Matlab Interface
-- `HELICS_BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface, NOTE: Only available for CMake 3.8 or higher.
+- `HELICS_BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface
 - `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building, HELICS 3.0 requires 17 or higher which will be used if nothing is specified.
 - `HELICS_INSTALL` :\[Default=ON\] If set to off HELICS will not generate any install instructions
 

@@ -1,6 +1,6 @@
 # Multi-Input
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
@@ -13,9 +13,9 @@ This demonstrates the use of federation queries and performs dynamic configurati
 
 ## Where is the code?
 
-This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -35,7 +35,7 @@ Additionally, since the protocol (to use the term loosely) in the Advanced Defau
 
 With a single charger being used to charge five batteries, each battery still publishes it's charging current as before but only has one subscription, the single charging voltage. This shows up on the Battery federate configuration:
 
-[BatteryConfig.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/user_guide_examples/advanced/advanced_message_comm/multi_input/BatteryConfig.json)
+[BatteryConfig.json](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_message_comm/multi_input/BatteryConfig.json)
 
 ```json
 {
@@ -121,7 +121,7 @@ Run the co-simulation:
 
 The primary result of interest is still the cumulative charging power.
 
-![placeholder](../../../img/advanced_multi_input_power.png)
+![](../../../img/advanced_multi_input_power.png)
 
 As the batteries are not replaced during charging, the initial charging power will be the peak power. The points in time when a battery reaches full charge, though, can be clearly seen as the discrete changes in cumulative charging power.
 

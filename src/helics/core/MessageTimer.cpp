@@ -17,7 +17,7 @@ MessageTimer::MessageTimer(std::function<void(ActionMessage&&)> sFunction):
 {
 }
 
-static void processTimerCallback(std::shared_ptr<MessageTimer> mtimer,
+static void processTimerCallback(const std::shared_ptr<MessageTimer>& mtimer,
                                  int32_t index,
                                  const std::error_code& ec)
 {
@@ -95,6 +95,13 @@ void MessageTimer::updateTimer(int32_t timerIndex, time_type expirationTime, Act
 
         timers[timerIndex]->async_wait(timerCallback);
     }
+}
+
+void MessageTimer::updateTimerFromNow(int32_t timerIndex,
+                                      std::chrono::nanoseconds time,
+                                      ActionMessage mess)
+{
+    updateTimer(timerIndex, std::chrono::steady_clock::now() + time, std::move(mess));
 }
 
 bool MessageTimer::addTimeToTimer(int32_t timerIndex, std::chrono::nanoseconds time)

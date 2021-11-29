@@ -1,6 +1,6 @@
 # Federation Queries
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
@@ -13,9 +13,9 @@ This demonstrates the use of federation queries and performs dynamic configurati
 
 ## Where is the code?
 
-This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -27,7 +27,7 @@ This example has the same federates interacting in the same ways as in the [Adva
 
 #### HELICS Differences
 
-In most of the examples presented here, the configuration of the federation is defined prior to executing the co-simulation via the configuration JSONs. It is possible, though, with extra effort and careful design, to write the federate code such that they self-configure based on the other participants in the co-simulation. This example provides a simple demonstration of this by having the Battery federate query the federation and look for the values that the Charger federate is publishing and subscribing to them.
+In most of the examples presented here, the configuration of the federation is defined prior to executing the co-simulation via the configuration JSON files. It is possible, though, with extra effort and careful design, to write the federate code such that they self-configure based on the other participants in the co-simulation. This example provides a simple demonstration of this by having the Battery federate query the federation and look for the values that the Charger federate is publishing and subscribing to them.
 
 ### HELICS components
 
@@ -37,7 +37,7 @@ In most of the examples presented here, the configuration of the federation is d
 
   ```python
   sleep_time = 5
-  logger.debug(f'Sleeping for {sleep_time} seconds')
+  logger.debug(f"Sleeping for {sleep_time} seconds")
   time.sleep(sleep_time)
   ```
 
@@ -47,18 +47,17 @@ In most of the examples presented here, the configuration of the federation is d
   def eval_data_flow_graph(fed):
       query = h.helicsCreateQuery("broker", "data_flow_graph")
       graph = h.helicsQueryExecute(query, fed)
-  ...
   ```
 
 - The Battery federate subscribes to all the publications from the Charger federate based on the results of the data flow graph.
 
   ```python
-  for core in graph['cores']:
-      if core['federates'][0]['name'] == 'Charger':
-          for pub in core['federates'][0]['publications']:
-              key = pub['key']
+  for core in graph["cores"]:
+      if core["federates"][0]["name"] == "Charger":
+          for pub in core["federates"][0]["publications"]:
+              key = pub["key"]
               sub = h.helicsFederateRegisterSubscription(fed, key)
-              logger.debug(f'Added subscription {key}')
+              logger.debug(f"Added subscription {key}")
   ```
 
 - After making the subscription, the Battery federate re-evaulates the data flow graph and updates its own internal record of the configuration
@@ -70,13 +69,13 @@ In most of the examples presented here, the configuration of the federation is d
   graph, federates_lut, handle_lut = eval_data_flow_graph(fed)
   # logger.debug(pp.pformat(graph))
   sub_count = h.helicsFederateGetInputCount(fed)
-  logger.debug(f'Number of subscriptions: {sub_count}')
+  logger.debug(f"Number of subscriptions: {sub_count}")
   subid = {}
   sub_name = {}
   for i in range(0, sub_count):
       subid[i] = h.helicsFederateGetInputByIndex(fed, i)
       sub_name[i] = h.helicsSubscriptionGetKey(subid[i])
-      logger.debug(f'\tRegistered subscription---> {sub_name[i]}')
+      logger.debug(f"\tRegistered subscription---> {sub_name[i]}")
   ```
 
 ## Execution and Results
@@ -87,11 +86,11 @@ Run the co-simulation:
 
 Since this is only a change to the configuration method of the federation, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![placeholder](../../../img/advanced_query_charging_power.png)
+![](../../../img/advanced_query_charging_power.png)
 
-![placeholder](../../../img/advanced_query_estimated_SOCs.png)
+![](../../../img/advanced_query_estimated_SOCs.png)
 
-![placeholder](../../../img/advanced_query_battery_SOCs.png)
+![](../../../img/advanced_query_battery_SOCs.png)
 
 The dynamic configuration can also been seen by looking at the log file for the Battery federate (`Battery.log`). The pre-configure data flow graph only showed five subscriptions, all made by the Charger federate of the Battery federates current
 

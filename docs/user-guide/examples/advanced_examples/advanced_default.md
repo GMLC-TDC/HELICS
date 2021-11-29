@@ -14,9 +14,9 @@ The Advanced Base Example tutorial is organized as follows:
 
 ## Example files
 
-All files necessary to run the Advanced Base Example can be found in the [Advanced Examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_default)
+All files necessary to run the Advanced Base Example can be found in the [Advanced Examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_default)
 
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_default)
+[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_default)
 
 The files include:
 

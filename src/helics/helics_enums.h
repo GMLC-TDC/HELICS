@@ -54,11 +54,14 @@ typedef enum {
     HELICS_CORE_TYPE_INPROC = 18,
     /** an explicit core type that is recognized but explicitly doesn't
                                   exist, for testing and a few other assorted reasons*/
-    HELICS_CORE_TYPE_NULL = 66
+    HELICS_CORE_TYPE_NULL = 66,
+    /** an explicit core type exists but does nothing but return empty values or sink calls*/
+    HELICS_CORE_TYPE_EMPTY = 77,
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
 typedef enum {
+    HELICS_DATA_TYPE_UNKNOWN = -1,
     /** a sequence of characters*/
     HELICS_DATA_TYPE_STRING = 0,
     /** a double precision floating point number*/
@@ -256,6 +259,9 @@ typedef enum {
     HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
     /** the property controlling output delay for a federate*/
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+    /** the property specifying a timeout to trigger actions if the time for granting exceeds a
+       certain threshold*/
+    HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
     /** integer property controlling the maximum number of iterations in a federate*/
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     /** integer property controlling the log level in a federate see \ref HelicsLogLevels*/
@@ -362,6 +368,9 @@ typedef enum {
     /** select the default channel*/
     HELICS_SEQUENCING_MODE_DEFAULT = 2
 } HelicsSequencingModes;
+
+#define HELICS_BIG_NUMBER 9223372036.854774
+const double cHelicsBigNumber = HELICS_BIG_NUMBER;
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

@@ -54,7 +54,7 @@ federate configuration
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the tracer executable also takes an untagged argument of a file name for example
 
@@ -64,7 +64,7 @@ helics_app tracer tracer_file.txt --stop 5
 
 Tracers support both delimited text files and JSON files some examples can be found in, they are otherwise the same as options for recorders.
 
-[Tracer configuration examples](https://github.com/GMLC-TDC/HELICS/tree/master/tests/helics/apps/test_files)
+[Tracer configuration examples](https://github.com/GMLC-TDC/HELICS/tree/main/tests/helics/apps/test_files)
 
 ## Config File Detail
 
@@ -86,7 +86,7 @@ if only a single column is specified it is assumed to be a subscription
 for two column rows the second is the identifier
 arguments with spaces should be enclosed in quotes
 
-```eval_rst
+```{eval-rst}
 +------------------------------+------------------------------------------------------------+
 | interface                    | description                                                |
 +==============================+============================================================+

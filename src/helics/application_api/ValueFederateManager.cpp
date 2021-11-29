@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonBuilder.hpp"
 #include "../core/Core.hpp"
+#include "../core/EmptyCore.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../core/queryHelpers.hpp"
 #include "Inputs.hpp"
@@ -16,15 +17,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 namespace helics {
 ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id):
-    coreObject(coreOb), fedID(id), fed(vfed)
+    fedID(id), coreObject(coreOb), fed(vfed)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
 
+static EmptyCore eCore;
+
 void ValueFederateManager::disconnect()
 {
-    // checks for the calls are handled in the MessageFederate itself
-    coreObject = nullptr;
+    /** disconnect to an empty Core which does nothing*/
+    coreObject = &eCore;
 }
 
 static const std::map<std::string, int> typeSizes = {
@@ -96,6 +99,9 @@ Input& ValueFederateManager::registerInput(const std::string& key,
         auto datHandle = inputData.lock();
         datHandle->push_back(std::move(edat));
         ref.referenceIndex = static_cast<int>(datHandle->size() - 1);
+        if (useJsonSerialization) {
+            ref.targetType = DataType::HELICS_JSON;
+        }
         return ref;
     }
     throw(RegistrationFailure("Unable to register Input"));
@@ -236,6 +242,20 @@ Time ValueFederateManager::getLastUpdateTime(const Input& inp)
     return Time::minVal();
 }
 
+bool ValueFederateManager::getUpdateFromCore(Input& inp)
+{
+    auto* iData = static_cast<input_info*>(inp.dataReference);
+    if (inp.getMultiInputMode() != MultiInputHandlingMethod::NO_OP) {
+        const auto& dataV = coreObject->getAllValues(inp.handle);
+        iData->hasUpdate = false;
+        return inp.vectorDataProcess(dataV);
+    }
+    const auto& data = coreObject->getValue(inp.handle);
+    iData->lastData = data;
+    iData->hasUpdate = true;
+    return inp.checkUpdate(true);
+}
+
 void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 {
     CurrentTime = newTime;
@@ -253,17 +273,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             auto* iData = static_cast<input_info*>(fid->dataReference);
             iData->lastUpdate = CurrentTime;
 
-            bool updated = false;
-            if (fid->getMultiInputMode() == MultiInputHandlingMethod::NO_OP) {
-                const auto& data = coreObject->getValue(handle);
-                iData->lastData = data;
-                iData->hasUpdate = true;
-                updated = fid->checkUpdate(true);
-            } else {
-                const auto& dataV = coreObject->getAllValues(handle);
-                iData->hasUpdate = false;
-                updated = fid->vectorDataProcess(dataV);
-            }
+            bool updated = getUpdateFromCore(*fid);
 
             if (updated) {
                 if (iData->callback) {

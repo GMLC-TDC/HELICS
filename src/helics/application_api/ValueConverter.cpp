@@ -175,19 +175,19 @@ namespace detail {
             std::to_integer<size_t>(data[7]);
     }
 
-    static constexpr const frozen::unordered_map<std::int8_t, helics::DataType, 8> typeDetect{
-        {std::to_integer<std::int8_t>(intCode), DataType::HELICS_INT},
-        {std::to_integer<std::int8_t>(doubleCode), DataType::HELICS_DOUBLE},
-        {std::to_integer<std::int8_t>(complexCode), DataType::HELICS_COMPLEX},
-        {std::to_integer<std::int8_t>(vectorCode), DataType::HELICS_VECTOR},
-        {std::to_integer<std::int8_t>(cvCode), DataType::HELICS_COMPLEX_VECTOR},
-        {std::to_integer<std::int8_t>(npCode), DataType::HELICS_NAMED_POINT},
-        {std::to_integer<std::int8_t>(customCode), DataType::HELICS_CUSTOM},
-        {std::to_integer<std::int8_t>(stringCode), DataType::HELICS_STRING}};
+    static constexpr const frozen::unordered_map<std::uint8_t, helics::DataType, 8> typeDetect{
+        {std::to_integer<std::uint8_t>(intCode), DataType::HELICS_INT},
+        {std::to_integer<std::uint8_t>(doubleCode), DataType::HELICS_DOUBLE},
+        {std::to_integer<std::uint8_t>(complexCode), DataType::HELICS_COMPLEX},
+        {std::to_integer<std::uint8_t>(vectorCode), DataType::HELICS_VECTOR},
+        {std::to_integer<std::uint8_t>(cvCode), DataType::HELICS_COMPLEX_VECTOR},
+        {std::to_integer<std::uint8_t>(npCode), DataType::HELICS_NAMED_POINT},
+        {std::to_integer<std::uint8_t>(customCode), DataType::HELICS_CUSTOM},
+        {std::to_integer<std::uint8_t>(stringCode), DataType::HELICS_STRING}};
 
     DataType detectType(const std::byte* data)
     {
-        const auto* res = typeDetect.find(std::to_integer<std::int8_t>(data[0]));
+        const auto* res = typeDetect.find(std::to_integer<std::uint8_t>(data[0]));
         return (res != typeDetect.end()) ? res->second : DataType::HELICS_UNKNOWN;
     }
 
@@ -207,6 +207,11 @@ namespace detail {
         }
     }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     void convertFromBinary(const std::byte* data, std::complex<double>& val)
     {
         // https://en.cppreference.com/w/cpp/numeric/complex
@@ -218,6 +223,9 @@ namespace detail {
             checks::swapBytes<8>(reinterpret_cast<std::byte*>(&val) + 8);
         }
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
     void convertFromBinary(const std::byte* data, std::string& val)
     {
@@ -277,7 +285,11 @@ namespace detail {
             }
         }
     }
-
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+    // std::complex is explicitly allowed to alias like this in the standard
+#endif
     void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val)
     {
         std::size_t size = getDataSize(data);
@@ -296,6 +308,9 @@ namespace detail {
             }
         }
     }
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 }  // namespace detail
 
 void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,

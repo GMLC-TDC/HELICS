@@ -77,6 +77,10 @@ public final class HelicsCoreTypes {
    *                                   exist, for testing and a few other assorted reasons
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_NULL = new HelicsCoreTypes("HELICS_CORE_TYPE_NULL", helicsJNI.HELICS_CORE_TYPE_NULL_get());
+  /**
+   *  an explicit core type exists but does nothing but return empty values or sink calls
+   */
+  public final static HelicsCoreTypes HELICS_CORE_TYPE_EMPTY = new HelicsCoreTypes("HELICS_CORE_TYPE_EMPTY", helicsJNI.HELICS_CORE_TYPE_EMPTY_get());
 
   public final int swigValue() {
     return swigValue;
@@ -112,7 +116,7 @@ public final class HelicsCoreTypes {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsCoreTypes[] swigValues = { HELICS_CORE_TYPE_DEFAULT, HELICS_CORE_TYPE_ZMQ, HELICS_CORE_TYPE_MPI, HELICS_CORE_TYPE_TEST, HELICS_CORE_TYPE_INTERPROCESS, HELICS_CORE_TYPE_IPC, HELICS_CORE_TYPE_TCP, HELICS_CORE_TYPE_UDP, HELICS_CORE_TYPE_ZMQ_SS, HELICS_CORE_TYPE_NNG, HELICS_CORE_TYPE_TCP_SS, HELICS_CORE_TYPE_HTTP, HELICS_CORE_TYPE_WEBSOCKET, HELICS_CORE_TYPE_INPROC, HELICS_CORE_TYPE_NULL };
+  private static HelicsCoreTypes[] swigValues = { HELICS_CORE_TYPE_DEFAULT, HELICS_CORE_TYPE_ZMQ, HELICS_CORE_TYPE_MPI, HELICS_CORE_TYPE_TEST, HELICS_CORE_TYPE_INTERPROCESS, HELICS_CORE_TYPE_IPC, HELICS_CORE_TYPE_TCP, HELICS_CORE_TYPE_UDP, HELICS_CORE_TYPE_ZMQ_SS, HELICS_CORE_TYPE_NNG, HELICS_CORE_TYPE_TCP_SS, HELICS_CORE_TYPE_HTTP, HELICS_CORE_TYPE_WEBSOCKET, HELICS_CORE_TYPE_INPROC, HELICS_CORE_TYPE_NULL, HELICS_CORE_TYPE_EMPTY };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

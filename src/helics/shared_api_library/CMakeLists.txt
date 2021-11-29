@@ -79,9 +79,22 @@ endif()
 
 if(UNIX OR MINGW)
     if(NOT APPLE)
-        target_link_libraries(
-            helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
-        )
+        if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.18)
+            include(CheckLinkerFlag)
+            check_linker_flag(
+                CXX "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt"
+                flag_linker_version_script
+            )
+            if(flag_linker_version_script)
+                target_link_libraries(
+                    helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
+                )
+            endif()
+        else()
+            target_link_libraries(
+                helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
+            )
+        endif()
     endif(NOT APPLE)
 endif()
 

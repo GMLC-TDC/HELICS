@@ -85,6 +85,8 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"timeoutputdelay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
     {"time_input_delay", HELICS_PROPERTY_TIME_INPUT_DELAY},
     {"time_output_delay", HELICS_PROPERTY_TIME_OUTPUT_DELAY},
+    {"granttimeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
+    {"grant_timeout", HELICS_PROPERTY_TIME_GRANT_TIMEOUT},
     {"loglevel", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"log_level", HELICS_PROPERTY_INT_LOG_LEVEL},
     {"logLevel", HELICS_PROPERTY_INT_LOG_LEVEL},
@@ -125,6 +127,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"debugging", HELICS_FLAG_DEBUGGING},
     {"profiling", HELICS_FLAG_PROFILING},
     {"local_profiling_capture", HELICS_FLAG_LOCAL_PROFILING_CAPTURE},
+    {"profiling_marker", HELICS_FLAG_PROFILING_MARKER},
     {"only_update_on_change", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyupdateonchange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
     {"onlyUpdateOnChange", HELICS_FLAG_ONLY_UPDATE_ON_CHANGE},
@@ -139,6 +142,7 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"real_time", HELICS_FLAG_REALTIME},
     {"realTime", HELICS_FLAG_REALTIME},
     {"json", HELICS_FLAG_USE_JSON_SERIALIZATION},
+    {"use_json_serialization", HELICS_FLAG_USE_JSON_SERIALIZATION},
     {"restrictivetimepolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictive_time_policy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictiveTimePolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
@@ -243,6 +247,8 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
 static const std::map<std::string, int> option_value_map{
     {"0", 0},
     {"1", 1},
+    {"-", 0},
+    {"+", 1},
     {"false", 0},
     {"true", 1},
     {"on", 1},
@@ -295,12 +301,19 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         }
         if (flg == "debugging") {
             fi.debugging = true;
+            continue;
         }
         if (flg == "json") {
             fi.useJsonSerialization = true;
+            // purposely not continuing here so the setFlagOption gets called
         }
         if (flg == "profiling") {
             fi.profilerFileName = "log";
+            // purposely not continuing here so the setFlagOption gets called
+        }
+        if (flg == "observer") {
+            fi.observer = true;
+            // purposely not continuing here so the setFlagOption gets called
         }
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
@@ -494,6 +507,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--debugging",
                   debugging,
                   "tell the core to allow user debugging in a nicer fashion");
+    app->add_flag("--observer",
+                  observer,
+                  "tell the federate/core that this federate is an observer");
     app->add_flag(
         "--json",
         useJsonSerialization,
@@ -554,6 +570,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--outputdelay",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, val); },
            "the output delay for outgoing communication of the federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
+           "--grant_timeout",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, val); },
+           "timeout to trigger diagnostic action when a federate time grant is not available within the timeout period (default in ms)")
         ->configurable(false);
     app->add_option_function<int>(
            "--maxiterations",
@@ -817,6 +838,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     }
     if (fi.debugging) {
         res.append(" --debugging");
+    }
+    if (fi.observer) {
+        res.append(" --observer");
     }
     if (fi.useJsonSerialization) {
         res.append(" --json");

@@ -15,7 +15,7 @@ the same function is available for federates, cores, and brokers.
 
 A target is specified, and can be one of the following. A federate named one of the key words is valid for the federation, but cannot be queried using the name.
 
-```eval_rst
+```{eval-rst}
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | target                                   | Description                                                                           |
 +==========================================+=======================================================================================+
@@ -37,7 +37,7 @@ The `commandStr` is a generic string, so can be anything that can be contained i
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +--------------------+------------------------------------------------------------+
 | Command String     | Description                                                |
 +====================+============================================================+
@@ -60,7 +60,7 @@ Commands that must traverse the network travel along priority paths.
 
 ### Application API
 
-There are two basic calls in the application API as part of a [federate object](../doxygen/classhelics_1_1Federate.html).
+There are two basic calls in the application API as part of a [federate object](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Federate.html).
 To retrieve a command addressed to a federate there are two commands
 
 ```cpp

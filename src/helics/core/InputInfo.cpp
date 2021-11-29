@@ -422,14 +422,14 @@ static const std::set<std::string> convertible_set{"double_vector",
 bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match)
 {
     if ((type1.empty()) || (type1 == type2) || (type1 == "def") || (type1 == "any") ||
-        (type1 == "raw")) {
+        (type1 == "raw") || (type1 == "json")) {
         return true;
     }
     if (strict_match) {
         return false;
     }
 
-    if ((type2.empty()) || (type2 == "def") || (type2 == "any")) {
+    if ((type2.empty()) || (type2 == "def") || (type2 == "any") || (type1 == "json")) {
         return true;
     }
     if (convertible_set.find(type1) != convertible_set.end()) {

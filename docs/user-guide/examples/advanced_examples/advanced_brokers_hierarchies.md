@@ -1,13 +1,13 @@
 # Brokers - Hierarchies
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
 
 ```
 
-![placeholder](../../../img/user_guide_combinations_advanced.png)
+![](../../../img/user_guide_combinations_advanced.png)
 
 This example shows how to configure a HELICS co-simulation to allow the use of multiple brokers in a single co-simulation.
 
@@ -20,9 +20,9 @@ This example shows how to configure a HELICS co-simulation to allow the use of m
 
 ## Where is the code?
 
-The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [broker hierarchies can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_brokers/hierarchies). If you have issues navigating to the examples, visit the HELICS Gitter page or the user forum on GitHub.
+The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [broker hierarchies can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/hierarchies). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_broker_hierarchies_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced)
+[![](../../../img/advanced_broker_hierarchies_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -82,11 +82,11 @@ Since this example requires three brokers and their respective federates to run 
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-![placeholder](../../../img/advanced_hierarchy_charging_power.png)
+![](../../../img/advanced_hierarchy_charging_power.png)
 
-![placeholder](../../../img/advanced_hierarchy_estimated_SOCs.png)
+![](../../../img/advanced_hierarchy_estimated_SOCs.png)
 
-![placeholder](../../../img/advanced_hierarchy_battery_SOCs.png)
+![](../../../img/advanced_hierarchy_battery_SOCs.png)
 
 These results are identical to those in the base [Advanced Default example](./advanced_default.md); this is expected as only the structure of the co-simulation has been changed and not any of the federate code itself.
 

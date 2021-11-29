@@ -4,7 +4,7 @@ On occasion it is useful to allow multiple source to feed an input, creating an 
 
 ## Mechanics of multi-input handling
 
-Internally, HELICS manages input data in a queue and when a federate is granted a time, the values are read and placed in a holding location by source. In many cases there is likely only to be a single source. But if multiple publications link to a single source the results are placed in a vector. The order in that vector is by order of linking when the federate with the multi-source input is created. If a single publication value is retrieved from the input, the newest value is given as if it were a single source. In case of ties (multiple publishing federates publishing values on the same timestep), the publication that connected first is given priority.
+Internally, HELICS manages input data in a queue and when a federate is granted a time, the values are read and placed in a holding location by source. In many cases there is likely only to be a single source. But if multiple publications link to a single source the results are placed in a vector. The order of the values in that vector is determined by the order of linking when the federate with the multi-source input is created. If a single publication value is retrieved from the input, the newest value is given as if it were a single source. In case of ties (multiple publishing federates publishing values on the same timestep), the publication that connected first is given priority.
 
 ## Controlling the behavior
 
@@ -22,7 +22,7 @@ There are several flags and handle options which can control this for Inputs
 
 The default priority of the inputs if they are published at the same time and only a single value is retrieved is in order of connection. This may not be desired so a few handle options are available to manipulate it.
 
-- `helics_handle_option_input_priority_location` takes a value specifying the input source index to give priority to. If given multiple times it establishes an ordering of the inputs. So in the case of timing ties they can be ordered. For example if the option is called first with a given value of 2 then again with 1 and an input has 3 sources. If they all tie the source with index 1 will have highest priority, and in the case of a tie between sources 0 and 2, source 2 will have priority.
+- `helics_handle_option_input_priority_location` takes a value specifying the input source index to which it will give priority. If given multiple times it establishes an ordering of the input priority with the most recent call being highest priority. This allows signals that are received at the same time to be prioritized. For example, let's say the option is called first with a given value of "2" then again with a value of "1". If all signals are sent at the same simulated time, the source with index 1 will have highest priority, and in the case of a tie between sources 0 and 2, source 2 will have priority.
 - `helics_handle_option_clear_priority_list` will erase the existing priority list.
 
 ## Reduction operations on multiple inputs
@@ -30,7 +30,7 @@ The default priority of the inputs if they are published at the same time and on
 The priority of the inputs is only applicable if the default operation to retrieve a single value is used. The option
 `helics_handle_option_multi_input_handling_method` can be used to specify a reduction operation on all the inputs to process them in some fashion a number of operations are available.
 
-```eval_rst
+```{eval-rst}
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | method                                    | Description                                                                                                                                  |
 +===========================================+==============================================================================================================================================+
@@ -86,12 +86,15 @@ helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics
 **Python**
 
 ```python
-in1 = h.helicsFederateRegisterInput("",h.helics_data_type_double,"");
-h.helicsInputAddTarget(in1,"pub1");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputAddTarget(in1,"pub2");
-h.helicsInputSetOption(in1,helics_handle_option_multi_input_handling_method,helics_multi_input_average_operation);
-
+in1 = h.helicsFederateRegisterInput("", h.helics_data_type_double, "")
+h.helicsInputAddTarget(in1, "pub1")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputAddTarget(in1, "pub2")
+h.helicsInputSetOption(
+    in1,
+    helics_handle_option_multi_input_handling_method,
+    helics_multi_input_average_operation,
+)
 ```
 
 The handling can also be configured in the configuration file for the federate
@@ -122,4 +125,4 @@ The priority of the inputs in most cases determined by the order of adding the p
 
 ## Example
 
-An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/master/user_guide_examples/advanced/advanced_message_comm/multi_input).
+An [explanation of a full co-simulation example](../examples/advanced_examples/advanced_multi_input.md) showing how a multi-source input might be used in a federation is provided in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/multi_input).

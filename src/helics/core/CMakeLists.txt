@@ -35,6 +35,7 @@ set(SRC_FILES
     BasicHandleInfo.cpp
     queryHelpers.cpp
     ProfilerBuffer.cpp
+    EmptyCore.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES
@@ -69,6 +70,7 @@ set(INCLUDE_FILES
     ActionMessageDefintions.hpp
     ActionMessage.hpp
     CommonCore.hpp
+    EmptyCore.hpp
     FederateState.hpp
     PublicationInfo.hpp
     InputInfo.hpp

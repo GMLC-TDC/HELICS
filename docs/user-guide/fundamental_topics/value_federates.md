@@ -1,6 +1,6 @@
 # Value Federates
 
-HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](./federates.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
+HELICS messages that are value-oriented are the most common type of messages. As mentioned in the [federate introduction](federates.md), value messages are intended to be used to represent the physics of a system, linking federates at their mutual boundaries and allowing a larger and more complex system to be represented than would be the case if only one simulator was used.
 
 ## Value Federate Interface Types
 
@@ -24,9 +24,9 @@ Though all four message types are supported, the remainder of this guide will fo
 
 For any simulator that you didn't write for yourself, the most common way of configuring that simulator for use in a HELICS co-simulation will be through the use of an external JSON configuration file. TOML files are also supported but we will concentrate on JSON for this discussion. This file is read when a federate is being created and initialized and it will provide all the necessary information to incorporate that federate into the co-simulation.
 
-As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options and in [Timing section](./timing.md) we'll look at the timing parameters.
+As the fundamental role of the co-simulation platform is to manage the synchronization and data exchange between the federates, you may or may not be surprised to learn that there are generic configuration options available to all HELICS federates that deal precisely with these. In this section, we'll focus on the options related to data exchange as pertaining to value federates, those options and in [Timing section](timing_configuration.md) we'll look at the timing parameters.
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown; the default values are shown in "[ ]". (Further parameters and explanations can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### General Configuration Parameter
 
@@ -93,20 +93,20 @@ Though contained here in this section on value federates, the options below are 
 
 To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS/tree/helics3/examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
 
-1.  [HELICS](https://helics.readthedocs.io/en/latest/installation/index.html)
+1.  [HELICS](../installation/index.md)
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
 3.  [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
     - matplotlib
     - time
     - logging
 4.  [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
-5.  [helics_cli](https://github.com/GMLC-TDC/helics-cli) - `pip install git+git://github.com/GMLC-TDC/helics-cli.git@master`
+5.  [helics_cli](https://github.com/GMLC-TDC/helics-cli) - `pip install git+git://github.com/GMLC-TDC/helics-cli.git@main`
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
-![Ex. 1a message topology](../img/Ex1a_Message_topology.png)
+![Ex. 1a message topology](../../img/Ex1a_Message_topology.png)
 
-![Ex. 1a broker topology](../img/Ex1a_Broker_topology.png)
+![Ex. 1a broker topology](../../img/Ex1a_Broker_topology.png)
 
 - **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 
@@ -154,10 +154,10 @@ To show the difference between running these two simulators in a stand-alone ana
 
 The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
 
-![Ex. 1a  transmission bus voltage](../img/Ex1a_Bus_voltage_118.png)
+![Ex. 1a  transmission bus voltage](../../img/Ex1a_Bus_voltage_118.png)
 
 As can be seen, the impacts of co-simulation are relatively modest in this case. Even when the transmission system provides a dynamic high-side substation voltage (rather than just assuming a fixed value) and even with loads that have been created to be very voltage sensitive, the changing substation voltage doesn't impact the load substantially and change the voltage profiles significantly. (If you're curious to see an even bigger impact, you can disable the voltage regulators in GridLAB-D by editing the `regulator_configuration` objects so that the `Control` parameter is set to `MANUAL`. This will lock the regulators into place and allow the substation voltage to propagate through the circuit unregulated.) (xxxxxxx - double-check this.)
 
 The load of the distribution circuit as seen by the transmission model with and without co-simulation is similarly muted.
 
-![Ex. 1a  distribution system load](../img/Ex1a_Feeder_consumption.png)
+![Ex. 1a  distribution system load](../../img/Ex1a_Feeder_consumption.png)

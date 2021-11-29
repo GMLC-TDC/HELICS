@@ -170,6 +170,13 @@ void BrokerApp::forceTerminate()
     }
 }
 
+void BrokerApp::linkEndpoints(const std::string& source, const std::string& target)
+{
+    if (broker) {
+        broker->linkEndpoints(source, target);
+    }
+}
+
 void BrokerApp::dataLink(const std::string& source, const std::string& target)
 {
     if (broker) {

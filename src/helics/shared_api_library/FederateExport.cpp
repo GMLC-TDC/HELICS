@@ -342,12 +342,34 @@ int helicsGetOptionValue(const char* val)
     return helics::getOptionValue(val);
 }
 
+int helicsGetDataType(const char* val)
+{
+    if (val == nullptr) {
+        return -1;
+    }
+    return static_cast<int>(helics::getTypeFromString(val));
+}
+
 void helicsFederateInfoSetFlagOption(HelicsFederateInfo fi, int flag, HelicsBool value, HelicsError* err)
 {
     auto* info = getFedInfo(fi, err);
     if (info == nullptr) {
         return;
     }
+    switch (flag) {
+        case HELICS_FLAG_OBSERVER:
+            info->observer = (value != HELICS_FALSE);
+            break;
+        case HELICS_FLAG_DEBUGGING:
+            info->debugging = (value != HELICS_FALSE);
+            break;
+        case HELICS_FLAG_USE_JSON_SERIALIZATION:
+            info->useJsonSerialization = (value != HELICS_FALSE);
+            break;
+        default:
+            break;
+    }
+
     info->setFlagOption(flag, (value != HELICS_FALSE));
 }
 

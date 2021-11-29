@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "spdlog/sinks/basic_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/spdlog.h"
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__MINGW32__) && !defined(CYGWIN) && !defined(_WIN32)
 #    include "spdlog/sinks/syslog_sink.h"
 #endif
 
@@ -28,7 +28,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #    include <asio/steady_timer.hpp>
 #else
-#    ifdef _WIN32
+#    if defined(_WIN32) || defined(WIN32)
 #        include <windows.h>
 #    else
 #        include <unistd.h>
@@ -159,6 +159,9 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+    hApp->add_flag("--observer",
+                   observer,
+                   "specify that the broker/core should be added as an observer only");
     hApp->add_flag("--json",
                    useJsonSerialization,
                    "use the JSON serialization mode for communications");
@@ -258,8 +261,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     timeout_group->add_option(
         "--querytimeout",
         queryTimeout,
-        "time to wait for a query to be answered default unit is in  ms default 15s(can also be entered as a time "
+        "time to wait for a query to be answered; default unit is in ms  and default time is 15s (can also be entered as a time "
         "like '10s' or '45ms') ");
+    timeout_group->add_option(
+        "--granttimeout",
+        grantTimeout,
+        "time to wait for a time request to be granted before triggering diagnostic actions; default is in ms (can also be entered as a time "
+        "like '10s' or '45ms')");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
@@ -285,7 +293,7 @@ void BrokerBase::generateLoggers()
             }
         }
         if (logFile == "syslog") {
-#if !defined(WIN32)
+#if !defined(WIN32) && !defined(__MINGW32__) && !defined(CYGWIN) && !defined(_WIN32)
             fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
 #endif
         } else if (!logFile.empty()) {

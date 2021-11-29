@@ -19,6 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+static const Time bigTime(HELICS_BIG_NUMBER);
+
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 
@@ -191,8 +194,8 @@ bool TimeCoordinator::updateNextExecutionTime()
             if (time_exec < Time::maxVal()) {
                 time_exec += info.inputDelay;
             }
-            time_exec = (time_exec <= time_granted) ? time_exec = time_granted :
-                                                      generateAllowedTime(time_requested);
+            time_exec =
+                (time_exec <= time_granted) ? time_granted : generateAllowedTime(time_requested);
         }
     } else {
         time_exec = std::min(time_message, time_value);
@@ -361,6 +364,45 @@ GlobalFederateId TimeCoordinator::getMinDependency() const
     return dependencies.getMinDependency();
 }
 
+void TimeCoordinator::enterInitialization()
+{
+    if (dynamicJoining) {
+        ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
+        timeUpdateRequest.source_id = source_id;
+        for (const auto& dep : dependencies) {
+            // send to all dependencies
+            if (dep.dependency) {
+                if (dep.fedID == source_id) {
+                    continue;
+                }
+                timeUpdateRequest.dest_id = dep.fedID;
+                sendMessageFunction(timeUpdateRequest);
+            }
+        }
+    }
+}
+
+void TimeCoordinator::requestTimeCheck()
+{
+    if (dynamicJoining) {
+        ActionMessage timeUpdateRequest(CMD_REQUEST_CURRENT_TIME);
+        timeUpdateRequest.source_id = source_id;
+        for (const auto& dep : dependencies) {
+            // send to all dependencies
+            if (dep.dependency) {
+                if (dep.fedID == source_id) {
+                    continue;
+                }
+                // only send the request if it is blocking the current grant
+                if (dep.next < time_exec) {
+                    timeUpdateRequest.dest_id = dep.fedID;
+                    sendMessageFunction(timeUpdateRequest);
+                }
+            }
+        }
+    }
+}
+
 Time TimeCoordinator::getNextPossibleTime() const
 {
     if (time_granted == timeZero) {
@@ -446,6 +488,7 @@ bool TimeCoordinator::updateTimeFactors()
     upstream =
         generateMinTimeUpstream(dependencies, info.restrictive_time_policy, GlobalFederateId{});
 
+    maxTime = Time::maxVal() - info.outputDelay - (std::max)(info.period, info.timeDelta);
     bool update = false;
     time_minminDe = total.minDe;
     Time prev_next = time_next;
@@ -457,14 +500,14 @@ bool TimeCoordinator::updateTimeFactors()
     if (prev_next != time_next) {
         update = true;
     }
-    if (total.minDe < Time::maxVal()) {
+    if (total.minDe < maxTime) {
         total.minDe = generateAllowedTime(total.minDe) + info.outputDelay;
     }
-    if (upstream.minDe < Time::maxVal() && upstream.minDe > total.minDe) {
+    if (upstream.minDe < maxTime && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (info.event_triggered) {
-        if (upstream.Te < Time::maxVal()) {
+    if (info.event_triggered || time_requested >= bigTime) {
+        if (upstream.Te < maxTime) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
     }
@@ -472,7 +515,7 @@ bool TimeCoordinator::updateTimeFactors()
         update = true;
         time_minDe = total.minDe;
     }
-    time_allow = (total.next < Time::maxVal()) ? info.inputDelay + total.next : Time::maxVal();
+    time_allow = (total.next < maxTime) ? info.inputDelay + total.next : Time::maxVal();
 
     updateNextExecutionTime();
     return update;
@@ -585,12 +628,12 @@ void TimeCoordinator::sendTimeRequest() const
         setActionFlag(upd, delayed_timing_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (info.event_triggered) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (info.event_triggered) {
+    if (info.event_triggered || time_requested >= bigTime) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
 
         if (upd.Tdemin < upd.actionTime) {
@@ -611,7 +654,7 @@ void TimeCoordinator::sendTimeRequest() const
         if (upstream.minFed.isValid()) {
             upd.dest_id = upstream.minFed;
             upd.setExtraData(GlobalFederateId{}.baseValue());
-            if (info.event_triggered) {
+            if (info.event_triggered || time_requested >= bigTime) {
                 upd.Te = checkAdd(time_exec, info.outputDelay);
                 upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
             }
@@ -812,25 +855,44 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
             ret = MessageProcessingResult::ITERATING;
             break;
     }
+    if (!dynamicJoining) {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
+            time_granted = timeZero;
+            time_grantBase = time_granted;
+            executionMode = true;
+            iteration = 0;
 
-    if (ret == MessageProcessingResult::NEXT_STEP) {
-        time_granted = timeZero;
-        time_grantBase = time_granted;
-        executionMode = true;
-        iteration = 0;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            transmitTimingMessages(execgrant);
+        } else if (ret == MessageProcessingResult::ITERATING) {
+            dependencies.resetIteratingExecRequests();
+            hasInitUpdates = false;
+            ++iteration;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.counter = iteration;
+            setActionFlag(execgrant, iteration_requested_flag);
+            transmitTimingMessages(execgrant);
+        }
+    } else {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
+            updateTimeFactors();
+            if (dependencyCount() > 0) {
+                time_granted =
+                    generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
+            } else {
+                time_granted = timeZero;
+            }
+            time_grantBase = time_granted;
+            executionMode = true;
+            iteration = 0;
 
-        ActionMessage execgrant(CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        transmitTimingMessages(execgrant);
-    } else if (ret == MessageProcessingResult::ITERATING) {
-        dependencies.resetIteratingExecRequests();
-        hasInitUpdates = false;
-        ++iteration;
-        ActionMessage execgrant(CMD_EXEC_GRANT);
-        execgrant.source_id = source_id;
-        execgrant.counter = iteration;
-        setActionFlag(execgrant, iteration_requested_flag);
-        transmitTimingMessages(execgrant);
+            ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.actionTime = time_granted;
+            transmitTimingMessages(execgrant);
+        }
     }
     return ret;
 }
@@ -839,6 +901,24 @@ static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localI
 {
     return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT)) &&
             (cmd.source_id != localId));
+}
+
+std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() const
+{
+    Time minTime = Time::maxVal();
+    GlobalFederateId minID;
+    for (const auto& dep : dependencies) {
+        if (!dep.dependency) {
+            continue;
+        }
+        if (dep.time_state != time_state_t::time_requested) {
+            if (dep.next < minTime) {
+                minTime = dep.next;
+                minID = dep.fedID;
+            }
+        }
+    }
+    return {minID, minTime};
 }
 
 message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
@@ -876,7 +956,23 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             // processing
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
-
+        case CMD_REQUEST_CURRENT_TIME:
+            if (disconnected) {
+                ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
+                sendMessageFunction(treq);
+            } else if (lastSend.time_state == time_state_t::time_granted) {
+                ActionMessage treq(CMD_TIME_GRANT, source_id, cmd.source_id);
+                treq.actionTime = lastSend.next;
+                sendMessageFunction(treq);
+            } else {
+                ActionMessage treq(CMD_TIME_REQUEST, source_id, cmd.source_id);
+                treq.actionTime = lastSend.next;
+                treq.Tdemin = lastSend.minDe;
+                treq.Te = lastSend.Te;
+                treq.setExtraData(lastSend.minFed.baseValue());
+                sendMessageFunction(treq);
+            }
+            return message_process_result::processed;
         default:
             break;
     }
