@@ -126,14 +126,14 @@ void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int),HelicsBool useSe
 {
     keyHandler = handler;
     if (handler != nullptr) {
-        if (useSeparateThread) {
+        if (useSeparateThread!=HELICS_FALSE) {
             signal(SIGINT, signalHandlerThreadedCallback);
         } else {
             signal(SIGINT, signalHandlerCallback);
         }
         
     } else {
-        if (useSeparateThread) {
+        if (useSeparateThread!=HELICS_FALSE) {
             helicsLoadThreadedSignalHandler();
         } else {
             helicsLoadSignalHandler();
