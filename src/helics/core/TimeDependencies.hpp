@@ -42,7 +42,7 @@ class TimeData {
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     time_state_t time_state{time_state_t::initialized};
-
+    std::int32_t timeoutCount{0};  // counter for timeout checking
     TimeData() = default;
     explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
     /** check if there is an update to the current dependency info and assign*/
@@ -53,7 +53,7 @@ class TimeData {
 class DependencyInfo: public TimeData {
   public:
     GlobalFederateId fedID{};  //!< identifier for the dependency
-
+    
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
     ConnectionType connection{ConnectionType::independent};

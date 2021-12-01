@@ -1254,6 +1254,13 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto qres = processQueryActual("global_time_debugging");
                 qres.insert(0, "TIME DEBUGGING::");
                 LOG_WARNING(qres);
+                auto parentID = timeCoord->getParent();
+                if (parentID.isValid()) {
+                    auto brokerTimeoutCheck = cmd;
+                    brokerTimeoutCheck.source_id = global_id.load();
+                    brokerTimeoutCheck.dest_id =parentID;
+                    routeMessage(brokerTimeoutCheck);
+                }
             } else if (cmd.counter == 10) {
                 LOG_WARNING("grant timeout stage 4 error actions(none available)");
             }

@@ -1187,6 +1187,17 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 transmit(getRoute(command.dest_id), command);
             }
             break;
+        case CMD_GRANT_TIMEOUT_CHECK:
+        if (command.dest_id==global_broker_id_local || (isRootc && command.dest_id==parent_broker_id)){
+            auto v = timeCoord->grantTimeoutCheck(command); if (!v.isNull()) {
+                auto debugString = fileops::generateJsonString(v);
+                debugString.insert(0, "TIME DEBUGGING::");
+                LOG_WARNING(global_broker_id_local, "broker", debugString);
+            }
+        } else {
+            routeMessage(std::move(command));
+        }
+        break;
         case CMD_PUB:
             transmit(getRoute(command.dest_id), command);
             break;

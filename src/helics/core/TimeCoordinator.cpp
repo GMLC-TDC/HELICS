@@ -208,7 +208,7 @@ bool TimeCoordinator::updateNextExecutionTime()
                                                                          time_granted;
         }
         if (time_granted < Time::maxVal()) {
-            if ((time_exec - time_granted) > timeZero) {
+            if (time_exec > time_granted) {
                 time_exec = generateAllowedTime(time_exec);
             }
         } else {
@@ -753,6 +753,16 @@ void TimeCoordinator::setAsParent(GlobalFederateId fedID)
     if (dep != nullptr) {
         dep->connection = ConnectionType::parent;
     }
+}
+
+GlobalFederateId TimeCoordinator::getParent() const
+{
+    for (const auto &dep:dependencies) {
+        if (dep.connection==ConnectionType::parent) {
+            return dep.fedID;
+        }
+    }
+    return {};
 }
 
 void TimeCoordinator::removeDependency(GlobalFederateId fedID)

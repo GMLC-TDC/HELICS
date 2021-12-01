@@ -30,6 +30,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
                 dep.time_state = time_state_t::time_granted;
                 dep.next = timeZero;
                 dep.minDe = timeZero;
+                dep.timeoutCount = 0;
                 dep.Te = timeZero;
             } else {
                 dep.time_state = time_state_t::initialized;
@@ -64,6 +65,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.Te = dep.next;
             dep.minDe = dep.next;
             dep.minFed = GlobalFederateId{};
+            dep.timeoutCount = 0;
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -77,6 +79,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.Te = Time::maxVal();
             dep.minDe = Time::maxVal();
             dep.minFed = GlobalFederateId{};
+            dep.timeoutCount = 0;
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -86,6 +89,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.Te = Time::maxVal();
             dep.minDe = Time::maxVal();
             dep.minFed = GlobalFederateId{};
+            dep.timeoutCount = 0;
             break;
         default:
             return false;

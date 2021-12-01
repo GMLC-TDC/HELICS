@@ -121,12 +121,14 @@ class BrokerBase {
         NONE = 0,
         NO_COMMS = 0x01,
         PING_RESPONSE = 0x02,
-        QUERY_TIMEOUT = 0x04
+        QUERY_TIMEOUT = 0x04,
+        GRANT_TIMEOUT = 0x08
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
+    /// flag indicating that the broker has entered execution mode
     bool enteredExecutionMode{
-        false};  //!< flag indicating that the broker has entered execution mode
+        false};  
     bool waitingForBrokerPingReply{false};  //!< flag indicating we are waiting for a ping reply
     bool hasFilters{false};  //!< flag indicating filters come through the broker
 
@@ -135,8 +137,9 @@ class BrokerBase {
     /** specify that outgoing connection should use json serialization */
     bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
+    /// time when the error condition started related to the errorDelay
     decltype(std::chrono::steady_clock::now())
-        errorTimeStart;  //!< time when the error condition started related to the errorDelay
+        errorTimeStart;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:

@@ -133,5 +133,9 @@ class ForwardingTimeCoordinator {
     int dependencyCount() const;
     /** get a count of the active dependencies*/
     GlobalFederateId getMinDependency() const;
+
+    /** grant timeout check
+    @return a json Object with debugging info if empty nothing is logged*/
+    Json::Value grantTimeoutCheck(const ActionMessage& cmd);
 };
 }  // namespace helics
