@@ -159,7 +159,9 @@ TEST_P(filter_type_tests, message_reroute_filter_condition)
 
     auto fFed = GetFederateAs<helics::MessageFederate>(0);
     auto mFed = GetFederateAs<helics::MessageFederate>(1);
-
+    // for debugging spurious timeouts;
+    fFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.5);
+    mFed->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 0.5);
     auto& p1 = mFed->registerGlobalEndpoint("port1");
     auto& p2 = mFed->registerGlobalEndpoint("endpt2");
     auto& p3 = mFed->registerGlobalEndpoint("port3");

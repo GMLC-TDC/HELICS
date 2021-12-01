@@ -509,6 +509,9 @@ void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
     switch (currentMode) {
         case Modes::STARTUP:
+        case Modes::INITIALIZING:
+        case Modes::EXECUTING:
+        case Modes::FINISHED:
             break;
         case Modes::PENDING_INIT: {
             auto asyncInfo = asyncCallInfo->lock();
@@ -520,16 +523,11 @@ void Federate::finalize()
                 throw;
             }
         } break;
-        case Modes::INITIALIZING:
-            break;
         case Modes::PENDING_EXEC:
             asyncCallInfo->lock()->execFuture.get();
             break;
         case Modes::PENDING_TIME:
             asyncCallInfo->lock()->timeRequestFuture.get();
-            break;
-        case Modes::EXECUTING:
-        case Modes::FINISHED:
             break;
         case Modes::PENDING_ITERATIVE_TIME:
             asyncCallInfo->lock()

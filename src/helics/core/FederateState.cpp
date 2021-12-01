@@ -801,12 +801,34 @@ void FederateState::finalize()
         return;
     }
     auto ret = MessageProcessingResult::NEXT_STEP;
+#ifndef HELICS_DISABLE_ASIO
+    if (grantTimeOutPeriod > timeZero) {
+        ActionMessage grantCheck(CMD_GRANT_TIMEOUT_CHECK);
+        grantCheck.setExtraData(static_cast<std::int32_t>(mGrantCount));
+        grantCheck.counter = 0;
+        grantCheck.actionTime = Time::maxVal();
+        if (grantTimeoutTimeIndex < 0) {
+            grantTimeoutTimeIndex =
+                mTimer->addTimerFromNow(grantTimeOutPeriod.to_ms(), std::move(grantCheck));
+        } else {
+            mTimer->updateTimerFromNow(realTimeTimerIndex,
+                                       grantTimeOutPeriod.to_ms(),
+                                       std::move(grantCheck));
+        }
+    }
+#endif
     while (ret != MessageProcessingResult::HALTED) {
         ret = genericUnspecifiedQueueProcess(false);
         if (ret == MessageProcessingResult::ERROR_RESULT) {
             break;
         }
     }
+#ifndef HELICS_DISABLE_ASIO
+    ++mGrantCount;
+    if (grantTimeOutPeriod > timeZero) {
+        mTimer->cancelTimer(grantTimeoutTimeIndex);
+    }
+#endif
 }
 
 const std::vector<InterfaceHandle> emptyHandles;
@@ -1226,7 +1248,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             LOG_WARNING(cmd.payload.to_string());
             break;
         case CMD_GRANT_TIMEOUT_CHECK:
-            if (timeGranted_mode) {
+            if (timeGranted_mode && cmd.actionTime!=Time::maxVal()) {
                 break;
             }
             if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
@@ -1237,12 +1259,12 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto blockFed = timeCoord->getMinGrantedDependency();
                 if (blockFed.first.isValid()) {
                     LOG_WARNING(fmt::format(
-                        "grant timeout exceeded triggering diagnostic action sim time {} waiting on {}",
+                        "grant timeout exceeded sim time {} waiting on {}",
                         time_granted,
                         blockFed.first.baseValue()));
                 } else {
                     LOG_WARNING(fmt::format(
-                        "grant timeout exceeded triggering diagnostic action sim time {}",
+                        "grant timeout exceeded sim time {}",
                         time_granted));
                 }
 
@@ -1262,7 +1284,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     routeMessage(brokerTimeoutCheck);
                 }
             } else if (cmd.counter == 10) {
-                LOG_WARNING("grant timeout stage 4 error actions(none available)");
+                if (cmd.actionTime == Time::maxVal()) {
+                    LOG_WARNING("finalize blocking");
+                } else {
+                    LOG_WARNING("grant timeout stage 4 error actions(none available)");
+                }
             }
 #ifndef HELICS_DISABLE_ASIO
             if (mTimer) {
