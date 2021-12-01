@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/Core.hpp"
 #include "../core/queryHelpers.hpp"
+#include "../core/EmptyCore.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include <cassert>
@@ -23,10 +24,12 @@ MessageFederateManager::MessageFederateManager(Core* coreOb,
 }
 MessageFederateManager::~MessageFederateManager() = default;
 
+static EmptyCore eCore;
+
 void MessageFederateManager::disconnect()
 {
     // checks for the calls are handled in the MessageFederate itself
-    coreObject = nullptr;
+    coreObject = &eCore;
 }
 
 Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, const std::string& type)

@@ -2075,6 +2075,10 @@ void CoreBroker::disconnect()
                                     currentMessageCounter()));
             addActionMessage(udisconnect);
         }
+        if (cnt % 13 == 0)
+        {
+            std::cerr << "waiting on disconnect " << std::endl;
+        }
     }
 }
 

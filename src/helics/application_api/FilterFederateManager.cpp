@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/Core.hpp"
 #include "Federate.hpp"
+#include "../core/EmptyCore.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include <utility>
@@ -125,4 +126,13 @@ void FilterFederateManager::disconnectAllFilters()
         filt->disconnectFromCore();
     }
 }
+
+static EmptyCore eCore;
+
+void FilterFederateManager::disconnect()
+{
+    // checks for the calls are handled in the MessageFederate itself
+    coreObject = &eCore;
+}
+
 }  // namespace helics

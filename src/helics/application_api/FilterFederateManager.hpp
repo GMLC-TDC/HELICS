@@ -76,9 +76,10 @@ class FilterFederateManager {
     void closeAllFilters();
     /** close all filters*/
     void disconnectAllFilters();
-
+    /** disconnect from the coreObject*/
+    void disconnect();
   private:
-    Core* coreObject = nullptr;
+    Core* coreObject{nullptr};
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID

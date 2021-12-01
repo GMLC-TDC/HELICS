@@ -507,7 +507,7 @@ bool Federate::getFlagOption(int flag) const
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
-    switch (currentMode) {
+    switch (currentMode.load()) {
         case Modes::STARTUP:
         case Modes::INITIALIZING:
         case Modes::EXECUTING:
@@ -550,7 +550,7 @@ void Federate::finalize()
     if (fManager) {
         fManager->closeAllFilters();
     }
-    currentMode = Modes::FINALIZE;
+    currentMode.store(Modes::FINALIZE);
 }
 
 void Federate::finalizeAsync()
@@ -597,7 +597,9 @@ void Federate::finalizeComplete()
 void Federate::disconnect()
 {
     finalize();
-
+    if (fManager) {
+        fManager->disconnect();
+    }
     coreObject = CoreFactory::getEmptyCore();
 }
 
