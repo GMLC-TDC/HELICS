@@ -17,9 +17,6 @@
 [submodule "ThirdParty/units"]
     path = ThirdParty/units
     url = https://github.com/LLNL/units.git
-[submodule "ThirdParty/toml11"]
-    path = ThirdParty/toml11
-    url = https://github.com/GMLC-TDC/toml11.git
 [submodule "ThirdParty/netif"]
     path = ThirdParty/netif
     url = https://github.com/GMLC-TDC/netif.git
@@ -30,3 +27,6 @@
     path = ThirdParty/json_cpp
     url = https://github.com/open-source-parsers/jsoncpp.git
     branch = master
+[submodule "ThirdParty/toml"]
+	path = ThirdParty/toml
+	url = https://github.com/ToruNiina/toml11

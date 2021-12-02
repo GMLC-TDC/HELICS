@@ -15,14 +15,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.1.0)
+project(HELICS VERSION 3.1.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-11-24")
+set(HELICS_DATE "2021-12-2")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -380,8 +380,8 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
-        submod_update(ThirdParty/toml11)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+        submod_update(ThirdParty/toml)
     endif()
 
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/netif/gmlc/netif/NetIF.hpp")
@@ -415,7 +415,7 @@ endif()
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
-add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
+add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
 # options for enabling specific core communication types
