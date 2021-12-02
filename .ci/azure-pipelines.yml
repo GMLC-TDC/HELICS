@@ -175,12 +175,6 @@ jobs:
         displayName: 'Package HELICS'
         workingDirectory: build
 
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathtoPublish: '$(Build.SourcesDirectory)/build/installer-output'
-          artifactName: cpack_output
-          condition: always()
-
       - task: CopyFiles@2
         inputs:
           sourceFolder: '$(Build.SourcesDirectory)/build/installer-output'
