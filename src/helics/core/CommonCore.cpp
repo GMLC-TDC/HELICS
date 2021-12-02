@@ -43,6 +43,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace helics {
 
@@ -237,6 +238,9 @@ void CommonCore::disconnect()
                 return;
             }
             addActionMessage(udisconnect);
+        }
+        if (cnt % 13 == 0) {
+            std::cerr << "waiting on disconnect " << std::endl;
         }
     }
 }
