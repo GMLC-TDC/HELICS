@@ -504,7 +504,8 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
             addActionMessage(halt);
         } else {
             errorTimeStart = std::chrono::steady_clock::now();
-            ActionMessage(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+            ActionMessage echeck(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+            addActionMessage(echeck);
         }
     }
 
