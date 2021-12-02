@@ -849,7 +849,7 @@ set(LICENSE_LIST
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/LICENSE"
     "toml11"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
     "netif"
