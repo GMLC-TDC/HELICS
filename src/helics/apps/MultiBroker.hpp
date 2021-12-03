@@ -28,11 +28,9 @@ class MultiBroker: public CoreBroker {
     std::atomic<int> disconnectionStage{0};  //!< the stage of disconnection
     std::vector<std::unique_ptr<CommsInterface>> comms;  //!< the actual comms objects
     /// the primary comms object or the one that links with the master
-    std::unique_ptr<CommsInterface>
-        masterComm; 
+    std::unique_ptr<CommsInterface> masterComm;
     /// structure containing the networking information
-    NetworkBrokerData netInfo{
-        gmlc::networking::InterfaceTypes::TCP};  
+    NetworkBrokerData netInfo{gmlc::networking::InterfaceTypes::TCP};
     std::string configFile;  //!< the name of the config file in use
     std::atomic<bool> brokerInitialized{false};  //!< atomic protecting local initialization
     CoreType type{CoreType::MULTI};  //!< the core type of the master controller
