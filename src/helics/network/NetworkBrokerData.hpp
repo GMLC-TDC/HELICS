@@ -36,8 +36,6 @@ class NetworkBrokerData {
         SERVER_DEACTIVATED = 4,
     };
 
-    using InterfaceTypes = gmlc::networking::InterfaceTypes;
-
     std::string brokerName;  //!< the identifier for the broker
     std::string brokerAddress;  //!< the address or domain name of the broker
     std::string localInterface;  //!< the interface to use for the local connection
@@ -66,7 +64,7 @@ class NetworkBrokerData {
   public:
     NetworkBrokerData() = default;
     /** constructor from the allowed type*/
-    explicit NetworkBrokerData(InterfaceTypes type): allowedType(type) {}
+    explicit NetworkBrokerData(gmlc::networking::InterfaceTypes type): allowedType(type) {}
 
     /** generate a command line argument parser for the network broker data
      @param localAddress a predefined string containing the desired local only address
@@ -75,12 +73,12 @@ class NetworkBrokerData {
                                                       bool enableConfig = true);
     /** set the desired interface type
      */
-    void setInterfaceType(InterfaceTypes type) { allowedType = type; }
+    void setInterfaceType(gmlc::networking::InterfaceTypes type) { allowedType = type; }
 
   private:
     /** do some checking on the brokerAddress*/
     void checkAndUpdateBrokerAddress(const std::string& localAddress);
-    InterfaceTypes allowedType = InterfaceTypes::IP;
+    gmlc::networking::InterfaceTypes allowedType{gmlc::networking::InterfaceTypes::IP};
 };
 
 /** create a combined address list with choices in a rough order of priority based on if they appear

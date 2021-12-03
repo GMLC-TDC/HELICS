@@ -174,6 +174,7 @@ std::shared_ptr<helicsCLI11App>
 
 void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddress)
 {
+    using gmlc::networking::InterfaceTypes;
     switch (allowedType) {
         case InterfaceTypes::TCP:
             if ((brokerAddress == "tcp://*") || (brokerAddress == "*") ||
@@ -208,9 +209,11 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
             break;
         case InterfaceTypes::IPC:
         case InterfaceTypes::INPROC:
+        default:
             if ((brokerAddress.empty()) && (!localAddress.empty())) {
                 brokerAddress = localAddress;
             }
+            break;
     }
 }
 
