@@ -30,3 +30,6 @@
 [submodule "ThirdParty/toml"]
 	path = ThirdParty/toml
 	url = https://github.com/ToruNiina/toml11
+[submodule "ThirdParty/networking"]
+	path = ThirdParty/networking
+	url = https://github.com/GMLC-TDC/networking.git

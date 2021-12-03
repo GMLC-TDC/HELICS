@@ -376,6 +376,10 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/utilities)
     endif()
 
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/networking/gmlc/networking/TcpServer.h")
+        submod_update(ThirdParty/networking)
+    endif()
+
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
         submod_update(ThirdParty/units)
     endif()
@@ -685,6 +689,7 @@ add_library(HELICS::units ALIAS units-static)
 # -----------------------------------------------------------------------------
 
 set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
+
 add_subdirectory(ThirdParty/utilities)
 
 hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
@@ -703,6 +708,26 @@ if(NOT HELICS_DISABLE_BOOST)
         gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     )
 endif()
+
+# -----------------------------------------------------------------------------
+# create networking target
+# -----------------------------------------------------------------------------
+
+set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
+set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
+set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
+add_subdirectory(ThirdParty/networking)
+
+hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)
+hide_variable(GMLC_NETWORKING_INCLUDE_BOOST)
+hide_variable(GMLC_NETWORKING_WITH_CMAKE_PACKAGE)
+hide_variable(GMLC_NETWORKING_OBJECT_LIB)
+hide_variable(GMLC_NETWORKING_STATIC_LIB)
+hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
+
+add_library(HELICS::networking ALIAS gmlc_networking)
+set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
+
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
@@ -854,6 +879,8 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
     "netif"
     "${PROJECT_SOURCE_DIR}/ThirdParty/netif/LICENSE"
+    "GMLC Networking"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)
