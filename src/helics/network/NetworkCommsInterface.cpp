@@ -76,7 +76,9 @@ bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, i
 /** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
-    using namespace gmlc::networking;
+    using gmlc::networking::InterfaceTypes;
+    using gmlc::networking::removeProtocol;
+
     CommsInterface::loadNetworkInfo(netInfo);
     if (!propertyLock()) {
         return;
@@ -94,7 +96,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             break;
     }
     if (localTargetAddress.empty()) {
-        auto bTarget = stripProtocol(brokerTargetAddress);
+        auto bTarget = gmlc::networking::stripProtocol(brokerTargetAddress);
         if ((bTarget == localHostString) || (bTarget == "127.0.0.1")) {
             localTargetAddress = localHostString;
         } else if (bTarget.empty()) {
@@ -228,7 +230,8 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
 
 std::string NetworkCommsInterface::getAddress() const
 {
-    using namespace gmlc::networking;
+    using gmlc::networking::makePortAddress;
+
     if ((PortNumber < 0) && (!serverMode)) {
         return name;
     }
