@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-NetworkCommsInterface::NetworkCommsInterface(InterfaceTypes type,
+NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes type,
                                              CommsInterface::thread_generation threads) noexcept:
     CommsInterface(threads),
     networkType(type)
@@ -76,6 +76,7 @@ bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, i
 /** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
+    using namespace gmlc::networking;
     CommsInterface::loadNetworkInfo(netInfo);
     if (!propertyLock()) {
         return;
@@ -227,6 +228,7 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
 
 std::string NetworkCommsInterface::getAddress() const
 {
+    using namespace gmlc::networking;
     if ((PortNumber < 0) && (!serverMode)) {
         return name;
     }
@@ -249,7 +251,7 @@ ActionMessage NetworkCommsInterface::generatePortRequest(int cnt) const
 {
     ActionMessage req(CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
-    req.payload = stripProtocol(localTargetAddress);
+    req.payload = gmlc::networking::stripProtocol(localTargetAddress);
     req.counter = cnt;
     req.setStringData(brokerName, brokerInitString);
     return req;

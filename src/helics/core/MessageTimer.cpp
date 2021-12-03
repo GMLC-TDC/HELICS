@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 MessageTimer::MessageTimer(std::function<void(ActionMessage&&)> sFunction):
-    sendFunction(std::move(sFunction)), contextPtr(AsioContextManager::getContextPointer()),
+    sendFunction(std::move(sFunction)), contextPtr(gmlc::networking::AsioContextManager::getContextPointer()),
     loopHandle(contextPtr->startContextLoop())
 {
 }

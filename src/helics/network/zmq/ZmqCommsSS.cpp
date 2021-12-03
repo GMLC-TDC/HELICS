@@ -32,10 +32,12 @@ namespace zeromq {
             return;
         }
         if (!brokerTargetAddress.empty()) {
-            insertProtocol(brokerTargetAddress, InterfaceTypes::TCP);
+            gmlc::networking::insertProtocol(brokerTargetAddress,
+                                             gmlc::networking::InterfaceTypes::TCP);
         }
         if (!localTargetAddress.empty()) {
-            insertProtocol(localTargetAddress, InterfaceTypes::TCP);
+            gmlc::networking::insertProtocol(localTargetAddress,
+                                             gmlc::networking::InterfaceTypes::TCP);
         }
         if (localTargetAddress == "tcp://localhost") {
             localTargetAddress = "tcp://127.0.0.1";
@@ -51,7 +53,8 @@ namespace zeromq {
     }
 
     ZmqCommsSS::ZmqCommsSS() noexcept:
-        NetworkCommsInterface(InterfaceTypes::IP, CommsInterface::thread_generation::single)
+        NetworkCommsInterface(gmlc::networking::InterfaceTypes::IP,
+                              CommsInterface::thread_generation::single)
     {
         appendNameToAddress = true;
     }
@@ -133,7 +136,7 @@ namespace zeromq {
                     break;
                 case NEW_BROKER_INFORMATION: {
                     logMessage("got new broker information");
-                    auto brkprt = extractInterfaceandPort(M.getString(0));
+                    auto brkprt = gmlc::networking::extractInterfaceandPort(M.getString(0));
                     brokerPort = brkprt.second;
                     if (brkprt.first != "?") {
                         brokerTargetAddress = brkprt.first;
@@ -184,11 +187,13 @@ namespace zeromq {
         brokerConnection.setsockopt(ZMQ_IDENTITY, name.c_str(), name.size());
         brokerConnection.setsockopt(ZMQ_LINGER, 500);
         try {
-            brokerConnection.connect(makePortAddress(brokerTargetAddress, brokerPort));
+            brokerConnection.connect(
+                gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort));
         }
         catch (zmq::error_t& ze) {
             logError(std::string("unable to connect with broker at ") +
-                     makePortAddress(brokerTargetAddress, brokerPort + 1) + ":(" + name + ")" +
+                     gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort + 1) + ":(" +
+                     name + ")" +
                      ze.what());
             setTxStatus(connection_status::error);
             return -1;
@@ -216,7 +221,7 @@ namespace zeromq {
                 brokerSocket.close();
                 disconnecting = true;
                 logError(std::string("Unable to bind zmq router socket giving up ") +
-                         makePortAddress(localTargetAddress, PortNumber));
+                         gmlc::networking::makePortAddress(localTargetAddress, PortNumber));
                 setRxStatus(connection_status::error);
                 return -1;
             }

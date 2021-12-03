@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
-#    include "../common/AsioContextManager.h"
+#    include "gmlc/networking/AsioContextManager.h"
 
 #    include <asio/ip/host_name.hpp>
 #    include <asio/ip/tcp.hpp>
@@ -44,7 +44,7 @@ std::shared_ptr<helicsCLI11App>
         ->add_option_function<std::string>(
             "--broker_address",
             [this, localAddress](const std::string& addr) {
-                auto brkprt = extractInterfaceandPort(addr);
+                auto brkprt = gmlc::networking::extractInterfaceandPort(addr);
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
                 checkAndUpdateBrokerAddress(localAddress);
@@ -68,7 +68,7 @@ std::shared_ptr<helicsCLI11App>
                 addr = brkr->getAddress();
             }
             if (brokerAddress.empty()) {
-                auto brkprt = extractInterfaceandPort(addr);
+                auto brkprt = gmlc::networking::extractInterfaceandPort(addr);
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
                 checkAndUpdateBrokerAddress(localAddress);
@@ -123,7 +123,7 @@ std::shared_ptr<helicsCLI11App>
     nbparser->add_option_function<std::string>(
         "--local_interface",
         [this](const std::string& addr) {
-            auto localprt = extractInterfaceandPort(addr);
+            auto localprt = gmlc::networking::extractInterfaceandPort(addr);
             localInterface = localprt.first;
             // this may get overridden later
             portNumber = localprt.second;
@@ -214,119 +214,6 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
     }
 }
 
-std::string makePortAddress(const std::string& networkInterface, int portNumber)
-{
-    std::string newAddress = networkInterface;
-    if (portNumber != 0) {
-        newAddress.push_back(':');
-        newAddress.append(std::to_string(portNumber));
-    }
-    return newAddress;
-}
-
-std::pair<std::string, int> extractInterfaceandPort(const std::string& address)
-{
-    std::pair<std::string, int> ret;
-    auto lastColon = address.find_last_of(':');
-    if (lastColon == std::string::npos) {
-        ret = std::make_pair(address, -1);
-    } else {
-        try {
-            if ((address.size() > lastColon + 1) && (address[lastColon + 1] != '/')) {
-                auto val = std::stoi(address.substr(lastColon + 1));
-                ret.first = address.substr(0, lastColon);
-                ret.second = val;
-            } else {
-                ret = std::make_pair(address, -1);
-            }
-        }
-        catch (const std::invalid_argument&) {
-            ret = std::make_pair(address, -1);
-        }
-    }
-
-    return ret;
-}
-
-std::pair<std::string, std::string> extractInterfaceandPortString(const std::string& address)
-{
-    auto lastColon = address.find_last_of(':');
-    return {address.substr(0, lastColon), address.substr(lastColon + 1)};
-}
-
-std::string stripProtocol(const std::string& networkAddress)
-{
-    auto loc = networkAddress.find("://");
-    if (loc != std::string::npos) {
-        return networkAddress.substr(loc + 3);
-    }
-    return networkAddress;
-}
-
-void removeProtocol(std::string& networkAddress)
-{
-    auto loc = networkAddress.find("://");
-    if (loc != std::string::npos) {
-        networkAddress.erase(0, loc + 3);
-    }
-}
-
-std::string addProtocol(const std::string& networkAddress, InterfaceTypes interfaceT)
-{
-    if (networkAddress.find("://") == std::string::npos) {
-        switch (interfaceT) {
-            case InterfaceTypes::IP:
-            case InterfaceTypes::TCP:
-                return std::string("tcp://") + networkAddress;
-            case InterfaceTypes::IPC:
-                return std::string("ipc://") + networkAddress;
-            case InterfaceTypes::UDP:
-                return std::string("udp://") + networkAddress;
-            case InterfaceTypes::INPROC:
-                return std::string("inproc://") + networkAddress;
-        }
-    }
-    return networkAddress;
-}
-
-void insertProtocol(std::string& networkAddress, InterfaceTypes interfaceT)
-{
-    if (networkAddress.find("://") == std::string::npos) {
-        switch (interfaceT) {
-            case InterfaceTypes::IP:
-            case InterfaceTypes::TCP:
-                networkAddress.insert(0, "tcp://");
-                break;
-            case InterfaceTypes::IPC:
-                networkAddress.insert(0, "ipc://");
-                break;
-            case InterfaceTypes::UDP:
-                networkAddress.insert(0, "udp://");
-                break;
-            case InterfaceTypes::INPROC:
-                networkAddress.insert(0, "inproc://");
-                break;
-        }
-    }
-}
-
-bool isipv6(const std::string& address)
-{
-    auto cntcolon = std::count(address.begin(), address.end(), ':');
-    if (cntcolon > 2) {
-        return true;
-    }
-
-    auto brkcnt = address.find_first_of('[');
-    if (brkcnt != std::string::npos) {
-        return true;
-    }
-    if (address.compare(0, 2, "::") == 0) {
-        return true;
-    }
-    return false;
-}
-
 std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high,
                                                      std::vector<std::string> low)
 {
@@ -372,7 +259,7 @@ std::string getLocalExternalAddressV4()
 {
     std::string resolved_address;
 #ifndef HELICS_DISABLE_ASIO
-    auto srv = AsioContextManager::getContextPointer();
+    auto srv = gmlc::networking::AsioContextManager::getContextPointer();
 
     asio::ip::tcp::resolver resolver(srv->getBaseContext());
     asio::ip::tcp::resolver::query query(asio::ip::tcp::v4(), asio::ip::host_name(), "");
@@ -427,7 +314,7 @@ std::string getLocalExternalAddressV4()
 std::string getLocalExternalAddressV4(const std::string& server)
 {
 #ifndef HELICS_DISABLE_ASIO
-    auto srv = AsioContextManager::getContextPointer();
+    auto srv = gmlc::networking::AsioContextManager::getContextPointer();
 
     asio::ip::tcp::resolver resolver(srv->getBaseContext());
 
@@ -481,7 +368,7 @@ std::string getLocalExternalAddressV4(const std::string& server)
 std::string getLocalExternalAddressV6()
 {
 #ifndef HELICS_DISABLE_ASIO
-    auto srv = AsioContextManager::getContextPointer();
+    auto srv = gmlc::networking::AsioContextManager::getContextPointer();
 
     asio::ip::tcp::resolver resolver(srv->getBaseContext());
     asio::ip::tcp::resolver::query query(asio::ip::tcp::v6(), asio::ip::host_name(), "");
@@ -531,7 +418,7 @@ std::string getLocalExternalAddressV6()
 std::string getLocalExternalAddressV6(const std::string& server)
 {
 #ifndef HELICS_DISABLE_ASIO
-    auto srv = AsioContextManager::getContextPointer();
+    auto srv = gmlc::networking::AsioContextManager::getContextPointer();
 
     asio::ip::tcp::resolver resolver(srv->getBaseContext());
 
@@ -574,7 +461,7 @@ std::string getLocalExternalAddressV6(const std::string& server)
 
 std::string getLocalExternalAddress(const std::string& server)
 {
-    if (isipv6(server)) {
+    if (gmlc::networking::isipv6(server)) {
         return getLocalExternalAddressV6(server);
     }
     return getLocalExternalAddressV4(server);

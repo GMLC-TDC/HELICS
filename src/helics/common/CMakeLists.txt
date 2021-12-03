@@ -29,11 +29,6 @@ set(helics_public_common JsonProcessingFunctions.hpp AsioContextManager.h SmallB
                          GuardedTypes.hpp
 )
 
-if(NOT HELICS_DISABLE_ASIO)
-    list(APPEND common_headers AsioContextManager.h)
-    list(APPEND common_sources AsioContextManager.cpp)
-endif()
-
 add_library(helics_common STATIC ${common_sources} ${common_headers})
 set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 

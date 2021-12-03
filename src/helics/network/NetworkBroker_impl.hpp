@@ -43,21 +43,21 @@ constexpr const char* defInterface[] = {"127.0.0.1",
                                         "_ipc_broker",
                                         ""};
 
-template<class COMMS, InterfaceTypes baseline, int tcode>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(bool rootBroker) noexcept:
     CommsBroker<COMMS, CoreBroker>(rootBroker)
 {
     netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE;
 }
 
-template<class COMMS, InterfaceTypes baseline, int tcode>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(const std::string& broker_name):
     CommsBroker<COMMS, CoreBroker>(broker_name)
 {
     netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE;
 }
 
-template<class COMMS, InterfaceTypes baseline, int tcode>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateCLI()
 {
     auto app = CoreBroker::generateCLI();
@@ -66,7 +66,7 @@ std::shared_ptr<helicsCLI11App> NetworkBroker<COMMS, baseline, tcode>::generateC
     return app;
 }
 
-template<class COMMS, InterfaceTypes baseline, int tcode>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
 {
     std::lock_guard<std::mutex> lock(dataMutex);
@@ -88,9 +88,10 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
     return res;
 }
 
-template<class COMMS, InterfaceTypes baseline, int tcode>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() const
 {
+    using InterfaceTypes=gmlc::networking::InterfaceTypes;
     std::string add;
     if (CommsBroker<COMMS, CoreBroker>::comms->isConnected()) {
         add = CommsBroker<COMMS, CoreBroker>::comms->getAddress();
@@ -101,11 +102,11 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() 
             case InterfaceTypes::IP:
             case InterfaceTypes::UDP:
                 if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*')) {
-                    add = makePortAddress(
+                    add = gmlc::networking::makePortAddress(
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
                         netInfo.portNumber);
                 } else {
-                    add = makePortAddress(netInfo.localInterface, netInfo.portNumber);
+                    add = gmlc::networking::makePortAddress(netInfo.localInterface, netInfo.portNumber);
                 }
                 break;
             case InterfaceTypes::INPROC:

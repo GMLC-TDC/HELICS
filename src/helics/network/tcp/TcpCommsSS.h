@@ -13,14 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-class AsioContextManager;
-namespace asio {
-class io_context;
-}  // namespace asio
+
+namespace gmlc::networking {
+class TcpConnection;
+}
 
 namespace helics {
 namespace tcp {
-    class TcpConnection;
 
     /** implementation for the communication interface that uses TCP messages to communicate*/
     class TcpCommsSS final: public NetworkCommsInterface {
@@ -38,8 +37,9 @@ namespace tcp {
         virtual void setFlag(const std::string& flag, bool val) override;
 
       private:
+        /// disable all outgoing connections- allow only incoming connections
         bool outgoingConnectionsAllowed{
-            true};  //!< disable all outgoing connections- allow only incoming connections
+            true};  
         bool reuse_address{false};
         std::vector<std::string> connections;  //!< list of connections to make
         virtual int getDefaultBrokerPort() const override;
@@ -56,7 +56,7 @@ namespace tcp {
     @param bytes_received the length of the received data
     @return a the number of bytes used by the function
     */
-        size_t dataReceive(TcpConnection* connection, const char* data, size_t bytes_received);
+        size_t dataReceive(gmlc::networking::TcpConnection* connection, const char* data, size_t bytes_received);
         //  bool errorHandle()
     };
 

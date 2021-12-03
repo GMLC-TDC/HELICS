@@ -14,15 +14,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <string>
 
+namespace gmlc::networking {
 class AsioContextManager;
-namespace asio {
-class io_context;
-}  // namespace asio
+class TcpConnection;
+}
 
-namespace helics {
-namespace tcp {
-    class TcpConnection;
-
+namespace helics::tcp {
+    
     /** implementation for the communication interface that uses TCP messages to communicate*/
     class TcpComms final: public NetworkCommsInterface {
       public:
@@ -44,8 +42,8 @@ namespace tcp {
         virtual void closeReceiver() override;  //!< function to instruct the receiver loop to close
 
         /** make the initial connection to a broker and get setup information*/
-        bool establishBrokerConnection(std::shared_ptr<AsioContextManager>& ioctx,
-                                       std::shared_ptr<TcpConnection>& brokerConnection);
+        bool establishBrokerConnection(std::shared_ptr<gmlc::networking::AsioContextManager>& ioctx,
+                                       std::shared_ptr<gmlc::networking::TcpConnection>& brokerConnection);
         /** process an incoming message
     return code for required action 0=NONE, -1 TERMINATE*/
         int processIncomingMessage(ActionMessage&& cmd);
@@ -60,10 +58,9 @@ namespace tcp {
     @param bytes_received the length of the received data
     @return a the number of bytes used by the function
     */
-        size_t dataReceive(TcpConnection* connection, const char* data, size_t bytes_received);
+        size_t dataReceive(gmlc::networking::TcpConnection* connection, const char* data, size_t bytes_received);
 
         //  bool errorHandle()
     };
 
-}  // namespace tcp
-}  // namespace helics
+}

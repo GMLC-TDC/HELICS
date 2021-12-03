@@ -15,18 +15,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #if defined(HELICS_ENABLE_TCP_CORE) || defined(HELICS_ENABLE_UDP_CORE)
 
-#    include "helics/common/AsioContextManager.h"
+#    include "gmlc/networking/AsioContextManager.h"
 
 #    include <mutex>
 #    include <thread>
 
-namespace helics {
 #    ifdef HELICS_ENABLE_TCP_CORE
-namespace tcp {
-    class TcpServer;
-    class TcpConnection;
+namespace gmlc::networking {
+class TcpServer;
+class TcpConnection;
 }  // namespace tcp
 #    endif
+
+namespace helics {
+
 #    ifdef HELICS_ENABLE_UDP_CORE
 namespace udp {
     class UdpServer;
@@ -51,12 +53,12 @@ namespace apps {
       private:
         void mainLoop();
 #    ifdef HELICS_ENABLE_TCP_CORE
-        std::shared_ptr<tcp::TcpServer> loadTCPserver(asio::io_context& ioctx);
+        std::shared_ptr<gmlc::networking::TcpServer> loadTCPserver(asio::io_context& ioctx);
         static void loadTCPServerData(portData& pdata);
-        std::size_t tcpDataReceive(const std::shared_ptr<tcp::TcpConnection>& connection,
+        std::size_t tcpDataReceive(const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
                                    const char* data,
                                    size_t bytes_received);
-        std::shared_ptr<tcp::TcpServer> tcpserver;
+        std::shared_ptr<gmlc::networking::TcpServer> tcpserver;
         portData tcpPortData;
 #    endif
 #    ifdef HELICS_ENABLE_UDP_CORE

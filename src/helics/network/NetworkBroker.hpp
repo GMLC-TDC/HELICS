@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-template<class COMMS, InterfaceTypes baseline, int tcode = 0>
+template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode = 0>
 class NetworkBroker: public CommsBroker<COMMS, CoreBroker> {
   public:
     /** default constructor*/

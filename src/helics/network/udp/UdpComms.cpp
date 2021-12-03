@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "UdpComms.h"
 
-#include "../../common/AsioContextManager.h"
+#include "gmlc/networking/AsioContextManager.h"
 #include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
@@ -23,7 +23,7 @@ namespace helics {
 namespace udp {
     using asio::ip::udp;
     UdpComms::UdpComms():
-        NetworkCommsInterface(InterfaceTypes::UDP), promisePort(std::promise<int>())
+        NetworkCommsInterface(gmlc::networking::InterfaceTypes::UDP), promisePort(std::promise<int>())
     {
         futurePort = promisePort.get_future();
     }
@@ -53,6 +53,8 @@ namespace udp {
 
     void UdpComms::queue_rx_function()
     {
+        using gmlc::networking::makePortAddress;
+
         if (PortNumber < 0) {
             PortNumber = futurePort.get();
         }
@@ -60,7 +62,7 @@ namespace udp {
             setRxStatus(connection_status::error);
             return;
         }
-        auto ioctx = AsioContextManager::getContextPointer();
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
         udp::socket socket(ioctx->getBaseContext());
         socket.open(udpnet(interfaceNetwork));
         std::chrono::milliseconds t_cnt{0};
@@ -164,7 +166,7 @@ namespace udp {
     void UdpComms::queue_tx_function()
     {
         std::vector<char> buffer;
-        auto ioctx = AsioContextManager::getContextPointer();
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
         udp::resolver resolver(ioctx->getBaseContext());
         bool closingRx = false;
         udp::socket transmitSocket(ioctx->getBaseContext());
@@ -286,7 +288,7 @@ namespace udp {
                             }
                         } else if (m.messageID == NEW_BROKER_INFORMATION) {
                             logMessage("got new broker information");
-                            auto brkprt = extractInterfaceandPort(m.getString(0));
+                            auto brkprt = gmlc::networking::extractInterfaceandPort(m.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
@@ -360,7 +362,7 @@ namespace udp {
                                 std::string newroute(cmd.payload.to_string());
                                 std::string interface;
                                 std::string port;
-                                std::tie(interface, port) = extractInterfaceandPortString(newroute);
+                                std::tie(interface, port) = gmlc::networking::extractInterfaceandPortString(newroute);
                                 udp::resolver::query queryNew(udpnet(interfaceNetwork),
                                                               interface,
                                                               port);
@@ -490,7 +492,7 @@ namespace udp {
             transmit(control_route, cmd);
         } else if (!disconnecting) {
             try {
-                auto serv = AsioContextManager::getContextPointer();
+                auto serv = gmlc::networking::AsioContextManager::getContextPointer();
                 if (serv) {
                     udp::endpoint rxEndpoint;
 

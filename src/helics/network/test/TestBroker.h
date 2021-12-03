@@ -14,8 +14,9 @@ namespace testcore {
     class TestComms;
 
     /** implementation for the core that uses IPC messages to communicate*/
-    using TestBroker =
-        NetworkBroker<TestComms, InterfaceTypes::INPROC, static_cast<int>(CoreType::TEST)>;
+    using TestBroker = NetworkBroker<TestComms,
+                                     gmlc::networking::InterfaceTypes::INPROC,
+                                     static_cast<int>(CoreType::TEST)>;
 
 }  // namespace testcore
 }  // namespace helics

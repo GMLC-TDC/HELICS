@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "AsioBrokerServer.hpp"
 
-#include "../common/AsioContextManager.h"
+#include "gmlc/networking/AsioContextManager.h"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
 #ifdef HELICS_ENABLE_TCP_CORE
-#    include "../network/tcp/TcpHelperClasses.h"
+#    include "gmlc/networking/TcpServer.h"
 #endif
 #ifdef HELICS_ENABLE_UDP_CORE
 #    include <asio/ip/udp.hpp>
@@ -103,7 +103,7 @@ namespace udp {
 namespace apps {
 #ifdef HELICS_ENABLE_TCP_CORE
     std::size_t
-        AsioBrokerServer::tcpDataReceive(const std::shared_ptr<tcp::TcpConnection>& connection,
+        AsioBrokerServer::tcpDataReceive(const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
                                          const char* data,
                                          std::size_t bytes_received)
     {
@@ -133,7 +133,7 @@ namespace apps {
         return used_total;
     }
 
-    std::shared_ptr<tcp::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
+    std::shared_ptr<gmlc::networking::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
     {
         std::string ext_interface = "0.0.0.0";
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
@@ -143,7 +143,7 @@ namespace apps {
             helics::fileops::replaceIfMember(V, "interface", ext_interface);
             helics::fileops::replaceIfMember(V, "port", tcpport);
         }
-        auto server = helics::tcp::TcpServer::create(
+        auto server = gmlc::networking::TcpServer::create(
             ioctx, ext_interface, static_cast<uint16_t>(tcpport), true, 2048);
         return server;
     }
@@ -269,14 +269,14 @@ namespace apps {
 
     void AsioBrokerServer::mainLoop()
     {
-        auto ioctx = AsioContextManager::getContextPointer();
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
 
 #ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
                 // NOLINTNEXTLINE
-                [this](tcp::TcpConnection::pointer connection, const char* data, size_t datasize) {
+                [this](gmlc::networking::TcpConnection::pointer connection, const char* data, size_t datasize) {
                     return tcpDataReceive(connection, data, datasize);
                 });
 

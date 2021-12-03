@@ -7,12 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TcpCommsSS.h"
 
-#include "../../common/AsioContextManager.h"
+#include "gmlc/networking/AsioContextManager.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "TcpCommsCommon.h"
-#include "TcpHelperClasses.h"
+#include "gmlc/networking/TcpHelperClasses.h"
+#include "gmlc/networking/TcpOperations.h"
 
 #include <map>
 #include <memory>
@@ -21,8 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace tcp {
+    using gmlc::networking::TcpConnection;
+
     TcpCommsSS::TcpCommsSS() noexcept:
-        NetworkCommsInterface(InterfaceTypes::TCP, CommsInterface::thread_generation::single)
+        NetworkCommsInterface(gmlc::networking::InterfaceTypes::TCP, CommsInterface::thread_generation::single)
     {
     }
 
@@ -113,21 +116,6 @@ namespace tcp {
         // this function does nothing since everything is handled in the other thread
     }
 
-    static TcpConnection::pointer generateConnection(std::shared_ptr<AsioContextManager>& ioctx,
-                                                     const std::string& address)
-    {
-        try {
-            std::string interface;
-            std::string port;
-            std::tie(interface, port) = extractInterfaceandPortString(address);
-            return TcpConnection::create(ioctx->getBaseContext(), interface, port);
-        }
-        catch (std::exception&) {
-            // TODO(PT):: do something???
-        }
-        return nullptr;
-    }
-
     void TcpCommsSS::queue_tx_function()
     {
         if (serverMode && (PortNumber < 0)) {
@@ -139,8 +127,8 @@ namespace tcp {
             setTxStatus(connection_status::error);
             return;
         }
-        TcpServer::pointer server;
-        auto ioctx = AsioContextManager::getContextPointer();
+        gmlc::networking::TcpServer::pointer server;
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         auto dataCall =
             [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
@@ -153,7 +141,7 @@ namespace tcp {
         };
 
         if (serverMode) {
-            server = TcpServer::create(ioctx->getBaseContext(),
+            server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
                                        localTargetAddress,
                                        static_cast<uint16_t>(PortNumber.load()),
                                        true,
@@ -185,7 +173,7 @@ namespace tcp {
         std::map<std::string, route_id> established_routes;
         if (outgoingConnectionsAllowed) {
             for (const auto& conn : connections) {
-                auto new_connect = generateConnection(ioctx, conn);
+                auto new_connect = gmlc::networking::generateConnection(ioctx, conn);
 
                 if (new_connect) {
                     new_connect->setDataCall(dataCall);
@@ -212,7 +200,7 @@ namespace tcp {
             }
             if (outgoingConnectionsAllowed) {
                 try {
-                    brokerConnection = makeConnection(ioctx->getBaseContext(),
+                    brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
                                                       brokerTargetAddress,
                                                       std::to_string(brokerPort),
                                                       maxMessageSize,
@@ -240,7 +228,7 @@ namespace tcp {
                     setRxStatus(connection_status::error);
                     return;
                 }
-                established_routes[makePortAddress(brokerTargetAddress, brokerPort)] =
+                established_routes[gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort)] =
                     parent_route_id;
             }
         }
@@ -267,7 +255,7 @@ namespace tcp {
                                                               // broker
                                         if ((cmd.payload.to_string() == brokerName) ||
                                             (cmd.payload.to_string() ==
-                                             makePortAddress(brokerTargetAddress, brokerPort))) {
+                                             gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort))) {
                                             brokerConnection = std::move(conn);
                                         }
                                     }
@@ -309,7 +297,7 @@ namespace tcp {
                             if (!established) {
                                 if (outgoingConnectionsAllowed) {
                                     auto new_connect =
-                                        generateConnection(ioctx,
+                                        gmlc::networking::generateConnection(ioctx,
                                                            std::string(cmd.payload.to_string()));
                                     if (new_connect) {
                                         new_connect->setDataCall(dataCall);

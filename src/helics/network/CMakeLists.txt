@@ -40,7 +40,6 @@ set(TCP_SOURCE_FILES
     tcp/TcpBroker.cpp
     tcp/TcpComms.cpp
     tcp/TcpCommsSS.cpp
-    tcp/TcpHelperClasses.cpp
     tcp/TcpCommsCommon.cpp
 )
 
@@ -89,7 +88,6 @@ set(TCP_HEADER_FILES
     tcp/TcpBroker.h
     tcp/TcpComms.h
     tcp/TcpCommsSS.h
-    tcp/TcpHelperClasses.h
     tcp/TcpCommsCommon.h
 )
 
@@ -130,7 +128,7 @@ endif()
 
 add_library(helics_network STATIC ${NETWORK_SRC_FILES} ${NETWORK_INCLUDE_FILES})
 
-target_link_libraries(helics_network PUBLIC HELICS::core PRIVATE fmt::fmt compile_flags_target)
+target_link_libraries(helics_network PUBLIC HELICS::core PRIVATE HELICS::networking fmt::fmt compile_flags_target)
 
 if(HELICS_ENABLE_ZMQ_CORE)
     target_link_libraries(helics_network PRIVATE helics::zmq)

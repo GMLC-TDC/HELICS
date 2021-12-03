@@ -26,7 +26,7 @@ namespace zeromq {
         milliseconds tcount{0};
         while (!bindsuccess) {
             try {
-                socket.bind(helics::makePortAddress(address, port));
+                socket.bind(gmlc::networking::makePortAddress(address, port));
                 bindsuccess = true;
             }
             catch (const zmq::error_t&) {

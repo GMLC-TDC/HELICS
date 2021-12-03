@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #ifndef HELICS_DISABLE_ASIO
-#    include "../common/AsioContextManager.h"
+#    include "gmlc/networking/AsioContextManager.h"
 
 #    include <asio/steady_timer.hpp>
 #else
@@ -676,7 +676,7 @@ void BrokerBase::queueProcessingLoop()
     }
     std::vector<ActionMessage> dumpMessages;
 #ifndef HELICS_DISABLE_ASIO
-    auto serv = AsioContextManager::getContextPointer();
+    auto serv = gmlc::networking::AsioContextManager::getContextPointer();
     auto contextLoop = serv->startContextLoop();
     asio::steady_timer ticktimer(serv->getBaseContext());
     activeProtector active(true, false);
