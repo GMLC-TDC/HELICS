@@ -26,7 +26,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::zeromq {
 
-    using gmlc::networking::makePortAddress;
+using gmlc::networking::makePortAddress;
 
 void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {

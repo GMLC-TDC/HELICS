@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace gmlc::networking {
 class TcpServer;
 class TcpConnection;
-}  // namespace tcp
+}  // namespace gmlc::networking
 #    endif
 
 namespace helics {
@@ -55,9 +55,10 @@ namespace apps {
 #    ifdef HELICS_ENABLE_TCP_CORE
         std::shared_ptr<gmlc::networking::TcpServer> loadTCPserver(asio::io_context& ioctx);
         static void loadTCPServerData(portData& pdata);
-        std::size_t tcpDataReceive(const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
-                                   const char* data,
-                                   size_t bytes_received);
+        std::size_t
+            tcpDataReceive(const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
+                           const char* data,
+                           size_t bytes_received);
         std::shared_ptr<gmlc::networking::TcpServer> tcpserver;
         portData tcpPortData;
 #    endif

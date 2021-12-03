@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-
 namespace gmlc::networking {
 class TcpConnection;
 }
@@ -38,8 +37,7 @@ namespace tcp {
 
       private:
         /// disable all outgoing connections- allow only incoming connections
-        bool outgoingConnectionsAllowed{
-            true};  
+        bool outgoingConnectionsAllowed{true};
         bool reuse_address{false};
         std::vector<std::string> connections;  //!< list of connections to make
         virtual int getDefaultBrokerPort() const override;
@@ -56,7 +54,9 @@ namespace tcp {
     @param bytes_received the length of the received data
     @return a the number of bytes used by the function
     */
-        size_t dataReceive(gmlc::networking::TcpConnection* connection, const char* data, size_t bytes_received);
+        size_t dataReceive(gmlc::networking::TcpConnection* connection,
+                           const char* data,
+                           size_t bytes_received);
         //  bool errorHandle()
     };
 

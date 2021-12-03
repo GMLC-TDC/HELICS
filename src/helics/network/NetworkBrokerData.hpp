@@ -36,7 +36,7 @@ class NetworkBrokerData {
         SERVER_DEACTIVATED = 4,
     };
 
-    using InterfaceTypes=gmlc::networking::InterfaceTypes;
+    using InterfaceTypes = gmlc::networking::InterfaceTypes;
 
     std::string brokerName;  //!< the identifier for the broker
     std::string brokerAddress;  //!< the address or domain name of the broker
@@ -82,7 +82,6 @@ class NetworkBrokerData {
     void checkAndUpdateBrokerAddress(const std::string& localAddress);
     InterfaceTypes allowedType = InterfaceTypes::IP;
 };
-
 
 /** create a combined address list with choices in a rough order of priority based on if they appear
 in both lists, followed by the high priority addresses, and low priority addresses last

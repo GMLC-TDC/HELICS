@@ -91,7 +91,7 @@ bool NetworkBroker<COMMS, baseline, tcode>::brokerConnect()
 template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
 std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() const
 {
-    using InterfaceTypes=gmlc::networking::InterfaceTypes;
+    using InterfaceTypes = gmlc::networking::InterfaceTypes;
     std::string add;
     if (CommsBroker<COMMS, CoreBroker>::comms->isConnected()) {
         add = CommsBroker<COMMS, CoreBroker>::comms->getAddress();
@@ -106,7 +106,8 @@ std::string NetworkBroker<COMMS, baseline, tcode>::generateLocalAddressString() 
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
                         netInfo.portNumber);
                 } else {
-                    add = gmlc::networking::makePortAddress(netInfo.localInterface, netInfo.portNumber);
+                    add = gmlc::networking::makePortAddress(netInfo.localInterface,
+                                                            netInfo.portNumber);
                 }
                 break;
             case InterfaceTypes::INPROC:

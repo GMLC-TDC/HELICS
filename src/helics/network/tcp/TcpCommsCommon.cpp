@@ -17,7 +17,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace tcp {
 
-
     bool commErrorHandler(CommsInterface* comm,
                           gmlc::networking::TcpConnection* /*connection*/,
                           const std::error_code& error)

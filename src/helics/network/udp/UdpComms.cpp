@@ -6,11 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "UdpComms.h"
 
-#include "gmlc/networking/AsioContextManager.h"
 #include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
+#include "gmlc/networking/AsioContextManager.h"
 
 #include <asio/ip/udp.hpp>
 #include <map>
@@ -23,7 +23,8 @@ namespace helics {
 namespace udp {
     using asio::ip::udp;
     UdpComms::UdpComms():
-        NetworkCommsInterface(gmlc::networking::InterfaceTypes::UDP), promisePort(std::promise<int>())
+        NetworkCommsInterface(gmlc::networking::InterfaceTypes::UDP),
+        promisePort(std::promise<int>())
     {
         futurePort = promisePort.get_future();
     }
@@ -362,7 +363,8 @@ namespace udp {
                                 std::string newroute(cmd.payload.to_string());
                                 std::string interface;
                                 std::string port;
-                                std::tie(interface, port) = gmlc::networking::extractInterfaceandPortString(newroute);
+                                std::tie(interface, port) =
+                                    gmlc::networking::extractInterfaceandPortString(newroute);
                                 udp::resolver::query queryNew(udpnet(interfaceNetwork),
                                                               interface,
                                                               port);

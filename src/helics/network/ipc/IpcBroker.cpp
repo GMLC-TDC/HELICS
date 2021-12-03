@@ -10,5 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "IpcComms.h"
 
 namespace helics {
-template class NetworkBroker<ipc::IpcComms, gmlc::networking::InterfaceTypes::IPC, static_cast<int>(CoreType::IPC)>;
+template class NetworkBroker<ipc::IpcComms,
+                             gmlc::networking::InterfaceTypes::IPC,
+                             static_cast<int>(CoreType::IPC)>;
 }  // namespace helics

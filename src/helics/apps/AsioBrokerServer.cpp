@@ -7,10 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "AsioBrokerServer.hpp"
 
-#include "gmlc/networking/AsioContextManager.h"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/networkDefaults.hpp"
+#include "gmlc/networking/AsioContextManager.h"
 #include "helics/external/CLI11/CLI11.hpp"
 #ifdef HELICS_ENABLE_TCP_CORE
 #    include "gmlc/networking/TcpServer.h"
@@ -102,10 +102,10 @@ namespace udp {
 
 namespace apps {
 #ifdef HELICS_ENABLE_TCP_CORE
-    std::size_t
-        AsioBrokerServer::tcpDataReceive(const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
-                                         const char* data,
-                                         std::size_t bytes_received)
+    std::size_t AsioBrokerServer::tcpDataReceive(
+        const std::shared_ptr<gmlc::networking::TcpConnection>& connection,
+        const char* data,
+        std::size_t bytes_received)
     {
         std::size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -133,7 +133,8 @@ namespace apps {
         return used_total;
     }
 
-    std::shared_ptr<gmlc::networking::TcpServer> AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
+    std::shared_ptr<gmlc::networking::TcpServer>
+        AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
     {
         std::string ext_interface = "0.0.0.0";
         int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
@@ -276,9 +277,9 @@ namespace apps {
             tcpserver = loadTCPserver(ioctx->getBaseContext());
             tcpserver->setDataCall(
                 // NOLINTNEXTLINE
-                [this](gmlc::networking::TcpConnection::pointer connection, const char* data, size_t datasize) {
-                    return tcpDataReceive(connection, data, datasize);
-                });
+                [this](gmlc::networking::TcpConnection::pointer connection,
+                       const char* data,
+                       size_t datasize) { return tcpDataReceive(connection, data, datasize); });
 
             loadTCPServerData(tcpPortData);
             tcpserver->start();

@@ -193,8 +193,7 @@ namespace zeromq {
         catch (zmq::error_t& ze) {
             logError(std::string("unable to connect with broker at ") +
                      gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort + 1) + ":(" +
-                     name + ")" +
-                     ze.what());
+                     name + ")" + ze.what());
             setTxStatus(connection_status::error);
             return -1;
         }

@@ -84,7 +84,8 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString() const
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
                         netInfo.portNumber);
                 } else {
-                    add = gmlc::networking::makePortAddress(netInfo.localInterface, netInfo.portNumber);
+                    add = gmlc::networking::makePortAddress(netInfo.localInterface,
+                                                            netInfo.portNumber);
                 }
                 break;
             case InterfaceTypes::INPROC:
