@@ -1257,12 +1257,14 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             } else if (cmd.counter == 10) {
                 LOG_WARNING("grant timeout stage 4 error actions(none available)");
             }
+#ifndef HELICS_DISABLE_ASIO
             if (mTimer) {
                 ++cmd.counter;
                 mTimer->updateTimerFromNow(grantTimeoutTimeIndex,
                                            grantTimeOutPeriod.to_ms(),
                                            std::move(cmd));
             }
+#endif
             break;
         case CMD_ADD_PUBLISHER: {
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
