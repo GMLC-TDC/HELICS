@@ -100,7 +100,7 @@ add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FI
 
 target_link_libraries(
     helics_core PUBLIC HELICS::common gmlc::networking PRIVATE spdlog::spdlog fmt::fmt
-                                                                 compile_flags_target
+                                                               compile_flags_target
 )
 
 add_library(HELICS::core ALIAS helics_core)
