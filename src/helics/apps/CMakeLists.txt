@@ -159,7 +159,7 @@ if(HELICS_BUILD_APP_LIBRARY)
 
         target_link_libraries(helicscpp-apps PUBLIC HELICS::helicscpp)
         target_link_libraries(
-            helicscpp-apps PRIVATE HELICS::common spdlog::spdlog fmt::fmt HELICS::utilities
+            helicscpp-apps PRIVATE HELICS::common spdlog::spdlog fmt::fmt gmlc::utilities
                                    gmlc::networking
         )
 

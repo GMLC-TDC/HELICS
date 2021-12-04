@@ -221,14 +221,18 @@ class ValueFederateManager {
     Core* coreObject{nullptr};  //!< the pointer to the actual core
     /** pointer back to the value Federate for creation of the Publication/Inputs */
     ValueFederate* fed{nullptr};
+    /// the global callback function
     atomic_guarded<std::function<void(Input&, Time)>>
-        allCallback;  //!< the global callback function
+        allCallback;
+    /// the storage for the message queues and other unique Endpoint information
     shared_guarded<std::vector<std::unique_ptr<input_info>>>
-        inputData;  //!< the storage for the message queues and other unique Endpoint information
+        inputData;
+    /// container for the target identifications
     shared_guarded<std::multimap<std::string, InterfaceHandle>>
-        targetIDs;  //!< container for the target identifications
+        targetIDs;
+    /// container for the specified input targets
     shared_guarded<std::multimap<InterfaceHandle, std::string>>
-        inputTargets;  //!< container for the specified input targets
+        inputTargets;  
   private:
     void getUpdateFromCore(InterfaceHandle handle);
 };
