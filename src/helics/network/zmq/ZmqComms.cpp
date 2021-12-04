@@ -371,7 +371,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                             brokerReq.disconnect(
                                 makePortAddress(brokerTargetAddress, brokerPort + 1));
                             auto brkprt =
-                                gmlc::networking::extractInterfaceandPort(rxcmd.getString(0));
+                                gmlc::networking::extractInterfaceAndPort(rxcmd.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
@@ -478,7 +478,7 @@ void ZmqComms::queue_tx_function()
                         break;
                     case NEW_ROUTE: {
                         try {
-                            auto interfaceAndPort = gmlc::networking::extractInterfaceandPort(
+                            auto interfaceAndPort = gmlc::networking::extractInterfaceAndPort(
                                 std::string(cmd.payload.to_string()));
 
                             auto zsock = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);

@@ -312,7 +312,7 @@ namespace tcp {
                             logMessage("got new broker information");
                             brokerConnection->close();
 
-                            auto brkprt = gmlc::networking::extractInterfaceandPort(
+                            auto brkprt = gmlc::networking::extractInterfaceAndPort(
                                 mess->second.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
@@ -398,7 +398,7 @@ namespace tcp {
                                 std::string interface;
                                 std::string port;
                                 std::tie(interface, port) =
-                                    gmlc::networking::extractInterfaceandPortString(newroute);
+                                    gmlc::networking::extractInterfaceAndPortString(newroute);
                                 auto new_connect =
                                     TcpConnection::create(ioctx->getBaseContext(), interface, port);
 

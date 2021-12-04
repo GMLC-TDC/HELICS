@@ -289,7 +289,7 @@ namespace udp {
                             }
                         } else if (m.messageID == NEW_BROKER_INFORMATION) {
                             logMessage("got new broker information");
-                            auto brkprt = gmlc::networking::extractInterfaceandPort(m.getString(0));
+                            auto brkprt = gmlc::networking::extractInterfaceAndPort(m.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
@@ -364,7 +364,7 @@ namespace udp {
                                 std::string interface;
                                 std::string port;
                                 std::tie(interface, port) =
-                                    gmlc::networking::extractInterfaceandPortString(newroute);
+                                    gmlc::networking::extractInterfaceAndPortString(newroute);
                                 udp::resolver::query queryNew(udpnet(interfaceNetwork),
                                                               interface,
                                                               port);

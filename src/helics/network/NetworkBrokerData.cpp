@@ -44,7 +44,7 @@ std::shared_ptr<helicsCLI11App>
         ->add_option_function<std::string>(
             "--broker_address",
             [this, localAddress](const std::string& addr) {
-                auto brkprt = gmlc::networking::extractInterfaceandPort(addr);
+                auto brkprt = gmlc::networking::extractInterfaceAndPort(addr);
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
                 checkAndUpdateBrokerAddress(localAddress);
@@ -68,7 +68,7 @@ std::shared_ptr<helicsCLI11App>
                 addr = brkr->getAddress();
             }
             if (brokerAddress.empty()) {
-                auto brkprt = gmlc::networking::extractInterfaceandPort(addr);
+                auto brkprt = gmlc::networking::extractInterfaceAndPort(addr);
                 brokerAddress = brkprt.first;
                 brokerPort = brkprt.second;
                 checkAndUpdateBrokerAddress(localAddress);
@@ -123,7 +123,7 @@ std::shared_ptr<helicsCLI11App>
     nbparser->add_option_function<std::string>(
         "--local_interface",
         [this](const std::string& addr) {
-            auto localprt = gmlc::networking::extractInterfaceandPort(addr);
+            auto localprt = gmlc::networking::extractInterfaceAndPort(addr);
             localInterface = localprt.first;
             // this may get overridden later
             portNumber = localprt.second;
@@ -464,7 +464,7 @@ std::string getLocalExternalAddressV6(const std::string& server)
 
 std::string getLocalExternalAddress(const std::string& server)
 {
-    if (gmlc::networking::isipv6(server)) {
+    if (gmlc::networking::isIpv6(server)) {
         return getLocalExternalAddressV6(server);
     }
     return getLocalExternalAddressV4(server);

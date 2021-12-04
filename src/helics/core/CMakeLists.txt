@@ -99,7 +99,7 @@ endif()
 add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 target_link_libraries(
-    helics_core PUBLIC HELICS::common HELICS::networking PRIVATE spdlog::spdlog fmt::fmt
+    helics_core PUBLIC HELICS::common gmlc::networking PRIVATE spdlog::spdlog fmt::fmt
                                                                  compile_flags_target
 )
 

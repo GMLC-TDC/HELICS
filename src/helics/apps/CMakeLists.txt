@@ -73,7 +73,7 @@ if(HELICS_BUILD_APP_LIBRARY)
     target_link_libraries(helics_apps PUBLIC HELICS::application_api)
     target_link_libraries(
         helics_apps PRIVATE HELICS::compile_flags_target spdlog::spdlog fmt::fmt helics::zmq
-                            HELICS::networking
+                            gmlc::networking
     )
 
     if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
@@ -160,7 +160,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         target_link_libraries(helicscpp-apps PUBLIC HELICS::helicscpp)
         target_link_libraries(
             helicscpp-apps PRIVATE HELICS::common spdlog::spdlog fmt::fmt HELICS::utilities
-                                   HELICS::networking
+                                   gmlc::networking
         )
 
         # add and alias library to match the find_package

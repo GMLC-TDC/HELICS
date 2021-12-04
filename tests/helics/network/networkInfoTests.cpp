@@ -27,10 +27,10 @@ TEST(networkData_tests, basic_test)
 TEST(networkData, local_address_test)
 {
     auto netw = helics::getLocalExternalAddressV4();
-    EXPECT_TRUE(!gmlc::networking::isipv6(netw));
+    EXPECT_TRUE(!gmlc::networking::isIpv6(netw));
     EXPECT_TRUE(!netw.empty());
     auto netw2 = helics::getLocalExternalAddressV4("www.google.com");
-    EXPECT_TRUE(!gmlc::networking::isipv6(netw2));
+    EXPECT_TRUE(!gmlc::networking::isIpv6(netw2));
     EXPECT_TRUE(!netw2.empty());
 }
 
@@ -39,9 +39,9 @@ TEST(networkData, local_address_testv6)
     try {
         auto netw = helics::getLocalExternalAddressV6();
         EXPECT_TRUE(!netw.empty());
-        EXPECT_TRUE(gmlc::networking::isipv6(netw));
+        EXPECT_TRUE(gmlc::networking::isIpv6(netw));
         auto netw2 = helics::getLocalExternalAddressV6("2001:db8::1");
-        EXPECT_TRUE(gmlc::networking::isipv6(netw2));
+        EXPECT_TRUE(gmlc::networking::isIpv6(netw2));
         EXPECT_TRUE(!netw2.empty());
     }
     catch (...) {

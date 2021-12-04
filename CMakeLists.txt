@@ -725,7 +725,6 @@ hide_variable(GMLC_NETWORKING_OBJECT_LIB)
 hide_variable(GMLC_NETWORKING_STATIC_LIB)
 hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
 
-add_library(HELICS::networking ALIAS gmlc_networking)
 set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
 
 # -----------------------------------------------------------------------------
