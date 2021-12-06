@@ -23,4 +23,3 @@ TEST(networkData_tests, basic_test)
     EXPECT_EQ(bdata.brokerPort, 20755);
     EXPECT_EQ(bdata.portNumber, 45);
 }
-

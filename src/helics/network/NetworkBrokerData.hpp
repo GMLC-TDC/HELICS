@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
 class helicsCLI11App;
 
 /** helper class designed to contain the common elements between networking brokers and cores
@@ -44,7 +43,8 @@ class NetworkBrokerData {
     int maxMessageSize{16 * 256};  //!< maximum message size
     int maxMessageCount{256};  //!< maximum message count
     int maxRetries{5};  //!< the maximum number of retries to establish a network connection
-    gmlc::networking::InterfaceNetworks interfaceNetwork{gmlc::networking::InterfaceNetworks::LOCAL};
+    gmlc::networking::InterfaceNetworks interfaceNetwork{
+        gmlc::networking::InterfaceNetworks::LOCAL};
     bool reuse_address{false};  //!< allow reuse of binding address
     bool use_os_port{false};  //!< specify that any automatic port allocation should use operating
                               //!< system allocation

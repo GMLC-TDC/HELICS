@@ -209,5 +209,4 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
     }
 }
 
-
 }  // namespace helics
