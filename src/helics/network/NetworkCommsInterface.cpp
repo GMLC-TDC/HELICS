@@ -101,7 +101,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             localTargetAddress = localHostString;
         } else if (bTarget.empty()) {
             switch (interfaceNetwork) {
-                case InterfaceNetworks::LOCAL:
+                case gmlc::networking::InterfaceNetworks::LOCAL:
                     localTargetAddress = localHostString;
                     break;
                 default:

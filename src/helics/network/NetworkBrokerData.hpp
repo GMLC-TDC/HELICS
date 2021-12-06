@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "gmlc/networking/addressOperations.hpp"
+#include "gmlc/networking/interfaceOperations.hpp"
 
 #include <memory>
 #include <string>
@@ -14,13 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
-/** define the network access*/
-enum class InterfaceNetworks : char {
-    LOCAL = 0,  //!< just open local ports
-    IPV4 = 4,  //!< use external ipv4 ports
-    IPV6 = 6,  //!< use external ipv6 ports
-    ALL = 10,  //!< use all external ports
-};
+
 
 class helicsCLI11App;
 
@@ -49,7 +44,7 @@ class NetworkBrokerData {
     int maxMessageSize{16 * 256};  //!< maximum message size
     int maxMessageCount{256};  //!< maximum message count
     int maxRetries{5};  //!< the maximum number of retries to establish a network connection
-    InterfaceNetworks interfaceNetwork{InterfaceNetworks::LOCAL};
+    gmlc::networking::InterfaceNetworks interfaceNetwork{gmlc::networking::InterfaceNetworks::LOCAL};
     bool reuse_address{false};  //!< allow reuse of binding address
     bool use_os_port{false};  //!< specify that any automatic port allocation should use operating
                               //!< system allocation
@@ -81,38 +76,4 @@ class NetworkBrokerData {
     gmlc::networking::InterfaceTypes allowedType{gmlc::networking::InterfaceTypes::IP};
 };
 
-/** create a combined address list with choices in a rough order of priority based on if they appear
-in both lists, followed by the high priority addresses, and low priority addresses last
-
-@param high addresses that should be considered before low addresses
-@param low addresses that should be considered last
-@return a vector of strings of ip addresses ordered in roughly the priority they should be used
- */
-std::vector<std::string> prioritizeExternalAddresses(std::vector<std::string> high,
-                                                     std::vector<std::string> low);
-
-/** get the external ipv4 address of the current computer
- */
-std::string getLocalExternalAddressV4();
-
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed
- * server*/
-std::string getLocalExternalAddress(const std::string& server);
-
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed
- * server*/
-std::string getLocalExternalAddressV4(const std::string& server);
-
-/** get the external ipv4 address of the current computer
- */
-std::string getLocalExternalAddressV6();
-
-/** get the external ipv4 Ethernet address of the current computer that best matches the listed
- * server*/
-std::string getLocalExternalAddressV6(const std::string& server);
-
-/** generate an interface that matches a defined server or network specification
- */
-std::string generateMatchingInterfaceAddress(const std::string& server,
-                                             InterfaceNetworks network = InterfaceNetworks::LOCAL);
 }  // namespace helics

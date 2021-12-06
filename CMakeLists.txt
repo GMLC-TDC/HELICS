@@ -388,10 +388,6 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/toml)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/netif/gmlc/netif/NetIF.hpp")
-        submod_update(ThirdParty/netif)
-    endif()
-
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
         submod_update(ThirdParty/spdlog)
     endif()
@@ -565,7 +561,6 @@ target_include_directories(
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/netif>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 )
@@ -876,8 +871,6 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
-    "netif"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/netif/LICENSE"
     "GMLC Networking"
     "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )

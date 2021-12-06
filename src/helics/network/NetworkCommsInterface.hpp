@@ -60,7 +60,7 @@ class NetworkCommsInterface: public CommsInterface {
     bool appendNameToAddress{false};  //!< flag to append the name to the network address
     bool noAckConnection{false};  //!< flag to bypass the connection acknowledge requirement
     const gmlc::networking::InterfaceTypes networkType;
-    InterfaceNetworks network{InterfaceNetworks::IPV4};
+    gmlc::networking::InterfaceNetworks network{gmlc::networking::InterfaceNetworks::IPV4};
     std::atomic<bool> hasBroker{false};
     int maxRetries{5};  // the maximum number of network retries
 

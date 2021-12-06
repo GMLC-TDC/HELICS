@@ -17,9 +17,6 @@
 [submodule "ThirdParty/units"]
     path = ThirdParty/units
     url = ../../LLNL/units.git
-[submodule "ThirdParty/netif"]
-    path = ThirdParty/netif
-    url = ../../GMLC-TDC/netif.git
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
     url = ../../gabime/spdlog.git

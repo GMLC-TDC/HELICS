@@ -140,7 +140,7 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 
 void CommsInterface::loadTargetInfo(const std::string& localTarget,
                                     const std::string& brokerTarget,
-                                    InterfaceNetworks targetNetwork)
+                                    gmlc::networking::InterfaceNetworks targetNetwork)
 {
     if (propertyLock()) {
         localTargetAddress = localTarget;
