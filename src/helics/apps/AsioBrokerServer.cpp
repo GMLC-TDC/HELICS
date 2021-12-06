@@ -270,7 +270,9 @@ namespace apps {
 
     void AsioBrokerServer::mainLoop()
     {
+#if defined(HELICS_ENABLE_TCP_CORE) || defined(HELICS_ENABLE_UDP_CORE)
         auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
+#endif
 
 #ifdef HELICS_ENABLE_TCP_CORE
         if (tcp_enabled_) {

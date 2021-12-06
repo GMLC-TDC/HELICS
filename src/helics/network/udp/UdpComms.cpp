@@ -47,9 +47,9 @@ namespace udp {
     /** destructor*/
     UdpComms::~UdpComms() { disconnect(); }
 
-    static inline auto udpnet(InterfaceNetworks net)
+    static inline auto udpnet(gmlc::networking::InterfaceNetworks net)
     {
-        return (net != InterfaceNetworks::IPV6) ? udp::v4() : udp::v6();
+        return (net != gmlc::networking::InterfaceNetworks::IPV6) ? udp::v4() : udp::v6();
     }
 
     void UdpComms::queue_rx_function()

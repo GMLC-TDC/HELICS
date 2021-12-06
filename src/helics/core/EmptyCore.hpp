@@ -21,7 +21,7 @@ class EmptyCore: public Core {
     /** default constructor*/
     EmptyCore() noexcept;
 
-    virtual ~EmptyCore() final;
+    virtual ~EmptyCore();
 
     virtual void configure(const std::string& configureString) override;
     virtual void configureFromArgs(int argc, char* argv[]) override;
