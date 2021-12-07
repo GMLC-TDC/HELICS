@@ -234,14 +234,13 @@ TEST(broker_timeout, maintain_connection_ci_skip)
 }
 #endif
 
-
 TEST(broker_timeout, max_duration)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
                                              "--maxcosimduration=300ms --tick 50ms");
     brk->connect();
     // the query is just to force the thread to be operating
-    auto str=brk->query(brk->getIdentifier(), "exists");
+    auto str = brk->query(brk->getIdentifier(), "exists");
     EXPECT_EQ(str, "true");
 
     auto res = brk->waitForDisconnect(std::chrono::milliseconds(600));

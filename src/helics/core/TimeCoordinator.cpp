@@ -757,8 +757,8 @@ void TimeCoordinator::setAsParent(GlobalFederateId fedID)
 
 GlobalFederateId TimeCoordinator::getParent() const
 {
-    for (const auto &dep:dependencies) {
-        if (dep.connection==ConnectionType::parent) {
+    for (const auto& dep : dependencies) {
+        if (dep.connection == ConnectionType::parent) {
             return dep.fedID;
         }
     }

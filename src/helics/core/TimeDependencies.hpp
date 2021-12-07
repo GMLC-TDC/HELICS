@@ -53,7 +53,7 @@ class TimeData {
 class DependencyInfo: public TimeData {
   public:
     GlobalFederateId fedID{};  //!< identifier for the dependency
-    
+
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
     ConnectionType connection{ConnectionType::independent};

@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "MessageFederateManager.hpp"
 
 #include "../core/Core.hpp"
-#include "../core/queryHelpers.hpp"
 #include "../core/EmptyCore.hpp"
+#include "../core/queryHelpers.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include <cassert>

@@ -1072,7 +1072,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             addActionMessage(CMD_STOP);
             break;
         case CMD_TIMEOUT_DISCONNECT:
-            if (command.dest_id==parent_broker_id||command.dest_id==global_broker_id_local) {
+            if (command.dest_id == parent_broker_id || command.dest_id == global_broker_id_local) {
                 if (isConnected()) {
                     if (timeCoord->hasActiveTimeDependencies()) {
                         Json::Value base;
@@ -1081,9 +1081,9 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         debugString.insert(0, "TIME DEBUGGING::");
                         LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
                     }
-                    
-                     LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout Disconnect");
- 
+
+                    LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout Disconnect");
+
                     if (getBrokerState() <
                         BrokerState::terminating) {  // only send a disconnect message
                                                      // if we haven't done so already
@@ -1215,17 +1215,18 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_GRANT_TIMEOUT_CHECK:
-        if (command.dest_id==global_broker_id_local || (isRootc && command.dest_id==parent_broker_id)){
-            auto v = timeCoord->grantTimeoutCheck(command);
-            if (!v.isNull()) {
-                auto debugString = fileops::generateJsonString(v);
-                debugString.insert(0, "TIME DEBUGGING::");
-                LOG_WARNING(global_broker_id_local, "broker", debugString);
+            if (command.dest_id == global_broker_id_local ||
+                (isRootc && command.dest_id == parent_broker_id)) {
+                auto v = timeCoord->grantTimeoutCheck(command);
+                if (!v.isNull()) {
+                    auto debugString = fileops::generateJsonString(v);
+                    debugString.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(global_broker_id_local, "broker", debugString);
+                }
+            } else {
+                routeMessage(std::move(command));
             }
-        } else {
-            routeMessage(std::move(command));
-        }
-        break;
+            break;
         case CMD_PUB:
             transmit(getRoute(command.dest_id), command);
             break;
@@ -2103,8 +2104,7 @@ void CoreBroker::disconnect()
                                     currentMessageCounter()));
             addActionMessage(udisconnect);
         }
-        if (cnt % 13 == 0)
-        {
+        if (cnt % 13 == 0) {
             std::cerr << "waiting on disconnect " << std::endl;
         }
     }

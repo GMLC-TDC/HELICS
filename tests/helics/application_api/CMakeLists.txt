@@ -23,7 +23,7 @@ set(application_api_test_sources
     data_viewTests.cpp
     MessageFederateAdditionalTests.cpp
     FederateTests.cpp
-    subPubObjectTests.cpp 
+    subPubObjectTests.cpp
     GrantTimeoutTests.cpp
     ValueFederateAdditionalTests.cpp
     CombinationFederateTests.cpp

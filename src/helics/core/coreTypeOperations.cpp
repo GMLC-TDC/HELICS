@@ -12,12 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <cctype>
+#include <frozen/set.h>
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
 #include <map>
 #include <set>
 #include <unordered_map>
-#include <frozen/unordered_map.h>
-#include <frozen/string.h>
-#include <frozen/set.h>
 
 namespace helics::core {
 std::string to_string(CoreType type)
@@ -57,7 +57,7 @@ std::string to_string(CoreType type)
     }
 }
 
-static constexpr frozen::unordered_map<frozen::string, CoreType,53> coreTypes{
+static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -257,7 +257,11 @@ bool isCoreTypeAvailable(CoreType type) noexcept
     return available;
 }
 
-static constexpr frozen::set<frozen::string,5> global_match_strings{"any", "all", "data", "string", "block"};
+static constexpr frozen::set<frozen::string, 5> global_match_strings{"any",
+                                                                     "all",
+                                                                     "data",
+                                                                     "string",
+                                                                     "block"};
 
 bool matchingTypes(std::string_view type1, std::string_view type2)
 {

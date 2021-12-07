@@ -160,11 +160,12 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
                        static_cast<double>(downstream.minDe));
 }
 
-Json::Value ForwardingTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd) {
-    for (auto &dep:dependencies) {
-        if (dep.fedID==cmd.source_id) {
+Json::Value ForwardingTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd)
+{
+    for (auto& dep : dependencies) {
+        if (dep.fedID == cmd.source_id) {
             dep.timeoutCount = cmd.counter;
-            if (cmd.counter==6) {
+            if (cmd.counter == 6) {
                 Json::Value base;
                 generateDebuggingTimeInfo(base);
                 return base;
@@ -175,7 +176,7 @@ Json::Value ForwardingTimeCoordinator::grantTimeoutCheck(const ActionMessage& cm
 }
 
 bool ForwardingTimeCoordinator::isDependency(GlobalFederateId ofed) const
-    {
+{
     return dependencies.isDependency(ofed);
 }
 

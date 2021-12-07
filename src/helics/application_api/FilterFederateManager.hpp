@@ -78,6 +78,7 @@ class FilterFederateManager {
     void disconnectAllFilters();
     /** disconnect from the coreObject*/
     void disconnect();
+
   private:
     Core* coreObject{nullptr};
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;

@@ -7,8 +7,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterFederateManager.hpp"
 
 #include "../core/Core.hpp"
-#include "Federate.hpp"
 #include "../core/EmptyCore.hpp"
+#include "Federate.hpp"
 #include "helics/core/core-exceptions.hpp"
 
 #include <utility>

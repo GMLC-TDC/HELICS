@@ -59,7 +59,7 @@ class BrokerBase {
                               //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
-    Time maxCoSimDuration{-1.0}; //!< the maximum lifetime(wall clock time) of the co-simulation
+    Time maxCoSimDuration{-1.0};  //!< the maximum lifetime(wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
                             //!< key is required
@@ -68,11 +68,9 @@ class BrokerBase {
     // constant function
     mutable std::string address;  //!< network location of the broker
     /// default logging object to use if the logging callback is not specified
-    std::shared_ptr<spdlog::logger>
-        consoleLogger;
+    std::shared_ptr<spdlog::logger> consoleLogger;
     /// default logging object to use if the logging callback is not specified
-    std::shared_ptr<spdlog::logger>
-        fileLogger;  
+    std::shared_ptr<spdlog::logger> fileLogger;
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;
@@ -89,13 +87,11 @@ class BrokerBase {
 
   private:
     /// flag indicating that the main processing loop is running
-    std::atomic<bool> mainLoopIsRunning{
-        false};  
+    std::atomic<bool> mainLoopIsRunning{false};
     bool dumplog{false};  //!< flag indicating the broker should capture a dump log
     std::atomic<bool> forceLoggingFlush{false};  //!< force the log to flush after every message
     /// flag indicating that the message queue should not be used and all functions
-    bool queueDisabled{
-        false};  
+    bool queueDisabled{false};
     //!< called directly instead of distinct thread
     bool disable_timer{false};  //!< turn off the timer/timeout subsystem completely
     /// counter for the total number of message processed
@@ -132,8 +128,7 @@ class BrokerBase {
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
     /// flag indicating that the broker has entered execution mode
-    bool enteredExecutionMode{
-        false};  
+    bool enteredExecutionMode{false};
     bool waitingForBrokerPingReply{false};  //!< flag indicating we are waiting for a ping reply
     bool hasFilters{false};  //!< flag indicating filters come through the broker
 
@@ -143,8 +138,7 @@ class BrokerBase {
     bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     /// time when the error condition started related to the errorDelay
-    decltype(std::chrono::steady_clock::now())
-        errorTimeStart;
+    decltype(std::chrono::steady_clock::now()) errorTimeStart;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:

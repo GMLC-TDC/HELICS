@@ -1248,7 +1248,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             LOG_WARNING(cmd.payload.to_string());
             break;
         case CMD_GRANT_TIMEOUT_CHECK:
-            if (timeGranted_mode && cmd.actionTime!=Time::maxVal()) {
+            if (timeGranted_mode && cmd.actionTime != Time::maxVal()) {
                 break;
             }
             if (mGrantCount != static_cast<std::uint32_t>(cmd.getExtraData())) {
@@ -1258,14 +1258,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             if (cmd.counter == 0) {
                 auto blockFed = timeCoord->getMinGrantedDependency();
                 if (blockFed.first.isValid()) {
-                    LOG_WARNING(fmt::format(
-                        "grant timeout exceeded sim time {} waiting on {}",
-                        time_granted,
-                        blockFed.first.baseValue()));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
+                                            time_granted,
+                                            blockFed.first.baseValue()));
                 } else {
-                    LOG_WARNING(fmt::format(
-                        "grant timeout exceeded sim time {}",
-                        time_granted));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", time_granted));
                 }
 
             } else if (cmd.counter == 3) {
@@ -1280,7 +1277,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (parentID.isValid()) {
                     auto brokerTimeoutCheck = cmd;
                     brokerTimeoutCheck.source_id = global_id.load();
-                    brokerTimeoutCheck.dest_id =parentID;
+                    brokerTimeoutCheck.dest_id = parentID;
                     routeMessage(brokerTimeoutCheck);
                 }
             } else if (cmd.counter == 10) {

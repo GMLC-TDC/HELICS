@@ -5,9 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "helics/application_api/ValueFederate.hpp"
-
 #include "helics/application_api/MessageFederate.hpp"
+#include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
 //#include "helics/core/CoreFactory.hpp"
 #include "helics/core/Core.hpp"
@@ -172,11 +171,12 @@ TEST(grant_timeout, phase3_core)
             mlog.lock()->emplace_back(level, message);
         });
 
-    Fed2->getCorePointer()->setLoggingCallback(
-        helics::gLocalCoreId,
-        [&clog](int level, std::string_view /*unused*/, std::string_view message) {
-            clog.lock()->emplace_back(level, message);
-        });
+    Fed2->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,
+                                               [&clog](int level,
+                                                       std::string_view /*unused*/,
+                                                       std::string_view message) {
+                                                   clog.lock()->emplace_back(level, message);
+                                               });
     Fed1->registerGlobalEndpoint("e1");
     Fed2->registerGlobalEndpoint("e2");
 
@@ -204,10 +204,9 @@ TEST(grant_timeout, phase3_core)
     auto res = Fed2->requestTimeComplete();
     Fed2->finalize();
     EXPECT_EQ(res, 2.0);
-    res=Fed1->requestTimeComplete();
+    res = Fed1->requestTimeComplete();
     Fed1->finalize();
     EXPECT_EQ(res, 3.0);
-    
 }
 
 TEST(grant_timeout, phase4)

@@ -220,9 +220,9 @@ class TimeCoordinator {
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
     void removeDependent(GlobalFederateId fedID);
-    /** set a federate to be a child in timekeeping hiearchy*/
+    /** set a federate to be a child in timekeeping hierarchy*/
     void setAsChild(GlobalFederateId fedID);
-    /** set a federate/broker to be the parent in the timekeeping hiearchy*/
+    /** set a federate/broker to be the parent in the timekeeping hierarchy*/
     void setAsParent(GlobalFederateId fedID);
     /** get the id of a federate acting as a parent for timekeeping*/
     GlobalFederateId getParent() const;

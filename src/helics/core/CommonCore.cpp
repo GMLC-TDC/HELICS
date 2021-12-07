@@ -37,13 +37,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>
 
 namespace helics {
 
@@ -4374,9 +4374,8 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
     } else if (cmd.action() == CMD_TIME_BLOCK || cmd.action() == CMD_TIME_UNBLOCK) {
         manageTimeBlocks(cmd);
     } else if (cmd.action() == CMD_GRANT_TIMEOUT_CHECK) {
-        auto v=timeCoord->grantTimeoutCheck(cmd);
-        if (!v.isNull())
-        {
+        auto v = timeCoord->grantTimeoutCheck(cmd);
+        if (!v.isNull()) {
             auto debugString = fileops::generateJsonString(v);
             debugString.insert(0, "TIME DEBUGGING::");
             LOG_WARNING(global_broker_id_local, "core", debugString);
