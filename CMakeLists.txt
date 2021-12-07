@@ -481,12 +481,8 @@ endif(HELICS_ENABLE_MPI_CORE)
 # -------------------------------------------------------------
 # add threading support
 # -------------------------------------------------------------
-if(NOT WIN32)
+if(MSYS OR CYGWIN OR NOT WIN32)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
-elseif(MSYS OR CYGWIN)
-    set(THREADS_PREFER_PTHREAD_FLAG ON)
-else()
-    set(CMAKE_USE_WIN32_THREADS_INIT ON)
 endif()
 find_package(Threads REQUIRED)
 
