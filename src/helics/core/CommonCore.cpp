@@ -3018,6 +3018,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT_CHECK:
         case CMD_DISCONNECT_CORE_ACK:
+        case CMD_TIMEOUT_DISCONNECT:
             processDisconnectCommand(command);
             break;
         case CMD_EXEC_GRANT:
@@ -4040,6 +4041,31 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             timeCoord->processTimeMessage(cmd);
             loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
             checkAndProcessDisconnect();
+            break;
+        case CMD_TIMEOUT_DISCONNECT:
+            if (isConnected()) {
+                Json::Value base;
+                timeCoord->generateDebuggingTimeInfo(base);
+                auto debugString = fileops::generateJsonString(base);
+                debugString.insert(0, "TIME DEBUGGING::");
+                LOG_WARNING(global_broker_id_local, "core", debugString);
+                if (getBrokerState() <
+                    BrokerState::terminating) {  // only send a disconnect message
+                                                 // if we haven't done so already
+                    setBrokerState(BrokerState::terminating);
+                    sendDisconnect();
+                    ActionMessage m(CMD_DISCONNECT);
+                    m.source_id = global_broker_id_local;
+                    transmit(parent_route_id, m);
+                }
+            } else if (getBrokerState() ==
+                       BrokerState::errored) {  // we are disconnecting in an error state
+                sendDisconnect();
+                ActionMessage m(CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit(parent_route_id, m);
+            }
+            addActionMessage(CMD_STOP);
             break;
         case CMD_STOP:
 

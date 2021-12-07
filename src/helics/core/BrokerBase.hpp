@@ -59,6 +59,7 @@ class BrokerBase {
                               //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
+    Time maxCoSimDuration{-1.0}; //!< the maximum lifetime(wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
                             //!< key is required
@@ -66,10 +67,12 @@ class BrokerBase {
     // consistent public interface for extracting it this variable may need to be updated in a
     // constant function
     mutable std::string address;  //!< network location of the broker
+    /// default logging object to use if the logging callback is not specified
     std::shared_ptr<spdlog::logger>
-        consoleLogger;  //!< default logging object to use if the logging callback is not specified
+        consoleLogger;
+    /// default logging object to use if the logging callback is not specified
     std::shared_ptr<spdlog::logger>
-        fileLogger;  //!< default logging object to use if the logging callback is not specified
+        fileLogger;  
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;
@@ -85,12 +88,14 @@ class BrokerBase {
     bool observer{false};
 
   private:
+    /// flag indicating that the main processing loop is running
     std::atomic<bool> mainLoopIsRunning{
-        false};  //!< flag indicating that the main processing loop is running
+        false};  
     bool dumplog{false};  //!< flag indicating the broker should capture a dump log
     std::atomic<bool> forceLoggingFlush{false};  //!< force the log to flush after every message
+    /// flag indicating that the message queue should not be used and all functions
     bool queueDisabled{
-        false};  //!< flag indicating that the message queue should not be used and all functions
+        false};  
     //!< called directly instead of distinct thread
     bool disable_timer{false};  //!< turn off the timer/timeout subsystem completely
     /// counter for the total number of message processed
