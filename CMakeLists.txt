@@ -463,6 +463,18 @@ if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
 endif()
 
 # -------------------------------------------------------------
+# setup logging options for HELICS
+# -------------------------------------------------------------
+option(HELICS_ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
+
+cmake_dependent_advanced_option(
+    HELICS_ENABLE_TRACE_LOGGING "enable trace logging" ON "HELICS_ENABLE_LOGGING" ON
+)
+cmake_dependent_advanced_option(
+    HELICS_ENABLE_DEBUG_LOGGING "enable debug logging" ON "HELICS_ENABLE_LOGGING" ON
+)
+
+# -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
 
@@ -646,15 +658,6 @@ if(NOT WIN32)
         list(APPEND CMAKE_BUILD_RPATH "${zmqdir}")
     endif()
 endif()
-
-option(HELICS_ENABLE_LOGGING "enable normal, debug, and trace logging in HELICS" ON)
-
-cmake_dependent_advanced_option(
-    HELICS_ENABLE_TRACE_LOGGING "enable trace logging" ON "HELICS_ENABLE_LOGGING" ON
-)
-cmake_dependent_advanced_option(
-    HELICS_ENABLE_DEBUG_LOGGING "enable debug logging" ON "HELICS_ENABLE_LOGGING" ON
-)
 
 # -----------------------------------------------------------------------------
 # create the fmt header only targets
