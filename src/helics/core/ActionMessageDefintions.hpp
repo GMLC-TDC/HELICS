@@ -390,6 +390,7 @@ across different compilers*/
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
+#define UPDATE_LOGGING_FILE 594
 #define REQUEST_TICK_FORWARDING 607
 
 /** return the name of the action

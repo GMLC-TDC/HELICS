@@ -258,7 +258,7 @@ class BrokerBase {
     /** set the broker error state and error string*/
     void setErrorState(int eCode, std::string_view estring);
     /** set the logging file if using the default logger*/
-    void setLoggingFile(const std::string& lfile);
+    void setLoggingFile(std::string_view lfile);
     /** get the value of a particular flag*/
     bool getFlagValue(int32_t flag) const;
     /** virtual function to return the current simulation time*/

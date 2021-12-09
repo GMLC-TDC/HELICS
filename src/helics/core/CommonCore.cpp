@@ -2049,7 +2049,11 @@ void CommonCore::setLoggingLevel(int logLevel)
 
 void CommonCore::setLogFile(const std::string& lfile)
 {
-    setLoggingFile(lfile);
+    ActionMessage cmd(CMD_CORE_CONFIGURE);
+    cmd.dest_id = global_id.load();
+    cmd.messageID = UPDATE_LOGGING_FILE;
+    cmd.payload = lfile;
+    addActionMessage(cmd);
 }
 
 std::pair<std::string, std::string> CommonCore::getCommand(LocalFederateId federateID)
@@ -4156,6 +4160,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     }
                 }
             }
+            break;
+        case UPDATE_LOGGING_FILE:
+            setLoggingFile(cmd.payload.to_string());
             break;
         case UPDATE_FILTER_OPERATOR:
             if (filterFed != nullptr) {

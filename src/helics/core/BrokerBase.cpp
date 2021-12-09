@@ -511,7 +511,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
     sendToLogger(global_id.load(), HELICS_LOG_LEVEL_ERROR, identifier, estring);
 }
 
-void BrokerBase::setLoggingFile(const std::string& lfile)
+void BrokerBase::setLoggingFile(std::string_view lfile)
 {
     if (logFile.empty() || lfile != logFile) {
         logFile = lfile;
