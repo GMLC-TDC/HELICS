@@ -1418,6 +1418,9 @@ void CoreBroker::processBrokerConfigureCommands(ActionMessage& cmd)
                 }
             }
             break;
+        case UPDATE_LOGGING_FILE:
+            setLoggingFile(cmd.payload.to_string());
+            break;
         case REQUEST_TICK_FORWARDING:
             if (checkActionFlag(cmd, indicator_flag)) {
                 setTickForwarding(TickForwardingReasons::PING_RESPONSE, true);
@@ -2682,7 +2685,11 @@ void CoreBroker::setLoggingLevel(int logLevel)
 
 void CoreBroker::setLogFile(const std::string& lfile)
 {
-    setLoggingFile(lfile);
+    ActionMessage cmd(CMD_BROKER_CONFIGURE);
+    cmd.dest_id = global_id.load();
+    cmd.messageID = UPDATE_LOGGING_FILE;
+    cmd.payload = lfile;
+    addActionMessage(cmd);
 }
 
 // public query function
