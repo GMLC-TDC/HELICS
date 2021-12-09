@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "TcpComms.h"
 
-#include "../../common/AsioContextManager.h"
 #include "../../core/ActionMessage.hpp"
 #include "../NetworkBrokerData.hpp"
 #include "../networkDefaults.hpp"
 #include "TcpCommsCommon.h"
-#include "TcpHelperClasses.h"
+#include "gmlc/networking/AsioContextManager.h"
+#include "gmlc/networking/TcpHelperClasses.h"
+#include "gmlc/networking/TcpOperations.h"
 
 #include <map>
 #include <memory>
@@ -22,7 +23,9 @@ namespace helics {
 namespace tcp {
     using asio::ip::tcp;
 
-    TcpComms::TcpComms() noexcept: NetworkCommsInterface(InterfaceTypes::TCP) {}
+    using gmlc::networking::TcpConnection;
+
+    TcpComms::TcpComms() noexcept: NetworkCommsInterface(gmlc::networking::InterfaceTypes::TCP) {}
 
     int TcpComms::getDefaultBrokerPort() const { return DEFAULT_TCP_BROKER_PORT_NUMBER; }
 
@@ -66,7 +69,9 @@ namespace tcp {
         return 0;
     }
 
-    size_t TcpComms::dataReceive(TcpConnection* connection, const char* data, size_t bytes_received)
+    size_t TcpComms::dataReceive(gmlc::networking::TcpConnection* connection,
+                                 const char* data,
+                                 size_t bytes_received)
     {
         size_t used_total = 0;
         while (used_total < bytes_received) {
@@ -123,23 +128,23 @@ namespace tcp {
             setRxStatus(connection_status::error);
             return;
         }
-        auto ioctx = AsioContextManager::getContextPointer();
-        auto server = helics::tcp::TcpServer::create(ioctx->getBaseContext(),
-                                                     localTargetAddress,
-                                                     static_cast<uint16_t>(PortNumber.load()),
-                                                     reuse_address,
-                                                     maxMessageSize);
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
+        auto server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+                                                          localTargetAddress,
+                                                          static_cast<uint16_t>(PortNumber.load()),
+                                                          reuse_address,
+                                                          maxMessageSize);
         while (!server->isReady()) {
             if ((autoPortNumber) &&
                 (hasBroker)) {  // If we failed and we are on an automatically assigned port number,
                                 // just try a different port
                 server->close();
                 ++PortNumber;
-                server = helics::tcp::TcpServer::create(ioctx->getBaseContext(),
-                                                        localTargetAddress,
-                                                        static_cast<uint16_t>(PortNumber),
-                                                        reuse_address,
-                                                        maxMessageSize);
+                server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+                                                             localTargetAddress,
+                                                             static_cast<uint16_t>(PortNumber),
+                                                             reuse_address,
+                                                             maxMessageSize);
             } else {
                 logWarning("retrying tcp bind");
                 std::this_thread::sleep_for(std::chrono::milliseconds(150));
@@ -197,8 +202,9 @@ namespace tcp {
         }
     }
 
-    bool TcpComms::establishBrokerConnection(std::shared_ptr<AsioContextManager>& ioctx,
-                                             std::shared_ptr<TcpConnection>& brokerConnection)
+    bool TcpComms::establishBrokerConnection(
+        std::shared_ptr<gmlc::networking::AsioContextManager>& ioctx,
+        std::shared_ptr<TcpConnection>& brokerConnection)
     {
         // lambda function that does the proper termination
         auto terminate = [&, this](connection_status status) -> bool {
@@ -214,11 +220,11 @@ namespace tcp {
             brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
         }
         try {
-            brokerConnection = makeConnection(ioctx->getBaseContext(),
-                                              brokerTargetAddress,
-                                              std::to_string(brokerPort),
-                                              maxMessageSize,
-                                              connectionTimeout);
+            brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
+                                                                brokerTargetAddress,
+                                                                std::to_string(brokerPort),
+                                                                maxMessageSize,
+                                                                connectionTimeout);
             int retries = 0;
             while (!brokerConnection) {
                 if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
@@ -242,11 +248,11 @@ namespace tcp {
                 if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                     return terminate(connection_status::terminated);
                 }
-                brokerConnection = makeConnection(ioctx->getBaseContext(),
-                                                  brokerTargetAddress,
-                                                  std::to_string(brokerPort),
-                                                  maxMessageSize,
-                                                  connectionTimeout);
+                brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
+                                                                    brokerTargetAddress,
+                                                                    std::to_string(brokerPort),
+                                                                    maxMessageSize,
+                                                                    connectionTimeout);
             }
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
@@ -306,16 +312,18 @@ namespace tcp {
                             logMessage("got new broker information");
                             brokerConnection->close();
 
-                            auto brkprt = extractInterfaceandPort(mess->second.getString(0));
+                            auto brkprt = gmlc::networking::extractInterfaceAndPort(
+                                mess->second.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
                             }
-                            brokerConnection = makeConnection(ioctx->getBaseContext(),
-                                                              brokerTargetAddress,
-                                                              std::to_string(brokerPort),
-                                                              maxMessageSize,
-                                                              connectionTimeout);
+                            brokerConnection =
+                                gmlc::networking::makeConnection(ioctx->getBaseContext(),
+                                                                 brokerTargetAddress,
+                                                                 std::to_string(brokerPort),
+                                                                 maxMessageSize,
+                                                                 connectionTimeout);
                             continue;
                         }
                         if (mess->second.messageID == DELAY_CONNECTION) {
@@ -346,7 +354,7 @@ namespace tcp {
     void TcpComms::queue_tx_function()
     {
         // std::vector<char> buffer;
-        auto ioctx = AsioContextManager::getContextPointer();
+        auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
         auto contextLoop = ioctx->startContextLoop();
         TcpConnection::pointer brokerConnection;
 
@@ -389,7 +397,8 @@ namespace tcp {
                             try {
                                 std::string interface;
                                 std::string port;
-                                std::tie(interface, port) = extractInterfaceandPortString(newroute);
+                                std::tie(interface, port) =
+                                    gmlc::networking::extractInterfaceAndPortString(newroute);
                                 auto new_connect =
                                     TcpConnection::create(ioctx->getBaseContext(), interface, port);
 

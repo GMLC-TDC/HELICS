@@ -11,5 +11,5 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "UdpComms.h"
 
 namespace helics {
-template class NetworkBroker<udp::UdpComms, InterfaceTypes::UDP, 7>;
+template class NetworkBroker<udp::UdpComms, gmlc::networking::InterfaceTypes::UDP, 7>;
 }  // namespace helics

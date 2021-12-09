@@ -14,7 +14,8 @@ namespace zeromq {
     class ZmqCommsSS;
 
     /** implementation for the core that uses zmq messages to communicate*/
-    class ZmqBroker final: public NetworkBroker<ZmqComms, InterfaceTypes::TCP, 1> {
+    class ZmqBroker final:
+        public NetworkBroker<ZmqComms, gmlc::networking::InterfaceTypes::TCP, 1> {
       public:
         /** default constructor*/
         explicit ZmqBroker(bool rootbroker = false) noexcept;
@@ -27,7 +28,8 @@ namespace zeromq {
 
     class ZmqCommsSS;
     /** implementation for the core that uses zmq messages to communicate*/
-    class ZmqBrokerSS final: public NetworkBroker<ZmqCommsSS, InterfaceTypes::TCP, 1> {
+    class ZmqBrokerSS final:
+        public NetworkBroker<ZmqCommsSS, gmlc::networking::InterfaceTypes::TCP, 1> {
       public:
         /** default constructor*/
         explicit ZmqBrokerSS(bool rootbroker = false) noexcept;

@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.20)
+cmake_minimum_required(VERSION 3.10...3.22)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -15,14 +15,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.1.0)
+project(HELICS VERSION 3.1.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-11-24")
+set(HELICS_DATE "2021-12-2")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -385,16 +385,16 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         submod_update(ThirdParty/utilities)
     endif()
 
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/networking/gmlc/networking/TcpServer.h")
+        submod_update(ThirdParty/networking)
+    endif()
+
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/units/units/units.hpp")
         submod_update(ThirdParty/units)
     endif()
 
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/toml/value.hpp")
-        submod_update(ThirdParty/toml11)
-    endif()
-
-    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/netif/gmlc/netif/NetIF.hpp")
-        submod_update(ThirdParty/netif)
+    if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/toml/toml/value.hpp")
+        submod_update(ThirdParty/toml)
     endif()
 
     if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ThirdParty/spdlog/CMakeLists.txt")
@@ -424,7 +424,7 @@ endif()
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
-add_subdirectory(ThirdParty/toml11 EXCLUDE_FROM_ALL)
+add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
 # options for enabling specific core communication types
@@ -566,7 +566,6 @@ target_include_directories(
               $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${CMAKE_INSTALL_INCLUDE_DIR}>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/containers>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/concurrency>
-              $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/netif>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities>
               $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/utilities/gmlc/utilities>
 )
@@ -681,6 +680,7 @@ add_library(HELICS::units ALIAS units-static)
 # -----------------------------------------------------------------------------
 
 set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
+
 add_subdirectory(ThirdParty/utilities)
 
 hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
@@ -692,13 +692,32 @@ hide_variable(GMLC_UTILITIES_STATIC_LIB)
 hide_variable(GMLC_UTILITIES_CLANG_TIDY_OPTIONS)
 
 target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
-add_library(HELICS::utilities ALIAS gmlc_utilities)
+
 set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(
         gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     )
 endif()
+
+# -----------------------------------------------------------------------------
+# create networking target
+# -----------------------------------------------------------------------------
+
+set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
+set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
+set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
+set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO})
+add_subdirectory(ThirdParty/networking)
+
+hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)
+hide_variable(GMLC_NETWORKING_INCLUDE_BOOST)
+hide_variable(GMLC_NETWORKING_WITH_CMAKE_PACKAGE)
+hide_variable(GMLC_NETWORKING_OBJECT_LIB)
+hide_variable(GMLC_NETWORKING_STATIC_LIB)
+hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
+
+set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories
@@ -845,11 +864,11 @@ set(LICENSE_LIST
     "JsonCpp"
     "${PROJECT_SOURCE_DIR}/ThirdParty/json_cpp/LICENSE"
     "toml11"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/toml11/LICENSE"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/toml/LICENSE"
     "GMLC Utilities"
     "${PROJECT_SOURCE_DIR}/ThirdParty/utilities/LICENSE"
-    "netif"
-    "${PROJECT_SOURCE_DIR}/ThirdParty/netif/LICENSE"
+    "GMLC Networking"
+    "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.11)

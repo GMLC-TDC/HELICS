@@ -15,7 +15,7 @@ using namespace std::literals::chrono_literals;
 
 TEST(messageTimer_tests, basic_test)
 {
-    auto contextPtr = AsioContextManager::getContextPointer();
+    auto contextPtr = gmlc::networking::AsioContextManager::getContextPointer();
     auto loopHandle = contextPtr->startContextLoop();
     if (!contextPtr->isRunning()) {
         std::this_thread::sleep_for(600ms);

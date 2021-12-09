@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-NetworkCommsInterface::NetworkCommsInterface(InterfaceTypes type,
+NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes type,
                                              CommsInterface::thread_generation threads) noexcept:
     CommsInterface(threads),
     networkType(type)
@@ -76,6 +76,9 @@ bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, i
 /** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
+    using gmlc::networking::InterfaceTypes;
+    using gmlc::networking::removeProtocol;
+
     CommsInterface::loadNetworkInfo(netInfo);
     if (!propertyLock()) {
         return;
@@ -93,12 +96,12 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
             break;
     }
     if (localTargetAddress.empty()) {
-        auto bTarget = stripProtocol(brokerTargetAddress);
+        auto bTarget = gmlc::networking::stripProtocol(brokerTargetAddress);
         if ((bTarget == localHostString) || (bTarget == "127.0.0.1")) {
             localTargetAddress = localHostString;
         } else if (bTarget.empty()) {
             switch (interfaceNetwork) {
-                case InterfaceNetworks::LOCAL:
+                case gmlc::networking::InterfaceNetworks::LOCAL:
                     localTargetAddress = localHostString;
                     break;
                 default:
@@ -227,6 +230,8 @@ ActionMessage NetworkCommsInterface::generateReplyToIncomingMessage(ActionMessag
 
 std::string NetworkCommsInterface::getAddress() const
 {
+    using gmlc::networking::makePortAddress;
+
     if ((PortNumber < 0) && (!serverMode)) {
         return name;
     }
@@ -249,7 +254,7 @@ ActionMessage NetworkCommsInterface::generatePortRequest(int cnt) const
 {
     ActionMessage req(CMD_PROTOCOL);
     req.messageID = REQUEST_PORTS;
-    req.payload = stripProtocol(localTargetAddress);
+    req.payload = gmlc::networking::stripProtocol(localTargetAddress);
     req.counter = cnt;
     req.setStringData(brokerName, brokerInitString);
     return req;

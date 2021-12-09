@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace udp {
     class UdpComms;
-    using UdpBroker = NetworkBroker<UdpComms, InterfaceTypes::UDP, 7>;
+    using UdpBroker = NetworkBroker<UdpComms, gmlc::networking::InterfaceTypes::UDP, 7>;
 
 }  // namespace udp
 }  // namespace helics

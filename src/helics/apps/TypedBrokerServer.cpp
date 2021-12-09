@@ -22,7 +22,7 @@ static ActionMessage generatePortRequestReply(const ActionMessage& /*cmd*/,
     ActionMessage rep(CMD_PROTOCOL);
     rep.messageID = NEW_BROKER_INFORMATION;
     rep.name(brk->getIdentifier());
-    auto brkptr = extractInterfaceandPortString(brk->getAddress());
+    auto brkptr = gmlc::networking::extractInterfaceAndPortString(brk->getAddress());
     rep.setString(0, std::string("?:") + brkptr.second);
     return rep;
 }

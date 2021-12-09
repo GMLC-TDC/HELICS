@@ -80,11 +80,12 @@ std::string NetworkCore<COMMS, baseline>::generateLocalAddressString() const
             case InterfaceTypes::IP:
             case InterfaceTypes::UDP:
                 if (!netInfo.localInterface.empty() && (netInfo.localInterface.back() == '*')) {
-                    add = makePortAddress(
+                    add = gmlc::networking::makePortAddress(
                         netInfo.localInterface.substr(0, netInfo.localInterface.size() - 1),
                         netInfo.portNumber);
                 } else {
-                    add = makePortAddress(netInfo.localInterface, netInfo.portNumber);
+                    add = gmlc::networking::makePortAddress(netInfo.localInterface,
+                                                            netInfo.portNumber);
                 }
                 break;
             case InterfaceTypes::INPROC:

@@ -32,7 +32,7 @@ if(ENABLE_MPI_CORE)
 endif()
 
 add_executable(network-tests ${network_test_sources} ${network_test_headers})
-target_link_libraries(network-tests HELICS::network helics_test_base helics::zmq)
+target_link_libraries(network-tests HELICS::network gmlc::networking helics_test_base helics::zmq)
 
 target_include_directories(network-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
 target_compile_definitions(network-tests PRIVATE BOOST_DATE_TIME_NO_LIB)

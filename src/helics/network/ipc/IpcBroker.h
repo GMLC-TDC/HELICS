@@ -13,7 +13,9 @@ namespace ipc {
     class IpcComms;
 
     /** implementation for the core that uses IPC messages to communicate*/
-    using IpcBroker = NetworkBroker<IpcComms, InterfaceTypes::IPC, static_cast<int>(CoreType::IPC)>;
+    using IpcBroker = NetworkBroker<IpcComms,
+                                    gmlc::networking::InterfaceTypes::IPC,
+                                    static_cast<int>(CoreType::IPC)>;
 
 }  // namespace ipc
 }  // namespace helics
