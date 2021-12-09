@@ -235,7 +235,6 @@ cmake_dependent_advanced_option(
     HELICS_ENABLE_DEBUG_LOGGING "enable debug logging" ON "HELICS_ENABLE_LOGGING" ON
 )
 
-
 # -----------------------------------------------------------------------------
 # General project wide configuration for debug postfix
 # -----------------------------------------------------------------------------
