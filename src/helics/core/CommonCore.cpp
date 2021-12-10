@@ -4059,27 +4059,26 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     timeCoord->generateDebuggingTimeInfo(base["time"]);
                     base["federates"] = Json::arrayValue;
                     for (const auto& fed : loopFederates) {
-                        
                         std::string ret = federateQuery(fed.fed, "global_time_debugging", false);
                         if (ret == "#wait") {
                             if (fed->getState() <= FederateStates::HELICS_EXECUTING) {
                                 cmd.dest_id = fed->global_id.load();
                                 cmd.source_id = global_broker_id_local;
                                 fed.fed->addAction(cmd);
-                            } 
-                        } else { base["federates"].append(ret); }
+                            }
+                        } else {
+                            base["federates"].append(ret);
+                        }
                     }
                     if (filterFed != nullptr) {
                         base["federates"].append(filterFed->query("global_time_debugging"));
-                        
                     }
                     auto debugString = fileops::generateJsonString(base);
                     debugString.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(global_broker_id_local, identifier, debugString);
                 }
 
-                if (getBrokerState() <
-                    BrokerState::terminating) {
+                if (getBrokerState() < BrokerState::terminating) {
                     // only send a disconnect message
                     // if we haven't done so already
                     setBrokerState(BrokerState::terminating);
@@ -4087,12 +4086,10 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     ActionMessage m(CMD_DISCONNECT);
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
-                    for (auto &fed:loopFederates) {
-
+                    for (auto& fed : loopFederates) {
                     }
                 }
-            } else if (getBrokerState() ==
-                       BrokerState::errored) {
+            } else if (getBrokerState() == BrokerState::errored) {
                 // we are disconnecting in an error state
                 sendDisconnect();
                 ActionMessage m(CMD_DISCONNECT);

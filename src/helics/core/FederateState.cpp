@@ -1399,8 +1399,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto qres = processQueryActual("global_time_debugging");
             qres.insert(0, "TIME DEBUGGING::");
             LOG_WARNING(qres);
-        }
-            break;
+        } break;
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;
