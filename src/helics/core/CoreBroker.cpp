@@ -1081,9 +1081,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         debugString.insert(0, "TIME DEBUGGING::");
                         LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
                     }
-
-                    LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout Disconnect");
-
+                    if (command.source_id==global_broker_id_local) {
+                        LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout disconnect");
+                    }
+                     else {
+                        LOG_ERROR(global_broker_id_local, getIdentifier(), "receoved timeout disconnect");
+                    }
+ 
                     if (getBrokerState() <
                         BrokerState::terminating) {  // only send a disconnect message
                                                      // if we haven't done so already

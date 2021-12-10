@@ -249,3 +249,21 @@ TEST(broker_timeout, max_duration)
         brk->disconnect();
     }
 }
+
+TEST(broker_timeout, max_duration_core)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                             "--maxcosimduration=300ms --tick 50ms");
+    brk->connect();
+    // the query is just to force the thread to be operating
+    auto str = brk->query(brk->getIdentifier(), "exists");
+    EXPECT_EQ(str, "true");
+
+    auto cr = helics::CoreFactory::create(CORE_TYPE_TO_TEST, "--broker=" + brk->getIdentifier());
+    EXPECT_TRUE(cr->connect());
+    auto res = cr->waitForDisconnect(std::chrono::milliseconds(600));
+    EXPECT_TRUE(res);
+    if (!res) {
+        brk->disconnect();
+    }
+}

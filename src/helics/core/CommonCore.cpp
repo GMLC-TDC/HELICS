@@ -4044,11 +4044,23 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             break;
         case CMD_TIMEOUT_DISCONNECT:
             if (isConnected()) {
-                Json::Value base;
-                timeCoord->generateDebuggingTimeInfo(base);
-                auto debugString = fileops::generateJsonString(base);
-                debugString.insert(0, "TIME DEBUGGING::");
-                LOG_WARNING(global_broker_id_local, "core", debugString);
+                if (cmd.source_id!=global_broker_id_local) {
+                    LOG_ERROR(global_broker_id_local,
+                              getIdentifier(),
+                              "received timeout disconnect");
+                } else {
+                    LOG_ERROR(global_broker_id_local,
+                              getIdentifier(),
+                              "timeout disconnect");
+                }
+                if (timeCoord->hasActiveTimeDependencies()) {
+                    Json::Value base;
+                    timeCoord->generateDebuggingTimeInfo(base);
+                    auto debugString = fileops::generateJsonString(base);
+                    debugString.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(global_broker_id_local, identifier, debugString);
+                }
+                
                 if (getBrokerState() <
                     BrokerState::terminating) {  // only send a disconnect message
                                                  // if we haven't done so already
@@ -4539,7 +4551,7 @@ void CommonCore::checkInFlightQueriesForDisconnect()
 
 void CommonCore::sendDisconnect()
 {
-    LOG_CONNECTIONS(global_broker_id_local, "core", "sending disconnect");
+    LOG_CONNECTIONS(global_broker_id_local, identifier, "sending disconnect");
     checkInFlightQueriesForDisconnect();
     ActionMessage bye(CMD_STOP);
     bye.source_id = global_broker_id_local;
