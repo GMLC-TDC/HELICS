@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/coreTypeOperations.hpp"
 #include "helics/helics-config.h"
 #include "helics/network/loadCores.hpp"
+#include "helics/core/helicsVersion.hpp"
+
+#include "helics/common/JsonProcessingFunctions.hpp"
 
 #include "gtest/gtest.h"
 #include <thread>
@@ -16,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 static const bool ld = helics::loadCores();
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
-TEST(CoreFactory_tests, ZmqCore_test)
+TEST(CoreFactory, ZmqCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::ZMQ), true);
 
@@ -26,7 +29,7 @@ TEST(CoreFactory_tests, ZmqCore_test)
     core = nullptr;
 }
 #else  // HELICS_ENABLE_ZMQ_CORE
-TEST(CoreFactory_tests, ZmqCore_test)
+TEST(CoreFactory, ZmqCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::ZMQ), false);
 }
@@ -35,7 +38,7 @@ TEST(CoreFactory_tests, ZmqCore_test)
 /*
 #ifdef HELICS_ENABLE_MPI_CORE
 
-TEST(CoreFactory_tests,MpiCore_test)
+TEST(CoreFactory,MpiCore)
 {
     EXPECT_EQ (helics::core::isCoreTypeAvailable (helics::CoreType::MPI), true);
     auto core = helics::CoreFactory::create (helics::CoreType::MPI, "");
@@ -44,14 +47,14 @@ TEST(CoreFactory_tests,MpiCore_test)
     core = nullptr;
 }
 #else
-TEST(CoreFactory_tests,MpiCore_test)
+TEST(CoreFactory,MpiCore)
 {
     EXPECT_EQ (helics::isCoreTypeAvailable (helics::CoreType::MPI), false);
 }
 #endif  // HELICS_ENABLE_MPI_CORE
 */
 
-TEST(CoreFactory_tests, TestCore_test)
+TEST(CoreFactory, TestCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TEST), true);
 
@@ -61,7 +64,7 @@ TEST(CoreFactory_tests, TestCore_test)
     core = nullptr;
 }
 #ifdef HELICS_ENABLE_IPC_CORE
-TEST(CoreFactory_tests, InterprocessCore_test)
+TEST(CoreFactory, InterprocessCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::INTERPROCESS), true);
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::IPC), true);
@@ -78,14 +81,14 @@ TEST(CoreFactory_tests, InterprocessCore_test)
     core2 = nullptr;
 }
 #else
-TEST(CoreFactory_tests, InterprocessCore_test)
+TEST(CoreFactory, InterprocessCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::INTERPROCESS), false);
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::IPC), false);
 }
 #endif
 #ifdef HELICS_ENABLE_TCP_CORE
-TEST(CoreFactory_tests, tcpCore_test)
+TEST(CoreFactory, tcpCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TCP), true);
 
@@ -94,7 +97,7 @@ TEST(CoreFactory_tests, tcpCore_test)
     core->disconnect();
     core = nullptr;
 }
-TEST(CoreFactory_tests, tcpSSCore_test)
+TEST(CoreFactory, tcpSSCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TCP_SS), true);
 
@@ -104,18 +107,18 @@ TEST(CoreFactory_tests, tcpSSCore_test)
     core = nullptr;
 }
 #else
-TEST(CoreFactory_tests, tcpCore_test)
+TEST(CoreFactory, tcpCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TCP), false);
 }
-TEST(CoreFactory_tests, tcpSSCore_test)
+TEST(CoreFactory, tcpSSCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::TCP_SS), false);
 }
 #endif
 
 #ifdef HELICS_ENABLE_UDP_CORE
-TEST(CoreFactory_tests, udpCore_test)
+TEST(CoreFactory, udpCore)
 {
     EXPECT_EQ(helics::core::isCoreTypeAvailable(helics::CoreType::UDP), true);
 
@@ -136,8 +139,8 @@ TEST(CoreFactory_tests, udpCore_test)
 }
 #endif
 
-/** This test should be removed once log levels with numbers is re-enabled ~helics 3.2 */
-TEST(core_tests, core_log_command_failures)
+/** This test should be removed once log levels with numbers is re-enabled ~helics 3.3 */
+TEST(core, core_log_command_failures)
 {
     EXPECT_THROW(helics::CoreFactory::create(helics::CoreType::TEST,
                                              "corelog1",
@@ -153,4 +156,30 @@ TEST(core_tests, core_log_command_failures)
                                              "corelog3",
                                              "--fileloglevel=6 --root"),
                  std::exception);
+}
+
+
+TEST(CoreFactory, availableCores)
+{
+    auto ac = helics::CoreFactory::getAvailableCoreTypes();
+    for (const auto &ct:ac) {
+        EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(ct)));
+    }
+}
+
+/** This test should be removed once log levels with numbers is re-enabled ~helics 3.3 */
+TEST(core, extendedVersion)
+{
+    auto eVers = helics::extendedVersionInfo();
+
+    auto jv = helics::fileops::loadJsonStr(eVers);
+    EXPECT_FALSE(jv.isNull());
+
+    EXPECT_FALSE(jv["version"].isNull());
+
+    ASSERT_FALSE(jv["cores"].isNull());
+    for (auto cr : jv["cores"]) {
+        auto cname = cr.asString();
+        EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(cname)));
+    }
 }

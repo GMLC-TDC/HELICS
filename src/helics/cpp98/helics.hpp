@@ -28,6 +28,12 @@ inline std::string version()
     return std::string(helicsGetVersion());
 }
 
+/** get a extended json version string with additional information*/
+inline std::string ExtendedVersion()
+{
+    return std::string(helicsGetExtendedVersionString());
+}
+
 /** get a string with the helics version info*/
 inline std::string buildFlags()
 {

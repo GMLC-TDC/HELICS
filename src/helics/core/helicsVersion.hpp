@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "helics/helics-config.h"
+#include <string>
 
 /** @file
 file linking with version info and containing some convenience functions
@@ -31,4 +32,6 @@ constexpr auto buildFlags = HELICS_BUILD_FLAGS_DEBUG;
 #endif
 /** compiler used to build helics*/
 constexpr auto compiler = HELICS_COMPILER_VERSION;
+/** generate an extended version info string in json format*/
+std::string extendedVersionInfo();
 }  // namespace helics

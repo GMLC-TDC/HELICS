@@ -36,6 +36,7 @@ set(SRC_FILES
     queryHelpers.cpp
     ProfilerBuffer.cpp
     EmptyCore.cpp
+    helicsVersion.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES
