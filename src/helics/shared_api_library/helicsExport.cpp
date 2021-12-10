@@ -41,8 +41,8 @@ const char* helicsGetCompilerVersion(void)
     return helics::compiler;
 }
 
-
-const char* helicsGetExtendedVersionString(void) {
+const char* helicsGetExtendedVersionString(void)
+{
     static const std::string extendedVersionInfo{helics::extendedVersionInfo()};
     return extendedVersionInfo.c_str();
 }
