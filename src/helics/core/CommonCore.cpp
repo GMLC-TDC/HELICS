@@ -4044,14 +4044,12 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             break;
         case CMD_TIMEOUT_DISCONNECT:
             if (isConnected()) {
-                if (cmd.source_id!=global_broker_id_local) {
+                if (cmd.source_id != global_broker_id_local) {
                     LOG_ERROR(global_broker_id_local,
                               getIdentifier(),
                               "received timeout disconnect");
                 } else {
-                    LOG_ERROR(global_broker_id_local,
-                              getIdentifier(),
-                              "timeout disconnect");
+                    LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout disconnect");
                 }
                 if (timeCoord->hasActiveTimeDependencies()) {
                     Json::Value base;
@@ -4060,7 +4058,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     debugString.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(global_broker_id_local, identifier, debugString);
                 }
-                
+
                 if (getBrokerState() <
                     BrokerState::terminating) {  // only send a disconnect message
                                                  // if we haven't done so already

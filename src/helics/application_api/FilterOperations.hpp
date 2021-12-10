@@ -125,11 +125,10 @@ class FirewallFilterOperation: public FilterOperations {
   private:
     std::shared_ptr<FirewallOperator> op;  //!< the actual operator
     /// the conditions on which the rerouting will occur
-    gmlc::libguarded::cow_guarded<std::vector<std::string>>
-        allowed;
+    gmlc::libguarded::cow_guarded<std::vector<std::string>> allowed;
     /// the conditions that block a message
-    gmlc::libguarded::cow_guarded<std::vector<std::string>>
-        blocked;  
+    gmlc::libguarded::cow_guarded<std::vector<std::string>> blocked;
+
   public:
     FirewallFilterOperation();
     ~FirewallFilterOperation();
@@ -147,8 +146,7 @@ class CloneFilterOperation: public FilterOperations {
   private:
     std::shared_ptr<CloneOperator> op;  //!< the actual operator
     /// the endpoints to deliver the cloned data to
-    shared_guarded<std::vector<std::string>>
-        deliveryAddresses;  
+    shared_guarded<std::vector<std::string>> deliveryAddresses;
 
   public:
     explicit CloneFilterOperation();

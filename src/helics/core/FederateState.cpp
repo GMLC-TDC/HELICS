@@ -1258,14 +1258,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             if (cmd.counter == 0) {
                 auto blockFed = timeCoord->getMinGrantedDependency();
                 if (blockFed.first.isValid()) {
-                    LOG_WARNING(fmt::format(
-                        "grant timeout exceeded sim time {} waiting on {}",
-                        time_granted,
-                        blockFed.first.baseValue()));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
+                                            time_granted,
+                                            blockFed.first.baseValue()));
                 } else {
-                    LOG_WARNING(fmt::format(
-                        "grant timeout exceeded sim time {}",
-                        time_granted));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", time_granted));
                 }
 
             } else if (cmd.counter == 3) {
