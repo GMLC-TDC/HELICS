@@ -1395,6 +1395,12 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_SEND_COMMAND_ORDERED:
             sendCommand(cmd);
             break;
+        case CMD_TIMEOUT_DISCONNECT: {
+            auto qres = processQueryActual("global_time_debugging");
+            qres.insert(0, "TIME DEBUGGING::");
+            LOG_WARNING(qres);
+        }
+            break;
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
             std::string repStr;

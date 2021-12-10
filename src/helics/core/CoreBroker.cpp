@@ -1076,6 +1076,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 if (isConnected()) {
                     if (timeCoord->hasActiveTimeDependencies()) {
                         Json::Value base;
+                        base["id"] = global_broker_id_local.baseValue();
                         timeCoord->generateDebuggingTimeInfo(base);
                         auto debugString = fileops::generateJsonString(base);
                         debugString.insert(0, "TIME DEBUGGING::");
