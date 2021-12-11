@@ -572,6 +572,11 @@ HELICS_EXPORT const char* helicsGetBuildFlags(void);
 HELICS_EXPORT const char* helicsGetCompilerVersion(void);
 
 /**
+ * Get an extended version string in json format, containing version info, buid flags and compiler info and information about which core types are available.
+ */
+HELICS_EXPORT const char* helicsGetExtendedVersionString(void);
+
+/**
  * Return an initialized error object.
  */
 HELICS_EXPORT HelicsError helicsErrorInitialize(void);
