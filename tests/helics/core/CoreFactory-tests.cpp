@@ -4,14 +4,13 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
+#include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/coreTypeOperations.hpp"
+#include "helics/core/helicsVersion.hpp"
 #include "helics/helics-config.h"
 #include "helics/network/loadCores.hpp"
-#include "helics/core/helicsVersion.hpp"
-
-#include "helics/common/JsonProcessingFunctions.hpp"
 
 #include "gtest/gtest.h"
 #include <thread>
@@ -158,11 +157,10 @@ TEST(core, core_log_command_failures)
                  std::exception);
 }
 
-
 TEST(CoreFactory, availableCores)
 {
     auto ac = helics::CoreFactory::getAvailableCoreTypes();
-    for (const auto &ct:ac) {
+    for (const auto& ct : ac) {
         EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(ct)));
     }
 }

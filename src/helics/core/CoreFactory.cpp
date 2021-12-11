@@ -63,7 +63,8 @@ class MasterCoreBuilder {
         static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
         return iptr;
     }
-    static size_t size() {
+    static size_t size()
+    {
         const auto& blder = instance();
         return blder->builders.size();
     }
@@ -75,6 +76,7 @@ class MasterCoreBuilder {
         }
         return std::get<1>(blder->builders[index]);
     }
+
   private:
     /** private constructor since we only really want one of them
     accessed through the instance static member*/
@@ -87,10 +89,11 @@ void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name,
     MasterCoreBuilder::addBuilder(std::move(cb), name, code);
 }
 
-std::vector<std::string> getAvailableCoreTypes() {
+std::vector<std::string> getAvailableCoreTypes()
+{
     std::vector<std::string> availableCores;
     auto builderCount = MasterCoreBuilder::size();
-    for (size_t ii=0;ii<builderCount;++ii) {
+    for (size_t ii = 0; ii < builderCount; ++ii) {
         availableCores.push_back(MasterCoreBuilder::getIndexedBuilderName(ii));
     }
     return availableCores;
