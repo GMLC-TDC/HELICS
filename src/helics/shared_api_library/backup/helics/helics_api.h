@@ -24,7 +24,7 @@ typedef enum {
     HELICS_CORE_TYPE_WEBSOCKET = 14,
     HELICS_CORE_TYPE_INPROC = 18,
     HELICS_CORE_TYPE_NULL = 66,
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 typedef enum {
