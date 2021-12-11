@@ -454,10 +454,28 @@ void CommonCore::finalize(LocalFederateId federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
-    ActionMessage bye(CMD_DISCONNECT);
-    bye.source_id = fed->global_id.load();
-    bye.dest_id = bye.source_id;
-    addActionMessage(bye);
+
+   auto cbrokerState = getBrokerState();
+    switch (cbrokerState)
+    {
+        case BrokerState::terminated:
+        case BrokerState::terminating:
+        case BrokerState::errored: {
+            ActionMessage bye(CMD_STOP);
+            bye.source_id = fed->global_id.load();
+            bye.dest_id = bye.source_id;
+            addActionMessage(bye);
+            fed->addAction(bye);
+        } break;
+        default: {
+            ActionMessage bye(CMD_DISCONNECT);
+            bye.source_id = fed->global_id.load();
+            bye.dest_id = bye.source_id;
+            addActionMessage(bye);
+        }
+        break;
+    }
+    
     fed->finalize();
 }
 
@@ -588,10 +606,26 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     if (HELICS_INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
+
     // do an exec check on the fed to process previously received messages so it can't get in a
     // deadlocked state
     ActionMessage execc(CMD_EXEC_CHECK);
     fed->addAction(execc);
+
+    //do a check on the core to make sure it isn't stopped
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        } break;
+        default:
+            break;
+    }
 
     ActionMessage exec(CMD_EXEC_REQUEST);
     exec.source_id = fed->global_id.load();
@@ -727,6 +761,20 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequest"));
     }
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        }
+                break;
+        default:
+            break;
+    }
     switch (fed->getState()) {
         case HELICS_EXECUTING: {
             // generate the request through the core
@@ -783,6 +831,19 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
         }
     }
 
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        } break;
+        default:
+            break;
+    }
     // generate the request through the core
     ActionMessage treq(CMD_TIME_REQUEST);
     treq.source_id = fed->global_id.load();
@@ -4056,6 +4117,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     base["id"] = global_broker_id_local.baseValue();
                     base["state"] = brokerStateName(getBrokerState());
                     base["time"] = Json::Value();
+                    base["name"] = getIdentifier();
                     timeCoord->generateDebuggingTimeInfo(base["time"]);
                     base["federates"] = Json::arrayValue;
                     for (const auto& fed : loopFederates) {
@@ -4067,11 +4129,14 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                 fed.fed->addAction(cmd);
                             }
                         } else {
-                            base["federates"].append(ret);
+                            auto element = fileops::loadJsonStr(ret);
+                            base["federates"].append(element);
                         }
                     }
                     if (filterFed != nullptr) {
-                        base["federates"].append(filterFed->query("global_time_debugging"));
+                        auto str = filterFed->query("global_time_debugging");
+                        auto element = fileops::loadJsonStr(str);
+                        base["federates"].append(element);
                     }
                     auto debugString = fileops::generateJsonString(base);
                     debugString.insert(0, "TIME DEBUGGING::");
