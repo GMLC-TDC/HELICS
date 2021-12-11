@@ -455,9 +455,8 @@ void CommonCore::finalize(LocalFederateId federateID)
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
 
-   auto cbrokerState = getBrokerState();
-    switch (cbrokerState)
-    {
+    auto cbrokerState = getBrokerState();
+    switch (cbrokerState) {
         case BrokerState::terminated:
         case BrokerState::terminating:
         case BrokerState::errored: {
@@ -472,10 +471,9 @@ void CommonCore::finalize(LocalFederateId federateID)
             bye.source_id = fed->global_id.load();
             bye.dest_id = bye.source_id;
             addActionMessage(bye);
-        }
-        break;
+        } break;
     }
-    
+
     fed->finalize();
 }
 
@@ -612,7 +610,7 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     ActionMessage execc(CMD_EXEC_CHECK);
     fed->addAction(execc);
 
-    //do a check on the core to make sure it isn't stopped
+    // do a check on the core to make sure it isn't stopped
     auto cBrokerState = getBrokerState();
     switch (cBrokerState) {
         case BrokerState::terminating:
@@ -770,8 +768,7 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
             terminate.dest_id = fed->global_id;
             terminate.source_id = fed->global_id;
             fed->addAction(terminate);
-        }
-                break;
+        } break;
         default:
             break;
     }
