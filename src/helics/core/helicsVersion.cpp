@@ -147,7 +147,7 @@ std::string os_info()
         osInfo.push_back(' ');
         osInfo.append(details.version);
     } else {
-        osInfo= "POSIX";
+        osInfo = "POSIX";
     }
     return osInfo;
 }
@@ -165,18 +165,18 @@ std::string getHostName()
         temp = nullptr;
     }
 #else
-        temp = getenv("HOSTNAME");
-        if (temp != nullptr) {
+    temp = getenv("HOSTNAME");
+    if (temp != nullptr) {
+        computerName = temp;
+        temp = nullptr;
+    } else {
+        temp = new char[512];
+        if (gethostname(temp, 512) == 0) {  // success = 0, failure = -1
             computerName = temp;
-            temp = nullptr;
-        } else {
-            temp = new char[512];
-            if (gethostname(temp, 512) == 0) {  // success = 0, failure = -1
-                computerName = temp;
-            }
-            delete[] temp;
-            temp = nullptr;
         }
+        delete[] temp;
+        temp = nullptr;
+    }
 #endif
     return computerName;
 }
