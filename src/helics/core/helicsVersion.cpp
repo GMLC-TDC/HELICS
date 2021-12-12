@@ -42,8 +42,7 @@ inline std::string getCPUModel()
     return std::string(CPUBrandString);
 }
 #elif defined(__unix__)
-#    include <cstdlib>
-#    include <ifstream>
+#    include <fstream>
 inline std::string getCPUModel()
 {  // Get the cpu from /proc/cpuinfo
     std::ifstream cpufile("/proc/cpuinfo");
@@ -95,7 +94,7 @@ inline std::string getCPUModel()
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
 #    include <windows.h>
 
-unsigned long long getTotalSystemMemory()
+std::uint64_t getTotalSystemMemory()
 {
     MEMORYSTATUSEX status;
     status.dwLength = sizeof(status);
@@ -105,7 +104,6 @@ unsigned long long getTotalSystemMemory()
 
 std::string os_info()
 {
-    using namespace std;
     NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
     OSVERSIONINFOEXW osInfo;
     std::string winVer = "WINDOWS ";
@@ -124,10 +122,10 @@ std::string os_info()
 #    include <sys/utsname.h>
 #    include <unistd.h>
 
-unsigned long long getTotalSystemMemory()
+std::uint64_t getTotalSystemMemory()
 {
-    long pages = sysconf(_SC_PHYS_PAGES);
-    long page_size = sysconf(_SC_PAGE_SIZE);
+    std::uint64_t pages = sysconf(_SC_PHYS_PAGES);
+    std::uint64_t page_size = sysconf(_SC_PAGE_SIZE);
     return pages * page_size;
 }
 
