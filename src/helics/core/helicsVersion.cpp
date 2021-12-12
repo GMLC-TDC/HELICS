@@ -42,8 +42,8 @@ inline std::string getCPUModel()
     return std::string(CPUBrandString);
 }
 #elif defined(__unix__)
-#    include <ifstream>
 #    include <cstdlib>
+#    include <ifstream>
 inline std::string getCPUModel()
 {  // Get the cpu from /proc/cpuinfo
     std::ifstream cpufile("/proc/cpuinfo");
@@ -52,7 +52,7 @@ inline std::string getCPUModel()
     }
     std::string info;
     std::string line;
-    while (getline(cpufile,line)) {
+    while (getline(cpufile, line)) {
         if (line.find("model name") != std::string::npos) {
             info.append(line);
             break;
@@ -134,7 +134,7 @@ unsigned long long getTotalSystemMemory()
 std::string os_info()
 {
     std::string osInfo;
-    struct utsname details={};
+    struct utsname details = {};
 
     int ret = uname(&details);
 
