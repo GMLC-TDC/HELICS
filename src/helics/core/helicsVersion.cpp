@@ -150,8 +150,10 @@ std::string os_info()
         osInfo.push_back(' ');
         osInfo.append(details.version);
     } else {
-        return "POSIX";
+        osInfo= "POSIX";
     }
+    return osInfo;
+}
 #endif
 
 std::string getHostName()
@@ -212,7 +214,7 @@ std::string extendedVersionInfo()
 #if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     base["zmqversion"] = helics::zeromq::getZMQVersion();
 #endif
-    base["memory"] = getTotalSystemMemory();
+    base["memory"] = static_cast<std::int64_t>(getTotalSystemMemory());
     base["OS"] = os_info();
     return fileops::generateJsonString(base);
 }
