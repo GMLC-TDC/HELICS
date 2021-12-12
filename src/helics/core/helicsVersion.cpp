@@ -125,7 +125,7 @@ std::string os_info()
 
 #else
 #    include <sys/utsname.h>
-#include <unistd.h>
+#    include <unistd.h>
 
 unsigned long long getTotalSystemMemory()
 {
