@@ -96,7 +96,6 @@ inline std::string getCPUModel()
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
-#    include <versionhelpers.h>
 #    include <windows.h>
 
 unsigned long long getTotalSystemMemory()
@@ -110,20 +109,17 @@ unsigned long long getTotalSystemMemory()
 std::string os_info()
 {
     using namespace std;
-    double ret = 0.0;
     NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
     OSVERSIONINFOEXW osInfo;
-
+    std::string winVer = "WINDOWS ";
     *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
 
     if (nullptr != RtlGetVersion) {
         osInfo.dwOSVersionInfoSize = sizeof(osInfo);
         RtlGetVersion(&osInfo);
-        ret = (double)osInfo.dwMajorVersion;
+        winVer +=
+            std::to_string(osInfo.dwMajorVersion) + '.' + std::to_string(osInfo.dwMinorVersion);
     }
-
-    std::string winVer = "WINDOWS ";
-    winVer += std::to_string(osInfo.dwMajorVersion) + '.' + std::to_string(osInfo.dwMinorVersion);
     return winVer;
 }
 
