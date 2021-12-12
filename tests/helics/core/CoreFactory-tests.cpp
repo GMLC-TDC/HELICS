@@ -176,7 +176,7 @@ TEST(core, extendedVersion)
     EXPECT_FALSE(jv["version"].isNull());
 
     ASSERT_FALSE(jv["cores"].isNull());
-    for (const auto &cr : jv["cores"]) {
+    for (const auto& cr : jv["cores"]) {
         auto cname = cr.asString();
         EXPECT_TRUE(helics::core::isCoreTypeAvailable(helics::core::coreTypeFromString(cname)));
     }
