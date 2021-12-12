@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "helicsVersion.hpp"
+
 #include "../common/JsonProcessingFunctions.hpp"
 #include "CoreFactory.hpp"
 
@@ -95,8 +96,8 @@ inline std::string getCPUModel()
 #endif
 
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
 #    include <versionhelpers.h>
+#    include <windows.h>
 
 unsigned long long getTotalSystemMemory()
 {
@@ -127,7 +128,7 @@ std::string os_info()
 }
 
 #else
-#include <sys/utsname.h>
+#    include <sys/utsname.h>
 
 unsigned long long getTotalSystemMemory()
 {
@@ -156,8 +157,9 @@ std::string os_info()
     }
 #endif
 
-std::string getHostName() {
-    char* temp { nullptr };
+std::string getHostName()
+{
+    char* temp{nullptr};
     std::string computerName;
 
 #if defined(WIN32) || defined(_WIN32) || defined(_WIN64)
@@ -167,23 +169,21 @@ std::string getHostName() {
         temp = nullptr;
     }
 #else
-    temp = getenv("HOSTNAME");
-    if (temp != nullptr) {
-        computerName = temp;
-        temp = nullptr;
-    } else {
-        temp = new char[512];
-        if (gethostname(temp, 512) == 0) {  // success = 0, failure = -1
+        temp = getenv("HOSTNAME");
+        if (temp != nullptr) {
             computerName = temp;
+            temp = nullptr;
+        } else {
+            temp = new char[512];
+            if (gethostname(temp, 512) == 0) {  // success = 0, failure = -1
+                computerName = temp;
+            }
+            delete[] temp;
+            temp = nullptr;
         }
-        delete[] temp;
-        temp = nullptr;
-    }
 #endif
     return computerName;
 }
-
-
 
 namespace helics {
 
@@ -213,7 +213,7 @@ std::string extendedVersionInfo()
     base["cputype"] = HELICS_BUILD_PROCESSOR;
     base["hostname"] = getHostName();
 #if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
-    base["zmqversion"]=helics::zeromq::getZMQVersion();
+    base["zmqversion"] = helics::zeromq::getZMQVersion();
 #endif
     base["memory"] = getTotalSystemMemory();
     base["OS"] = os_info();
