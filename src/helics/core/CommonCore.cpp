@@ -4149,6 +4149,8 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
                     for (auto& fed : loopFederates) {
+                        m.dest_id = fed->global_id;
+                        fed.fed->addAction(m);
                     }
                 }
             } else if (getBrokerState() == BrokerState::errored) {
@@ -4471,10 +4473,10 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
         if (!v.isNull()) {
             auto debugString = fileops::generateJsonString(v);
             debugString.insert(0, "TIME DEBUGGING::");
-            LOG_WARNING(global_broker_id_local, "core", debugString);
+            LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
         }
     } else {
-        LOG_WARNING(global_broker_id_local, "core", "dropping message:" + prettyPrintString(cmd));
+        LOG_WARNING(global_broker_id_local, getIdentifier(), "dropping message:" + prettyPrintString(cmd));
     }
 }
 

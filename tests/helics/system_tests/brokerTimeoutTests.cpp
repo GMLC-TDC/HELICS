@@ -243,7 +243,7 @@ TEST(broker_timeout, max_duration)
     auto str = brk->query(brk->getIdentifier(), "exists");
     EXPECT_EQ(str, "true");
 
-    auto res = brk->waitForDisconnect(std::chrono::milliseconds(600));
+    auto res = brk->waitForDisconnect(std::chrono::milliseconds(900));
     EXPECT_TRUE(res);
     if (!res) {
         brk->disconnect();

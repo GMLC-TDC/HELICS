@@ -39,7 +39,7 @@ TEST_P(combofed_single_type_tests, initialize_tests)
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
-    vFed1->finalize();
+    vFed1->disconnect();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
@@ -70,7 +70,7 @@ TEST_P(combofed_single_type_tests, publication_registration)
     EXPECT_TRUE(vFed1->getPublication("pub1").getHandle() == pubid.getHandle());
     EXPECT_TRUE(vFed1->getPublication("pub2").getHandle() == pubid2.getHandle());
     EXPECT_TRUE(vFed1->getPublication("fed0/pub1").getHandle() == pubid.getHandle());
-    vFed1->finalize();
+    vFed1->disconnect();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }

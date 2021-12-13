@@ -1279,6 +1279,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     brokerTimeoutCheck.source_id = global_id.load();
                     brokerTimeoutCheck.dest_id = parentID;
                     routeMessage(brokerTimeoutCheck);
+                    LOG_WARNING(
+                        fmt::format("sending grant time out check to {}", parentID.baseValue()));
                 }
             } else if (cmd.counter == 10) {
                 if (cmd.actionTime == Time::maxVal()) {
