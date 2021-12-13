@@ -4476,7 +4476,9 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
             LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
         }
     } else {
-        LOG_WARNING(global_broker_id_local, getIdentifier(), "dropping message:" + prettyPrintString(cmd));
+        LOG_WARNING(global_broker_id_local,
+                    getIdentifier(),
+                    "dropping message:" + prettyPrintString(cmd));
     }
 }
 
