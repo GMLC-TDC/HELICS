@@ -575,7 +575,6 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
     res = mFed2->enterExecutingModeComplete();
     EXPECT_EQ(res, helics::IterationResult::ERROR_RESULT);
 
-    
     mFed1->disconnect();
 
     mFed2->disconnect();
@@ -635,7 +634,6 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     EXPECT_EQ(retTime, 3.0);
     ept1.sendTo("message3", "ept2");
 
-    
     mFed1->disconnect();
 
     retTime = mFed2->requestTimeComplete();
