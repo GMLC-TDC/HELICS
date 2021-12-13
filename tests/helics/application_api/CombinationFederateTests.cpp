@@ -134,7 +134,7 @@ TEST_P(combofed_single_type_tests, endpoint_registration)
     EXPECT_TRUE(mFed1->getEndpoint("ep1").getHandle() == epid.getHandle());
     EXPECT_TRUE(mFed1->getEndpoint("fed0/ep1").getHandle() == epid.getHandle());
     EXPECT_TRUE(mFed1->getEndpoint("ep2").getHandle() == epid2.getHandle());
-    mFed1->finalize();
+    mFed1->disconnect();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
@@ -186,8 +186,8 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     ASSERT_EQ(M2->data.size(), data.size());
 
     EXPECT_EQ(M2->data[245], data[245]);
-    mFed1->finalize();
-    mFed2->finalize();
+    mFed1->disconnect();
+    mFed2->disconnect();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -274,8 +274,8 @@ TEST_P(combofed_type_tests, multimode_transfer)
 
     EXPECT_EQ(ns, "string2");
 
-    cFed1->finalize();
-    cFed2->finalize();
+    cFed1->disconnect();
+    cFed2->disconnect();
 
     EXPECT_TRUE(cFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(cFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -326,7 +326,7 @@ TEST(comboFederate, constructor2)
     mf1.registerGlobalFilter("filt2");
 
     EXPECT_NO_THROW(mf1.enterExecutingMode());
-    mf1.finalize();
+    mf1.disconnect();
 
     cr.reset();
 }
@@ -342,6 +342,6 @@ TEST(comboFederate, constructor3)
     mf1.registerGlobalFilter("filt2");
 
     EXPECT_NO_THROW(mf1.enterExecutingMode());
-    mf1.finalize();
+    mf1.disconnect();
     EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(500)));
 }
