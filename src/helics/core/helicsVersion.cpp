@@ -107,13 +107,16 @@ std::string os_info()
     NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
     OSVERSIONINFOEXW osInfo;
     std::string winVer = "WINDOWS ";
-    *(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+    auto module = GetModuleHandleA("ntdll");
+    if (module!=nullptr) {
+        *(FARPROC*)&RtlGetVersion = GetProcAddress(module, "RtlGetVersion");
 
-    if (nullptr != RtlGetVersion) {
-        osInfo.dwOSVersionInfoSize = sizeof(osInfo);
-        RtlGetVersion(&osInfo);
-        winVer +=
-            std::to_string(osInfo.dwMajorVersion) + '.' + std::to_string(osInfo.dwMinorVersion);
+        if (nullptr != RtlGetVersion) {
+            osInfo.dwOSVersionInfoSize = sizeof(osInfo);
+            RtlGetVersion(&osInfo);
+            winVer +=
+                std::to_string(osInfo.dwMajorVersion) + '.' + std::to_string(osInfo.dwMinorVersion);
+        }
     }
     return winVer;
 }
