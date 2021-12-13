@@ -108,7 +108,7 @@ std::string os_info()
     OSVERSIONINFOEXW osInfo;
     std::string winVer = "WINDOWS ";
     auto module = GetModuleHandleA("ntdll");
-    if (module!=nullptr) {
+    if (module != nullptr) {
         *(FARPROC*)&RtlGetVersion = GetProcAddress(module, "RtlGetVersion");
 
         if (nullptr != RtlGetVersion) {
