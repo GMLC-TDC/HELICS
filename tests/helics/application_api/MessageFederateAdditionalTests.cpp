@@ -539,6 +539,7 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     auto cr = mFed.getCorePointer();
     mFed.disconnect();
     cr->disconnect();
+    cr.reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,

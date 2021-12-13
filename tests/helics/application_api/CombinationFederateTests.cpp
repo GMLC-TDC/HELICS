@@ -308,6 +308,7 @@ TEST_P(combofed_file_load_tests, test_file_load)
     EXPECT_EQ(cFed.getPublicationCount(), 2);
 
     EXPECT_TRUE(!cFed.getPublication(1).getInfo().empty());
+    cFed.getCorePointer()->disconnect();
     cFed.disconnect();
 }
 

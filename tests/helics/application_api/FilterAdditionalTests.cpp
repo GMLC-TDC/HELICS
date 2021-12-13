@@ -79,7 +79,7 @@ TEST_P(filter_type_tests, message_reroute_filter_object1)
     fFed->requestTimeComplete();
 
     mFed->finalizeAsync();
-    fFed->finalize();
+    fFed->disconnect();
     mFed->finalizeComplete();
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
