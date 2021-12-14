@@ -63,6 +63,19 @@ class MasterCoreBuilder {
         static std::shared_ptr<MasterCoreBuilder> iptr(new MasterCoreBuilder());
         return iptr;
     }
+    static size_t size()
+    {
+        const auto& blder = instance();
+        return blder->builders.size();
+    }
+    static const std::string& getIndexedBuilderName(std::size_t index)
+    {
+        const auto& blder = instance();
+        if (blder->builders.size() <= index) {
+            throw(HelicsException("core type index is not available"));
+        }
+        return std::get<1>(blder->builders[index]);
+    }
 
   private:
     /** private constructor since we only really want one of them
@@ -74,6 +87,16 @@ class MasterCoreBuilder {
 void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
 {
     MasterCoreBuilder::addBuilder(std::move(cb), name, code);
+}
+
+std::vector<std::string> getAvailableCoreTypes()
+{
+    std::vector<std::string> availableCores;
+    auto builderCount = MasterCoreBuilder::size();
+    for (size_t ii = 0; ii < builderCount; ++ii) {
+        availableCores.push_back(MasterCoreBuilder::getIndexedBuilderName(ii));
+    }
+    return availableCores;
 }
 
 static std::shared_ptr<Core> emptyCore = std::make_shared<EmptyCore>();

@@ -24,7 +24,7 @@ typedef enum {
     HELICS_CORE_TYPE_WEBSOCKET = 14,
     HELICS_CORE_TYPE_INPROC = 18,
     HELICS_CORE_TYPE_NULL = 66,
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 typedef enum {
@@ -253,6 +253,7 @@ typedef struct HelicsError {
 const char* helicsGetVersion(void);
 const char* helicsGetBuildFlags(void);
 const char* helicsGetCompilerVersion(void);
+const char* helicsGetSystemInfo(void);
 HelicsError helicsErrorInitialize(void);
 void helicsErrorClear(HelicsError* err);
 void helicsLoadSignalHandler();
