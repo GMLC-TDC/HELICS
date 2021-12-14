@@ -248,7 +248,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     timeout_group->add_flag(
         "--disable_timer,--no_tick",
         disable_timer,
-        "if set to true the timeout timer is disabled, cannot be re-enabled later");
+        "if set to true all timeouts are disabled, cannot be re-enabled later");
     timeout_group
         ->add_option(
             "--timeout",
