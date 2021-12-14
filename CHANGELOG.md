@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.1.1][] - 2021-12-14
 
-Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages.  Also included are `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.  
+Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages. Also included are `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.
 
 ### Fixed
 
@@ -24,14 +24,13 @@ Primarily a bug fix release to fix a build issue resulting in internal logging m
 - CMake version 3.22 tested and used if available.
 - The TCP networking components that were not core to HELICS have been moved to a separate repo and linked at a submodule See [networking](www.github.com/GMLC-TDC/networking).
 - Several documentation fixes and updates
-- Moved to using the upstream toml11 repo instead of a custom modified version.  Customized modifications have now been merged upstream.
+- Moved to using the upstream toml11 repo instead of a custom modified version. Customized modifications have now been merged upstream.
 
 ### Added
 
 - '--maxcosimduration' flag added in the broker to specify a max co-sim duration after which the cosimulation will be terminated.
 - `helicsGetSystemInfo()` function was added to the API to retrieve HELICS version and system info for debugging and diagnostic purposes.
--  added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
-
+- added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
 
 ## [3.1.0][] - 2021-11-25
 
