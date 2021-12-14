@@ -9,7 +9,6 @@ The Fundamental Examples teach three concepts to build on a default setup:
     fundamental_default
     fundamental_fedintegration
     fundamental_communication
-    fundamental_final
 
 ```
 
