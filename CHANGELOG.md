@@ -31,6 +31,7 @@ Primarily a bug fix release to fix a build issue resulting in internal logging m
 - '--maxcosimduration' flag added in the broker to specify a max co-sim duration after which the cosimulation will be terminated.
 - `helicsGetSystemInfo()` function was added to the API to retrieve HELICS version and system info for debugging and diagnostic purposes.
 - added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
+- added `helicsFederateInfoLoadFromString` to better match C++ API available functions.  This loads the federateInfo structure from command line arguments contained in a string.  
 
 ## [3.1.0][] - 2021-11-25
 
