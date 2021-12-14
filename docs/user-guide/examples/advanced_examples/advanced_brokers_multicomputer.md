@@ -29,6 +29,7 @@ The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples
 This example shows you how to configure a co-simulation to take advantage of multiple brokers. Though we'll be running this example on a single computer, the application of broker hierarchies is more common when running a co-simulation across multiple computers.
 
 ### Differences compared to Advanced Default example
+
 As will be shown, the use of multiple computers to run the co-simulation will not affect the results of the co-simulation.
 
 #### HELICS differences
@@ -39,13 +40,11 @@ Running a HELICS co-simulation across multiple computers is useful in situations
 
 When running across multiple compute nodes, the relevant portion of the broker instantiation looks like this on the computer where broker is running:
 
-
 ```shell
 "helics_broker --loglevel=debug --timeout='10s' --ipv4",
 ```
 
 The "ipv4" flag opens up an externally accessible port (by default, 23405).
-
 
 On the computer(s) where the broker is not running, each of the federates has to define the "broker_address" as part of the configuration. In this case, that's happening in a JSON configuration file and as such we just need to add a single line to the file:
 
@@ -70,6 +69,7 @@ All federates would also need to know to use the new port number. For those that
 ```
 
 Alternatively, the "broker_port" option can be set:
+
 ```json
 ...
 "broker_port": "<port number>",
@@ -77,8 +77,6 @@ Alternatively, the "broker_port" option can be set:
 ```
 
 Note that any federates running on the same machine as the broker would also need to set this port option.
-
-
 
 ## Execution and Results
 
@@ -88,7 +86,6 @@ To run this example you'll need to use two computers, running one part of the fe
 
 `$ helics run --path=./multi_computer_2_runner.json`
 
-
 The peak charging results are shown below and are identical to the results from the similarly configured [broker hierarchy example](advanced_brokers_hierarchies.md).
 
 ![](../../../img/advanced_hierarchy_charging_power.png)
@@ -96,7 +93,6 @@ The peak charging results are shown below and are identical to the results from 
 ![](../../../img/advanced_hierarchy_estimated_SOCs.png)
 
 ![](../../../img/advanced_hierarchy_battery_SOCs.png)
-
 
 ## [Questions and Help](../../support.md)
 
