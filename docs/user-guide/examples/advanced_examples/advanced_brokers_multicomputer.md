@@ -44,7 +44,7 @@ When running across multiple compute nodes, the relevant portion of the broker i
 "helics_broker --loglevel=debug --timeout='10s' --ipv4",
 ```
 
-The "ipv4" flag opens up an externally accessible port (by default, 23405).
+The "ipv4" flag opens up an externally accessible ports (by default, 23405) on externally facing network interfaces with an ipv4 address.
 
 On the computer(s) where the broker is not running, each of the federates has to define the "broker_address" as part of the configuration. In this case, that's happening in a JSON configuration file and as such we just need to add a single line to the file:
 
