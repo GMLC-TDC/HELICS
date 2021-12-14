@@ -245,10 +245,9 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             "heartbeat time in ms, if there is no broker communication for 2 ticks then "
             "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')")
         ->capture_default_str();
-    timeout_group->add_flag(
-        "--disable_timer,--no_tick",
-        disable_timer,
-        "if set to true all timeouts are disabled, cannot be re-enabled later");
+    timeout_group->add_flag("--disable_timer,--no_tick",
+                            disable_timer,
+                            "if set to true all timeouts are disabled, cannot be re-enabled later");
     timeout_group
         ->add_option(
             "--timeout",
