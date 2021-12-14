@@ -82,7 +82,7 @@ typedef enum {
                                   exist, for testing and a few other assorted reasons*/
     HELICS_CORE_TYPE_NULL = 66,
     /** an explicit core type exists but does nothing but return empty values or sink calls*/
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
@@ -570,6 +570,13 @@ HELICS_EXPORT const char* helicsGetBuildFlags(void);
  * Get the compiler version used to compile HELICS.
  */
 HELICS_EXPORT const char* helicsGetCompilerVersion(void);
+
+/**
+ * Get a json formatted system information, containing version info,
+ * The string contains fields with system information like cpu, core count, operating system and memory
+ * as well as information about the HELICS build.  Used for debugging reports and other information
+ */
+HELICS_EXPORT const char* helicsGetSystemInfo(void);
 
 /**
  * Return an initialized error object.
