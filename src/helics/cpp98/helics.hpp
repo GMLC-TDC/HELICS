@@ -28,7 +28,7 @@ inline std::string version()
     return std::string(helicsGetVersion());
 }
 
-/** get a extended json version string with additional information*/
+/** generate an extended version and system info string in json format*/
 inline std::string systemInfo()
 {
     return std::string(helicsGetSystemInfo());

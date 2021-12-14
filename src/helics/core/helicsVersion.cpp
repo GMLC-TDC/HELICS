@@ -223,7 +223,7 @@ std::string systemInfo()
 #endif
     auto memory = getTotalSystemMemory();
     base["memory"] = std::to_string(memory / (1024ULL * 1024ULL)) + " MB";
-    base["OS"] = os_info();
+    base["os"] = os_info();
     return fileops::generateJsonString(base);
 }
 
