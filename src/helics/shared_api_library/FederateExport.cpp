@@ -192,7 +192,7 @@ void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char*
     }
 }
 
-void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char *args, HelicsError* err)
+void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err)
 {
     auto* info = getFedInfo(fi, err);
     if (info == nullptr) {

@@ -1134,7 +1134,7 @@ HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int arg
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
  */
-HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char *args, HelicsError* err);
+HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.
