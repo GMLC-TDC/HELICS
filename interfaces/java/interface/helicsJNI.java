@@ -176,6 +176,7 @@ public class helicsJNI {
   public final static native String helicsGetVersion();
   public final static native String helicsGetBuildFlags();
   public final static native String helicsGetCompilerVersion();
+  public final static native String helicsGetSystemInfo();
   public final static native void helicsLoadSignalHandler();
   public final static native void helicsClearSignalHandler();
   public final static native void helicsAbort(int jarg1, String jarg2);

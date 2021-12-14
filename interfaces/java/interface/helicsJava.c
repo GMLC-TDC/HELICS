@@ -2229,6 +2229,18 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetCompilerVersi
 }
 
 
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetSystemInfo(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetSystemInfo();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandler(JNIEnv *jenv, jclass jcls) {
   (void)jenv;
   (void)jcls;

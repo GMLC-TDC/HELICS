@@ -58,6 +58,9 @@ namespace CoreFactory {
         return cbld;
     }
 
+    /** generate a vector of the currently available core types*/
+    std::vector<std::string> getAvailableCoreTypes();
+
     /** create a core from a type, name, and initializationString
 @param type the type of core to create
 @param coreName the name for the core
