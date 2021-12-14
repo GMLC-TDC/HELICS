@@ -6,7 +6,7 @@ Though often it may make sense to put a HELICS broker on every compute node used
 
 Generally, there are a few changes that will be necessary for running a multi-computer co-simulation:
 
-- Adding the `--ipv4` flag to the broker initialization string. This opens an external port for federates on other computers to use when connecting to the broker; something like `helics_broker -f 3 --loglevel=warning --ipv4` (NOTE:  --ipv4 is a shortcut to open up the ports on all external network interfaces with ipv4 addresses,  other options can do similar things on specific interfaces or with ipv6).
+- Adding the `--ipv4` flag to the broker initialization string. This opens an external port for federates on other computers to use when connecting to the broker; something like `helics_broker -f 3 --loglevel=warning --ipv4` (NOTE: --ipv4 is a shortcut to open up the ports on all external network interfaces with ipv4 addresses, other options can do similar things on specific interfaces or with ipv6).
 - Define `broker_address` for each of the federates that are running on another computer. This will look something like `"broker_address": "tcp://10.211.55.23"` is using a JSON configuration file.
 - The default port for the HELICS broker is 23405 and if that works in your networking environment then you don't need to do anything. To use another port, each federate must change the value for `broker_port` (_e.g._ `"broker_port": "23406"`)and the broker must set its own `port` option to the same value (_e.g._ `helics_broker -f 3 --loglevel=warning --ipv4 --port=23406`).
 
