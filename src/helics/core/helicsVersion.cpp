@@ -63,7 +63,7 @@ inline std::string getCPUModel()
     if (modelLoc != std::string::npos) {
         auto cloc = info.find_first_of(':', modelLoc);
         auto eline = info.find_first_of("\n\r\0", modelLoc);
-        auto modelString=info.substr(cloc + 1, eline - cloc - 1);
+        auto modelString = info.substr(cloc + 1, eline - cloc - 1);
         if (modelString.back() == '\0') {
             modelString.pop_back();
         }
@@ -80,8 +80,8 @@ inline std::string getCPUModel()
     std::string info;
     size_t name_sz = 0;
     if (!sysctlbyname("machdep.cpu.brand_string", nullptr, &name_sz, nullptr, 0)) {
-        info.resize(name_sz,'\0');
-        if (sysctlbyname("machdep.cpu.brand_string", info.data(), &name_sz, nullptr, 0)!=0) {
+        info.resize(name_sz, '\0');
+        if (sysctlbyname("machdep.cpu.brand_string", info.data(), &name_sz, nullptr, 0) != 0) {
             info = "UNKNOWN";
         }
     }
@@ -208,7 +208,7 @@ std::string systemInfo()
     }
     auto cpumodel = getCPUModel();
     if (!cpumodel.empty()) {
-        if (cpumodel.back() == ' ' || cpumodel.back() == '\n' || cpumodel.back() =='\0') {
+        if (cpumodel.back() == ' ' || cpumodel.back() == '\n' || cpumodel.back() == '\0') {
             cpumodel.pop_back();
         }
         base["cpu"] = cpumodel;
@@ -221,7 +221,7 @@ std::string systemInfo()
 #if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     base["zmqversion"] = helics::zeromq::getZMQVersion();
 #endif
-    auto memory=getTotalSystemMemory();
+    auto memory = getTotalSystemMemory();
     base["memory"] = std::to_string(memory / (1024ULL * 1024ULL)) + " MB";
     base["OS"] = os_info();
     return fileops::generateJsonString(base);
