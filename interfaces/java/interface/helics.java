@@ -89,6 +89,15 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Get a json formatted system information string, containing version info.<br>
+   * The string contains fields with system information like cpu, core count, operating system, and memory,<br>
+   * as well as information about the HELICS build.  Used for debugging reports and gathering other information.
+   */
+  public static String helicsGetSystemInfo() {
+    return helicsJNI.helicsGetSystemInfo();
+  }
+
+  /**
    *  Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,<br>
    * and federates then exits the process.
    */
