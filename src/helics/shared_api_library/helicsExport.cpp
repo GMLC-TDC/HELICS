@@ -41,10 +41,10 @@ const char* helicsGetCompilerVersion(void)
     return helics::compiler;
 }
 
-const char* helicsGetExtendedVersionString(void)
+const char* helicsGetSystemInfo(void)
 {
-    static const std::string extendedVersionInfo{helics::extendedVersionInfo()};
-    return extendedVersionInfo.c_str();
+    static const std::string systemInfo{helics::systemInfo()};
+    return systemInfo.c_str();
 }
 
 static constexpr const char* nullstrPtr = "";

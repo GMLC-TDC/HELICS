@@ -165,10 +165,9 @@ TEST(CoreFactory, availableCores)
     }
 }
 
-/** This test should be removed once log levels with numbers is re-enabled ~helics 3.3 */
-TEST(core, extendedVersion)
+TEST(core, systemInfo)
 {
-    auto eVers = helics::extendedVersionInfo();
+    auto eVers = helics::systemInfo();
 
     auto jv = helics::fileops::loadJsonStr(eVers);
     EXPECT_FALSE(jv.isNull());

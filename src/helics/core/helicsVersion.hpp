@@ -34,5 +34,5 @@ constexpr auto buildFlags = HELICS_BUILD_FLAGS_DEBUG;
 /** compiler used to build helics*/
 constexpr auto compiler = HELICS_COMPILER_VERSION;
 /** generate an extended version info string in json format*/
-std::string extendedVersionInfo();
+std::string systemInfo();
 }  // namespace helics

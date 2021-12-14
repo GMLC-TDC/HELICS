@@ -63,7 +63,11 @@ inline std::string getCPUModel()
     if (modelLoc != std::string::npos) {
         auto cloc = info.find_first_of(':', modelLoc);
         auto eline = info.find_first_of("\n\r\0", modelLoc);
-        return info.substr(cloc + 1, eline - cloc - 1);
+        auto modelString=info.substr(cloc + 1, eline - cloc - 1);
+        if (modelString.back() == '\0') {
+            modelString.pop_back();
+        }
+        return modelString;
     }
     return std::string{};
 }
@@ -76,11 +80,13 @@ inline std::string getCPUModel()
     std::string info;
     size_t name_sz = 0;
     if (!sysctlbyname("machdep.cpu.brand_string", nullptr, &name_sz, nullptr, 0)) {
-        char* buffer = static_cast<char*>(malloc(name_sz));
-        if (!sysctlbyname("machdep.cpu.brand_string", buffer, &name_sz, nullptr, 0)) {
-            info = std::string(buffer, name_sz);
+        info.resize(name_sz,'\0');
+        if (sysctlbyname("machdep.cpu.brand_string", info.data(), &name_sz, nullptr, 0)!=0) {
+            info = "UNKNOWN";
         }
-        free(buffer);
+    }
+    while (!info.empty() && info.back() == '\0') {
+        info.pop_back();
     }
     return info;
 }
@@ -184,7 +190,7 @@ std::string getHostName()
 
 namespace helics {
 
-std::string extendedVersionInfo()
+std::string systemInfo()
 {
     Json::Value base;
     base["version"]["string"] = helics::versionString;
@@ -202,9 +208,12 @@ std::string extendedVersionInfo()
     }
     auto cpumodel = getCPUModel();
     if (!cpumodel.empty()) {
+        if (cpumodel.back() == ' ' || cpumodel.back() == '\n' || cpumodel.back() =='\0') {
+            cpumodel.pop_back();
+        }
         base["cpu"] = cpumodel;
     } else {
-        base["cpu"] = "unknown";
+        base["cpu"] = "UNKNOWN";
     }
     base["cpucount"] = std::thread::hardware_concurrency();
     base["cputype"] = HELICS_BUILD_PROCESSOR;
@@ -212,7 +221,8 @@ std::string extendedVersionInfo()
 #if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     base["zmqversion"] = helics::zeromq::getZMQVersion();
 #endif
-    base["memory"] = static_cast<std::int64_t>(getTotalSystemMemory());
+    auto memory=getTotalSystemMemory();
+    base["memory"] = std::to_string(memory / (1024ULL * 1024ULL)) + " MB";
     base["OS"] = os_info();
     return fileops::generateJsonString(base);
 }

@@ -699,9 +699,9 @@ TEST_F(function_tests, version)
     EXPECT_NE(b, nullptr);
 }
 
-TEST_F(function_tests, extendedversion)
+TEST_F(function_tests, systemInfo)
 {
-    auto b = helicsGetExtendedVersionString();
+    auto b = helicsGetSystemInfo();
     EXPECT_NE(b, nullptr);
 }
 
