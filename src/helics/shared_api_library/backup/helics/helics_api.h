@@ -305,6 +305,7 @@ HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
 HelicsFederateInfo helicsCreateFederateInfo(void);
 HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
 void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
+void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
 void helicsFederateInfoFree(HelicsFederateInfo fi);
 HelicsBool helicsFederateIsValid(HelicsFederate fed);
 void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);

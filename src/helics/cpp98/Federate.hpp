@@ -73,6 +73,10 @@ class FederateInfo {
 #endif
     /** destructor*/
     ~FederateInfo() { helicsFederateInfoFree(fi); }
+    void loadFromArgs(const std::string& argString)
+    {
+        helicsFederateInfoLoadFromString(fi, argString.c_str(), HELICS_NULL_POINTER);
+    }
     /** set the core name to use in the federateInfo
     @param corename the core name to use*/
     void setCoreName(const std::string& corename)

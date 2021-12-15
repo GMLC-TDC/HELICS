@@ -604,6 +604,17 @@ HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, 
 HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
 
 /**
+ * Load federate info from command line arguments contained in a string.
+ *
+ * @param fi A federateInfo object.
+ * @param args Command line arguments specified in a string.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+ */
+HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
+
+/**
  * Delete the memory associated with a federate info object.
  */
 HELICS_EXPORT void helicsFederateInfoFree(HelicsFederateInfo fi);
