@@ -24,6 +24,7 @@ set(application_api_test_sources
     MessageFederateAdditionalTests.cpp
     FederateTests.cpp
     subPubObjectTests.cpp
+    GrantTimeoutTests.cpp
     ValueFederateAdditionalTests.cpp
     CombinationFederateTests.cpp
     ValueFederateSingleTransfer.cpp

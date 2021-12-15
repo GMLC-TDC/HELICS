@@ -792,9 +792,9 @@ void CoreBroker::labelAsDisconnected(GlobalBrokerId brkid)
     _federates.apply(disconnect_procedure);
 }
 
-void CoreBroker::sendDisconnect()
+void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
 {
-    ActionMessage bye(CMD_GLOBAL_DISCONNECT);
+    ActionMessage bye(disconnectType);
     bye.source_id = global_broker_id_local;
     _brokers.apply([this, &bye](auto& brk) {
         if (brk.state < connection_state::disconnected) {
@@ -872,7 +872,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_CHECK_CONNECTIONS:
-            sendDisconnect();
+            sendDisconnect(CMD_GLOBAL_DISCONNECT);
             addActionMessage(CMD_STOP);
             LOG_WARNING(global_broker_id_local,
                         getIdentifier(),
@@ -1068,8 +1068,41 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_USER_DISCONNECT:
         case CMD_GLOBAL_DISCONNECT:
-            sendDisconnect();
+            sendDisconnect(CMD_GLOBAL_DISCONNECT);
             addActionMessage(CMD_STOP);
+            break;
+        case CMD_TIMEOUT_DISCONNECT:
+            if (command.dest_id == parent_broker_id || command.dest_id == global_broker_id_local) {
+                if (isConnected()) {
+                    if (timeCoord->hasActiveTimeDependencies()) {
+                        Json::Value base;
+                        base["id"] = global_broker_id_local.baseValue();
+                        timeCoord->generateDebuggingTimeInfo(base);
+                        auto debugString = fileops::generateJsonString(base);
+                        debugString.insert(0, "TIME DEBUGGING::");
+                        LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
+                    }
+                    if (command.source_id == global_broker_id_local) {
+                        LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout disconnect");
+                    } else {
+                        LOG_ERROR(global_broker_id_local,
+                                  getIdentifier(),
+                                  "receoved timeout disconnect");
+                    }
+
+                    if (getBrokerState() <
+                        BrokerState::terminating) {  // only send a disconnect message
+                                                     // if we haven't done so already
+                        sendDisconnect(CMD_TIMEOUT_DISCONNECT);
+                    }
+                } else if (getBrokerState() ==
+                           BrokerState::errored) {  // we are disconnecting in an error state
+                    sendDisconnect(CMD_TIMEOUT_DISCONNECT);
+                }
+                addActionMessage(CMD_USER_DISCONNECT);
+            } else {
+                routeMessage(command);
+            }
             break;
         case CMD_DISCONNECT_FED: {
             auto fed = _federates.find(command.source_id);
@@ -1185,6 +1218,19 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 }
             } else {
                 transmit(getRoute(command.dest_id), command);
+            }
+            break;
+        case CMD_GRANT_TIMEOUT_CHECK:
+            if (command.dest_id == global_broker_id_local ||
+                (isRootc && command.dest_id == parent_broker_id)) {
+                auto v = timeCoord->grantTimeoutCheck(command);
+                if (!v.isNull()) {
+                    auto debugString = fileops::generateJsonString(v);
+                    debugString.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(global_broker_id_local, "broker", debugString);
+                }
+            } else {
+                routeMessage(std::move(command));
             }
             break;
         case CMD_PUB:
@@ -2064,6 +2110,9 @@ void CoreBroker::disconnect()
                                     currentMessageCounter()));
             addActionMessage(udisconnect);
         }
+        if (cnt % 13 == 0) {
+            std::cerr << "waiting on disconnect " << std::endl;
+        }
     }
 }
 
@@ -2194,7 +2243,7 @@ void CoreBroker::executeInitializationOperations()
                 eMiss.payload = "Missing required connections";
                 eMiss.dest_handle = InterfaceHandle{};
                 broadcast(eMiss);
-                sendDisconnect();
+                sendDisconnect(CMD_GLOBAL_DISCONNECT);
                 addActionMessage(CMD_STOP);
                 return;
             }
@@ -2512,7 +2561,7 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                         LOG_CONNECTIONS(parent_broker_id,
                                         getIdentifier(),
                                         "got disconnect from parent");
-                        sendDisconnect();
+                        sendDisconnect(CMD_GLOBAL_DISCONNECT);
                         addActionMessage(CMD_STOP);
                         return;
                     }

@@ -386,7 +386,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int errorCode);
     /** send a disconnect message to time dependencies and child brokers*/
-    void sendDisconnect();
+    void sendDisconnect(action_message_def::action_t disconnectType);
     /** generate a string about the federation summarizing connections*/
     std::string generateFederationSummary() const;
     /** label the broker and all children as disconnected*/

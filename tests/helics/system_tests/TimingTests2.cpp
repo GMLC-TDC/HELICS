@@ -575,10 +575,11 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
     res = mFed2->enterExecutingModeComplete();
     EXPECT_EQ(res, helics::IterationResult::ERROR_RESULT);
 
-    broker.reset();
-    mFed1->finalize();
+    mFed1->disconnect();
 
-    mFed2->finalize();
+    mFed2->disconnect();
+    broker->disconnect();
+    broker.reset();
 }
 
 TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
@@ -633,8 +634,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     EXPECT_EQ(retTime, 3.0);
     ept1.sendTo("message3", "ept2");
 
-    broker.reset();
-    mFed1->finalize();
+    mFed1->disconnect();
 
     retTime = mFed2->requestTimeComplete();
     EXPECT_EQ(retTime, 3.0);
@@ -642,7 +642,9 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     retTime = mFed2->requestTime(7.0);
     EXPECT_EQ(retTime, 7.0);
     EXPECT_EQ(ept2.pendingMessageCount(), 3U);
-    mFed2->finalize();
+    mFed2->disconnect();
+    broker->disconnect();
+    broker.reset();
 }
 
 TEST_F(timing_tests2, offset_timing)
@@ -679,8 +681,8 @@ TEST_F(timing_tests2, offset_timing)
     double val2 = sub2.getValue<double>();
     EXPECT_DOUBLE_EQ(val2, 3.5);  // shouldn't have gotten the update
 
-    vFed1->finalize();
-    vFed2->finalize();
+    vFed1->disconnect();
+    vFed2->disconnect();
 }
 
 TEST_F(timing_tests2, wait_for_current_time_iterative)

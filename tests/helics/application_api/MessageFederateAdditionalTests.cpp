@@ -327,8 +327,9 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_EQ(e1cnt, 0);
     EXPECT_EQ(e2cnt, 4);
     mFed1->finalizeAsync();
-    mFed2->finalize();
+    mFed2->disconnect();
     mFed1->finalizeComplete();
+    mFed1->disconnect();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -539,6 +540,7 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     auto cr = mFed.getCorePointer();
     mFed.disconnect();
     cr->disconnect();
+    cr.reset();
 }
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,

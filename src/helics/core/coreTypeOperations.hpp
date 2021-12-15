@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreTypes.hpp"
 
 #include <string>
+#include <string_view>
 
 /** @file
 @details function definitions for operations on core types
@@ -35,6 +36,6 @@ helics::CoreType::UNRECOGNIZED if the type is not valid
 @param type2 the second type to check
 @return true if the types are compatible with each other
 */
-    bool matchingTypes(const std::string& type1, const std::string& type2);
+    bool matchingTypes(std::string_view type1, std::string_view type2);
 }  // namespace core
 }  // namespace helics

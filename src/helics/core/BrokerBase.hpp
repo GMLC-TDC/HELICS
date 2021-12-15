@@ -59,6 +59,7 @@ class BrokerBase {
                               //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
+    Time maxCoSimDuration{-1.0};  //!< the maximum lifetime (wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
                             //!< key is required
@@ -66,10 +67,10 @@ class BrokerBase {
     // consistent public interface for extracting it this variable may need to be updated in a
     // constant function
     mutable std::string address;  //!< network location of the broker
-    std::shared_ptr<spdlog::logger>
-        consoleLogger;  //!< default logging object to use if the logging callback is not specified
-    std::shared_ptr<spdlog::logger>
-        fileLogger;  //!< default logging object to use if the logging callback is not specified
+    /// default logging object to use if the logging callback is not specified
+    std::shared_ptr<spdlog::logger> consoleLogger;
+    /// default logging object to use if the logging callback is not specified
+    std::shared_ptr<spdlog::logger> fileLogger;
     std::thread queueProcessingThread;  //!< thread for running the broker
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;
@@ -85,14 +86,17 @@ class BrokerBase {
     bool observer{false};
 
   private:
-    std::atomic<bool> mainLoopIsRunning{
-        false};  //!< flag indicating that the main processing loop is running
-    bool dumplog{false};  //!< flag indicating the broker should capture a dump log
-    std::atomic<bool> forceLoggingFlush{false};  //!< force the log to flush after every message
-    bool queueDisabled{
-        false};  //!< flag indicating that the message queue should not be used and all functions
-    //!< called directly instead of distinct thread
-    bool disable_timer{false};  //!< turn off the timer/timeout subsystem completely
+    /// flag indicating that the main processing loop is running
+    std::atomic<bool> mainLoopIsRunning{false};
+    /// flag indicating the broker should capture a dump log
+    bool dumplog{false};
+    /// force the log to flush after every message
+    std::atomic<bool> forceLoggingFlush{false};
+    /// flag indicating that the message queue should not be used and all functions are called
+    /// directly instead of in a distinct thread
+    bool queueDisabled{false};
+    /// turn off the timer/timeout subsystem completely
+    bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
 
@@ -121,12 +125,13 @@ class BrokerBase {
         NONE = 0,
         NO_COMMS = 0x01,
         PING_RESPONSE = 0x02,
-        QUERY_TIMEOUT = 0x04
+        QUERY_TIMEOUT = 0x04,
+        GRANT_TIMEOUT = 0x08
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
-    bool enteredExecutionMode{
-        false};  //!< flag indicating that the broker has entered execution mode
+    /// flag indicating that the broker has entered execution mode
+    bool enteredExecutionMode{false};
     bool waitingForBrokerPingReply{false};  //!< flag indicating we are waiting for a ping reply
     bool hasFilters{false};  //!< flag indicating filters come through the broker
 
@@ -135,8 +140,8 @@ class BrokerBase {
     /** specify that outgoing connection should use json serialization */
     bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
-    decltype(std::chrono::steady_clock::now())
-        errorTimeStart;  //!< time when the error condition started related to the errorDelay
+    /// time when the error condition started; related to the errorDelay
+    decltype(std::chrono::steady_clock::now()) errorTimeStart;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
