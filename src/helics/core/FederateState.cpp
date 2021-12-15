@@ -1286,7 +1286,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (cmd.actionTime == Time::maxVal()) {
                     LOG_WARNING("finalize blocking");
                 } else {
-                    LOG_WARNING("grant timeout stage 4 error actions(none available)");
+                    LOG_WARNING("grant timeout stage 4 error actions (none available)");
                 }
             }
 #ifndef HELICS_DISABLE_ASIO

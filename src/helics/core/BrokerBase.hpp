@@ -59,7 +59,7 @@ class BrokerBase {
                               //!< period respond with timeout error
     Time errorDelay{10.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
-    Time maxCoSimDuration{-1.0};  //!< the maximum lifetime(wall clock time) of the co-simulation
+    Time maxCoSimDuration{-1.0};  //!< the maximum lifetime (wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
     std::string brokerKey;  //!< a key that all joining federates must have to connect if empty no
                             //!< key is required
@@ -137,7 +137,7 @@ class BrokerBase {
     /** specify that outgoing connection should use json serialization */
     bool useJsonSerialization{false};
     bool enable_profiling{false};  //!< indicator that profiling is enabled
-    /// time when the error condition started related to the errorDelay
+    /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string

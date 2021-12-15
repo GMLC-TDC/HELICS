@@ -243,7 +243,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
             "--tick",
             tickTimer,
             "heartbeat time in ms, if there is no broker communication for 2 ticks then "
-            "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')")
+            "secondary actions are taken (can also be entered as a time like '10s' or '45ms')")
         ->capture_default_str();
     timeout_group->add_flag("--disable_timer,--no_tick",
                             disable_timer,
@@ -260,7 +260,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->add_option(
             "--networktimeout",
             networkTimeout,
-            "time to wait for a broker connection default unit is in ms(can also be entered as a time "
+            "time to wait for a broker connection, default unit is in ms (can also be entered as a time "
             "like '10s' or '45ms') ")
         ->capture_default_str();
     timeout_group->add_option(
