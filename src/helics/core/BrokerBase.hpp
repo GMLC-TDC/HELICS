@@ -88,12 +88,15 @@ class BrokerBase {
   private:
     /// flag indicating that the main processing loop is running
     std::atomic<bool> mainLoopIsRunning{false};
-    bool dumplog{false};  //!< flag indicating the broker should capture a dump log
-    std::atomic<bool> forceLoggingFlush{false};  //!< force the log to flush after every message
-    /// flag indicating that the message queue should not be used and all functions
+    /// flag indicating the broker should capture a dump log
+    bool dumplog{false};
+    /// force the log to flush after every message
+    std::atomic<bool> forceLoggingFlush{false};
+    /// flag indicating that the message queue should not be used and all functions are called
+    /// directly instead of in a distinct thread
     bool queueDisabled{false};
-    //!< called directly instead of distinct thread
-    bool disable_timer{false};  //!< turn off the timer/timeout subsystem completely
+    /// turn off the timer/timeout subsystem completely
+    bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
 
