@@ -120,7 +120,7 @@ The [Examples](../examples/examples_index.md) in this User Guide are written in 
 
 ### Sample PyHELICS API configuration
 
-The following example of a federate interface configuration with the PyHELICS API comes from the [Fundamental Final Example](../examples/fundamental_examples/fundamental_final.md). This co-simulation has exactly the same interface configuration as the Combination Federation above. The only difference is that the federate interfaces are configured with the PyHELICS API.
+The following example of a federate interface configuration with the PyHELICS API comes from the [Fundamental Integration Example](../examples/fundamental_examples/fundamental_fedintegration.md). This co-simulation has exactly the same interface configuration as the Combination Federation above. The only difference is that the federate interfaces are configured with the PyHELICS API.
 
 In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 
