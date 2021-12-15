@@ -79,6 +79,7 @@ typedef enum {
 } HelicsFlags;
 
 typedef enum {
+    HELICS_LOG_LEVEL_DUMPLOG = -10,
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     HELICS_LOG_LEVEL_ERROR = 0,
     HELICS_LOG_LEVEL_PROFILING = 2,
