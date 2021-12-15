@@ -903,6 +903,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1PROFILING_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1DUMPLOG_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsLogLevels result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsLogLevels)HELICS_LOG_LEVEL_DUMPLOG;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1NO_1PRINT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsLogLevels result;

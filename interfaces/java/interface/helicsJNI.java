@@ -66,6 +66,7 @@ public class helicsJNI {
   public final static native int HELICS_FLAG_DUMPLOG_get();
   public final static native int HELICS_FLAG_PROFILING_get();
   public final static native int HELICS_FLAG_PROFILING_MARKER_get();
+  public final static native int HELICS_LOG_LEVEL_DUMPLOG_get();
   public final static native int HELICS_LOG_LEVEL_NO_PRINT_get();
   public final static native int HELICS_LOG_LEVEL_ERROR_get();
   public final static native int HELICS_LOG_LEVEL_PROFILING_get();

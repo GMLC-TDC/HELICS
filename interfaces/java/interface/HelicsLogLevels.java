@@ -13,6 +13,10 @@ package com.java.helics;
  */
 public final class HelicsLogLevels {
   /**
+   *  log level for dumping log messages
+   */
+  public final static HelicsLogLevels HELICS_LOG_LEVEL_DUMPLOG = new HelicsLogLevels("HELICS_LOG_LEVEL_DUMPLOG", helicsJNI.HELICS_LOG_LEVEL_DUMPLOG_get());
+  /**
    *  don't print anything except a few catastrophic errors
    */
   public final static HelicsLogLevels HELICS_LOG_LEVEL_NO_PRINT = new HelicsLogLevels("HELICS_LOG_LEVEL_NO_PRINT", helicsJNI.HELICS_LOG_LEVEL_NO_PRINT_get());
@@ -92,7 +96,7 @@ public final class HelicsLogLevels {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsLogLevels[] swigValues = { HELICS_LOG_LEVEL_NO_PRINT, HELICS_LOG_LEVEL_ERROR, HELICS_LOG_LEVEL_PROFILING, HELICS_LOG_LEVEL_WARNING, HELICS_LOG_LEVEL_SUMMARY, HELICS_LOG_LEVEL_CONNECTIONS, HELICS_LOG_LEVEL_INTERFACES, HELICS_LOG_LEVEL_TIMING, HELICS_LOG_LEVEL_DATA, HELICS_LOG_LEVEL_DEBUG, HELICS_LOG_LEVEL_TRACE };
+  private static HelicsLogLevels[] swigValues = { HELICS_LOG_LEVEL_DUMPLOG, HELICS_LOG_LEVEL_NO_PRINT, HELICS_LOG_LEVEL_ERROR, HELICS_LOG_LEVEL_PROFILING, HELICS_LOG_LEVEL_WARNING, HELICS_LOG_LEVEL_SUMMARY, HELICS_LOG_LEVEL_CONNECTIONS, HELICS_LOG_LEVEL_INTERFACES, HELICS_LOG_LEVEL_TIMING, HELICS_LOG_LEVEL_DATA, HELICS_LOG_LEVEL_DEBUG, HELICS_LOG_LEVEL_TRACE };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
