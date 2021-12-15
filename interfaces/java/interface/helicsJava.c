@@ -3501,6 +3501,36 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFro
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFromString(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  HelicsFederateInfo arg1 = (HelicsFederateInfo) 0 ;
+  char *arg2 = (char *) 0 ;
+  HelicsError *arg3 = (HelicsError *) 0 ;
+  HelicsError etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(HelicsFederateInfo *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  helicsFederateInfoLoadFromString(arg1,(char const *)arg2,arg3);
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoFree(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   HelicsFederateInfo arg1 = (HelicsFederateInfo) 0 ;
   
