@@ -193,7 +193,14 @@ InterfaceHandle EmptyCore::registerInput(LocalFederateId /*federateID*/,
     return {};
 }
 
-InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/,
+InterfaceHandle EmptyCore::registerTranslator(const std::string& /*translatorName*/,
+                                              const std::string& /*message_type*/,
+                                              const std::string& /*units*/)
+{
+    return {};
+}
+
+    InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/,
                                     const std::string& /*key*/) const
 {
     return {};

@@ -507,7 +507,7 @@ class Core {
                                                   const std::string& type_out) = 0;
 
     /**
-     * Register source filter.
+     * Register filter.
      *
      * May only be invoked in the Initialization state.
      @param filterName the name of the filter (may be left blank and one will be automatically
@@ -520,6 +520,20 @@ class Core {
     virtual InterfaceHandle registerFilter(const std::string& filterName,
                                            const std::string& type_in,
                                            const std::string& type_out) = 0;
+
+     /**
+    * Register translator.
+    *
+    @param translatorName the name of the translator (may be left blank and one will be automatically
+    assigned)
+    @param units the specified units for the value side of the translator
+    @param message_type a specified value type for the units
+    @return the handle for the new translator
+    */
+    virtual InterfaceHandle registerTranslator(const std::string& translatorName,
+                                           const std::string& message_type,
+                                           const std::string& units) = 0;
+
     /**
     * add a destination target,  the handle can be for a filter or a publication
     @details a filter will create an additional processing step for messages before they get to a

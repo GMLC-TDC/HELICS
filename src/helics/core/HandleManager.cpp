@@ -6,8 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
 
-#include "ActionMessage.hpp"
-
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           InterfaceType what,
@@ -347,6 +345,11 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
         case InterfaceType::INPUT:
             inputs.emplace(handle.key, InterfaceHandle(index));
             break;
+        case InterfaceType::TRANSLATOR:
+            publications.emplace(handle.key, InterfaceHandle(index));
+            endpoints.emplace(handle.key, InterfaceHandle(index));
+            inputs.emplace(handle.key, InterfaceHandle(index));
+            break;
         default:
             break;
     }
@@ -356,17 +359,28 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
 
 std::string HandleManager::generateName(InterfaceType what) const
 {
+    std::string base;
     switch (what) {
         case InterfaceType::ENDPOINT:
-            return std::string("_ept_") + std::to_string(handles.size());
+            base = "_ept_";
+            break;
         case InterfaceType::INPUT:
-            return std::string("_input_") + std::to_string(handles.size());
+            base = "_input_";
+            break;
         case InterfaceType::PUBLICATION:
-            return std::string("_pub_") + std::to_string(handles.size());
+            base = "_pub_";
+            break;
         case InterfaceType::FILTER:
-            return std::string("_filter_") + std::to_string(handles.size());
+            base = "_filter_";
+            break;
+        case InterfaceType::TRANSLATOR:
+            base = "_translator_";
+            break;
         default:
-            return std::string("_handle_") + std::to_string(handles.size());
+            base = "_handle_";
+            break;
     }
+    base.append(std::to_string(handles.size()));
+    return base;
 }
 }  // namespace helics

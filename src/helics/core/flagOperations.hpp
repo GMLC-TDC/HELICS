@@ -11,6 +11,7 @@ operations and helper functions for handling flags in helics
 */
 #include <cstdint>
 
+namespace helics {
 /** flag definitions for the action Message Flag field*/
 enum operation_flags : uint16_t {
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
@@ -128,3 +129,5 @@ inline constexpr uint16_t make_flags(unsigned int flag1, unsigned int flag2, uns
 {
     return make_flags(flag1, flag2) | make_flags(flag3);
 }
+
+}  // namespace helics

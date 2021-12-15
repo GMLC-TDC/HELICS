@@ -101,21 +101,18 @@ enum class InterfaceType : char {
     PUBLICATION = 'p',  //!< handle to output interface
     INPUT = 'i',  //!< handle to a input interface
     ENDPOINT = 'e',  //!< handle to an endpoint
-    FILTER = 'f'  //!< handle to a filter
+    FILTER = 'f',  //!< handle to a filter
+    TRANSLATOR = 't' //!< handle to a translator object
 };
 
 }  // namespace helics
-
-constexpr auto ITERATION_COMPLETE =
-    helics::IterationRequest::NO_ITERATIONS;  //!< simplified alias to indicate that iterations
-                                              //!< have concluded
-constexpr auto NO_ITERATION =
-    helics::IterationRequest::NO_ITERATIONS;  //!< simplified alias to indicate that no iterations
-                                              //!< are needed
-constexpr auto FORCE_ITERATION =
-    helics::IterationRequest::FORCE_ITERATION;  //!< simplified alias to force an iteration
-constexpr auto ITERATE_IF_NEEDED =
-    helics::IterationRequest::ITERATE_IF_NEEDED;  //!< simplified alias to indicate that helics
-                                                  //!< should iterate if warranted
+/// simplified alias to indicate that iterations have concluded
+constexpr auto ITERATION_COMPLETE = helics::IterationRequest::NO_ITERATIONS;
+/// simplified alias to indicate that no iterations are needed
+constexpr auto NO_ITERATION = helics::IterationRequest::NO_ITERATIONS;
+/// simplified alias to force an iteration
+constexpr auto FORCE_ITERATION = helics::IterationRequest::FORCE_ITERATION;
+/// simplified alias to indicate that helics should iterate if warranted
+constexpr auto ITERATE_IF_NEEDED = helics::IterationRequest::ITERATE_IF_NEEDED;
 
 #endif

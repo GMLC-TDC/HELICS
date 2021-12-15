@@ -187,6 +187,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
                                                   const std::string& type_in,
                                                   const std::string& type_out) override final;
+    virtual InterfaceHandle registerTranslator(const std::string& translatorName,
+                                       const std::string& message_type,
+                                       const std::string& units) override final; 
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
                                const std::string& federateName) override final;

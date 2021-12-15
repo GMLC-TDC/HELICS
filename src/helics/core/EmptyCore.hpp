@@ -79,6 +79,10 @@ class EmptyCore: public Core {
     virtual InterfaceHandle getInput(LocalFederateId federateID,
                                      const std::string& key) const override;
 
+    virtual InterfaceHandle registerTranslator(const std::string& translatorName,
+                                               const std::string& message_type,
+                                               const std::string& units) override;
+
     virtual const std::string& getHandleName(InterfaceHandle handle) const override;
 
     virtual void
