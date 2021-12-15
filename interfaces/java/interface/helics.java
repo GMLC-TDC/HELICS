@@ -731,6 +731,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Load federate info from command line arguments contained in a string.<br>
+   * <br>
+   * @param fi A federateInfo object.<br>
+   * @param args Command line arguments specified in a string.<br>
+   * <br>
+   * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsFederateInfoLoadFromString(SWIGTYPE_p_void fi, String args) {
+    helicsJNI.helicsFederateInfoLoadFromString(SWIGTYPE_p_void.getCPtr(fi), args);
+  }
+
+  /**
    * Delete the memory associated with a federate info object.
    */
   public static void helicsFederateInfoFree(SWIGTYPE_p_void fi) {

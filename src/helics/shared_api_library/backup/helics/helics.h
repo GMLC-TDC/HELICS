@@ -1136,7 +1136,7 @@ HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int arg
  * Load federate info from command line arguments contained in a string.
  *
  * @param fi A federateInfo object.
- * @param args a command line arguments specified in a string
+ * @param args Command line arguments specified in a string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
