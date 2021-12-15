@@ -10,28 +10,28 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.1.1][] - 2021-12-14
 
-Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages. Also included are `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.
+Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages. Also includes a `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.
 
 ### Fixed
 
 - CMake issue resulting in internal logging messages being disabled for some builds including some package releases.
-- fix a few deadlock pathways if the core was killed internally
-- fixed some timeout issues in the CI builds
-- fixed a potential race condition when setting the log file after execution has started on helics cores
+- Fixed a few deadlock pathways if the core was killed internally.
+- Fixed some timeout issues in the CI builds.
+- Fixed a potential race condition when setting the log file after execution has started on helics cores.
 
 ### Changed
 
 - CMake version 3.22 tested and used if available.
-- The TCP networking components that were not core to HELICS have been moved to a separate repo and linked at a submodule See [networking](www.github.com/GMLC-TDC/networking).
-- Several documentation fixes and updates
+- The TCP networking components that were not core to HELICS have been moved to a separate repo and linked as a submodule. See [networking](www.github.com/GMLC-TDC/networking).
+- Several documentation fixes and updates.
 - Moved to using the upstream toml11 repo instead of a custom modified version. Customized modifications have now been merged upstream.
 
 ### Added
 
 - '--maxcosimduration' flag added in the broker to specify a max co-sim duration after which the cosimulation will be terminated.
 - `helicsGetSystemInfo()` function was added to the API to retrieve HELICS version and system info for debugging and diagnostic purposes.
-- added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
-- added `helicsFederateInfoLoadFromString` to better match C++ API available functions. This loads the federateInfo structure from command line arguments contained in a string.
+- Added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
+- Added `helicsFederateInfoLoadFromString` to better match C++ API available functions. This loads the federateInfo structure from command line arguments contained in a string.
 
 ## [3.1.0][] - 2021-11-25
 
