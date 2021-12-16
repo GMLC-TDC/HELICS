@@ -70,12 +70,12 @@ inline void loadThreadedSignalHandler()
 
 inline void loadSignalHandler(HelicsBool (*handler)(int))
 {
-    helicsLoadSignalHandlerCallback(handler,HELICS_FALSE);
+    helicsLoadSignalHandlerCallback(handler, HELICS_FALSE);
 }
 
-inline void loadSignalHandler(HelicsBool (*handler)(int),bool val)
+inline void loadSignalHandler(HelicsBool (*handler)(int), bool val)
 {
-    helicsLoadSignalHandlerCallback(handler,val?HELICS_TRUE:HELICS_FALSE);
+    helicsLoadSignalHandlerCallback(handler, val ? HELICS_TRUE : HELICS_FALSE);
 }
 
 inline void clearSignalHandler()

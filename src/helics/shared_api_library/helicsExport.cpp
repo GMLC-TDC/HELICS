@@ -122,18 +122,18 @@ static void signalHandlerThreadedCallback(int signum)
     }
 }
 
-void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int),HelicsBool useSeparateThread)
+void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useSeparateThread)
 {
     keyHandler = handler;
     if (handler != nullptr) {
-        if (useSeparateThread!=HELICS_FALSE) {
+        if (useSeparateThread != HELICS_FALSE) {
             signal(SIGINT, signalHandlerThreadedCallback);
         } else {
             signal(SIGINT, signalHandlerCallback);
         }
-        
+
     } else {
-        if (useSeparateThread!=HELICS_FALSE) {
+        if (useSeparateThread != HELICS_FALSE) {
             helicsLoadThreadedSignalHandler();
         } else {
             helicsLoadSignalHandler();
