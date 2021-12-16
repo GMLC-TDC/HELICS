@@ -384,7 +384,7 @@ static HelicsBool testHandlerTrue(int /*unused*/)
 TEST(other_tests, signal_handler_callback)
 {
     handlerCount.store(0);
-    helicsLoadSignalHandlerCallback(testHandlerFalse,HELICS_FALSE);
+    helicsLoadSignalHandlerCallback(testHandlerFalse, HELICS_FALSE);
     raise(SIGINT);
     EXPECT_EQ(handlerCount.load(), 1);
     helicsClearSignalHandler();
@@ -405,14 +405,13 @@ TEST(other_tests, signal_handler_threaded_death_ci_skip)
     auto hb = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
     EXPECT_TRUE(helicsBrokerIsConnected(hb));
     raise(SIGINT);
-    auto res = helicsBrokerWaitForDisconnect(hb, 1000,nullptr);
-    if (res==HELICS_FALSE) {
+    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
+    if (res == HELICS_FALSE) {
         res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
     }
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
 }
-
 
 /** test the default signal handler*/
 TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
