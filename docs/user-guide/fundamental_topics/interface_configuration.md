@@ -25,20 +25,23 @@ The [Examples](../examples/examples_index.md) illustrate in detail how to integr
 
 ### Sample JSON configuration file
 
-The most common parameters are set in the file `ChargerConfig.json`. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [Configurations Options Reference](../../references/configuration_options_reference.md).
+Below is a sample JSON configuration file with some of the more common options. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [Configurations Options Reference](../../references/configuration_options_reference.md).
 
 ```json
 {
-  "name": "Charger",
-  "loglevel": 7,
+  "name": "sample_federate",
+  "loglevel": "debug",
   "coreType": "zmq",
   "period": 60,
+  "offset": 10,
   "uninterruptible": false,
   "terminate_on_error": true,
+  "wait_for_current_time_update": false,
+  "federate_init_string": "--broker_address=127.0.0.1 --port=23405"
   "endpoints": [
     {
-      "name": "Charger/EV1.soc",
-      "destination": "Controller/ep",
+      "name": "sample_federate/ep1",
+      "destination": "other_federate/ep1",
       "global": true
     },
     {
@@ -47,10 +50,12 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
   ],
   "publications":[
     {
-      "key":"Charger/EV1_voltage",
+      "key":"sample_federate/voltage",
       "type":"double",
       "unit":"V",
-      "global": true
+      "global": true,
+      "only_transmit_on_change": true,
+      "tolerance": 0.1,
       "tags": {
         "period": 0.5,
         "description": "a test publication"
@@ -62,10 +67,12 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
   ],
   "subscriptions":[
     {
-      "key":"Battery/EV1_current",
+      "key":"other_federate/current",
       "type":"double",
       "unit":"A",
-      "global": true
+      "global": true,
+      "only_update_on_change": true,
+      "tolerance": 0.2
     },
     {
     ...
@@ -77,11 +84,14 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
 ### JSON configuration file explanation
 
 - **`name`** - Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
-- **`loglevel`** - The level of detail exported to the [log files](./logging.md) during run time ranges from 1 (minimal) to 7 (most).
+- **`loglevel`** - The level of detail exported to the [log files](./logging.md) during run time ranges from "none" to "trace".
 - **`coreType`** - There are a number of technologies or message buses that can be used to send HELICS messages among federates, detailed in [Core Types](../advanced_topics/CoreTypes.md). Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used, but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on high-performance computing clusters where MPI is installed).
-- **`period`** - The federate needs instruction for how to step forward in time in order to synchronize calculations. This is the simplest way to synchronize simulators to the same time step; this forces the federate to time step intervals of `n*period`. The default units are in seconds. Timing configuration is explained in greater detail in the [Timing](./timing_configuration.md) page, with additional configuration options in the [Configuration Options Reference](../../references/configuration_options_reference.md#timing-options).
+- **`period`** and **`offset`** - The federate needs instruction for how to step forward in time in order to synchronize calculations. This is the simplest way to synchronize simulators to the same time step; this forces the federate to time step intervals of `n*period + offset`. The default units are in seconds. Timing configuration is explained in greater detail in the [Timing](./timing_configuration.md) page, with additional configuration options in the [Configuration Options Reference](../../references/configuration_options_reference.md#timing-options).
+  configuration_options_reference.md#timing-options).
 - **`uninterruptible`** - Setting `uninterruptible` to `false` allows the federate to be interrupted if there is a signal available for it to receive. This is a [timing configuration](./timing_configuration.md) option.
 - **`terminate_on_error`** - By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. Setting `terminate_on_error` frees the federate from the broker if there is an error in execution, which simplifies debugging. This will prevent your federate from hanging in the event that another federate fails.
+- **`wait_for_current_time_update`** - There are times when HELICS will grant the same simulated time to a number of federates simultaneously. There is a possibility of this leading to unexpected co-simulation results if federates are unexpectedly operating on old data. Using this flag, HELICS uses this option to provide the ability for one federate to always be granted this time last, after all other federates that have been granted this time have requested a later time. This ensures that the federate with this flag set will have all the latest information from all other federates before it begins execution at the granted time.
+- **`federate_init_string`** - This option provides a way of passing in a large number of configuration options that a federate needs during initialization. You can consult the [Configuration Options Reference](../../references/configuration_options_reference.md#broker-init-string-brokerinitstring-brokerinitstring) page for a more complete list but there are a few worth bringing up specifically. `--broker_address=<IP address>` and `--port=<port number>`- Allows you to specify the IP address and port number of the broker to which you want this federate to connect. You can consult the [Advanced Topics section of the User Guide](../advanced_topics/advanced_topics_index.md) to see further explanation of how to handle more complex broker configuration.
 - **`endpoints`**
   - `name` - The string in this field is the unique identifier/handle for the endpoint interface.
   - `destination` - This option can be used to set a default destination for the messages sent from this endpoint. The default destination is allowed to be rerouted or changed during run time.
@@ -92,13 +102,15 @@ The most common parameters are set in the file `ChargerConfig.json`. There are m
   - `required` - At least one federate must subscribe to the publications.
   - `type` - Data type, such as integer, double, complex.
   - `units` - The units can be any sort of unit string, a wide assortment is supported and can be compound units such as m/s^2 and the conversion will convert as long as things are convertible. The unit match is also checked for other types and an error if mismatching units are detected. A warning is also generated if the units are not understood and not matching. The unit checking and conversion is only active if both the publication and subscription specify units. HELICS is able to do some levels of unit conversion, currently only on double type publications but more may be added in the future.
-    - `tags` - Arbitrary string value pairs that can be applied to interfaces. Tags are available to others through queries but are not transmitted by default. They can be used to store additional information about an interface that might be useful to applications. At some point in the future automated connection routines will make use of them. "tags" are applicable to any interface and can also be used on federates.
+  - `only_transmit_on_change` and `tolerance` - Publications will only send a new value out to the federation when the value has changed more than the delta specified by `tolerance`.
+  - `tags` - Arbitrary string value pairs that can be applied to interfaces. Tags are available to others through queries but are not transmitted by default. They can be used to store additional information about an interface that might be useful to applications. At some point in the future automated connection routines will make use of them. "tags" are applicable to any interface and can also be used on federates.
 - **`subscriptions`** - These are lists of the values being sent to and from the given federate.
   - `key` - This string identifies the federation-unique value that this federate wishes to receive. If `global` has been set to `false` in the `publications` JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is the publishing federate's `key` value.
   - `required` - The message being subscribed to must be provided by some other publisher in the federation.
   - `type` - Data type, such as integer, double, complex.
   - `units` - Same as with `publications`.
   - `global` - Applies to the `key`, same as with `publications`.
+  - `only_update_on_change` and `tolerance` - Subscriptions will only consider a new value received when that value has changed more than the delta specified by `tolerance`.
 
 ## API Configuration
 
@@ -108,7 +120,7 @@ The [Examples](../examples/examples_index.md) in this User Guide are written in 
 
 ### Sample PyHELICS API configuration
 
-The following example of a federate interface configuration with the PyHELICS API comes from the [Fundamental Final Example](../examples/fundamental_examples/fundamental_final.md). This co-simulation has exactly the same interface configuration as the Combination Federation above. The only difference is that the federate interfaces are configured with the PyHELICS API.
+The following example of a federate interface configuration with the PyHELICS API comes from the [Fundamental Integration Example](../examples/fundamental_examples/fundamental_fedintegration.md). This co-simulation has exactly the same interface configuration as the Combination Federation above. The only difference is that the federate interfaces are configured with the PyHELICS API.
 
 In the `Charger.py` simulator, the following function calls the APIs to create a federate:
 

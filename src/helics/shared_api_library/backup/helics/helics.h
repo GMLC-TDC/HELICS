@@ -82,7 +82,7 @@ typedef enum {
                                   exist, for testing and a few other assorted reasons*/
     HELICS_CORE_TYPE_NULL = 66,
     /** an explicit core type exists but does nothing but return empty values or sink calls*/
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
@@ -201,6 +201,8 @@ typedef enum {
 /** log level definitions
  */
 typedef enum {
+    /** log level for dumping log messages*/
+    HELICS_LOG_LEVEL_DUMPLOG = -10,
     /** don't print anything except a few catastrophic errors*/
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     /** only print error level indicators*/
@@ -570,6 +572,13 @@ HELICS_EXPORT const char* helicsGetBuildFlags(void);
  * Get the compiler version used to compile HELICS.
  */
 HELICS_EXPORT const char* helicsGetCompilerVersion(void);
+
+/**
+ * Get a json formatted system information string, containing version info.
+ * The string contains fields with system information like cpu, core count, operating system, and memory,
+ * as well as information about the HELICS build.  Used for debugging reports and gathering other information.
+ */
+HELICS_EXPORT const char* helicsGetSystemInfo(void);
 
 /**
  * Return an initialized error object.
@@ -1124,6 +1133,17 @@ HELICS_EXPORT HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, 
 
  */
 HELICS_EXPORT void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
+
+/**
+ * Load federate info from command line arguments contained in a string.
+ *
+ * @param fi A federateInfo object.
+ * @param args Command line arguments specified in a string.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+ */
+HELICS_EXPORT void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
 
 /**
  * Delete the memory associated with a federate info object.

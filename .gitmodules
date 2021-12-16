@@ -1,32 +1,32 @@
 [submodule "ThirdParty/asio"]
     path = ThirdParty/asio
-    url = https://github.com/chriskohlhoff/asio
+    url = ../../chriskohlhoff/asio
 [submodule "ThirdParty/fmtlib"]
     path = ThirdParty/fmtlib
-    url = https://github.com/fmtlib/fmt.git
+    url = ../../fmtlib/fmt.git
 [submodule "ThirdParty/containers"]
     path = ThirdParty/containers
-    url = https://github.com/GMLC-TDC/containers.git
+    url = ../../GMLC-TDC/containers.git
     branch = master
 [submodule "ThirdParty/concurrency"]
     path = ThirdParty/concurrency
-    url = https://github.com/GMLC-TDC/concurrency.git
+    url = ../../GMLC-TDC/concurrency.git
 [submodule "ThirdParty/utilities"]
     path = ThirdParty/utilities
-    url = https://github.com/GMLC-TDC/utilities.git
+    url = ../../GMLC-TDC/utilities.git
 [submodule "ThirdParty/units"]
     path = ThirdParty/units
-    url = https://github.com/LLNL/units.git
-[submodule "ThirdParty/toml11"]
-    path = ThirdParty/toml11
-    url = https://github.com/GMLC-TDC/toml11.git
-[submodule "ThirdParty/netif"]
-    path = ThirdParty/netif
-    url = https://github.com/GMLC-TDC/netif.git
+    url = ../../LLNL/units.git
 [submodule "ThirdParty/spdlog"]
     path = ThirdParty/spdlog
-    url = https://github.com/gabime/spdlog.git
+    url = ../../gabime/spdlog.git
 [submodule "ThirdParty/json_cpp"]
     path = ThirdParty/json_cpp
-    url = https://github.com/open-source-parsers/jsoncpp.git
+    url = ../../open-source-parsers/jsoncpp.git
     branch = master
+[submodule "ThirdParty/toml"]
+	path = ThirdParty/toml
+	url = ../../ToruNiina/toml11
+[submodule "ThirdParty/networking"]
+	path = ThirdParty/networking
+	url = ../../GMLC-TDC/networking.git

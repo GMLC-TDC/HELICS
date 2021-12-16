@@ -9,6 +9,7 @@
     advanced_brokers_simultaneous
     advanced_brokers_hierarchies
     advanced_brokers_multibroker
+    advanced_brokers_multicomputer
     advanced_query
     advanced_multi_input
     advanced_orchestration

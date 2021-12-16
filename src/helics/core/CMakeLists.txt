@@ -36,6 +36,7 @@ set(SRC_FILES
     queryHelpers.cpp
     ProfilerBuffer.cpp
     EmptyCore.cpp
+    helicsVersion.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES
@@ -99,7 +100,8 @@ endif()
 add_library(helics_core STATIC ${SRC_FILES} ${INCLUDE_FILES} ${PUBLIC_INCLUDE_FILES})
 
 target_link_libraries(
-    helics_core PUBLIC HELICS::common PRIVATE spdlog::spdlog fmt::fmt compile_flags_target
+    helics_core PUBLIC HELICS::common gmlc::networking PRIVATE spdlog::spdlog fmt::fmt
+                                                               compile_flags_target
 )
 
 add_library(HELICS::core ALIAS helics_core)

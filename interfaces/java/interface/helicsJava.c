@@ -903,6 +903,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1FLAG_1PROFILING_1
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1DUMPLOG_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsLogLevels result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsLogLevels)HELICS_LOG_LEVEL_DUMPLOG;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1LOG_1LEVEL_1NO_1PRINT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsLogLevels result;
@@ -2229,6 +2241,18 @@ SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetCompilerVersi
 }
 
 
+SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsGetSystemInfo(JNIEnv *jenv, jclass jcls) {
+  jstring jresult = 0 ;
+  char *result = 0 ;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (char *)helicsGetSystemInfo();
+  if (result) jresult = (*jenv)->NewStringUTF(jenv, (const char *)result);
+  return jresult;
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandler(JNIEnv *jenv, jclass jcls) {
   (void)jenv;
   (void)jcls;
@@ -3484,6 +3508,36 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFro
     {
       jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
       (*jenv)->ThrowNew(jenv, clazz, arg4->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateInfoLoadFromString(JNIEnv *jenv, jclass jcls, jlong jarg1, jstring jarg2) {
+  HelicsFederateInfo arg1 = (HelicsFederateInfo) 0 ;
+  char *arg2 = (char *) 0 ;
+  HelicsError *arg3 = (HelicsError *) 0 ;
+  HelicsError etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(HelicsFederateInfo *)&jarg1; 
+  arg2 = 0;
+  if (jarg2) {
+    arg2 = (char *)(*jenv)->GetStringUTFChars(jenv, jarg2, 0);
+    if (!arg2) return ;
+  }
+  helicsFederateInfoLoadFromString(arg1,(char const *)arg2,arg3);
+  if (arg2) (*jenv)->ReleaseStringUTFChars(jenv, jarg2, (const char *)arg2);
+  {
+    if (arg3->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
     }
   }
 }

@@ -24,7 +24,7 @@ typedef enum {
     HELICS_CORE_TYPE_WEBSOCKET = 14,
     HELICS_CORE_TYPE_INPROC = 18,
     HELICS_CORE_TYPE_NULL = 66,
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 typedef enum {
@@ -79,6 +79,7 @@ typedef enum {
 } HelicsFlags;
 
 typedef enum {
+    HELICS_LOG_LEVEL_DUMPLOG = -10,
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     HELICS_LOG_LEVEL_ERROR = 0,
     HELICS_LOG_LEVEL_PROFILING = 2,
@@ -253,6 +254,7 @@ typedef struct HelicsError {
 const char* helicsGetVersion(void);
 const char* helicsGetBuildFlags(void);
 const char* helicsGetCompilerVersion(void);
+const char* helicsGetSystemInfo(void);
 HelicsError helicsErrorInitialize(void);
 void helicsErrorClear(HelicsError* err);
 void helicsLoadSignalHandler();
@@ -304,6 +306,7 @@ HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
 HelicsFederateInfo helicsCreateFederateInfo(void);
 HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
 void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);
+void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, HelicsError* err);
 void helicsFederateInfoFree(HelicsFederateInfo fi);
 HelicsBool helicsFederateIsValid(HelicsFederate fed);
 void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, HelicsError* err);

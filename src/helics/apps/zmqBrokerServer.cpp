@@ -89,7 +89,7 @@ void zmqBrokerServer::stopServer()
     }
 
     try {
-        reqSocket.connect(helics::makePortAddress(mZmqInterface, port));
+        reqSocket.connect(gmlc::networking::makePortAddress(mZmqInterface, port));
         reqSocket.send(std::string("close_server:") + name_);
         reqSocket.close();
     }

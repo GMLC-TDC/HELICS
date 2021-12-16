@@ -14,11 +14,13 @@
     broker_hierarchies
     environment_variables
     simultaneous_cosimulations
+    broker_multicomputer
     orchestration
     program_termination
     profiling
     targeted_endpoints
     dynamic_federations
+    timeouts
 
 ```
 
@@ -49,3 +51,4 @@ The Advanced Topics will cover:
 - [**Profiling**](./profiling.md) - Some profiling capability for co-simulations.
 - [**Targeted Endpoints**](./targeted_endpoints.md) - details on the new targeted endpoints in HELICS 3.
 - [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation. This is a dynamic federation. There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.
+- [**Timeouts**](./timeouts.md) - HELICS includes a number of timeouts to prevent failed operations from continuing indefinitely, the various timeout options are discussed in this document.

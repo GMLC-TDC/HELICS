@@ -66,6 +66,7 @@ public class helicsJNI {
   public final static native int HELICS_FLAG_DUMPLOG_get();
   public final static native int HELICS_FLAG_PROFILING_get();
   public final static native int HELICS_FLAG_PROFILING_MARKER_get();
+  public final static native int HELICS_LOG_LEVEL_DUMPLOG_get();
   public final static native int HELICS_LOG_LEVEL_NO_PRINT_get();
   public final static native int HELICS_LOG_LEVEL_ERROR_get();
   public final static native int HELICS_LOG_LEVEL_PROFILING_get();
@@ -176,6 +177,7 @@ public class helicsJNI {
   public final static native String helicsGetVersion();
   public final static native String helicsGetBuildFlags();
   public final static native String helicsGetCompilerVersion();
+  public final static native String helicsGetSystemInfo();
   public final static native void helicsLoadSignalHandler();
   public final static native void helicsClearSignalHandler();
   public final static native void helicsAbort(int jarg1, String jarg2);
@@ -224,6 +226,7 @@ public class helicsJNI {
   public final static native long helicsCreateFederateInfo();
   public final static native long helicsFederateInfoClone(long jarg1);
   public final static native void helicsFederateInfoLoadFromArgs(long jarg1, String[] jarg2);
+  public final static native void helicsFederateInfoLoadFromString(long jarg1, String jarg2);
   public final static native void helicsFederateInfoFree(long jarg1);
   public final static native int helicsFederateIsValid(long jarg1);
   public final static native void helicsFederateInfoSetCoreName(long jarg1, String jarg2);

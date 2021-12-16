@@ -507,8 +507,11 @@ bool Federate::getFlagOption(int flag) const
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
-    switch (currentMode) {
+    switch (currentMode.load()) {
         case Modes::STARTUP:
+        case Modes::INITIALIZING:
+        case Modes::EXECUTING:
+        case Modes::FINISHED:
             break;
         case Modes::PENDING_INIT: {
             auto asyncInfo = asyncCallInfo->lock();
@@ -520,16 +523,11 @@ void Federate::finalize()
                 throw;
             }
         } break;
-        case Modes::INITIALIZING:
-            break;
         case Modes::PENDING_EXEC:
             asyncCallInfo->lock()->execFuture.get();
             break;
         case Modes::PENDING_TIME:
             asyncCallInfo->lock()->timeRequestFuture.get();
-            break;
-        case Modes::EXECUTING:
-        case Modes::FINISHED:
             break;
         case Modes::PENDING_ITERATIVE_TIME:
             asyncCallInfo->lock()
@@ -552,7 +550,7 @@ void Federate::finalize()
     if (fManager) {
         fManager->closeAllFilters();
     }
-    currentMode = Modes::FINALIZE;
+    currentMode.store(Modes::FINALIZE);
 }
 
 void Federate::finalizeAsync()
@@ -599,7 +597,9 @@ void Federate::finalizeComplete()
 void Federate::disconnect()
 {
     finalize();
-
+    if (fManager) {
+        fManager->disconnect();
+    }
     coreObject = CoreFactory::getEmptyCore();
 }
 

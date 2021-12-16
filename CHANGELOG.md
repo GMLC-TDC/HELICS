@@ -8,6 +8,31 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.1.1][] - 2021-12-14
+
+Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages. Also includes a `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.
+
+### Fixed
+
+- CMake issue resulting in internal logging messages being disabled for some builds including some package releases.
+- Fixed a few deadlock pathways if the core was killed internally.
+- Fixed some timeout issues in the CI builds.
+- Fixed a potential race condition when setting the log file after execution has started on helics cores.
+
+### Changed
+
+- CMake version 3.22 tested and used if available.
+- The TCP networking components that were not core to HELICS have been moved to a separate repo and linked as a submodule. See [networking](www.github.com/GMLC-TDC/networking).
+- Several documentation fixes and updates.
+- Moved to using the upstream toml11 repo instead of a custom modified version. Customized modifications have now been merged upstream.
+
+### Added
+
+- '--maxcosimduration' flag added in the broker to specify a max co-sim duration after which the cosimulation will be terminated.
+- `helicsGetSystemInfo()` function was added to the API to retrieve HELICS version and system info for debugging and diagnostic purposes.
+- Added a threaded signal handler to execute close out operations in a new thread and return control back to the main thread to wait for error signals.
+- Added `helicsFederateInfoLoadFromString` to better match C++ API available functions. This loads the federateInfo structure from command line arguments contained in a string.
+
 ## [3.1.0][] - 2021-11-25
 
 This release includes some bug fixes and enhancements to HELICS 3 which is now the default. The [migrating 2 to 3](./docs/developer-guide/porting-2-to-3.md) page includes some specific details on migrating from HELICS 2 to 3.
@@ -97,6 +122,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.0.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.0
 [3.0.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.1
 [3.1.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.0
+[3.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.1
 
 ## [2.7.1][] - 2021-06-05
 

@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 
 #ifndef HELICS_DISABLE_ASIO
-#    include "../common/AsioContextManager.h"
+#    include "gmlc/networking/AsioContextManager.h"
 
 #    include <asio/steady_timer.hpp>
 #else
@@ -238,26 +238,31 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
-    timeout_group->add_option(
-        "--tick",
-        tickTimer,
-        "heartbeat time in ms, if there is no broker communication for 2 ticks then "
-        "secondary actions are taken  (can also be entered as a time like '10s' or '45ms')");
-    timeout_group->add_flag(
-        "--disable_timer,--no_tick",
-        disable_timer,
-        "if set to true the timeout timer is disabled, cannot be re-enabled later");
-    timeout_group->add_option(
-        "--timeout",
-        timeout,
-        "time to wait to establish a network or for a connection to communicate, default "
-        "unit is in ms (can also be entered as "
-        "a time like '10s' or '45ms') ");
-    timeout_group->add_option(
-        "--networktimeout",
-        networkTimeout,
-        "time to wait for a broker connection default unit is in ms(can also be entered as a time "
-        "like '10s' or '45ms') ");
+    timeout_group
+        ->add_option(
+            "--tick",
+            tickTimer,
+            "heartbeat time in ms, if there is no broker communication for 2 ticks then "
+            "secondary actions are taken (can also be entered as a time like '10s' or '45ms')")
+        ->capture_default_str();
+    timeout_group->add_flag("--disable_timer,--no_tick",
+                            disable_timer,
+                            "if set to true all timeouts are disabled, cannot be re-enabled later");
+    timeout_group
+        ->add_option(
+            "--timeout",
+            timeout,
+            "time to wait to establish a network or for a connection to communicate, default "
+            "unit is in ms (can also be entered as "
+            "a time like '10s' or '45ms') ")
+        ->capture_default_str();
+    timeout_group
+        ->add_option(
+            "--networktimeout",
+            networkTimeout,
+            "time to wait for a broker connection, default unit is in ms (can also be entered as a time "
+            "like '10s' or '45ms') ")
+        ->capture_default_str();
     timeout_group->add_option(
         "--querytimeout",
         queryTimeout,
@@ -267,6 +272,11 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--granttimeout",
         grantTimeout,
         "time to wait for a time request to be granted before triggering diagnostic actions; default is in ms (can also be entered as a time "
+        "like '10s' or '45ms')");
+    timeout_group->add_option(
+        "--maxcosimduration",
+        maxCoSimDuration,
+        "the maximum time a broker/core should be active, the co-simulation will self terminate if it is still active after this duration, the time resolution is the tick timer (can also be entered as a time "
         "like '10s' or '45ms')");
     timeout_group
         ->add_option("--errordelay,--errortimeout",
@@ -504,14 +514,15 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
             addActionMessage(halt);
         } else {
             errorTimeStart = std::chrono::steady_clock::now();
-            ActionMessage(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+            ActionMessage echeck(CMD_ERROR_CHECK, global_id.load(), global_id.load());
+            addActionMessage(echeck);
         }
     }
 
     sendToLogger(global_id.load(), HELICS_LOG_LEVEL_ERROR, identifier, estring);
 }
 
-void BrokerBase::setLoggingFile(const std::string& lfile)
+void BrokerBase::setLoggingFile(std::string_view lfile)
 {
     if (logFile.empty() || lfile != logFile) {
         logFile = lfile;
@@ -675,7 +686,7 @@ void BrokerBase::queueProcessingLoop()
     }
     std::vector<ActionMessage> dumpMessages;
 #ifndef HELICS_DISABLE_ASIO
-    auto serv = AsioContextManager::getContextPointer();
+    auto serv = gmlc::networking::AsioContextManager::getContextPointer();
     auto contextLoop = serv->startContextLoop();
     asio::steady_timer ticktimer(serv->getBaseContext());
     activeProtector active(true, false);
@@ -700,6 +711,7 @@ void BrokerBase::queueProcessingLoop()
         }
         contextLoop = nullptr;
     };
+    auto timeStart = std::chrono::steady_clock::now();
 #else
     auto timerStop = []() {};
 #endif
@@ -782,10 +794,22 @@ void BrokerBase::queueProcessingLoop()
                 messagesSinceLastTick = 0;
 // reschedule the timer
 #ifndef HELICS_DISABLE_ASIO
-                if (tickTimer > timeZero && !disable_timer) {
-                    ticktimer.expires_at(std::chrono::steady_clock::now() + tickTimer.to_ns());
-                    active = std::make_pair(true, true);
-                    ticktimer.async_wait(timerCallback);
+                {
+                    auto currTime = std::chrono::steady_clock::now();
+                    if (maxCoSimDuration > timeZero) {
+                        if ((currTime - timeStart) > maxCoSimDuration.to_ms()) {
+                            ActionMessage dDisable(CMD_TIMEOUT_DISCONNECT);
+                            dDisable.source_id = global_broker_id_local;
+                            dDisable.dest_id = global_broker_id_local;
+                            addActionMessage(dDisable);
+                            break;
+                        }
+                    }
+                    if (tickTimer > timeZero && !disable_timer) {
+                        ticktimer.expires_at(currTime + tickTimer.to_ns());
+                        active = std::make_pair(true, true);
+                        ticktimer.async_wait(timerCallback);
+                    }
                 }
 #endif
                 break;

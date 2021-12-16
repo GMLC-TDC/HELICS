@@ -41,6 +41,12 @@ const char* helicsGetCompilerVersion(void)
     return helics::compiler;
 }
 
+const char* helicsGetSystemInfo(void)
+{
+    static const std::string systemInfo{helics::systemInfo()};
+    return systemInfo.c_str();
+}
+
 static constexpr const char* nullstrPtr = "";
 
 const std::string gEmptyStr;

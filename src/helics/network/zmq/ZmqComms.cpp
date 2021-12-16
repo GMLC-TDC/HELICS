@@ -25,6 +25,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics::zeromq {
+
+using gmlc::networking::makePortAddress;
+
 void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
     NetworkCommsInterface::loadNetworkInfo(netInfo);
@@ -32,10 +35,11 @@ void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
         return;
     }
     if (!brokerTargetAddress.empty()) {
-        insertProtocol(brokerTargetAddress, InterfaceTypes::TCP);
+        gmlc::networking::insertProtocol(brokerTargetAddress,
+                                         gmlc::networking::InterfaceTypes::TCP);
     }
     if (!localTargetAddress.empty()) {
-        insertProtocol(localTargetAddress, InterfaceTypes::TCP);
+        gmlc::networking::insertProtocol(localTargetAddress, gmlc::networking::InterfaceTypes::TCP);
     }
     if (localTargetAddress == "tcp://localhost") {
         localTargetAddress = "tcp://127.0.0.1";
@@ -50,7 +54,7 @@ void ZmqComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     propertyUnLock();
 }
 
-ZmqComms::ZmqComms() noexcept: NetworkCommsInterface(InterfaceTypes::IP) {}
+ZmqComms::ZmqComms() noexcept: NetworkCommsInterface(gmlc::networking::InterfaceTypes::IP) {}
 
 /** destructor*/
 ZmqComms::~ZmqComms()
@@ -366,7 +370,8 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                             logMessage("got new broker information");
                             brokerReq.disconnect(
                                 makePortAddress(brokerTargetAddress, brokerPort + 1));
-                            auto brkprt = extractInterfaceandPort(rxcmd.getString(0));
+                            auto brkprt =
+                                gmlc::networking::extractInterfaceAndPort(rxcmd.getString(0));
                             brokerPort = brkprt.second;
                             if (brkprt.first != "?") {
                                 brokerTargetAddress = brkprt.first;
@@ -473,8 +478,8 @@ void ZmqComms::queue_tx_function()
                         break;
                     case NEW_ROUTE: {
                         try {
-                            auto interfaceAndPort =
-                                extractInterfaceandPort(std::string(cmd.payload.to_string()));
+                            auto interfaceAndPort = gmlc::networking::extractInterfaceAndPort(
+                                std::string(cmd.payload.to_string()));
 
                             auto zsock = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
                             zsock.setsockopt(ZMQ_LINGER, 100);

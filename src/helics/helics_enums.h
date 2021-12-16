@@ -56,7 +56,7 @@ typedef enum {
                                   exist, for testing and a few other assorted reasons*/
     HELICS_CORE_TYPE_NULL = 66,
     /** an explicit core type exists but does nothing but return empty values or sink calls*/
-    HELICS_CORE_TYPE_EMPTY = 77,
+    HELICS_CORE_TYPE_EMPTY = 77
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
@@ -175,6 +175,8 @@ typedef enum {
 /** log level definitions
  */
 typedef enum {
+    /** log level for dumping log messages*/
+    HELICS_LOG_LEVEL_DUMPLOG = -10,
     /** don't print anything except a few catastrophic errors*/
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     /** only print error level indicators*/

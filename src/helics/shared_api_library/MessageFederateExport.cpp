@@ -481,6 +481,7 @@ void MessageHolder::freeMessage(int index)
 {
     if (isValidIndex(index, messages)) {
         if (messages[index]) {
+            messages[index]->backReference = nullptr;
             messages[index]->messageValidation = 0;
             messages[index].reset();
             freeMessageSlots.push_back(index);

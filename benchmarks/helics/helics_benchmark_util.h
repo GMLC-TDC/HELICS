@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 
-#if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
+#if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
 #    include "helics/network/zmq/ZmqCommsCommon.h"
 #endif
 
@@ -102,7 +102,7 @@ inline void printHELICSsystemInfo()
 {
     std::cout << "------------HELICS BUILD INFO -------------\nHELICS VERSION: "
               << HELICS_VERSION_STRING << '\n';
-#if defined(ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
+#if defined(HELICS_ENABLE_ZMQ_CORE) && !defined(USING_HELICS_C_SHARED_LIB)
     std::cout << "ZMQ VERSION: " << helics::zeromq::getZMQVersion() << '\n';
 #endif
     std::cout << "COMPILER INFO: " << helics::compiler << '\n';

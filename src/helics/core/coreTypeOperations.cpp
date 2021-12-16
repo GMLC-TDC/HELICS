@@ -12,6 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <cctype>
+#include <frozen/set.h>
+#include <frozen/string.h>
+#include <frozen/unordered_map.h>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -47,12 +50,14 @@ std::string to_string(CoreType type)
             return "websocket_";
         case CoreType::NULLCORE:
             return "null_";
+        case CoreType::EMPTY:
+            return "empty_";
         default:
             return std::string();
     }
 }
 
-static const std::unordered_map<std::string, CoreType> coreTypes{
+static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -101,9 +106,9 @@ static const std::unordered_map<std::string, CoreType> coreTypes{
     {"null", CoreType::NULLCORE},
     {"nullcore", CoreType::NULLCORE},
     {"none", CoreType::NULLCORE},
+    {"empty", CoreType::EMPTY},
     {"http", CoreType::HTTP},
     {"HTTP", CoreType::HTTP},
-    {"web", CoreType::HTTP},
     {"test1", CoreType::TEST},
     {"multi", CoreType::MULTI}};
 
@@ -112,12 +117,12 @@ CoreType coreTypeFromString(std::string type) noexcept
     if (type.empty()) {
         return CoreType::DEFAULT;
     }
-    auto fnd = coreTypes.find(type);
+    auto fnd = coreTypes.find(frozen::string(type));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
     std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
-    fnd = coreTypes.find(type);
+    fnd = coreTypes.find(frozen::string(type));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
@@ -207,7 +212,7 @@ static bool constexpr inproc_availability{true};
 
 bool isCoreTypeAvailable(CoreType type) noexcept
 {
-    bool available = false;
+    bool available{false};
 
     switch (type) {
         case CoreType::ZMQ:
@@ -242,6 +247,9 @@ bool isCoreTypeAvailable(CoreType type) noexcept
         case CoreType::NULLCORE:
             available = false;
             break;
+        case CoreType::EMPTY:
+            available = true;
+            break;
         default:
             break;
     }
@@ -249,9 +257,13 @@ bool isCoreTypeAvailable(CoreType type) noexcept
     return available;
 }
 
-static const std::set<std::string> global_match_strings{"any", "all", "data", "string", "block"};
+static constexpr frozen::set<frozen::string, 5> global_match_strings{"any",
+                                                                     "all",
+                                                                     "data",
+                                                                     "string",
+                                                                     "block"};
 
-bool matchingTypes(const std::string& type1, const std::string& type2)
+bool matchingTypes(std::string_view type1, std::string_view type2)
 {
     if (type1 == type2) {
         return true;

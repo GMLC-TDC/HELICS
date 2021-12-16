@@ -699,6 +699,12 @@ TEST_F(function_tests, version)
     EXPECT_NE(b, nullptr);
 }
 
+TEST_F(function_tests, systemInfo)
+{
+    auto b = helicsGetSystemInfo();
+    EXPECT_NE(b, nullptr);
+}
+
 TEST_F(function_tests, initError5)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);

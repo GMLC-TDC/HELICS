@@ -6,6 +6,5 @@
     fundamental_default
     fundamental_fedintegration
     fundamental_communication
-    fundamental_final
 
 ```

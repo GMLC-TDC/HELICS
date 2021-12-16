@@ -89,6 +89,15 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Get a json formatted system information string, containing version info.<br>
+   * The string contains fields with system information like cpu, core count, operating system, and memory,<br>
+   * as well as information about the HELICS build.  Used for debugging reports and gathering other information.
+   */
+  public static String helicsGetSystemInfo() {
+    return helicsJNI.helicsGetSystemInfo();
+  }
+
+  /**
    *  Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,<br>
    * and federates then exits the process.
    */
@@ -719,6 +728,18 @@ public class helics implements helicsConstants {
    */
   public static void helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void fi, String[] argc) {
     helicsJNI.helicsFederateInfoLoadFromArgs(SWIGTYPE_p_void.getCPtr(fi), argc);
+  }
+
+  /**
+   * Load federate info from command line arguments contained in a string.<br>
+   * <br>
+   * @param fi A federateInfo object.<br>
+   * @param args Command line arguments specified in a string.<br>
+   * <br>
+   * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsFederateInfoLoadFromString(SWIGTYPE_p_void fi, String args) {
+    helicsJNI.helicsFederateInfoLoadFromString(SWIGTYPE_p_void.getCPtr(fi), args);
   }
 
   /**

@@ -11,7 +11,7 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     add_subdirectory(helics)
 else()
-    cmake_minimum_required(VERSION 3.10...3.18)
+    cmake_minimum_required(VERSION 3.10...3.22)
 
     set(HELICS_BUILD_TESTS OFF CACHE INTERNAL "")
     set(HELICS_BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")

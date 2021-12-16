@@ -65,7 +65,7 @@ void ForwardingTimeCoordinator::disconnect()
 
         } else {
             ActionMessage multi(CMD_MULTI_MESSAGE);
-            for (auto dep : dependencies) {
+            for (const auto& dep : dependencies) {
                 if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                     bye.dest_id = dep.fedID;
                     if (dep.fedID == source_id) {
@@ -140,7 +140,7 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
 
     base["dependencies"] = Json::arrayValue;
     base["federatesonly"] = federatesOnly;
-    for (auto dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependency) {
             Json::Value depblock;
             generateJsonOutputDependency(depblock, dep);
@@ -158,6 +158,21 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
                        static_cast<double>(downstream.next),
                        static_cast<double>(downstream.Te),
                        static_cast<double>(downstream.minDe));
+}
+
+Json::Value ForwardingTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd)
+{
+    for (auto& dep : dependencies) {
+        if (dep.fedID == cmd.source_id) {
+            dep.timeoutCount = cmd.counter;
+            if (cmd.counter == 6) {
+                Json::Value base;
+                generateDebuggingTimeInfo(base);
+                return base;
+            }
+        }
+    }
+    return Json::nullValue;
 }
 
 bool ForwardingTimeCoordinator::isDependency(GlobalFederateId ofed) const
@@ -311,7 +326,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
         return;
     }
 
-    for (auto dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.connection == ConnectionType::child) {
             continue;
         }
@@ -330,7 +345,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         return;
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
-        for (auto dep : dependencies) {
+        for (const auto& dep : dependencies) {
             if (dep.connection != ConnectionType::child) {
                 continue;
             }
@@ -349,7 +364,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
             sendMessageFunction(msg);
         }
     } else {
-        for (auto dep : dependencies) {
+        for (const auto& dep : dependencies) {
             if (dep.dependent) {
                 if (dep.fedID == skipFed) {
                     continue;

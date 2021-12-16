@@ -37,6 +37,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cstring>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
@@ -237,6 +238,9 @@ void CommonCore::disconnect()
                 return;
             }
             addActionMessage(udisconnect);
+        }
+        if (cnt % 13 == 0) {
+            std::cerr << "waiting on disconnect " << std::endl;
         }
     }
 }
@@ -450,10 +454,26 @@ void CommonCore::finalize(LocalFederateId federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
-    ActionMessage bye(CMD_DISCONNECT);
-    bye.source_id = fed->global_id.load();
-    bye.dest_id = bye.source_id;
-    addActionMessage(bye);
+
+    auto cbrokerState = getBrokerState();
+    switch (cbrokerState) {
+        case BrokerState::terminated:
+        case BrokerState::terminating:
+        case BrokerState::errored: {
+            ActionMessage bye(CMD_STOP);
+            bye.source_id = fed->global_id.load();
+            bye.dest_id = bye.source_id;
+            addActionMessage(bye);
+            fed->addAction(bye);
+        } break;
+        default: {
+            ActionMessage bye(CMD_DISCONNECT);
+            bye.source_id = fed->global_id.load();
+            bye.dest_id = bye.source_id;
+            addActionMessage(bye);
+        } break;
+    }
+
     fed->finalize();
 }
 
@@ -584,10 +604,26 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     if (HELICS_INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
+
     // do an exec check on the fed to process previously received messages so it can't get in a
     // deadlocked state
     ActionMessage execc(CMD_EXEC_CHECK);
     fed->addAction(execc);
+
+    // do a check on the core to make sure it isn't stopped
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        } break;
+        default:
+            break;
+    }
 
     ActionMessage exec(CMD_EXEC_REQUEST);
     exec.source_id = fed->global_id.load();
@@ -723,6 +759,19 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequest"));
     }
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        } break;
+        default:
+            break;
+    }
     switch (fed->getState()) {
         case HELICS_EXECUTING: {
             // generate the request through the core
@@ -779,6 +828,19 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
         }
     }
 
+    auto cBrokerState = getBrokerState();
+    switch (cBrokerState) {
+        case BrokerState::terminating:
+        case BrokerState::terminated:
+        case BrokerState::errored: {
+            ActionMessage terminate(CMD_STOP);
+            terminate.dest_id = fed->global_id;
+            terminate.source_id = fed->global_id;
+            fed->addAction(terminate);
+        } break;
+        default:
+            break;
+    }
     // generate the request through the core
     ActionMessage treq(CMD_TIME_REQUEST);
     treq.source_id = fed->global_id.load();
@@ -2049,7 +2111,11 @@ void CommonCore::setLoggingLevel(int logLevel)
 
 void CommonCore::setLogFile(const std::string& lfile)
 {
-    setLoggingFile(lfile);
+    ActionMessage cmd(CMD_CORE_CONFIGURE);
+    cmd.dest_id = global_id.load();
+    cmd.messageID = UPDATE_LOGGING_FILE;
+    cmd.payload = lfile;
+    addActionMessage(cmd);
 }
 
 std::pair<std::string, std::string> CommonCore::getCommand(LocalFederateId federateID)
@@ -3010,6 +3076,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT_CHECK:
         case CMD_DISCONNECT_CORE_ACK:
+        case CMD_TIMEOUT_DISCONNECT:
             processDisconnectCommand(command);
             break;
         case CMD_EXEC_GRANT:
@@ -3052,6 +3119,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                     break;
                 }
             }
+            routeMessage(command);
+            break;
+        case CMD_GRANT_TIMEOUT_CHECK:
             routeMessage(command);
             break;
         case CMD_TIME_BLOCK:
@@ -4030,6 +4100,68 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
             loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
             checkAndProcessDisconnect();
             break;
+        case CMD_TIMEOUT_DISCONNECT:
+            if (isConnected()) {
+                if (cmd.source_id != global_broker_id_local) {
+                    LOG_ERROR(global_broker_id_local,
+                              getIdentifier(),
+                              "received timeout disconnect");
+                } else {
+                    LOG_ERROR(global_broker_id_local, getIdentifier(), "timeout disconnect");
+                }
+                if (timeCoord && !timeCoord->empty()) {
+                    Json::Value base;
+                    base["id"] = global_broker_id_local.baseValue();
+                    base["state"] = brokerStateName(getBrokerState());
+                    base["time"] = Json::Value();
+                    base["name"] = getIdentifier();
+                    timeCoord->generateDebuggingTimeInfo(base["time"]);
+                    base["federates"] = Json::arrayValue;
+                    for (const auto& fed : loopFederates) {
+                        std::string ret = federateQuery(fed.fed, "global_time_debugging", false);
+                        if (ret == "#wait") {
+                            if (fed->getState() <= FederateStates::HELICS_EXECUTING) {
+                                cmd.dest_id = fed->global_id.load();
+                                cmd.source_id = global_broker_id_local;
+                                fed.fed->addAction(cmd);
+                            }
+                        } else {
+                            auto element = fileops::loadJsonStr(ret);
+                            base["federates"].append(element);
+                        }
+                    }
+                    if (filterFed != nullptr) {
+                        auto str = filterFed->query("global_time_debugging");
+                        auto element = fileops::loadJsonStr(str);
+                        base["federates"].append(element);
+                    }
+                    auto debugString = fileops::generateJsonString(base);
+                    debugString.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(global_broker_id_local, identifier, debugString);
+                }
+
+                if (getBrokerState() < BrokerState::terminating) {
+                    // only send a disconnect message
+                    // if we haven't done so already
+                    setBrokerState(BrokerState::terminating);
+                    sendDisconnect();
+                    ActionMessage m(CMD_DISCONNECT);
+                    m.source_id = global_broker_id_local;
+                    transmit(parent_route_id, m);
+                    for (auto& fed : loopFederates) {
+                        m.dest_id = fed->global_id;
+                        fed.fed->addAction(m);
+                    }
+                }
+            } else if (getBrokerState() == BrokerState::errored) {
+                // we are disconnecting in an error state
+                sendDisconnect();
+                ActionMessage m(CMD_DISCONNECT);
+                m.source_id = global_broker_id_local;
+                transmit(parent_route_id, m);
+            }
+            addActionMessage(CMD_STOP);
+            break;
         case CMD_STOP:
 
             if (isConnected()) {
@@ -4156,6 +4288,9 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     }
                 }
             }
+            break;
+        case UPDATE_LOGGING_FILE:
+            setLoggingFile(cmd.payload.to_string());
             break;
         case UPDATE_FILTER_OPERATOR:
             if (filterFed != nullptr) {
@@ -4333,8 +4468,17 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
         timeCoord->processDependencyUpdateMessage(cmd);
     } else if (cmd.action() == CMD_TIME_BLOCK || cmd.action() == CMD_TIME_UNBLOCK) {
         manageTimeBlocks(cmd);
+    } else if (cmd.action() == CMD_GRANT_TIMEOUT_CHECK) {
+        auto v = timeCoord->grantTimeoutCheck(cmd);
+        if (!v.isNull()) {
+            auto debugString = fileops::generateJsonString(v);
+            debugString.insert(0, "TIME DEBUGGING::");
+            LOG_WARNING(global_broker_id_local, getIdentifier(), debugString);
+        }
     } else {
-        LOG_WARNING(global_broker_id_local, "core", "dropping message:" + prettyPrintString(cmd));
+        LOG_WARNING(global_broker_id_local,
+                    getIdentifier(),
+                    "dropping message:" + prettyPrintString(cmd));
     }
 }
 
@@ -4492,7 +4636,7 @@ void CommonCore::checkInFlightQueriesForDisconnect()
 
 void CommonCore::sendDisconnect()
 {
-    LOG_CONNECTIONS(global_broker_id_local, "core", "sending disconnect");
+    LOG_CONNECTIONS(global_broker_id_local, identifier, "sending disconnect");
     checkInFlightQueriesForDisconnect();
     ActionMessage bye(CMD_STOP);
     bye.source_id = global_broker_id_local;
