@@ -73,10 +73,7 @@ namespace zeromq {
         }
     }
 
-    int ZmqCommsSS::getDefaultBrokerPort() const
-    {
-        return getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS);
-    }
+    int ZmqCommsSS::getDefaultBrokerPort() const { return getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS); }
 
     int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
                                            std::map<std::string, std::string>& connection_info)

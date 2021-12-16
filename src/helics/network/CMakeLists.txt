@@ -7,8 +7,13 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(NETWORK_SRC_FILES NetworkCommsInterface.cpp NetworkBrokerData.cpp CommsInterface.cpp
-                      CommsBroker.cpp loadCores.cpp networkDefaults.cpp
+set(NETWORK_SRC_FILES
+    NetworkCommsInterface.cpp
+    NetworkBrokerData.cpp
+    CommsInterface.cpp
+    CommsBroker.cpp
+    loadCores.cpp
+    networkDefaults.cpp
 )
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)

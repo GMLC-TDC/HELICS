@@ -71,9 +71,9 @@ void zmqBrokerServer::stopServer()
     auto ctx = ZmqContextManager::getContextPointer();
     zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
     reqSocket.setsockopt(ZMQ_LINGER, 300);
-    int port = (mZmqPort != 0) ?
-        mZmqPort :
-        ((zmq_enabled_) ? getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1 : getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS));
+    int port = (mZmqPort != 0) ? mZmqPort :
+                                 ((zmq_enabled_) ? getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1 :
+                                                   getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS));
     if (zmq_enabled_) {
         if (config_->isMember("zmq")) {
             auto V = (*config_)["zmq"];

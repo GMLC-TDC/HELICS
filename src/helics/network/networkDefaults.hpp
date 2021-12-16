@@ -5,9 +5,9 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-namespace helics{
+namespace helics {
 
-    namespace network {
+namespace network {
     // For ZMQ Comms
     constexpr int DEFAULT_ZMQ_BROKER_PORT_NUMBER = 23404;
 
