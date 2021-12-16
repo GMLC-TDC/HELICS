@@ -27,7 +27,7 @@ namespace tcp {
 
     TcpComms::TcpComms() noexcept: NetworkCommsInterface(gmlc::networking::InterfaceTypes::TCP) {}
 
-    int TcpComms::getDefaultBrokerPort() const { return DEFAULT_TCP_BROKER_PORT_NUMBER; }
+    int TcpComms::getDefaultBrokerPort() const { return getDefaultPort(HELICS_CORE_TYPE_TCP); }
 
     /** load network information into the comms object*/
     void TcpComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
@@ -217,7 +217,7 @@ namespace tcp {
         };
 
         if (brokerPort < 0) {
-            brokerPort = DEFAULT_TCP_BROKER_PORT_NUMBER;
+            brokerPort = getDefaultBrokerPort();
         }
         try {
             brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
@@ -371,7 +371,7 @@ namespace tcp {
             }
         } else {
             if (PortNumber < 0) {
-                PortNumber = DEFAULT_TCP_BROKER_PORT_NUMBER;
+                PortNumber = getDefaultBrokerPort();
                 ActionMessage m(CMD_PROTOCOL);
                 m.messageID = PORT_DEFINITIONS;
                 m.setExtraData(PortNumber);

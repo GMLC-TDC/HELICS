@@ -33,7 +33,7 @@ namespace tcp {
     /** destructor*/
     TcpCommsSS::~TcpCommsSS() { disconnect(); }
 
-    int TcpCommsSS::getDefaultBrokerPort() const { return DEFAULT_TCPSS_PORT; }
+    int TcpCommsSS::getDefaultBrokerPort() const { return getDefaultPort(HELICS_CORE_TYPE_TCP_SS); }
 
     void TcpCommsSS::addConnection(const std::string& newConn)
     {
@@ -120,7 +120,7 @@ namespace tcp {
     void TcpCommsSS::queue_tx_function()
     {
         if (serverMode && (PortNumber < 0)) {
-            PortNumber = DEFAULT_TCPSS_PORT;
+            PortNumber = getDefaultBrokerPort();
         }
         if (!serverMode && !outgoingConnectionsAllowed) {
             logError("no server and no outgoing connections-> no way to connect to comms");
@@ -197,7 +197,7 @@ namespace tcp {
         }
         if (hasBroker) {
             if (brokerPort < 0) {
-                brokerPort = DEFAULT_TCPSS_PORT;
+                brokerPort = getDefaultBrokerPort();
             }
             if (outgoingConnectionsAllowed) {
                 try {

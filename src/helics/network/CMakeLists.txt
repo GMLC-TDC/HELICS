@@ -8,7 +8,7 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 set(NETWORK_SRC_FILES NetworkCommsInterface.cpp NetworkBrokerData.cpp CommsInterface.cpp
-                      CommsBroker.cpp loadCores.cpp
+                      CommsBroker.cpp loadCores.cpp networkDefaults.cpp
 )
 
 set(TESTCORE_SOURCE_FILES test/TestBroker.cpp test/TestCore.cpp test/TestComms.cpp)

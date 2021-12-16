@@ -29,7 +29,7 @@ namespace udp {
         futurePort = promisePort.get_future();
     }
 
-    int UdpComms::getDefaultBrokerPort() const { return DEFAULT_UDP_BROKER_PORT_NUMBER; }
+    int UdpComms::getDefaultBrokerPort() const { return getDefaultPort(HELICS_CORE_TYPE_UDP); }
 
     /** load network information into the comms object*/
     void UdpComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
@@ -185,7 +185,7 @@ namespace udp {
         }
         if (hasBroker) {
             if (brokerPort < 0) {
-                brokerPort = DEFAULT_UDP_BROKER_PORT_NUMBER;
+                brokerPort = getDefaultBrokerPort();
             }
             try {
                 udp::resolver::query query(udpnet(interfaceNetwork),
@@ -322,7 +322,7 @@ namespace udp {
             }
         } else {
             if (PortNumber < 0) {
-                PortNumber = DEFAULT_UDP_BROKER_PORT_NUMBER;
+                PortNumber = getDefaultBrokerPort();
                 promisePort.set_value(PortNumber);
             }
         }

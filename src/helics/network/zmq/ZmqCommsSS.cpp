@@ -73,7 +73,10 @@ namespace zeromq {
         }
     }
 
-    int ZmqCommsSS::getDefaultBrokerPort() const { return DEFAULT_ZMQSS_BROKER_PORT_NUMBER; }
+    int ZmqCommsSS::getDefaultBrokerPort() const
+    {
+        return getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS);
+    }
 
     int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
                                            std::map<std::string, std::string>& connection_info)
@@ -319,10 +322,10 @@ namespace zeromq {
         std::map<std::string, std::string> connection_info;
 
         if (brokerPort < 0) {
-            brokerPort = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
+            brokerPort = getDefaultBrokerPort();
         }
         if (PortNumber < 0) {
-            PortNumber = DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
+            PortNumber = getDefaultBrokerPort();
         }
         zmq::socket_t brokerSocket(ctx->getContext(), ZMQ_ROUTER);
         zmq::socket_t brokerConnection(ctx->getContext(), ZMQ_DEALER);

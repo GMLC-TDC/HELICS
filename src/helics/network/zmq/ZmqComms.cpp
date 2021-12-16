@@ -64,7 +64,7 @@ ZmqComms::~ZmqComms()
 
 int ZmqComms::getDefaultBrokerPort() const
 {
-    return DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+    return getDefaultPort(HELICS_CORE_TYPE_ZMQ);
 }
 
 int ZmqComms::processIncomingMessage(zmq::message_t& msg)
@@ -252,7 +252,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
     if (hasBroker) {
         auto ctx = ZmqContextManager::getContextPointer();
         if (brokerPort < 0) {
-            brokerPort = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+            brokerPort = getDefaultBrokerPort();
         }
 
         zmq::socket_t brokerReq(ctx->getContext(), ZMQ_REQ);
@@ -405,7 +405,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
         }
     } else {
         if ((PortNumber < 0)) {
-            PortNumber = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+            PortNumber = getDefaultBrokerPort();
             ActionMessage setPorts(CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;
             setPorts.setExtraData(PortNumber);
