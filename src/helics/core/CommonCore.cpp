@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FederateState.hpp"
 #include "FilterCoordinator.hpp"
 #include "FilterFederate.hpp"
+#include "TranslatorFederate.hpp"
 #include "FilterInfo.hpp"
 #include "InputInfo.hpp"
 #include "LogManager.hpp"
@@ -52,17 +53,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-const std::string& state_string(operation_state state)
+const std::string& state_string(OperatingState state)
 {
     static const std::string c1{"connected"};
     static const std::string estate{"error"};
     static const std::string dis{"disconnected"};
     switch (state) {
-        case operation_state::operating:
+        case OperatingState::OPERATING:
             return c1;
-        case operation_state::disconnected:
+        case OperatingState::DISCONNECTED:
             return dis;
-        case operation_state::error:
+        case OperatingState::ERROR_STATE:
         default:
             return estate;
     }
@@ -503,7 +504,7 @@ bool CommonCore::allInitReady() const
 bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
-    auto afed = (minFederateState() == operation_state::disconnected);
+    auto afed = (minFederateState() == OperatingState::DISCONNECTED);
     if ((hasTimeDependency) || (hasFilters)) {
         if (afed) {
             if (!timeCoord->hasActiveTimeDependencies()) {
@@ -518,9 +519,9 @@ bool CommonCore::allDisconnected() const
     return (afed);
 }
 
-operation_state CommonCore::minFederateState() const
+OperatingState CommonCore::minFederateState() const
 {
-    operation_state op{operation_state::disconnected};
+    OperatingState op{OperatingState::DISCONNECTED};
     for (const auto& fed : loopFederates) {
         if (fed.state < op) {
             op = fed.state;
@@ -1774,6 +1775,52 @@ InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
     actionQueue.push(std::move(m));
     return id;
 }
+
+InterfaceHandle CommonCore::registerTranslator(const std::string& translatorName,
+                                           const std::string& messageType,
+                                           const std::string& units)
+{
+    // check to make sure the name isn't already used
+    if (!translatorName.empty()) {
+        if (handles.read([&translatorName](auto& hand) {
+                auto* res = hand.getEndpoint(translatorName);
+                if (res != nullptr) {
+                    return false;
+                }
+                res = hand.getPublication(translatorName);
+                if (res != nullptr) {
+                    return false;
+                }
+                res = hand.getInput(translatorName);
+                if (res != nullptr) {
+                    return false;
+                }
+                return true;
+            })) {
+            throw(RegistrationFailure("there already exists an interface with this name"));
+        }
+    }
+    if (!waitCoreRegistration()) {
+        if (getBrokerState() >= BrokerState::terminating) {
+            throw(RegistrationFailure("core is terminated no further registration possible"));
+        }
+        throw(RegistrationFailure("registration timeout exceeded"));
+    }
+    auto fid = filterFedID.load();
+
+    const auto& handle = createBasicHandle(
+        fid, LocalFederateId(), InterfaceType::TRANSLATOR, translatorName, messageType, units);
+    auto id = handle.getInterfaceHandle();
+
+    ActionMessage m(CMD_REG_TRANSLATOR);
+    m.source_id = fid;
+    m.source_handle = id;
+    m.name(handle.key);
+    
+    actionQueue.push(std::move(m));
+    return id;
+}
+
 
 InterfaceHandle CommonCore::getFilter(const std::string& name) const
 {
@@ -3066,7 +3113,7 @@ void CommonCore::sendErrorToFederates(int errorCode, std::string_view message)
     errorCom.messageID = errorCode;
     errorCom.payload = message;
     loopFederates.apply([&errorCom](auto& fed) {
-        if ((fed) && (fed.state == operation_state::operating)) {
+        if ((fed) && (fed.state == OperatingState::OPERATING)) {
             fed->addAction(errorCom);
         }
     });
@@ -3075,7 +3122,7 @@ void CommonCore::sendErrorToFederates(int errorCode, std::string_view message)
 void CommonCore::broadcastToFederates(ActionMessage& cmd)
 {
     loopFederates.apply([&cmd](auto& fed) {
-        if ((fed) && (fed.state == operation_state::operating)) {
+        if ((fed) && (fed.state == OperatingState::OPERATING)) {
             cmd.dest_id = fed->global_id;
             fed->addAction(cmd);
         }
@@ -3635,6 +3682,36 @@ void CommonCore::registerInterface(ActionMessage& command)
 }
 
 void CommonCore::generateFilterFederate()
+{
+    auto fid = translatorFedID.load();
+
+    translatorFed = new TranslatorFederate(fid, getIdentifier() + "_translators", global_broker_id_local, this);
+    translatorThread.store(std::this_thread::get_id());
+    translatorFedID.store(fid);
+
+    translatorFed->setCallbacks([this](const ActionMessage& m) { addActionMessage(m); },
+                            [this](ActionMessage&& m) { addActionMessage(std::move(m)); },
+                            [this](const ActionMessage& m) { routeMessage(m); },
+                            [this](ActionMessage&& m) { routeMessage(std::move(m)); });
+    hasFilters = true;
+
+    translatorFed->setHandleManager(&loopHandles);
+    translatorFed->setLogger([this](int level, const std::string& name, const std::string& message) {
+        sendToLogger(global_broker_id_local, level, name, message);
+    });
+    translatorFed->setAirLockFunction([this](int index) { return std::ref(dataAirlocks[index]); });
+    translatorFed->setDeliver([this](ActionMessage& m) { deliverMessage(m); });
+    ActionMessage newFed(CMD_REG_FED);
+    setActionFlag(newFed, child_flag);
+    setActionFlag(newFed, non_counting_flag);
+    newFed.dest_id = parent_broker_id;
+    newFed.source_id = global_broker_id_local;
+    newFed.setExtraData(fid.baseValue());
+    newFed.name(getIdentifier() + "_translators");
+    transmit(getRoute(higher_broker_id), newFed);
+}
+
+void CommonCore::generateTranslatorFederate()
 {
     auto fid = filterFedID.load();
 
@@ -4377,12 +4454,12 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     if (fed == loopFederates.end()) {
                         return;
                     }
-                    fed->state = operation_state::disconnected;
+                    fed->state = OperatingState::DISCONNECTED;
                     auto cstate = getBrokerState();
                     if ((!checkAndProcessDisconnect()) || (cstate < BrokerState::operating)) {
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
-                        if (minFederateState() != operation_state::disconnected ||
+                        if (minFederateState() != OperatingState::DISCONNECTED ||
                             filterFed != nullptr) {
                             cmd.setAction(CMD_DISCONNECT_FED_ACK);
                             cmd.dest_id = cmd.source_id;

@@ -726,7 +726,7 @@ TEST_F(mfed_tests, message_warnings_ignore)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(warnings.load(), 1);
-    setActionFlag(mess1, optional_flag);
+    setActionFlag(mess1, helics::optional_flag);
     // it should cause the unknown destination to be ignored
     ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -761,7 +761,7 @@ TEST_F(mfed_tests, message_error)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(errors.load(), 0);
-    setActionFlag(mess1, required_flag);
+    setActionFlag(mess1, helics::required_flag);
     // it should cause the unknown destination to be to generate an error
     ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
