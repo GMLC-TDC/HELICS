@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace tcp {
+namespace helics::tcp {
     using asio::ip::tcp;
 
     using gmlc::networking::TcpConnection;
@@ -507,4 +506,3 @@ namespace tcp {
     }
 
 }  // namespace tcp
-}  // namespace helics

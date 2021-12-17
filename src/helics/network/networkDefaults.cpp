@@ -24,7 +24,6 @@ int getDefaultPort(int coreType)
         case HELICS_CORE_TYPE_UDP:
             return network::DEFAULT_UDP_BROKER_PORT_NUMBER;
         case HELICS_CORE_TYPE_HTTP:
-            return 80;
         case HELICS_CORE_TYPE_WEBSOCKET:
             return 80;
         default:

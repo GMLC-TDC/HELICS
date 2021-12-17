@@ -23,8 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static const int TX_RX_MSG_COUNT = 20;
 
-namespace helics {
-namespace zeromq {
+namespace helics::zeromq {
     void ZmqCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
         NetworkCommsInterface::loadNetworkInfo(netInfo);
@@ -500,4 +499,3 @@ namespace zeromq {
     }
 
 }  // namespace zeromq
-}  // namespace helics

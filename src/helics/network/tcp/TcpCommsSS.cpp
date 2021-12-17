@@ -20,8 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace tcp {
+namespace helics::tcp {
     using gmlc::networking::TcpConnection;
 
     TcpCommsSS::TcpCommsSS() noexcept:
@@ -422,4 +421,3 @@ namespace tcp {
     }
 
 }  // namespace tcp
-}  // namespace helics

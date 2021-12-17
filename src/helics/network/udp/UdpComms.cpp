@@ -19,12 +19,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace udp {
+namespace helics::udp {
     using asio::ip::udp;
     UdpComms::UdpComms():
-        NetworkCommsInterface(gmlc::networking::InterfaceTypes::UDP),
-        promisePort(std::promise<int>())
+        NetworkCommsInterface(gmlc::networking::InterfaceTypes::UDP)
     {
         futurePort = promisePort.get_future();
     }
@@ -532,5 +530,3 @@ namespace udp {
         }
     }
 }  // namespace udp
-
-}  // namespace helics
