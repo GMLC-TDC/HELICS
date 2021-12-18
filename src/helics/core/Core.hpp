@@ -577,6 +577,12 @@ class Core {
     @return a handle to identify the filter*/
     virtual InterfaceHandle getFilter(const std::string& name) const = 0;
 
+    /** get a translator Handle from its name or target(this may not be unique so it will
+    only find the first one)
+    @param name the name of the translator or its target
+    @return a handle to identify the translator*/
+    virtual InterfaceHandle getTranslator(const std::string& name) const = 0;
+
     /**
     * add a time dependency between federates
     * @details this function is primarily useful for Message federates which do not otherwise
@@ -734,6 +740,13 @@ class Core {
     */
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) = 0;
+
+    /** set the translator callback operators
+    @param translator  the handle of the translator
+    @param callback pointer to the operator class executing the translator
+    */
+    virtual void setTranslatorOperator(InterfaceHandle translator,
+                                   std::shared_ptr<TranslatorOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

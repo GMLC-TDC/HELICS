@@ -123,6 +123,27 @@ class NullFilterOperator final: public FilterOperator {
     }
 };
 
+
+/**
+ * TranslatorOperator abstract class
+ @details TranslatorOperators will perform the conversion from a value to message and vice versa
+ *
+ */
+class TranslatorOperator {
+  public:
+    /** default constructor*/
+    TranslatorOperator() = default;
+    /**virtual destructor*/
+    virtual ~TranslatorOperator() = default;
+    /** convert a message to a value*/
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) = 0;
+
+    /** convert a value to a message*/
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer &value) = 0;
+    
+};
+
+
 /** helper template to check whether an index is actually valid for a particular vector
 @tparam SizedDataType a vector like data type that must have a size function
 @param testSize an index to test
