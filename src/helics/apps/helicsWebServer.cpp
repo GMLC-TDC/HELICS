@@ -344,6 +344,8 @@ std::pair<return_val, std::string>
                 type = fields.at("type");
             } else if (fields.find("CoreType") != fields.end()) {
                 type = fields.at("CoreType");
+            } else if (fields.find("core_type") != fields.end()) {
+                type = fields.at("core_type");
             }
             helics::CoreType ctype{helics::CoreType::DEFAULT};
             if (!type.empty()) {
@@ -358,6 +360,15 @@ std::pair<return_val, std::string>
             }
             if (fields.find("num_brokers") != fields.end()) {
                 start_args += " --minbrokers=" + fields.at("num_brokers");
+            }
+            if (fields.find("port") != fields.end()) {
+                start_args += " --port=" + fields.at("port");
+            }
+            if (fields.find("host") != fields.end()) {
+                start_args += " --interface=" + fields.at("host");
+            }
+            if (fields.find("log_level") != fields.end()) {
+                start_args += " --loglevel=" + fields.at("log_level");
             }
             bool useUuid{false};
             if (brokerName.empty()) {
@@ -658,6 +669,10 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     auto psize = req.payload_size();
     if (target == "/index.html" || (target == "/" && (!psize || *psize < 4))) {
         return send(response_ok(index_page, "text/html"));
+    }
+
+    if (target == "/healthcheck" ) {
+        return send(response_ok("{\"success\":true}", "application/json"));
     }
 
     auto reqpr = processRequestParameters(target, req.body());
