@@ -124,11 +124,11 @@ HELICS_EXPORT void
 /**
  * Set callback for the time update.
  *
- * @details this callback will be executed every time the simulation time is updated starting on entry to executing mode
+ * @details This callback will be executed every time the simulation time is updated starting on entry to executing mode.
  *
  * @param fed The federate to set the callback for.
  * @param timeUpdate A callback with signature void(HelicsTime newTime, bool iterating, void *userdata);
- *                 The function arguments are the new time value, a bool indicating that the time is iterating, and pointer to the userdata
+ *                 The function arguments are the new time value, a bool indicating that the time is iterating, and pointer to the userdata.
  * @param userdata A pointer to user data that is passed to the function when executing.
  *
  * @param[in,out] err A pointer to an error object for catching errors.

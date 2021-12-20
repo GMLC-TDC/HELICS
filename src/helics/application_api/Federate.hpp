@@ -326,7 +326,7 @@ class HELICS_CXX_EXPORT Federate {
     @details this callback is executed before other callbacks updating values, no values will have
     been updated when this callback is executed it is intended purely for updating time before value
     callbacks are executed.
-    @param callback the function to call signature void(Time, bool) the Time value is the new time
+    @param callback the function to call; the function signature is void(Time, bool) where the Time value is the new time
     and bool is true if this is an iteration
     */
     void setTimeUpdateCallback(std::function<void(Time, bool)> callback);

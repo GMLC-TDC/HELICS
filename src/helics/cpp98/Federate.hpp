@@ -186,7 +186,7 @@ namespace details {
         helicsQueryBufferFill(buffer, result.c_str(), static_cast<int>(result.size()), nullptr);
     }
 
-    /** helper function for the callback executor for queries*/
+    /** helper function for the callback executor for time updates*/
     inline void
         helicCppTimeUpdateCallbackExecutor(HelicsTime time, HelicsBool iterating, void* userData)
     {
