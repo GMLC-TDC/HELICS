@@ -94,6 +94,7 @@ class HELICS_CXX_EXPORT Federate {
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, int)> timeUpdateCallback;
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -320,10 +321,13 @@ class HELICS_CXX_EXPORT Federate {
     void setLoggingCallback(
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
-    /** register a callback function to call when the time gets updated and before other value callbacks are executed
-    @details this callback is executed before other callbacks updating values, no values will have been updated when this callback is executed
-    it is intended purely for updating time before value callbacks are executed.  
-    @param callback the function to call signature void(Time, bool) the Time value is the new time and bool is true if this is an iteration
+    /** register a callback function to call when the time gets updated and before other value
+    callbacks are executed
+    @details this callback is executed before other callbacks updating values, no values will have
+    been updated when this callback is executed it is intended purely for updating time before value
+    callbacks are executed.
+    @param callback the function to call signature void(Time, bool) the Time value is the new time
+    and bool is true if this is an iteration
     */
     void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
 

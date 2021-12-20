@@ -713,7 +713,6 @@ TEST_F(valuefed_tests, all_callback)
     vFed1->finalize();
 }
 
-
 TEST_F(valuefed_tests, time_update_callback)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);

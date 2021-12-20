@@ -122,7 +122,6 @@ void helicsFederateSetQueryCallback(HelicsFederate fed,
     }
 }
 
-
 void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
                                          void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
                                          void* userdata,

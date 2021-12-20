@@ -124,7 +124,7 @@ HELICS_EXPORT void
 /**
  * Set callback for the time update.
  *
- * @details this callback will be exectued every time the simulation time is updated starting on entry to executing mode
+ * @details this callback will be executed every time the simulation time is updated starting on entry to executing mode
  *
  * @param fed The federate to set the callback for.
  * @param timeUpdate A callback with signature void(HelicsTime newTime, bool iterating, void *userdata);
@@ -135,11 +135,10 @@ HELICS_EXPORT void
 
  */
 
-HELICS_EXPORT void
-    helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
-                                   void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
-                                   void* userdata,
-                                   HelicsError* err);
+HELICS_EXPORT void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
+                                                       void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                                       void* userdata,
+                                                       HelicsError* err);
 
 /**
  * Set the data for a query callback.

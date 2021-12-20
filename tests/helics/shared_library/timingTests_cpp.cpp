@@ -64,7 +64,7 @@ TEST_F(timing_tests, time_barrier_update)
 
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
 // Tests out the time update callback in cpp98
-TEST_F(timing_tests,timeUpdateCallback)
+TEST_F(timing_tests, timeUpdateCallback)
 {
     SetupTest<helicscpp::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);

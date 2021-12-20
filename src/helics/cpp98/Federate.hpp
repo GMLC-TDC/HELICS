@@ -187,12 +187,11 @@ namespace details {
     }
 
     /** helper function for the callback executor for queries*/
-    inline void helicCppTimeUpdateCallbackExecutor(HelicsTime time,
-                                              HelicsBool iterating,
-                                              void* userData)
+    inline void
+        helicCppTimeUpdateCallbackExecutor(HelicsTime time, HelicsBool iterating, void* userData)
     {
         auto cback = reinterpret_cast<std::function<void(HelicsTime, bool)>*>(userData);
-       (*cback)(time, iterating==HELICS_TRUE);
+        (*cback)(time, iterating == HELICS_TRUE);
     }
 }  // namespace details
 #endif
@@ -539,9 +538,10 @@ class Federate {
     {
         helicsFederateSetQueryCallback(fed, queryAnswer, userdata, hThrowOnError());
     }
-    void setTimeUpdateCallback(
-        void (*timeUpdate)(HelicsTime time, HelicsBool iterating, void* userdata),
-        void* userdata)
+    void setTimeUpdateCallback(void (*timeUpdate)(HelicsTime time,
+                                                  HelicsBool iterating,
+                                                  void* userdata),
+                               void* userdata)
 
     {
         helicsFederateSetTimeUpdateCallback(fed, timeUpdate, userdata, hThrowOnError());
@@ -560,11 +560,12 @@ class Federate {
     void setTimeUpdateCallback(std::function<void(HelicsTime time, bool iterating)> callback)
 
     {
-        timeUpdateCallbackBuffer = new std::function<void(HelicsTime time, bool iterating)>(std::move(callback));
+        timeUpdateCallbackBuffer =
+            new std::function<void(HelicsTime time, bool iterating)>(std::move(callback));
         helicsFederateSetTimeUpdateCallback(fed,
-                                       details::helicCppTimeUpdateCallbackExecutor,
-                                       timeUpdateCallbackBuffer,
-                                       hThrowOnError());
+                                            details::helicCppTimeUpdateCallbackExecutor,
+                                            timeUpdateCallbackBuffer,
+                                            hThrowOnError());
     }
 
 #endif
@@ -721,7 +722,7 @@ class Federate {
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
   private:
     void* callbackBuffer{nullptr};  //!< buffer to contain pointer to a callback
-    void* timeUpdateCallbackBuffer{nullptr}; //!< buffer for pointer to time update callback
+    void* timeUpdateCallbackBuffer{nullptr};  //!< buffer for pointer to time update callback
 #endif
 };
 
