@@ -93,7 +93,7 @@ class HELICS_CXX_EXPORT Federate {
         asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
-    std::function<void(Time, int)> timeUpdateCallback;
+    std::function<void(Time, bool)> timeUpdateCallback;
 
   public:
     /**constructor taking a federate information structure
