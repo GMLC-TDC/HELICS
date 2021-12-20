@@ -736,7 +736,7 @@ TEST_F(valuefed_tests, time_update_callback)
         lastId = subid.getHandle();
     });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
-        if (newTime > lastTime && iterating == false) {
+        if (newTime > lastTime && !iterating) {
             ++validCount;
         }
     });
