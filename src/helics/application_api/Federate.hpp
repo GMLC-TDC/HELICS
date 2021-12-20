@@ -93,7 +93,7 @@ class HELICS_CXX_EXPORT Federate {
         asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
-
+    std::function<void(Time, int)> timeUpdateCallback;
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -319,6 +319,13 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setLoggingCallback(
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
+
+    /** register a callback function to call when the time gets updated and before other value callbacks are executed
+    @details this callback is executed before other callbacks updating values, no values will have been updated when this callback is executed
+    it is intended purely for updating time before value callbacks are executed.  
+    @param callback the function to call signature void(Time, bool) the Time value is the new time and bool is true if this is an iteration
+    */
+    void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -611,6 +618,8 @@ received
     void completeOperation();
 
   private:
+    /** function to deal with any operations that need to occur on a time update*/
+    void updateSimulationTime(Time newTime, Time oldTime, bool iterating);
     /** register filter interfaces defined in  file or string
   @details call is only valid in startup mode
   @param jsonString  the location of the file or config String to load to generate the interfaces

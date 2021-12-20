@@ -650,9 +650,9 @@ TEST_P(valuefed_single_type, block_send_receive)
 
 /** test the all callback*/
 
-TEST_P(valuefed_single_type, all_callback)
+TEST_F(valuefed_tests, all_callback)
 {
-    SetupTest<helics::ValueFederate>(GetParam(), 1, 1.0);
+    SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
@@ -710,6 +710,64 @@ TEST_P(valuefed_single_type, all_callback)
     vFed1->requestTime(5.0);
     // the callback should have occurred here
     EXPECT_EQ(ccnt, 3);
+    vFed1->finalize();
+}
+
+
+TEST_F(valuefed_tests, time_update_callback)
+{
+    SetupTest<helics::ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+
+    auto& pubid3 = vFed1->registerPublication("pub3", "");
+
+    auto& sub1 = vFed1->registerSubscription("fed0/pub1", "");
+    auto& sub2 = vFed1->registerSubscription("pub2", "");
+    auto& sub3 = vFed1->registerSubscription("fed0/pub3", "");
+
+    helics::SmallBuffer db(547, ';');
+    helics::InterfaceHandle lastId;
+    helics::Time lastTime;
+    int validCount{0};
+    vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
+        lastTime = callTime;
+        lastId = subid.getHandle();
+    });
+    vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
+        if (newTime > lastTime && iterating == false) {
+            ++validCount;
+        }
+    });
+    vFed1->enterExecutingMode();
+    EXPECT_EQ(validCount, 1);
+    vFed1->publishBytes(pubid3, db);
+    vFed1->requestTime(1.0);
+    // the callbacks should have occurred here
+    EXPECT_EQ(validCount, 2);
+    EXPECT_TRUE(lastId == sub3.getHandle());
+    if (lastId == sub3.getHandle()) {
+        EXPECT_EQ(lastTime, 1.0);
+        EXPECT_EQ(vFed1->getLastUpdateTime(sub3), lastTime);
+    } else {
+        EXPECT_TRUE(false) << " missed callback\n";
+    }
+
+    pubid2.publish(4);
+    vFed1->requestTime(2.0);
+    // the callback should have occurred here
+    EXPECT_EQ(validCount, 3);
+    EXPECT_TRUE(lastId == sub2.getHandle());
+    EXPECT_EQ(lastTime, 2.0);
+    pubid1.publish("this is a test");
+    vFed1->requestTime(3.0);
+    // the callback should have occurred here
+    EXPECT_EQ(validCount, 4);
+    EXPECT_TRUE(lastId == sub1.getHandle());
+    EXPECT_EQ(lastTime, 3.0);
+
     vFed1->finalize();
 }
 
