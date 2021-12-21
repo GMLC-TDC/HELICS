@@ -729,7 +729,7 @@ TEST_F(valuefed_tests, time_update_callback)
 
     helics::SmallBuffer db(547, ';');
     helics::InterfaceHandle lastId;
-    helics::Time lastTime;
+    helics::Time lastTime{helics::Time::minVal()};
     int validCount{0};
     vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
         lastTime = callTime;
