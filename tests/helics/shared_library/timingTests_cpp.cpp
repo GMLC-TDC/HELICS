@@ -61,3 +61,29 @@ TEST_F(timing_tests, time_barrier_update)
     vFed1->finalize();
     vFed2->finalize();
 }
+
+#if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
+// Tests out the time update callback in cpp98
+TEST_F(timing_tests, timeUpdateCallback)
+{
+    SetupTest<helicscpp::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helicscpp::ValueFederate>(1);
+    int updCall{0};
+    auto tUpdate = [&](HelicsTime /*time*/, bool /*iterating*/) { ++updCall; };
+    vFed1->setTimeUpdateCallback(tUpdate);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(updCall, 1);
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_DOUBLE_EQ(rtime, 1.89);
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+    EXPECT_EQ(updCall, 2);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+#endif

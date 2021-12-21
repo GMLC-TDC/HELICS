@@ -622,4 +622,8 @@ void helicsFederateSetQueryCallback(HelicsFederate fed,
                                     void (*queryAnswer)(const char* query, int querySize, HelicsQueryBuffer buffer, void* userdata),
                                     void* userdata,
                                     HelicsError* err);
+void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
+                                         void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                         void* userdata,
+                                         HelicsError* err);
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);

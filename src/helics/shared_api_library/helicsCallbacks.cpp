@@ -122,6 +122,30 @@ void helicsFederateSetQueryCallback(HelicsFederate fed,
     }
 }
 
+void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
+                                         void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                         void* userdata,
+                                         HelicsError* err)
+{
+    auto* fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (timeUpdate == nullptr) {
+            fedptr->setTimeUpdateCallback({});
+        } else {
+            fedptr->setTimeUpdateCallback([timeUpdate, userdata](helics::Time newTime, bool iterating) {
+                timeUpdate(static_cast<HelicsTime>(newTime), iterating ? HELICS_TRUE : HELICS_FALSE, userdata);
+            });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
+
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int stringSize, HelicsError* err)
 {
     static const char* invalidBuffer = "The given buffer is not valid";
