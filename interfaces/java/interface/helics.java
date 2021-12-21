@@ -4330,4 +4330,20 @@ public class helics implements helicsConstants {
     return helicsJNI.helicsFilterGetOption(SWIGTYPE_p_void.getCPtr(filt), option);
   }
 
+  /**
+   * Set callback for the time update.<br>
+   * <br>
+   * This callback will be executed every time the simulation time is updated starting on entry to executing mode.<br>
+   * <br>
+   * @param fed The federate to set the callback for.<br>
+   * @param timeUpdate A callback with signature void(HelicsTime newTime, bool iterating, void *userdata);<br>
+   *                 The function arguments are the new time value, a bool indicating that the time is iterating, and pointer to the userdata.<br>
+   * @param userdata A pointer to user data that is passed to the function when executing.<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.
+   */
+  public static void helicsFederateSetTimeUpdateCallback(SWIGTYPE_p_void fed, SWIGTYPE_p_f_double_int_p_void__void timeUpdate, SWIGTYPE_p_void userdata) {
+    helicsJNI.helicsFederateSetTimeUpdateCallback(SWIGTYPE_p_void.getCPtr(fed), SWIGTYPE_p_f_double_int_p_void__void.getCPtr(timeUpdate), SWIGTYPE_p_void.getCPtr(userdata));
+  }
+
 }

@@ -1225,12 +1225,13 @@ namespace swig {
 #define SWIGTYPE_p_HelicsSequencingModes swig_types[16]
 #define SWIGTYPE_p_char swig_types[17]
 #define SWIGTYPE_p_double swig_types[18]
-#define SWIGTYPE_p_int swig_types[19]
-#define SWIGTYPE_p_int32_t swig_types[20]
-#define SWIGTYPE_p_p_char swig_types[21]
-#define SWIGTYPE_p_void swig_types[22]
-static swig_type_info *swig_types[24];
-static swig_module_info swig_module = {swig_types, 23, 0, 0, 0, 0};
+#define SWIGTYPE_p_f_double_int_p_void__void swig_types[19]
+#define SWIGTYPE_p_int swig_types[20]
+#define SWIGTYPE_p_int32_t swig_types[21]
+#define SWIGTYPE_p_p_char swig_types[22]
+#define SWIGTYPE_p_void swig_types[23]
+static swig_type_info *swig_types[25];
+static swig_module_info swig_module = {swig_types, 24, 0, 0, 0, 0};
 #define SWIG_TypeQuery(name) SWIG_TypeQueryModule(&swig_module, &swig_module, name)
 #define SWIG_MangledTypeQuery(name) SWIG_MangledTypeQueryModule(&swig_module, &swig_module, name)
 
@@ -15792,6 +15793,58 @@ fail:
 }
 
 
+int _wrap_helicsFederateSetTimeUpdateCallback(int resc, mxArray *resv[], int argc, mxArray *argv[]) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  void (*arg2)(HelicsTime,HelicsBool,void *) = (void (*)(HelicsTime,HelicsBool,void *)) 0 ;
+  void *arg3 = (void *) 0 ;
+  HelicsError *arg4 = (HelicsError *) 0 ;
+  int res1 ;
+  int res3 ;
+  HelicsError etemp4 ;
+  mxArray * _out;
+  
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  if (!SWIG_check_num_args("helicsFederateSetTimeUpdateCallback",argc,3,3,0)) {
+    SWIG_fail;
+  }
+  res1 = SWIG_ConvertPtr(argv[0],SWIG_as_voidptrptr(&arg1), 0, 0);
+  if (!SWIG_IsOK(res1)) {
+    SWIG_exception_fail(SWIG_ArgError(res1), "in method '" "helicsFederateSetTimeUpdateCallback" "', argument " "1"" of type '" "HelicsFederate""'"); 
+  }
+  {
+    int res = SWIG_ConvertFunctionPtr(argv[1], (void**)(&arg2), SWIGTYPE_p_f_double_int_p_void__void);
+    if (!SWIG_IsOK(res)) {
+      SWIG_exception_fail(SWIG_ArgError(res), "in method '" "helicsFederateSetTimeUpdateCallback" "', argument " "2"" of type '" "void (*)(HelicsTime,HelicsBool,void *)""'"); 
+    }
+  }
+  res3 = SWIG_ConvertPtr(argv[2],SWIG_as_voidptrptr(&arg3), 0, 0);
+  if (!SWIG_IsOK(res3)) {
+    SWIG_exception_fail(SWIG_ArgError(res3), "in method '" "helicsFederateSetTimeUpdateCallback" "', argument " "3"" of type '" "void *""'"); 
+  }
+  helicsFederateSetTimeUpdateCallback(arg1,arg2,arg3,arg4);
+  _out = (mxArray*)0;
+  if (_out) --resc, *resv++ = _out;
+  {
+    if (arg4->error_code!=HELICS_OK)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
+  return 0;
+fail:
+  {
+    if (arg4->error_code!=HELICS_OK)
+    {
+      throwHelicsMatlabError(arg4);
+    }
+  }
+  return 1;
+}
+
+
 
 /* -------- TYPE CONVERSION AND EQUIVALENCE RULES (BEGIN) -------- */
 
@@ -15814,6 +15867,7 @@ static swig_type_info _swigt__p_HelicsProperties = {"_p_HelicsProperties", "enum
 static swig_type_info _swigt__p_HelicsSequencingModes = {"_p_HelicsSequencingModes", "enum HelicsSequencingModes *|HelicsSequencingModes *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_char = {"_p_char", "char *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_double = {"_p_double", "double *|HelicsTime *", 0, 0, (void*)0, 0};
+static swig_type_info _swigt__p_f_double_int_p_void__void = {"_p_f_double_int_p_void__void", "void (*)(double,int,void *)|void (*)(HelicsTime,HelicsBool,void *)", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int = {"_p_int", "int *|HelicsBool *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_int32_t = {"_p_int32_t", "int32_t *", 0, 0, (void*)0, 0};
 static swig_type_info _swigt__p_p_char = {"_p_p_char", "char **", 0, 0, (void*)0, 0};
@@ -15839,6 +15893,7 @@ static swig_type_info *swig_type_initial[] = {
   &_swigt__p_HelicsSequencingModes,
   &_swigt__p_char,
   &_swigt__p_double,
+  &_swigt__p_f_double_int_p_void__void,
   &_swigt__p_int,
   &_swigt__p_int32_t,
   &_swigt__p_p_char,
@@ -15864,6 +15919,7 @@ static swig_cast_info _swigc__p_HelicsProperties[] = {  {&_swigt__p_HelicsProper
 static swig_cast_info _swigc__p_HelicsSequencingModes[] = {  {&_swigt__p_HelicsSequencingModes, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_char[] = {  {&_swigt__p_char, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_double[] = {  {&_swigt__p_double, 0, 0, 0},{0, 0, 0, 0}};
+static swig_cast_info _swigc__p_f_double_int_p_void__void[] = {  {&_swigt__p_f_double_int_p_void__void, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int[] = {  {&_swigt__p_int, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_int32_t[] = {  {&_swigt__p_int32_t, 0, 0, 0},{0, 0, 0, 0}};
 static swig_cast_info _swigc__p_p_char[] = {  {&_swigt__p_p_char, 0, 0, 0},{0, 0, 0, 0}};
@@ -15889,6 +15945,7 @@ static swig_cast_info *swig_cast_initial[] = {
   _swigc__p_HelicsSequencingModes,
   _swigc__p_char,
   _swigc__p_double,
+  _swigc__p_f_double_int_p_void__void,
   _swigc__p_int,
   _swigc__p_int32_t,
   _swigc__p_p_char,
@@ -16837,6 +16894,7 @@ SWIGINTERN const char* SwigFunctionName(int fcn_id) {
   case 344: return "_wrap_helicsFilterSetTag";
   case 345: return "_wrap_helicsFilterSetOption";
   case 346: return "_wrap_helicsFilterGetOption";
+  case 347: return "_wrap_helicsFederateSetTimeUpdateCallback";
   default: return 0;
   }
 }
@@ -17240,6 +17298,7 @@ void mexFunction(int resc, mxArray *resv[], int argc, const mxArray *argv[]) {
   case 344: flag=_wrap_helicsFilterSetTag(resc,resv,argc,(mxArray**)(argv)); break;
   case 345: flag=_wrap_helicsFilterSetOption(resc,resv,argc,(mxArray**)(argv)); break;
   case 346: flag=_wrap_helicsFilterGetOption(resc,resv,argc,(mxArray**)(argv)); break;
+  case 347: flag=_wrap_helicsFederateSetTimeUpdateCallback(resc,resv,argc,(mxArray**)(argv)); break;
   default: flag=1, SWIG_Error(SWIG_RuntimeError, "No function id %d.", fcn_id);
   }
   if (flag) {
