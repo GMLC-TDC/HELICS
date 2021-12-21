@@ -247,6 +247,11 @@ class Federate {
                 reinterpret_cast<std::function<std::string(const std::string&)>*>(callbackBuffer);
             delete cback;
         }
+        if (timeUpdateCallbackBuffer != nullptr) {
+            auto cback =
+                reinterpret_cast<std::function<void(HelicsTime, bool)>*>(timeUpdateCallbackBuffer);
+            delete cback;
+        }
 #endif
     }
     /** cast operator to get the underlying HelicsFederate object*/
