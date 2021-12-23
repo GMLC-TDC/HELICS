@@ -1194,4 +1194,47 @@ void valueConvert(defV& val, DataType newType)
     }
 }
 
+SmallBuffer typeConvertDefV(DataType type, const defV& val)
+{
+    switch (val.index()) {
+        case double_loc:  // double
+            return typeConvert(type, std::get<double>(val));
+        case int_loc:  // int64_t
+            return typeConvert(type, std::get<int64_t>(val));
+        case string_loc:  // string
+        default:
+            return typeConvert(type, std::string_view(std::get<std::string>(val)));
+        case complex_loc:  // complex
+            return typeConvert(type, std::get<std::complex<double>>(val));
+        case vector_loc:  // vector
+            return typeConvert(type, std::get<std::vector<double>>(val));
+        case complex_vector_loc:  // complex
+            return typeConvert(type, std::get<std::vector<std::complex<double>>>(val));
+        case named_point_loc:
+            return typeConvert(type, std::get<NamedPoint>(val));
+    }
+}
+
+
+SmallBuffer typeConvertDefV(const defV& val)
+{
+    switch (val.index()) {
+        case double_loc:  // double
+            return typeConvert(DataType::HELICS_DOUBLE, std::get<double>(val));
+        case int_loc:  // int64_t
+            return typeConvert(DataType::HELICS_INT, std::get<int64_t>(val));
+        case string_loc:  // string
+        default:
+            return typeConvert(DataType::HELICS_STRING, std::string_view(std::get<std::string>(val)));
+        case complex_loc:  // complex
+            return typeConvert(DataType::HELICS_COMPLEX, std::get<std::complex<double>>(val));
+        case vector_loc:  // vector
+            return typeConvert(DataType::HELICS_VECTOR, std::get<std::vector<double>>(val));
+        case complex_vector_loc:  // complex
+            return typeConvert(DataType::HELICS_COMPLEX_VECTOR, std::get<std::vector<std::complex<double>>>(val));
+        case named_point_loc:
+            return typeConvert(DataType::HELICS_NAMED_POINT, std::get<NamedPoint>(val));
+    }
+}
+
 }  // namespace helics

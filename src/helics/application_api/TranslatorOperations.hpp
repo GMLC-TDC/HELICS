@@ -81,7 +81,10 @@ class JsonTranslatorOperation: public TranslatorOperations {
     std::shared_ptr<JsonTranslatorOperator> to;
   public:
     JsonTranslatorOperation();
-    virtual std::shared_ptr<TranslatorOperator> getOperator() override;
+    virtual std::shared_ptr<TranslatorOperator> getOperator() override
+    {
+        return std::static_pointer_cast<TranslatorOperator>(to);
+    }
 };
 
 
@@ -93,7 +96,10 @@ class BinaryTranslatorOperation: public TranslatorOperations {
     /** default constructor*/
     BinaryTranslatorOperation();
     
-    virtual std::shared_ptr<TranslatorOperator> getOperator() override;
+    virtual std::shared_ptr<TranslatorOperator> getOperator() override
+    {
+        return std::static_pointer_cast<TranslatorOperator>(to);
+    }
 
 };
 
