@@ -10838,6 +10838,33 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFilterGetOption(JNI
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateSetTimeUpdateCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  void (*arg2)(HelicsTime,HelicsBool,void *) = (void (*)(HelicsTime,HelicsBool,void *)) 0 ;
+  void *arg3 = (void *) 0 ;
+  HelicsError *arg4 = (HelicsError *) 0 ;
+  HelicsError etemp4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  arg1 = *(HelicsFederate *)&jarg1; 
+  arg2 = *(void (**)(HelicsTime,HelicsBool,void *))&jarg2; 
+  arg3 = *(void **)&jarg3; 
+  helicsFederateSetTimeUpdateCallback(arg1,arg2,arg3,arg4);
+  {
+    if (arg4->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg4->message);
+    }
+  }
+}
+
+
 #ifdef __cplusplus
 }
 #endif
