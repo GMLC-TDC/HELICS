@@ -346,6 +346,10 @@ InterfaceHandle EmptyCore::getFilter(const std::string& /*name*/) const
     return {};
 }
 
+InterfaceHandle EmptyCore::getTranslator(const std::string& /*name*/) const
+{
+    return {};
+}
 void EmptyCore::makeConnections(const std::string& /*file*/) {}
 
 void EmptyCore::linkEndpoints(const std::string& /*source*/, const std::string& /*dest*/) {}
@@ -451,7 +455,12 @@ void EmptyCore::setFilterOperator(InterfaceHandle /*filter*/,
 {
 }
 
-void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
+void EmptyCore::setTranslatorOperator(InterfaceHandle /*translator*/,
+                                      std::shared_ptr<TranslatorOperator> /*callback*/)
+{
+
+}
+    void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
                                  std::function<std::string(std::string_view)> /*queryFunction*/)
 {
 }

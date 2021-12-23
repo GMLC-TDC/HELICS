@@ -9,6 +9,7 @@
 
 set(helicsShared_headers
     helicsCore.h
+    helicsData.h
     api-data.h
     ValueFederate.h
     MessageFederate.h
@@ -23,6 +24,7 @@ set(helicsShared_sources
     MessageFederateExport.cpp
     MessageFiltersExport.cpp
     helicsCallbacks.cpp
+    helicsData.cpp
     internal/api_objects.h
 )
 

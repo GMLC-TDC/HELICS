@@ -140,9 +140,25 @@ class TranslatorOperator {
 
     /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer &value) = 0;
-    
 };
 
+/** special filter operator defining no operation the original message is simply returned
+ */
+class NullTranslatorOperator final: public TranslatorOperator {
+  public:
+    /**default constructor*/
+    NullTranslatorOperator() = default;
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> /*message*/) override
+    {
+        return {};
+    }
+
+    /** convert a value to a message*/
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& /*value*/)
+    {
+        return nullptr;
+    }
+};
 
 /** helper template to check whether an index is actually valid for a particular vector
 @tparam SizedDataType a vector like data type that must have a size function

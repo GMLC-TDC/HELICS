@@ -308,12 +308,46 @@ const BasicHandleInfo* HandleManager::getFilter(std::string_view name) const
     }
     return &(handles[ar.first->second.baseValue()]);
 }
+
+
+
 BasicHandleInfo* HandleManager::getFilter(InterfaceHandle handle)
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
         if (hand.handleType == InterfaceType::FILTER) {
+            return &hand;
+        }
+    }
+
+    return nullptr;
+}
+
+
+const BasicHandleInfo* HandleManager::getTranslator(std::string_view name) const
+{
+    auto fnd = endpoints.find(name);
+    if (fnd != endpoints.end()) {
+        return &handles[fnd->second.baseValue()];
+    }
+    return nullptr;
+}
+
+BasicHandleInfo* HandleManager::getTranslator(std::string_view name)
+{
+    auto fnd = endpoints.find(name);
+    if (fnd != endpoints.end()) {
+        return &handles[fnd->second.baseValue()];
+    }
+    return nullptr;
+}
+BasicHandleInfo* HandleManager::getTranslator(InterfaceHandle handle)
+{
+    auto index = handle.baseValue();
+    if (isValidIndex(index, handles)) {
+        auto& hand = handles[index];
+        if (hand.handleType == InterfaceType::TRANSLATOR) {
             return &hand;
         }
     }

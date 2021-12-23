@@ -91,6 +91,13 @@ class HandleManager {
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
     BasicHandleInfo* getFilter(InterfaceHandle handle);
+
+    const BasicHandleInfo* getTranslator(std::string_view name) const;
+    BasicHandleInfo* getTranslator(std::string_view name);
+    /** get a filter by index
+    @return nullptr if the index doesn't point to a valid filter*/
+    BasicHandleInfo* getTranslator(InterfaceHandle handle);
+
     /** get a publication by name*/
     BasicHandleInfo* getPublication(std::string_view name);
     const BasicHandleInfo* getPublication(std::string_view name) const;

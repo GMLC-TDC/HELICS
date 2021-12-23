@@ -192,6 +192,7 @@ class CommonCore: public Core, public BrokerBase {
                                        const std::string& message_type,
                                        const std::string& units) override final; 
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
+    virtual InterfaceHandle getTranslator(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
                                const std::string& federateName) override final;
     virtual void linkEndpoints(const std::string& source, const std::string& dest) override final;
@@ -228,7 +229,8 @@ class CommonCore: public Core, public BrokerBase {
                             const std::string& messageToLog) override final;
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) override final;
-
+    virtual void setTranslatorOperator(InterfaceHandle translator,
+                                   std::shared_ptr<TranslatorOperator> callbacks) override final;
     /** set the local identification for the core*/
     void setIdentifier(const std::string& name);
     /** get the local identifier for the core*/

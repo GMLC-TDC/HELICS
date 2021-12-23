@@ -1831,6 +1831,15 @@ InterfaceHandle CommonCore::getFilter(const std::string& name) const
     return {};
 }
 
+InterfaceHandle CommonCore::getTranslator(const std::string& name) const
+{
+    const auto* filt = handles.read([&name](auto& hand) { return hand.getTranslator(name); });
+    if ((filt != nullptr) && (filt->handleType == InterfaceType::TRANSLATOR)) {
+        return filt->getInterfaceHandle();
+    }
+    return {};
+}
+
 void CommonCore::makeConnections(const std::string& file)
 {
     if (fileops::hasTomlExtension(file)) {
@@ -2341,8 +2350,32 @@ void CommonCore::setFilterOperator(InterfaceHandle filter, std::shared_ptr<Filte
     filtOpUpdate.source_handle = filter;
     actionQueue.push(filtOpUpdate);
 }
+void CommonCore::setTranslatorOperator(InterfaceHandle translator,
+    std::shared_ptr<TranslatorOperator> callbacks)
+{
+    static std::shared_ptr<TranslatorOperator> nullTranslator = std::make_shared<NullTranslatorOperator>();
+    const auto* hndl = getHandleInfo(translator);
+    if (hndl == nullptr) {
+        throw(InvalidIdentifier("filter is not a valid handle"));
+    }
+    if ((hndl->handleType != InterfaceType::FILTER)) {
+        throw(InvalidIdentifier("filter identifier does not point a filter"));
+    }
+    ActionMessage transOpUpdate(CMD_CORE_CONFIGURE);
+    transOpUpdate.messageID = UPDATE_TRANSLATOR_OPERATOR;
+    if (!callbacks) {
+        callbacks = nullTranslator;
+    }
+    auto ii = getNextAirlockIndex();
+    dataAirlocks[ii].load(std::move(callbacks));
+    transOpUpdate.counter = ii;
+    transOpUpdate.source_id = hndl->getFederateId();
+    transOpUpdate.source_handle = translator;
+    actionQueue.push(transOpUpdate);
+}
 
-void CommonCore::setIdentifier(const std::string& name)
+
+    void CommonCore::setIdentifier(const std::string& name)
 {
     if (getBrokerState() == BrokerState::created) {
         identifier = name;

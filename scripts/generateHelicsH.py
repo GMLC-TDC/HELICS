@@ -71,6 +71,7 @@ outfile.write("#endif\n")
 files = [
     "src/helics/helics_enums.h",
     "src/helics/shared_api_library/api-data.h",
+    "src/helics/shared_api_library/helicsData.h",
     "src/helics/shared_api_library/helicsCore.h",
     "src/helics/shared_api_library/ValueFederate.h",
     "src/helics/shared_api_library/MessageFederate.h",

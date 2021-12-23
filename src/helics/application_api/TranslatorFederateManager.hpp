@@ -52,7 +52,7 @@ class  TranslatorFederateManager {
     @param name the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     Translator& getTranslator(const std::string& name);
-    const Translator& getTranslatorr(const std::string& name) const;
+    const Translator& getTranslator(const std::string& name) const;
     Translator& getTranslator(int index);
     const Translator& getTranslator(int index) const;
 
@@ -61,7 +61,7 @@ class  TranslatorFederateManager {
     /** close all filters*/
     void closeAllTranslators();
     /** close all filters*/
-    void disconnectAllTranslator();
+    void disconnectAllTranslators();
     /** disconnect from the coreObject*/
     void disconnect();
 

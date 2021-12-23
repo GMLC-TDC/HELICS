@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "FilterFederateManager.hpp"
+#include "TranslatorFederateManager.hpp"
 
 #include "../core/Core.hpp"
 #include "../core/EmptyCore.hpp"
@@ -14,122 +14,100 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
+TranslatorFederateManager::TranslatorFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
     coreObject(coreObj), fed(ffed), fedID(id)
 {
 }
-FilterFederateManager::~FilterFederateManager() = default;
+TranslatorFederateManager::~TranslatorFederateManager() = default;
 
-Filter& FilterFederateManager::registerFilter(const std::string& name,
+Translator& TranslatorFederateManager::registerTranslator(const std::string& name,
                                               const std::string& type_in,
                                               const std::string& type_out)
 {
-    auto handle = coreObject->registerFilter(name, type_in, type_out);
+    auto handle = coreObject->registerTranslator(name, type_in, type_out);
     if (handle.isValid()) {
-        auto filt = std::make_unique<Filter>(fed, name, handle);
-        Filter& f = *filt;
-        auto filts = filters.lock();
+        auto trans = std::make_unique<Translator>(fed, name, handle);
+        Translator& f = *trans;
+        auto filts = translators.lock();
         if (name.empty()) {
-            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
+            filts->insert(coreObject->getHandleName(trans->getHandle()), std::move(trans));
         } else {
-            filts->insert(name, std::move(filt));
+            filts->insert(name, std::move(trans));
         }
         return f;
     }
-    throw(RegistrationFailure("Unable to register Filter"));
+    throw(RegistrationFailure("Unable to register Translator"));
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(const std::string& name,
-                                                            const std::string& type_in,
-                                                            const std::string& type_out)
+
+
+Translator& TranslatorFederateManager::registerTranslator(TranslatorTypes type, const std::string& name)
 {
-    auto handle = coreObject->registerCloningFilter(name, type_in, type_out);
-    if (handle.isValid()) {
-        auto filt = std::make_unique<CloningFilter>(fed, name, handle);
-        CloningFilter& f = *filt;
-        auto filts = filters.lock();
-        if (name.empty()) {
-            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
-        } else {
-            filts->insert(name, std::move(filt));
-        }
-        return f;
-    }
-    throw(RegistrationFailure("Unable to register Filter"));
+    return make_translator(type, fed, name);
 }
 
-Filter& FilterFederateManager::registerFilter(FilterTypes type, const std::string& name)
+
+static const Translator invalidFilt{};
+static Translator invalidFiltNC{};
+
+Translator& TranslatorFederateManager::getTranslator(const std::string& name)
 {
-    return make_filter(type, fed, name);
+    auto filts = translators.lock();
+    auto trans = filts->find(name);
+    return (trans != filts.end()) ? (**trans) : invalidFiltNC;
+}
+const Translator& TranslatorFederateManager::getTranslator(const std::string& name) const
+{
+    auto sharedFilt = translators.lock_shared();
+    auto trans = sharedFilt->find(name);
+    return (trans != sharedFilt.end()) ? (**trans) : invalidFilt;
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(FilterTypes type,
-                                                            const std::string& name)
+Translator& TranslatorFederateManager::getTranslator(int index)
 {
-    return make_cloning_filter(type, fed, std::string(), name);
-}
-
-static const Filter invalidFilt{};
-static Filter invalidFiltNC{};
-
-Filter& FilterFederateManager::getFilter(const std::string& name)
-{
-    auto filts = filters.lock();
-    auto filt = filts->find(name);
-    return (filt != filts.end()) ? (**filt) : invalidFiltNC;
-}
-const Filter& FilterFederateManager::getFilter(const std::string& name) const
-{
-    auto sharedFilt = filters.lock_shared();
-    auto filt = sharedFilt->find(name);
-    return (filt != sharedFilt.end()) ? (**filt) : invalidFilt;
-}
-
-Filter& FilterFederateManager::getFilter(int index)
-{
-    auto sharedFilt = filters.lock();
+    auto sharedFilt = translators.lock();
     if (isValidIndex(index, *sharedFilt)) {
         return *(*sharedFilt)[index];
     }
     return invalidFiltNC;
 }
 
-const Filter& FilterFederateManager::getFilter(int index) const
+const Translator& TranslatorFederateManager::getTranslator(int index) const
 {
-    auto sharedFilt = filters.lock_shared();
+    auto sharedFilt = translators.lock_shared();
     if (isValidIndex(index, *sharedFilt)) {
         return *(*sharedFilt)[index];
     }
     return invalidFilt;
 }
 
-int FilterFederateManager::getFilterCount() const
+int TranslatorFederateManager::getTranslatorCount() const
 {
-    return static_cast<int>(filters.lock_shared()->size());
+    return static_cast<int>(translators.lock_shared()->size());
 }
 
-void FilterFederateManager::closeAllFilters()
+void TranslatorFederateManager::closeAllTranslators()
 {
     if (coreObject != nullptr) {
-        auto filts = filters.lock();
-        for (auto& filt : filts) {
-            coreObject->closeHandle(filt->getHandle());
-            filt->disconnectFromCore();
+        auto filts = translators.lock();
+        for (auto& trans : filts) {
+            coreObject->closeHandle(trans->getHandle());
+            trans->disconnectFromCore();
         }
     }
 }
 
-void FilterFederateManager::disconnectAllFilters()
+void TranslatorFederateManager::disconnectAllTranslators()
 {
-    auto filts = filters.lock();
-    for (auto& filt : filts) {
-        filt->disconnectFromCore();
+    auto filts = translators.lock();
+    for (auto& trans : filts) {
+        trans->disconnectFromCore();
     }
 }
 
 static EmptyCore eCore;
 
-void FilterFederateManager::disconnect()
+void TranslatorFederateManager::disconnect()
 {
     // checks for the calls are handled in the MessageFederate itself
     coreObject = &eCore;
