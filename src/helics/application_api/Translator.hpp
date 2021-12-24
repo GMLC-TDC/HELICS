@@ -21,6 +21,7 @@ class CoreApp;
 enum class TranslatorTypes {
     CUSTOM = HELICS_TRANSLATOR_TYPE_CUSTOM,
     JSON = HELICS_TRANSLATOR_TYPE_JSON,
+    BINARY=HELICS_TRANSLATOR_TYPE_BINARY,
     UNRECOGNIZED = 7
 };
 
@@ -35,7 +36,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     bool disableAssign = false;  //!< disable assignment for the object
   private:
     std::shared_ptr<TranslatorOperations>
-        filtOp;  //!< a class running any specific operation of the Translator
+        transOp;  //!< a class running any specific operation of the Translator
   public:
     /** default constructor*/
     Translator() = default;

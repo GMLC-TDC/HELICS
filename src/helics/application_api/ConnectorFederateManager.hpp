@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "Filters.hpp"
+#include "Translator.hpp"
 #include "gmlc/containers/MappedVector.hpp"
 
 #include <memory>
@@ -50,10 +51,17 @@ class FilterFederateManager {
 
     /** register a Filter
     @details call is only valid in startup mode
-    @param name the name of the endpoint
-    @param type the defined type of the interface for endpoint checking if requested
+    @param type the defined type of the filter
+    @param name the name of the filter
     */
     Filter& registerFilter(FilterTypes type, const std::string& name);
+
+     /** register a Translator
+   @details call is only valid in startup mode
+   @param name the name of the endpoint
+   @param type the defined type of the interface for endpoint checking if requested
+   */
+    Translator& registerTranslator(TranslatorTypes type, const std::string& name);
 
     /** register a cloningFilter
     @details call is only valid in startup mode

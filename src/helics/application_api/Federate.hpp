@@ -37,7 +37,7 @@ class Core;
 class CoreApp;
 class AsyncFedCallInfo;
 class MessageOperator;
-class FilterFederateManager;
+class ConnectionFederateManager;
 class Filter;
 class CloningFilter;
 class Federate;
@@ -91,7 +91,7 @@ class HELICS_CXX_EXPORT Federate {
   private:
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
         asyncCallInfo;  //!< pointer to a class defining the async call information
-    std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
+    std::unique_ptr<ConnectionFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
@@ -530,12 +530,38 @@ received
                                          const std::string& outputType = std::string());
 
     /** define a nameless filter interface
-     */
+    */
     Filter& registerFilter()
     {
         return registerGlobalFilter(std::string(), std::string(), std::string());
     }
 
+    /** define a named global translator interface
+    @param translatorName the name of the globally visible filter
+    @param inputType the inputType which the filter can handle
+    @param outputType the outputType of the filter which the filter produces
+    */
+    Translator& registerGlobalTranslator(const std::string& translatorName,
+                                 const std::string& inputType = std::string(),
+                                 const std::string& outputType = std::string());
+
+    /** define a translator interface
+    @details a translator will modify messages coming from or going to target endpoints
+    @param filterName the name of the filter
+    @param inputType the inputType which the filter can handle
+    @param outputType the outputType of the filter which the filter produces
+    */
+    Translator& registerTranslator(const std::string& translatorName,
+                           const std::string& inputType = std::string(),
+                           const std::string& outputType = std::string());
+   
+
+    /** define a nameless translator interface
+     */
+    Translator& registerTranslator()
+    {
+        return registerGlobalTranslator(std::string(), std::string(), std::string());
+    }
     /** define a nameless cloning filter interface on a source
      */
     CloningFilter& registerCloningFilter()
@@ -597,7 +623,7 @@ received
     interfaces
     */
     virtual void registerInterfaces(const std::string& configString);
-    /** register filter interfaces defined in  file or string
+    /** register filter/translator interfaces defined in  file or string
     @details call is only valid in startup mode
     @param configString  the location of the file or config String to load to generate the
     interfaces
