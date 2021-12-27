@@ -22,7 +22,7 @@ repos:
     hooks:
       - id: remove-tabs
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.0.1
+    rev: v4.1.0
     hooks:
       - id: check-added-large-files
       - id: mixed-line-ending
@@ -47,7 +47,7 @@ repos:
         exclude: "mac.md"
       - id: script-must-have-extension
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.8.0.2
+    rev: v0.8.0.3
     hooks:
       - id: shellcheck
         args: [-x]
