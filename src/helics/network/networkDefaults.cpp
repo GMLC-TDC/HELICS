@@ -14,15 +14,15 @@ int getDefaultPort(int coreType)
 {
     switch (coreType) {
         case HELICS_CORE_TYPE_TCP:
-            return network::DEFAULT_TCP_BROKER_PORT_NUMBER;
+            return network::DEFAULT_TCP_PORT;
         case HELICS_CORE_TYPE_TCP_SS:
             return network::DEFAULT_TCPSS_PORT;
         case HELICS_CORE_TYPE_ZMQ:
-            return network::DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+            return network::DEFAULT_ZMQ_PORT;
         case HELICS_CORE_TYPE_ZMQ_SS:
-            return network::DEFAULT_ZMQSS_BROKER_PORT_NUMBER;
+            return network::DEFAULT_ZMQSS_PORT;
         case HELICS_CORE_TYPE_UDP:
-            return network::DEFAULT_UDP_BROKER_PORT_NUMBER;
+            return network::DEFAULT_UDP_PORT;
         case HELICS_CORE_TYPE_HTTP:
         case HELICS_CORE_TYPE_WEBSOCKET:
             return 80;
