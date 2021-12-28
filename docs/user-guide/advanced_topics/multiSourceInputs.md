@@ -36,7 +36,7 @@ The priority of the inputs is only applicable if the default operation to retrie
 +===========================================+==============================================================================================================================================+
 | ``helics_multi_input_no_op``              | default operation to pick the highest priority value                                                                                         |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-| ``helics_multi_input_vectorize_operation``| take all the values and collapse to a single vector, converts strings into a JSON string vector                                               |
+| ``helics_multi_input_vectorize_operation``| take all the values and collapse to a single vector, converts strings into a JSON string vector                                              |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 |``helics_multi_input_and_operation``       | treat all inputs as booleans and perform an `and` operation                                                                                  |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+

@@ -58,7 +58,7 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``exists``         | basic query if the federate exists in the Federation [T/F] |
 +--------------------+------------------------------------------------------------+
-| ``isinit``         | federate has entered init mode? [T/F]                |
+| ``isinit``         | federate has entered init mode? [T/F]                      |
 +--------------------+------------------------------------------------------------+
 | ``state``          | current state of the federate as a string [string]         |
 +--------------------+------------------------------------------------------------+
@@ -157,7 +157,7 @@ The following queries will be answered by a core:
 | ``current_time``         | if a time is computed locally that time sequence is returned [structure]            |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``global_time``          | get a structure with the current time status of all the federates/cores [structure] |
-+------------------------------+---------------------------------------------------------------------------------+
++--------------------------+-------------------------------------------------------------------------------------+
 | ``current_state``        | The state of all the components of a core as known by the core [structure]          |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``global_state``         | The state of all the components from the components [structure]                     |
