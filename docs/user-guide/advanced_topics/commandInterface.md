@@ -23,7 +23,7 @@ A target is specified, and can be one of the following. A federate named one of 
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``root``, ``federation``                 | The root broker of the federation                                                     |
 +------------------------------------------+---------------------------------------------------------------------------------------+
-| ``core``                                 | The core of a federate, this is not a valid target if called from a broker          |
+| ``core``                                 | The core of a federate, this is not a valid target if called from a broker            |
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | ``<object name>``                        | any named object in the federation can also be queried, brokers, cores, and federates |
 +------------------------------------------+---------------------------------------------------------------------------------------+
@@ -38,16 +38,16 @@ The `commandStr` is a generic string, so can be anything that can be contained i
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
 ```{eval-rst}
-+--------------------+------------------------------------------------------------+
-| Command String     | Description                                                |
-+====================+============================================================+
-| ``terminate``      | [all objects] disconnect the object from the federation                    |
-+--------------------+------------------------------------------------------------+
-| ``echo``           | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender |
-+--------------------+------------------------------------------------------------+
-| ``command_status`` | [federates] when received will send a string back to the source of the command
++--------------------+------------------------------------------------------------------------------------------------+
+| Command String     | Description                                                                                    |
++====================+================================================================================================+
+| ``terminate``      | [all objects] disconnect the object from the federation                                        |
++--------------------+------------------------------------------------------------------------------------------------+
+| ``echo``           | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
++--------------------+------------------------------------------------------------------------------------------------+
+| ``command_status`` | [federates] when received will send a string back to the source of the command                 |
 |                    | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
-+--------------------+------------------------------------------------------------+
++--------------------+------------------------------------------------------------------------------------------------+
 ```
 
 ### Future
