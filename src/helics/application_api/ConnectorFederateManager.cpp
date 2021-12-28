@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "FilterFederateManager.hpp"
+#include "ConnectorFederateManager.hpp"
 
 #include "../core/Core.hpp"
 #include "../core/EmptyCore.hpp"
@@ -14,13 +14,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-FilterFederateManager::FilterFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
+ConnectorFederateManager::ConnectorFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
     coreObject(coreObj), fed(ffed), fedID(id)
 {
 }
-FilterFederateManager::~FilterFederateManager() = default;
+ConnectorFederateManager::~ConnectorFederateManager() = default;
 
-Filter& FilterFederateManager::registerFilter(const std::string& name,
+Filter& ConnectorFederateManager::registerFilter(const std::string& name,
                                               const std::string& type_in,
                                               const std::string& type_out)
 {
@@ -39,7 +39,26 @@ Filter& FilterFederateManager::registerFilter(const std::string& name,
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(const std::string& name,
+Translator& ConnectorFederateManager::registerTranslator(const std::string& name,
+                                                 const std::string& type_in,
+                                                 const std::string& type_out)
+{
+    auto handle = coreObject->registerTranslator(name, type_in, type_out);
+    if (handle.isValid()) {
+        auto tran = std::make_unique<Translator>(fed, name, handle);
+        Translator& t = *tran;
+        auto trans = translators.lock();
+        if (name.empty()) {
+            trans->insert(coreObject->getHandleName(tran->getHandle()), std::move(tran));
+        } else {
+            trans->insert(name, std::move(tran));
+        }
+        return t;
+    }
+    throw(RegistrationFailure("Unable to register translator"));
+}
+
+CloningFilter& ConnectorFederateManager::registerCloningFilter(const std::string& name,
                                                             const std::string& type_in,
                                                             const std::string& type_out)
 {
@@ -58,12 +77,17 @@ CloningFilter& FilterFederateManager::registerCloningFilter(const std::string& n
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-Filter& FilterFederateManager::registerFilter(FilterTypes type, const std::string& name)
+Filter& ConnectorFederateManager::registerFilter(FilterTypes type, const std::string& name)
 {
     return make_filter(type, fed, name);
 }
 
-CloningFilter& FilterFederateManager::registerCloningFilter(FilterTypes type,
+Translator& ConnectorFederateManager::registerTranslator(TranslatorTypes type, const std::string& name)
+{
+    return make_translator(type, fed, name);
+}
+
+CloningFilter& ConnectorFederateManager::registerCloningFilter(FilterTypes type,
                                                             const std::string& name)
 {
     return make_cloning_filter(type, fed, std::string(), name);
@@ -72,20 +96,23 @@ CloningFilter& FilterFederateManager::registerCloningFilter(FilterTypes type,
 static const Filter invalidFilt{};
 static Filter invalidFiltNC{};
 
-Filter& FilterFederateManager::getFilter(const std::string& name)
+static const Translator invalidTran{};
+static Translator invalidTranNC{};
+
+Filter& ConnectorFederateManager::getFilter(const std::string& name)
 {
     auto filts = filters.lock();
     auto filt = filts->find(name);
     return (filt != filts.end()) ? (**filt) : invalidFiltNC;
 }
-const Filter& FilterFederateManager::getFilter(const std::string& name) const
+const Filter& ConnectorFederateManager::getFilter(const std::string& name) const
 {
     auto sharedFilt = filters.lock_shared();
     auto filt = sharedFilt->find(name);
     return (filt != sharedFilt.end()) ? (**filt) : invalidFilt;
 }
 
-Filter& FilterFederateManager::getFilter(int index)
+Filter& ConnectorFederateManager::getFilter(int index)
 {
     auto sharedFilt = filters.lock();
     if (isValidIndex(index, *sharedFilt)) {
@@ -94,7 +121,7 @@ Filter& FilterFederateManager::getFilter(int index)
     return invalidFiltNC;
 }
 
-const Filter& FilterFederateManager::getFilter(int index) const
+const Filter& ConnectorFederateManager::getFilter(int index) const
 {
     auto sharedFilt = filters.lock_shared();
     if (isValidIndex(index, *sharedFilt)) {
@@ -103,12 +130,48 @@ const Filter& FilterFederateManager::getFilter(int index) const
     return invalidFilt;
 }
 
-int FilterFederateManager::getFilterCount() const
+
+int ConnectorFederateManager::getFilterCount() const
 {
     return static_cast<int>(filters.lock_shared()->size());
 }
 
-void FilterFederateManager::closeAllFilters()
+Translator& ConnectorFederateManager::getTranslator(const std::string& name)
+{
+    auto trans = translators.lock();
+    auto tran = trans->find(name);
+    return (tran != trans.end()) ? (**tran) : invalidTranNC;
+}
+const Translator& ConnectorFederateManager::getTranslator(const std::string& name) const
+{
+    auto sharedTran = translators.lock_shared();
+    auto tran = sharedTran->find(name);
+    return (tran != sharedTran.end()) ? (**tran) : invalidTran;
+}
+
+Translator& ConnectorFederateManager::getTranslator(int index)
+{
+    auto sharedTran = translators.lock();
+    if (isValidIndex(index, *sharedTran)) {
+        return *(*sharedTran)[index];
+    }
+    return invalidTranNC;
+}
+
+const Translator& ConnectorFederateManager::getTranslator(int index) const
+{
+    auto sharedTran = translators.lock_shared();
+    if (isValidIndex(index, *sharedTran)) {
+        return *(*sharedTran)[index];
+    }
+    return invalidTran;
+}
+
+int ConnectorFederateManager::getTranslatorCount() const
+{
+    return static_cast<int>(translators.lock_shared()->size());
+}
+void ConnectorFederateManager::closeAllConnectors()
 {
     if (coreObject != nullptr) {
         auto filts = filters.lock();
@@ -116,20 +179,30 @@ void FilterFederateManager::closeAllFilters()
             coreObject->closeHandle(filt->getHandle());
             filt->disconnectFromCore();
         }
+
+        auto trans = translators.lock();
+        for (auto& tran : trans) {
+            coreObject->closeHandle(tran->getHandle());
+            tran->disconnectFromCore();
+        }
     }
 }
 
-void FilterFederateManager::disconnectAllFilters()
+void ConnectorFederateManager::disconnectAllConnectors()
 {
     auto filts = filters.lock();
     for (auto& filt : filts) {
         filt->disconnectFromCore();
     }
+    auto trans = translators.lock();
+    for (auto& tran : trans) {
+        tran->disconnectFromCore();
+    }
 }
 
 static EmptyCore eCore;
 
-void FilterFederateManager::disconnect()
+void ConnectorFederateManager::disconnect()
 {
     // checks for the calls are handled in the MessageFederate itself
     coreObject = &eCore;

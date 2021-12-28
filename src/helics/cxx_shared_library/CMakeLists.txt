@@ -18,8 +18,10 @@ set(helics_shared_sources
     ../application_api/helicsPrimaryTypes.cpp
     ../application_api/Publications.cpp
     ../application_api/Filters.cpp
+    ../application_api/Translator.cpp
     ../application_api/FilterOperations.cpp
-    ../application_api/FilterFederateManager.cpp
+    ../application_api/TranslatorOperations.cpp
+    ../application_api/ConnectorFederateManager.cpp
     ../application_api/Endpoints.cpp
     ../application_api/helicsTypes.cpp
     ../application_api/queryFunctions.cpp

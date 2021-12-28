@@ -97,9 +97,9 @@ void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
 
 void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> transOps)
 {
-    TransOp = std::move(transOps);
+    transOp = std::move(transOps);
     if (cr != nullptr) {
-        cr->setTranslatorOperator(handle, (TransOp) ? TransOp->getOperator() : nullptr);
+        cr->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
     }
 }
 
@@ -107,15 +107,15 @@ static const std::string emptyStr;
 
 void Translator::set(const std::string& property, double val)
 {
-    if (TransOp) {
-        TransOp->set(property, val);
+    if (transOp) {
+        transOp->set(property, val);
     }
 }
 
 void Translator::setString(const std::string& property, const std::string& val)
 {
-    if (TransOp) {
-        TransOp->setString(property, val);
+    if (transOp) {
+        transOp->setString(property, val);
     }
 }
 
@@ -126,7 +126,7 @@ Translator& make_translator(TranslatorTypes type, Federate* mFed, const std::str
     return dfilt;
 }
 
-Translator& make_filter(InterfaceVisibility locality,
+Translator& make_translator(InterfaceVisibility locality,
                     TranslatorTypes type,
                     Federate* mFed,
                     const std::string& name)

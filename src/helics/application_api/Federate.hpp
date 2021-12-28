@@ -37,8 +37,9 @@ class Core;
 class CoreApp;
 class AsyncFedCallInfo;
 class MessageOperator;
-class ConnectionFederateManager;
+class ConnectorFederateManager;
 class Filter;
+class Translator;
 class CloningFilter;
 class Federate;
 
@@ -91,7 +92,7 @@ class HELICS_CXX_EXPORT Federate {
   private:
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
         asyncCallInfo;  //!< pointer to a class defining the async call information
-    std::unique_ptr<ConnectionFederateManager> cManager;  //!< class for managing filter operations
+    std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;

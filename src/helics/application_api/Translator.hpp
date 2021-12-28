@@ -55,10 +55,10 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     /** virtual destructor*/
     virtual ~Translator() = default;
 
-    Translator(Translator&& filt) = default;
+    Translator(Translator&& trans) = default;
     /** copy the translator, a copied translator will point to the same object*/
-    Translator(const Translator& filt) = default;
-    Translator& operator=(Translator&& filt) = default;
+    Translator(const Translator& trans) = default;
+    Translator& operator=(Translator&& trans) = default;
     /** copy the translator, a copied translator will point to the same object as the original*/
     Translator& operator=(const Translator& filt) = default;
 

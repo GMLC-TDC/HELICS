@@ -38,8 +38,6 @@ TranslatorFederate::~TranslatorFederate()
 {
     mHandles = {nullptr};
     current_state = {HELICS_CREATED};
-    /// map of all local filters
-    filterCoord.clear();
     // The interface_handle used is here is usually referencing an endpoint
 
     mQueueMessage = nullptr;
@@ -52,10 +50,6 @@ TranslatorFederate::~TranslatorFederate()
     mLogger = nullptr;
     mGetAirLock = nullptr;
 
-    /// sets of ongoing filtered messages
-    ongoingFilterProcesses.clear();
-    /// sets of ongoing destination filter processing
-    ongoingDestFilterProcesses.clear();
 
     filters.clear();
 }
@@ -184,59 +178,27 @@ void TranslatorFederate::generateProcessMarker(GlobalFederateId fid, uint32_t pi
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
-    if (ongoingFilterProcesses[fid_index].empty()) {
-        ActionMessage block(CMD_TIME_BLOCK);
-        block.dest_id = mCoreID;
-        block.source_id = fid;
-        mSendMessage(block);
-    }
-    ongoingFilterProcesses[fid_index].insert(pid);
-    addTimeReturn(pid, returnTime);
+    
 }
 
 void TranslatorFederate::acceptProcessReturn(GlobalFederateId fid, uint32_t pid)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
-    ongoingFilterProcesses[fid_index].erase(pid);
-    if (ongoingFilterProcesses[fid_index].empty()) {
-        ActionMessage unblock(CMD_TIME_UNBLOCK);
-        unblock.dest_id = mCoreID;
-        unblock.source_id = fid;
-        unblock.sequenceID = pid;
-        mSendMessage(unblock);
-    }
-    clearTimeReturn(pid);
+    
 }
 
 void TranslatorFederate::generateDestProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
-    if (ongoingDestFilterProcesses[fid_index].empty()) {
-        ActionMessage block(CMD_TIME_BLOCK);
-        block.dest_id = fid;
-        block.source_id = mFedID;
-        block.sequenceID = pid;
-        mSendMessage(block);
-    }
-    ongoingDestFilterProcesses[fid_index].insert(pid);
-    addTimeReturn(pid, returnTime);
 }
 
 void TranslatorFederate::acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid)
 {
     // nothing further to process
     auto fid_index = fid.baseValue();
-    ongoingDestFilterProcesses[fid_index].erase(pid);
-    if (ongoingDestFilterProcesses[fid_index].empty()) {
-        ActionMessage unblock(CMD_TIME_UNBLOCK);
-        unblock.dest_id = fid;
-        unblock.source_id = mFedID;
-        unblock.sequenceID = pid;
-        mSendMessage(unblock);
-    }
-    clearTimeReturn(pid);
+    
 }
 
 /** process a filter message return*/
@@ -251,77 +213,9 @@ void TranslatorFederate::processFilterReturn(ActionMessage& cmd)
     auto fid = handle->getFederateId();
     auto fid_index = fid.baseValue();
 
-    if (ongoingFilterProcesses[fid_index].find(mid) != ongoingFilterProcesses[fid_index].end()) {
-        if (cmd.action() == CMD_NULL_MESSAGE) {
-            acceptProcessReturn(fid, mid);
-            return;
-        }
-        auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
-        cmd.setAction(CMD_SEND_MESSAGE);
-        bool needToSendMessage{true};
-        for (auto ii = static_cast<size_t>(cmd.counter) + 1; ii < filtFunc->sourceFilters.size();
-             ++ii) {
-            auto* filt = filtFunc->sourceFilters[ii];
-            if (checkActionFlag(*filt, disconnected_flag)) {
-                continue;
-            }
-
-            auto press = executeFilter(cmd, filt);
-            if (!press.second) {
-                if (cmd.action() == CMD_IGNORE) {
-                    needToSendMessage = false;
-                    break;
-                }
-
-                if (ii < filtFunc->sourceFilters.size() - 1) {
-                    cmd.counter = static_cast<uint16_t>(ii);
-                    cmd.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
-                    cmd.sequenceID = messageCounter++;
-                    cmd.setSource(handle->handle);
-                    generateProcessMarker(handle->getFederateId(), cmd.sequenceID, cmd.actionTime);
-                } else {
-                    cmd.setAction(CMD_SEND_FOR_FILTER);
-                }
-                break;
-            }
-        }
-        acceptProcessReturn(fid, mid);
-        if (needToSendMessage) {
-            mDeliverMessage(cmd);
-        }
-    }
+    
 }
 
-/** process a destination filter message return*/
-void TranslatorFederate::processDestFilterReturn(ActionMessage& command)
-{
-    {
-        auto* handle = mHandles->getEndpoint(command.dest_handle);
-        if (handle == nullptr) {
-            return;
-        }
-        auto mid = command.sequenceID;
-        auto fid = handle->getFederateId();
-
-        auto& ongoingDestProcess = ongoingDestFilterProcesses[fid.baseValue()];
-        if (ongoingDestProcess.find(mid) != ongoingDestProcess.end()) {
-            if (command.action() == CMD_NULL_DEST_MESSAGE) {
-                acceptDestProcessReturn(fid, mid);
-                return;
-            }
-            auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
-
-            if (!filtFunc->cloningDestFilters.empty()) {
-                runCloningDestinationFilters(filtFunc, handle, command);
-            }
-
-            // mCoord->processTimeMessage(command);
-            command.setAction(CMD_SEND_MESSAGE);
-            mSendMessageMove(std::move(command));
-            acceptDestProcessReturn(fid, mid);
-        }
-    }
-}
 
 std::pair<ActionMessage&, bool> TranslatorFederate::executeFilter(ActionMessage& command,
                                                               FilterInfo* filt)
@@ -364,167 +258,11 @@ std::pair<ActionMessage&, bool> TranslatorFederate::executeFilter(ActionMessage&
     return {command, true};
 }
 
-ActionMessage& TranslatorFederate::processMessage(ActionMessage& command, const BasicHandleInfo* handle)
-{
-    auto* filtFunc = getFilterCoordinator(handle->getInterfaceHandle());
-    if (filtFunc == nullptr) {
-        return command;
-    }
-    if (filtFunc->hasSourceFilters) {
-        //   for (int ii = 0; ii < static_cast<int> (filtFunc->sourceFilters.size ()); ++ii)
-        size_t ii = 0;
-        for (auto& filt : filtFunc->sourceFilters) {
-            if (checkActionFlag(*filt, disconnected_flag)) {
-                continue;
-            }
-            auto press = executeFilter(command, filt);
-            if (!press.second) {
-                if (command.action() == CMD_IGNORE) {
-                    return command;
-                }
-                command.counter = static_cast<uint16_t>(ii);
-                if (ii < filtFunc->sourceFilters.size() - 1) {
-                    command.setAction(CMD_SEND_FOR_FILTER_AND_RETURN);
-                    command.sequenceID = messageCounter++;
-                    generateProcessMarker(handle->getFederateId(),
-                                          command.sequenceID,
-                                          command.actionTime);
-                } else {
-                    command.setAction(CMD_SEND_FOR_FILTER);
-                }
-                return command;
-            }
-            ++ii;
-        }
-    }
-    return command;
-}
 
-bool TranslatorFederate::destinationProcessMessage(ActionMessage& command,
-                                               const BasicHandleInfo* handle)
-{
-    auto* ffunc = getFilterCoordinator(handle->getInterfaceHandle());
-    if (ffunc != nullptr) {
-        if (ffunc->destFilter != nullptr) {
-            if (!checkActionFlag(*(ffunc->destFilter), disconnected_flag)) {
-                if (ffunc->destFilter->core_id != mFedID) {  // now we have deal with non-local
-                                                             // processing destination filter
-                    // first block the federate time advancement until the return is
-                    // received
-                    auto mid = ++messageCounter;
-                    auto fed_id = handle->getFederateId();
-                    generateDestProcessMarker(handle->getFederateId(), mid, command.actionTime);
 
-                    // now send a message to get filtered
-                    command.setAction(CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
-                    command.sequenceID = mid;
-                    command.source_id = fed_id;
-                    command.source_handle = handle->getInterfaceHandle();
-                    command.dest_id = ffunc->destFilter->core_id;
-                    command.dest_handle = ffunc->destFilter->handle;
 
-                    mSendMessageMove(std::move(command));
-                    return false;
-                }
-                // the filter is part of this core
 
-                if (ffunc->destFilter->filterOp) {
-                    auto tempMessage = createMessageFromCommand(std::move(command));
-                    auto odest = tempMessage->dest;
-                    auto nmessage = ffunc->destFilter->filterOp->process(std::move(tempMessage));
-                    if (odest == nmessage->dest) {
-                        command = std::move(nmessage);
-                    } else {
-                        // handle destination reroute filters
-                        command = std::move(nmessage);
-                        mDeliverMessage(command);
-                        return false;
-                    }
-                }
-            }
-        }
-        if (!ffunc->cloningDestFilters.empty()) {
-            runCloningDestinationFilters(ffunc, handle, command);
-        }
-    }
-    return true;
-}
 
-void TranslatorFederate::runCloningDestinationFilters(const FilterCoordinator* fcoord,
-                                                  const BasicHandleInfo* handle,
-                                                  const ActionMessage& command) const
-{
-    // now go to the cloning filters
-    for (auto* clFilter : fcoord->cloningDestFilters) {
-        if (checkActionFlag(*clFilter, disconnected_flag)) {
-            continue;
-        }
-        if (clFilter->core_id == mFedID) {
-            const auto* FiltI = getFilterInfo(mFedID, clFilter->handle);
-            if (FiltI != nullptr) {
-                if (FiltI->filterOp != nullptr) {
-                    // this is a cloning filter so it generates a bunch(?) of new
-                    // messages
-                    auto new_messages =
-                        FiltI->filterOp->processVector(createMessageFromCommand(command));
-                    for (auto& msg : new_messages) {
-                        if (msg) {
-                            if (msg->dest == handle->key) {
-                                // in case the clone filter send to itself.
-                                ActionMessage cmd(std::move(msg));
-                                cmd.dest_id = handle->handle.fed_id;
-                                cmd.dest_handle = handle->handle.handle;
-                                mSendMessageMove(std::move(cmd));
-                            } else {
-                                ActionMessage cmd(std::move(msg));
-                                mDeliverMessage(cmd);
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            ActionMessage clone(command);
-            clone.setAction(CMD_SEND_FOR_FILTER);
-            clone.dest_id = clFilter->core_id;
-            clone.dest_handle = clFilter->handle;
-            mSendMessage(clone);
-        }
-    }
-}
-
-void TranslatorFederate::addTimeReturn(int32_t id, Time TimeVal)
-{
-    timeBlockProcesses.emplace_back(id, TimeVal);
-    if (TimeVal < minReturnTime) {
-        minReturnTime = TimeVal;
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
-    }
-}
-
-void TranslatorFederate::clearTimeReturn(int32_t id)
-{
-    if (timeBlockProcesses.empty()) {
-        return;
-    }
-    bool recheckTime = false;
-    if (timeBlockProcesses.front().first == id) {
-        if (timeBlockProcesses.front().second == minReturnTime) {
-            recheckTime = true;
-        }
-        timeBlockProcesses.pop_front();
-    } else {
-    }
-    if (recheckTime) {
-        minReturnTime = Time::maxVal();
-        for (const auto& tBP : timeBlockProcesses) {
-            if (tBP.second < minReturnTime) {
-                minReturnTime = tBP.second;
-            }
-        }
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
-    }
-}
 
 void TranslatorFederate::handleMessage(ActionMessage& command)
 {
@@ -612,13 +350,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                 setActionFlag(*filt, disconnected_flag);
             }
         } break;
-        case CMD_REMOVE_FILTER: {
-            auto* filterC = getFilterCoordinator(command.dest_handle);
-            if (filterC == nullptr) {
-                return;
-            }
-            filterC->closeFilter(command.getSource());
-        } break;
+        
         case CMD_REMOVE_ENDPOINT: {
             auto* filtI = getFilterInfo(command.getDest());
             if (filtI != nullptr) {
@@ -636,9 +368,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                 filthandle->used = true;
             }
         } break;
-        case CMD_REG_FILTER:
-            processFilterInfo(command);
-            break;
+
         case CMD_ADD_ENDPOINT: {
             auto* filtI = getFilterInfo(mFedID, command.dest_handle);
             if (filtI != nullptr) {
@@ -710,18 +440,6 @@ FilterInfo* TranslatorFederate::createFilter(GlobalBrokerId dest,
     return retTarget;
 }
 
-FilterCoordinator* TranslatorFederate::getFilterCoordinator(InterfaceHandle handle)
-{
-    auto fnd = filterCoord.find(handle);
-    if (fnd == filterCoord.end()) {
-        // just make a dummy filterFunction so we have something to return
-        auto ff = std::make_unique<FilterCoordinator>();
-        auto* ffp = ff.get();
-        filterCoord.emplace(handle, std::move(ff));
-        return ffp;
-    }
-    return fnd->second.get();
-}
 
 FilterInfo* TranslatorFederate::getFilterInfo(GlobalHandle id)
 {
@@ -742,222 +460,6 @@ const FilterInfo* TranslatorFederate::getFilterInfo(GlobalFederateId fed, Interf
         fed = mFedID;
     }
     return filters.find(GlobalHandle{fed, handle});
-}
-
-void TranslatorFederate::processFilterInfo(ActionMessage& command)
-{
-    auto* filterC = getFilterCoordinator(command.dest_handle);
-    if (filterC == nullptr) {
-        return;
-    }
-    bool FilterAlreadyPresent = false;
-    if (checkActionFlag(command, destination_target)) {
-        if (checkActionFlag(command, clone_flag)) {
-            for (auto& filt : filterC->cloningDestFilters) {
-                if ((filt->core_id == command.source_id) &&
-                    (filt->handle == command.source_handle)) {
-                    FilterAlreadyPresent = true;
-                    break;
-                }
-            }
-        } else {  // there can only be one non-cloning destination filter
-            if (filterC->destFilter != nullptr) {
-                if ((filterC->destFilter->core_id == command.source_id) &&
-                    (filterC->destFilter->handle == command.source_handle)) {
-                    FilterAlreadyPresent = true;
-                }
-            }
-        }
-
-        if (!FilterAlreadyPresent) {
-            auto* endhandle = mHandles->getEndpoint(command.dest_handle);
-            if (endhandle != nullptr) {
-                setActionFlag(*endhandle, has_dest_filter_flag);
-                if ((!checkActionFlag(command, clone_flag)) && (filterC->hasDestFilters)) {
-                    // duplicate non cloning destination filters are not allowed
-                    ActionMessage err(CMD_ERROR);
-                    err.dest_id = command.source_id;
-                    err.setSource(command.getDest());
-                    err.messageID = defs::Errors::REGISTRATION_FAILURE;
-                    err.payload =
-                        "Endpoint " + endhandle->key + " already has a destination filter";
-                    mSendMessageMove(std::move(err));
-                    return;
-                }
-            }
-            auto* newFilter = getFilterInfo(command.getSource());
-            if (newFilter == nullptr) {
-                newFilter = createFilter(GlobalBrokerId(command.source_id),
-                                         command.source_handle,
-                                         std::string(command.payload.to_string()),
-                                         command.getString(typeStringLoc),
-                                         command.getString(typeOutStringLoc),
-                                         checkActionFlag(command, clone_flag));
-            }
-
-            filterC->hasDestFilters = true;
-            if (checkActionFlag(command, clone_flag)) {
-                filterC->cloningDestFilters.push_back(newFilter);
-            } else {
-                if (endhandle != nullptr) {
-                    setActionFlag(*endhandle, has_non_cloning_dest_filter_flag);
-                }
-                filterC->destFilter = newFilter;
-            }
-        }
-    } else {
-        for (auto& filt : filterC->allSourceFilters) {
-            if ((filt->core_id == command.source_id) && (filt->handle == command.source_handle)) {
-                FilterAlreadyPresent = true;
-                break;
-            }
-        }
-        if (!FilterAlreadyPresent) {
-            auto* newFilter = getFilterInfo(command.getSource());
-            if (newFilter == nullptr) {
-                newFilter = createFilter(GlobalBrokerId(command.source_id),
-                                         command.source_handle,
-                                         std::string(command.payload.to_string()),
-                                         command.getString(typeStringLoc),
-                                         command.getString(typeOutStringLoc),
-                                         checkActionFlag(command, clone_flag));
-            }
-            filterC->allSourceFilters.push_back(newFilter);
-            filterC->hasSourceFilters = true;
-            auto* endhandle = mHandles->getEndpoint(command.dest_handle);
-            if (endhandle != nullptr) {
-                setActionFlag(*endhandle, has_source_filter_flag);
-            }
-        }
-    }
-}
-
-void TranslatorFederate::organizeFilterOperations()
-{
-    for (auto& fc : filterCoord) {
-        auto* fi = fc.second.get();
-        const auto* handle = mHandles->getHandleInfo(fc.first);
-        if (handle == nullptr) {
-            continue;
-        }
-        std::string endpointType = handle->type;
-
-        if (!fi->allSourceFilters.empty()) {
-            fi->sourceFilters.clear();
-            fi->sourceFilters.reserve(fi->allSourceFilters.size());
-            // Now we have to do some intelligent ordering with types
-            std::vector<bool> used(fi->allSourceFilters.size(), false);
-            bool someUnused = true;
-            bool usedMore = true;
-            bool firstPass = true;
-            std::string currentType = endpointType;
-            while (someUnused && usedMore) {
-                someUnused = false;
-                usedMore = false;
-                for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
-                    if (used[ii]) {
-                        continue;
-                    }
-                    if (firstPass) {
-                        if (fi->allSourceFilters[ii]->cloning) {
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
-                            used[ii] = true;
-                            usedMore = true;
-                        } else {
-                            someUnused = true;
-                        }
-                    } else {
-                        // TODO(PT): this will need some work to finish sorting out but should work
-                        // for initial tests
-                        if (core::matchingTypes(fi->allSourceFilters[ii]->inputType, currentType)) {
-                            used[ii] = true;
-                            usedMore = true;
-                            fi->sourceFilters.push_back(fi->allSourceFilters[ii]);
-                            currentType = fi->allSourceFilters[ii]->outputType;
-                        } else {
-                            someUnused = true;
-                        }
-                    }
-                }
-                if (firstPass) {
-                    firstPass = false;
-                    usedMore = true;
-                }
-            }
-            for (size_t ii = 0; ii < fi->allSourceFilters.size(); ++ii) {
-                if (used[ii]) {
-                    continue;
-                }
-                mLogger(HELICS_LOG_LEVEL_WARNING,
-                        fi->allSourceFilters[ii]->key,
-                        "unable to match types on some filters");
-            }
-        }
-    }
-}
-
-void TranslatorFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const
-{
-    block["endpoints"] = Json::arrayValue;
-    for (const auto& filt : filterCoord) {
-        auto* fc = filt.second.get();
-        const auto* ep = mHandles->getEndpoint(filt.first);
-        if (ep->getFederateId() != fed) {
-            continue;
-        }
-        Json::Value eptBlock;
-
-        eptBlock["name"] = ep->key;
-        eptBlock["id"] = ep->handle.handle.baseValue();
-        if (fc->hasSourceFilters) {
-            std::string srcFilters = "[";
-            for (auto& fcc : fc->sourceFilters) {
-                if (!fcc->key.empty()) {
-                    srcFilters.append(fcc->key);
-                } else {
-                    srcFilters += std::to_string(fcc->core_id.baseValue()) + ':' +
-                        std::to_string(fcc->handle.baseValue());
-                }
-                if (fcc->cloning) {
-                    srcFilters.append("(cloning)");
-                }
-                srcFilters.push_back(',');
-            }
-            if (srcFilters.back() == ',') {
-                srcFilters.pop_back();
-            }
-            srcFilters.push_back(']');
-            eptBlock["srcFilters"] = srcFilters;
-        }
-        if (fc->hasDestFilters) {
-            if (fc->destFilter != nullptr) {
-                if (!fc->destFilter->key.empty()) {
-                    eptBlock["destFilter"] = fc->destFilter->key;
-                } else {
-                    eptBlock["destFilter"] = std::to_string(fc->destFilter->core_id.baseValue()) +
-                        ':' + std::to_string(fc->destFilter->handle.baseValue());
-                }
-            }
-            if (!fc->cloningDestFilters.empty()) {
-                std::string dcloningFilter = "[";
-                for (auto& fcc : fc->cloningDestFilters) {
-                    if (!fcc->key.empty()) {
-                        dcloningFilter.append(fcc->key);
-                    } else {
-                        dcloningFilter += std::to_string(fcc->core_id.baseValue()) + ':' +
-                            std::to_string(fcc->handle.baseValue());
-                    }
-                    dcloningFilter.push_back(',');
-                }
-                if (dcloningFilter.back() == ',') {
-                    dcloningFilter.pop_back();
-                }
-                dcloningFilter.push_back(']');
-                eptBlock["cloningdestFilter"] = dcloningFilter;
-            }
-        }
-        block["endpoints"].append(eptBlock);
-    }
 }
 
 std::string TranslatorFederate::query(const std::string& queryStr) const

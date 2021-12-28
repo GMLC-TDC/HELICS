@@ -21,13 +21,13 @@ class Federate;
 @details the functions will parallel those in message Federate and contain the actual implementation
 details
 */
-class FilterFederateManager {
+class ConnectorFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    FilterFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id);
+    ConnectorFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id);
     /** destructor */
-    ~FilterFederateManager();
+    ~ConnectorFederateManager();
 
     /** register a Filter
     @details call is only valid in startup mode
@@ -56,13 +56,6 @@ class FilterFederateManager {
     */
     Filter& registerFilter(FilterTypes type, const std::string& name);
 
-     /** register a Translator
-   @details call is only valid in startup mode
-   @param name the name of the endpoint
-   @param type the defined type of the interface for endpoint checking if requested
-   */
-    Translator& registerTranslator(TranslatorTypes type, const std::string& name);
-
     /** register a cloningFilter
     @details call is only valid in startup mode
     @param name the name of the endpoint
@@ -78,18 +71,49 @@ class FilterFederateManager {
     Filter& getFilter(int index);
     const Filter& getFilter(int index) const;
 
+
+    /** register a Translator
+    @details call is only valid in startup mode
+    @param name the name of the translator
+    @param type_in the type the translator is expecting on the value interface
+    @param type_out the type the translator for the endpoint
+    */
+    Translator& registerTranslator(const std::string& name,
+                           const std::string& type_in,
+                           const std::string& type_out);
+
+
+    /** register a Translator
+    @details call is only valid in startup mode
+    @param type the defined type of the filter
+    @param name the name of the filter
+    */
+    Translator& registerTranslator(TranslatorTypes type, const std::string& name);
+
+
+    /** get a registered Translator
+    @param name the translator name
+    @return invalid translator object if name is not recognized otherwise returns the translator*/
+    Translator& getTranslator(const std::string& name);
+    const Translator& getTranslator(const std::string& name) const;
+    Translator& getTranslator(int index);
+    const Translator & getTranslator(int index) const;
+
     /** get the number of registered filters in the federate*/
     int getFilterCount() const;
+    /** get the number of registered filters in the federate*/
+    int getTranslatorCount() const;
     /** close all filters*/
-    void closeAllFilters();
+    void closeAllConnectors();
     /** close all filters*/
-    void disconnectAllFilters();
+    void disconnectAllConnectors();
     /** disconnect from the coreObject*/
     void disconnect();
 
   private:
     Core* coreObject{nullptr};
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
+    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Translator>, std::string>> translators;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
 };

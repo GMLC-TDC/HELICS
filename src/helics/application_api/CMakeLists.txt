@@ -33,7 +33,7 @@ set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederate
 
 set(private_application_api_headers
     MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp FilterOperations.hpp
-    FilterFederateManager.hpp TranslatorFederateManager.hpp TranslatorOperations.hpp
+    ConnectorFederateManager.hpp TranslatorOperations.hpp
 )
 
 set(application_api_sources
@@ -49,10 +49,9 @@ set(application_api_sources
     Publications.cpp
     Filters.cpp
     FilterOperations.cpp
-    FilterFederateManager.cpp
+    ConnectorFederateManager.cpp
     Translator.cpp
     TranslatorOperations.cpp
-    TranslatorFederateManager.cpp
     Endpoints.cpp
     helicsTypes.cpp
     queryFunctions.cpp

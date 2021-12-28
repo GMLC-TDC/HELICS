@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonBuilder.hpp"
 #include "Core.hpp"
-#include "FilterCoordinator.hpp"
 #include "FilterInfo.hpp"
 #include "GlobalFederateId.hpp"
 #include "TimeCoordinator.hpp"
@@ -39,9 +38,6 @@ class TranslatorFederate {
     TimeCoordinator mCoord;
     HandleManager* mHandles{nullptr};
     FederateStates current_state{HELICS_CREATED};
-    /// map of all local filters
-    std::map<InterfaceHandle, std::unique_ptr<FilterCoordinator>> filterCoord;
-    // The interface_handle used is here is usually referencing an endpoint
 
     std::function<void(const ActionMessage&)> mQueueMessage;
     std::function<void(ActionMessage&&)> mQueueMessageMove;
@@ -52,15 +48,9 @@ class TranslatorFederate {
 
     std::function<void(int, const std::string&, const std::string&)> mLogger;
     std::function<gmlc::containers::AirLock<std::any>&(int)> mGetAirLock;
-    std::deque<std::pair<int32_t, Time>> timeBlockProcesses;
+
     Time minReturnTime{Time::maxVal()};
-    /// sets of ongoing filtered messages
-    std::map<int32_t, std::set<int32_t>> ongoingFilterProcesses;
-    /// sets of ongoing destination filter processing
-    std::map<int32_t, std::set<int32_t>> ongoingDestFilterProcesses;
-    /** counter for the number of messages that have been sent, nothing magical about 54 just a
-     * number bigger than 1 to prevent confusion */
-    std::atomic<int32_t> messageCounter{54};
+    
     /// storage for all the filters
     gmlc::containers::MappedPointerVector<FilterInfo, GlobalHandle> filters;
     // bool hasTiming{false};
@@ -72,8 +62,6 @@ class TranslatorFederate {
     void processMessageFilter(ActionMessage& cmd);
     /** process a filter message return*/
     void processFilterReturn(ActionMessage& cmd);
-    /** process a destination filter message return*/
-    void processDestFilterReturn(ActionMessage& command);
     /** create a filter */
     FilterInfo* createFilter(GlobalBrokerId dest,
                              InterfaceHandle handle,
@@ -107,18 +95,8 @@ class TranslatorFederate {
     {
         mGetAirLock = std::move(getAirLock);
     }
-    void organizeFilterOperations();
 
     void handleMessage(ActionMessage& command);
-
-    void processFilterInfo(ActionMessage& command);
-
-    ActionMessage& processMessage(ActionMessage& command, const BasicHandleInfo* handle);
-    /** process destination filters on the message and return true if the original command should be
-     * delivered to a federate*/
-    bool destinationProcessMessage(ActionMessage& command, const BasicHandleInfo* handle);
-
-    void addFilteredEndpoint(Json::Value& block, GlobalFederateId fed) const;
 
     void setHandleManager(HandleManager* handles) { mHandles = handles; }
 
@@ -129,17 +107,13 @@ class TranslatorFederate {
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/
-    FilterCoordinator* getFilterCoordinator(InterfaceHandle handle);
+
 
     FilterInfo* getFilterInfo(GlobalHandle id);
     FilterInfo* getFilterInfo(GlobalFederateId fed, InterfaceHandle handle);
     const FilterInfo* getFilterInfo(GlobalFederateId fed, InterfaceHandle handle) const;
     /** run the destination filters associated with an endpoint*/
-    void runCloningDestinationFilters(const FilterCoordinator* filt,
-                                      const BasicHandleInfo* handle,
-                                      const ActionMessage& command) const;
-    void addTimeReturn(int32_t id, Time TimeVal);
-    void clearTimeReturn(int32_t id);
+
 
     std::pair<ActionMessage&, bool> executeFilter(ActionMessage& command, FilterInfo* filt);
     void generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);

@@ -19,7 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
 #include "CoreApp.hpp"
-#include "FilterFederateManager.hpp"
+#include "ConnectorFederateManager.hpp"
 #include "Filters.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
@@ -112,7 +112,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     observerMode = fi.observer;
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
 Federate::Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi):
@@ -151,7 +151,7 @@ Federate::Federate(const std::string& fedName,
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
 Federate::Federate(const std::string& fedName, const std::string& configString):
@@ -183,7 +183,7 @@ Federate::Federate(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     observerMode = fed.observerMode;
     asyncCallInfo = std::move(fed.asyncCallInfo);
-    fManager = std::move(fed.fManager);
+    cManager = std::move(fed.cManager);
     mName = std::move(fed.mName);
 }
 
@@ -200,7 +200,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     observerMode = fed.observerMode;
-    fManager = std::move(fed.fManager);
+    cManager = std::move(fed.cManager);
     mName = std::move(fed.mName);
     return *this;
 }
@@ -596,8 +596,8 @@ void Federate::finalize()
         coreObject->finalize(fedID);
     }
 
-    if (fManager) {
-        fManager->closeAllFilters();
+    if (cManager) {
+        cManager->closeAllConnectors();
     }
     updateFederateMode(Modes::FINALIZE);
 }
@@ -651,8 +651,8 @@ void Federate::processCommunication(std::chrono::milliseconds period)
 void Federate::disconnect()
 {
     finalize();
-    if (fManager) {
-        fManager->disconnect();
+    if (cManager) {
+        cManager->disconnect();
     }
     coreObject = CoreFactory::getEmptyCore();
 }
@@ -934,8 +934,8 @@ void Federate::initializeToExecuteStateTransition(IterationResult /*unused*/)
 
 void Federate::disconnectTransition()
 {
-    if (fManager) {
-        fManager->closeAllFilters();
+    if (cManager) {
+        cManager->closeAllConnectors();
     }
 }
 
@@ -1269,17 +1269,17 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
 Filter& Federate::getFilter(int index)
 {
-    return fManager->getFilter(index);
+    return cManager->getFilter(index);
 }
 
 const Filter& Federate::getFilter(int index) const
 {
-    return fManager->getFilter(index);
+    return cManager->getFilter(index);
 }
 
 int Federate::filterCount() const
 {
-    return fManager->getFilterCount();
+    return cManager->getFilterCount();
 }
 
 std::string Federate::localQuery(const std::string& /*queryStr*/) const
@@ -1399,7 +1399,7 @@ Filter& Federate::registerFilter(const std::string& filterName,
                                  const std::string& inputType,
                                  const std::string& outputType)
 {
-    return fManager->registerFilter((!filterName.empty()) ?
+    return cManager->registerFilter((!filterName.empty()) ?
                                         (getName() + nameSegmentSeparator + filterName) :
                                         filterName,
                                     inputType,
@@ -1410,7 +1410,7 @@ CloningFilter& Federate::registerCloningFilter(const std::string& filterName,
                                                const std::string& inputType,
                                                const std::string& outputType)
 {
-    return fManager->registerCloningFilter((!filterName.empty()) ?
+    return cManager->registerCloningFilter((!filterName.empty()) ?
                                                (getName() + nameSegmentSeparator + filterName) :
                                                filterName,
                                            inputType,
@@ -1421,37 +1421,61 @@ Filter& Federate::registerGlobalFilter(const std::string& filterName,
                                        const std::string& inputType,
                                        const std::string& outputType)
 {
-    return fManager->registerFilter(filterName, inputType, outputType);
+    return cManager->registerFilter(filterName, inputType, outputType);
 }
 
 CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterName,
                                                      const std::string& inputType,
                                                      const std::string& outputType)
 {
-    return fManager->registerCloningFilter(filterName, inputType, outputType);
+    return cManager->registerCloningFilter(filterName, inputType, outputType);
+}
+
+
+Translator& Federate::registerGlobalTranslator(const std::string& translatorName,
+    const std::string& inputType,
+    const std::string& outputType)
+{
+    return cManager->registerTranslator((!translatorName.empty()) ?
+                                        (getName() + nameSegmentSeparator + translatorName) :
+                                        translatorName,
+                                    inputType,
+                                    outputType);
+}
+
+
+Translator& Federate::registerTranslator(const std::string& translatorName,
+                               const std::string& inputType,
+                               const std::string& outputType)
+{
+    return cManager->registerTranslator((!translatorName.empty()) ?
+                                        (getName() + nameSegmentSeparator + translatorName) :
+                                        translatorName,
+                                    inputType,
+                                    outputType);
 }
 
 const Filter& Federate::getFilter(const std::string& filterName) const
 {
-    const Filter& filt = fManager->getFilter(filterName);
+    const Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return fManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
     }
     return filt;
 }
 
 Filter& Federate::getFilter(const std::string& filterName)
 {
-    Filter& filt = fManager->getFilter(filterName);
+    Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return fManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
     }
     return filt;
 }
 
 int Federate::getFilterCount() const
 {
-    return fManager->getFilterCount();
+    return cManager->getFilterCount();
 }
 
 void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op)
