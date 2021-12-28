@@ -16,8 +16,6 @@
 
 ```
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 The Advanced Examples are modular, each building upon the [base example](./advanced_default.md). Users are encouraged to dive into a specific concept to build their HELICS knowledge once they have mastered the default setup in the [base example](./advanced_default.md).
 
 This page describes the model for the Advanced Examples. This model is topically the same as the Fundamental Examples, but more complex in its execution. This allows the research question to become more nuanced and for the user to define new components to a HELICS co-simulation.

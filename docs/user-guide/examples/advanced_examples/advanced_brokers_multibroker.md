@@ -1,7 +1,5 @@
 # Brokers - Multi-Protocol Brokers
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This example shows how to configure a HELICS co-simulation to implement a broker structure that utilizes multiple core types in a single co-simulation. Typically, all federates in a single federation use the same core type (ZMQ by default) but HELICS can be set up to utilize different core types in the same federation
 
 - [Where is the code?](#where-is-the-code)

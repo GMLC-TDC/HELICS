@@ -7,8 +7,6 @@
 
 ```
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This example shows how to configure a HELICS co-simulation to run across multiple computers.
 
 - [Where is the code?](#where-is-the-code)

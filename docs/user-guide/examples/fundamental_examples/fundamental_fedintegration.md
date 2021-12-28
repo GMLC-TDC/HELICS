@@ -1,10 +1,6 @@
 # Federate Integration with PyHELICS API
 
-The Federate Integration Example extends the Base Example to demonstrate how to integrate federates using the HELICS API instead of JSON config files.
-
-![](../../../img/fed_int_setup.png)
-
-This tutorial is organized as follows:
+The Federate Integration Example extends the Base Example to demonstrate how to integrate federates using the HELICS API instead of JSON config files. This tutorial is organized as follows:
 
 - [Computing Environment](#computing-environment)
 - [Example files](#example-files)

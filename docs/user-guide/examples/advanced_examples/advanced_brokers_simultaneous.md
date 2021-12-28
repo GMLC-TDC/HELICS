@@ -1,7 +1,5 @@
 # Brokers - Simultaneous Co-simulations
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This example shows how to configure a HELICS co-simulation so that multiple co-simulations can run simultaneously on one computer. Understanding this configuration is a pre-requisite to running the other advanced broker examples (which also involve multiple brokers running on one computer).
 
 - [Where is the code?](#where-is-the-code)

@@ -12,8 +12,6 @@ The Fundamental Examples teach three concepts to build on a default setup:
 
 ```
 
-![](../../../img/user_guide_combinations_fundamental.png)
-
 The Fundamental examples are meant to build in complexity -- if you are new to HELICS, we recommend you start with the Base Example, which is also the recommended default setup. The examples in this section start with the simplest configuration method, which makes assumptions about the system which may not be completely valid but are reasonable for learning purposes.
 
 This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation:
