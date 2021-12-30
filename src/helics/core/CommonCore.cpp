@@ -1842,7 +1842,6 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
                           std::string_view destination,
                           Time sendTime)
 {
-    
     if (destination.empty()) {
         // sendToAt should be the equivalent of sendAt if there is an empty destination
         sendAt(sourceHandle, data, length, sendTime);
@@ -1862,11 +1861,11 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
         auto res = std::find_if(targets.begin(), targets.end(), [destination](const auto& val) {
             return (val.second == destination);
         });
-        if (res==targets.end()) {
+        if (res == targets.end()) {
             throw(InvalidParameter("targeted endpoint destination not in target list"));
         }
     }
-    
+
     ActionMessage m(CMD_SEND_MESSAGE);
 
     m.messageID = ++messageCounter;
@@ -2011,27 +2010,23 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
                 return;
             }
             generateMessages(m, targets);
-        }
-        else
-        {
+        } else {
             throw(InvalidParameter("no destination specified in message"));
         }
-    }
-    else {
+    } else {
         if (checkActionFlag(*hndl, targeted_flag)) {
             auto targets = fed->getMessageDestinations(sourceHandle);
             auto res = std::find_if(targets.begin(),
                                     targets.end(),
                                     [destination = m.getString(targetStringLoc)](const auto& val) {
-                return (val.second == destination);
-            });
+                                        return (val.second == destination);
+                                    });
             if (res == targets.end()) {
                 throw(InvalidParameter("targeted endpoint destination not in target list"));
             }
         }
         addActionMessage(std::move(m));
     }
-    
 }
 
 void CommonCore::deliverMessage(ActionMessage& message)

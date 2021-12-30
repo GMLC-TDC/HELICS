@@ -906,7 +906,7 @@ TEST_F(mfed_tests, missing_endpoint)
 
 TEST_F(mfed_tests, targeted_endpoint_send_error1)
 {
-    SetupTest<helics::MessageFederate>("test", 2,1.0);
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
 
@@ -926,7 +926,7 @@ TEST_F(mfed_tests, targeted_endpoint_send_error1)
     mFed1->enterExecutingModeComplete();
 
     EXPECT_NO_THROW(ep1.sendTo(message1.c_str(), 26, "ep2"));
-    EXPECT_THROW(ep1.sendTo(message1.c_str(), 26, "ep3"),helics::InvalidParameter);
+    EXPECT_THROW(ep1.sendTo(message1.c_str(), 26, "ep3"), helics::InvalidParameter);
     mFed1->requestTimeAsync(1.0);
     mFed2->requestTimeAdvance(1.0);
     mFed1->requestTimeComplete();
@@ -944,7 +944,6 @@ TEST_F(mfed_tests, targeted_endpoint_send_error1)
     mFed1->finalize();
 }
 
-
 TEST_F(mfed_tests, targeted_endpoint_send_error2)
 {
     SetupTest<helics::MessageFederate>("test", 2, 1.0);
@@ -954,7 +953,7 @@ TEST_F(mfed_tests, targeted_endpoint_send_error2)
     auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
 
     auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
-    auto& ep3= mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
     auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
 
     ep1.addDestinationTarget("ep2");
@@ -966,8 +965,8 @@ TEST_F(mfed_tests, targeted_endpoint_send_error2)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
 
-    EXPECT_NO_THROW(ep1.sendToAt(message1.c_str(), 26, "ep2",0.0));
-    EXPECT_THROW(ep1.sendToAt(message1.c_str(), 26, "ep3",0.0), helics::InvalidParameter);
+    EXPECT_NO_THROW(ep1.sendToAt(message1.c_str(), 26, "ep2", 0.0));
+    EXPECT_THROW(ep1.sendToAt(message1.c_str(), 26, "ep3", 0.0), helics::InvalidParameter);
     mFed1->requestTimeAsync(1.0);
     mFed2->requestTimeAdvance(1.0);
     mFed1->requestTimeComplete();
@@ -985,7 +984,6 @@ TEST_F(mfed_tests, targeted_endpoint_send_error2)
     mFed1->finalize();
 }
 
-
 TEST_F(mfed_tests, targeted_endpoint_send_error3)
 {
     SetupTest<helics::MessageFederate>("test", 2, 1.0);
@@ -995,7 +993,7 @@ TEST_F(mfed_tests, targeted_endpoint_send_error3)
     auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
 
     auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
-    auto & ep3= mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
     auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
 
     ep1.addDestinationTarget("ep2");
@@ -1031,7 +1029,6 @@ TEST_F(mfed_tests, targeted_endpoint_send_error3)
     mFed2->finalize();
     mFed1->finalize();
 }
-
 
 TEST_F(mfed_tests, targeted_endpoint_send_all)
 {
@@ -1074,7 +1071,7 @@ TEST_F(mfed_tests, targeted_endpoint_send_all)
         EXPECT_EQ(m->time, helics::timeZero);
     }
 
-     auto m2 = ep4.getMessage();
+    auto m2 = ep4.getMessage();
     if (m2) {
         EXPECT_EQ(m2->data.size(), 26U);
         EXPECT_EQ(m2->time, helics::timeZero);
