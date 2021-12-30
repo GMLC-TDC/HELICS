@@ -188,9 +188,9 @@ class CommonCore: public Core, public BrokerBase {
     virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
                                                   const std::string& type_in,
                                                   const std::string& type_out) override final;
-    virtual InterfaceHandle registerTranslator(const std::string& translatorName,
-                                       const std::string& message_type,
-                                       const std::string& units) override final; 
+    virtual InterfaceHandle registerTranslator(std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units) override final; 
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
     virtual InterfaceHandle getTranslator(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
@@ -505,9 +505,9 @@ class CommonCore: public Core, public BrokerBase {
     const BasicHandleInfo& createBasicHandle(GlobalFederateId global_federateId,
                                              LocalFederateId local_federateId,
                                              InterfaceType HandleType,
-                                             const std::string& key,
-                                             const std::string& type,
-                                             const std::string& units,
+                                             std::string_view key,
+                                             std::string_view type,
+                                             std::string_view units,
                                              uint16_t flags = 0);
 
     /** check if a global id represents a local federate

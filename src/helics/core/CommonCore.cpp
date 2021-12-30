@@ -1057,9 +1057,9 @@ bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
 const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_federateId,
                                                      LocalFederateId local_federateId,
                                                      InterfaceType HandleType,
-                                                     const std::string& key,
-                                                     const std::string& type,
-                                                     const std::string& units,
+                                                     std::string_view key,
+                                                     std::string_view type,
+                                                     std::string_view units,
                                                      uint16_t flags)
 {
     return handles.modify([&](auto& hand) -> const BasicHandleInfo& {
@@ -1776,26 +1776,26 @@ InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
     return id;
 }
 
-InterfaceHandle CommonCore::registerTranslator(const std::string& translatorName,
-                                           const std::string& messageType,
-                                           const std::string& units)
+InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units)
 {
     // check to make sure the name isn't already used
     if (!translatorName.empty()) {
         if (handles.read([&translatorName](auto& hand) {
                 auto* res = hand.getEndpoint(translatorName);
                 if (res != nullptr) {
-                    return false;
+                    return true;
                 }
                 res = hand.getPublication(translatorName);
                 if (res != nullptr) {
-                    return false;
+                    return true;
                 }
                 res = hand.getInput(translatorName);
                 if (res != nullptr) {
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
             })) {
             throw(RegistrationFailure("there already exists an interface with this name"));
         }
@@ -1806,17 +1806,19 @@ InterfaceHandle CommonCore::registerTranslator(const std::string& translatorName
         }
         throw(RegistrationFailure("registration timeout exceeded"));
     }
-    auto fid = filterFedID.load();
+    auto fid = translatorFedID.load();
 
     const auto& handle = createBasicHandle(
-        fid, LocalFederateId(), InterfaceType::TRANSLATOR, translatorName, messageType, units);
+        fid, LocalFederateId(), InterfaceType::TRANSLATOR, translatorName, endpointType, units);
     auto id = handle.getInterfaceHandle();
 
     ActionMessage m(CMD_REG_TRANSLATOR);
     m.source_id = fid;
     m.source_handle = id;
     m.name(handle.key);
-    
+    if ((!endpointType.empty()) || (!units.empty())) {
+        m.setStringData(endpointType, units);
+    }
     actionQueue.push(std::move(m));
     return id;
 }
@@ -1833,9 +1835,9 @@ InterfaceHandle CommonCore::getFilter(const std::string& name) const
 
 InterfaceHandle CommonCore::getTranslator(const std::string& name) const
 {
-    const auto* filt = handles.read([&name](auto& hand) { return hand.getTranslator(name); });
-    if ((filt != nullptr) && (filt->handleType == InterfaceType::TRANSLATOR)) {
-        return filt->getInterfaceHandle();
+    const auto* trans = handles.read([&name](auto& hand) { return hand.getTranslator(name); });
+    if ((trans != nullptr) && (trans->handleType == InterfaceType::TRANSLATOR)) {
+        return trans->getInterfaceHandle();
     }
     return {};
 }
@@ -3494,6 +3496,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_REG_ENDPOINT:
         case CMD_REG_PUB:
         case CMD_REG_FILTER:
+        case CMD_REG_TRANSLATOR:
             registerInterface(command);
             break;
         case CMD_ADD_NAMED_ENDPOINT:
@@ -3703,6 +3706,18 @@ void CommonCore::registerInterface(ActionMessage& command)
                                         checkActionFlag(command, clone_flag));
                 connectFilterTiming();
                 break;
+            case CMD_REG_TRANSLATOR:
+
+                if (translatorFed == nullptr) {
+                    generateTranslatorFederate();
+                }
+                translatorFed->createTranslator(translatorFedID.load(),
+                                        command.source_handle,
+                                        std::string(command.name()),
+                                        command.getString(typeStringLoc),
+                                        command.getString(unitStringLoc));
+                //connectFilterTiming();
+                break;
             default:
                 return;
         }
@@ -3714,7 +3729,7 @@ void CommonCore::registerInterface(ActionMessage& command)
     }
 }
 
-void CommonCore::generateFilterFederate()
+void CommonCore::generateTranslatorFederate()
 {
     auto fid = translatorFedID.load();
 
@@ -3733,7 +3748,6 @@ void CommonCore::generateFilterFederate()
         sendToLogger(global_broker_id_local, level, name, message);
     });
     translatorFed->setAirLockFunction([this](int index) { return std::ref(dataAirlocks[index]); });
-    translatorFed->setDeliver([this](ActionMessage& m) { deliverMessage(m); });
     ActionMessage newFed(CMD_REG_FED);
     setActionFlag(newFed, child_flag);
     setActionFlag(newFed, non_counting_flag);
@@ -3744,7 +3758,7 @@ void CommonCore::generateFilterFederate()
     transmit(getRoute(higher_broker_id), newFed);
 }
 
-void CommonCore::generateTranslatorFederate()
+void CommonCore::generateFilterFederate()
 {
     auto fid = filterFedID.load();
 

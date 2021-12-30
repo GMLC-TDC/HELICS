@@ -1432,27 +1432,25 @@ CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterNa
 }
 
 
-Translator& Federate::registerGlobalTranslator(const std::string& translatorName,
-    const std::string& inputType,
-    const std::string& outputType)
+Translator& Federate::registerGlobalTranslator(std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units)
 {
-    return cManager->registerTranslator((!translatorName.empty()) ?
-                                        (getName() + nameSegmentSeparator + translatorName) :
-                                        translatorName,
-                                    inputType,
-                                    outputType);
+    return cManager->registerTranslator(translatorName,
+                                    endpointType,
+                                    units);
 }
 
 
-Translator& Federate::registerTranslator(const std::string& translatorName,
-                               const std::string& inputType,
-                               const std::string& outputType)
+Translator& Federate::registerTranslator(std::string_view translatorName,
+                                         std::string_view endpointType,
+                                         std::string_view units)
 {
     return cManager->registerTranslator((!translatorName.empty()) ?
-                                        (getName() + nameSegmentSeparator + translatorName) :
+                                        (getName() + nameSegmentSeparator + std::string(translatorName)) :
                                         translatorName,
-                                    inputType,
-                                    outputType);
+                                    endpointType,
+                                    units);
 }
 
 const Filter& Federate::getFilter(const std::string& filterName) const

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonBuilder.hpp"
 #include "Core.hpp"
-#include "FilterInfo.hpp"
+#include "TranslatorInfo.hpp"
 #include "GlobalFederateId.hpp"
 #include "TimeCoordinator.hpp"
 #include "gmlc/containers/AirLock.hpp"
@@ -52,7 +52,7 @@ class TranslatorFederate {
     Time minReturnTime{Time::maxVal()};
     
     /// storage for all the filters
-    gmlc::containers::MappedPointerVector<FilterInfo, GlobalHandle> filters;
+    gmlc::containers::MappedPointerVector<TranslatorInfo, GlobalHandle> translators;
     // bool hasTiming{false};
 
   public:
@@ -63,12 +63,11 @@ class TranslatorFederate {
     /** process a filter message return*/
     void processFilterReturn(ActionMessage& cmd);
     /** create a filter */
-    FilterInfo* createFilter(GlobalBrokerId dest,
+    TranslatorInfo* createTranslator(GlobalBrokerId dest,
                              InterfaceHandle handle,
                              const std::string& key,
-                             const std::string& type_in,
-                             const std::string& type_out,
-                             bool cloning);
+                             const std::string& endpointType,
+                             const std::string& units);
 
     void setCallbacks(std::function<void(const ActionMessage&)> queueMessage,
                       std::function<void(ActionMessage&&)> queueMessageMove,
@@ -109,13 +108,13 @@ class TranslatorFederate {
     /** get a filtering function object*/
 
 
-    FilterInfo* getFilterInfo(GlobalHandle id);
-    FilterInfo* getFilterInfo(GlobalFederateId fed, InterfaceHandle handle);
-    const FilterInfo* getFilterInfo(GlobalFederateId fed, InterfaceHandle handle) const;
+    TranslatorInfo* getTranslatorInfo(GlobalHandle id);
+    TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle);
+    const TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle) const;
     /** run the destination filters associated with an endpoint*/
 
 
-    std::pair<ActionMessage&, bool> executeFilter(ActionMessage& command, FilterInfo* filt);
+    std::pair<ActionMessage&, bool> executeTranslator(ActionMessage& command, TranslatorInfo* trans);
     void generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);
     void acceptProcessReturn(GlobalFederateId fid, uint32_t pid);
 

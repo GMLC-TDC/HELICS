@@ -51,7 +51,7 @@ TranslatorFederate::~TranslatorFederate()
     mGetAirLock = nullptr;
 
 
-    filters.clear();
+    translators.clear();
 }
 
 void TranslatorFederate::routeMessage(const ActionMessage& msg)
@@ -64,114 +64,7 @@ void TranslatorFederate::routeMessage(const ActionMessage& msg)
 /** process any filter or route the message*/
 void TranslatorFederate::processMessageFilter(ActionMessage& cmd)
 {
-    if (cmd.dest_id != mFedID) {
-        mSendMessage(cmd);
-    } else {
-        // deal with local source filters
-        auto* FiltI = getFilterInfo(cmd.getDest());
-        if (FiltI != nullptr) {
-            if ((!checkActionFlag(*FiltI, disconnected_flag)) && (FiltI->filterOp)) {
-                if (FiltI->cloning) {
-                    auto new_messages =
-                        FiltI->filterOp->processVector(createMessageFromCommand(std::move(cmd)));
-                    for (auto& msg : new_messages) {
-                        if (msg) {
-                            cmd = ActionMessage(std::move(msg));
-                            mDeliverMessage(cmd);
-                        }
-                    }
-                } else {
-                    bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
-                    bool returnToSender =
-                        ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);
-                    auto source = cmd.getSource();
-                    auto filterCounter = cmd.counter;
-                    auto seqID = cmd.sequenceID;
-                    if (FiltI->filterOp) {
-                        auto tempMessage = createMessageFromCommand(std::move(cmd));
-                        auto dest = tempMessage->dest;
-                        tempMessage = FiltI->filterOp->process(std::move(tempMessage));
-
-                        if (tempMessage) {
-                            if (tempMessage->dest != dest && destFilter) {
-                                // the destination was altered we need to start the process over
-                                cmd = ActionMessage(std::move(tempMessage));
-                                cmd.dest_id = parent_broker_id;
-                                cmd.dest_handle = InterfaceHandle{};
-                                mDeliverMessage(cmd);
-                                cmd = CMD_IGNORE;
-                            } else {
-                                cmd = ActionMessage(std::move(tempMessage));
-                            }
-                        } else {
-                            cmd = CMD_IGNORE;
-                        }
-                    }
-
-                    if (!returnToSender) {
-                        if (cmd.action() == CMD_IGNORE) {
-                            return;
-                        }
-                        cmd.setSource(source);
-                        cmd.dest_id = parent_broker_id;
-                        cmd.dest_handle = InterfaceHandle();
-                        mDeliverMessage(cmd);
-                    } else {
-                        cmd.setDestination(source);
-                        cmd.counter = filterCounter;
-                        cmd.sequenceID = seqID;
-                        cmd.source_handle = FiltI->handle;
-                        cmd.source_id = mFedID;
-                        if (cmd.action() == CMD_IGNORE) {
-                            cmd.setAction(destFilter ? CMD_NULL_DEST_MESSAGE : CMD_NULL_MESSAGE);
-
-                            mDeliverMessage(cmd);
-                            return;
-                        }
-                        cmd.setAction(destFilter ? CMD_DEST_FILTER_RESULT : CMD_FILTER_RESULT);
-
-                        mDeliverMessage(cmd);
-                    }
-                }
-            } else {
-                // the filter didn't have a function or was deactivated but still was requested to
-                // process
-                bool destFilter = (cmd.action() == CMD_SEND_FOR_DEST_FILTER_AND_RETURN);
-                bool returnToSender =
-                    ((cmd.action() == CMD_SEND_FOR_FILTER_AND_RETURN) || destFilter);
-                auto source = cmd.getSource();
-                if (!returnToSender) {
-                    cmd.setAction(CMD_SEND_MESSAGE);
-                    cmd.dest_id = parent_broker_id;
-                    cmd.dest_handle = InterfaceHandle();
-                    mDeliverMessage(cmd);
-                } else {
-                    cmd.setDestination(source);
-                    cmd.setAction(destFilter ? CMD_DEST_FILTER_RESULT : CMD_FILTER_RESULT);
-
-                    cmd.source_handle = FiltI->handle;
-                    cmd.source_id = mFedID;
-                    mDeliverMessage(cmd);
-                }
-            }
-        } else {
-            assert(false);
-            // this is an odd condition (not sure what to do yet)
-            /*    m.dest_id = filtFunc->sourceOperators[ii].fed_id;
-                m.dest_handle = filtFunc->sourceOperators[ii].handle;
-                if ((ii < static_cast<int> (filtFunc->sourceOperators.size() - 1)) ||
-                    (filtFunc->finalSourceFilter.fed_id != invalid_fed_id))
-                {
-                    m.setAction(CMD_SEND_FOR_FILTER_OPERATION);
-                }
-                else
-                {
-                    m.setAction(CMD_SEND_FOR_FILTER);
-                }
-                return m;
-                */
-        }
-    }
+    
 }
 
 void TranslatorFederate::generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
@@ -217,44 +110,10 @@ void TranslatorFederate::processFilterReturn(ActionMessage& cmd)
 }
 
 
-std::pair<ActionMessage&, bool> TranslatorFederate::executeFilter(ActionMessage& command,
-                                                              FilterInfo* filt)
+std::pair<ActionMessage&, bool> TranslatorFederate::executeTranslator(ActionMessage& command,
+                                                              TranslatorInfo* filt)
 {
-    if (filt->core_id == mFedID) {
-        if (filt->cloning) {
-            // cloning filter returns a vector
-            auto new_messages = filt->filterOp->processVector(createMessageFromCommand(command));
-            for (auto& msg : new_messages) {
-                if (msg) {
-                    ActionMessage cmd(std::move(msg));
-                    mDeliverMessage(cmd);
-                }
-            }
-        } else {
-            // deal with local source filters
-            auto tempMessage = createMessageFromCommand(std::move(command));
-            tempMessage = filt->filterOp->process(std::move(tempMessage));
-            if (tempMessage) {
-                command = ActionMessage(std::move(tempMessage));
-            } else {
-                // the filter dropped the message;
-                command = CMD_IGNORE;
-                return {command, false};
-            }
-        }
-    } else if (filt->cloning) {
-        ActionMessage cloneMessage(command);
-        cloneMessage.setAction(CMD_SEND_FOR_FILTER);
-        setActionFlag(cloneMessage, clone_flag);
-        cloneMessage.dest_id = filt->core_id;
-        cloneMessage.dest_handle = filt->handle;
-        mSendMessage(cloneMessage);
-    } else {
-        command.dest_id = filt->core_id;
-        command.dest_handle = filt->handle;
-
-        return {command, false};
-    }
+    
     return {command, true};
 }
 
@@ -329,72 +188,47 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
     }
     switch (command.action()) {
         case CMD_CLOSE_INTERFACE: {
-            auto* filt = filters.find(command.getSource());
-            if (filt != nullptr) {
-                ActionMessage rem(CMD_REMOVE_FILTER);
-                rem.source_handle = filt->handle;
-                rem.source_id = filt->core_id;
-                for (auto& target : filt->sourceTargets) {
-                    rem.setDestination(target);
-                    mSendMessage(rem);
-                }
-                for (auto& target : filt->destTargets) {
-                    if (std::find(filt->sourceTargets.begin(), filt->sourceTargets.end(), target) !=
-                        filt->sourceTargets.end()) {
-                        rem.setDestination(target);
-                        mSendMessage(rem);
-                    }
-                }
-                filt->sourceTargets.clear();
-                filt->destTargets.clear();
-                setActionFlag(*filt, disconnected_flag);
+            auto* tran = translators.find(command.getSource());
+            if (tran != nullptr) {
+                
             }
         } break;
         
         case CMD_REMOVE_ENDPOINT: {
-            auto* filtI = getFilterInfo(command.getDest());
-            if (filtI != nullptr) {
-                filtI->removeTarget(command.getSource());
+            auto* tranI = getTranslatorInfo(command.getDest());
+            if (tranI != nullptr) {
+                tranI->getEndpointInfo()->removeTarget(command.getSource());
             }
         } break;
         case CMD_REG_ENDPOINT: {
-            auto* filtI = getFilterInfo(mFedID, command.dest_handle);
-            if (filtI != nullptr) {
-                filtI->sourceTargets.emplace_back(command.source_id, command.source_handle);
-                mCoord.addDependency(command.source_id);
-            }
-            auto* filthandle = mHandles->getFilter(command.dest_handle);
-            if (filthandle != nullptr) {
-                filthandle->used = true;
-            }
+           
         } break;
 
         case CMD_ADD_ENDPOINT: {
-            auto* filtI = getFilterInfo(mFedID, command.dest_handle);
-            if (filtI != nullptr) {
+            auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
+            if (tranI != nullptr) {
                 if (checkActionFlag(command, destination_target)) {
-                    filtI->destTargets.emplace_back(command.getSource());
+                    tranI->getEndpointInfo()->addDestinationTarget(command.getSource(),command.payload.to_string(),command.getString(typeStringLoc));
                 } else {
-                    filtI->sourceTargets.emplace_back(command.getSource());
+                    tranI->getEndpointInfo()->addSourceTarget(command.getSource(),
+                                                              command.payload.to_string(),
+                                                              command.getString(typeStringLoc));
                 }
                 if (!checkActionFlag(command, error_flag)) {
                     mCoord.addDependency(command.source_id);
                 }
             }
 
-            auto* filthandle = mHandles->getFilter(command.dest_handle);
-            if (filthandle != nullptr) {
-                filthandle->used = true;
-            }
+            
         } break;
         case CMD_CORE_CONFIGURE:
-            if (command.messageID == UPDATE_FILTER_OPERATOR) {
-                auto* filtI = getFilterInfo(mFedID, command.source_handle);
-                if (filtI != nullptr) {
+            if (command.messageID == UPDATE_TRANSLATOR_OPERATOR) {
+                auto* tranI = getTranslatorInfo(mFedID, command.source_handle);
+                if (tranI != nullptr) {
                     auto op = mGetAirLock(command.counter).try_unload();
                     if (op) {
-                        auto M = std::any_cast<std::shared_ptr<FilterOperator>>(std::move(*op));
-                        filtI->filterOp = std::move(M);
+                        auto M = std::any_cast<std::shared_ptr<TranslatorOperator>>(std::move(*op));
+                        tranI->tranOp = std::move(M);
                     }
                 }
             }
@@ -404,33 +238,29 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
     }
 }
 
-FilterInfo* TranslatorFederate::createFilter(GlobalBrokerId dest,
+TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
                                          InterfaceHandle handle,
                                          const std::string& key,
-                                         const std::string& type_in,
-                                         const std::string& type_out,
-                                         bool cloning)
+                                         const std::string& endpointType,
+                                         const std::string& units)
 {
-    auto filt = std::make_unique<FilterInfo>((dest == parent_broker_id || dest == mCoreID) ?
-                                                 GlobalBrokerId(mFedID) :
-                                                 dest,
-                                             handle,
+    auto tran = std::make_unique<TranslatorInfo>(
+        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest, handle},
                                              key,
-                                             type_in,
-                                             type_out,
-                                             false);
+                                             endpointType,
+                                             units);
 
-    auto cid = filt->core_id;
-    auto* retTarget = filt.get();
+    auto cid = tran->id;
+    auto* retTarget = tran.get();
     // auto actualKey = key;
-    retTarget->cloning = cloning;
+
     // if (actualKey.empty()) {
     // actualKey = "sFilter_";
     // actualKey.append(std::to_string(handle.baseValue()));
     // }
 
     // if (filt->core_id == mFedID) {
-    filters.insert({cid, handle}, std::move(filt));
+    translators.insert(cid, std::move(tran));
     //} else {
     // actualKey.push_back('_');
     //  actualKey.append(std::to_string(cid.baseValue()));
@@ -441,25 +271,25 @@ FilterInfo* TranslatorFederate::createFilter(GlobalBrokerId dest,
 }
 
 
-FilterInfo* TranslatorFederate::getFilterInfo(GlobalHandle id)
+TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalHandle id)
 {
-    return filters.find(id);
+    return translators.find(id);
 }
 
-FilterInfo* TranslatorFederate::getFilterInfo(GlobalFederateId fed, InterfaceHandle handle)
+TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle)
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;
     }
-    return filters.find(GlobalHandle{fed, handle});
+    return translators.find(GlobalHandle{fed, handle});
 }
 
-const FilterInfo* TranslatorFederate::getFilterInfo(GlobalFederateId fed, InterfaceHandle handle) const
+const TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle) const
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;
     }
-    return filters.find(GlobalHandle{fed, handle});
+    return translators.find(GlobalHandle{fed, handle});
 }
 
 std::string TranslatorFederate::query(const std::string& queryStr) const
@@ -541,22 +371,23 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
         base["name"] = mName;
         base["id"] = mFedID.baseValue();
         base["parent"] = mCoreID.baseValue();
-        if (filters.size() > 0) {
+        if (translators.size() > 0) {
             base["filters"] = Json::arrayValue;
-            for (const auto& filt : filters) {
-                Json::Value filter;
-                filter["id"] = filt->handle.baseValue();
-                filter["name"] = filt->key;
-                filter["cloning"] = filt->cloning;
-                filter["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
+            for (const auto& trans : translators) {
+                Json::Value tran;
+                tran["id"] = trans->id.handle.baseValue();
+                tran["name"] = trans->key;
+                /*
+                tran["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
                     return std::to_string(dep.fed_id.baseValue()) +
                         "::" + std::to_string(dep.handle.baseValue());
                 });
-                filter["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
+                tran["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
                     return std::to_string(dep.fed_id.baseValue()) +
                         "::" + std::to_string(dep.handle.baseValue());
                 });
-                base["filters"].append(std::move(filter));
+                */
+                tran["translators"].append(std::move(tran));
             }
         }
         return fileops::generateJsonString(base);

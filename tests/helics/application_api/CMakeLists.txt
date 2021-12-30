@@ -15,6 +15,7 @@ set(application_api_test_sources
     MessageFederateKeyTests.cpp
     ValueFederateKeyTests.cpp
     FilterTests.cpp
+    TranslatorTests.cpp
     testFixtures.cpp
     PrimaryTypeConversionTests.cpp
     FilterAdditionalTests.cpp

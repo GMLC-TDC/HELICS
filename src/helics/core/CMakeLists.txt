@@ -40,6 +40,7 @@ set(SRC_FILES
     ProfilerBuffer.cpp
     EmptyCore.cpp
     helicsVersion.cpp
+    TranslatorInfo.cpp
     LogManager.cpp
 )
 
@@ -82,6 +83,7 @@ set(INCLUDE_FILES
     PublicationInfo.hpp
     InputInfo.hpp
     EndpointInfo.hpp
+    TranslatorInfo.hpp
     flagOperations.hpp
     BasicHandleInfo.hpp
     FederateIdExtra.hpp

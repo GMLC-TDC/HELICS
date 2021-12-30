@@ -53,38 +53,40 @@ void addOperations(Translator* trans, TranslatorTypes type, Core* /*cptr*/)
     }
 }
 
-Translator::Translator(Federate* ffed, const std::string& filtName):
-    Translator(InterfaceVisibility::LOCAL, ffed, filtName)
+Translator::Translator(Federate* ffed, std::string_view translatorName):
+    Translator(InterfaceVisibility::LOCAL, ffed, translatorName)
 {
 }
 
-Translator::Translator(Federate* ffed, const std::string& filtName, InterfaceHandle ihandle):
-    Interface(ffed, ihandle, filtName)
+Translator::Translator(Federate* ffed, std::string_view translatorName, InterfaceHandle ihandle):
+    Interface(ffed, ihandle, translatorName)
 {
 }
 
-Translator::Translator(Core* core, const std::string& filtName, InterfaceHandle ihandle):
-    Interface(core, ihandle, filtName)
+Translator::Translator(Core* core, std::string_view translatorName, InterfaceHandle ihandle):
+    Interface(core, ihandle, translatorName)
 {
 }
 
-Translator::Translator(InterfaceVisibility locality, Federate* ffed, const std::string& filtName):
-    Interface(ffed, InterfaceHandle(), filtName)
+Translator::Translator(InterfaceVisibility locality,
+                       Federate* ffed,
+                       std::string_view translatorName):
+    Interface(ffed, InterfaceHandle(), translatorName)
 {
     if (ffed != nullptr) {
         if (locality == InterfaceVisibility::GLOBAL) {
-            handle = ffed->registerGlobalTranslator(filtName);
+            handle = ffed->registerGlobalTranslator(translatorName);
         } else {
-            handle = ffed->registerTranslator(filtName);
+            handle = ffed->registerTranslator(translatorName);
         }
     }
 }
 
-Translator::Translator(Core* core, const std::string& filtName):
-    Interface(core, InterfaceHandle(), filtName)
+Translator::Translator(Core* core, const std::string_view translatorName):
+    Interface(core, InterfaceHandle(), translatorName)
 {
     if (cr != nullptr) {
-        handle = cr->registerTranslator(filtName, std::string(), std::string());
+        handle = cr->registerTranslator(translatorName, std::string_view{}, std::string_view{});
     }
 }
 
@@ -119,7 +121,7 @@ void Translator::setString(const std::string& property, const std::string& val)
     }
 }
 
-Translator& make_translator(TranslatorTypes type, Federate* mFed, const std::string& name)
+Translator& make_translator(TranslatorTypes type, Federate* mFed, std::string_view name)
 {
     auto& dfilt = mFed->registerTranslator(name);
     addOperations(&dfilt, type, nullptr);
@@ -129,7 +131,7 @@ Translator& make_translator(TranslatorTypes type, Federate* mFed, const std::str
 Translator& make_translator(InterfaceVisibility locality,
                     TranslatorTypes type,
                     Federate* mFed,
-                    const std::string& name)
+                    std::string_view name)
 {
     
     auto& dfilt = (locality == InterfaceVisibility::GLOBAL) ? mFed->registerGlobalTranslator(name) :
@@ -138,7 +140,7 @@ Translator& make_translator(InterfaceVisibility locality,
     return dfilt;
 }
 
-std::unique_ptr<Translator> make_translator(TranslatorTypes type, Core* cr, const std::string& name)
+std::unique_ptr<Translator> make_translator(TranslatorTypes type, Core* cr, std::string_view name)
 {
     
     auto dfilt = std::make_unique<Translator>(cr, name);
@@ -146,7 +148,8 @@ std::unique_ptr<Translator> make_translator(TranslatorTypes type, Core* cr, cons
     return dfilt;
 }
 
-std::unique_ptr<Translator> make_translator(TranslatorTypes type, CoreApp& cr, const std::string& name)
+std::unique_ptr<Translator>
+    make_translator(TranslatorTypes type, CoreApp& cr, std::string_view name)
 {
     return make_translator(type, cr.getCopyofCorePointer().get(), name);
 }

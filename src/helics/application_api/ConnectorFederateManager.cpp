@@ -39,11 +39,11 @@ Filter& ConnectorFederateManager::registerFilter(const std::string& name,
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-Translator& ConnectorFederateManager::registerTranslator(const std::string& name,
-                                                 const std::string& type_in,
-                                                 const std::string& type_out)
+Translator& ConnectorFederateManager::registerTranslator(std::string_view name,
+                                                         std::string_view endpointType,
+                                                         std::string_view units)
 {
-    auto handle = coreObject->registerTranslator(name, type_in, type_out);
+    auto handle = coreObject->registerTranslator(name, endpointType, units);
     if (handle.isValid()) {
         auto tran = std::make_unique<Translator>(fed, name, handle);
         Translator& t = *tran;
@@ -51,7 +51,7 @@ Translator& ConnectorFederateManager::registerTranslator(const std::string& name
         if (name.empty()) {
             trans->insert(coreObject->getHandleName(tran->getHandle()), std::move(tran));
         } else {
-            trans->insert(name, std::move(tran));
+            trans->insert(std::string(name), std::move(tran));
         }
         return t;
     }
@@ -82,7 +82,7 @@ Filter& ConnectorFederateManager::registerFilter(FilterTypes type, const std::st
     return make_filter(type, fed, name);
 }
 
-Translator& ConnectorFederateManager::registerTranslator(TranslatorTypes type, const std::string& name)
+Translator& ConnectorFederateManager::registerTranslator(TranslatorTypes type, std::string_view name)
 {
     return make_translator(type, fed, name);
 }

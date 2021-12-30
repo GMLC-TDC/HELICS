@@ -530,9 +530,9 @@ class Core {
     @param message_type a specified value type for the units
     @return the handle for the new translator
     */
-    virtual InterfaceHandle registerTranslator(const std::string& translatorName,
-                                           const std::string& message_type,
-                                           const std::string& units) = 0;
+    virtual InterfaceHandle registerTranslator(std::string_view translatorName,
+                                           std::string_view endpointType,
+                                           std::string_view units) = 0;
 
     /**
     * add a destination target,  the handle can be for a filter or a publication

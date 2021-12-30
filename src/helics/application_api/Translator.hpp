@@ -41,17 +41,17 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     /** default constructor*/
     Translator() = default;
     /** construct through a federate*/
-    explicit Translator(Federate* ffed, const std::string& translatorName = EMPTY_STRING);
+    explicit Translator(Federate* ffed, std::string_view translatorName = EMPTY_STRING);
     /** construct from handle and federate*/
-    Translator(Federate* ffed, const std::string& translatorName, InterfaceHandle ihandle);
+    Translator(Federate* ffed, std::string_view translatorName, InterfaceHandle ihandle);
     /** construct from handle and core*/
-    Translator(Core* core, const std::string& translatorName, InterfaceHandle ihandle);
+    Translator(Core* core, std::string_view translatorName, InterfaceHandle ihandle);
     /** construct through a federate*/
     Translator(InterfaceVisibility locality,
            Federate* ffed,
-           const std::string& translatorName = EMPTY_STRING);
+               std::string_view translatorName = EMPTY_STRING);
     /** construct through a core object*/
-    explicit Translator(Core* cr, const std::string& translatorName = EMPTY_STRING);
+    explicit Translator(Core* cr, std::string_view translatorName = EMPTY_STRING);
     /** virtual destructor*/
     virtual ~Translator() = default;
 
@@ -96,7 +96,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
 deactivate the translator
 */
 HELICS_CXX_EXPORT Translator&
-    make_translator(TranslatorTypes type, Federate* fed, const std::string& name = EMPTY_STRING);
+    make_translator(TranslatorTypes type, Federate* fed, std::string_view name = EMPTY_STRING);
 
 /** create a  translator
 @param locality the visibility of the translator global or local
@@ -109,7 +109,7 @@ deactivate the translator
 HELICS_CXX_EXPORT Translator& make_translator(InterfaceVisibility locality,
                                       TranslatorTypes type,
                                       Federate* fed,
-                                      const std::string& name = EMPTY_STRING);
+                                              std::string_view name = EMPTY_STRING);
 
 /** create a translator
 @param type the type of translator to create
@@ -119,7 +119,7 @@ HELICS_CXX_EXPORT Translator& make_translator(InterfaceVisibility locality,
 the translator
 */
 HELICS_CXX_EXPORT std::unique_ptr<Translator>
-    make_translator(TranslatorTypes type, Core* cr, const std::string& name = EMPTY_STRING);
+    make_translator(TranslatorTypes type, Core* cr, std::string_view name = EMPTY_STRING);
 
 /** create a translator
 @param type the type of translator to create
@@ -129,7 +129,7 @@ HELICS_CXX_EXPORT std::unique_ptr<Translator>
 the translator
 */
 HELICS_CXX_EXPORT std::unique_ptr<Translator>
-    make_translator(TranslatorTypes type, CoreApp& cr, const std::string& name = EMPTY_STRING);
+    make_translator(TranslatorTypes type, CoreApp& cr, std::string_view name = EMPTY_STRING);
 
 
 }  // namespace helics

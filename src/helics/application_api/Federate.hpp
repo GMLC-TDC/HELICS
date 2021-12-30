@@ -538,30 +538,30 @@ received
     }
 
     /** define a named global translator interface
-    @param translatorName the name of the globally visible filter
-    @param inputType the inputType which the filter can handle
-    @param outputType the outputType of the filter which the filter produces
+    @param translatorName the name of the globally visible translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
     */
-    Translator& registerGlobalTranslator(const std::string& translatorName,
-                                 const std::string& inputType = std::string(),
-                                 const std::string& outputType = std::string());
+    Translator& registerGlobalTranslator(std::string_view translatorName,
+                                 std::string_view endpointType = std::string_view{},
+                                 std::string_view units = std::string_view());
 
     /** define a translator interface
-    @details a translator will modify messages coming from or going to target endpoints
-    @param filterName the name of the filter
-    @param inputType the inputType which the filter can handle
-    @param outputType the outputType of the filter which the filter produces
+    @details a translator acts as a bridge between value and message interfaces
+    @param translatorName the name of the globally visible translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
     */
-    Translator& registerTranslator(const std::string& translatorName,
-                           const std::string& inputType = std::string(),
-                           const std::string& outputType = std::string());
+    Translator& registerTranslator(std::string_view translatorName,
+                                   std::string_view endpointType = std::string_view{},
+                                   std::string_view units = std::string_view{});
    
 
     /** define a nameless translator interface
      */
     Translator& registerTranslator()
     {
-        return registerGlobalTranslator(std::string(), std::string(), std::string());
+        return registerGlobalTranslator("");
     }
     /** define a nameless cloning filter interface on a source
      */
