@@ -4194,7 +4194,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     ActionMessage m(CMD_DISCONNECT);
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
-                    for (auto& fed : loopFederates) {
+                    for (const auto& fed : loopFederates) {
                         m.dest_id = fed->global_id;
                         fed.fed->addAction(m);
                     }
