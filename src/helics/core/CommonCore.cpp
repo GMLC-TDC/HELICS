@@ -1809,10 +1809,16 @@ void CommonCore::sendTo(InterfaceHandle sourceHandle,
     if (hndl->handleType != InterfaceType::ENDPOINT) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
-    if (checkActionFlag(*hndl, targetted_flag)) {
-        throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
-    }
     auto* fed = getFederateAt(hndl->local_fed_id);
+    if (checkActionFlag(*hndl, targetted_flag)) {
+        auto targets = fed->getMessageDestinations(sourceHandle);
+        auto res = std::find_if(targets.begin(), targets.end(), [destination](const auto& val) {
+            return (val.second == destination);
+        });
+        if (res == targets.end()) {
+            throw(InvalidParameter("targeted endpoint destination not in target list"));
+        }
+    }
     ActionMessage m(CMD_SEND_MESSAGE);
 
     m.messageID = ++messageCounter;
@@ -1839,10 +1845,17 @@ void CommonCore::sendToAt(InterfaceHandle sourceHandle,
     if (hndl->handleType != InterfaceType::ENDPOINT) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
-    if (checkActionFlag(*hndl, targetted_flag)) {
-        throw(InvalidFunctionCall("targeted endpoints may not specify a destination"));
-    }
     auto* fed = getFederateAt(hndl->local_fed_id);
+    if (checkActionFlag(*hndl, targetted_flag)) {
+        auto targets = fed->getMessageDestinations(sourceHandle);
+        auto res = std::find_if(targets.begin(), targets.end(), [destination](const auto& val) {
+            return (val.second == destination);
+        });
+        if (res==targets.end()) {
+            throw(InvalidParameter("targeted endpoint destination not in target list"));
+        }
+    }
+    
     ActionMessage m(CMD_SEND_MESSAGE);
 
     m.messageID = ++messageCounter;
@@ -1980,7 +1993,34 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
                         "",
                         fmt::format("receive_message {}", prettyPrintString(m)));
     }
-    addActionMessage(std::move(m));
+    if (m.getString(targetStringLoc).empty()) {
+        if (checkActionFlag(*hndl, targetted_flag)) {
+            auto targets = fed->getMessageDestinations(sourceHandle);
+            if (targets.empty()) {
+                return;
+            }
+            generateMessages(m, targets);
+        }
+        else
+        {
+            throw(InvalidParameter("no destination specified in message"));
+        }
+    }
+    else {
+        if (checkActionFlag(*hndl, targetted_flag)) {
+            auto targets = fed->getMessageDestinations(sourceHandle);
+            auto res = std::find_if(targets.begin(),
+                                    targets.end(),
+                                    [destination = m.getString(targetStringLoc)](const auto& val) {
+                return (val.second == destination);
+            });
+            if (res == targets.end()) {
+                throw(InvalidParameter("targetted endpoint destination not in target list"));
+            }
+        }
+        addActionMessage(std::move(m));
+    }
+    
 }
 
 void CommonCore::deliverMessage(ActionMessage& message)
