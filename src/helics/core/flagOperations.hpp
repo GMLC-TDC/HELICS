@@ -52,7 +52,7 @@ constexpr uint16_t child_flag = extra_flag4;
 constexpr uint16_t non_counting_flag = empty_flag;
 
 /// overload of extra_flag2 indicating an endpoint is targeted
-constexpr uint16_t targetted_flag = extra_flag2;
+constexpr uint16_t targeted_flag = extra_flag2;
 
 constexpr uint16_t filter_processing_required_flag =
     extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for
