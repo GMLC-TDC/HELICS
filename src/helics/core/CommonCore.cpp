@@ -2685,7 +2685,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     if (!interfaceQueryResult.empty()) {
         return interfaceQueryResult;
     }
-
+    if (queryStr == "translators") {
+        return generateStringVector_if(
+            loopHandles,
+            [](const auto& handle) { return handle.key; },
+            [](const auto& handle) { return (handle.handleType == InterfaceType::TRANSLATOR); });
+    }
     if (queryStr == "dependson") {
         return generateStringVector(timeCoord->getDependencies(),
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });

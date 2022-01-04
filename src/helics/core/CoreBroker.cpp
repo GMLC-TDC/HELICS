@@ -1344,6 +1344,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             addFilter(command);
             break;
+        case CMD_REG_TRANSLATOR:
+            if ((!isRootc) && (command.dest_id != parent_broker_id)) {
+                routeMessage(command);
+                // break;
+            }
+            addTranslator(command);
+            break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
@@ -1924,7 +1931,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 }
 void CoreBroker::addFilter(ActionMessage& m)
 {
-    // detect duplicate endpoints
+    // detect duplicate filters
     if (handles.getFilter(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
@@ -1944,6 +1951,34 @@ void CoreBroker::addFilter(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
+    } else {
+        FindandNotifyFilterTargets(filt);
+    }
+}
+
+void CoreBroker::addTranslator(ActionMessage& m)
+{
+    // detect duplicate endpoints/pubs/inputs
+    if (handles.getEndpoint(m.name()) != nullptr || handles.getInput(m.name()) != nullptr ||
+        handles.getPublication(m.name()) != nullptr) {
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+        eret.dest_handle = m.source_handle;
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate names for translator({})", m.name());
+        propagateError(std::move(eret));
+        return;
+    }
+
+    auto& trans = handles.addHandle(m.source_id,
+                                   m.source_handle,
+                                   InterfaceType::TRANSLATOR,
+                                   std::string(m.name()),
+                                   m.getString(typeStringLoc),
+                                   m.getString(typeOutStringLoc));
+    addLocalInfo(trans, m);
+
+    if (!isRootc) {
+        transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
             if (!globalTime) {
@@ -1956,7 +1991,9 @@ void CoreBroker::addFilter(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyFilterTargets(filt);
+        FindandNotifyInputTargets(trans);
+        FindandNotifyPublicationTargets(trans);
+        FindandNotifyEndpointTargets(trans);
     }
 }
 
