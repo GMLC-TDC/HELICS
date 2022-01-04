@@ -77,7 +77,7 @@ $ python
 
 All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_integration)
 
-[![](../../../img/fund_fedint_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_integration)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fund_fedint_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_integration)
 
 The files include:
 
@@ -279,8 +279,8 @@ Execute the co-simulation with the same command as the Base Example
 
 This results in the same output; the only thing we have changed is the method of configuring the federates and integrating them.
 
-![](../../../img/fundamental_default_resultbattery.png)
-![](../../../img/fundamental_default_resultcharger.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_default_resultbattery.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_default_resultcharger.png)
 
 If your output is not the same as with the Base Example, it can be helpful to pinpoint source of the difference -- have you used the correct API method?
 

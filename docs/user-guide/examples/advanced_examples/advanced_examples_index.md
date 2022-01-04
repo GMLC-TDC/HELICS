@@ -41,7 +41,7 @@ The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples
 
 **TODO: UPDATE IMAGE**
 
-[![](../../../img/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 <a name="what-is-this-co-simulation-doing">
 <strong>

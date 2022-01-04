@@ -223,7 +223,7 @@ study:
 
 Finally, we can look at the DAG of the spec to visualize the steps in the Study.
 
-![](../../img/Merlin_pi_send_receive_DAG.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Merlin_pi_send_receive_DAG.png)
 
 ### Orchestration Example
 

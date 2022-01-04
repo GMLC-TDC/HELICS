@@ -17,7 +17,7 @@ This tutorial is organized as follows:
 
 All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/endpoints)
 
-[![](../../../img/fundamental_endpoints_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/endpoints)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_endpoints_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/endpoints)
 
 The files include:
 
@@ -88,13 +88,13 @@ The easiest way to determine whether you should use pub/subs vs endpoints to con
 
 With this pub/sub configuration, we have established a **direct** communication link between the Battery and Charger:
 
-![](../../../img/battery_sub.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/battery_sub.png)
 
 ---
 
 **_If we accept that the information being passed between the two is not physics-based,_** then the communication link only depends on each federate having an endpoint:
 
-![](../../../img/ep_connection.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/ep_connection.png)
 
 In departure from the directly-coupled communication links of pub/subs, messages sent from **endpoints** can be intercepted, delayed, or picked up by any federate. In that sense, communication via pub/subs can be thought of as sealed letters sent via pneumatic tubes, and messages sent via endpoints as a return-address labeled letter sent into the postal service system.
 
@@ -310,8 +310,8 @@ We run the co-simulation just as before in the Base Example -- the `runner.json`
 
 And we get these figures:
 
-![](../../../img/fundamental_endpoints_battery_SOCs.png)
-![](../../../img/fundamental_endpoints_charger_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_endpoints_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_endpoints_charger_power.png)
 
 Armed now with the knowledge of endpoints and messages, how could you change the research question?
 

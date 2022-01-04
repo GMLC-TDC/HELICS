@@ -17,7 +17,7 @@ The response from helics_cli is the address of the web interface that can be use
 
 ## Web Interface Overview
 
-![Ex. 1a message topology](../../img/web_interface_overview.png)
+![Ex. 1a message topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/web_interface_overview.png)
 
 1. **Load web interface configuration** - A configuration file is provided to allow the user to be more specific about which federates and publications are of interest. Particularly for federations with large numbers of federates and/or large numbers of publications, it may not be desirable to display all of that information in the web interface, especially if it isn't needed. A configuration file can be loaded that will allow the user to restrict which federates and publications are added to the respective tables. xxxxxxx - Do we need to advise users to limit the size of these tables for performance reasons. Or is this largely expected to be a convenience for them? At what point does size become a problem?
 2. **Run co-simulation** - This button will launch the co-simulation via helics_cli and run it to completion. The values in the "Federate Configuration" and "Publication" fields will update periodically to reflect the current state of the federation. This allows for some degree of monitoring while the co-simulation runs.

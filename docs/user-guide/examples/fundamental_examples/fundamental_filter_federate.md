@@ -15,7 +15,7 @@ This tutorial is organized as follows:
 
 All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/filter_federate)
 
-[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
@@ -30,7 +30,7 @@ For situations that require filtering beyond what native HELICS filters can prov
 
 Here is our new federation using a custom filter federate:
 
-![](../../../img/fundamental_filter_federate_federation.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_federate_federation.png)
 
 We have:
 
@@ -100,9 +100,9 @@ helics run --path=./fundamental_filter_runner.json
 
 The resulting figures show the actual on board SOC at each EV charging port, the instantaneous power draw, and the SOC estimated by the on board charger.
 
-![](../../../img/fundamental_filter_federate_battery_SOCs.png)
-![](../../../img/fundamental_filter_federate_charging_power.png)
-![](../../../img/fundamental_filter_federate_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_federate_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_federate_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_federate_estimated_SOCs.png)
 
 When comparing to the results from the [previous example without any filters](./fundamental_combo.md), the effects of the filter federate are clear. By modifying the control signals between the controller and charger it is relatively easy to cause significantly different behavior in the system.
 

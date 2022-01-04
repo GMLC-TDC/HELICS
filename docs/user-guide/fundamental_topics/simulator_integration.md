@@ -39,7 +39,7 @@ Broker topology is somewhat optional for simple co-simulations, but offers an in
 
 The figure below shows the most common architecture for HELICS co-simulation. Each core has only one federate as an integrated executable, all executables reside on the same computer and are connected to the same broker. This architecture is particularly common for small federates and/or co-simulations under development. This is also the architecture for the [Fundamental Examples](../examples/fundamental_examples/fundamental_examples_index.md).
 
-![](../../img/helics_architecture_1.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/helics_architecture_1.png)
 
 ## Configuring the federate
 
