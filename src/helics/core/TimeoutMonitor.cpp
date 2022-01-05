@@ -176,7 +176,7 @@ void TimeoutMonitor::pingSub(CoreBroker* brk)
 {
     auto now = std::chrono::steady_clock::now();
     bool activePing = false;
-    for (const auto& brkr : brk->_brokers) {
+    for (const auto& brkr : brk->mBrokers) {
         size_t cindex = connections.size();
         for (size_t ii = 0; ii < cindex; ++ii) {
             if (connections[ii].connection == brkr.global_id) {

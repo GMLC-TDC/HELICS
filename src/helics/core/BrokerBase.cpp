@@ -413,7 +413,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         logLevel -= static_cast<int>(LogLevels::FED);
         alwaysLog = true;
     }
-    if ((federateID == parent_broker_id) || (federateID == global_id.load())) {
+    
         if (logLevel > maxLogLevel && !alwaysLog) {
             // check the logging level
             return true;
@@ -471,7 +471,6 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                     fileLogger->flush();
                 }
             }
-        }
         return true;
     }
     return false;

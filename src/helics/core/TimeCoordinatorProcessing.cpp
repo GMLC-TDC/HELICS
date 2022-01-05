@@ -253,7 +253,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
             if (cmd.action() == CMD_GLOBAL_ERROR || cmd.source_id == localID ||
-                cmd.source_id == parent_broker_id || cmd.source_id == root_broker_id ||
+                cmd.source_id == parent_broker_id || cmd.source_id == gRootBrokerID ||
                 cmd.dest_id != localID) {
                 if ((state != HELICS_FINISHED) && (state != HELICS_TERMINATING)) {
                     if (cmd.action() != CMD_GLOBAL_ERROR) {
