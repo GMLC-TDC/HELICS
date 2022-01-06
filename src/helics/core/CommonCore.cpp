@@ -2857,7 +2857,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 }
                 global_id = GlobalBrokerId(command.dest_id);
                 global_broker_id_local = GlobalBrokerId(command.dest_id);
-                filterFedID = getSpecialFederateId(global_broker_id_local,0);
+                filterFedID = getSpecialFederateId(global_broker_id_local, 0);
                 timeCoord->source_id = global_broker_id_local;
                 higher_broker_id = GlobalBrokerId(command.source_id);
                 transmitDelayedMessages();

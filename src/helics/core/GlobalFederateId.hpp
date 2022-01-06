@@ -14,8 +14,9 @@ namespace helics {
    federates in the system and 268,435,455 brokers allowed  if we need more than that this, HELICS
    as a program has been phenomenally successful beyond all wildest imaginations and we can probably
    afford to change these to 64 bit numbers to accommodate.  Of the available federates there are 2
-   federate numbers that can be defined per core/broker for various purposes.  These are the upper number of
-   federate id's so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the root broker
+   federate numbers that can be defined per core/broker for various purposes.  These are the upper
+   number of federate id's so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the
+   root broker
     */
 constexpr IdentifierBaseType gGlobalFederateIdShift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
@@ -121,10 +122,13 @@ class GlobalFederateId {
 constexpr GlobalFederateId gDirectCoreId{-235262};
 
 /** generate a special federate id for a broker/core */
-constexpr GlobalFederateId getSpecialFederateId(GlobalBrokerId broker, GlobalBrokerId::BaseType index) {
+constexpr GlobalFederateId getSpecialFederateId(GlobalBrokerId broker,
+                                                GlobalBrokerId::BaseType index)
+{
     return (broker != gRootBrokerID) ?
         (GlobalFederateId(gGlobalBrokerIdShift -
-                            2 * (broker.baseValue() - gGlobalBrokerIdShift + 2)+index)):GlobalFederateId(gGlobalBrokerIdShift-index-1);
+                          2 * (broker.baseValue() - gGlobalBrokerIdShift + 2) + index)) :
+        GlobalFederateId(gGlobalBrokerIdShift - index - 1);
 }
 /** stream operator for a federate_id*/
 std::ostream& operator<<(std::ostream& os, GlobalFederateId id);

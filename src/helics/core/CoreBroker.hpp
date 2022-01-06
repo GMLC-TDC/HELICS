@@ -135,14 +135,15 @@ class CoreBroker: public Broker, public BrokerBase {
     std::array<gmlc::containers::AirLock<std::any>, 3>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
     // variables for a time logging federate
-    std::string mTimeMonitorFederate; //!< name of the federate to use for logging time and time markers
+    std::string
+        mTimeMonitorFederate;  //!< name of the federate to use for logging time and time markers
     GlobalFederateId mTimeMonitorFederateId{};  //!< id of the timing federate
     GlobalFederateId
         mTimeMonitorLocalFederateId{};  //!< local id for a special receiving destination
     Time mTimeMonitorPeriod{timeZero};  //!< period to display the time logging
     Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
     Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
-    std::atomic<double> simTime{mInvalidSimulationTime}; //!< loaded simTime for logging
+    std::atomic<double> simTime{mInvalidSimulationTime};  //!< loaded simTime for logging
   private:
     /** function that processes all the messages
     @param command -- the message to process

@@ -323,10 +323,10 @@ TEST(logging, dumplog)
                                           // the future as part of the debugging improvements
 }
 
-
 TEST(logging, timeMonitorFederate1)
 {
-    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=monbroker1 --timemonitor=monitor");
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                "--name=monbroker1 --timemonitor=monitor");
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -337,14 +337,12 @@ TEST(logging, timeMonitorFederate1)
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "monbroker1";
-    
-    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
 
-    
+    auto Fed = std::make_shared<helics::Federate>("monitor", fi);
 
     Fed->enterExecutingMode();
 
-    auto rtime=Fed->requestTime(2.0);
+    auto rtime = Fed->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed->finalize();
     broker.reset();
@@ -355,8 +353,8 @@ TEST(logging, timeMonitorFederate1)
     bool grant{false};
     bool disconnect{false};
     int timeCount{0};
-    for (const auto &message:llock) {
-        if (message.second.find("TIME:")!=std::string::npos) {
+    for (const auto& message : llock) {
+        if (message.second.find("TIME:") != std::string::npos) {
             ++timeCount;
             if (message.second.find("exec granted") != std::string::npos) {
                 exec = true;
@@ -378,11 +376,10 @@ TEST(logging, timeMonitorFederate1)
     EXPECT_TRUE(grant);
 }
 
-
 TEST(logging, timeMonitorFederate2)
 {
-    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
-                                                "--name=monbroker2 --timemonitor=monitor --timemonitorperiod=2s");
+    auto broker = helics::BrokerFactory::create(
+        helics::CoreType::TEST, "--name=monbroker2 --timemonitor=monitor --timemonitorperiod=2s");
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -413,20 +410,17 @@ TEST(logging, timeMonitorFederate2)
 
     int grantCount{0};
     for (const auto& message : llock) {
-            if (message.second.find("granted time") != std::string::npos) {
+        if (message.second.find("granted time") != std::string::npos) {
             ++grantCount;
-                continue;
-            }
-            
+            continue;
+        }
     }
     EXPECT_EQ(grantCount, 2);
 }
 
-
 TEST(logging, timeMonitorFederate_command)
 {
-    auto broker = helics::BrokerFactory::create(
-        helics::CoreType::TEST, "--name=monbroker3");
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=monbroker3");
     gmlc::libguarded::guarded<std::vector<std::pair<int, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view /*unused*/, std::string_view message) {
@@ -508,14 +502,13 @@ TEST(logging, timeMonitorFederate_command2)
     EXPECT_EQ(grantCount, 2);
 }
 
-
 TEST(logging, timeMonitorFederate_swap)
 {
     auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=monbroker4");
-    gmlc::libguarded::guarded<std::vector<std::tuple<int,std::string, std::string>>> mlog;
+    gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view header, std::string_view message) {
-            mlog.lock()->emplace_back(level,header, message);
+            mlog.lock()->emplace_back(level, header, message);
         });
     broker->setLoggingLevel(HELICS_LOG_LEVEL_SUMMARY);
     broker->sendCommand("root", "monitor monitor 2 sec");
@@ -539,7 +532,7 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed->finalize();
-    
+
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 4U);
 
@@ -567,7 +560,7 @@ TEST(logging, timeMonitorFederate_swap)
     llock = mlog.lock();
     EXPECT_GE(llock->size(), 8U);
 
-    grantCount=0;
+    grantCount = 0;
     for (const auto& message : llock) {
         if (std::get<1>(message).find("monitor2") != std::string::npos) {
             ++grantCount;
