@@ -35,19 +35,23 @@ The `commandStr` is a generic string, so can be anything that can be contained i
 
 ### HELICS supported commands
 
-The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
+The following queries are defined directly in HELICS. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
 ```{eval-rst}
-+--------------------+------------------------------------------------------------------------------------------------+
-| Command String     | Description                                                                                    |
-+====================+================================================================================================+
-| ``terminate``      | [all objects] disconnect the object from the federation                                        |
-+--------------------+------------------------------------------------------------------------------------------------+
-| ``echo``           | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
-+--------------------+------------------------------------------------------------------------------------------------+
-| ``command_status`` | [federates] when received will send a string back to the source of the command                 |
-|                    | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
-+--------------------+------------------------------------------------------------------------------------------------+
++----------------------+------------------------------------------------------------------------------------------------+
+| Command String       | Description                                                                                    |
++======================+================================================================================================+
+| ``terminate``        | [all objects] disconnect the object from the federation                                        |
++----------------------+------------------------------------------------------------------------------------------------+
+| ``echo``             | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
++----------------------+------------------------------------------------------------------------------------------------+
+| ``log <string>``     | [all objects] generate a log message in a particular object                                    |
++----------------------+------------------------------------------------------------------------------------------------+
+| ``monitor <args...>``| [brokers] set up a federate the time monitor <args...> = <federate names> <logperiod>          |
++----------------------+------------------------------------------------------------------------------------------------+
+| ``command_status``   | [federates] when received will send a string back to the source of the command                 |
+|                      | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
++----------------------+------------------------------------------------------------------------------------------------+
 ```
 
 ### Future
