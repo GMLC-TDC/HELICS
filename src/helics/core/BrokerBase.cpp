@@ -420,7 +420,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
     }
     bool noID = (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
     std::string timeString;
-    if (federateID == global_broker_id_local && !noID) {
+    if (federateID == global_id.load() && !noID) {
         Time currentTime = getSimulationTime();
         if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
             timeString.push_back('[');
