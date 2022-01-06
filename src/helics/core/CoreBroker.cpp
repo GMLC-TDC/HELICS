@@ -3068,9 +3068,8 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             return fmt::format(R"raw({{"time":{}, "federate":{}}})raw",
                                static_cast<double>(mTimeMonitorCurrentTime),
                                mTimeMonitorFederate);
-        } else {
-            return "{}";
         }
+        return "{}";
     }
     if (request == "global_status") {
         if (!isConnected()) {

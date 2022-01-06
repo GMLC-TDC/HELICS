@@ -34,18 +34,18 @@ class GlobalBrokerId {
     /** extract the base value of the id code*/
     constexpr BaseType baseValue() const { return gid; }
     /** equality operator*/
-    bool operator==(GlobalBrokerId id) const noexcept { return (gid == id.gid); }
+    constexpr bool operator==(GlobalBrokerId id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(GlobalBrokerId id) const noexcept { return (gid != id.gid); }
+    constexpr bool operator!=(GlobalBrokerId id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(GlobalBrokerId id) const noexcept { return (gid < id.gid); }
+    constexpr bool operator<(GlobalBrokerId id) const noexcept { return (gid < id.gid); }
 
-    bool isFederate() const
+    constexpr bool isFederate() const
     {
         return ((gid >= gGlobalFederateIdShift) && (gid < gGlobalBrokerIdShift));
     }
-    bool isBroker() const { return (gid >= gGlobalBrokerIdShift || gid == 1); }
-    bool isValid() const
+    constexpr bool isBroker() const { return (gid >= gGlobalBrokerIdShift || gid == 1); }
+    constexpr bool isValid() const
     {
         return (gid != invalid_global_broker_id && gid != detail::gInvalidInterfaceHandle);
     }
@@ -80,30 +80,30 @@ class GlobalFederateId {
     /** conversion to the BaseType*/
     constexpr BaseType baseValue() const { return gid; }
     /** equality operator*/
-    bool operator==(GlobalFederateId id) const noexcept { return (gid == id.gid); }
+    constexpr bool operator==(GlobalFederateId id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(GlobalFederateId id) const noexcept { return (gid != id.gid); }
+    constexpr bool operator!=(GlobalFederateId id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(GlobalFederateId id) const noexcept { return (gid < id.gid); }
+    constexpr bool operator<(GlobalFederateId id) const noexcept { return (gid < id.gid); }
     /** greater than operator for sorting*/
-    bool operator>(GlobalFederateId id) const noexcept { return (gid > id.gid); }
+    constexpr bool operator>(GlobalFederateId id) const noexcept { return (gid > id.gid); }
     /** equality operator*/
-    bool operator==(GlobalBrokerId id) const noexcept { return (gid == id.gid); }
+    constexpr bool operator==(GlobalBrokerId id) const noexcept { return (gid == id.gid); }
     /** inequality operator*/
-    bool operator!=(GlobalBrokerId id) const noexcept { return (gid != id.gid); }
+    constexpr bool operator!=(GlobalBrokerId id) const noexcept { return (gid != id.gid); }
     /** less than operator for sorting*/
-    bool operator<(GlobalBrokerId id) const noexcept { return (gid < id.gid); }
+    constexpr bool operator<(GlobalBrokerId id) const noexcept { return (gid < id.gid); }
     /** greater than operator for sorting*/
-    bool operator>(GlobalBrokerId id) const noexcept { return (gid > id.gid); }
+    constexpr bool operator>(GlobalBrokerId id) const noexcept { return (gid > id.gid); }
     /** return true if the broker_id is a valid federate id code*/
-    bool isFederate() const
+    constexpr bool isFederate() const
     {
         return ((gid >= gGlobalFederateIdShift) && (gid < gGlobalBrokerIdShift));
     }
     /** return true if the broker_id is a valid broker id code*/
-    bool isBroker() const { return (gid >= gGlobalBrokerIdShift || gid == 1); }
+    constexpr bool isBroker() const { return (gid >= gGlobalBrokerIdShift || gid == 1); }
     /** return true if the broker_id is a valid broker id code*/
-    bool isValid() const
+    constexpr bool isValid() const
     {
         return (gid != invalid_global_fed_id && gid != detail::gInvalidInterfaceHandle);
     }
@@ -151,22 +151,22 @@ class GlobalHandle {
         return key;
     }
     /** equality operator*/
-    bool operator==(GlobalHandle id) const noexcept
+    constexpr bool operator==(GlobalHandle id) const noexcept
     {
         return ((fed_id == id.fed_id) && (handle == id.handle));
     }
     /** inequality operator*/
-    bool operator!=(GlobalHandle id) const noexcept
+    constexpr bool operator!=(GlobalHandle id) const noexcept
     {
         return ((fed_id != id.fed_id) || (handle != id.handle));
     }
     /** less than operator for sorting*/
-    bool operator<(GlobalHandle id) const noexcept
+    constexpr bool operator<(GlobalHandle id) const noexcept
     {
         return (fed_id < id.fed_id) ? true : ((fed_id != id.fed_id) ? false : (handle < id.handle));
     }
     /** check if the handle points to a validly specified interface*/
-    bool isValid() const { return fed_id.isValid() && handle.isValid(); }
+    constexpr bool isValid() const { return fed_id.isValid() && handle.isValid(); }
 };
 
 /** stream operator for a federate_id
@@ -184,13 +184,13 @@ class route_id {
     /** explicitly convert to a base value */
     constexpr BaseType baseValue() const { return rid; }
     /** equality operator*/
-    bool operator==(route_id id) const noexcept { return (rid == id.rid); }
+    constexpr bool operator==(route_id id) const noexcept { return (rid == id.rid); }
     /** inequality operator*/
-    bool operator!=(route_id id) const noexcept { return (rid != id.rid); }
+    constexpr bool operator!=(route_id id) const noexcept { return (rid != id.rid); }
     /** less than operator for sorting*/
-    bool operator<(route_id id) const noexcept { return (rid < id.rid); }
+    constexpr bool operator<(route_id id) const noexcept { return (rid < id.rid); }
     /** check if the route is valid*/
-    bool isValid() const { return (rid != invalid_route_id); }
+    constexpr bool isValid() const { return (rid != invalid_route_id); }
 
   private:
     static constexpr BaseType invalid_route_id{-1'295'148'000};
