@@ -135,13 +135,14 @@ class CoreBroker: public Broker, public BrokerBase {
     std::array<gmlc::containers::AirLock<std::any>, 3>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
     // variables for a time logging federate
-    std::string mTimeFederate; //!< name of the federate to use for logging time and time markers
-    GlobalFederateId mTimeFederateId{};  //!< id of the timing federate
+    std::string mTimeMonitorFederate; //!< name of the federate to use for logging time and time markers
+    GlobalFederateId mTimeMonitorFederateId{};  //!< id of the timing federate
     GlobalFederateId
-        mLocalTimeDestinationFederate{};  //!< local id for a special receiving destination
-    Time mTimeLogPeriod{timeZero};  //!< period to display the time logging
-    Time mLastLogTime{Time::minVal()};  //!< the time of the last timing log message
-    Time mCurrentTime{Time::minVal()};  //!< the last time from the timing federate
+        mTimeMonitorLocalFederateId{};  //!< local id for a special receiving destination
+    Time mTimeMonitorPeriod{timeZero};  //!< period to display the time logging
+    Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
+    Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
+    std::atomic<double> simTime{mInvalidSimulationTime}; //!< loaded simTime for logging
   private:
     /** function that processes all the messages
     @param command -- the message to process
@@ -318,6 +319,8 @@ class CoreBroker: public Broker, public BrokerBase {
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
+    virtual double getSimulationTime() const override;
+
   private:
     int getCountableFederates() const;
     /** check if we can remove some dependencies*/
@@ -402,6 +405,8 @@ class CoreBroker: public Broker, public BrokerBase {
 
     /** process message for the time monitor*/
     void processTimeMonitorMessage(ActionMessage& m);
+    /** load up the monitor federate*/
+    void loadTimeMonitor(bool firstLoad, std::string_view newFederate);
     /** generate a time barrier request*/
     void generateTimeBarrier(ActionMessage& m);
     int generateMapObjectCounter() const;

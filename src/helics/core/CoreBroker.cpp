@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
 #include "gmlc/utilities/stringConversion.h"
+#include "gmlc/utilities/string_viewOps.h"
 #include "helicsCLI11.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
@@ -701,45 +702,45 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
 std::string CoreBroker::generateFederationSummary() const
 {
     int pubs = 0;
-    int epts = 0;
-    int ipts = 0;
-    int filt = 0;
-    for (const auto& hand : handles) {
-        switch (hand.handleType) {
-            case InterfaceType::PUBLICATION:
-                ++pubs;
-                break;
-            case InterfaceType::INPUT:
-                ++ipts;
-                break;
-            case InterfaceType::ENDPOINT:
-                ++epts;
-                break;
-            default:
-                ++filt;
-                break;
-        }
+int epts = 0;
+int ipts = 0;
+int filt = 0;
+for (const auto& hand : handles) {
+    switch (hand.handleType) {
+    case InterfaceType::PUBLICATION:
+        ++pubs;
+        break;
+    case InterfaceType::INPUT:
+        ++ipts;
+        break;
+    case InterfaceType::ENDPOINT:
+        ++epts;
+        break;
+    default:
+        ++filt;
+        break;
     }
-    Json::Value summary;
-    Json::Value block;
-    block["federates"] = static_cast<int>(mFederates.size());
-    block["min_federates"] = minFederateCount;
-    block["brokers"] =
-        static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
-            return !static_cast<bool>(brk._core);
-        }));
-    block["cores"] =
-        static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
-            return static_cast<bool>(brk._core);
-        }));
-    block["min_brokers"] = minBrokerCount;
-    block["publications"] = pubs;
-    block["inputs"] = ipts;
-    block["filters"] = filt;
-    block["endpoints"] = epts;
-    summary["summary"] = block;
+}
+Json::Value summary;
+Json::Value block;
+block["federates"] = static_cast<int>(mFederates.size());
+block["min_federates"] = minFederateCount;
+block["brokers"] =
+static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
+    return !static_cast<bool>(brk._core);
+    }));
+block["cores"] =
+static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
+    return static_cast<bool>(brk._core);
+    }));
+block["min_brokers"] = minBrokerCount;
+block["publications"] = pubs;
+block["inputs"] = ipts;
+block["filters"] = filt;
+block["endpoints"] = epts;
+summary["summary"] = block;
 
-    return fileops::generateJsonString(summary);
+return fileops::generateJsonString(summary);
 }
 
 void CoreBroker::generateTimeBarrier(ActionMessage& m)
@@ -792,33 +793,98 @@ void CoreBroker::labelAsDisconnected(GlobalBrokerId brkid)
     mFederates.apply(disconnect_procedure);
 }
 
+void CoreBroker::loadTimeMonitor(bool firstLoad, std::string_view newFederate)
+{
+    if (!newFederate.empty() && newFederate == mTimeMonitorFederate)
+    {
+        return;
+    }
+    if (!firstLoad && mTimeMonitorFederateId.isValid() && newFederate.empty()) {
+        // do a disconnect
+        ActionMessage timeMarkerRem(CMD_REMOVE_DEPENDENT);
+        timeMarkerRem.dest_id = mTimeMonitorFederateId;
+        timeMarkerRem.source_id = mTimeMonitorLocalFederateId;
+        routeMessage(timeMarkerRem);
+        mTimeMonitorFederateId = GlobalFederateId{};
+        LOG_SUMMARY(global_broker_id_local,
+                    getIdentifier(),
+                    " disconnected time monitor federate");
+        mTimeMonitorFederate = newFederate;
+        return;
+    }
+    auto cState = getBrokerState();
+    if (cState == BrokerState::operating || firstLoad) {
+        if (cState == BrokerState::operating && !firstLoad)
+        {
+            if (mTimeMonitorFederateId.isValid()) {
+                // do a disconnect
+                ActionMessage timeMarkerRem(CMD_REMOVE_DEPENDENT);
+                timeMarkerRem.dest_id = mTimeMonitorFederateId;
+                timeMarkerRem.source_id = mTimeMonitorLocalFederateId;
+                routeMessage(timeMarkerRem);
+                mTimeMonitorFederateId = GlobalFederateId{};
+                LOG_SUMMARY(global_broker_id_local,
+                            getIdentifier(),
+                            fmt::format(" changing time monitor federate from {} to {}", mTimeMonitorFederate,newFederate));
+            }
+        }
+        if (!newFederate.empty()) {
+            mTimeMonitorFederate = newFederate;
+        }
+        auto fed = mFederates.find(mTimeMonitorFederate);
+        if (fed != mFederates.end()) {
+            ActionMessage timeMarker(CMD_ADD_DEPENDENT);
+            timeMarker.dest_id = fed->global_id;
+
+            mTimeMonitorFederateId = fed->global_id;
+            mTimeMonitorLastLogTime = Time::minVal();
+            mTimeMonitorLocalFederateId = getSpecialFederateId(global_broker_id_local, 0);
+            timeMarker.source_id = mTimeMonitorLocalFederateId;
+            routeMessage(timeMarker);
+        } else {
+            LOG_WARNING(global_broker_id_local,
+                        getIdentifier(),
+                        fmt::format(" unrecognized timing federate {}", mTimeMonitorFederate));
+        }
+    } else if (cState<BrokerState::operating) {
+        if (!newFederate.empty()) {
+            mTimeMonitorFederate = newFederate;
+        }
+
+    }
+}
+
 void CoreBroker::processTimeMonitorMessage(ActionMessage& m)
 {
-    if (m.source_id!=mTimeFederateId) {
+    if (m.source_id!=mTimeMonitorFederateId) {
         return;
     }
     switch (m.action())
     {
         case CMD_EXEC_GRANT: 
-            mLastLogTime = timeZero;
-            mCurrentTime = timeZero;
-            LOG_SUMMARY(m.source_id, mTimeFederate, "TIME: exec granted");
+            mTimeMonitorLastLogTime = timeZero;
+            mTimeMonitorCurrentTime = timeZero;
+
+            simTime.store(static_cast<double>(mTimeMonitorCurrentTime));
+            LOG_SUMMARY(m.source_id, mTimeMonitorFederate, "TIME: exec granted");
             break;
         case CMD_TIME_GRANT:
-            mCurrentTime = m.actionTime;
-            if (mCurrentTime - mTimeLogPeriod > mLastLogTime)
+            mTimeMonitorCurrentTime = m.actionTime;
+            simTime.store(static_cast<double>(mTimeMonitorCurrentTime));
+            if (mTimeMonitorCurrentTime - mTimeMonitorPeriod >= mTimeMonitorLastLogTime)
             {
                 LOG_SUMMARY(m.source_id,
-                            mTimeFederate,
+                            mTimeMonitorFederate,
                             fmt::format("TIME: granted time={}",
-                                        static_cast<double>(mCurrentTime)));
-                mLastLogTime = mCurrentTime;
+                                        static_cast<double>(mTimeMonitorCurrentTime)));
+                mTimeMonitorLastLogTime = mTimeMonitorCurrentTime;
             }
             break;
         case CMD_DISCONNECT:
-            LOG_SUMMARY(m.source_id, mTimeFederate, fmt::format("TIME: disconnected, last time {}",static_cast<double>(mCurrentTime)));
-            mCurrentTime = Time::maxVal();
-            mLastLogTime = Time::maxVal();
+            LOG_SUMMARY(m.source_id, mTimeMonitorFederate, fmt::format("TIME: disconnected, last time {}",static_cast<double>(mTimeMonitorCurrentTime)));
+            mTimeMonitorCurrentTime = Time::maxVal();
+            mTimeMonitorLastLogTime = Time::maxVal();
+            simTime.store(static_cast<double>(mTimeMonitorCurrentTime));
             break;
         default:
             break;
@@ -1183,6 +1249,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }
+            } else if (command.dest_id == mTimeMonitorLocalFederateId) {
+                processTimeMonitorMessage(command);
             } else {
                 transmit(getRoute(command.dest_id), command);
             }
@@ -1220,7 +1288,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                         }
                     }
                 }
-            } else if (command.dest_id == mTimeFederateId) {
+            } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
                 routeMessage(command);
@@ -1978,17 +2046,22 @@ void CoreBroker::configureFromVector(std::vector<std::string> args)
     }
 }
 
+double CoreBroker::getSimulationTime() const {
+    return static_cast<double>(simTime.load());
+}
+
 std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI()
 {
     auto app = std::make_shared<helicsCLI11App>("Option for Broker");
     app->remove_helics_specifics();
     app->add_flag_callback(
         "--root", [this]() { setAsRoot(); }, "specify whether the broker is a root");
-    app->add_option(
-        "--timingfederate", mTimeFederate, "specify a federate to use as the primary time for logging and indicator purpose, it has no actual impact on the cosimulation");
-    app->add_option("--timelogperiod",
-                    mTimeLogPeriod,
-                    "period to display logs of times from the timing federate");
+    auto *tfed=app->add_option(
+        "--timemonitor", mTimeMonitorFederate, "specify a federate to use as the primary time monitor for logging and indicator purpose, it has no actual impact on the cosimulation");
+    app->add_option("--timemonitorperiod",
+                    mTimeMonitorPeriod,
+                    "period to display logs of times from the time monitor federate")
+        ->needs(tfed);
     return app;
 }
 
@@ -2234,23 +2307,8 @@ void CoreBroker::executeInitializationOperations()
         LOG_SUMMARY(global_broker_id_local, getIdentifier(), "Broker started with universal key");
     }
     checkDependencies();
-    if (!mTimeFederate.empty()) {
-        auto fed = mFederates.find(mTimeFederate);
-        if (fed != mFederates.end()) {
-            ActionMessage timeMarker(CMD_ADD_DEPENDENT);
-            timeMarker.dest_id = fed->global_id;
-            
-            mTimeFederateId = fed->global_id;
-
-            mLocalTimeDestinationFederate = getSpecialFederateId(global_broker_id_local, 0);
-            timeMarker.source_id = mLocalTimeDestinationFederate;
-            routeMessage(timeMarker);
-        }
-        else {
-            LOG_WARNING(global_broker_id_local,
-                        getIdentifier(),
-                        fmt::format(" unrecognized timing federate {}", mTimeFederate));
-        }
+    if (!mTimeMonitorFederate.empty()) {
+        loadTimeMonitor(true, std::string{});
     }
     if (unknownHandles.hasUnknowns()) {
         if (unknownHandles.hasNonOptionalUnknowns()) {
@@ -2680,6 +2738,8 @@ void CoreBroker::processDisconnect(ActionMessage& command)
                         }
                     }
                 }
+            } else if (command.dest_id==mTimeMonitorLocalFederateId) {
+                processTimeMonitorMessage(command);
             } else {
                 transmit(getRoute(command.dest_id), command);
             }
@@ -3002,6 +3062,15 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             return "{}";
         }
         return timeCoord->printTimeStatus();
+    }
+    if (request == "time_monitor") {
+        if (mTimeMonitorFederateId.isValid()) {
+            return fmt::format(R"raw({{"time":{}, "federate":{}}})raw",
+                               static_cast<double>(mTimeMonitorCurrentTime),
+                               mTimeMonitorFederate);
+        } else {
+            return "{}";
+        }
     }
     if (request == "global_status") {
         if (!isConnected()) {
@@ -3635,7 +3704,32 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
     } else if (cmd.compare(0, 4, "log ") == 0) {
         LOG_SUMMARY(global_broker_id_local,
                     m.getString(sourceStringLoc),
-                    m.payload.to_string().substr(4));
+                    cmd.substr(4));
+    } else if (cmd.compare(0,8, "monitor ") ==0) {
+        namespace svo= gmlc::utilities::string_viewOps;
+        auto res=svo::splitlineQuotes(
+            cmd, " ", svo::default_quote_chars,svo::delimiter_compression::on);
+        switch (res.size()) {
+            case 1:
+                break;
+            case 2:
+                if (res[1] == "stop" || res[1] == "off") {
+                    loadTimeMonitor(false, "");
+                } else {
+                    loadTimeMonitor(false, res[1]);
+                }
+                break;
+            case 3:
+                mTimeMonitorPeriod = loadTimeFromString(std::string(res[2]),time_units::sec);
+                loadTimeMonitor(false, res[1]);
+                break;
+            case 4:
+            default:
+                mTimeMonitorPeriod = loadTimeFromString(std::string(svo::merge(res[2],res[3])), time_units::sec);
+                loadTimeMonitor(false, res[1]);
+                break;
+        }
+        
     } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),

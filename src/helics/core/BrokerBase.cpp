@@ -420,15 +420,26 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         bool noID =
             (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
-        double currentTime = (noID) ? mInvalidSimulationTime : getSimulationTime();
+        std::string timeString;
+        if (federateID == global_broker_id_local && !noID) {
+            Time currentTime = getSimulationTime();
+            if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
+                timeString.push_back('[');
+                timeString.append(brokerStateName(getBrokerState()));
+                timeString.push_back(']');
+            } else {
+                timeString = fmt::format("[t={}]", currentTime);
+            }
+        }
+         
         if (loggerFunction) {
             if (noID) {
                 loggerFunction(logLevel, name, message);
             } else {
-                loggerFunction(
-                    logLevel,
-                    fmt::format("{} ({})[t={}]", name, federateID.baseValue(), currentTime),
-                    message);
+                    loggerFunction(
+                        logLevel,
+                        fmt::format("{} ({}){}", name, federateID.baseValue(), timeString),
+                        message);
             }
         } else {
             if (consoleLogLevel >= logLevel || alwaysLog) {
@@ -438,12 +449,14 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                     if (noID) {
                         consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
                     } else {
-                        consoleLogger->log(getSpdLogLevel(logLevel),
-                                           "{} ({})[t={}]::{}",
-                                           name,
-                                           federateID.baseValue(),
-                                           currentTime,
-                                           message);
+                        
+                            consoleLogger->log(getSpdLogLevel(logLevel),
+                                               "{} ({}){}::{}",
+                                               name,
+                                               federateID.baseValue(),
+                                               timeString,
+                                               message);
+                        
                     }
                 }
 
@@ -458,12 +471,13 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                     if (noID) {
                         fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
                     } else {
-                        fileLogger->log(getSpdLogLevel(logLevel),
-                                        "{} ({})[t={}]::{}",
-                                        name,
-                                        federateID.baseValue(),
-                                        currentTime,
-                                        message);
+                            fileLogger->log(getSpdLogLevel(logLevel),
+                                            "{} ({}){}::{}",
+                                            name,
+                                            federateID.baseValue(),
+                                            timeString,
+                                            message);
+                        
                     }
                 }
 

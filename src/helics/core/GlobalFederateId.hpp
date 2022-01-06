@@ -124,7 +124,7 @@ constexpr GlobalFederateId gDirectCoreId{-235262};
 constexpr GlobalFederateId getSpecialFederateId(GlobalBrokerId broker, GlobalBrokerId::BaseType index) {
     return (broker != gRootBrokerID) ?
         (GlobalFederateId(gGlobalBrokerIdShift -
-                            2 * (broker.baseValue() - gGlobalBrokerIdShift + 2)+index)):GlobalFederateId(gGlobalBrokerIdShift-index);
+                            2 * (broker.baseValue() - gGlobalBrokerIdShift + 2)+index)):GlobalFederateId(gGlobalBrokerIdShift-index-1);
 }
 /** stream operator for a federate_id*/
 std::ostream& operator<<(std::ostream& os, GlobalFederateId id);
