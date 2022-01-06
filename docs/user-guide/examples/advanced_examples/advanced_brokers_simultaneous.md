@@ -13,7 +13,7 @@ This example shows how to configure a HELICS co-simulation so that multiple co-s
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on GitHub. This example on [simultaneous co-simulations can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_brokers/simultaneous). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_simultaneous_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_simultaneous_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -98,11 +98,11 @@ To run the co-simulations simultaneously, all that is required is having `helics
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-![](../../../img/advanced_simultaneous_power_1.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_simultaneous_power_1.png)
 
-![](../../../img/advanced_simultaneous_power_2.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_simultaneous_power_2.png)
 
-![](../../../img/advanced_simultaneous_power_3.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_simultaneous_power_3.png)
 
 To do a more legitimate sensitivity analysis to the population of EVs that are being charged, a sample size larger than three is almost certainly necessary. [We've put together another example](./advanced_orchestration.md) to show how to orchestrate running larger sets of co-simulations to address exactly these kinds of needs.
 

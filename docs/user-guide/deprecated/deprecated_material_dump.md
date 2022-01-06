@@ -4,9 +4,9 @@ If you're familiar with transmission and distribution system simulation tools, y
 
 Given the fact that only two federates are being used (the minimum number to be a co-simulation, though HELICS itself works just fine with a single federate), only a single broker is required.
 
-![Transmission and distribution co-simulation signal topology](../../img/ditl_message_topology.png)
+![Transmission and distribution co-simulation signal topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/ditl_message_topology.png)
 
-![Transmission distribution co-simulation broker topology](../../img/ditl_broker_topology.png)
+![Transmission distribution co-simulation broker topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/ditl_broker_topology.png)
 
 Below is an example of how a very generic configuration for the transmission federate could look followed by one for the distribution federate.
 

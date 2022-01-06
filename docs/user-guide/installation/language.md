@@ -56,7 +56,7 @@ helicsStartup
 display(helics.helicsGetVersion())
 ```
 
-![](../../img/matlab-success.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/matlab-success.png)
 
 The helics Startup usually isn't required on Windows systems. Alternatively, you can load the HELICS library manually, depending on which operating system you use.
 

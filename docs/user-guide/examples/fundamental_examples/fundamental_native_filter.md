@@ -15,7 +15,7 @@ This tutorial is organized as follows:
 
 All files necessary to run the Federate Integration Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
-[![](../../../img/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_message_comm/combo)
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
@@ -32,7 +32,7 @@ In the [Endpoints Example](./fundamental_endpoints.md), we learned how to pass m
 
 Here is our new federation of three federates:
 
-![](../../../img/fundamental_complete.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_complete.png)
 
 We have:
 
@@ -214,9 +214,9 @@ helics run --path=fundamental_combo_runner.json
 
 The resulting figures show the actual on board SOC at each EV charging port, the instantaneous power draw, and the SOC estimated by the on board charger.
 
-![](../../../img/fundamental_combo_battery_SOCs.png)
-![](../../../img/fundamental_combo_charging_power.png)
-![](../../../img/fundamental_combo_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_estimated_SOCs.png)
 
 Note that we have made a number of simplifying assumptions in this analysis:
 

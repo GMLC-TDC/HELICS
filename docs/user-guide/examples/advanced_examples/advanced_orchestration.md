@@ -21,7 +21,7 @@ familiarity with how Merlin works.
 Code for the Monte Carlo simulation and the
 full Merlin spec and be found in the [HELICS Examples Repo](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_orchestration_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_orchestration_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_orchestration)
 
 The necessary files are:
 
@@ -50,7 +50,7 @@ _M ~ U(a,b)_
 Where _M_ is the measured voltage, _a_ is the lower bound for possible values, and _b_ is the upper bound for possible values. This is read as, "_M_
 is distributed uniformly with bounds _a_ and _b_."
 
-![](../../../img/uniform_dist.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/uniform_dist.png)
 
 The uniform distribution is among the most simple of probability distributions. Additional resources on probability and statistics are plentiful; [Statistical Rethinking](https://xcelab.net/rm/statistical-rethinking/) is highly recommended.
 
@@ -72,7 +72,7 @@ _L2 ~ P(100,0.5)_
 
 _L3 ~ P(100,0.2)_
 
-![](../../../img/EVPoisson.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/EVPoisson.png)
 
 What if we weren't entirely certain that the average values for _L1, L2, L3_ are _0.3, 0.5, 0.2_, we can also sample the averages from a normal distribution centered on these values with reasonable standard deviations. We can say that:
 
@@ -95,7 +95,7 @@ _λ ~ N(μ,σ)_
 
 </center>
 
-![](../../../img/EVfulldist.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/EVfulldist.png)
 
 Notice that the individual overplotted distributions in the two histograms above are different -- there is more flexibility encoded into the second. The distributions in the second plot describe the following assumptions about the anticipated need for Level 1, 2, and 3 chargers:
 
@@ -188,7 +188,7 @@ In the runner scripts directory, there will be 30 JSON files. Each will have a u
 
 The final result of the default Monte Carlo co-simulation is shown below.
 
-![](../../../img/MonteCarlo_Manual_small.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/MonteCarlo_Manual_small.png)
 
 This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
 
@@ -343,7 +343,7 @@ Co-Sim_n bubbles represents the Monte Carlo simulation. Each co-sim
 runs in parallel with each other since there is no dependency on the
 output that each co-sim runs.
 
-![](../../../img/UQ_DAG.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/UQ_DAG.png)
 
 ## [Questions and Help](../../support.md)
 

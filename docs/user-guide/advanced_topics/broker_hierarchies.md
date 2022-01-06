@@ -14,9 +14,9 @@ So, using an example we've seen several times, imagine a scenario where a single
 
 The diagrams below show the message and broker topologies for this hypothetical examples.
 
-![](../../img/broker_hierarchy_message_topology.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/broker_hierarchy_message_topology.png)
 
-![](../../img/broker_hierarchy_broker_topology.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/broker_hierarchy_broker_topology.png)
 
 ## Broker Hierarchy Implementation
 

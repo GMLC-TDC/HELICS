@@ -104,9 +104,9 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
-![Ex. 1a message topology](../../img/Ex1a_Message_topology.png)
+![Ex. 1a message topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Message_topology.png)
 
-![Ex. 1a broker topology](../../img/Ex1a_Broker_topology.png)
+![Ex. 1a broker topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Broker_topology.png)
 
 - **Transmission system** - The transmission system model used is the IEEE-118 bus model. To a single bus in this model the GridLAB-D distribution system is attached. All other load buses in the model use a static load shape scaled proportionately so the peak of the load shape matches meet the model-defined load value. The generators are re-dispatched every fifteen minutes by running an optimal power flow (the so-called "ACOPF" which places constraints on the voltage at the nodes in the system) and every five minutes a powerflow is run the update the state of the system. To allow for the relatively modest size of the single distribution system attached to the transmission system, the distribution system load is amplified by a factor of fifteen before being applied to the transmission system.
 
@@ -154,10 +154,10 @@ To show the difference between running these two simulators in a stand-alone ana
 
 The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
 
-![Ex. 1a  transmission bus voltage](../../img/Ex1a_Bus_voltage_118.png)
+![Ex. 1a  transmission bus voltage](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Bus_voltage_118.png)
 
 As can be seen, the impacts of co-simulation are relatively modest in this case. Even when the transmission system provides a dynamic high-side substation voltage (rather than just assuming a fixed value) and even with loads that have been created to be very voltage sensitive, the changing substation voltage doesn't impact the load substantially and change the voltage profiles significantly. (If you're curious to see an even bigger impact, you can disable the voltage regulators in GridLAB-D by editing the `regulator_configuration` objects so that the `Control` parameter is set to `MANUAL`. This will lock the regulators into place and allow the substation voltage to propagate through the circuit unregulated.) (xxxxxxx - double-check this.)
 
 The load of the distribution circuit as seen by the transmission model with and without co-simulation is similarly muted.
 
-![Ex. 1a  distribution system load](../../img/Ex1a_Feeder_consumption.png)
+![Ex. 1a  distribution system load](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Feeder_consumption.png)
