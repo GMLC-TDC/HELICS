@@ -2,8 +2,6 @@
 
 The Advanced Base example walks through a HELICS co-simulation between three python federates, one of each type: value federate (`Battery.py`), message federate (`Controller.py`), and combination federate (`Charger.py`). This serves as the starting point for many of the other advanced examples and is an extension of the [Base Example.](../fundamental_examples/fundamental_default.md)
 
-![](../../../img/advanced_default_setup.png)
-
 The Advanced Base Example tutorial is organized as follows:
 
 - [Example files](#example-files)

@@ -1,7 +1,5 @@
 # Multi-Input
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
 - [Where is the code?](#where-is-the-code)
