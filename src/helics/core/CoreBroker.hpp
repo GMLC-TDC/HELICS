@@ -101,9 +101,9 @@ class CoreBroker: public Broker, public BrokerBase {
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
     gmlc::containers::DualMappedVector<BasicFedInfo, std::string, GlobalFederateId>
-        _federates;  //!< container for all federates
+        mFederates;  //!< container for all federates
     gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, GlobalBrokerId>
-        _brokers;  //!< container for all the broker information
+        mBrokers;  //!< container for all the broker information
     std::string
         previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
 
@@ -134,6 +134,16 @@ class CoreBroker: public Broker, public BrokerBase {
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     std::array<gmlc::containers::AirLock<std::any>, 3>
         dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    // variables for a time logging federate
+    std::string
+        mTimeMonitorFederate;  //!< name of the federate to use for logging time and time markers
+    GlobalFederateId mTimeMonitorFederateId{};  //!< id of the timing federate
+    GlobalFederateId
+        mTimeMonitorLocalFederateId{};  //!< local id for a special receiving destination
+    Time mTimeMonitorPeriod{timeZero};  //!< period to display the time logging
+    Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
+    Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
+    std::atomic<double> simTime{mInvalidSimulationTime};  //!< loaded simTime for logging
   private:
     /** function that processes all the messages
     @param command -- the message to process
@@ -310,6 +320,8 @@ class CoreBroker: public Broker, public BrokerBase {
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
+    virtual double getSimulationTime() const override;
+
   private:
     int getCountableFederates() const;
     /** check if we can remove some dependencies*/
@@ -392,6 +404,10 @@ class CoreBroker: public Broker, public BrokerBase {
     /** label the broker and all children as disconnected*/
     void labelAsDisconnected(GlobalBrokerId brkid);
 
+    /** process message for the time monitor*/
+    void processTimeMonitorMessage(ActionMessage& m);
+    /** load up the monitor federate*/
+    void loadTimeMonitor(bool firstLoad, std::string_view newFederate);
     /** generate a time barrier request*/
     void generateTimeBarrier(ActionMessage& m);
     int generateMapObjectCounter() const;
