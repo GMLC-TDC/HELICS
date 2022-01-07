@@ -174,8 +174,9 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 ## Additional Broker Features
 
 ### Time monitor
+
 As of Version 3.2 Brokers have the capability to specify a federate as a time monitor, this does not affect the co-simulation but instructs the Broker to get time messages from a particular federate.
-There are two new command line arguments for brokers `--timemonitor=fedName` and `--timemonitorperiod=<time>`  The second can only be used if the first is specified as well.
+There are two new command line arguments for brokers `--timemonitor=fedName` and `--timemonitorperiod=<time>` The second can only be used if the first is specified as well.
 
 When specified the broker creates a link to that federate and will generate a log message of form
 
@@ -184,6 +185,7 @@ TIME: exec granted
 TIME: granted time=2
 TIME: disconnected, last time=4
 ```
+
 The monitor can be stopped via the [command](../advanced_topics/command_interface.md) interface through the `monitor` keyword.
 
 ```cpp
