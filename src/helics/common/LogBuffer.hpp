@@ -8,12 +8,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gmlc/libguarded/shared_guarded.hpp"
 
+#include <atomic>
 #include <deque>
 #include <functional>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <atomic>
 
 namespace Json {
 class Value;
