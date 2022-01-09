@@ -12,7 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <string>
 #include <string_view>
-#include <utility>
+#include <tuple>
+#include <atomic>
 
 namespace Json {
 class Value;

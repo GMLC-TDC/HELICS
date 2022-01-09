@@ -236,7 +236,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--dumplog",
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
-    auto lbs = logging_group->add_option(
+    auto* lbs = logging_group->add_option(
         "--logbuffersize",
         mlogBufferSize,
         "specify the size of the circular buffer for storing log messages for later retrieval");

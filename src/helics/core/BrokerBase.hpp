@@ -100,12 +100,11 @@ class BrokerBase {
     bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
-
+    std::size_t mlogBufferSize{0};  //!< logBufferSize
   protected:
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     std::unique_ptr<LogBuffer> mLogBuffer;  //!< object for buffering a set of log messages
-    std::size_t mlogBufferSize;  //!< logBufferSize
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
 
     /** enumeration of the possible core states*/
