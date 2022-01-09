@@ -8,6 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
+#include "../common/LogBuffer.hpp"
+#include "gmlc/utilities/string_viewConversion.h"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -104,6 +106,7 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
     global_id{GlobalFederateId()}
 {
+    mLogBuffer = std::make_unique<LogBuffer>();
     for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
     }
@@ -1595,6 +1598,9 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             rt_lead = rt_lag;
             break;
+        case defs::Properties::LOG_BUFFER_SIZE:
+            mLogBuffer->resize(propertyVal);
+            break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);
     }
@@ -1871,18 +1877,20 @@ void FederateState::logMessage(int level,
                                std::string_view logMessageSource,
                                std::string_view message) const
 {
-    if ((loggerFunction) && (level <= logLevel)) {
-        loggerFunction(level,
-                       (logMessageSource.empty()) ?
-                           fmt::format("{} ({})[t={}]",
-                                       name,
-                                       global_id.load().baseValue(),
-                                       static_cast<double>(grantedTime())) :
-                           fmt::format("{}[t={}]",
-                                       logMessageSource,
-                                       static_cast<double>(grantedTime())),
-                       message);
+    if (level > logLevel) {
+        return;
     }
+    std::string header = (logMessageSource.empty()) ?
+        fmt::format("{} ({})[t={}]",
+                    name,
+                    global_id.load().baseValue(),
+                    static_cast<double>(grantedTime())) :
+        fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
+
+    if (loggerFunction ) {
+        loggerFunction(level,header,message);
+    }
+    mLogBuffer->push(level, header, message);
 }
 
 const std::string& fedStateString(FederateStates state)
@@ -1917,14 +1925,28 @@ const std::string& fedStateString(FederateStates state)
 void FederateState::sendCommand(ActionMessage& command)
 {
     auto cmd = command.payload.to_string();
-    if (cmd == "terminate") {
+    auto commentLoc = cmd.find('#');
+    if (commentLoc != std::string_view::npos) {
+        cmd = cmd.substr(0, commentLoc - 1);
+    }
+    gmlc::utilities::string_viewOps::trimString(cmd);
+    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
+        cmd,
+        " ",
+        gmlc::utilities::string_viewOps::default_quote_chars,
+        gmlc::utilities::string_viewOps::delimiter_compression::on);
+    if (res.empty()) {
+        return;
+    }
+
+    if (res[0] == "terminate") {
         if (parent_ != nullptr) {
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
             parent_->addActionMessage(bye);
         }
-    } else if (cmd == "echo") {
+    } else if (res[0] == "echo") {
         ActionMessage response(command.action());
         response.payload = "echo_reply";
         response.dest_id = command.source_id;
@@ -1934,7 +1956,7 @@ void FederateState::sendCommand(ActionMessage& command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
-    } else if (cmd == "command_status") {
+    } else if (res[0] == "command_status") {
         ActionMessage response(command.action());
         response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
         response.dest_id = command.source_id;
@@ -1944,9 +1966,19 @@ void FederateState::sendCommand(ActionMessage& command)
         if (parent_ != nullptr) {
             parent_->addActionMessage(response);
         }
-    } else if (cmd == "timeout_monitor") {
+    } else if (res[0] == "logbuffer") {
+        if (res.size() > 1) {
+            if (res[1] == "stop") {
+                mLogBuffer->resize(0);
+            } else {
+                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], 10));
+            }
+        } else {
+            mLogBuffer->resize(10);
+        }
+    } else if (res[0] == "timeout_monitor"){
         setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);
-    } else if (cmd.compare(0, 4, "log ") == 0) {
+    } else if (res[0] == "log") {
         logMessage(HELICS_LOG_LEVEL_SUMMARY,
                    command.getString(sourceStringLoc),
                    command.payload.to_string().substr(4));
@@ -2091,6 +2123,13 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return generateStringVector(timeCoord->getDependents(),
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
     }
+    if (query == "logs") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        bufferToJson(*mLogBuffer, base);
+        return fileops::generateJsonString(base);
+    }
     if (query == "data_flow_graph") {
         Json::Value base;
         base["name"] = getIdentifier();
@@ -2148,8 +2187,8 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         qstring = processQueryActual(query);
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
-            R"("publications","inputs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
-    } else {  // the rest might to prevent a race condition
+            R"("publications","inputs","logs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
+    } else {  // the rest might need be locked to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);
             unlock();

@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
+#include "../common/LogBuffer.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -27,6 +28,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "fileConnections.hpp"
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewConversion.h"
 #include "helicsVersion.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
@@ -2345,7 +2347,8 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\"]";
+               "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\","
+            "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2469,13 +2472,27 @@ void CommonCore::initializeMapBuilder(const std::string& request,
 void CommonCore::processCommandInstruction(ActionMessage& command)
 {
     auto cmd = command.payload.to_string();
-    if (cmd == "terminate") {
+    auto commentLoc = cmd.find('#');
+    if (commentLoc != std::string_view::npos) {
+        cmd = cmd.substr(0, commentLoc - 1);
+    }
+    gmlc::utilities::string_viewOps::trimString(cmd);
+    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
+        cmd,
+        " ",
+        gmlc::utilities::string_viewOps::default_quote_chars,
+        gmlc::utilities::string_viewOps::delimiter_compression::on);
+    if (res.empty()) {
+        return;
+    }
+
+    if (res[0] == "terminate") {
         LOG_SUMMARY(global_broker_id_local,
                     getIdentifier(),
                     " received terminate instruction via command instruction")
         ActionMessage udisconnect(CMD_USER_DISCONNECT);
         addActionMessage(udisconnect);
-    } else if (cmd == "echo") {
+    } else if (res[0] == "echo") {
         LOG_SUMMARY(global_broker_id_local,
                     getIdentifier(),
                     " received echo command via command instruction")
@@ -2484,11 +2501,22 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         command.setString(targetStringLoc, command.getString(sourceStringLoc));
         command.setString(sourceStringLoc, getIdentifier());
         addActionMessage(command);
-    } else if (cmd.compare(0, 4, "log ") == 0) {
+    } else if (res[0] == "log")
+        {
         LOG_SUMMARY(global_broker_id_local,
                     command.getString(sourceStringLoc),
                     command.payload.to_string().substr(4));
-
+    } else if (res[0] == "logbuffer") {
+        if (res.size() > 1) {
+            if (res[1] == "stop") {
+                mLogBuffer->resize(0);
+            }
+            else {
+                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], 10));
+            }
+        } else {
+            mLogBuffer->resize(10);
+        }
     } else {
         LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
@@ -2563,7 +2591,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     if (queryStr == "isinit") {
         return (allInitReady()) ? "true" : "false";
     }
-
+    if (queryStr == "logs") {
+        Json::Value base;
+        loadBasicJsonInfo(base, nullptr);
+        bufferToJson(*mLogBuffer, base);
+        return fileops::generateJsonString(base);
+    }
     if (queryStr == "address") {
         return Json::valueToQuotedString(getAddress().c_str());
     }
@@ -2680,6 +2713,13 @@ std::string CommonCore::query(const std::string& target,
             auto res = quickCoreQueries(queryStr);
             if (!res.empty()) {
                 return res;
+            }
+            if (queryStr == "logs")
+            {
+                Json::Value base;
+                loadBasicJsonInfo(base, nullptr);
+                bufferToJson(*mLogBuffer, base);
+                return fileops::generateJsonString(base);
             }
         }
         return generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Core has terminated");
@@ -4303,6 +4343,12 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             break;
         case defs::Properties::CONSOLE_LOG_LEVEL:
             setLogLevels(cmd.getExtraData(), fileLogLevel);
+            break;
+        case defs::Properties::LOG_BUFFER_SIZE: {
+            auto size = cmd.getExtraData();
+            mLogBuffer->resize((size<=0)?0UL:static_cast<std::size_t>(size));
+        }
+            
             break;
         case defs::Flags::TERMINATE_ON_ERROR:
             terminate_on_error = checkActionFlag(cmd, indicator_flag);

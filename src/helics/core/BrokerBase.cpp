@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
+#include "helics/common/LogBuffer.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -235,7 +236,12 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--dumplog",
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
-
+    auto lbs = logging_group->add_option(
+        "--logbuffersize",
+        mlogBufferSize,
+        "specify the size of the circular buffer for storing log messages for later retrieval");
+    logging_group->add_flag("--logbuffer{10}", mlogBufferSize, "specify that the ")
+        ->excludes(lbs);
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group
@@ -372,6 +378,8 @@ void BrokerBase::configureBase()
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->restrictive_time_policy = restrictive_time_policy;
 
+    mLogBuffer = std::make_unique<LogBuffer>(mlogBufferSize);
+
     generateLoggers();
 
     mainLoopIsRunning.store(true);
@@ -430,30 +438,21 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             timeString = fmt::format("[t={}]", currentTime);
         }
     }
-
+    std::string header;
+    if (noID) {
+        header = name;
+    } else {
+        header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
+    }
+    mLogBuffer->push(logLevel, header, message);
     if (loggerFunction) {
-        if (noID) {
-            loggerFunction(logLevel, name, message);
-        } else {
-            loggerFunction(logLevel,
-                           fmt::format("{} ({}){}", name, federateID.baseValue(), timeString),
-                           message);
-        }
+       loggerFunction(logLevel, header, message);
     } else {
         if (consoleLogLevel >= logLevel || alwaysLog) {
             if (logLevel == -10) {  // dumplog
                 consoleLogger->log(spdlog::level::trace, "{}", message);
             } else {
-                if (noID) {
-                    consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
-                } else {
-                    consoleLogger->log(getSpdLogLevel(logLevel),
-                                       "{} ({}){}::{}",
-                                       name,
-                                       federateID.baseValue(),
-                                       timeString,
-                                       message);
-                }
+                consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
             }
 
             if (forceLoggingFlush) {
@@ -464,16 +463,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             if (logLevel == -10) {  // dumplog
                 fileLogger->log(spdlog::level::trace, "{}", message);
             } else {
-                if (noID) {
-                    fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", name, message);
-                } else {
-                    fileLogger->log(getSpdLogLevel(logLevel),
-                                    "{} ({}){}::{}",
-                                    name,
-                                    federateID.baseValue(),
-                                    timeString,
-                                    message);
-                }
+               fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
             }
 
             if (forceLoggingFlush) {

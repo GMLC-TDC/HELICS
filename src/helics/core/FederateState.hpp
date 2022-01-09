@@ -35,6 +35,7 @@ class CoreFederateInfo;
 
 class TimeCoordinator;
 class MessageTimer;
+class LogBuffer;
 
 constexpr Time startupTime = Time::minVal();
 constexpr Time initialTime{-1000000.0};
@@ -66,15 +67,17 @@ class FederateState {
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false};  //!< flag indicating the federate is a source_only
+    /// flag indicating that time mismatches should be ignored
     bool ignore_time_mismatch_warnings{
-        false};  //!< flag indicating that time mismatches should be ignored
+        false};  
+    /// flag indicating that inputs should have strict type checking
     bool strict_input_type_checking{
-        false};  //!< flag indicating that inputs should have strict type checking
+        false};  
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     /// flag indicating that a federate is likely to be slow in responding
     bool slow_responding{false};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
-
+    std::unique_ptr<LogBuffer> mLogBuffer; //!< buffer for recent log messages;
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:

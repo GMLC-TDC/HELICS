@@ -90,13 +90,15 @@ The following queries are defined for federates. Federates may specify a callbac
 +--------------------+------------------------------------------------------------+
 | ``tags``           | a JSON structure with the tags and values [structure]      |
 +--------------------+------------------------------------------------------------+
+| ``logs``           | any log messages stored in the log buffer [structure]      |
++--------------------+------------------------------------------------------------+
 | ``tag/<tagname>``  | the value associated with a tagname [string]               |
 +--------------------+------------------------------------------------------------+
 | ``<tagname>``      | the value associated with a tagname [string]               |
 +--------------------+------------------------------------------------------------+
 ```
 
-The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them. The difference between `tag/<tagname>` and `<tagname>` is that using the `tag/` prefix can retrieve any tag and will return an empty string if the tag doesn't exist. Just using the tag name will not return tags of the same name as other queries and will generate an error response if the tag doesn't exist.
+The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them. The difference between `tag/<tagname>` and `<tagname>` is that using the `tag/` prefix can retrieve any tag and will return an empty string if the tag doesn't exist. Just using the tag name will not return tags of the same name as other queries and will generate an error response if the tag doesn't exist.  The `logs` query will only contain information if log buffer size is set to greater than 0 by property or command.  The logs query also works on cores and brokers that have been disconnected to retrieve buffered logs after the co-simulation has completed.  This of course only works with the local instance.  
 
 ### Local Federate Queries
 
@@ -182,6 +184,8 @@ The following queries will be answered by a core:
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``tags``                 | a JSON structure with the tags and values [structure]                               |
 +--------------------------+-------------------------------------------------------------------------------------+
+| ``logs``                 | any log messages stored in the log buffer [structure]                               |
++--------------------------+-------------------------------------------------------------------------------------+
 | ``tag/<tagname>``        | the value associated with a tagname [string]                                        |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``<tagname>``            | the value associated with a tagname [string]                                        |
@@ -246,6 +250,8 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``counter``              | A single number with a code, changes indicate federation changes [string]                         |
 +--------------------------+---------------------------------------------------------------------------------------------------+
+| ``logs``                 | any log messages stored in the log buffer [structure]                                             |
++--------------------------+---------------------------------------------------------------------------------------------------+
 | ``global_time_debugging``| return detailed time debugging state [structure]                                                  |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``global_flush``         | a query that just flushes the current system and returns the id's [structure]                     |
@@ -309,4 +315,4 @@ As long as timeouts are enabled in the library itself, queries have a timeout sy
 
 ## Example
 
-A full co-simulation example showing how queries can be used for [dynamic configuration can can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query)).
+A full co-simulation example showing how queries can be used for [dynamic configuration can be found here](../examples/advanced_examples/advanced_query.md) (with the source code in the [HELICS Examples repository](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query)).

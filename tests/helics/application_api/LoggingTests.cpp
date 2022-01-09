@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "helics/external/filesystem.hpp"
+#include "helics/common/JsonProcessingFunctions.hpp"
 
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
@@ -569,4 +570,293 @@ TEST(logging, timeMonitorFederate_swap)
     }
     // should be two grants and disconnect since we are looking at header
     EXPECT_EQ(grantCount, 3);
+}
+
+
+TEST(logging, log_buffer_broker)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                "--name=logbroker1 --logbuffer -f2");
+    broker->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            //this is mainly so it doesn't overload the console output
+        });
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker1";
+
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+
+    Fed2->enterExecutingModeAsync();
+    Fed1->enterExecutingMode();
+    Fed2->enterExecutingModeComplete();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    rtime = Fed2->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    Fed1->finalize();
+    auto str = broker->query("broker", "logs");
+    Fed2->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_EQ(js["logs"].size(), 10U);
+    broker->waitForDisconnect();
+
+    str = broker->query("broker", "logs");
+    broker.reset();
+    js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_EQ(js["logs"].size(), 10U);
+}
+
+
+TEST(logging, log_buffer_broker2)
+{
+    auto broker =
+        helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker2 --logbuffersize 7 -f2");
+    broker->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker2";
+
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+
+    Fed2->enterExecutingModeAsync();
+    Fed1->enterExecutingMode();
+    Fed2->enterExecutingModeComplete();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    rtime = Fed2->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    Fed1->finalize();
+    auto str = broker->query("broker", "logs");
+    Fed2->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_EQ(js["logs"].size(), 7U);
+    broker.reset();
+}
+
+
+TEST(logging, log_buffer_broker3)
+{
+    auto broker =
+        helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker3 -f2");
+    broker->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
+    broker->sendCommand("broker", "logbuffer");
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker3";
+
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+
+    Fed2->enterExecutingModeAsync();
+    Fed1->enterExecutingMode();
+    Fed2->enterExecutingModeComplete();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    rtime = Fed2->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    Fed1->finalize();
+    auto str = broker->query("broker", "logs");
+    Fed2->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_EQ(js["logs"].size(), 10U);
+    broker.reset();
+}
+
+TEST(logging, log_buffer_broker4)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
+                                                "--name=logbroker4 -f2");
+    broker->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_TRACE);
+    broker->sendCommand("broker", "logbuffer 7");
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker4";
+
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
+
+    Fed2->enterExecutingModeAsync();
+    Fed1->enterExecutingMode();
+    Fed2->enterExecutingModeComplete();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    rtime = Fed2->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    Fed1->finalize();
+    auto str = broker->query("broker", "logs");
+    Fed2->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_EQ(js["logs"].size(), 7U);
+    broker.reset();
+}
+
+
+TEST(logging, log_buffer_fed)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker5");
+    
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker5";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    Fed1->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+    
+    broker->sendCommand("monitor1", "logbuffer");
+    Fed1->enterExecutingMode();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+
+    
+    auto str = broker->query("monitor1", "logs");
+
+    Fed1->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_GE(js["logs"].size(), 1U);
+    broker.reset();
+}
+
+TEST(logging, log_buffer_fed2)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker6");
+
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker6";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    fi.setProperty(helics::defs::Properties::LOG_BUFFER_SIZE, 3);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    Fed1->setLoggingCallback(
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+
+    Fed1->enterExecutingMode();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+
+    auto str =Fed1->query("logs");
+
+    Fed1->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_GE(js["logs"].size(), 1U);
+    EXPECT_LE(js["logs"].size(), 3U);
+    broker.reset();
+}
+
+
+TEST(logging, log_buffer_core)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker7");
+
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker7";
+    fi.coreName = "logcore1";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    Fed1->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,
+        [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
+            // this is mainly so it doesn't overload the console output
+        });
+
+    broker->sendCommand("logcore1", "logbuffer");
+    Fed1->enterExecutingMode();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+
+    auto str = broker->query("logcore1", "logs");
+
+    Fed1->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_GE(js["logs"].size(), 1U);
+    broker.reset();
+}
+
+
+TEST(logging, log_buffer_core2)
+{
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=logbroker8");
+
+    broker->connect();
+
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.broker = "logbroker8";
+    fi.coreName = "logcore2";
+    fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
+    auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
+    auto cr = Fed1->getCorePointer();
+    cr->setLoggingCallback(helics::gLocalCoreId,
+                                               [](int /*level*/,
+                                                  std::string_view /*unused*/,
+                                                  std::string_view /*message*/) {
+                                                   // this is mainly so it doesn't overload the
+                                                   // console output
+                                               });
+
+    cr->setIntegerProperty(helics::gLocalCoreId,
+                                               helics::defs::Properties::LOG_BUFFER_SIZE,
+                                               3);
+    Fed1->enterExecutingMode();
+
+    auto rtime = Fed1->requestTime(2.0);
+    EXPECT_EQ(rtime, 2.0);
+    
+    auto str = cr->query("core", "logs",HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+
+    Fed1->finalize();
+    auto js = helics::fileops::loadJsonStr(str);
+
+    EXPECT_GE(js["logs"].size(), 1U);
+    EXPECT_LE(js["logs"].size(), 3U);
+    broker.reset();
+    cr->waitForDisconnect();
+    //test to make sure this works after disconnect
+    auto str2 = cr->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+    auto js2 = helics::fileops::loadJsonStr(str);
+
+    EXPECT_GE(js2["logs"].size(), 1U);
+    EXPECT_LE(js2["logs"].size(), 3U);
+    cr.reset();
 }

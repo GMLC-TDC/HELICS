@@ -360,6 +360,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer(const std::string& request, bool force_ordering);
+    /** run queries that are not dependent on the main loop to be running*/
+    std::string quickBrokerQueries(const std::string& request) const;
     /** process a command instruction message*/
     void processCommandInstruction(ActionMessage& m);
     /** process a command instruction targeted at this broker*/

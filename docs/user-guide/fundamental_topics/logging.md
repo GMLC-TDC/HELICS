@@ -171,6 +171,11 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 - identifier a string with the name of the object generating the message (may be empty)
 - message the actual message to log
 
+## Log Buffer
+
+As of Version 3.2
+HELICS cores brokers and federates have the capability to buffer logs messages.  This can be activated via `--logbuffer` flag, or `--logbuffersize=X` option.  The default size is 10 messages for the `--logbuffer` flag.  For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER_SIZE` property that can be set.  And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely.  `<X>` is the desired size of the buffer.  `logbuffer stop` will deactivate the buffer in a remote command.  The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query.  The buffer is available even after disconnect for cores and brokers from the local object.  
+
 ## Additional Broker Features
 
 ### Time monitor

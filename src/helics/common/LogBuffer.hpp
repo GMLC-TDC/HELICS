@@ -9,22 +9,36 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <deque>
 #include <utility>
 #include <string>
+#include <string_view>
+#include <functional>
+#include "gmlc/libguarded/shared_guarded.hpp"
 
-namespace helics
-{
-/** defining a small buffer for log messages*/
+namespace Json {
+class Value;
+}
+
+namespace helics {
+/** defining a threadsafe small buffer for log messages the buffer will store a maximum of mMaxSize
+ * messages*/
 class LogBuffer {
   private:
-    std::deque<std::tuple<int, std::string, std::string>> mBuffer;
-    std::size_t mMaxSize{0};
+    gmlc::libguarded::shared_guarded<std::deque<std::tuple<int, std::string, std::string>>> mBuffer;
+    std::atomic<std::size_t> mMaxSize{0};
+
   public:
+    LogBuffer() = default;
+    explicit LogBuffer(std::size_t maxSize): mMaxSize(maxSize) {}
     void resize(std::size_t newSize);
     std::size_t capacity() const { return mMaxSize; }
-    std::size_t size() const { return mBuffer.size(); }
+    std::size_t size() const { return mBuffer.lock()->size(); }
 
-    void push(int logLevel, std::string header, std::string message);
+    void push(int logLevel, std::string_view header, std::string_view message);
 
-    auto begin() const { return mBuffer.begin(); }
-    auto end() const { return mBuffer.end(); }
+    void
+        process(const std::function<void(int, std::string_view, std::string_view)>& procFunc) const;
 };
-}
+
+/** helper function to write a log buffer to a json object*/
+void bufferToJson(const LogBuffer& buffer, Json::Value& base);
+
+}  // namespace helics
