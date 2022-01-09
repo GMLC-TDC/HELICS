@@ -104,10 +104,10 @@ class BrokerBase {
   protected:
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
-    std::unique_ptr<LogBuffer> mLogBuffer; //!< object for buffering a set of log messages
-    std::size_t mlogBufferSize; //!< logBufferSize
+    std::unique_ptr<LogBuffer> mLogBuffer;  //!< object for buffering a set of log messages
+    std::size_t mlogBufferSize;  //!< logBufferSize
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
-    
+
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
         created = -6,  //!< the broker has been created

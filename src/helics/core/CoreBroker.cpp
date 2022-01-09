@@ -15,13 +15,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
 #include "gmlc/utilities/stringConversion.h"
-#include "gmlc/utilities/string_viewOps.h"
 #include "gmlc/utilities/string_viewConversion.h"
+#include "gmlc/utilities/string_viewOps.h"
+#include "helics/common/LogBuffer.hpp"
 #include "helicsCLI11.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
-#include "helics/common/LogBuffer.hpp"
 
 #include <iostream>
 #include <limits>
@@ -2867,7 +2867,8 @@ std::string CoreBroker::query(const std::string& target,
                               HelicsSequencingModes mode)
 {
     if (getBrokerState() >= BrokerState::terminating) {
-        if (target == "broker" || target == getIdentifier() || target.empty() || (target == "root" && _isRoot)||(target=="federation" && _isRoot)) {
+        if (target == "broker" || target == getIdentifier() || target.empty() ||
+            (target == "root" && _isRoot) || (target == "federation" && _isRoot)) {
             auto res = quickBrokerQueries(queryStr);
             if (!res.empty()) {
                 return res;
@@ -3030,8 +3031,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
     auto res = quickBrokerQueries(request);
-    if (!res.empty())
-    {
+    if (!res.empty()) {
         return res;
     }
     if (request == "counts") {
@@ -3733,12 +3733,13 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
     auto cmd = m.payload.to_string();
     auto commentLoc = cmd.find('#');
-    if (commentLoc!=std::string_view::npos) {
+    if (commentLoc != std::string_view::npos) {
         cmd = cmd.substr(0, commentLoc - 1);
     }
     gmlc::utilities::string_viewOps::trimString(cmd);
-    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(cmd,
-                                                                " ",
+    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
+        cmd,
+        " ",
         gmlc::utilities::string_viewOps::default_quote_chars,
         gmlc::utilities::string_viewOps::delimiter_compression::on);
     if (res.empty()) {
@@ -3762,12 +3763,12 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
     } else if (res[0] == "log") {
         LOG_SUMMARY(global_broker_id_local, m.getString(sourceStringLoc), cmd.substr(4));
     } else if (res[0] == "logbuffer") {
-        if (res.size()>1) {
+        if (res.size() > 1) {
             mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], 10));
         } else {
             mLogBuffer->resize(10);
         }
-    } else if (res[0]=="monitor") {
+    } else if (res[0] == "monitor") {
         switch (res.size()) {
             case 1:
                 break;
@@ -3785,7 +3786,9 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
             case 4:
             default:
                 mTimeMonitorPeriod =
-                    loadTimeFromString(std::string(gmlc::utilities::string_viewOps::merge(res[2], res[3])), time_units::sec);
+                    loadTimeFromString(std::string(
+                                           gmlc::utilities::string_viewOps::merge(res[2], res[3])),
+                                       time_units::sec);
                 loadTimeMonitor(false, res[1]);
                 break;
         }

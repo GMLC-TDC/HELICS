@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/LogBuffer.hpp"
-#include "gmlc/utilities/string_viewConversion.h"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -18,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeCoordinator.hpp"
 #include "TimeCoordinatorProcessing.hpp"
 #include "TimeDependencies.hpp"
+#include "gmlc/utilities/string_viewConversion.h"
 #include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
@@ -1887,8 +1887,8 @@ void FederateState::logMessage(int level,
                     static_cast<double>(grantedTime())) :
         fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
 
-    if (loggerFunction ) {
-        loggerFunction(level,header,message);
+    if (loggerFunction) {
+        loggerFunction(level, header, message);
     }
     mLogBuffer->push(level, header, message);
 }
@@ -1976,7 +1976,7 @@ void FederateState::sendCommand(ActionMessage& command)
         } else {
             mLogBuffer->resize(10);
         }
-    } else if (res[0] == "timeout_monitor"){
+    } else if (res[0] == "timeout_monitor") {
         setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);
     } else if (res[0] == "log") {
         logMessage(HELICS_LOG_LEVEL_SUMMARY,

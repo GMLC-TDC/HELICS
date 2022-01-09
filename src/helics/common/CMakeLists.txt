@@ -21,8 +21,13 @@ set(common_headers
     LogBuffer.hpp
 )
 
-set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
-                   configFileHelpers.cpp addTargets.cpp LogBuffer.cpp
+set(common_sources
+    JsonProcessingFunctions.cpp
+    JsonBuilder.cpp
+    TomlProcessingFunctions.cpp
+    configFileHelpers.cpp
+    addTargets.cpp
+    LogBuffer.cpp
 )
 
 # headers that are part of the public interface

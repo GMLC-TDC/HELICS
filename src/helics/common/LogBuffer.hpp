@@ -6,12 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
+#include "gmlc/libguarded/shared_guarded.hpp"
+
 #include <deque>
-#include <utility>
+#include <functional>
 #include <string>
 #include <string_view>
-#include <functional>
-#include "gmlc/libguarded/shared_guarded.hpp"
+#include <utility>
 
 namespace Json {
 class Value;

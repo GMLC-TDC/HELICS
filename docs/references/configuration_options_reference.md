@@ -462,7 +462,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER_SIZE` [276]
 
-When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user_guide/advanced_topics/queries.md). Also see discussion in [Logging](../user_guide/fundamental_topics/logging.md#log_buffer).  
+When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user_guide/advanced_topics/queries.md). Also see discussion in [Logging](../user_guide/fundamental_topics/logging.md#log_buffer).
 
 ## Timing Options
 

@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
-#include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helics/common/LogBuffer.hpp"
+#include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
 #include "spdlog/sinks/basic_file_sink.h"
@@ -240,8 +240,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--logbuffersize",
         mlogBufferSize,
         "specify the size of the circular buffer for storing log messages for later retrieval");
-    logging_group->add_flag("--logbuffer{10}", mlogBufferSize, "specify that the ")
-        ->excludes(lbs);
+    logging_group->add_flag("--logbuffer{10}", mlogBufferSize, "specify that the ")->excludes(lbs);
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group
@@ -446,7 +445,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
     }
     mLogBuffer->push(logLevel, header, message);
     if (loggerFunction) {
-       loggerFunction(logLevel, header, message);
+        loggerFunction(logLevel, header, message);
     } else {
         if (consoleLogLevel >= logLevel || alwaysLog) {
             if (logLevel == -10) {  // dumplog
@@ -463,7 +462,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             if (logLevel == -10) {  // dumplog
                 fileLogger->log(spdlog::level::trace, "{}", message);
             } else {
-               fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
+                fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
             }
 
             if (forceLoggingFlush) {

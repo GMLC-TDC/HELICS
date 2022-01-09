@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
 #include "../common/LogBuffer.hpp"
+#include "../common/fmt_format.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -2348,7 +2348,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
                "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\","
-            "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
+               "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2501,8 +2501,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         command.setString(targetStringLoc, command.getString(sourceStringLoc));
         command.setString(sourceStringLoc, getIdentifier());
         addActionMessage(command);
-    } else if (res[0] == "log")
-        {
+    } else if (res[0] == "log") {
         LOG_SUMMARY(global_broker_id_local,
                     command.getString(sourceStringLoc),
                     command.payload.to_string().substr(4));
@@ -2510,8 +2509,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
         if (res.size() > 1) {
             if (res[1] == "stop") {
                 mLogBuffer->resize(0);
-            }
-            else {
+            } else {
                 mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], 10));
             }
         } else {
@@ -2714,8 +2712,7 @@ std::string CommonCore::query(const std::string& target,
             if (!res.empty()) {
                 return res;
             }
-            if (queryStr == "logs")
-            {
+            if (queryStr == "logs") {
                 Json::Value base;
                 loadBasicJsonInfo(base, nullptr);
                 bufferToJson(*mLogBuffer, base);
@@ -4346,10 +4343,10 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             break;
         case defs::Properties::LOG_BUFFER_SIZE: {
             auto size = cmd.getExtraData();
-            mLogBuffer->resize((size<=0)?0UL:static_cast<std::size_t>(size));
+            mLogBuffer->resize((size <= 0) ? 0UL : static_cast<std::size_t>(size));
         }
-            
-            break;
+
+        break;
         case defs::Flags::TERMINATE_ON_ERROR:
             terminate_on_error = checkActionFlag(cmd, indicator_flag);
             break;
