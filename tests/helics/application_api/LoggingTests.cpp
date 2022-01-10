@@ -568,8 +568,8 @@ TEST(logging, timeMonitorFederate_swap)
             continue;
         }
     }
-    // should be two grants and disconnect since we are looking at header but just need to make sure there is at least 1
-    // since test timing can vary here
+    // should be two grants and disconnect since we are looking at header but just need to make sure
+    // there is at least 1 since test timing can vary here
     EXPECT_GE(grantCount, 1);
 }
 
