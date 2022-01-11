@@ -18,7 +18,7 @@ using elsewhere is probably not going to work.
 
 /** enumeration of defined print levels*/
 enum LogLevels : int {
-    DUMPLOG = HELICS_LOG_LEVEL_DUMPLOG, //!< only for dumplog
+    DUMPLOG = HELICS_LOG_LEVEL_DUMPLOG,  //!< only for dumplog
     NO_PRINT = HELICS_LOG_LEVEL_NO_PRINT,  //!< never print
     ERROR_LEVEL = HELICS_LOG_LEVEL_ERROR,  //!< only print errors
     PROFILING = HELICS_LOG_LEVEL_PROFILING,  //!< profiling log level

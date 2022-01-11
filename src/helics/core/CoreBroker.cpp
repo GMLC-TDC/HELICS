@@ -3764,7 +3764,9 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
         LOG_SUMMARY(global_broker_id_local, m.getString(sourceStringLoc), cmd.substr(4));
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
-            mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], LogBuffer::cDefaultBufferSize));
+            mLogBuffer->resize(
+                gmlc::utilities::numeric_conversion<std::size_t>(res[1],
+                                                                 LogBuffer::cDefaultBufferSize));
         } else {
             mLogBuffer->enable(true);
         }

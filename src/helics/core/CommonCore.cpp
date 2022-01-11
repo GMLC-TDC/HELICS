@@ -1013,7 +1013,7 @@ bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
             break;
     }
     if (federateID == gLocalCoreId) {
-        if (flag==defs::Properties::LOG_BUFFER) {
+        if (flag == defs::Properties::LOG_BUFFER) {
             return (mLogBuffer->capacity() > 0);
         }
         return false;

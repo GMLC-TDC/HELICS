@@ -1598,7 +1598,7 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lead = rt_lag;
             break;
         case defs::Properties::LOG_BUFFER:
-            mLogBuffer->resize((propertyVal <= 0)?0UL:static_cast<std::size_t>(propertyVal));
+            mLogBuffer->resize((propertyVal <= 0) ? 0UL : static_cast<std::size_t>(propertyVal));
             break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);

@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/BrokerFactory.hpp"
 //#include "helics/core/CoreFactory.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
+#include "helics/common/LogBuffer.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "helics/external/filesystem.hpp"
-#include "helics/common/LogBuffer.hpp"
 
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
@@ -838,7 +838,7 @@ TEST(logging, log_buffer_core2)
 
     auto rtime = Fed1->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
-    auto sz=cr->getIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER);
+    auto sz = cr->getIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER);
     EXPECT_EQ(sz, 3);
     auto str = cr->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
 

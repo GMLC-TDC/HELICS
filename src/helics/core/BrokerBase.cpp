@@ -238,7 +238,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "capture a record of all messages and dump a complete log to file or console on termination");
     logging_group
         ->add_flag(
-            fmt::format("--logbuffer{{{}}}",LogBuffer::cDefaultBufferSize),
+            fmt::format("--logbuffer{{{}}}", LogBuffer::cDefaultBufferSize),
             mlogBufferSize,
             "optionally specify the size of the circular buffer for storing log messages for later retrieval ")
         ->expected(0, 1)
