@@ -1133,7 +1133,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             if (cmd.getStringData().empty()) {
                 logMessage(cmd.messageID, gEmptyStr, cmd.payload.to_string());
             } else {
-                logMessage(cmd.messageID, cmd.getStringData()[0], cmd.payload.to_string());
+                logMessage(cmd.messageID, cmd.getString(0), cmd.payload.to_string());
             }
         }
 

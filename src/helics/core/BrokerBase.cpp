@@ -414,7 +414,7 @@ static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
-                              std::string_view message) const
+                              std::string_view message, bool disableRemote) const
 {
     bool alwaysLog{false};
     if (logLevel > LogLevels::FED - 100) {
@@ -445,6 +445,12 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
     mLogBuffer->push(logLevel, header, message);
+    if (remoteLogLevel >= logLevel && !disableRemote) {
+        ActionMessage remMess(CMD_REMOTE_LOG, global_id.load(), remoteLogTarget);
+        remMess.setString(0, header);
+        remMess.payload = message;
+        addActionMessage(std::move(remMess));
+    }
     if (loggerFunction) {
         loggerFunction(logLevel, header, message);
     } else {
@@ -575,17 +581,11 @@ void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
 {
     consoleLogLevel = consoleLevel;
     fileLogLevel = fileLevel;
-    maxLogLevel = (std::max)(consoleLogLevel, fileLogLevel);
+    maxLogLevel = (std::max)(consoleLogLevel, (std::max)(fileLogLevel,remoteLogLevel));
 }
 
 void BrokerBase::addActionMessage(const ActionMessage& m)
 {
-    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
-    // {
-    ///   if (m.action() == CMD_TIME_REQUEST && m.actionTime>timeZero) {
-    //       printf("adding action message\n");
-    //  }
-    //}
     if (isPriorityCommand(m)) {
         actionQueue.pushPriority(m);
     } else {
@@ -596,12 +596,6 @@ void BrokerBase::addActionMessage(const ActionMessage& m)
 
 void BrokerBase::addActionMessage(ActionMessage&& m)
 {
-    // if (m.dest_id == global_federate_id(131074) && m.source_id == global_federate_id(1879048194))
-    // {
-    //    if (m.action() == CMD_TIME_REQUEST && m.actionTime > timeZero) {
-    //        printf("adding action message 2\n");
-    //    }
-    //}
     if (isPriorityCommand(m)) {
         actionQueue.emplacePriority(std::move(m));
     } else {
@@ -609,6 +603,19 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
         actionQueue.emplace(std::move(m));
     }
 }
+
+void BrokerBase::addActionMessage(ActionMessage&& m) const
+{
+    // the queue is thread safe so can be run in a const situation without possibility of issues
+    auto& lQueue = const_cast<decltype(actionQueue) &>(actionQueue); 
+    if (isPriorityCommand(m)) {
+        lQueue.emplacePriority(std::move(m));
+    } else {
+        // just route to the general queue;
+        lQueue.emplace(std::move(m));
+    }
+}
+
 #ifndef HELICS_DISABLE_ASIO
 using activeProtector = gmlc::libguarded::guarded<std::pair<bool, bool>>;
 

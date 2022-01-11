@@ -1342,7 +1342,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
 
         case CMD_LOG:
             if (isRootc) {
-                sendToLogger(command.source_id, command.counter, std::string(), command.name());
+                    sendToLogger(command.source_id,
+                                 command.messageID,
+                                 command.getString(0),
+                                 command.name());
+                
             } else {
                 transmit(parent_route_id, command);
             }
@@ -3873,6 +3877,7 @@ void CoreBroker::checkDependencies()
                 logWarning.messageID = WARNING;
                 logWarning.payload =
                     "unable to locate " + newdep.first + " to establish dependency";
+                logWarning.setString(0, getIdentifier());
                 routeMessage(logWarning);
             }
         }

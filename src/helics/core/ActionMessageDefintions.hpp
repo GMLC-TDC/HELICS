@@ -97,6 +97,7 @@ across different compilers*/
         cmd_pub = 52,  //!< publish a value
         cmd_bye = 2000,  //!< message stating this is the last communication from a federate
         cmd_log = 55,  //!< log a message with the root broker
+        cmd_remote_log = 2055,  //!< send a log message to a remote host
         cmd_warning = 9990,  //!< indicate some sort of warning
         cmd_error = 10000,  //!< indicate an error with a federate
         cmd_local_error = 10003,  //!< indicate a local error within a federate/core/broker
@@ -269,6 +270,7 @@ across different compilers*/
 
 #define CMD_PUB action_message_def::action_t::cmd_pub
 #define CMD_LOG action_message_def::action_t::cmd_log
+#define CMD_REMOTE_LOG action_message_def::action_t::cmd_remote_log
 #define CMD_WARNING action_message_def::action_t::cmd_warning
 #define CMD_ERROR action_message_def::action_t::cmd_error
 #define CMD_GLOBAL_ERROR action_message_def::action_t::cmd_global_error

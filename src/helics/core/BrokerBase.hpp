@@ -44,6 +44,8 @@ class BrokerBase {
     std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
     int32_t consoleLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for console display
     int32_t fileLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for logging to a file
+    int32_t remoteLogLevel{HELICS_LOG_LEVEL_NO_PRINT}; //!< the logging level for a remote logging message
+    GlobalFederateId remoteLogTarget{}; //!< target for remote logging messages
     /** the minimum number of federates that must connect before entering init mode */
     int32_t minFederateCount{1};
     /** the minimum number of brokers that must connect before entering init mode */
@@ -217,6 +219,9 @@ class BrokerBase {
     /** handle some configuration options for the base*/
     void baseConfigure(ActionMessage& command);
 
+    /** move a action Message into the commandQueue allow const in this case to allow messages
+    to be sent internally in a few specific instances*/
+    void addActionMessage(ActionMessage&& m) const;
   protected:
     /** check whether a code contains a specific reason*/
     static bool isReasonForTick(std::uint32_t code, TickForwardingReasons reason)
@@ -246,10 +251,11 @@ class BrokerBase {
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger(GlobalFederateId federateID,
+    bool sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
-                              std::string_view message) const;
+                              std::string_view message,
+                              bool disableRemote=false) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
     /** write profiler data to file*/

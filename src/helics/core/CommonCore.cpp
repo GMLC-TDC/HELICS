@@ -3319,8 +3319,18 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 sendToLogger(parent_broker_id,
                              command.messageID,
-                             getFederateNameNoThrow(command.source_id),
+                             command.getString(0),
                              command.payload.to_string());
+            } else {
+                routeMessage(command);
+            }
+            break;
+        case CMD_REMOTE_LOG:
+            if (command.dest_id == global_broker_id_local) {
+                sendToLogger(parent_broker_id,
+                             command.messageID,
+                             command.getString(0),
+                             command.payload.to_string(),true);
             } else {
                 routeMessage(command);
             }
@@ -3329,7 +3339,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 sendToLogger(command.source_id,
                              LogLevels::WARNING,
-                             getFederateNameNoThrow(command.source_id),
+                             command.getString(0),
                              command.payload.to_string());
             } else {
                 routeMessage(command);
