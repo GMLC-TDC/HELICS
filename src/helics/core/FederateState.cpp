@@ -1597,8 +1597,8 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             rt_lead = rt_lag;
             break;
-        case defs::Properties::LOG_BUFFER_SIZE:
-            mLogBuffer->resize(propertyVal);
+        case defs::Properties::LOG_BUFFER:
+            mLogBuffer->resize((propertyVal <= 0)?0UL:static_cast<std::size_t>(propertyVal));
             break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);
@@ -1694,6 +1694,9 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
                 interfaceFlags &= ~(make_flags(optional_flag));
             }
             break;
+        case defs::Properties::LOG_BUFFER:
+            mLogBuffer->enable(value);
+            break;
         default:
             timeCoord->setOptionFlag(optionFlag, value);
             break;
@@ -1747,6 +1750,8 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return ignore_unit_mismatch;
         case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:
             return ignore_time_mismatch_warnings;
+        case defs::Properties::LOG_BUFFER:
+            return (mLogBuffer->capacity() > 0);
         default:
             return timeCoord->getOptionFlag(optionFlag);
     }
@@ -1775,6 +1780,8 @@ int FederateState::getIntegerProperty(int intProperty) const
         case defs::Properties::FILE_LOG_LEVEL:
         case defs::Properties::CONSOLE_LOG_LEVEL:
             return logLevel;
+        case defs::Properties::LOG_BUFFER:
+            return static_cast<int>(mLogBuffer->capacity());
         default:
             return timeCoord->getIntegerProperty(intProperty);
     }
@@ -1968,12 +1975,13 @@ void FederateState::sendCommand(ActionMessage& command)
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
             if (res[1] == "stop") {
-                mLogBuffer->resize(0);
+                mLogBuffer->enable(false);
             } else {
-                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(res[1], 10));
+                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(
+                    res[1], LogBuffer::cDefaultBufferSize));
             }
         } else {
-            mLogBuffer->resize(10);
+            mLogBuffer->enable(true);
         }
     } else if (res[0] == "timeout_monitor") {
         setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);

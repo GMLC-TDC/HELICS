@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 #include "helics/external/filesystem.hpp"
+#include "helics/common/LogBuffer.hpp"
 
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
@@ -320,8 +321,7 @@ TEST(logging, dumplog)
     EXPECT_GE(llock->size(), 2U);
     EXPECT_LE(llock->size(), 3U);
     // this is to check that it has the correct level
-    EXPECT_EQ(llock->back().first, -10);  // the -10 should have a level enum value at some point in
-                                          // the future as part of the debugging improvements
+    EXPECT_EQ(llock->back().first, HELICS_LOG_LEVEL_DUMPLOG);
 }
 
 TEST(logging, timeMonitorFederate1)
@@ -616,7 +616,7 @@ TEST(logging, log_buffer_broker)
 TEST(logging, log_buffer_broker2)
 {
     auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
-                                                "--name=logbroker2 --logbuffersize 7 -f2");
+                                                "--name=logbroker2 --logbuffer 7 -f2");
     broker->setLoggingCallback(
         [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
             // this is mainly so it doesn't overload the console output
@@ -738,6 +738,9 @@ TEST(logging, log_buffer_fed)
 
     auto str = broker->query("monitor1", "logs");
 
+    auto prop = Fed1->getIntegerProperty(helics::defs::LOG_BUFFER);
+    EXPECT_EQ(prop, static_cast<int>(helics::LogBuffer::cDefaultBufferSize));
+    EXPECT_TRUE(Fed1->getFlagOption(helics::defs::LOG_BUFFER));
     Fed1->finalize();
     auto js = helics::fileops::loadJsonStr(str);
 
@@ -754,7 +757,7 @@ TEST(logging, log_buffer_fed2)
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "logbroker6";
     fi.setProperty(helics::defs::Properties::LOG_LEVEL, HELICS_LOG_LEVEL_DEBUG);
-    fi.setProperty(helics::defs::Properties::LOG_BUFFER_SIZE, 3);
+    fi.setProperty(helics::defs::Properties::LOG_BUFFER, 3);
     auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
     Fed1->setLoggingCallback(
         [](int /*level*/, std::string_view /*unused*/, std::string_view /*message*/) {
@@ -830,12 +833,13 @@ TEST(logging, log_buffer_core2)
                                // console output
                            });
 
-    cr->setIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER_SIZE, 3);
+    cr->setIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER, 3);
     Fed1->enterExecutingMode();
 
     auto rtime = Fed1->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
-
+    auto sz=cr->getIntegerProperty(helics::gLocalCoreId, helics::defs::Properties::LOG_BUFFER);
+    EXPECT_EQ(sz, 3);
     auto str = cr->query("core", "logs", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
 
     Fed1->finalize();

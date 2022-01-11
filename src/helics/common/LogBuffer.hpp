@@ -27,9 +27,11 @@ class LogBuffer {
     std::atomic<std::size_t> mMaxSize{0};
 
   public:
+    static constexpr std::size_t cDefaultBufferSize{10UL};
     LogBuffer() = default;
     explicit LogBuffer(std::size_t maxSize): mMaxSize(maxSize) {}
     void resize(std::size_t newSize);
+    void enable(bool enable = true);
     std::size_t capacity() const { return mMaxSize; }
     std::size_t size() const { return mBuffer.lock()->size(); }
 

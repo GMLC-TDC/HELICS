@@ -236,11 +236,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--dumplog",
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
-    auto* lbs = logging_group->add_option(
-        "--logbuffersize",
-        mlogBufferSize,
-        "specify the size of the circular buffer for storing log messages for later retrieval");
-    logging_group->add_flag("--logbuffer{10}", mlogBufferSize, "specify that the ")->excludes(lbs);
+    logging_group
+        ->add_flag(
+            fmt::format("--logbuffer{{{}}}",LogBuffer::cDefaultBufferSize),
+            mlogBufferSize,
+            "optionally specify the size of the circular buffer for storing log messages for later retrieval ")
+        ->expected(0, 1)
+        ->multi_option_policy(CLI::MultiOptionPolicy::TakeLast);
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group
@@ -388,8 +390,7 @@ void BrokerBase::configureBase()
 
 static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
 {
-    if (helicsLogLevel >= LogLevels::TRACE || helicsLogLevel == -10) {
-        // dumplog == -10
+    if (helicsLogLevel >= LogLevels::TRACE || helicsLogLevel == LogLevels::DUMPLOG) {
         return spdlog::level::trace;
     }
     if (helicsLogLevel >= LogLevels::TIMING) {
@@ -448,7 +449,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         loggerFunction(logLevel, header, message);
     } else {
         if (consoleLogLevel >= logLevel || alwaysLog) {
-            if (logLevel == -10) {  // dumplog
+            if (logLevel == HELICS_LOG_LEVEL_DUMPLOG) {  // dumplog
                 consoleLogger->log(spdlog::level::trace, "{}", message);
             } else {
                 consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
@@ -459,7 +460,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             }
         }
         if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-            if (logLevel == -10) {  // dumplog
+            if (logLevel == HELICS_LOG_LEVEL_DUMPLOG) {  // dumplog
                 fileLogger->log(spdlog::level::trace, "{}", message);
             } else {
                 fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
@@ -719,7 +720,7 @@ void BrokerBase::queueProcessingLoop()
         if (!dumpMessages.empty()) {
             for (auto& act : dumpMessages) {
                 sendToLogger(parent_broker_id,
-                             -10,
+                             HELICS_LOG_LEVEL_DUMPLOG,
                              identifier,
                              fmt::format("|| dl cmd:{} from {} to {}",
                                          prettyPrintString(act),

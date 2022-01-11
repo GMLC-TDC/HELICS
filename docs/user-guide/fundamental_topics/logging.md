@@ -93,11 +93,11 @@ logger.warning("Only prints to log file if log_level = 1 or warning")
 
 Most of the time the log for a federate is the same as for its core. This is managed through a few properties in the [`HelicsFederateInfo` class](https://python.helics.org/api/capi-py#HelicsFederateInfo) which can also be directly specified through the property functions.
 
-- `helics_property_int_log_level` - General logging level applicable to both file and console logs
+- `HELICS_PROPERTY_INT_LOG_LEVEL` - General logging level applicable to both file and console logs
 
-- `helics_property_int_file_log_level` Level to log to the file
+- `HELICS_PROPERTY_INT_FILE_LOG_LEVEL` Level to log to the file
 
-- `helics_property_int_console_log_level` Level to log to the console
+- `HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL` Level to log to the console
 
 These properties can be set using the JSON configuration for each federate:
 
@@ -112,7 +112,7 @@ These properties can be set using the JSON configuration for each federate:
 Or with the API interface functions for each federate:
 
 ```python
-h.helicsFederateInfoSetIntegerProperty(fed, h.helics_property_int_log_level, 1)
+h.helicsFederateInfoSetIntegerProperty(fed, h.HELICS_PROPERTY_INT_LOG_LEVEL, 1)
 ```
 
 ## Setting up the Core/Broker for Logging
@@ -168,13 +168,13 @@ h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 The callback take 3 parameters about a message and in the case of `C` callbacks a pointer to user data.
 
 - loglevel an integer code describing the level of the message as described above.
-- identifier a string with the name of the object generating the message (may be empty)
+- header a string with the name of the object generating the message and possibly some state and time information (may be empty)
 - message the actual message to log
 
 ## Log Buffer
 
-As of Version 3.2
-HELICS cores, brokers, and federates have the capability to buffer log messages. This can be activated via the `--logbuffer` flag, or `--logbuffersize=X` option. The default size is 10 messages for the `--logbuffer` flag. For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER_SIZE` property that can be set. And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely. `<X>` is the desired size of the buffer. `logbuffer stop` will deactivate the buffer in a remote command. The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query. The buffer is available even after disconnect for cores and brokers from the local object.
+As of Version 3.2,
+HELICS cores, brokers, and federates have the capability to buffer log messages. This can be activated via the `--logbuffer` flag, or `--logbuffer=X` option. The default size is 10 messages for the `--logbuffer` flag. For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER_SIZE` property that can be set. And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely. `<X>` is the desired size of the buffer. `logbuffer stop` will deactivate the buffer in a remote command. The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query. The buffer is available even after disconnect for cores and brokers from the local object.
 
 ## Additional Broker Features
 

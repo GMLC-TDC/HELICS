@@ -111,9 +111,9 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"logbuffersize", HELICS_PROPERTY_INT_LOG_BUFFER_SIZE},
-    {"logBufferSize", HELICS_PROPERTY_INT_LOG_BUFFER_SIZE},
-    {"log_buffer_size", HELICS_PROPERTY_INT_LOG_BUFFER_SIZE}};
+    {"logbuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
+    {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
+    {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
 static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},

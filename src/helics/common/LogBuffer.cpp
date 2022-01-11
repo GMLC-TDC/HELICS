@@ -22,6 +22,17 @@ void LogBuffer::resize(std::size_t newSize)
     mMaxSize = newSize;
 }
 
+void LogBuffer::enable(bool enabled)
+{
+    if (enabled) {
+        if (mMaxSize == 0) {
+            resize(cDefaultBufferSize);
+        }
+    } else {
+        resize(0);
+    }
+}
+
 void LogBuffer::push(int logLevel, std::string_view header, std::string_view message)
 {
     if (mMaxSize.load() == 0) {
