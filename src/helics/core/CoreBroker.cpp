@@ -15,7 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
 #include "gmlc/utilities/stringConversion.h"
+#include "gmlc/utilities/string_viewConversion.h"
 #include "gmlc/utilities/string_viewOps.h"
+#include "helics/common/LogBuffer.hpp"
 #include "helicsCLI11.hpp"
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
@@ -2864,8 +2866,36 @@ std::string CoreBroker::query(const std::string& target,
                               const std::string& queryStr,
                               HelicsSequencingModes mode)
 {
+    if (getBrokerState() >= BrokerState::terminating) {
+        if (target == "broker" || target == getIdentifier() || target.empty() ||
+            (target == "root" && _isRoot) || (target == "federation" && _isRoot)) {
+            auto res = quickBrokerQueries(queryStr);
+            if (!res.empty()) {
+                return res;
+            }
+            if (queryStr == "logs") {
+                Json::Value base;
+                base["name"] = getIdentifier();
+                if (uuid_like) {
+                    base["uuid"] = getIdentifier();
+                }
+                base["id"] = global_broker_id_local.baseValue();
+                bufferToJson(*mLogBuffer, base);
+                return fileops::generateJsonString(base);
+            }
+        }
+        return generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Broker has terminated");
+    }
     auto gid = global_id.load();
     if (target == "broker" || target == getIdentifier() || target.empty()) {
+        auto res = quickBrokerQueries(queryStr);
+        if (!res.empty()) {
+            return res;
+        }
+        if (queryStr == "address") {
+            res = generateJsonQuotedString(getAddress());
+            return res;
+        }
         ActionMessage querycmd(mode == HELICS_SEQUENCING_MODE_FAST ? CMD_BROKER_QUERY :
                                                                      CMD_BROKER_QUERY_ORDERED);
         querycmd.source_id = querycmd.dest_id = gid;
@@ -2921,8 +2951,6 @@ std::string CoreBroker::query(const std::string& target,
     auto ret = queryResult.get();
     activeQueries.finishedWithValue(index);
     return ret;
-
-    //  return "#invalid";
 }
 
 void CoreBroker::setGlobal(const std::string& valueName, const std::string& value)
@@ -2958,7 +2986,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_status", {GLOBAL_STATUS, true}},
     {"global_flush", {GLOBAL_FLUSH, true}}};
 
-std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
+std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 {
     if (request == "isinit") {
         return (getBrokerState() >= BrokerState::operating) ? std::string("true") :
@@ -2997,6 +3025,15 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         base["status"] = isConnected();
         return fileops::generateJsonString(base);
     }
+    return {};
+}
+
+std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
+{
+    auto res = quickBrokerQueries(request);
+    if (!res.empty()) {
+        return res;
+    }
     if (request == "counts") {
         Json::Value base;
         base["name"] = getIdentifier();
@@ -3015,6 +3052,16 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "summary") {
         return generateFederationSummary();
+    }
+    if (request == "logs") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
+        base["id"] = global_broker_id_local.baseValue();
+        bufferToJson(*mLogBuffer, base);
+        return fileops::generateJsonString(base);
     }
     if (request == "federates") {
         return generateStringVector(mFederates, [](auto& fed) { return fed.name; });
@@ -3685,13 +3732,26 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
 void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
     auto cmd = m.payload.to_string();
-    if (cmd == "terminate") {
+    auto commentLoc = cmd.find('#');
+    if (commentLoc != std::string_view::npos) {
+        cmd = cmd.substr(0, commentLoc - 1);
+    }
+    gmlc::utilities::string_viewOps::trimString(cmd);
+    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
+        cmd,
+        " ",
+        gmlc::utilities::string_viewOps::default_quote_chars,
+        gmlc::utilities::string_viewOps::delimiter_compression::on);
+    if (res.empty()) {
+        return;
+    }
+    if (res[0] == "terminate") {
         LOG_SUMMARY(global_broker_id_local,
                     getIdentifier(),
                     " received terminate instruction via command instruction")
         ActionMessage udisconnect(CMD_USER_DISCONNECT);
         addActionMessage(udisconnect);
-    } else if (cmd == "echo") {
+    } else if (res[0] == "echo") {
         LOG_SUMMARY(global_broker_id_local,
                     getIdentifier(),
                     " received echo command via command instruction")
@@ -3700,14 +3760,17 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
         m.setString(targetStringLoc, m.getString(sourceStringLoc));
         m.setString(sourceStringLoc, getIdentifier());
         addActionMessage(m);
-    } else if (cmd.compare(0, 4, "log ") == 0) {
+    } else if (res[0] == "log") {
         LOG_SUMMARY(global_broker_id_local, m.getString(sourceStringLoc), cmd.substr(4));
-    } else if (cmd.compare(0, 8, "monitor ") == 0) {
-        namespace svo = gmlc::utilities::string_viewOps;
-        auto res = svo::splitlineQuotes(cmd,
-                                        " ",
-                                        svo::default_quote_chars,
-                                        svo::delimiter_compression::on);
+    } else if (res[0] == "logbuffer") {
+        if (res.size() > 1) {
+            mLogBuffer->resize(
+                gmlc::utilities::numeric_conversion<std::size_t>(res[1],
+                                                                 LogBuffer::cDefaultBufferSize));
+        } else {
+            mLogBuffer->enable(true);
+        }
+    } else if (res[0] == "monitor") {
         switch (res.size()) {
             case 1:
                 break;
@@ -3725,7 +3788,9 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
             case 4:
             default:
                 mTimeMonitorPeriod =
-                    loadTimeFromString(std::string(svo::merge(res[2], res[3])), time_units::sec);
+                    loadTimeFromString(std::string(
+                                           gmlc::utilities::string_viewOps::merge(res[2], res[3])),
+                                       time_units::sec);
                 loadTimeMonitor(false, res[1]);
                 break;
         }

@@ -29,6 +29,7 @@ namespace helics {
 class ForwardingTimeCoordinator;
 class helicsCLI11App;
 class ProfilerBuffer;
+class LogBuffer;
 /** base class for broker like objects
  */
 class BrokerBase {
@@ -99,14 +100,13 @@ class BrokerBase {
     bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
-
+    std::size_t mlogBufferSize{0};  //!< logBufferSize
   protected:
     std::string logFile;  //!< the file to log message to
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<LogBuffer> mLogBuffer;  //!< object for buffering a set of log messages
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
-    // time coordinator for managing filters
-    // std::unique_ptr<TimeCoordinator> filterTimeCoord;
-    // global_federate_id filterFedID;
+
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
         created = -6,  //!< the broker has been created

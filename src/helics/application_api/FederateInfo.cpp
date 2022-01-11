@@ -110,7 +110,10 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"maxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
-    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS}};
+    {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
+    {"logbuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
+    {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
+    {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
 static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
@@ -161,7 +164,6 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
-
     {"optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"uninterruptible", HELICS_FLAG_UNINTERRUPTIBLE},
     {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
@@ -260,6 +262,8 @@ static const std::map<std::string, int> option_value_map{
     {"2", 2},
     {"3", 3},
     {"4", 4},
+    {"stop", 0},
+    {"start", 1},
     // vector operation values
     {"none", HELICS_MULTI_INPUT_NO_OP},
     {"no_op", HELICS_MULTI_INPUT_NO_OP},
