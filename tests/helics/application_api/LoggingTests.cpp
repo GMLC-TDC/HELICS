@@ -547,6 +547,7 @@ TEST(logging, timeMonitorFederate_swap)
     EXPECT_EQ(grantCount, 2);
     llock.unlock();
     broker->sendCommand("root", "monitor monitor2");
+    broker->query("root", "global_flush");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     rtime = Fed2->requestTime(1.0);
     EXPECT_EQ(rtime, 1.0);
