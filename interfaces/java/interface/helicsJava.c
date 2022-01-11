@@ -1407,6 +1407,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1CO
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1LOG_1BUFFER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsProperties result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsProperties)HELICS_PROPERTY_INT_LOG_BUFFER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1INVALID_1PROPERTY_1VALUE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
