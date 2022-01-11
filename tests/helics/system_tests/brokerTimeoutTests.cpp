@@ -262,7 +262,7 @@ TEST(broker_timeout, max_duration_core)
     auto cr = helics::CoreFactory::create(CORE_TYPE_TO_TEST, "--broker=" + brk->getIdentifier());
     EXPECT_TRUE(cr->connect());
     auto res = cr->waitForDisconnect(std::chrono::milliseconds(600));
-    if (false) {
+    if (!res) {
         res = cr->waitForDisconnect(std::chrono::milliseconds(400));
     }
     EXPECT_TRUE(res);

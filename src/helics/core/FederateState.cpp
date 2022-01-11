@@ -104,9 +104,8 @@ namespace helics {
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
-    global_id{GlobalFederateId()}
+    global_id{GlobalFederateId()}, mLogBuffer(std::make_unique<LogBuffer>())
 {
-    mLogBuffer = std::make_unique<LogBuffer>();
     for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
     }
