@@ -271,11 +271,10 @@ typedef enum {
     /** integer property controlling the log level for file logging in a federate see \ref
        HelicsLogLevels*/
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
-    /** integer property controlling the log level for file logging in a federate see \ref
+    /** integer property controlling the log level for console logging in a federate see \ref
        HelicsLogLevels*/
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
-    /** integer property controlling the log level for file logging in a federate see \ref
-       HelicsLogLevels*/
+    /** integer property controlling the size of the log buffer*/
     HELICS_PROPERTY_INT_LOG_BUFFER_SIZE = 276,
 } HelicsProperties;
 

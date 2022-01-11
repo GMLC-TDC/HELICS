@@ -20,8 +20,7 @@ class Value;
 }
 
 namespace helics {
-/** defining a threadsafe small buffer for log messages the buffer will store a maximum of mMaxSize
- * messages*/
+/** a threadsafe small buffer for log messages that will store a maximum of mMaxSize messages*/
 class LogBuffer {
   private:
     gmlc::libguarded::shared_guarded<std::deque<std::tuple<int, std::string, std::string>>> mBuffer;
