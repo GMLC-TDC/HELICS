@@ -177,11 +177,13 @@ std::string getHostName()
         computerName = temp;
         temp = nullptr;
     } else {
+#if !defined(__CYGWIN__)
         temp = new char[512];
         if (gethostname(temp, 512) == 0) {  // success = 0, failure = -1
             computerName = temp;
         }
         delete[] temp;
+#endif
         temp = nullptr;
     }
 #endif
