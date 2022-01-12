@@ -196,7 +196,7 @@ After MSYS2 has been successfully updated Some packages need to be installed in 
 - git
 - mingw-w64-x86_64-CMake
 - mingw-w64-x86_64-boost
-- mingw-w64-x86_64-qt5 (only if you want to be able to run cmake-gui which this guide recommends.)
+- mingw-w64-x86_64-qt6 (only if you want to be able to run cmake-gui which this guide recommends.)
 - mingw-w64-x86_64-zeromq
 
 All packages can be installed by typing the following:
@@ -226,7 +226,7 @@ git will clone the source code into a folder in the current working directory ca
 Change directories to HELICS_ROOT_DIR. Create a directory called helics-build. This can be accomplished by using the mkdir command. cd into this directory. Now type the following:
 
 ```bash
-$ CMake-gui ../
+$ cmake-gui ../
 ```
 
 If this fails that is because mingw-w64-x86_64-qt5 was not installed. If you did install it the CMake gui window should pop up. click the Advanced check box next to the search bar. Then click Configure. A window will pop up asking you to specify the generator for this project. Select "MSYS Makefiles" from the dropdown menu. The native compilers can be used and will most likely default to gcc. The compilers can also be specified manually. Select Finish; once the configure process completes finished several variables will show up highlighted in red. Since this is the first time setup the Boost and ZeroMQ library. Below are the following CMake variables that could to be verified.
@@ -279,7 +279,6 @@ HELICS can also be built with the standalone MinGW
 
 Cygwin is another UNIX like environment on Windows. It has some peculiarities.
 HELICS will only build on the 32 bit version due to incompatibilities with ASIO and the 64 bit build. But it does build on the 32 bit versions completely and on the 64 bit version if `HELICS_DISABLE_ASIO=ON` is set
-Also the helics-config utility does not get built due to an incompatibility with the filesystem header.
 
 - required packages include CMake, libboost-devel, make, gcc, g++, libzmq(if using zmq)
 - use the unix makefiles generator
