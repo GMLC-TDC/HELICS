@@ -22,12 +22,18 @@ set(SUPPORTS_USER_DEFINED_LITERALS ON)
 set(FMT_HAS_VARIANT ON)
 set(type STRING CACHE INTERNAL "")
 
+if (CYGWIN)
 
+set(FMT_OS
+    OFF
+    CACHE INTERNAL ""
+)
+else()
 set(FMT_OS
     ON
     CACHE INTERNAL ""
 )
-
+endif()
 # get the FMT header only library
 add_subdirectory(ThirdParty/fmtlib)
 

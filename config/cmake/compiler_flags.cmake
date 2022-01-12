@@ -126,9 +126,6 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
             )
 
         endif()
-        if (CYGWIN)
-            target_compile_definitions(compile_flags_target INTERFACE _POSIX_C_SOURCE=200809)
-        endif()
     endif()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         target_compile_options(
