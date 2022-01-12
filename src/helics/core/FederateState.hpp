@@ -134,6 +134,8 @@ class FederateState {
     std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
+    GlobalFederateId remoteLogTarget{};  //!< storage for the federate to send remote Logs to
+    int remoteLogLevel{HELICS_LOG_LEVEL_NO_PRINT};  //!< level for remote logging information
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -394,8 +396,9 @@ class FederateState {
     @param level the logging level of the message
     @param logMessageSource the name of the object that sent the message
     @param message the message to log
+    @param noRemote disable the remote logging capability
     */
-    void logMessage(int level, std::string_view logMessageSource, std::string_view message) const;
+    void logMessage(int level, std::string_view logMessageSource, std::string_view message, bool noRemote=false) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const

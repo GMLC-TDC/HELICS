@@ -1129,14 +1129,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_IGNORE:
         default:
             break;
-        case CMD_LOG: {
-            if (cmd.getStringData().empty()) {
-                logMessage(cmd.messageID, gEmptyStr, cmd.payload.to_string());
-            } else {
-                logMessage(cmd.messageID, cmd.getString(0), cmd.payload.to_string());
-            }
-        }
-
+        case CMD_LOG:
+            logMessage(cmd.messageID, cmd.getString(0), cmd.payload.to_string());
         break;
 
         case CMD_EXEC_REQUEST:
@@ -1907,9 +1901,10 @@ void FederateState::setCoreObject(CommonCore* parent)
 
 void FederateState::logMessage(int level,
                                std::string_view logMessageSource,
-                               std::string_view message) const
+                               std::string_view message,
+     bool noRemote) const
 {
-    if (level > logLevel) {
+    if (level > logLevel && level>remoteLogLevel) {
         return;
     }
     std::string header = (logMessageSource.empty()) ?
@@ -1923,6 +1918,12 @@ void FederateState::logMessage(int level,
         loggerFunction(level, header, message);
     }
     mLogBuffer->push(level, header, message);
+    if (level <= remoteLogLevel && !noRemote && remoteLogTarget.isValid()) {
+        ActionMessage remMess(CMD_REMOTE_LOG, global_id.load(), remoteLogTarget);
+        remMess.setString(0, header);
+        remMess.payload = message;
+        parent_->addActionMessage(std::move(remMess));
+    }
 }
 
 const std::string& fedStateString(FederateStates state)

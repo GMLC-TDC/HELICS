@@ -445,7 +445,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
     mLogBuffer->push(logLevel, header, message);
-    if (remoteLogLevel >= logLevel && !disableRemote) {
+    if (remoteLogLevel >= logLevel && !disableRemote && remoteLogTarget.isValid()) {
         ActionMessage remMess(CMD_REMOTE_LOG, global_id.load(), remoteLogTarget);
         remMess.setString(0, header);
         remMess.payload = message;
