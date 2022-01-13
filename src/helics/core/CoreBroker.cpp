@@ -1341,14 +1341,15 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
 
         case CMD_LOG:
-            if (isRootc) {
+        case CMD_REMOTE_LOG:
+            if (command.dest_id == global_broker_id_local||command.dest_id==parent_broker_id) {
                     sendToLogger(command.source_id,
                                  command.messageID,
                                  command.getString(0),
-                                 command.name());
+                                 command.name(),(command.action()==CMD_REMOTE_LOG));
                 
             } else {
-                transmit(parent_route_id, command);
+                routeMessage(command);
             }
             break;
         case CMD_ERROR:
