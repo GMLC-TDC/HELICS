@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -47,15 +47,10 @@ else()
             endif()
         endif()
     elseif(CMAKE_CXX_STANDARD EQUAL 17)
-        check_cxx_compiler_flag(-std=c++17 has_std_17_flag)
-        if(has_std_17_flag)
-            set(CXX_STANDARD_FLAG -std=c++17)
-            set(has_std_1z_flag ON)
+        if (CYGWIN AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+            set(CXX_STANDARD_FLAG -std=gnu++17)
         else()
-            check_cxx_compiler_flag(-std=c++1z has_std_1z_flag)
-            if(has_std_1z_flag)
-                set(CXX_STANDARD_FLAG -std=c++1z)
-            endif()
+           set(CXX_STANDARD_FLAG -std=c++17)
         endif()
 
     else()
