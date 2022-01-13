@@ -9,7 +9,7 @@
 package com.java.helics;
 
 /**
- *  enumeration of properties that apply to federates
+ *  enumeration of properties that apply to federates and sometimes cores
  */
 public final class HelicsProperties {
   /**
@@ -66,10 +66,14 @@ public final class HelicsProperties {
    */
   public final static HelicsProperties HELICS_PROPERTY_INT_FILE_LOG_LEVEL = new HelicsProperties("HELICS_PROPERTY_INT_FILE_LOG_LEVEL", helicsJNI.HELICS_PROPERTY_INT_FILE_LOG_LEVEL_get());
   /**
-   *  integer property controlling the log level for file logging in a federate see <br>
+   *  integer property controlling the log level for console logging in a federate see <br>
    *        HelicsLogLevels
    */
   public final static HelicsProperties HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = new HelicsProperties("HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL", helicsJNI.HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL_get());
+  /**
+   *  integer property controlling the size of the log buffer
+   */
+  public final static HelicsProperties HELICS_PROPERTY_INT_LOG_BUFFER = new HelicsProperties("HELICS_PROPERTY_INT_LOG_BUFFER", helicsJNI.HELICS_PROPERTY_INT_LOG_BUFFER_get());
 
   public final int swigValue() {
     return swigValue;
@@ -105,7 +109,7 @@ public final class HelicsProperties {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsProperties[] swigValues = { HELICS_PROPERTY_TIME_DELTA, HELICS_PROPERTY_TIME_PERIOD, HELICS_PROPERTY_TIME_OFFSET, HELICS_PROPERTY_TIME_RT_LAG, HELICS_PROPERTY_TIME_RT_LEAD, HELICS_PROPERTY_TIME_RT_TOLERANCE, HELICS_PROPERTY_TIME_INPUT_DELAY, HELICS_PROPERTY_TIME_OUTPUT_DELAY, HELICS_PROPERTY_TIME_GRANT_TIMEOUT, HELICS_PROPERTY_INT_MAX_ITERATIONS, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_PROPERTY_INT_FILE_LOG_LEVEL, HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL };
+  private static HelicsProperties[] swigValues = { HELICS_PROPERTY_TIME_DELTA, HELICS_PROPERTY_TIME_PERIOD, HELICS_PROPERTY_TIME_OFFSET, HELICS_PROPERTY_TIME_RT_LAG, HELICS_PROPERTY_TIME_RT_LEAD, HELICS_PROPERTY_TIME_RT_TOLERANCE, HELICS_PROPERTY_TIME_INPUT_DELAY, HELICS_PROPERTY_TIME_OUTPUT_DELAY, HELICS_PROPERTY_TIME_GRANT_TIMEOUT, HELICS_PROPERTY_INT_MAX_ITERATIONS, HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_PROPERTY_INT_FILE_LOG_LEVEL, HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL, HELICS_PROPERTY_INT_LOG_BUFFER };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
