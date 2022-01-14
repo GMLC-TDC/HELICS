@@ -2272,6 +2272,13 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandler(J
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadThreadedSignalHandler(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  helicsLoadThreadedSignalHandler();
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsClearSignalHandler(JNIEnv *jenv, jclass jcls) {
   (void)jenv;
   (void)jcls;

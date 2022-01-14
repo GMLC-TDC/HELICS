@@ -106,6 +106,15 @@ public class helics implements helicsConstants {
   }
 
   /**
+   *  Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,<br>
+   * and federates then exits the process.  This operation will execute in a newly created and detached thread returning control back to the<br>
+   * calling program before completing operations.
+   */
+  public static void helicsLoadThreadedSignalHandler() {
+    helicsJNI.helicsLoadThreadedSignalHandler();
+  }
+
+  /**
    *  Clear HELICS based signal handlers.
    */
   public static void helicsClearSignalHandler() {
@@ -178,9 +187,7 @@ public class helics implements helicsConstants {
    * This will create a new broker object that references the existing broker. The new broker object must be freed as well.<br>
    * <br>
    * @param core An existing HelicsCore.<br>
-   * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
-   * <br>
    * <br>
    * @return A new reference to the same broker.
    */
@@ -224,9 +231,7 @@ public class helics implements helicsConstants {
    * <br>
    * @param type The type of the core to create.<br>
    * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.<br>
-   * <br>
    * @param argc The number of arguments.<br>
-   * <br>
    * @param argv The list of string values from a command line.<br>
    * <br>
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
