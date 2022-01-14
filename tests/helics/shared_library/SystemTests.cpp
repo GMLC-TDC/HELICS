@@ -369,15 +369,22 @@ TEST(other_tests, broker_after_close)
 
 static std::atomic<int> handlerCount{0};
 
-static HelicsBool testHandler(int /*unused*/)
+static HelicsBool testHandlerFalse(int /*unused*/)
 {
     ++handlerCount;
     return HELICS_FALSE;
 }
 
+static HelicsBool testHandlerTrue(int /*unused*/)
+{
+    ++handlerCount;
+    return HELICS_TRUE;
+}
+
 TEST(other_tests, signal_handler_callback)
 {
-    helicsLoadSignalHandlerCallback(testHandler);
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerFalse, HELICS_FALSE);
     raise(SIGINT);
     EXPECT_EQ(handlerCount.load(), 1);
     helicsClearSignalHandler();
@@ -389,4 +396,37 @@ TEST(other_tests, signal_handler_death_ci_skip)
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
     helicsClearSignalHandler();
+}
+
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_threaded_death_ci_skip)
+{
+    helicsLoadThreadedSignalHandler();
+    auto hb = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(hb));
+    raise(SIGINT);
+    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
+    if (res == HELICS_FALSE) {
+        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
+    }
+    EXPECT_TRUE(res);
+    helicsClearSignalHandler();
+}
+
+/** test the default signal handler*/
+TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_TRUE);
+
+    auto hb = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
+    EXPECT_TRUE(helicsBrokerIsConnected(hb));
+    raise(SIGINT);
+    auto res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
+    if (res == HELICS_FALSE) {
+        res = helicsBrokerWaitForDisconnect(hb, 1000, nullptr);
+    }
+    EXPECT_TRUE(res);
+    helicsClearSignalHandler();
+    EXPECT_EQ(handlerCount.load(), 1);
 }

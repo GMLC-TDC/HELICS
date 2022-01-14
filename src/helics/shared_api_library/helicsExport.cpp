@@ -77,9 +77,20 @@ static void signalHandler(int /*signum*/)
     exit(HELICS_ERROR_USER_ABORT);
 }
 
+static void signalHandlerThreaded(int signum)
+{
+    std::thread sigthread(signalHandler, signum);
+    sigthread.detach();
+}
+
 void helicsLoadSignalHandler()
 {
     signal(SIGINT, signalHandler);
+}
+
+void helicsLoadThreadedSignalHandler()
+{
+    signal(SIGINT, signalHandlerThreaded);
 }
 
 void helicsClearSignalHandler()
@@ -100,13 +111,33 @@ static void signalHandlerCallback(int signum)
     }
 }
 
-void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int))
+static void signalHandlerThreadedCallback(int signum)
+{
+    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
+    if (keyHandler != nullptr) {
+        runDefaultSignalHandler = keyHandler(signum);
+    }
+    if (runDefaultSignalHandler != HELICS_FALSE) {
+        signalHandlerThreaded(signum);
+    }
+}
+
+void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useSeparateThread)
 {
     keyHandler = handler;
     if (handler != nullptr) {
-        signal(SIGINT, signalHandlerCallback);
+        if (useSeparateThread != HELICS_FALSE) {
+            signal(SIGINT, signalHandlerThreadedCallback);
+        } else {
+            signal(SIGINT, signalHandlerCallback);
+        }
+
     } else {
-        helicsLoadSignalHandler();
+        if (useSeparateThread != HELICS_FALSE) {
+            helicsLoadThreadedSignalHandler();
+        } else {
+            helicsLoadSignalHandler();
+        }
     }
 }
 
