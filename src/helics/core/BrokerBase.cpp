@@ -310,7 +310,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               std::string_view name,
                               std::string_view message, bool fromRemote) const
 {
-    bool noID = (federateID != global_id.load()) || (name.back() == ']');
+    bool noID = (federateID != global_id.load()) || (!name.empty() && name.back() == ']');
 
     std::string header;
     if (noID) {

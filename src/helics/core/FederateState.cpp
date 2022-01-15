@@ -119,6 +119,7 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
     }
     mLogManager->setTransmitCallback(
         [this](ActionMessage&& m) { parent_->addActionMessage(std::move(m)); });
+    maxLogLevel = mLogManager->getMaxLevel();
 }
 
 FederateState::~FederateState() = default;
@@ -1922,14 +1923,19 @@ void FederateState::logMessage(int level,
     if (level > maxLogLevel && !fromRemote) {
         return;
     }
-    std::string header = (logMessageSource.empty() && !fromRemote) ?
-        fmt::format("{} ({})[t={}]",
-                    name,
-                    global_id.load().baseValue(),
-                    static_cast<double>(grantedTime())) :
-        ((logMessageSource.back() == ']') ?
-             std::string{logMessageSource} :
-             fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime())));
+    std::string header;
+    if (logMessageSource.empty()) {
+        header = fmt::format("{} ({})[t={}]",
+                             name,
+                             global_id.load().baseValue(),
+                             static_cast<double>(grantedTime()));
+    } else if (logMessageSource.back() == ']') {
+        header = logMessageSource;
+    }
+    else {
+        header = fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
+    }
+    
     mLogManager->sendToLogger(level, header, message, fromRemote);
 }
 
