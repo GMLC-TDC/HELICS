@@ -1932,11 +1932,10 @@ void FederateState::logMessage(int level,
                              static_cast<double>(grantedTime()));
     } else if (logMessageSource.back() == ']') {
         header = logMessageSource;
-    }
-    else {
+    } else {
         header = fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
     }
-    
+
     mLogManager->sendToLogger(level, header, message, fromRemote);
 }
 
