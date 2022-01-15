@@ -21,6 +21,7 @@ and some common methods used cores and brokers
 #include <string>
 #include <thread>
 #include <vector>
+#include <utility>
 
 namespace spdlog {
 class logger;

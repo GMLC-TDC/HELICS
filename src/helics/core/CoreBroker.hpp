@@ -384,7 +384,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void addFilter(ActionMessage& m);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
-
+    // Helper function for linking interfaces
+    void linkInterfaces(ActionMessage& command);
     // Handle the registration of new federates
     void fedRegistration(ActionMessage&& command);
 

@@ -1056,87 +1056,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         }
-        case CMD_DATA_LINK: {
-            auto* pub = handles.getPublication(command.name());
-            if (pub != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_INPUT);
-                command.setSource(pub->handle);
-                checkForNamedInterface(command);
-            } else {
-                auto* input = handles.getInput(command.getString(targetStringLoc));
-                if (input == nullptr) {
-                    if (isRootc) {
-                        unknownHandles.addDataLink(std::string(command.name()),
-                                                   command.getString(targetStringLoc));
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_PUBLICATION);
-                    command.setSource(input->handle);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_ENDPOINT_LINK: {
-            auto* ept = handles.getEndpoint(command.name());
-            if (ept != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                setActionFlag(command, destination_target);
-                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                command.setSource(ept->handle);
-                checkForNamedInterface(command);
-            } else {
-                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
-                if (target == nullptr) {
-                    if (isRootc) {
-                        unknownHandles.addEndpointLink(std::string(command.name()),
-                                                       command.getString(targetStringLoc));
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    command.setSource(target->handle);
-                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_FILTER_LINK: {
-            auto* filt = handles.getFilter(command.name());
-            if (filt != nullptr) {
-                command.payload = command.getString(targetStringLoc);
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                command.setSource(filt->handle);
-                if (checkActionFlag(*filt, clone_flag)) {
-                    setActionFlag(command, clone_flag);
-                }
-                checkForNamedInterface(command);
-            } else {
-                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
-                if (ept == nullptr) {
-                    if (isRootc) {
-                        if (checkActionFlag(command, destination_target)) {
-                            unknownHandles.addDestinationFilterLink(std::string(command.name()),
-                                                                    command.getString(
-                                                                        targetStringLoc));
-                        } else {
-                            unknownHandles.addSourceFilterLink(std::string(command.name()),
-                                                               command.getString(targetStringLoc));
-                        }
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_FILTER);
-                    command.setSource(ept->handle);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
+        case CMD_DATA_LINK:
+        case CMD_ENDPOINT_LINK:
+        case CMD_FILTER_LINK:
+            linkInterfaces(command);
+            break;
         case CMD_DISCONNECT_NAME:
             if (command.dest_id == parent_broker_id) {
                 auto brk = mBrokers.find(std::string(command.name()));
@@ -1995,6 +1919,96 @@ void CoreBroker::addFilter(ActionMessage& m)
         }
     } else {
         FindandNotifyFilterTargets(filt);
+    }
+}
+
+
+void CoreBroker::linkInterfaces(ActionMessage& command)
+{
+    switch (command.action()) {
+        case CMD_DATA_LINK: {
+            auto* pub = handles.getPublication(command.name());
+            if (pub != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_INPUT);
+                command.setSource(pub->handle);
+                checkForNamedInterface(command);
+            } else {
+                auto* input = handles.getInput(command.getString(targetStringLoc));
+                if (input == nullptr) {
+                    if (isRootc) {
+                        unknownHandles.addDataLink(std::string(command.name()),
+                                                   command.getString(targetStringLoc));
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    command.setSource(input->handle);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = handles.getEndpoint(command.name());
+            if (ept != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                setActionFlag(command, destination_target);
+                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                command.setSource(ept->handle);
+                checkForNamedInterface(command);
+            } else {
+                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
+                if (target == nullptr) {
+                    if (isRootc) {
+                        unknownHandles.addEndpointLink(std::string(command.name()),
+                                                       command.getString(targetStringLoc));
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    command.setSource(target->handle);
+                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        case CMD_FILTER_LINK: {
+            auto* filt = handles.getFilter(command.name());
+            if (filt != nullptr) {
+                command.payload = command.getString(targetStringLoc);
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                command.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
+                checkForNamedInterface(command);
+            } else {
+                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
+                if (ept == nullptr) {
+                    if (isRootc) {
+                        if (checkActionFlag(command, destination_target)) {
+                            unknownHandles.addDestinationFilterLink(std::string(command.name()),
+                                                                    command.getString(
+                                                                        targetStringLoc));
+                        } else {
+                            unknownHandles.addSourceFilterLink(std::string(command.name()),
+                                                               command.getString(targetStringLoc));
+                        }
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_FILTER);
+                    command.setSource(ept->handle);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        default:
+            break;
     }
 }
 
