@@ -180,6 +180,7 @@ public class helicsJNI {
   public final static native String helicsGetCompilerVersion();
   public final static native String helicsGetSystemInfo();
   public final static native void helicsLoadSignalHandler();
+  public final static native void helicsLoadThreadedSignalHandler();
   public final static native void helicsClearSignalHandler();
   public final static native void helicsAbort(int jarg1, String jarg2);
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
