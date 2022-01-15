@@ -416,7 +416,7 @@ void ZmqCommsSS::queue_tx_function()
                             brokerConnection.send(zmq::const_buffer(buffer.data(), buffer.size()),
                                                   zmq::send_flags::dontwait);
                         } else {
-                            if (!isDisconnectCommand(cmd)) {
+                            if (!isIgnoreableCommand(cmd)) {
                                 logWarning(
                                     std::string("unknown route and no broker, dropping message ") +
                                     prettyPrintString(cmd));

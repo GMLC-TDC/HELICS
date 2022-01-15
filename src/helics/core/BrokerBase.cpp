@@ -17,12 +17,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
-#include "spdlog/sinks/basic_file_sink.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
-#include "spdlog/spdlog.h"
-#if !defined(WIN32) && !defined(__MINGW32__) && !defined(CYGWIN) && !defined(_WIN32)
-#    include "spdlog/sinks/syslog_sink.h"
-#endif
+#include "gmlc/utilities/string_viewConversion.h"
+
+#include "LogManager.hpp"
+#include "../common/logging.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "gmlc/networking/AsioContextManager.h"
@@ -59,19 +57,16 @@ static inline std::string genId()
 }
 
 namespace helics {
-BrokerBase::BrokerBase(bool DisableQueue) noexcept: queueDisabled(DisableQueue) {}
+BrokerBase::BrokerBase(bool DisableQueue) noexcept: queueDisabled(DisableQueue),mLogManager(std::make_shared<LogManager>()) {}
 
 BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
-    identifier(broker_name), queueDisabled(DisableQueue)
+    identifier(broker_name), queueDisabled(DisableQueue),
+    mLogManager(std::make_shared<LogManager>())
 {
 }
 
 BrokerBase::~BrokerBase()
 {
-    consoleLogger.reset();
-    if (fileLogger) {
-        spdlog::drop(identifier);
-    }
     if (!queueDisabled) {
         try {
             joinAllThreads();
@@ -103,18 +98,6 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateCLI()
     hApp->remove_helics_specifics();
     return hApp;
 }
-
-static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"error", HELICS_LOG_LEVEL_ERROR},
-                                                      {"warning", HELICS_LOG_LEVEL_WARNING},
-                                                      {"summary", HELICS_LOG_LEVEL_SUMMARY},
-                                                      {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
-                                                      {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
-                                                      {"timing", HELICS_LOG_LEVEL_TIMING},
-                                                      {"data", HELICS_LOG_LEVEL_DATA},
-                                                      {"debug", HELICS_LOG_LEVEL_DEBUG},
-                                                      {"trace", HELICS_LOG_LEVEL_TRACE}};
 
 std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
 {
@@ -195,54 +178,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
                    "specify that a broker should cause the federation to terminate on an error");
-    auto* logging_group =
-        hApp->add_option_group("logging", "Options related to file and message logging");
-    logging_group->add_flag_function(
-        "--force_logging_flush",
-        [this](int64_t val) {
-            if (val > 0) {
-                forceLoggingFlush = true;
-            }
-        },
-        "flush the log after every message");
-    logging_group->add_option("--logfile", logFile, "the file to log the messages to");
-    logging_group
-        ->add_option_function<int>(
-            "--loglevel",
-            [this](int val) { setLogLevel(val); },
-            "the level at which to log, the higher this is set the more gets logged; set to \"no_print\" for no logging")
-        ->envname("HELICS_BROKER_LOG_LEVEL")
+    mLogManager->addLoggingCLI(hApp);
 
-        ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
-        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
-
-    logging_group
-        ->add_option("--fileloglevel",
-                     fileLogLevel,
-                     "the level at which messages get sent to the file")
-        ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
-        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
-    logging_group
-        ->add_option("--consoleloglevel",
-                     consoleLogLevel,
-                     "the level at which messages get sent to the file")
-
-        ->transform(
-            CLI::CheckedTransformer(&log_level_map, CLI::ignore_case, CLI::ignore_underscore))
-        ->transform(CLI::IsMember(&log_level_map, CLI::ignore_case, CLI::ignore_underscore));
-    logging_group->add_flag(
+    hApp->add_flag(
         "--dumplog",
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
-    logging_group
-        ->add_flag(
-            fmt::format("--logbuffer{{{}}}", LogBuffer::cDefaultBufferSize),
-            mlogBufferSize,
-            "optionally specify the size of the circular buffer for storing log messages for later retrieval ")
-        ->expected(0, 1)
-        ->multi_option_policy(CLI::MultiOptionPolicy::TakeLast);
+    
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group
@@ -293,37 +235,6 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->default_str(std::to_string(static_cast<double>(errorDelay)));
 
     return hApp;
-}
-
-void BrokerBase::generateLoggers()
-{
-    try {
-        consoleLogger = spdlog::get("console");
-        if (!consoleLogger) {
-            try {
-                consoleLogger = spdlog::stdout_color_mt("console");
-                consoleLogger->flush_on(spdlog::level::info);
-                consoleLogger->set_level(spdlog::level::trace);
-            }
-            catch (const spdlog::spdlog_ex&) {
-                consoleLogger = spdlog::get("console");
-            }
-        }
-        if (logFile == "syslog") {
-#if !defined(WIN32) && !defined(__MINGW32__) && !defined(CYGWIN) && !defined(_WIN32)
-            fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
-#endif
-        } else if (!logFile.empty()) {
-            fileLogger = spdlog::basic_logger_mt(identifier, logFile);
-        }
-        if (fileLogger) {
-            fileLogger->flush_on(spdlog::level::info);
-            fileLogger->set_level(spdlog::level::trace);
-        }
-    }
-    catch (const spdlog::spdlog_ex& ex) {
-        std::cerr << "Log init failed in " << identifier << " : " << ex.what() << std::endl;
-    }
 }
 
 int BrokerBase::parseArgs(int argc, char* argv[])
@@ -379,106 +290,48 @@ void BrokerBase::configureBase()
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->restrictive_time_policy = restrictive_time_policy;
 
-    mLogBuffer = std::make_unique<LogBuffer>(mlogBufferSize);
 
-    generateLoggers();
+    mLogManager->setTransmitCallback([this](ActionMessage&& m) {
+        if (getBrokerState() < BrokerState::terminating) {
+            m.source_id = global_id.load();
+            addActionMessage(std::move(m));
+        }
+    });
+    mLogManager->initializeLogging(identifier);
 
     mainLoopIsRunning.store(true);
     queueProcessingThread = std::thread(&BrokerBase::queueProcessingLoop, this);
     brokerState = BrokerState::configured;
 }
 
-static spdlog::level::level_enum getSpdLogLevel(int helicsLogLevel)
-{
-    if (helicsLogLevel >= LogLevels::TRACE || helicsLogLevel == LogLevels::DUMPLOG) {
-        return spdlog::level::trace;
-    }
-    if (helicsLogLevel >= LogLevels::TIMING) {
-        return spdlog::level::debug;
-    }
-    if (helicsLogLevel >= LogLevels::SUMMARY) {
-        return spdlog::level::info;
-    }
-    if (helicsLogLevel >= LogLevels::WARNING) {
-        return spdlog::level::warn;
-    }
-    if (helicsLogLevel == LogLevels::PROFILING) {
-        return spdlog::level::info;
-    }
-    if (helicsLogLevel >= LogLevels::ERROR_LEVEL) {
-        return spdlog::level::err;
-    }
-    return spdlog::level::critical;
-}
 
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
-                              std::string_view message, bool disableRemote) const
+                              std::string_view message, bool fromRemote) const
 {
-    bool alwaysLog{false};
-    if (logLevel > LogLevels::FED - 100) {
-        logLevel -= static_cast<int>(LogLevels::FED);
-        alwaysLog = true;
-    }
+    bool noID = (federateID != global_id.load()) || (name.back() == ']');
 
-    if (logLevel > maxLogLevel && !alwaysLog) {
-        // check the logging level
-        return true;
-    }
-    bool noID = (federateID == parent_broker_id) && (name.find("[t=") != std::string_view::npos);
-    std::string timeString;
-    if (federateID == global_id.load() && !noID) {
-        Time currentTime = getSimulationTime();
-        if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
-            timeString.push_back('[');
-            timeString.append(brokerStateName(getBrokerState()));
-            timeString.push_back(']');
-        } else {
-            timeString = fmt::format("[t={}]", currentTime);
-        }
-    }
     std::string header;
     if (noID) {
         header = name;
     } else {
-        header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
-    }
-    mLogBuffer->push(logLevel, header, message);
-    if (remoteLogLevel >= logLevel && !disableRemote && remoteLogTarget.isValid()) {
-        ActionMessage remMess(CMD_REMOTE_LOG, global_id.load(), remoteLogTarget);
-        remMess.setString(0, header);
-        remMess.payload = message;
-        addActionMessage(std::move(remMess));
-    }
-    if (loggerFunction) {
-        loggerFunction(logLevel, header, message);
-    } else {
-        if (consoleLogLevel >= logLevel || alwaysLog) {
-            if (logLevel == HELICS_LOG_LEVEL_DUMPLOG) {  // dumplog
-                consoleLogger->log(spdlog::level::trace, "{}", message);
-            } else {
-                consoleLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
-            }
+        std::string timeString;
 
-            if (forceLoggingFlush) {
-                consoleLogger->flush();
-            }
-        }
-        if (fileLogger && (logLevel <= fileLogLevel || alwaysLog)) {
-            if (logLevel == HELICS_LOG_LEVEL_DUMPLOG) {  // dumplog
-                fileLogger->log(spdlog::level::trace, "{}", message);
+            Time currentTime = getSimulationTime();
+            if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
+                timeString.push_back('[');
+                timeString.append(brokerStateName(getBrokerState()));
+                timeString.push_back(']');
             } else {
-                fileLogger->log(getSpdLogLevel(logLevel), "{}::{}", header, message);
+                timeString = fmt::format("[t={}]", currentTime);
             }
-
-            if (forceLoggingFlush) {
-                fileLogger->flush();
-            }
-        }
-        return true;
+            header = fmt::format("{} ({}){}",
+                                 name,
+                                 federateID.baseValue(),
+                                 timeString);
     }
-    return false;
+    return mLogManager->sendToLogger(logLevel, name, message, fromRemote);
 }
 
 void BrokerBase::generateNewIdentifier()
@@ -528,17 +381,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
 
 void BrokerBase::setLoggingFile(std::string_view lfile)
 {
-    if (logFile.empty() || lfile != logFile) {
-        logFile = lfile;
-        if (!logFile.empty()) {
-            fileLogger = spdlog::basic_logger_mt(identifier, logFile);
-        } else {
-            if (fileLogger) {
-                spdlog::drop(identifier);
-                fileLogger.reset();
-            }
-        }
-    }
+    mLogManager->setLoggingFile(lfile, identifier);
 }
 
 bool BrokerBase::getFlagValue(int32_t flag) const
@@ -547,17 +390,93 @@ bool BrokerBase::getFlagValue(int32_t flag) const
         case HELICS_FLAG_DUMPLOG:
             return dumplog;
         case HELICS_FLAG_FORCE_LOGGING_FLUSH:
-            return forceLoggingFlush.load();
+            return mLogManager->forceLoggingFlush.load();
         default:
             return false;
     }
 }
 
-void BrokerBase::setLoggerFunction(
+std::pair<bool, std::vector<std::string_view>>
+    BrokerBase::processBaseCommands(ActionMessage& command)
+{
+    auto cmd = command.payload.to_string();
+    auto commentLoc = cmd.find('#');
+    if (commentLoc != std::string_view::npos) {
+        cmd = cmd.substr(0, commentLoc - 1);
+    }
+    gmlc::utilities::string_viewOps::trimString(cmd);
+    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
+        cmd,
+        " |",
+        gmlc::utilities::string_viewOps::default_quote_chars,
+        gmlc::utilities::string_viewOps::delimiter_compression::on);
+    if (res.empty()) {
+        return {true,{}};
+    }
+    if (res[0] == "ignore")
+        {
+        }
+    else if (res[0] == "terminate") {
+        LOG_SUMMARY(global_broker_id_local,
+                    identifier,
+                    " received terminate instruction via command instruction")
+        ActionMessage udisconnect(CMD_USER_DISCONNECT);
+        addActionMessage(udisconnect);
+    } else if (res[0] == "echo") {
+        LOG_SUMMARY(global_broker_id_local,
+                    identifier,
+                    " received echo command via command instruction")
+        command.swapSourceDest();
+        command.payload = "echo_reply";
+        command.setString(targetStringLoc, command.getString(sourceStringLoc));
+        command.setString(sourceStringLoc, identifier);
+        addActionMessage(command);
+    } else if (res[0] == "log") {
+        LOG_SUMMARY(global_broker_id_local,
+                    command.getString(sourceStringLoc),
+                    command.payload.to_string().substr(4));
+    } else if (res[0] == "logbuffer") {
+        if (res.size() > 1) {
+            if (res[1] == "stop") {
+                mLogManager->getLogBuffer().enable(false);
+            } else {
+                mLogManager->getLogBuffer().resize(
+                    gmlc::utilities::numeric_conversion<std::size_t>(
+                    res[1], LogBuffer::cDefaultBufferSize));
+            }
+        } else {
+            mLogManager->getLogBuffer().enable(true);
+        }
+    } else if (res[0] == "remotelog") {
+        if (res.size() > 1) {
+            if (res[1] == "stop") {
+                mLogManager->updateRemote(command.source_id, HELICS_LOG_LEVEL_NO_PRINT);
+            } else {
+                int newLogLevel = HELICS_LOG_LEVEL_NO_PRINT;
+                if (isdigit(res[1][0])!=0)
+                {
+                    newLogLevel =
+                        gmlc::utilities::numeric_conversion<int>(res[1], HELICS_LOG_LEVEL_NO_PRINT);
+                } else {
+                    newLogLevel = logLevelFromString(res[1]);
+                }
+                mLogManager->updateRemote(command.source_id, newLogLevel);
+            }
+        } else {
+            mLogManager->updateRemote(command.source_id, mLogManager->getConsoleLevel());
+        }
+        maxLogLevel.store(mLogManager->getMaxLevel());
+    } else {
+       return {false,res};
+    }
+    return {true,res};
+}
+
+    void BrokerBase::setLoggerFunction(
     std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
-    loggerFunction = std::move(logFunction);
-}
+        mLogManager->setLoggerFunction(std::move(logFunction));
+    }
 
 void BrokerBase::setLogLevel(int32_t level)
 {
@@ -566,12 +485,7 @@ void BrokerBase::setLogLevel(int32_t level)
 
 void BrokerBase::logFlush()
 {
-    if (consoleLogger) {
-        consoleLogger->flush();
-    }
-    if (fileLogger) {
-        fileLogger->flush();
-    }
+    mLogManager->logFlush();
 }
 /** set the logging levels
 @param consoleLevel the logging level for the console display
@@ -579,9 +493,8 @@ void BrokerBase::logFlush()
 */
 void BrokerBase::setLogLevels(int32_t consoleLevel, int32_t fileLevel)
 {
-    consoleLogLevel = consoleLevel;
-    fileLogLevel = fileLevel;
-    maxLogLevel = (std::max)(consoleLogLevel, (std::max)(fileLogLevel,remoteLogLevel));
+    mLogManager->setLogLevels(consoleLevel, fileLevel);
+    maxLogLevel.store(mLogManager->getMaxLevel());
 }
 
 void BrokerBase::addActionMessage(const ActionMessage& m)
@@ -726,7 +639,7 @@ void BrokerBase::queueProcessingLoop()
     auto logDump = [&, this]() {
         if (!dumpMessages.empty()) {
             for (auto& act : dumpMessages) {
-                sendToLogger(parent_broker_id,
+                mLogManager->sendToLogger(
                              HELICS_LOG_LEVEL_DUMPLOG,
                              identifier,
                              fmt::format("|| dl cmd:{} from {} to {}",
@@ -924,7 +837,7 @@ void BrokerBase::baseConfigure(ActionMessage& command)
                 dumplog = checkActionFlag(command, indicator_flag);
                 break;
             case HELICS_FLAG_FORCE_LOGGING_FLUSH:
-                forceLoggingFlush = checkActionFlag(command, indicator_flag);
+                mLogManager->forceLoggingFlush = checkActionFlag(command, indicator_flag);
                 break;
             default:
                 break;

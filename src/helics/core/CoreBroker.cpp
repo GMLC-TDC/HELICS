@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
+#include "../common/logging.hpp"
 #include "BrokerFactory.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "TimeoutMonitor.h"
@@ -22,6 +23,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
+
+#include "LogManager.hpp"
 
 #include <iostream>
 #include <limits>
@@ -2885,7 +2888,7 @@ std::string CoreBroker::query(const std::string& target,
                     base["uuid"] = getIdentifier();
                 }
                 base["id"] = global_broker_id_local.baseValue();
-                bufferToJson(*mLogBuffer, base);
+                bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
         }
@@ -3065,7 +3068,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             base["uuid"] = getIdentifier();
         }
         base["id"] = global_broker_id_local.baseValue();
-        bufferToJson(*mLogBuffer, base);
+        bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (request == "federates") {
@@ -3736,46 +3739,13 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
 
 void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
-    auto cmd = m.payload.to_string();
-    auto commentLoc = cmd.find('#');
-    if (commentLoc != std::string_view::npos) {
-        cmd = cmd.substr(0, commentLoc - 1);
-    }
-    gmlc::utilities::string_viewOps::trimString(cmd);
-    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
-        cmd,
-        " ",
-        gmlc::utilities::string_viewOps::default_quote_chars,
-        gmlc::utilities::string_viewOps::delimiter_compression::on);
-    if (res.empty()) {
+    auto [processed,res]=processBaseCommands(m);
+    if (processed)
+    {
         return;
     }
-    if (res[0] == "terminate") {
-        LOG_SUMMARY(global_broker_id_local,
-                    getIdentifier(),
-                    " received terminate instruction via command instruction")
-        ActionMessage udisconnect(CMD_USER_DISCONNECT);
-        addActionMessage(udisconnect);
-    } else if (res[0] == "echo") {
-        LOG_SUMMARY(global_broker_id_local,
-                    getIdentifier(),
-                    " received echo command via command instruction")
-        m.swapSourceDest();
-        m.payload = "echo_reply";
-        m.setString(targetStringLoc, m.getString(sourceStringLoc));
-        m.setString(sourceStringLoc, getIdentifier());
-        addActionMessage(m);
-    } else if (res[0] == "log") {
-        LOG_SUMMARY(global_broker_id_local, m.getString(sourceStringLoc), cmd.substr(4));
-    } else if (res[0] == "logbuffer") {
-        if (res.size() > 1) {
-            mLogBuffer->resize(
-                gmlc::utilities::numeric_conversion<std::size_t>(res[1],
-                                                                 LogBuffer::cDefaultBufferSize));
-        } else {
-            mLogBuffer->enable(true);
-        }
-    } else if (res[0] == "monitor") {
+
+    if (res[0] == "monitor") {
         switch (res.size()) {
             case 1:
                 break;
@@ -3799,11 +3769,20 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
-
+        
     } else {
-        LOG_WARNING(global_broker_id_local,
+        auto warnString=fmt::format(" unrecognized command instruction \"{}\"", res[0]);
+    LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
-                    fmt::format(" unrecognized command instruction \"{}\"", cmd));
+                    warnString);
+    if (m.source_id != global_broker_id_local)
+    {
+        ActionMessage warn(CMD_WARNING,global_broker_id_local,m.source_id);
+    warn.payload=std::move(warnString);
+    warn.messageID=HELICS_LOG_LEVEL_WARNING;
+    warn.setString(0,getIdentifier());
+    routeMessage(warn);
+    }
     }
 }
 

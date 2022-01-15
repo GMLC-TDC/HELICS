@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/LogBuffer.hpp"
+#include "../common/logging.hpp"
 #include "CommonCore.hpp"
 #include "CoreFederateInfo.hpp"
 #include "EndpointInfo.hpp"
@@ -21,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics_definitions.hpp"
 #include "queryHelpers.hpp"
+#include "LogManager.hpp"
 
 #include <algorithm>
 #include <chrono>
@@ -49,14 +51,14 @@ static const std::string gEmptyStr;
 
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
-            if (logLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
+            if (maxLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                            \
                 logMessage(HELICS_LOG_LEVEL_SUMMARY, gEmptyStr, message);                          \
             }                                                                                      \
         } while (false)
 
 #    define LOG_INTERFACES(message)                                                                \
         do {                                                                                       \
-            if (logLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                         \
+            if (maxLogLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                         \
                 logMessage(HELICS_LOG_LEVEL_INTERFACES, gEmptyStr, message);                       \
             }                                                                                      \
         } while (false)
@@ -64,14 +66,14 @@ static const std::string gEmptyStr;
 #    ifdef HELICS_ENABLE_DEBUG_LOGGING
 #        define LOG_TIMING(message)                                                                \
             do {                                                                                   \
-                if (logLevel >= HELICS_LOG_LEVEL_TIMING) {                                         \
+                if (maxLogLevel >= HELICS_LOG_LEVEL_TIMING) {                                         \
                     logMessage(HELICS_LOG_LEVEL_TIMING, gEmptyStr, message);                       \
                 }                                                                                  \
             } while (false)
 
 #        define LOG_DATA(message)                                                                  \
             do {                                                                                   \
-                if (logLevel >= HELICS_LOG_LEVEL_DATA) {                                           \
+                if (maxLogLevel >= HELICS_LOG_LEVEL_DATA) {                                           \
                     logMessage(HELICS_LOG_LEVEL_DATA, gEmptyStr, message);                         \
                 }                                                                                  \
             } while (false)
@@ -83,7 +85,7 @@ static const std::string gEmptyStr;
 #    ifdef HELICS_ENABLE_TRACE_LOGGING
 #        define LOG_TRACE(message)                                                                 \
             do {                                                                                   \
-                if (logLevel >= HELICS_LOG_LEVEL_TRACE) {                                          \
+                if (maxLogLevel >= HELICS_LOG_LEVEL_TRACE) {                                          \
                     logMessage(HELICS_LOG_LEVEL_TRACE, gEmptyStr, message);                        \
                 }                                                                                  \
             } while (false)
@@ -104,7 +106,7 @@ namespace helics {
 FederateState::FederateState(const std::string& fedName, const CoreFederateInfo& fedInfo):
     name(fedName),
     timeCoord(new TimeCoordinator([this](const ActionMessage& msg) { routeMessage(msg); })),
-    global_id{GlobalFederateId()}, mLogBuffer(std::make_unique<LogBuffer>())
+    global_id{GlobalFederateId()}, mLogManager(std::make_unique<LogManager>())
 {
     for (const auto& prop : fedInfo.timeProps) {
         setProperty(prop.first, prop.second);
@@ -115,6 +117,8 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
     for (const auto& prop : fedInfo.flagProps) {
         setOptionFlag(prop.first, prop.second);
     }
+    mLogManager->setTransmitCallback(
+        [this](ActionMessage&& m) { parent_->addActionMessage(std::move(m)); });
 }
 
 FederateState::~FederateState() = default;
@@ -219,7 +223,13 @@ uint64_t FederateState::getQueueSize() const
     return cnt;
 }
 
-std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)
+void FederateState::setLogger(
+    std::function<void(int, std::string_view, std::string_view)> logFunction)
+{
+    mLogManager->setLoggerFunction(logFunction);
+}
+
+    std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)
 {
     auto* epI = interfaceInformation.getEndpoint(id);
     if (epI != nullptr) {
@@ -931,7 +941,7 @@ bool FederateState::messageShouldBeDelayed(const ActionMessage& cmd) const
     }
 }
 
-void FederateState::generateProfilingMarker()
+    void FederateState::generateProfilingMarker()
 {
     auto ctime = std::chrono::steady_clock::now();
     auto gtime = std::chrono::system_clock::now();
@@ -1130,7 +1140,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         default:
             break;
         case CMD_LOG:
-            logMessage(cmd.messageID, cmd.getString(0), cmd.payload.to_string());
+        case CMD_REMOTE_LOG:
+            logMessage(cmd.messageID,
+                       cmd.getString(0),
+                       cmd.payload.to_string(),
+                       cmd.action() == CMD_REMOTE_LOG);
         break;
 
         case CMD_EXEC_REQUEST:
@@ -1605,7 +1619,8 @@ void FederateState::setProperty(int intProperty, int propertyVal)
         case defs::Properties::LOG_LEVEL:
         case defs::Properties::FILE_LOG_LEVEL:
         case defs::Properties::CONSOLE_LOG_LEVEL:
-            logLevel = propertyVal;
+            mLogManager->setLogLevel(propertyVal);
+            maxLogLevel = mLogManager->getMaxLevel();
             break;
         case defs::Properties::RT_LAG:
             rt_lag = helics::Time(static_cast<double>(propertyVal));
@@ -1618,7 +1633,7 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lead = rt_lag;
             break;
         case defs::Properties::LOG_BUFFER:
-            mLogBuffer->resize((propertyVal <= 0) ? 0UL : static_cast<std::size_t>(propertyVal));
+            mLogManager->getLogBuffer().resize((propertyVal <= 0) ? 0UL : static_cast<std::size_t>(propertyVal));
             break;
         default:
             timeCoord->setProperty(intProperty, propertyVal);
@@ -1715,7 +1730,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             }
             break;
         case defs::Properties::LOG_BUFFER:
-            mLogBuffer->enable(value);
+            mLogManager->getLogBuffer().enable(value);
             break;
         default:
             timeCoord->setOptionFlag(optionFlag, value);
@@ -1771,7 +1786,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
         case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:
             return ignore_time_mismatch_warnings;
         case defs::Properties::LOG_BUFFER:
-            return (mLogBuffer->capacity() > 0);
+            return (mLogManager->getLogBuffer().capacity() > 0);
         default:
             return timeCoord->getOptionFlag(optionFlag);
     }
@@ -1799,9 +1814,9 @@ int FederateState::getIntegerProperty(int intProperty) const
         case defs::Properties::LOG_LEVEL:
         case defs::Properties::FILE_LOG_LEVEL:
         case defs::Properties::CONSOLE_LOG_LEVEL:
-            return logLevel;
+            return mLogManager->getConsoleLevel();
         case defs::Properties::LOG_BUFFER:
-            return static_cast<int>(mLogBuffer->capacity());
+            return static_cast<int>(mLogManager->getLogBuffer().capacity());
         default:
             return timeCoord->getIntegerProperty(intProperty);
     }
@@ -1902,28 +1917,20 @@ void FederateState::setCoreObject(CommonCore* parent)
 void FederateState::logMessage(int level,
                                std::string_view logMessageSource,
                                std::string_view message,
-     bool noRemote) const
+     bool fromRemote) const
 {
-    if (level > logLevel && level>remoteLogLevel) {
+    if (level > maxLogLevel && !fromRemote) {
         return;
     }
-    std::string header = (logMessageSource.empty()) ?
+    std::string header = (logMessageSource.empty() && !fromRemote) ?
         fmt::format("{} ({})[t={}]",
                     name,
                     global_id.load().baseValue(),
                     static_cast<double>(grantedTime())) :
-        fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
-
-    if (loggerFunction) {
-        loggerFunction(level, header, message);
-    }
-    mLogBuffer->push(level, header, message);
-    if (level <= remoteLogLevel && !noRemote && remoteLogTarget.isValid()) {
-        ActionMessage remMess(CMD_REMOTE_LOG, global_id.load(), remoteLogTarget);
-        remMess.setString(0, header);
-        remMess.payload = message;
-        parent_->addActionMessage(std::move(remMess));
-    }
+        ((logMessageSource.back() == ']') ?
+             std::string{logMessageSource} :
+             fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime())));
+    mLogManager->sendToLogger(level, header, message, fromRemote);
 }
 
 const std::string& fedStateString(FederateStates state)
@@ -1980,36 +1987,58 @@ void FederateState::sendCommand(ActionMessage& command)
             parent_->addActionMessage(bye);
         }
     } else if (res[0] == "echo") {
+        if (parent_ != nullptr) {
         ActionMessage response(command.action());
         response.payload = "echo_reply";
         response.dest_id = command.source_id;
         response.source_id = global_id.load();
         response.setString(targetStringLoc, command.getString(sourceStringLoc));
         response.setString(sourceStringLoc, getIdentifier());
-        if (parent_ != nullptr) {
+        
             parent_->addActionMessage(response);
         }
     } else if (res[0] == "command_status") {
+        if (parent_ != nullptr) {
         ActionMessage response(command.action());
         response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
         response.dest_id = command.source_id;
         response.source_id = global_id.load();
         response.setString(targetStringLoc, command.getString(sourceStringLoc));
         response.setString(sourceStringLoc, getIdentifier());
-        if (parent_ != nullptr) {
+        
             parent_->addActionMessage(response);
         }
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
             if (res[1] == "stop") {
-                mLogBuffer->enable(false);
+                mLogManager->getLogBuffer().enable(false);
             } else {
-                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(
+                mLogManager->getLogBuffer().resize(
+                    gmlc::utilities::numeric_conversion<std::size_t>(
                     res[1], LogBuffer::cDefaultBufferSize));
             }
         } else {
-            mLogBuffer->enable(true);
+            mLogManager->getLogBuffer().enable(true);
         }
+    } else if (res[0] == "remotelog") {
+        if (res.size() > 1) {
+            if (res[1] == "stop") {
+                mLogManager->updateRemote(command.source_id, HELICS_LOG_LEVEL_NO_PRINT);
+            } else {
+                int newLevel{HELICS_LOG_LEVEL_NO_PRINT};
+                if(isdigit(res[1][0]) != 0)
+                {
+                    newLevel =
+                        gmlc::utilities::numeric_conversion<int>(res[1],
+                                                                 mLogManager->getConsoleLevel());
+                }
+                else { newLevel = logLevelFromString(res[1]); }
+                mLogManager->updateRemote(command.source_id, newLevel);
+            }
+        } else {
+            mLogManager->updateRemote(command.source_id, mLogManager->getConsoleLevel());
+        }
+        maxLogLevel = mLogManager->getMaxLevel();
     } else if (res[0] == "timeout_monitor") {
         setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);
     } else if (res[0] == "log") {
@@ -2161,7 +2190,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value base;
         base["name"] = getIdentifier();
         base["id"] = global_id.load().baseValue();
-        bufferToJson(*mLogBuffer, base);
+        bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (query == "data_flow_graph") {
@@ -2231,6 +2260,11 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         }
     }
     return qstring;
+}
+
+int FederateState::loggingLevel() const
+{
+    return mLogManager->getConsoleLevel();
 }
 
 void FederateState::setTag(const std::string& tag, const std::string& value)

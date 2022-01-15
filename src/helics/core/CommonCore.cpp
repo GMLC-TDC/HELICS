@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/LogBuffer.hpp"
+#include "../common/logging.hpp"
 #include "../common/fmt_format.h"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
@@ -33,6 +34,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
+#include "LogManager.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -946,13 +948,13 @@ int16_t CommonCore::getIntegerProperty(LocalFederateId federateID, int32_t prope
     if (federateID == gLocalCoreId) {
         if (property == HELICS_PROPERTY_INT_LOG_LEVEL ||
             property == HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL) {
-            return consoleLogLevel;
+            return mLogManager->getConsoleLevel();
         }
         if (property == HELICS_PROPERTY_INT_FILE_LOG_LEVEL) {
-            return fileLogLevel;
+            return mLogManager->getFileLevel();
         }
         if (property == HELICS_PROPERTY_INT_LOG_BUFFER) {
-            return static_cast<int16_t>(mLogBuffer->capacity());
+            return static_cast<int16_t>(mLogManager->getLogBuffer().capacity());
         }
         return 0;
     }
@@ -985,7 +987,7 @@ void CommonCore::setFlagOption(LocalFederateId federateID, int32_t flag, bool fl
                 }
                 break;
             case defs::LOG_BUFFER:
-                mLogBuffer->enable(flagValue);
+                mLogManager->getLogBuffer().enable(flagValue);
                 break;
             default: {
                 ActionMessage cmd(CMD_CORE_CONFIGURE);
@@ -1031,7 +1033,7 @@ bool CommonCore::getFlagOption(LocalFederateId federateID, int32_t flag) const
     }
     if (federateID == gLocalCoreId) {
         if (flag == defs::Properties::LOG_BUFFER) {
-            return (mLogBuffer->capacity() > 0);
+            return (mLogManager->getLogBuffer().capacity() > 0);
         }
         return false;
     }
@@ -2500,56 +2502,24 @@ void CommonCore::initializeMapBuilder(const std::string& request,
 
 void CommonCore::processCommandInstruction(ActionMessage& command)
 {
-    auto cmd = command.payload.to_string();
-    auto commentLoc = cmd.find('#');
-    if (commentLoc != std::string_view::npos) {
-        cmd = cmd.substr(0, commentLoc - 1);
-    }
-    gmlc::utilities::string_viewOps::trimString(cmd);
-    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
-        cmd,
-        " ",
-        gmlc::utilities::string_viewOps::default_quote_chars,
-        gmlc::utilities::string_viewOps::delimiter_compression::on);
-    if (res.empty()) {
+    auto [processed,res]=processBaseCommands(command);
+    if (processed)
+    {
         return;
     }
-
-    if (res[0] == "terminate") {
-        LOG_SUMMARY(global_broker_id_local,
+    auto warnString=fmt::format("Unrecognized command instruction \"{}\"", res[0]);
+    LOG_WARNING(global_broker_id_local,
                     getIdentifier(),
-                    " received terminate instruction via command instruction")
-        ActionMessage udisconnect(CMD_USER_DISCONNECT);
-        addActionMessage(udisconnect);
-    } else if (res[0] == "echo") {
-        LOG_SUMMARY(global_broker_id_local,
-                    getIdentifier(),
-                    " received echo command via command instruction")
-        command.swapSourceDest();
-        command.payload = "echo_reply";
-        command.setString(targetStringLoc, command.getString(sourceStringLoc));
-        command.setString(sourceStringLoc, getIdentifier());
-        addActionMessage(command);
-    } else if (res[0] == "log") {
-        LOG_SUMMARY(global_broker_id_local,
-                    command.getString(sourceStringLoc),
-                    command.payload.to_string().substr(4));
-    } else if (res[0] == "logbuffer") {
-        if (res.size() > 1) {
-            if (res[1] == "stop") {
-                mLogBuffer->enable(false);
-            } else {
-                mLogBuffer->resize(gmlc::utilities::numeric_conversion<std::size_t>(
-                    res[1], LogBuffer::cDefaultBufferSize));
-            }
-        } else {
-            mLogBuffer->enable(true);
-        }
-    } else {
-        LOG_WARNING(global_broker_id_local,
-                    getIdentifier(),
-                    fmt::format(" unrecognized command instruction \"{}\"", cmd));
+                    warnString);
+    if (command.source_id != global_broker_id_local)
+    {
+        ActionMessage warn(CMD_WARNING,global_broker_id_local,command.source_id);
+    warn.payload=std::move(warnString);
+    warn.messageID=HELICS_LOG_LEVEL_WARNING;
+    warn.setString(0,getIdentifier());
+    routeMessage(warn);
     }
+    
 }
 
 std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
@@ -2622,7 +2592,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     if (queryStr == "logs") {
         Json::Value base;
         loadBasicJsonInfo(base, nullptr);
-        bufferToJson(*mLogBuffer, base);
+        bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "address") {
@@ -2745,7 +2715,7 @@ std::string CommonCore::query(const std::string& target,
             if (queryStr == "logs") {
                 Json::Value base;
                 loadBasicJsonInfo(base, nullptr);
-                bufferToJson(*mLogBuffer, base);
+                bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
         }
@@ -3316,21 +3286,12 @@ void CommonCore::processCommand(ActionMessage&& command)
             routeMessage(command);
             break;
         case CMD_LOG:
-            if (command.dest_id == global_broker_id_local) {
-                sendToLogger(parent_broker_id,
-                             command.messageID,
-                             command.getString(0),
-                             command.payload.to_string());
-            } else {
-                routeMessage(command);
-            }
-            break;
         case CMD_REMOTE_LOG:
             if (command.dest_id == global_broker_id_local) {
                 sendToLogger(parent_broker_id,
                              command.messageID,
                              command.getString(0),
-                             command.payload.to_string(),true);
+                             command.payload.to_string(),command.action()==CMD_REMOTE_LOG);
             } else {
                 routeMessage(command);
             }
@@ -4376,14 +4337,14 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             setLogLevel(cmd.getExtraData());
             break;
         case defs::Properties::FILE_LOG_LEVEL:
-            setLogLevels(consoleLogLevel, cmd.getExtraData());
+            setLogLevels(mLogManager->getConsoleLevel(), cmd.getExtraData());
             break;
         case defs::Properties::CONSOLE_LOG_LEVEL:
-            setLogLevels(cmd.getExtraData(), fileLogLevel);
+            setLogLevels(cmd.getExtraData(), mLogManager->getFileLevel());
             break;
         case defs::Properties::LOG_BUFFER: {
             auto size = cmd.getExtraData();
-            mLogBuffer->resize((size <= 0) ? 0UL : static_cast<std::size_t>(size));
+            mLogManager->getLogBuffer().resize((size <= 0) ? 0UL : static_cast<std::size_t>(size));
         }
 
         break;

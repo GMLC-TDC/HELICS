@@ -544,7 +544,7 @@ void ZmqComms::queue_tx_function()
                 if (hasBroker) {
                     brokerPushSocket.send(zmq::const_buffer(buffer.data(), buffer.size()));
                 } else {
-                    if (!isDisconnectCommand(cmd)) {
+                    if (!isIgnoreableCommand(cmd)) {
                         logWarning(std::string("unknown route and no broker, dropping message ") +
                                    prettyPrintString(cmd));
                     }

@@ -246,7 +246,7 @@ namespace testcore {
                     if (tbroker) {
                         tbroker->addActionMessage(std::move(cmd));
                     } else {
-                        if (!isDisconnectCommand(cmd)) {
+                        if (!isIgnoreableCommand(cmd)) {
                             logWarning(std::string("unknown route, message dropped ") +
                                        prettyPrintString(cmd));
                         }

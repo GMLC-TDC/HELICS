@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CommonCore.hpp"
 #include "CoreBroker.hpp"
 #include "loggingHelper.hpp"
-
+#include "../common/logging.hpp"
 #include <string>
 #include <utility>
 
