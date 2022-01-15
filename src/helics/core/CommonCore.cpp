@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/LogBuffer.hpp"
-#include "../common/logging.hpp"
 #include "../common/fmt_format.h"
+#include "../common/logging.hpp"
 #include "ActionMessage.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterInfo.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "InputInfo.hpp"
+#include "LogManager.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
 #include "core-exceptions.hpp"
@@ -34,7 +35,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
-#include "LogManager.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -2502,24 +2502,19 @@ void CommonCore::initializeMapBuilder(const std::string& request,
 
 void CommonCore::processCommandInstruction(ActionMessage& command)
 {
-    auto [processed,res]=processBaseCommands(command);
-    if (processed)
-    {
+    auto [processed, res] = processBaseCommands(command);
+    if (processed) {
         return;
     }
-    auto warnString=fmt::format("Unrecognized command instruction \"{}\"", res[0]);
-    LOG_WARNING(global_broker_id_local,
-                    getIdentifier(),
-                    warnString);
-    if (command.source_id != global_broker_id_local)
-    {
-        ActionMessage warn(CMD_WARNING,global_broker_id_local,command.source_id);
-    warn.payload=std::move(warnString);
-    warn.messageID=HELICS_LOG_LEVEL_WARNING;
-    warn.setString(0,getIdentifier());
-    routeMessage(warn);
+    auto warnString = fmt::format("Unrecognized command instruction \"{}\"", res[0]);
+    LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);
+    if (command.source_id != global_broker_id_local) {
+        ActionMessage warn(CMD_WARNING, global_broker_id_local, command.source_id);
+        warn.payload = std::move(warnString);
+        warn.messageID = HELICS_LOG_LEVEL_WARNING;
+        warn.setString(0, getIdentifier());
+        routeMessage(warn);
     }
-    
 }
 
 std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
@@ -3291,7 +3286,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                 sendToLogger(parent_broker_id,
                              command.messageID,
                              command.getString(0),
-                             command.payload.to_string(),command.action()==CMD_REMOTE_LOG);
+                             command.payload.to_string(),
+                             command.action() == CMD_REMOTE_LOG);
             } else {
                 routeMessage(command);
             }

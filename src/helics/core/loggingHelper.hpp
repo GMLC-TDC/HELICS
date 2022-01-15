@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics/helics_enums.h"
 
-namespace helics{
+namespace helics {
 /** @file
 this file is meant to be included in the commonCore.cpp and coreBroker.cpp
 and inherited class files
@@ -77,4 +77,4 @@ using elsewhere is probably not going to work.
 #    define LOG_DEBUG_MESSAGES(id, ident, message)
 #    define LOG_TRACE(id, ident, message)
 #endif
-}
+}  // namespace helics

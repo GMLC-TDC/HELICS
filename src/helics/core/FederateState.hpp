@@ -55,8 +55,8 @@ class FederateState {
   private:
     const std::string name;  //!< the name of the federate
     /// object that manages the time to determine granting
-    std::unique_ptr<TimeCoordinator>
-        timeCoord;  
+    std::unique_ptr<TimeCoordinator> timeCoord;
+
   public:
     LocalFederateId local_id;  //!< id code for the local federate descriptor
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
@@ -78,6 +78,7 @@ class FederateState {
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
     std::unique_ptr<LogManager> mLogManager;
     int maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
+
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
   private:
@@ -133,7 +134,7 @@ class FederateState {
     std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
-    
+
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -320,7 +321,8 @@ class FederateState {
     /** generate a timing marker message system time + steady time*/
     void generateProfilingMarker();
     /** go through and update the max log level*/
-    void updateMaxLogLevel(); 
+    void updateMaxLogLevel();
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }
@@ -395,9 +397,13 @@ class FederateState {
     @param level the logging level of the message
     @param logMessageSource the name of the object that sent the message
     @param message the message to log
-    @param fromRemote indicator that the message is from a remote source and should be treated accordingly
+    @param fromRemote indicator that the message is from a remote source and should be treated
+    accordingly
     */
-    void logMessage(int level, std::string_view logMessageSource, std::string_view message, bool fromRemote=false) const;
+    void logMessage(int level,
+                    std::string_view logMessageSource,
+                    std::string_view message,
+                    bool fromRemote = false) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const

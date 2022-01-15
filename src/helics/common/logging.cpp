@@ -6,22 +6,24 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "logging.hpp"
+
 #include "gmlc/utilities/string_viewOps.h"
 
 namespace helics {
-extern const std::unordered_map<std::string, int> gLogLevelMap{{"none", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"noprint", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"error", HELICS_LOG_LEVEL_ERROR},
-                                                      {"profiling", HELICS_LOG_LEVEL_PROFILING},
-                                                      {"warning", HELICS_LOG_LEVEL_WARNING},
-                                                      {"summary", HELICS_LOG_LEVEL_SUMMARY},
-                                                      {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
-                                                      {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
-                                                      {"timing", HELICS_LOG_LEVEL_TIMING},
-                                                      {"data", HELICS_LOG_LEVEL_DATA},
-                                                      {"debug", HELICS_LOG_LEVEL_DEBUG},
-                                                      {"trace", HELICS_LOG_LEVEL_TRACE},
+extern const std::unordered_map<std::string, int> gLogLevelMap{
+    {"none", HELICS_LOG_LEVEL_NO_PRINT},
+    {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
+    {"noprint", HELICS_LOG_LEVEL_NO_PRINT},
+    {"error", HELICS_LOG_LEVEL_ERROR},
+    {"profiling", HELICS_LOG_LEVEL_PROFILING},
+    {"warning", HELICS_LOG_LEVEL_WARNING},
+    {"summary", HELICS_LOG_LEVEL_SUMMARY},
+    {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
+    {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
+    {"timing", HELICS_LOG_LEVEL_TIMING},
+    {"data", HELICS_LOG_LEVEL_DATA},
+    {"debug", HELICS_LOG_LEVEL_DEBUG},
+    {"trace", HELICS_LOG_LEVEL_TRACE},
 
     {"NONE", HELICS_LOG_LEVEL_NO_PRINT},
     {"NO_PRINT", HELICS_LOG_LEVEL_NO_PRINT},
@@ -52,8 +54,8 @@ extern const std::unordered_map<std::string, int> gLogLevelMap{{"none", HELICS_L
     {"Debug", HELICS_LOG_LEVEL_DEBUG},
     {"Trace", HELICS_LOG_LEVEL_TRACE}};
 
-
-LogLevels logLevelFromString(std::string_view level) {
+LogLevels logLevelFromString(std::string_view level)
+{
     auto res = gLogLevelMap.find(std::string(level));
     if (res != gLogLevelMap.end()) {
         return static_cast<LogLevels>(res->second);
@@ -61,5 +63,4 @@ LogLevels logLevelFromString(std::string_view level) {
     return static_cast<LogLevels>(-999999);
 }
 
-
-}
+}  // namespace helics

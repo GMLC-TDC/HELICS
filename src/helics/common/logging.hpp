@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "../helics_enums.h"
+
 #include <string>
 #include <unordered_map>
 

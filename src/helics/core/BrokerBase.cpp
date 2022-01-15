@@ -8,19 +8,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "BrokerBase.hpp"
 
 #include "../common/fmt_format.h"
+#include "../common/logging.hpp"
 #include "ForwardingTimeCoordinator.hpp"
+#include "LogManager.hpp"
 #include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewConversion.h"
 #include "helics/common/LogBuffer.hpp"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
-#include "gmlc/utilities/string_viewConversion.h"
-
-#include "LogManager.hpp"
-#include "../common/logging.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "gmlc/networking/AsioContextManager.h"
@@ -57,7 +56,10 @@ static inline std::string genId()
 }
 
 namespace helics {
-BrokerBase::BrokerBase(bool DisableQueue) noexcept: queueDisabled(DisableQueue),mLogManager(std::make_shared<LogManager>()) {}
+BrokerBase::BrokerBase(bool DisableQueue) noexcept:
+    queueDisabled(DisableQueue), mLogManager(std::make_shared<LogManager>())
+{
+}
 
 BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
     identifier(broker_name), queueDisabled(DisableQueue),
@@ -184,7 +186,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--dumplog",
         dumplog,
         "capture a record of all messages and dump a complete log to file or console on termination");
-    
+
     auto* timeout_group =
         hApp->add_option_group("timeouts", "Options related to network and process timeouts");
     timeout_group
@@ -290,7 +292,6 @@ void BrokerBase::configureBase()
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->restrictive_time_policy = restrictive_time_policy;
 
-
     mLogManager->setTransmitCallback([this](ActionMessage&& m) {
         if (getBrokerState() < BrokerState::terminating) {
             m.source_id = global_id.load();
@@ -304,11 +305,11 @@ void BrokerBase::configureBase()
     brokerState = BrokerState::configured;
 }
 
-
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
                               int logLevel,
                               std::string_view name,
-                              std::string_view message, bool fromRemote) const
+                              std::string_view message,
+                              bool fromRemote) const
 {
     bool noID = (federateID != global_id.load()) || (!name.empty() && name.back() == ']');
 
@@ -318,18 +319,15 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
     } else {
         std::string timeString;
 
-            Time currentTime = getSimulationTime();
-            if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
-                timeString.push_back('[');
-                timeString.append(brokerStateName(getBrokerState()));
-                timeString.push_back(']');
-            } else {
-                timeString = fmt::format("[t={}]", currentTime);
-            }
-            header = fmt::format("{} ({}){}",
-                                 name,
-                                 federateID.baseValue(),
-                                 timeString);
+        Time currentTime = getSimulationTime();
+        if (currentTime <= mInvalidSimulationTime || currentTime >= cHelicsBigNumber) {
+            timeString.push_back('[');
+            timeString.append(brokerStateName(getBrokerState()));
+            timeString.push_back(']');
+        } else {
+            timeString = fmt::format("[t={}]", currentTime);
+        }
+        header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
     return mLogManager->sendToLogger(logLevel, name, message, fromRemote);
 }
@@ -411,12 +409,10 @@ std::pair<bool, std::vector<std::string_view>>
         gmlc::utilities::string_viewOps::default_quote_chars,
         gmlc::utilities::string_viewOps::delimiter_compression::on);
     if (res.empty()) {
-        return {true,{}};
+        return {true, {}};
     }
-    if (res[0] == "ignore")
-        {
-        }
-    else if (res[0] == "terminate") {
+    if (res[0] == "ignore") {
+    } else if (res[0] == "terminate") {
         LOG_SUMMARY(global_broker_id_local,
                     identifier,
                     " received terminate instruction via command instruction")
@@ -440,8 +436,7 @@ std::pair<bool, std::vector<std::string_view>>
             if (res[1] == "stop") {
                 mLogManager->getLogBuffer().enable(false);
             } else {
-                mLogManager->getLogBuffer().resize(
-                    gmlc::utilities::numeric_conversion<std::size_t>(
+                mLogManager->getLogBuffer().resize(gmlc::utilities::numeric_conversion<std::size_t>(
                     res[1], LogBuffer::cDefaultBufferSize));
             }
         } else {
@@ -453,8 +448,7 @@ std::pair<bool, std::vector<std::string_view>>
                 mLogManager->updateRemote(command.source_id, HELICS_LOG_LEVEL_NO_PRINT);
             } else {
                 int newLogLevel = HELICS_LOG_LEVEL_NO_PRINT;
-                if (isdigit(res[1][0])!=0)
-                {
+                if (isdigit(res[1][0]) != 0) {
                     newLogLevel =
                         gmlc::utilities::numeric_conversion<int>(res[1], HELICS_LOG_LEVEL_NO_PRINT);
                 } else {
@@ -467,16 +461,16 @@ std::pair<bool, std::vector<std::string_view>>
         }
         maxLogLevel.store(mLogManager->getMaxLevel());
     } else {
-       return {false,res};
+        return {false, res};
     }
-    return {true,res};
+    return {true, res};
 }
 
-    void BrokerBase::setLoggerFunction(
+void BrokerBase::setLoggerFunction(
     std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
-        mLogManager->setLoggerFunction(std::move(logFunction));
-    }
+    mLogManager->setLoggerFunction(std::move(logFunction));
+}
 
 void BrokerBase::setLogLevel(int32_t level)
 {
@@ -520,7 +514,7 @@ void BrokerBase::addActionMessage(ActionMessage&& m)
 void BrokerBase::addActionMessage(ActionMessage&& m) const
 {
     // the queue is thread safe so can be run in a const situation without possibility of issues
-    auto& lQueue = const_cast<decltype(actionQueue) &>(actionQueue); 
+    auto& lQueue = const_cast<decltype(actionQueue)&>(actionQueue);
     if (isPriorityCommand(m)) {
         lQueue.emplacePriority(std::move(m));
     } else {
@@ -639,13 +633,12 @@ void BrokerBase::queueProcessingLoop()
     auto logDump = [&, this]() {
         if (!dumpMessages.empty()) {
             for (auto& act : dumpMessages) {
-                mLogManager->sendToLogger(
-                             HELICS_LOG_LEVEL_DUMPLOG,
-                             identifier,
-                             fmt::format("|| dl cmd:{} from {} to {}",
-                                         prettyPrintString(act),
-                                         act.source_id.baseValue(),
-                                         act.dest_id.baseValue()));
+                mLogManager->sendToLogger(HELICS_LOG_LEVEL_DUMPLOG,
+                                          identifier,
+                                          fmt::format("|| dl cmd:{} from {} to {}",
+                                                      prettyPrintString(act),
+                                                      act.source_id.baseValue(),
+                                                      act.dest_id.baseValue()));
             }
         }
     };

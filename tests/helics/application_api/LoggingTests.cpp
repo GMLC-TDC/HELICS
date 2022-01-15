@@ -873,12 +873,10 @@ TEST(logging, log_buffer_core2)
     cr.reset();
 }
 
-
 TEST(logging, remote_log_broker)
 {
-    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST,
-                                                "--name=broker8");
-    gmlc::libguarded::guarded<std::vector<std::tuple<int,std::string,std::string>>> mlog;
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker8");
+    gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view source, std::string_view message) {
             mlog.lock()->emplace_back(level, source, message);
@@ -889,7 +887,7 @@ TEST(logging, remote_log_broker)
     fi.broker = "broker8";
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
-    broker->sendCommand("monitor","remotelog timing");
+    broker->sendCommand("monitor", "remotelog timing");
     broker->query("root", "global_flush");
     Fed->enterExecutingMode();
 
@@ -900,31 +898,28 @@ TEST(logging, remote_log_broker)
     broker.reset();
     auto llock = mlog.lock();
     int remote_cnt{0};
-    for (const auto &lg:llock) {
-        if (std::get<1>(lg).find("monitor")!=std::string::npos) {
+    for (const auto& lg : llock) {
+        if (std::get<1>(lg).find("monitor") != std::string::npos) {
             ++remote_cnt;
         }
     }
     EXPECT_GT(remote_cnt, 0);
-    
 }
-
 
 TEST(logging, remote_log_fed)
 {
     auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker9");
     gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlog;
-    
+
     broker->connect();
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "broker9";
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
-    Fed->setLoggingCallback(
-        [&mlog](int level, std::string_view source, std::string_view message) {
-            mlog.lock()->emplace_back(level, source, message);
-        });
-    
+    Fed->setLoggingCallback([&mlog](int level, std::string_view source, std::string_view message) {
+        mlog.lock()->emplace_back(level, source, message);
+    });
+
     Fed->sendCommand("broker9", "remotelog debug");
     Fed->enterExecutingMode();
 
@@ -932,15 +927,14 @@ TEST(logging, remote_log_fed)
     EXPECT_EQ(rtime, 2.0);
     Fed->query("root", "global_flush");
     Fed->finalize();
-    
+
     broker.reset();
     auto llock = mlog.lock();
     int remote_cnt{0};
     for (const auto& lg : llock) {
         if (std::get<1>(lg).find("broker9") != std::string::npos) {
             ++remote_cnt;
-        }
-        else if (std::get<1>(lg).find("root") != std::string::npos) {
+        } else if (std::get<1>(lg).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -958,9 +952,12 @@ TEST(logging, remote_log_core)
     fi.broker = "broker10";
     fi.coreName = "core10";
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
-    Fed->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,[&mlog](int level, std::string_view source, std::string_view message) {
-        mlog.lock()->emplace_back(level, source, message);
-    });
+    Fed->getCorePointer()->setLoggingCallback(helics::gLocalCoreId,
+                                              [&mlog](int level,
+                                                      std::string_view source,
+                                                      std::string_view message) {
+                                                  mlog.lock()->emplace_back(level, source, message);
+                                              });
 
     Fed->getCorePointer()->sendCommand("broker10",
                                        "remotelog debug",

@@ -272,7 +272,7 @@ inline bool isDependencyCommand(const ActionMessage& command) noexcept
     }
 }
 
-    /** check if a command is a disconnect command*/
+/** check if a command is a disconnect command*/
 inline bool isDisconnectCommand(const ActionMessage& command) noexcept
 {
     switch (command.action()) {
@@ -299,8 +299,6 @@ inline bool isDisconnectCommand(const ActionMessage& command) noexcept
             return false;
     }
 }
-
-
 
 /** check if a command is an error command*/
 inline bool isErrorCommand(const ActionMessage& command) noexcept

@@ -43,7 +43,7 @@ class BrokerBase {
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     /**the logging level to use,  levels >= this will be ignored*/
     std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
-    
+
     /** the minimum number of federates that must connect before entering init mode */
     int32_t minFederateCount{1};
     /** the minimum number of brokers that must connect before entering init mode */
@@ -93,10 +93,11 @@ class BrokerBase {
     bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
+
   protected:
     std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
-    std::shared_ptr<LogManager> mLogManager; //!< object to handle the logging considerations
+    std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
         created = -6,  //!< the broker has been created
@@ -239,10 +240,10 @@ class BrokerBase {
     @return true if the message was actually logged
     */
     bool sendToLogger(GlobalFederateId federateID,
-                              int logLevel,
-                              std::string_view name,
-                              std::string_view message,
-                              bool disableRemote=false) const;
+                      int logLevel,
+                      std::string_view name,
+                      std::string_view message,
+                      bool disableRemote = false) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
     /** write profiler data to file*/
@@ -262,7 +263,8 @@ class BrokerBase {
     /** virtual function to return the current simulation time*/
     virtual double getSimulationTime() const { return mInvalidSimulationTime; }
     /** process some common commands that can be processed by the broker base */
-    std::pair < bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
+    std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
+
   public:
     /** generate a callback function for the logging purposes*/
     std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;

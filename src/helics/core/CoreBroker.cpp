@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/logging.hpp"
 #include "BrokerFactory.hpp"
 #include "ForwardingTimeCoordinator.hpp"
+#include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
 #include "gmlc/utilities/stringConversion.h"
@@ -23,8 +24,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics_definitions.hpp"
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
-
-#include "LogManager.hpp"
 
 #include <iostream>
 #include <limits>
@@ -1345,12 +1344,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
 
         case CMD_LOG:
         case CMD_REMOTE_LOG:
-            if (command.dest_id == global_broker_id_local||command.dest_id==parent_broker_id) {
-                    sendToLogger(command.source_id,
-                                 command.messageID,
-                                 command.getString(0),
-                                 command.name(),(command.action()==CMD_REMOTE_LOG));
-                
+            if (command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id) {
+                sendToLogger(command.source_id,
+                             command.messageID,
+                             command.getString(0),
+                             command.name(),
+                             (command.action() == CMD_REMOTE_LOG));
+
             } else {
                 routeMessage(command);
             }
@@ -3739,9 +3739,8 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
 
 void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
-    auto [processed,res]=processBaseCommands(m);
-    if (processed)
-    {
+    auto [processed, res] = processBaseCommands(m);
+    if (processed) {
         return;
     }
 
@@ -3769,20 +3768,17 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
-        
+
     } else {
-        auto warnString=fmt::format(" unrecognized command instruction \"{}\"", res[0]);
-    LOG_WARNING(global_broker_id_local,
-                    getIdentifier(),
-                    warnString);
-    if (m.source_id != global_broker_id_local)
-    {
-        ActionMessage warn(CMD_WARNING,global_broker_id_local,m.source_id);
-    warn.payload=std::move(warnString);
-    warn.messageID=HELICS_LOG_LEVEL_WARNING;
-    warn.setString(0,getIdentifier());
-    routeMessage(warn);
-    }
+        auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
+        LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);
+        if (m.source_id != global_broker_id_local) {
+            ActionMessage warn(CMD_WARNING, global_broker_id_local, m.source_id);
+            warn.payload = std::move(warnString);
+            warn.messageID = HELICS_LOG_LEVEL_WARNING;
+            warn.setString(0, getIdentifier());
+            routeMessage(warn);
+        }
     }
 }
 
