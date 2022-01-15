@@ -299,7 +299,7 @@ void BrokerBase::configureBase()
         }
     });
     mLogManager->initializeLogging(identifier);
-
+    maxLogLevel.store(mLogManager->getMaxLevel());
     mainLoopIsRunning.store(true);
     queueProcessingThread = std::thread(&BrokerBase::queueProcessingLoop, this);
     brokerState = BrokerState::configured;

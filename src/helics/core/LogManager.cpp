@@ -193,6 +193,7 @@ void LogManager::addLoggingCLI(std::shared_ptr<helicsCLI11App>& app)
             "optionally specify the size of the circular buffer for storing log messages for later retrieval ")
         ->expected(0, 1)
         ->multi_option_policy(CLI::MultiOptionPolicy::TakeLast);
+    logging_group->callback([this]() { updateMaxLogLevel(); });
 }
 
 void LogManager::setLoggerFunction(

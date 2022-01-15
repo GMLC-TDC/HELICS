@@ -42,7 +42,7 @@ class BrokerBase {
                                               //!< atomically protected
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     /**the logging level to use,  levels >= this will be ignored*/
-    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
+    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
 
     /** the minimum number of federates that must connect before entering init mode */
     int32_t minFederateCount{1};
