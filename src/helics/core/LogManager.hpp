@@ -46,7 +46,7 @@ class LogManager {
     std::shared_ptr<spdlog::logger> consoleLogger;
     /// default logging object to use if the logging callback is not specified
     std::shared_ptr<spdlog::logger> fileLogger;
-
+    std::atomic<bool> initialized{false};
     mutable LogBuffer mLogBuffer;  //!< object for buffering a set of log messages
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;

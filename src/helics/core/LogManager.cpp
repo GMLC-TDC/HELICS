@@ -31,33 +31,37 @@ LogManager::~LogManager()
 }
 void LogManager::initializeLogging(const std::string& identifier)
 {
-    logIdentifier = identifier;
-    try {
-        consoleLogger = spdlog::get("console");
-        if (!consoleLogger) {
-            try {
-                consoleLogger = spdlog::stdout_color_mt("console");
-                consoleLogger->flush_on(spdlog::level::info);
-                consoleLogger->set_level(spdlog::level::trace);
+    bool expected{false};
+    if (initialized.compare_exchange_strong(expected,true))
+    {
+        logIdentifier = identifier;
+        try {
+            consoleLogger = spdlog::get("console");
+            if (!consoleLogger) {
+                try {
+                    consoleLogger = spdlog::stdout_color_mt("console");
+                    consoleLogger->flush_on(spdlog::level::info);
+                    consoleLogger->set_level(spdlog::level::trace);
+                }
+                catch (const spdlog::spdlog_ex&) {
+                    consoleLogger = spdlog::get("console");
+                }
             }
-            catch (const spdlog::spdlog_ex&) {
-                consoleLogger = spdlog::get("console");
-            }
-        }
-        if (logFile == "syslog") {
+            if (logFile == "syslog") {
 #if !defined(WIN32) && !defined(__MINGW32__) && !defined(CYGWIN) && !defined(_WIN32)
-            fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
+                fileLogger = spdlog::syslog_logger_mt("syslog", identifier);
 #endif
-        } else if (!logFile.empty()) {
-            fileLogger = spdlog::basic_logger_mt(identifier, logFile);
+            } else if (!logFile.empty()) {
+                fileLogger = spdlog::basic_logger_mt(identifier, logFile);
+            }
+            if (fileLogger) {
+                fileLogger->flush_on(spdlog::level::info);
+                fileLogger->set_level(spdlog::level::trace);
+            }
         }
-        if (fileLogger) {
-            fileLogger->flush_on(spdlog::level::info);
-            fileLogger->set_level(spdlog::level::trace);
+        catch (const spdlog::spdlog_ex& ex) {
+            std::cerr << "Log init failed in " << identifier << " : " << ex.what() << std::endl;
         }
-    }
-    catch (const spdlog::spdlog_ex& ex) {
-        std::cerr << "Log init failed in " << identifier << " : " << ex.what() << std::endl;
     }
 }
 
@@ -119,7 +123,7 @@ bool LogManager::sendToLogger(int logLevel,
         if (consoleLogLevel >= logLevel || fileLogLevel >= logLevel || alwaysLog) {
             loggerFunction(logLevel, header, message);
         }
-    } else {
+    } else if (initialized.load()) {
         if (consoleLogLevel >= logLevel || alwaysLog) {
             if (logLevel == HELICS_LOG_LEVEL_DUMPLOG) {  // dumplog
                 consoleLogger->log(spdlog::level::trace, "{}", message);
