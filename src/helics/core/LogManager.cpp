@@ -32,8 +32,7 @@ LogManager::~LogManager()
 void LogManager::initializeLogging(const std::string& identifier)
 {
     bool expected{false};
-    if (initialized.compare_exchange_strong(expected,true))
-    {
+    if (initialized.compare_exchange_strong(expected, true)) {
         logIdentifier = identifier;
         try {
             consoleLogger = spdlog::get("console");

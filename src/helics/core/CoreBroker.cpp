@@ -1922,7 +1922,6 @@ void CoreBroker::addFilter(ActionMessage& m)
     }
 }
 
-
 void CoreBroker::linkInterfaces(ActionMessage& command)
 {
     switch (command.action()) {

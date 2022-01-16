@@ -17,10 +17,10 @@ helper class for managing logging information
 
 #include <atomic>
 #include <functional>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <memory>
 
 namespace spdlog {
 class logger;
