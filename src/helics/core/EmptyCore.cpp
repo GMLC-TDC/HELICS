@@ -35,13 +35,13 @@ bool EmptyCore::isConnected() const
 
 const std::string& EmptyCore::getIdentifier() const
 {
-    static const std::string nullStr{""};
+    static const std::string nullStr;
     return nullStr;
 }
 
 const std::string& EmptyCore::getAddress() const
 {
-    static const std::string nullStr{""};
+    static const std::string nullStr;
     return nullStr;
 }
 

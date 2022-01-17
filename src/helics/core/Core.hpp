@@ -275,7 +275,7 @@ class Core {
      */
     virtual void processCommunications(
         LocalFederateId fedId,
-        std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) = 0;
+        std::chrono::milliseconds msToWait) = 0;
     /** set a timebased property on a federate
     @param federateID the federate to set a time based property on
     @param property the property to set see /ref defs::properties

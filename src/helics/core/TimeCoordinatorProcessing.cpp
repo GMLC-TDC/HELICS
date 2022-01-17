@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "flagOperations.hpp"
 
 #include <tuple>
+#include <thread>
 
 namespace helics {
 std::tuple<FederateStates, MessageProcessingResult, bool>
@@ -29,8 +30,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         default:
             break;
         case CMD_USER_RETURN: {
-            auto tid =
-                static_cast<int32_t>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+            auto tidHash = std::hash<std::thread::id>{}(std::this_thread::get_id());
+            auto tid = static_cast<std::int32_t>(tidHash);
             if (tid == cmd.messageID) {
                 proc = MessageProcessingResult::USER_RETURN;
             }

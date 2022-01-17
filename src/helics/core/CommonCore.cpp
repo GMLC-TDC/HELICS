@@ -4599,10 +4599,10 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
     }
 }
 
-bool CommonCore::hasTimeBlock(GlobalFederateId fedID)
+bool CommonCore::hasTimeBlock(GlobalFederateId federateID)
 {
     for (auto& tb : timeBlocks) {
-        if (fedID == tb.first) {
+        if (federateID == tb.first) {
             return (tb.second != 0);
         }
     }

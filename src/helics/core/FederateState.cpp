@@ -850,7 +850,7 @@ void FederateState::processCommunications(std::chrono::milliseconds period)
             return;
         }
     }
-    if (period > std::chrono::milliseconds(0)) {
+    if (period >= std::chrono::milliseconds(10)) {
         auto ctime = std::chrono::steady_clock::now();
         if (period - (ctime - starttime) > std::chrono::milliseconds(10)) {
             std::this_thread::sleep_for(period - (ctime - starttime));
