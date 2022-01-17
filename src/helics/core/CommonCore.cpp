@@ -860,7 +860,7 @@ void CommonCore::processCommunications(LocalFederateId federateID,
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        throw(InvalidIdentifier("federateID not valid timeRequestIterative"));
+        throw(InvalidIdentifier("federateID not valid (processCommunications)"));
     }
 
     switch (fed->getState()) {

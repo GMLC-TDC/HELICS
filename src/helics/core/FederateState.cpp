@@ -839,7 +839,7 @@ void FederateState::processCommunications(std::chrono::milliseconds period)
 {
     ActionMessage treq(CMD_USER_RETURN);
     treq.source_id = global_id.load();
-    // the user return should only be for this thread, other threads
+    // the user return should only be for this thread, other threads will ignore it
     treq.messageID = static_cast<int32_t>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
     addAction(treq);
     auto starttime = std::chrono::steady_clock::now();

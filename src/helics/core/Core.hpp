@@ -269,6 +269,8 @@ class Core {
      * this call can be used when expecting communication from other federates or when the federate
      * has nothing else to do and doesn't want to advance time
      *
+     * @param fedId the ID of the federate to process communications for
+     * @param msToWait the amount of time to wait before the function returns from processing communications
      */
     virtual void processCommunications(
         LocalFederateId fedId,
