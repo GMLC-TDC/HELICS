@@ -273,9 +273,8 @@ class Core {
      * @param msToWait the amount of time to wait before the function returns from processing
      * communications
      */
-    virtual void processCommunications(
-        LocalFederateId fedId,
-        std::chrono::milliseconds msToWait) = 0;
+    virtual void processCommunications(LocalFederateId fedId,
+                                       std::chrono::milliseconds msToWait) = 0;
     /** set a timebased property on a federate
     @param federateID the federate to set a time based property on
     @param property the property to set see /ref defs::properties
