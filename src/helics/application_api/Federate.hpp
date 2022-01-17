@@ -182,9 +182,10 @@ class HELICS_CXX_EXPORT Federate {
     void finalizeAsync();
     /** complete the asynchronous terminate pair*/
     void finalizeComplete();
-    /** run a processing loop for X amount of time if the period is set to 0 it just processes currently pending communications
-    */
-    void processCommunication(std::chrono::milliseconds period=std::chrono::milliseconds(0));
+    /** run a processing loop for X amount of time if the period is set to 0 it just processes
+     * currently pending communications
+     */
+    void processCommunication(std::chrono::milliseconds period = std::chrono::milliseconds(0));
     /** disconnect a simulation from the core (will also call finalize before disconnecting if
      * necessary)*/
     virtual void disconnect();

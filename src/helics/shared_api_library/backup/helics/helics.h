@@ -1699,9 +1699,7 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFedera
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  */
-HELICS_EXPORT void helicsFederateProcessCommunications(HelicsFederate fed,
-                                                                    HelicsTime period,
-                                                                    HelicsError* err);
+HELICS_EXPORT void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err);
 
 /**
  * Get the name of the federate.

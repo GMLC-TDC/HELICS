@@ -855,9 +855,8 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     return fed->requestTime(next, iterate, false);
 }
 
-
 void CommonCore::processCommunications(LocalFederateId federateID,
-    std::chrono::milliseconds msToWait)
+                                       std::chrono::milliseconds msToWait)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -873,7 +872,7 @@ void CommonCore::processCommunications(LocalFederateId federateID,
     }
     fed->processCommunications(msToWait);
 }
-    Time CommonCore::getCurrentTime(LocalFederateId federateID) const
+Time CommonCore::getCurrentTime(LocalFederateId federateID) const
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {

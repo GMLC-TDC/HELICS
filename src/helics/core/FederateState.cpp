@@ -839,7 +839,7 @@ void FederateState::processCommunications(std::chrono::milliseconds period)
 {
     ActionMessage treq(CMD_USER_RETURN);
     treq.source_id = global_id.load();
-    //the user return should only be for this thread, other threads 
+    // the user return should only be for this thread, other threads
     treq.messageID = static_cast<int32_t>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
     addAction(treq);
     auto starttime = std::chrono::steady_clock::now();
@@ -852,14 +852,12 @@ void FederateState::processCommunications(std::chrono::milliseconds period)
     }
     if (period > std::chrono::milliseconds(0)) {
         auto ctime = std::chrono::steady_clock::now();
-        if (period-(ctime - starttime) > std::chrono::milliseconds(10)) {
+        if (period - (ctime - starttime) > std::chrono::milliseconds(10)) {
             std::this_thread::sleep_for(period - (ctime - starttime));
             processCommunications(std::chrono::milliseconds(0));
         }
     }
-    
 }
-
 
 const std::vector<InterfaceHandle> emptyHandles;
 

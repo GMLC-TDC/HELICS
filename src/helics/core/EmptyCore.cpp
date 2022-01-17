@@ -142,7 +142,6 @@ iteration_time EmptyCore::requestTimeIterative(LocalFederateId /*federateID*/,
 void EmptyCore::processCommunications(LocalFederateId /*federateID*/,
                                       std::chrono::milliseconds /*msToWait*/)
 {
-
 }
 
 Time EmptyCore::getCurrentTime(LocalFederateId /*federateID*/) const
