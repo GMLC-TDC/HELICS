@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
     app.add_option("--source,-s", myendpoint, "name of the source endpoint")->capture_default_str();
     app.add_option("--startbroker", brokerArgs, "start a broker with the specified arguments");
 
+    app.allow_extras();
     auto ret = app.helics_parse(argc, argv);
 
     helics::FederateInfo fi;
