@@ -265,7 +265,13 @@ class Core {
      * Returns the current reiteration count for the specified federate.
      */
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const = 0;
-
+    /** blocking call that processes helics communication messages
+    * this call can be used when expecting communication from other federates or when the federate has nothing else to do and doesn't wnat to advance time
+    * 
+    */
+    virtual void
+        processCommunications(LocalFederateId fedId,
+                              std::chrono::milliseconds msToWait = std::chrono::milliseconds(0));
     /** set a timebased property on a federate
     @param federateID the federate to set a time based property on
     @param property the property to set see /ref defs::properties

@@ -855,7 +855,24 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     return fed->requestTime(next, iterate, false);
 }
 
-Time CommonCore::getCurrentTime(LocalFederateId federateID) const
+
+void CommonCore::processCommunications(LocalFederateId federateID,
+    std::chrono::milliseconds msToWait)
+{
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid timeRequestIterative"));
+    }
+
+    switch (fed->getState()) {
+        case HELICS_FINISHED:
+        case HELICS_TERMINATING:
+            return;
+        default:
+            break;
+    }
+}
+    Time CommonCore::getCurrentTime(LocalFederateId federateID) const
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
