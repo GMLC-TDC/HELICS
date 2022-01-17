@@ -547,7 +547,7 @@ TEST(logging, timeMonitorFederate_swap)
     EXPECT_EQ(grantCount, 2);
     llock.unlock();
     broker->sendCommand("root", "monitor monitor2");
-    
+
     Fed2->processCommunication(std::chrono::milliseconds(100));
 
     auto deps = Fed2->query("dependents");
@@ -557,7 +557,7 @@ TEST(logging, timeMonitorFederate_swap)
 
         deps = Fed2->query("dependents");
         ++cnt;
-        if (cnt>10) {
+        if (cnt > 10) {
             break;
         }
     }

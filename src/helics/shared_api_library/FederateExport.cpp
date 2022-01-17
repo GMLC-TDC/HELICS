@@ -1019,8 +1019,8 @@ HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed, Helics
     }
 }
 
-
-void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err) {
+void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err)
+{
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
         return;

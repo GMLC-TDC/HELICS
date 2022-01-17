@@ -266,9 +266,10 @@ class Core {
      */
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const = 0;
     /** blocking call that processes helics communication messages
-    * this call can be used when expecting communication from other federates or when the federate has nothing else to do and doesn't want to advance time
-    * 
-    */
+     * this call can be used when expecting communication from other federates or when the federate
+     * has nothing else to do and doesn't want to advance time
+     *
+     */
     virtual void processCommunications(
         LocalFederateId fedId,
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) = 0;

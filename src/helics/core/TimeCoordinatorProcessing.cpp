@@ -31,12 +31,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_USER_RETURN: {
             auto tid =
                 static_cast<int32_t>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
-            if (tid==cmd.messageID) {
+            if (tid == cmd.messageID) {
                 proc = MessageProcessingResult::USER_RETURN;
             }
-            
-        }
-            break;
+
+        } break;
         case CMD_TIME_BLOCK:
         case CMD_TIME_BARRIER:
         case CMD_TIME_BARRIER_CLEAR:
