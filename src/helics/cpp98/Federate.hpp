@@ -480,6 +480,11 @@ class Federate {
             helicsFederateRequestTimeIterativeComplete(fed, &(itTime.status), hThrowOnError());
         return itTime;
     }
+
+    void processCommunication(HelicsTime period)
+    {
+        helicsFederateProcessCommunications(fed, period, HELICS_IGNORE_ERROR);
+    }
     /** get the federate name*/
     const char* getName() const { return helicsFederateGetName(fed); }
 

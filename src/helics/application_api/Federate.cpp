@@ -608,6 +608,11 @@ void Federate::finalizeComplete()
     }
 }
 
+void Federate::processCommunication(std::chrono::milliseconds period)
+{
+    coreObject->processCommunications(fedID, period);
+}
+
 void Federate::disconnect()
 {
     finalize();

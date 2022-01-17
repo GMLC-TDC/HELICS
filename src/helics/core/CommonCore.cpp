@@ -871,6 +871,7 @@ void CommonCore::processCommunications(LocalFederateId federateID,
         default:
             break;
     }
+    fed->processCommunications(msToWait);
 }
     Time CommonCore::getCurrentTime(LocalFederateId federateID) const
 {

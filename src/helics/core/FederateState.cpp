@@ -771,8 +771,10 @@ MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyR
 {
     if (try_lock()) {  // only 1 thread can enter this loop once per federate
         auto ret = processQueue();
-        time_granted = timeCoord->getGrantedTime();
-        allowed_send_time = timeCoord->allowedSendTime();
+        if (ret != MessageProcessingResult::USER_RETURN) {
+            time_granted = timeCoord->getGrantedTime();
+            allowed_send_time = timeCoord->allowedSendTime();
+        }
         unlock();
         return ret;
     }
@@ -832,6 +834,32 @@ void FederateState::finalize()
     }
 #endif
 }
+
+void FederateState::processCommunications(std::chrono::milliseconds period)
+{
+    ActionMessage treq(CMD_USER_RETURN);
+    treq.source_id = global_id.load();
+    //the user return should only be for this thread, other threads 
+    treq.messageID = static_cast<int32_t>(std::hash<std::thread::id>{}(std::this_thread::get_id()));
+    addAction(treq);
+    auto starttime = std::chrono::steady_clock::now();
+    auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
+    while (ret != MessageProcessingResult::USER_RETURN) {
+        ret = genericUnspecifiedQueueProcess(true);
+        if (ret == MessageProcessingResult::BUSY) {
+            return;
+        }
+    }
+    if (period > std::chrono::milliseconds(0)) {
+        auto ctime = std::chrono::steady_clock::now();
+        if (period-(ctime - starttime) > std::chrono::milliseconds(10)) {
+            std::this_thread::sleep_for(period - (ctime - starttime));
+            processCommunications(std::chrono::milliseconds(0));
+        }
+    }
+    
+}
+
 
 const std::vector<InterfaceHandle> emptyHandles;
 

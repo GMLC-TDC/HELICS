@@ -1019,6 +1019,20 @@ HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed, Helics
     }
 }
 
+
+void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err) {
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->processCommunication(helics::Time(period).to_ms());
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
 static const std::map<helics::Federate::Modes, HelicsFederateState> modeEnumConversions{
     {helics::Federate::Modes::ERROR_STATE, HelicsFederateState::HELICS_STATE_ERROR},
     {helics::Federate::Modes::STARTUP, HelicsFederateState::HELICS_STATE_STARTUP},

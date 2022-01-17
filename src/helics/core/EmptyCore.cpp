@@ -139,6 +139,12 @@ iteration_time EmptyCore::requestTimeIterative(LocalFederateId /*federateID*/,
     throw(InvalidFunctionCall("time request should only be called in execution state"));
 }
 
+void EmptyCore::processCommunications(LocalFederateId /*federateID*/,
+                                      std::chrono::milliseconds /*msToWait*/)
+{
+
+}
+
 Time EmptyCore::getCurrentTime(LocalFederateId /*federateID*/) const
 {
     return Time::maxVal();
