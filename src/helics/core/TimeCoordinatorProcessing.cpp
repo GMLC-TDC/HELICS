@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeCoordinator.hpp"
 #include "flagOperations.hpp"
 
-#include <tuple>
 #include <thread>
+#include <tuple>
 
 namespace helics {
 std::tuple<FederateStates, MessageProcessingResult, bool>
