@@ -35,16 +35,16 @@ To set up your environment:
 
 2. Make sure _CMake_ and _git_ are available in the Command Prompt. If they aren't, add them to the system PATH variable. This should be covered by installing them as above.
 
-	```bash
-	$ which git 
-	/usr/local/git
-	
-	$ which cmake
-	/usr/local/cmake
-	
-	$ which ccmake
-	/usr/local/ccmake
-	```
+   ```bash
+   $ which git
+   /usr/local/git
+
+   $ which cmake
+   /usr/local/cmake
+
+   $ which ccmake
+   /usr/local/ccmake
+   ```
 
 3. Checkout the source code and build from source:
 
@@ -82,7 +82,7 @@ To run a full co-simulation go to the "examples/comboFederate1" folder and run t
 
 ```text
 [2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering PUB fed1/pub
-[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering Input 
+[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering Input
 entering init State
 [2022-01-17 14:50:32.990] [console] [info] fed1 (131072)[t=-9223372036.854776]::Registration Complete
 [2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granting Initialization
