@@ -21,7 +21,7 @@ Sequencing Mode determines the priority of the command and can be either
 helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err)
 ```
 
-All commands in C are send on the default ordering for now.  The use case for ordered commands is primarily testing for the time being so the interface has not been added to the C API as of yet.  
+All commands in C are send on the default ordering for now. The use case for ordered commands is primarily testing for the time being so the interface has not been added to the C API as of yet.
 
 ## Targets
 
@@ -64,7 +64,7 @@ The following queries are defined directly in HELICS. Federates may specify a ca
 | ``monitor <args...>``  | [brokers] set up a federate the time monitor <args...> = <federate names> <logperiod>          |
 +------------------------+------------------------------------------------------------------------------------------------+
 | ``remotelog <level>``  | [all object] instruct the object to send log messages to a remote location in addition to local|
-|                        |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |             
+|                        |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |
 +------------------------+------------------------------------------------------------------------------------------------+
 | ``command_status``     | [federates] when received will send a string back to the source of the command                 |
 |                        | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
@@ -77,7 +77,7 @@ How this will get used is somewhat up in the air yet. It is expected that future
 
 ## Usage Notes
 
-Commands that must traverse the network travel along priority paths unless specified with the `HELICS_SEQUENCING_MODE_ORDERED` option in the C++ API.  
+Commands that must traverse the network travel along priority paths unless specified with the `HELICS_SEQUENCING_MODE_ORDERED` option in the C++ API.
 
 ### Application API
 

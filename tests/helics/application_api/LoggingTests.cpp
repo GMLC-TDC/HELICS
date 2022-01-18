@@ -729,7 +729,6 @@ TEST(logging, log_buffer_broker4)
     auto js = helics::fileops::loadJsonStr(str);
     ASSERT_TRUE(js["logs"].isArray());
     EXPECT_EQ(js["logs"].size(), 7U);
-    
 }
 
 TEST(logging, log_buffer_fed)
@@ -985,7 +984,6 @@ TEST(logging, remote_log_core)
     EXPECT_GT(remote_cnt, 0);
 }
 
-
 TEST(logging, remote_log_multifed)
 {
     auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "-f2 --name=broker12");
@@ -1033,7 +1031,6 @@ TEST(logging, remote_log_multifed)
     EXPECT_GT(remote_cnt2, 0);
 }
 
-
 TEST(logging, remote_log_multiObjects)
 {
     auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "-f2 --name=broker13");
@@ -1049,9 +1046,10 @@ TEST(logging, remote_log_multiObjects)
 
     auto Fed1 = std::make_shared<helics::Federate>("monitor1", fi);
     gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlogFed;
-    Fed1->setLoggingCallback([&mlogFed](int level, std::string_view source, std::string_view message) {
-        mlogFed.lock()->emplace_back(level, source, message);
-    });
+    Fed1->setLoggingCallback(
+        [&mlogFed](int level, std::string_view source, std::string_view message) {
+            mlogFed.lock()->emplace_back(level, source, message);
+        });
 
     auto Fed2 = std::make_shared<helics::Federate>("monitor2", fi);
     broker->sendCommand("monitor1", "remotelog timing");
