@@ -533,7 +533,7 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed->finalize();
-
+   
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 4U);
 
@@ -571,7 +571,8 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed2->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed2->finalize();
-
+    broker->waitForDisconnect();
+    broker.reset();
     llock = mlog.lock();
     EXPECT_GE(llock->size(), 8U);
 
