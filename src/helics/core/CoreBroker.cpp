@@ -3025,6 +3025,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     if ((request == "queries") || (request == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
                "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
+               "\"monitor\","
                "\"current_time\",\"current_state\",\"global_state\",\"status\",\"global_time\",\"global_status\",\"version\",\"version_all\",\"exists\",\"global_flush\"]";
     }
     if (request == "address") {
@@ -3073,6 +3074,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "summary") {
         return generateFederationSummary();
+    }
+    if (request == "monitor") {
+        return std::string{"\""} + mTimeMonitorFederate + '"';
     }
     if (request == "logs") {
         Json::Value base;

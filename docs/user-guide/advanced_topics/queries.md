@@ -260,6 +260,8 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``time_monitor``         | get the current time as recorded from the current monitor federate[structure]                     |
 +--------------------------+---------------------------------------------------------------------------------------------------+
+| ``monitor``              | The name of the object used as a time monitor [string]                                            |
++--------------------------+---------------------------------------------------------------------------------------------------+
 ```
 
 `federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower. Error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".

@@ -6,10 +6,22 @@ Cores and Brokers will respond to a small subset of commands known by HELICS, bu
 The general function appears like
 
 ```cpp
-void sendCommand(const std::string& target, const std::string& commandStr)
+void sendCommand(const std::string& target, const std::string& commandStr,
+                             HelicsSequencingModes mode)
 ```
 
 the same function is available for federates, cores, and brokers.
+Sequencing Mode determines the priority of the command and can be either
+
+- `HELICS_SEQUENCING_MODE_FAST` : send on priority channel
+- `HELICS_SEQUENCING_MODE_ORDERED` : send on normal channels ordered with other communication
+- `HELICS_SEQUENCING_MODE_DEFAULT` : use HELICS determined default mode.
+
+```c
+helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err)
+```
+
+All commands in C are send on the default ordering for now.  The use case for ordered commands is primarily testing for the time being so the interface has not been added to the C API as of yet.  
 
 ## Targets
 
@@ -38,20 +50,25 @@ The `commandStr` is a generic string, so can be anything that can be contained i
 The following queries are defined directly in HELICS. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
 ```{eval-rst}
-+----------------------+------------------------------------------------------------------------------------------------+
-| Command String       | Description                                                                                    |
-+======================+================================================================================================+
-| ``terminate``        | [all objects] disconnect the object from the federation                                        |
-+----------------------+------------------------------------------------------------------------------------------------+
-| ``echo``             | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
-+----------------------+------------------------------------------------------------------------------------------------+
-| ``log <string>``     | [all objects] generate a log message in a particular object                                    |
-+----------------------+------------------------------------------------------------------------------------------------+
-| ``monitor <args...>``| [brokers] set up a federate the time monitor <args...> = <federate names> <logperiod>          |
-+----------------------+------------------------------------------------------------------------------------------------+
-| ``command_status``   | [federates] when received will send a string back to the source of the command                 |
-|                      | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
-+----------------------+------------------------------------------------------------------------------------------------+
++------------------------+------------------------------------------------------------------------------------------------+
+| Command String         | Description                                                                                    |
++========================+================================================================================================+
+| ``terminate``          | [all objects] disconnect the object from the federation                                        |
++------------------------+------------------------------------------------------------------------------------------------+
+| ``echo``               | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
++------------------------+------------------------------------------------------------------------------------------------+
+| ``log <string>``       | [all objects] generate a log message in a particular object                                    |
++------------------------+------------------------------------------------------------------------------------------------+
+| ``logbuffer <size>``   | [all objects] set the log buffer to a particular size or `stop`                                |
++------------------------+------------------------------------------------------------------------------------------------+
+| ``monitor <args...>``  | [brokers] set up a federate the time monitor <args...> = <federate names> <logperiod>          |
++------------------------+------------------------------------------------------------------------------------------------+
+| ``remotelog <level>``  | [all object] instruct the object to send log messages to a remote location in addition to local|
+|                        |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |             
++------------------------+------------------------------------------------------------------------------------------------+
+| ``command_status``     | [federates] when received will send a string back to the source of the command                 |
+|                        | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
++------------------------+------------------------------------------------------------------------------------------------+
 ```
 
 ### Future
@@ -60,7 +77,7 @@ How this will get used is somewhat up in the air yet. It is expected that future
 
 ## Usage Notes
 
-Commands that must traverse the network travel along priority paths.
+Commands that must traverse the network travel along priority paths unless specified with the `HELICS_SEQUENCING_MODE_ORDERED` option in the C++ API.  
 
 ### Application API
 
