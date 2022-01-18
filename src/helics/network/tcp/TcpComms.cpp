@@ -222,10 +222,9 @@ bool TcpComms::establishBrokerConnection(
         brokerPort = getDefaultBrokerPort();
     }
     try {
-        brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
+        brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
                                                             brokerTargetAddress,
                                                             std::to_string(brokerPort),
-                                                            maxMessageSize,
                                                             connectionTimeout);
         int retries = 0;
         while (!brokerConnection) {
@@ -250,10 +249,9 @@ bool TcpComms::establishBrokerConnection(
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
             }
-            brokerConnection = gmlc::networking::makeConnection(ioctx->getBaseContext(),
+            brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
                                                                 brokerTargetAddress,
                                                                 std::to_string(brokerPort),
-                                                                maxMessageSize,
                                                                 connectionTimeout);
         }
         if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
@@ -321,10 +319,9 @@ bool TcpComms::establishBrokerConnection(
                             brokerTargetAddress = brkprt.first;
                         }
                         brokerConnection =
-                            gmlc::networking::makeConnection(ioctx->getBaseContext(),
+                            gmlc::networking::establishConnection(ioctx->getBaseContext(),
                                                              brokerTargetAddress,
                                                              std::to_string(brokerPort),
-                                                             maxMessageSize,
                                                              connectionTimeout);
                         continue;
                     }
