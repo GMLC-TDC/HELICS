@@ -177,7 +177,7 @@ void TcpCommsSS::queue_tx_function()
     std::map<std::string, route_id> established_routes;
     if (outgoingConnectionsAllowed) {
         for (const auto& conn : connections) {
-            auto new_connect = gmlc::networking::generateConnection(ioctx, conn);
+            auto new_connect = gmlc::networking::establishConnection(ioctx->getBaseContext(), conn);
 
             if (new_connect) {
                 new_connect->setDataCall(dataCall);
@@ -204,12 +204,11 @@ void TcpCommsSS::queue_tx_function()
         }
         if (outgoingConnectionsAllowed) {
             try {
-                brokerConnection =
-                    gmlc::networking::makeConnection(ioctx->getBaseContext(),
-                                                     brokerTargetAddress,
-                                                     std::to_string(brokerPort),
-                                                     maxMessageSize,
-                                                     std::chrono::milliseconds(connectionTimeout));
+                brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
+                                                                         brokerTargetAddress,
+                                                                         std::to_string(brokerPort),
+                                                                         std::chrono::milliseconds(
+                                                                             connectionTimeout));
                 if (!brokerConnection) {
                     logError("initial connection to broker timed out");
 
@@ -300,8 +299,8 @@ void TcpCommsSS::queue_tx_function()
 
                         if (!established) {
                             if (outgoingConnectionsAllowed) {
-                                auto new_connect = gmlc::networking::generateConnection(
-                                    ioctx, std::string(cmd.payload.to_string()));
+                                auto new_connect = gmlc::networking::establishConnection(
+                                    ioctx->getBaseContext(), std::string(cmd.payload.to_string()));
                                 if (new_connect) {
                                     new_connect->setDataCall(dataCall);
                                     new_connect->setErrorCall(errorCall);
