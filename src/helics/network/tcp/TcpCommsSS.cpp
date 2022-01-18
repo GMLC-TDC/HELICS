@@ -204,11 +204,11 @@ void TcpCommsSS::queue_tx_function()
         }
         if (outgoingConnectionsAllowed) {
             try {
-                brokerConnection =
-                    gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                     brokerTargetAddress,
-                                                     std::to_string(brokerPort),
-                                                     std::chrono::milliseconds(connectionTimeout));
+                brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
+                                                                         brokerTargetAddress,
+                                                                         std::to_string(brokerPort),
+                                                                         std::chrono::milliseconds(
+                                                                             connectionTimeout));
                 if (!brokerConnection) {
                     logError("initial connection to broker timed out");
 

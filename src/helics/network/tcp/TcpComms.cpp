@@ -223,9 +223,9 @@ bool TcpComms::establishBrokerConnection(
     }
     try {
         brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                            brokerTargetAddress,
-                                                            std::to_string(brokerPort),
-                                                            connectionTimeout);
+                                                                 brokerTargetAddress,
+                                                                 std::to_string(brokerPort),
+                                                                 connectionTimeout);
         int retries = 0;
         while (!brokerConnection) {
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
@@ -250,9 +250,9 @@ bool TcpComms::establishBrokerConnection(
                 return terminate(connection_status::terminated);
             }
             brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                                brokerTargetAddress,
-                                                                std::to_string(brokerPort),
-                                                                connectionTimeout);
+                                                                     brokerTargetAddress,
+                                                                     std::to_string(brokerPort),
+                                                                     connectionTimeout);
         }
         if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
             return terminate(connection_status::terminated);
@@ -320,9 +320,9 @@ bool TcpComms::establishBrokerConnection(
                         }
                         brokerConnection =
                             gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                             brokerTargetAddress,
-                                                             std::to_string(brokerPort),
-                                                             connectionTimeout);
+                                                                  brokerTargetAddress,
+                                                                  std::to_string(brokerPort),
+                                                                  connectionTimeout);
                         continue;
                     }
                     if (mess->second.messageID == DELAY_CONNECTION) {
