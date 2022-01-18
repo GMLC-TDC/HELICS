@@ -533,7 +533,7 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed->finalize();
-   
+
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 4U);
 
