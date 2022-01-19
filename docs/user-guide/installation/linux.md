@@ -35,16 +35,16 @@ To set up your environment:
 
 2. Make sure _CMake_ and _git_ are available in the Command Prompt. If they aren't, add them to the system PATH variable. This should be covered by installing them as above.
 
-	```bash
-	$ which git 
-	/usr/local/git
-	
-	$ which cmake
-	/usr/local/cmake
-	
-	$ which ccmake
-	/usr/local/ccmake
-	```
+   ```bash
+   $ which git
+   /usr/local/git
+
+   $ which cmake
+   /usr/local/cmake
+
+   $ which ccmake
+   /usr/local/ccmake
+   ```
 
 3. Checkout the source code and build from source:
 
