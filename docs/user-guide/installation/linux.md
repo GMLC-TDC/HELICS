@@ -78,25 +78,31 @@ $ helics_recorder --version
 3.x.x (20XX-XX-XX)
 ```
 
-To run a full co-simulation go to the "examples/comboFederate1" folder and run the "run2.sh". This will produce three output files: "broker.out", "fed1.out", and "fed2.out". The federate log files should show the exchange of information between federate 1 and 2 such as:
+To run a full co-simulation go to the "examples/comboFederate1" folder and run the "run3.sh". This will produce four output files: "broker.out", "fed1.out", "fed2.out", and "fed3.out". Opening "fed1.out" should show it sending messages to fed2 and receiving messages from fed3.
 
 ```text
-[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering PUB fed1/pub
-[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering Input
+[2022-01-19 11:53:05.308] [console] [info] fed1 (0)::registering PUB fed1/pub
+[2022-01-19 11:53:05.308] [console] [info] fed1 (0)::registering Input 
 entering init State
-[2022-01-17 14:50:32.990] [console] [info] fed1 (131072)[t=-9223372036.854776]::Registration Complete
-[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granting Initialization
-[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granted Time=-9223372036.854776
+[2022-01-19 11:53:05.310] [console] [info] fed1 (131072)[t=-9223372036.854776]::Registration Complete
+[2022-01-19 11:53:05.311] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granting Initialization
+[2022-01-19 11:53:05.311] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granted Time=-9223372036.854776
 entered init State
-[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-1000000]::Granting Execution
-[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=0]::Granted Time=0
+[2022-01-19 11:53:05.312] [console] [debug] fed1 (131072)[t=-1000000]::Granting Execution
+[2022-01-19 11:53:05.312] [console] [debug] fed1 (131072)[t=0]::Granted Time=0
 entered exec State
-message sent from fed1 to fed1/endpoint at time 1
-[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=1e-09]::Granted Time=1e-09
+message sent from fed1 to fed2/endpoint at time 1
+[2022-01-19 11:53:05.313] [console] [debug] fed1 (131072)[t=1e-09]::Granted Time=1e-09
 processed time 1e-09
-received message from fed1/endpoint at 0 ::message sent from fed1 to fed1/endpoint at time 1
-received updated value of 1 at 1e-09s from fed1/pub
-message sent from fed1 to fed1/endpoint at time 2
+received message from fed3/endpoint at 0 ::message sent from fed3 to fed1/endpoint at time 1
+received updated value of 1 at 1e-09s from fed2/pub
+message sent from fed1 to fed2/endpoint at time 2
+[2022-01-19 11:53:05.315] [console] [debug] fed1 (131072)[t=2e-09]::Granted Time=2e-09
+processed time 2e-09
+received message from fed3/endpoint at 1e-09 ::message sent from fed3 to fed1/endpoint at time 2
+received updated value of 2 at 2e-09s from fed2/pub
+message sent from fed1 to fed2/endpoint at time 3
+
 ...
 ```
 
