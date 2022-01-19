@@ -78,6 +78,28 @@ $ helics_recorder --version
 3.x.x (20XX-XX-XX)
 ```
 
+To run a full co-simulation go to the "examples/comboFederate1" folder and run the "run2.sh". This will produce three output files: "broker.out", "fed1.out", and "fed2.out". The federate log files should show the exchange of information between federate 1 and 2 such as:
+
+```text
+[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering PUB fed1/pub
+[2022-01-17 14:50:32.990] [console] [info] fed1 (0)[t=-98763.2]::registering Input
+entering init State
+[2022-01-17 14:50:32.990] [console] [info] fed1 (131072)[t=-9223372036.854776]::Registration Complete
+[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granting Initialization
+[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granted Time=-9223372036.854776
+entered init State
+[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=-1000000]::Granting Execution
+[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=0]::Granted Time=0
+entered exec State
+message sent from fed1 to fed1/endpoint at time 1
+[2022-01-17 14:50:32.991] [console] [debug] fed1 (131072)[t=1e-09]::Granted Time=1e-09
+processed time 1e-09
+received message from fed1/endpoint at 0 ::message sent from fed1 to fed1/endpoint at time 1
+received updated value of 1 at 1e-09s from fed1/pub
+message sent from fed1 to fed1/endpoint at time 2
+...
+```
+
 ## A few Specialized Platforms
 
 The HELICS build supports a few specialized platforms, more will be added as needed. Generally the build requirements are automatically detected but that is not always possible. So a system configuration can be specified in the HELICS_BUILD_CONFIGURATION variable of CMake.
