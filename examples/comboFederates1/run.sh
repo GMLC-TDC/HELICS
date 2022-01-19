@@ -1,5 +1,4 @@
 #!/bin/sh
+# Run this example from the examples/comboFederates1/ folder
 
-../../src/helics/core/helics_broker 2 --loglevel=4 >broker.out &
-./comboFed --name fed1 --target fed2 >fed1.out &
-./comboFed --name fed2 --target fed1 >fed2.out
+../../build/bin/comboFed --startbroker "-f1" --name=fed1 --target=fed1 > fed.out

@@ -9,7 +9,7 @@
 - CMake 3.10 or newer (if using clang with libc++, use 3.18+)
 - git
 - Boost 1.67 or newer
-- ZeroMQ 4.2 or newer (if ZeroMQ support is needed)
+- ZeroMQ 4.2 or newer (generally recommended but technically not essential)
 - MPI-2 implementation (if MPI support is needed)
 
 ### Setup
@@ -21,8 +21,10 @@ To set up your environment:
 1. Install dependencies using apt-get.
 
    ```bash
-   sudo apt-get install libboost-dev
-   sudo apt-get install libzmq5-dev
+   $ sudo apt install libboost-dev
+   $ sudo apt install libzmq5-dev
+   $ sudo apt install git
+   $ sudo apt install cmake-curses-gui #includes ccmake gui
    ```
 
    As an alternative, you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
@@ -31,15 +33,20 @@ To set up your environment:
    `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
    variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
 
-2. Make sure _CMake_ and _git_ are available in the Command Prompt. If they aren't, add them to the system PATH variable.
+2. Make sure _CMake_ and _git_ are available in the Command Prompt. If they aren't, add them to the system PATH variable. This should be covered by installing them as above.
 
-Getting and building from source:
+	```bash
+	$ which git 
+	/usr/local/git
+	
+	$ which cmake
+	/usr/local/cmake
+	
+	$ which ccmake
+	/usr/local/ccmake
+	```
 
-1. Use `git clone` to to check out a copy of HELICS.
-
-2. Create a build folder. Run CMake and give it the path that HELICS was checked out into.
-
-3. Run "make".
+3. Checkout the source code and build from source:
 
 #### Notes for Ubuntu
 
@@ -51,8 +58,8 @@ mkdir build
 cd build
 cmake ../
 # the options can be modified by altering the CMakeCache.txt file or by using the ccmake command to edit them
-# the cmake-gui will also work to graphically edit the configuration options.
-cmake . # optional, to update install path or other configuration settings if modified.
+# the cmake GUI will also work to graphically edit the configuration options.
+ccmake . #optional, invokes the cmake GUI to edit options
 make
 make install
 ```
