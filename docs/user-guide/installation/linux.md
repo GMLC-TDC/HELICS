@@ -82,7 +82,7 @@ To run a full co-simulation go to the "examples/comboFederate1" folder and run t
 
 ```text
 [2022-01-19 11:53:05.308] [console] [info] fed1 (0)::registering PUB fed1/pub
-[2022-01-19 11:53:05.308] [console] [info] fed1 (0)::registering Input 
+[2022-01-19 11:53:05.308] [console] [info] fed1 (0)::registering Input
 entering init State
 [2022-01-19 11:53:05.310] [console] [info] fed1 (131072)[t=-9223372036.854776]::Registration Complete
 [2022-01-19 11:53:05.311] [console] [debug] fed1 (131072)[t=-9223372036.854776]::Granting Initialization
