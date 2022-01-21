@@ -4856,6 +4856,31 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_helicsFederateRequestT
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateProcessCommunications(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  HelicsTime arg2 ;
+  HelicsError *arg3 = (HelicsError *) 0 ;
+  HelicsError etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(HelicsFederate *)&jarg1; 
+  arg2 = (HelicsTime)jarg2; 
+  helicsFederateProcessCommunications(arg1,arg2,arg3);
+  {
+    if (arg3->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
+}
+
+
 SWIGEXPORT jstring JNICALL Java_com_java_helics_helicsJNI_helicsFederateGetName(JNIEnv *jenv, jclass jcls, jlong jarg1) {
   jstring jresult = 0 ;
   HelicsFederate arg1 = (HelicsFederate) 0 ;

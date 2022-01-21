@@ -1,3 +1,3 @@
 function varargout = helicsEndpointAddSourceTarget(varargin)
-  [varargout{1:nargout}] = helicsMEX(291, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(292, varargin{:});
 end

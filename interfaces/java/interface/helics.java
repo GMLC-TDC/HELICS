@@ -1370,6 +1370,18 @@ public class helics implements helicsConstants {
   }
 
   /**
+   * Tell helics to process internal communications for a period of time.<br>
+   * <br>
+   * @param fed The federate to tell to process.<br>
+   * <br>
+   * @param period The length of time to process communications and then return control.<br>
+   * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+   */
+  public static void helicsFederateProcessCommunications(SWIGTYPE_p_void fed, double period) {
+    helicsJNI.helicsFederateProcessCommunications(SWIGTYPE_p_void.getCPtr(fed), period);
+  }
+
+  /**
    * Get the name of the federate.<br>
    * <br>
    * @param fed The federate object to query.<br>
