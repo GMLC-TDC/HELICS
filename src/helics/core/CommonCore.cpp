@@ -855,6 +855,23 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     return fed->requestTime(next, iterate, false);
 }
 
+void CommonCore::processCommunications(LocalFederateId federateID,
+                                       std::chrono::milliseconds msToWait)
+{
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("federateID not valid (processCommunications)"));
+    }
+
+    switch (fed->getState()) {
+        case HELICS_FINISHED:
+        case HELICS_TERMINATING:
+            return;
+        default:
+            break;
+    }
+    fed->processCommunications(msToWait);
+}
 Time CommonCore::getCurrentTime(LocalFederateId federateID) const
 {
     auto* fed = getFederateAt(federateID);
@@ -4582,10 +4599,10 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
     }
 }
 
-bool CommonCore::hasTimeBlock(GlobalFederateId fedID)
+bool CommonCore::hasTimeBlock(GlobalFederateId federateID)
 {
     for (auto& tb : timeBlocks) {
-        if (fedID == tb.first) {
+        if (federateID == tb.first) {
             return (tb.second != 0);
         }
     }

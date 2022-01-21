@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "TimeCoordinator.hpp"
 #include "flagOperations.hpp"
 
+#include <thread>
 #include <tuple>
 
 namespace helics {
@@ -28,6 +29,14 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_IGNORE:
         default:
             break;
+        case CMD_USER_RETURN: {
+            auto tidHash = std::hash<std::thread::id>{}(std::this_thread::get_id());
+            auto tid = static_cast<std::int32_t>(tidHash);
+            if (tid == cmd.messageID) {
+                proc = MessageProcessingResult::USER_RETURN;
+            }
+
+        } break;
         case CMD_TIME_BLOCK:
         case CMD_TIME_BARRIER:
         case CMD_TIME_BARRIER_CLEAR:

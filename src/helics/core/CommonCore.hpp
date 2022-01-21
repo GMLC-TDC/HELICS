@@ -110,6 +110,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual iteration_time requestTimeIterative(LocalFederateId federateID,
                                                 Time next,
                                                 IterationRequest iterate) override final;
+    virtual void processCommunications(LocalFederateId federateID,
+                                       std::chrono::milliseconds msToWait) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override final;
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override final;
     virtual void
@@ -473,7 +475,7 @@ class CommonCore: public Core, public BrokerBase {
     // generate a timing connection between the core and filter Federate
     void connectFilterTiming();
     /** check if a given federate has a timeblock*/
-    bool hasTimeBlock(GlobalFederateId fedID);
+    bool hasTimeBlock(GlobalFederateId federateID);
     /** wait for the core to be registered with the broker*/
     bool waitCoreRegistration();
     /** generate the messages to a set of destinations*/

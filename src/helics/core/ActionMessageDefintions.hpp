@@ -87,6 +87,7 @@ across different compilers*/
             38,  //!< command to request the current time status of a federate
         cmd_grant_timeout_check = 439,  //!< command to run a check on whether a timeout has been
                                         //!< exceeded for granting time
+        cmd_user_return = 535,  //!< return from processing
         cmd_time_block = 40,  //!< prevent a federate from granting time until the block is cleared
         cmd_time_unblock = 41,  //!< clear a time block
         cmd_time_barrier_request = 42,  //!< request a time barrier
@@ -247,6 +248,7 @@ across different compilers*/
 #define CMD_TIME_CHECK action_message_def::action_t::cmd_time_check
 #define CMD_GRANT_TIMEOUT_CHECK action_message_def::action_t::cmd_grant_timeout_check
 #define CMD_REQUEST_CURRENT_TIME action_message_def::action_t::cmd_request_current_time
+#define CMD_USER_RETURN action_message_def::action_t::cmd_user_return
 
 #define CMD_TIME_BLOCK action_message_def::action_t::cmd_time_block
 #define CMD_TIME_UNBLOCK action_message_def::action_t::cmd_time_unblock

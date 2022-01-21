@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
     app.add_option("--startbroker", brokerArgs, "start a broker with the specified arguments");
     app.allow_extras();
 
+    app.allow_extras();
     auto ret = app.helics_parse(argc, argv);
 
     helics::FederateInfo fi;

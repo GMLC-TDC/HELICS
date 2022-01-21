@@ -547,8 +547,21 @@ TEST(logging, timeMonitorFederate_swap)
     EXPECT_EQ(grantCount, 2);
     llock.unlock();
     broker->sendCommand("root", "monitor monitor2");
-    broker->query("root", "global_flush");
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    Fed2->processCommunication(std::chrono::milliseconds(100));
+
+    auto deps = Fed2->query("dependents");
+    int cnt{0};
+    while (deps == "[]") {
+        Fed2->processCommunication(std::chrono::milliseconds(100));
+
+        deps = Fed2->query("dependents");
+        ++cnt;
+        if (cnt > 10) {
+            break;
+        }
+    }
+    EXPECT_LE(cnt, 10);
     rtime = Fed2->requestTime(1.0);
     EXPECT_EQ(rtime, 1.0);
     rtime = Fed2->requestTime(2.0);
@@ -558,7 +571,8 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed2->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed2->finalize();
-
+    broker->waitForDisconnect();
+    broker.reset();
     llock = mlog.lock();
     EXPECT_GE(llock->size(), 8U);
 

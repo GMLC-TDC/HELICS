@@ -378,7 +378,8 @@ class FederateState {
     MessageProcessingResult genericUnspecifiedQueueProcess(bool busyReturn);
     /** function to process the queue until a disconnect_fed_ack is received*/
     void finalize();
-
+    /** process incoming messages for a certain amount of time*/
+    void processCommunications(std::chrono::milliseconds period);
     /** add an action message to the queue*/
     void addAction(const ActionMessage& action);
     /** move a message to the queue*/

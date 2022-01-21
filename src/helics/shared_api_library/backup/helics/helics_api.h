@@ -364,6 +364,7 @@ void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime requestTime, 
 HelicsTime helicsFederateRequestTimeComplete(HelicsFederate fed, HelicsError* err);
 void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requestTime, HelicsIterationRequest iterate, HelicsError* err);
 HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed, HelicsIterationResult* outIterate, HelicsError* err);
+void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err);
 const char* helicsFederateGetName(HelicsFederate fed);
 void helicsFederateSetTimeProperty(HelicsFederate fed, int timeProperty, HelicsTime time, HelicsError* err);
 void helicsFederateSetFlagOption(HelicsFederate fed, int flag, HelicsBool flagValue, HelicsError* err);
