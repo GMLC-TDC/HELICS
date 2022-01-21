@@ -1,7 +1,7 @@
 sphinx==4.2.0
 sphinx_rtd_theme==1.0.0
 myst-parser==0.15.2
-ipython==7.28.0
+ipython==7.31.1
 ipykernel==6.4.2
 nbsphinx==0.8.7
 breathe==4.31.0
