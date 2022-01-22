@@ -538,13 +538,39 @@ received
     }
 
     /** define a named global translator interface
+    @param translatorType a code defining a known type of translator (0 for custom)
+    @param translatorName the name of the globally visible translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerGlobalTranslator(std::int32_t translatorType,
+                                         std::string_view translatorName,
+                                         std::string_view endpointType = std::string_view{},
+                                         std::string_view units = std::string_view());
+
+    /** define a translator interface
+    @details a translator acts as a bridge between value and message interfaces
+    @param translatorType a code defining a known type of translator (0 for custom)
+    @param translatorName the name of the globally visible translator can be empty for 
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerTranslator(std::int32_t translatorType,
+                                   std::string_view translatorName,
+                                   std::string_view endpointType = std::string_view{},
+                                   std::string_view units = std::string_view{});
+
+    /** define a named global translator interface
     @param translatorName the name of the globally visible translator
     @param endpointType the type associated with the translator endpoint
     @param units the units associated with the translator value interfaces
     */
     Translator& registerGlobalTranslator(std::string_view translatorName,
                                  std::string_view endpointType = std::string_view{},
-                                 std::string_view units = std::string_view());
+                                 std::string_view units = std::string_view())
+    {
+        return registerGlobalTranslator(0, translatorName, endpointType, units);
+    }
 
     /** define a translator interface
     @details a translator acts as a bridge between value and message interfaces
@@ -554,7 +580,10 @@ received
     */
     Translator& registerTranslator(std::string_view translatorName,
                                    std::string_view endpointType = std::string_view{},
-                                   std::string_view units = std::string_view{});
+                                   std::string_view units = std::string_view{})
+    {
+        return registerTranslator(0, translatorName, endpointType, units);
+    }
    
 
     /** define a nameless translator interface
@@ -602,6 +631,39 @@ received
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
 
+    //translator retrieval
+    /** get a translator from its name
+    @param translatorName the name of the translator
+    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    const Translator& getTranslator(const std::string& translatorName) const;
+
+    /** get a translator from its index
+    @param index the index of a translator
+    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    const Translator& getTranslator(int index) const;
+
+    /** get a translator from its name
+      @param translatorName the name of the translator
+      @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    Translator& getTranslator(const std::string& translatorName);
+
+    /** get a translator from its index
+    @param index the index of a translator
+    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    Translator& getTranslator(int index);
+
+    /** @brief register a operator for the specified translator
+    @details
+    The TranslatorOperator gets called when there is a message or value to translate, There is no order or state to
+    this messages can come in any order.
+    @param trans the translator object to set the operation on
+    @param op a shared_ptr to a \ref TranslatorOperator
+    */
+    void setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op);
+
+    /** get the number of translators registered through this federate*/
+    int getTranslatorCount() const;
+
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
@@ -642,9 +704,7 @@ received
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/
     const std::shared_ptr<Core>& getCorePointer() { return coreObject; }
-    // interface for filter objects
-    /** get a count of the number of filter objects stored in the federate*/
-    int filterCount() const;
+
     /** log a message to the federate Logger
    @param level the logging level of the message
    @param message the message to log
@@ -687,16 +747,16 @@ received
     void updateFederateMode(Modes newMode);
     /** function to deal with any operations that need to occur on a time update*/
     void updateSimulationTime(Time newTime, Time oldTime, bool iterating);
-    /** register filter interfaces defined in  file or string
+    /** register connector(filters,translators) interfaces defined in  file or string
   @details call is only valid in startup mode
   @param jsonString  the location of the file or config String to load to generate the interfaces
   */
-    void registerFilterInterfacesJson(const std::string& jsonString);
-    /** register filter interfaces defined in  file or string
+    void registerConnectorInterfacesJson(const std::string& jsonString);
+    /** register connector(filters,translators) interfaces defined in  file or string
     @details call is only valid in startup mode
     @param tomlString  the location of the file or config String to load to generate the interfaces
     */
-    void registerFilterInterfacesToml(const std::string& tomlString);
+    void registerConnectorInterfacesToml(const std::string& tomlString);
 };
 
 /** base class for the interface objects*/

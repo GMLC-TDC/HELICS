@@ -82,11 +82,6 @@ Filter& ConnectorFederateManager::registerFilter(FilterTypes type, const std::st
     return make_filter(type, fed, name);
 }
 
-Translator& ConnectorFederateManager::registerTranslator(TranslatorTypes type, std::string_view name)
-{
-    return make_translator(type, fed, name);
-}
-
 CloningFilter& ConnectorFederateManager::registerCloningFilter(FilterTypes type,
                                                             const std::string& name)
 {

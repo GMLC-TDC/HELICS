@@ -75,6 +75,20 @@ class TranslatorOperations {
     virtual std::shared_ptr<TranslatorOperator> getOperator() = 0;
 };
 
+
+/**custom operation object*/
+class CustomTranslatorOperation: public TranslatorOperations {
+  private:
+    std::shared_ptr<TranslatorOperator> to;
+
+  public:
+    explicit CustomTranslatorOperation(std::shared_ptr<TranslatorOperator> op): to(std::move(op)){};
+    virtual std::shared_ptr<TranslatorOperator> getOperator() override
+    {
+        return to;
+    }
+};
+
 /**translator for converting a message to JSON and vice versa*/
 class JsonTranslatorOperation: public TranslatorOperations {
   private:

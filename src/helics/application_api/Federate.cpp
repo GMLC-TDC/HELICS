@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "CoreApp.hpp"
 #include "ConnectorFederateManager.hpp"
 #include "Filters.hpp"
+#include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
@@ -947,10 +948,10 @@ void Federate::registerInterfaces(const std::string& configString)
 void Federate::registerFilterInterfaces(const std::string& configString)
 {
     if (fileops::hasTomlExtension(configString)) {
-        registerFilterInterfacesToml(configString);
+        registerConnectorInterfacesToml(configString);
     } else {
         try {
-            registerFilterInterfacesJson(configString);
+            registerConnectorInterfacesJson(configString);
         }
         catch (const std::invalid_argument& e) {
             throw(helics::InvalidParameter(e.what()));
@@ -1020,7 +1021,7 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     addTargets(data, "destination_targets", adest);
 }
 
-void Federate::registerFilterInterfacesJson(const std::string& jsonString)
+void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     using fileops::getOrDefault;
     auto doc = fileops::loadJson(jsonString);
@@ -1132,7 +1133,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
     });
 }
 
-void Federate::registerFilterInterfacesToml(const std::string& tomlString)
+void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
     using fileops::isMember;
@@ -1277,10 +1278,16 @@ const Filter& Federate::getFilter(int index) const
     return cManager->getFilter(index);
 }
 
-int Federate::filterCount() const
+Translator& Federate::getTranslator(int index)
 {
-    return cManager->getFilterCount();
+    return cManager->getTranslator(index);
 }
+
+const Translator& Federate::getTranslator(int index) const
+{
+    return cManager->getTranslator(index);
+}
+
 
 std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
@@ -1432,25 +1439,40 @@ CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterNa
 }
 
 
-Translator& Federate::registerGlobalTranslator(std::string_view translatorName,
+Translator& Federate::registerGlobalTranslator(std::int32_t translatorType,
+                                               std::string_view translatorName,
                                                std::string_view endpointType,
                                                std::string_view units)
 {
-    return cManager->registerTranslator(translatorName,
+    Translator& trans= cManager->registerTranslator(translatorName,
                                     endpointType,
                                     units);
+    trans.setTranslatorType(translatorType);
+    return trans;
 }
 
 
-Translator& Federate::registerTranslator(std::string_view translatorName,
+Translator& Federate::registerTranslator(std::int32_t translatorType,
+                                         std::string_view translatorName,
                                          std::string_view endpointType,
                                          std::string_view units)
 {
-    return cManager->registerTranslator((!translatorName.empty()) ?
-                                        (getName() + nameSegmentSeparator + std::string(translatorName)) :
-                                        translatorName,
+
+    std::string globalName = [this, translatorName]() {
+        if (translatorName.empty()) {
+            std::string name = getName();
+            name.push_back(nameSegmentSeparator);
+            name.append(translatorName);
+            return name;
+        }
+        return std::string{};
+    }();
+    
+    Translator& trans = cManager->registerTranslator(globalName,
                                     endpointType,
                                     units);
+    trans.setTranslatorType(translatorType);
+    return trans;
 }
 
 const Filter& Federate::getFilter(const std::string& filterName) const
@@ -1479,6 +1501,29 @@ int Federate::getFilterCount() const
 void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op)
 {
     coreObject->setFilterOperator(filt.getHandle(), std::move(op));
+}
+
+const Translator& Federate::getTranslator(const std::string& translatorName) const
+{
+    const Translator& trans = cManager->getTranslator(translatorName);
+    if (!trans.isValid()) {
+        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+    }
+    return trans;
+}
+
+Translator& Federate::getTranslator(const std::string& translatorName)
+{
+    Translator& trans = cManager->getTranslator(translatorName);
+    if (!trans.isValid()) {
+        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+    }
+    return trans;
+}
+
+int Federate::getTranslatorCount() const
+{
+    return cManager->getTranslatorCount();
 }
 
 void Federate::logMessage(int level, const std::string& message) const

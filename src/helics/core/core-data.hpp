@@ -139,7 +139,13 @@ class TranslatorOperator {
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) = 0;
 
     /** convert a value to a message*/
-    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer &value) = 0;
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) = 0;
+
+    /** generate a new time for the message based on the value time */
+    virtual Time computeNewMessageTime(Time valueTime) { return valueTime + minDelay; }
+    /** generate a new time for the value based on the message time */
+    virtual Time computeNewValueTime(Time messageTime) { return messageTime + minDelay; }
+    Time minDelay{Time::epsilon()};
 };
 
 /** special filter operator defining no operation the original message is simply returned

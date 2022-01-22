@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/application_api/TranslatorOperations.hpp"
+#include "helics/application_api/CombinationFederate.hpp"
 
 #ifndef HELICS_SHARED_LIBRARY
 #    include "helics/core/Broker.hpp"
@@ -26,11 +27,11 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out translator operations
  */
 
-class translator_tests: public ::testing::Test, public FederateTestFixture {
+class translator: public ::testing::Test, public FederateTestFixture {
 };
 
 /** test registration of translators*/
-TEST_F(translator_tests, translator_registration)
+TEST_F(translator, translator_registration)
 {
     auto broker = AddBroker("test", 2);
 
@@ -60,7 +61,7 @@ TEST_F(translator_tests, translator_registration)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_queries)
+TEST_F(translator, translator_queries)
 {
     auto broker = AddBroker("test", 2);
 
@@ -101,7 +102,7 @@ TEST_F(translator_tests, translator_queries)
 }
 
 
-TEST_F(translator_tests, translator_connections1)
+TEST_F(translator, translator_connections1)
 {
     auto broker = AddBroker("test", 2);
 
@@ -130,7 +131,7 @@ TEST_F(translator_tests, translator_connections1)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections2)
+TEST_F(translator, translator_connections2)
 {
     auto broker = AddBroker("test", 2);
 
@@ -161,7 +162,7 @@ TEST_F(translator_tests, translator_connections2)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections3)
+TEST_F(translator, translator_connections3)
 {
     auto broker = AddBroker("test", 2);
 
@@ -201,7 +202,7 @@ TEST_F(translator_tests, translator_connections3)
 }
 
 
-TEST_F(translator_tests, translator_connections4)
+TEST_F(translator, translator_connections4)
 {
     auto broker = AddBroker("test", 2);
 
@@ -230,7 +231,7 @@ TEST_F(translator_tests, translator_connections4)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections5)
+TEST_F(translator, translator_connections5)
 {
     auto broker = AddBroker("test", 2);
 
@@ -259,7 +260,7 @@ TEST_F(translator_tests, translator_connections5)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections6)
+TEST_F(translator, translator_connections6)
 {
     auto broker = AddBroker("test", 2);
 
@@ -298,7 +299,7 @@ TEST_F(translator_tests, translator_connections6)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections7)
+TEST_F(translator, translator_connections7)
 {
     auto broker = AddBroker("test", 2);
 
@@ -327,7 +328,7 @@ TEST_F(translator_tests, translator_connections7)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections8)
+TEST_F(translator, translator_connections8)
 {
     auto broker = AddBroker("test", 2);
 
@@ -356,7 +357,7 @@ TEST_F(translator_tests, translator_connections8)
     FullDisconnect();
 }
 
-TEST_F(translator_tests, translator_connections9)
+TEST_F(translator, translator_connections9)
 {
     auto broker = AddBroker("test", 2);
 
@@ -391,6 +392,104 @@ TEST_F(translator_tests, translator_connections9)
     mFed1->finalize();
     // std::cout << "fFed returned\n";
     mFed2->finalizeComplete();
+
+    FullDisconnect();
+}
+
+
+TEST_F(translator, translator_connections10)
+{
+    auto broker = AddBroker("test", 1);
+
+    AddFederates<helics::CombinationFederate>("test", 1, broker, helics::timeZero, "A");
+    
+
+    auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+
+    auto& e1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
+    auto& i1 = cFed1->registerGlobalInput<double>("i1");
+    auto& p1 = cFed1->registerGlobalPublication<double>("p1");
+    p1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+
+    e1.addSourceTarget("t1");
+    p1.addDestinationTarget("t1");
+    i1.addSourceTarget("t1");
+    e1.addDestinationTarget("t1");
+
+    cFed1->registerGlobalTranslator("t1");
+
+    EXPECT_NO_THROW(cFed1->enterExecutingMode());
+
+    cFed1->finalize();
+
+    FullDisconnect();
+}
+
+
+
+TEST_F(translator, translator_time_advance)
+{
+    auto broker = AddBroker("test", 1);
+
+    AddFederates<helics::CombinationFederate>("test", 1, broker, helics::timeZero, "A");
+
+    auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto& e1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
+    auto& i1 = cFed1->registerGlobalInput<double>("i1");
+    auto& p1 = cFed1->registerGlobalPublication<double>("p1");
+    p1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+
+    e1.addSourceTarget("t1");
+    p1.addDestinationTarget("t1");
+    i1.addSourceTarget("t1");
+    e1.addDestinationTarget("t1");
+
+    cFed1->registerGlobalTranslator("t1");
+
+    EXPECT_NO_THROW(cFed1->enterExecutingMode());
+
+    auto tres = cFed1->requestTime(2.0);
+    EXPECT_EQ(tres, 2.0);
+    cFed1->finalize();
+
+    FullDisconnect();
+}
+
+
+TEST_F(translator, translator_to_message)
+{
+    auto broker = AddBroker("test", 1);
+
+    AddFederates<helics::CombinationFederate>("test", 1, broker, helics::timeZero, "A");
+
+    auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
+
+    auto& e1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
+    auto& i1 = cFed1->registerGlobalInput<double>("i1");
+    auto& p1 = cFed1->registerGlobalPublication<double>("p1");
+    p1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+
+    e1.addSourceTarget("t1");
+    p1.addDestinationTarget("t1");
+    i1.addSourceTarget("t1");
+    e1.addDestinationTarget("t1");
+
+    cFed1->registerGlobalTranslator(helics::TranslatorTypes::JSON,"t1");
+
+    EXPECT_NO_THROW(cFed1->enterExecutingMode());
+
+    p1.publish(20.7);
+    auto tres = cFed1->requestTime(2.0);
+    EXPECT_LT(tres, 2.0);
+    cFed1->finalize();
 
     FullDisconnect();
 }

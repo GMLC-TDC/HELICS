@@ -531,7 +531,7 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     auto id = mFed.getEndpoint("ept1");
     EXPECT_EQ(id.getExtractionType(), "genmessage");
 
-    EXPECT_EQ(mFed.filterCount(), 3);
+    EXPECT_EQ(mFed.getFilterCount(), 3);
 
     auto filt = &mFed.getFilter(2);
 

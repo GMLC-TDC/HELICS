@@ -46,7 +46,7 @@ class TranslatorFederate {
 
     std::function<void(ActionMessage&)> mDeliverMessage;
 
-    std::function<void(int, const std::string&, const std::string&)> mLogger;
+    std::function<void(int, std::string_view, std::string_view)> mLogger;
     std::function<gmlc::containers::AirLock<std::any>&(int)> mGetAirLock;
 
     Time minReturnTime{Time::maxVal()};
@@ -58,11 +58,7 @@ class TranslatorFederate {
   public:
     TranslatorFederate(GlobalFederateId fedID, std::string name, GlobalBrokerId coreID, Core* core);
     ~TranslatorFederate();
-    /** process any filter or route the message*/
-    void processMessageFilter(ActionMessage& cmd);
-    /** process a filter message return*/
-    void processFilterReturn(ActionMessage& cmd);
-    /** create a filter */
+    /** create a translator */
     TranslatorInfo* createTranslator(GlobalBrokerId dest,
                              InterfaceHandle handle,
                              const std::string& key,
@@ -80,7 +76,7 @@ class TranslatorFederate {
         mSendMessageMove = std::move(sendMessageMove);
     }
 
-    void setLogger(std::function<void(int, const std::string&, const std::string&)> logger)
+    void setLogger(std::function<void(int, std::string_view, std::string_view)> logger)
     {
         mLogger = std::move(logger);
     }
@@ -111,14 +107,7 @@ class TranslatorFederate {
     TranslatorInfo* getTranslatorInfo(GlobalHandle id);
     TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle);
     const TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle) const;
-    /** run the destination filters associated with an endpoint*/
 
-
-    std::pair<ActionMessage&, bool> executeTranslator(ActionMessage& command, TranslatorInfo* trans);
-    void generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);
-    void acceptProcessReturn(GlobalFederateId fid, uint32_t pid);
-
-    void generateDestProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime);
-    void acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid);
+    void executeTranslator(ActionMessage& command, TranslatorInfo* trans);
 };
 }  // namespace helics

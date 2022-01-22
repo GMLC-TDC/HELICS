@@ -22,7 +22,7 @@ struct TransInformation {
     std::string key;
     std::string type;
     TransInformation() = default;
-    TransInformation(GlobalHandle gid, const std::string& key_, const std::string& type_):
+    TransInformation(GlobalHandle gid, std::string_view key_, std::string_view type_):
         id(gid), key(key_), type(type_)
     {
     }
@@ -33,12 +33,12 @@ class TranslatorInfo {
   public:
     /** constructor from all fields*/
     TranslatorInfo(GlobalHandle handle,
-        const std::string & key_,
-               const std::string& type_in_,
-               const std::string& units):
+        std::string_view key_,
+                   std::string_view endpointType,
+                   std::string_view units):
         id(handle),
-        key(key_),
-        pub(handle, key_, "any", units), ipt(handle, key_, "any", units), ept(handle,key_,type_in_)
+        key(key_), pub(handle, key_, "any", units), ipt(handle, key_, "any", units),
+        ept(handle, key_, endpointType)
     {
     }
     const GlobalHandle id;  //!< id of the translator

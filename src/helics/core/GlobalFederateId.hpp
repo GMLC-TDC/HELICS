@@ -131,9 +131,10 @@ constexpr GlobalFederateId gDirectCoreId{-235262};
 constexpr GlobalFederateId getSpecialFederateId(GlobalBrokerId broker,
                                                 GlobalBrokerId::BaseType index)
 {
+    //allow 3 special federates per subbroker/core + 3 special ones for the root broker
     return (broker != gRootBrokerID) ?
         (GlobalFederateId(gGlobalBrokerIdShift -
-                          2 * (broker.baseValue() - gGlobalBrokerIdShift + 2) + index)) :
+                          3 * (broker.baseValue() - gGlobalBrokerIdShift + 2) + index)) :
         GlobalFederateId(gGlobalBrokerIdShift - index - 1);
 }
 /** stream operator for a federate_id*/

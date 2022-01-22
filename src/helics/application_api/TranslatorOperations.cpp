@@ -27,9 +27,9 @@ namespace helics {
     std::unique_ptr<Message> JsonTranslatorOperator::convertToMessage(const SmallBuffer& value) {
         defV val;
         valueExtract(value, DataType::HELICS_ANY, val);
-       valueConvert(val,DataType::HELICS_JSON);
+       auto sb=typeConvertDefV(DataType::HELICS_JSON,val);
         auto m = std::make_unique<Message>();
-       m->data = std::get<std::string>(val);
+       m->data = sb.to_string();
         return m;
     }
 

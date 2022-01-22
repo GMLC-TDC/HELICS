@@ -31,20 +31,18 @@ TranslatorFederate::TranslatorFederate(GlobalFederateId fedID,
     mCoord.source_id = fedID;
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
     mCoord.specifyNonGranting(true);
-    mCoord.specifyNonGranting(true);
+    mCoord.setProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, Time::epsilon());
 }
 
 TranslatorFederate::~TranslatorFederate()
 {
     mHandles = {nullptr};
     current_state = {HELICS_CREATED};
-    // The interface_handle used is here is usually referencing an endpoint
 
     mQueueMessage = nullptr;
     mQueueMessageMove = nullptr;
     mSendMessage = nullptr;
     mSendMessageMove = nullptr;
-
     mDeliverMessage = nullptr;
 
     mLogger = nullptr;
@@ -61,66 +59,43 @@ void TranslatorFederate::routeMessage(const ActionMessage& msg)
     }
 }
 
-/** process any filter or route the message*/
-void TranslatorFederate::processMessageFilter(ActionMessage& cmd)
+void TranslatorFederate::executeTranslator(ActionMessage& command,
+                                                              TranslatorInfo* trans)
 {
-    
-}
-
-void TranslatorFederate::generateProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
-{
-    // nothing further to process
-    auto fid_index = fid.baseValue();
-    
-}
-
-void TranslatorFederate::acceptProcessReturn(GlobalFederateId fid, uint32_t pid)
-{
-    // nothing further to process
-    auto fid_index = fid.baseValue();
-    
-}
-
-void TranslatorFederate::generateDestProcessMarker(GlobalFederateId fid, uint32_t pid, Time returnTime)
-{
-    // nothing further to process
-    auto fid_index = fid.baseValue();
-}
-
-void TranslatorFederate::acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid)
-{
-    // nothing further to process
-    auto fid_index = fid.baseValue();
-    
-}
-
-/** process a filter message return*/
-void TranslatorFederate::processFilterReturn(ActionMessage& cmd)
-{
-    auto* handle = mHandles->getEndpoint(cmd.dest_handle);
-    if (handle == nullptr) {
+    if (!trans->tranOp) {
         return;
     }
-
-    auto mid = cmd.sequenceID;
-    auto fid = handle->getFederateId();
-    auto fid_index = fid.baseValue();
-
-    
+    switch (command.action()) {
+        case CMD_SEND_MESSAGE:
+            break;
+        case CMD_PUB: {
+            auto message = trans->tranOp->convertToMessage(command.payload);
+            if (message) {
+                auto targets=trans->getEndpointInfo()->getTargets();
+                if (targets.empty()) {
+                    break;
+                }
+                const auto &source=trans->getInputInfo()->getSourceName(command.getSource());
+                if (targets.size()==1) {
+                    message->dest = targets.front().second;
+                    message->source = source;
+                    message->time = command.actionTime + 0.1;
+                    ActionMessage sendM(std::move(message));
+                    sendM.setDestination(targets.front().first);
+                    sendM.setSource(command.getSource());
+                    mDeliverMessage(sendM);
+                } else {
+                    for (const auto& tg : targets) {
+                    }
+                }
+                
+            }
+        }
+            
+            break;
+    }
+    return ;
 }
-
-
-std::pair<ActionMessage&, bool> TranslatorFederate::executeTranslator(ActionMessage& command,
-                                                              TranslatorInfo* filt)
-{
-    
-    return {command, true};
-}
-
-
-
-
-
 
 
 void TranslatorFederate::handleMessage(ActionMessage& command)
@@ -200,26 +175,63 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                 tranI->getEndpointInfo()->removeTarget(command.getSource());
             }
         } break;
-        case CMD_REG_ENDPOINT: {
+        case CMD_REMOVE_PUBLICATION: {
+            auto* tranI = getTranslatorInfo(command.getDest());
+            if (tranI != nullptr) {
+                tranI->getInputInfo()->removeSource(command.getSource(),timeZero);
+            }
            
         } break;
+        case CMD_REMOVE_SUBSCRIBER: {
+            auto* tranI = getTranslatorInfo(command.getDest());
+            if (tranI != nullptr) {
+                tranI->getPubInfo()->removeSubscriber(command.getSource());
+            }
 
+        } break;
+        case CMD_ADD_PUBLISHER: {
+            auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
+            if (tranI != nullptr) {
+               
+                    tranI->getInputInfo()->addSource(command.getSource(),
+                                                                   command.payload.to_string(),
+                                                                   command.getString(
+                                                                       typeStringLoc), command.getString(unitStringLoc));
+                
+                if (!checkActionFlag(command, error_flag)) {
+                    mCoord.addDependency(command.source_id);
+                }
+            }
+        } break;
+        case CMD_ADD_SUBSCRIBER: {
+            auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
+            if (tranI != nullptr) {
+                tranI->getPubInfo()->addSubscriber(command.getSource());
+
+                if (!checkActionFlag(command, error_flag)) {
+                    mCoord.addDependent(command.source_id);
+                }
+            }
+        } break;
         case CMD_ADD_ENDPOINT: {
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
                 if (checkActionFlag(command, destination_target)) {
                     tranI->getEndpointInfo()->addDestinationTarget(command.getSource(),command.payload.to_string(),command.getString(typeStringLoc));
+                    if (!checkActionFlag(command, error_flag)) {
+                        mCoord.addDependent(command.source_id);
+                    }
                 } else {
                     tranI->getEndpointInfo()->addSourceTarget(command.getSource(),
                                                               command.payload.to_string(),
                                                               command.getString(typeStringLoc));
+                    if (!checkActionFlag(command, error_flag)) {
+                        mCoord.addDependency(command.source_id);
+                    }
                 }
-                if (!checkActionFlag(command, error_flag)) {
-                    mCoord.addDependency(command.source_id);
-                }
+                
             }
 
-            
         } break;
         case CMD_CORE_CONFIGURE:
             if (command.messageID == UPDATE_TRANSLATOR_OPERATOR) {
@@ -232,6 +244,14 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                     }
                 }
             }
+            break;
+        case CMD_SEND_MESSAGE:
+        case CMD_PUB: {
+            auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
+            if (tranI != nullptr) {
+                executeTranslator(command, tranI);
+            }
+        }
             break;
         default:
             break;
@@ -372,7 +392,7 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
         base["id"] = mFedID.baseValue();
         base["parent"] = mCoreID.baseValue();
         if (translators.size() > 0) {
-            base["filters"] = Json::arrayValue;
+            base["translators"] = Json::arrayValue;
             for (const auto& trans : translators) {
                 Json::Value tran;
                 tran["id"] = trans->id.handle.baseValue();

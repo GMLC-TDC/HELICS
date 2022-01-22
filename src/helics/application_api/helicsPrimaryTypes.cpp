@@ -1145,6 +1145,8 @@ void valueConvert(defV& val, DataType newType)
             val = V.getBaseTimeCode();
             break;
         }
+        case DataType::HELICS_JSON:
+            break;
         case DataType::HELICS_STRING:
         default: {
             if (index == string_loc) {

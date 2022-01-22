@@ -18,14 +18,14 @@ class TranslatorOperations;
 class TranslatorOperator;
 class CoreApp;
 /** a set of common defined translators*/
-enum class TranslatorTypes {
+enum TranslatorTypes:std::int32_t {
     CUSTOM = HELICS_TRANSLATOR_TYPE_CUSTOM,
     JSON = HELICS_TRANSLATOR_TYPE_JSON,
     BINARY=HELICS_TRANSLATOR_TYPE_BINARY,
     UNRECOGNIZED = 7
 };
 
-#define EMPTY_STRING std::string()
+constexpr std::string_view emptyString{""};
 
 /** get the translator type from a string*/
 HELICS_CXX_EXPORT TranslatorTypes translatorTypeFromString(const std::string& translatorType) noexcept;
@@ -40,18 +40,12 @@ class HELICS_CXX_EXPORT Translator: public Interface {
   public:
     /** default constructor*/
     Translator() = default;
-    /** construct through a federate*/
-    explicit Translator(Federate* ffed, std::string_view translatorName = EMPTY_STRING);
     /** construct from handle and federate*/
     Translator(Federate* ffed, std::string_view translatorName, InterfaceHandle ihandle);
     /** construct from handle and core*/
     Translator(Core* core, std::string_view translatorName, InterfaceHandle ihandle);
-    /** construct through a federate*/
-    Translator(InterfaceVisibility locality,
-           Federate* ffed,
-               std::string_view translatorName = EMPTY_STRING);
     /** construct through a core object*/
-    explicit Translator(Core* cr, std::string_view translatorName = EMPTY_STRING);
+    explicit Translator(Core* cr, std::string_view translatorName = emptyString);
     /** virtual destructor*/
     virtual ~Translator() = default;
 
@@ -80,56 +74,13 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     virtual void setString(const std::string& property, const std::string& val);
 
     void addTarget(const std::string& target) { addSourceTarget(target); }
-
+    /** set the type of operations specifying how the translator should operate*/
+    void setTranslatorType(std::int32_t type);
   protected:
     /** set a translator operations object */
     void setTranslatorOperations(std::shared_ptr<TranslatorOperations> translatorOps);
     /** add a defined operation to a translator*/
-    friend void addOperations(Translator* translator, TranslatorTypes type, Core* cptr);
+    friend void addOperations(Translator* translator, TranslatorTypes type);
 };
-
-/** create a  translator
-@param type the type of translator to create
-@param fed the federate to create the translator through
-@param name the name of the translator (optional)
-@return a unique pointer to a destination Translator object,  note destroying the object does not
-deactivate the translator
-*/
-HELICS_CXX_EXPORT Translator&
-    make_translator(TranslatorTypes type, Federate* fed, std::string_view name = EMPTY_STRING);
-
-/** create a  translator
-@param locality the visibility of the translator global or local
-@param type the type of translator to create
-@param fed the federate to create the translator through
-@param name the name of the translator (optional)
-@return a unique pointer to a destination Translator object,  note destroying the object does not
-deactivate the translator
-*/
-HELICS_CXX_EXPORT Translator& make_translator(InterfaceVisibility locality,
-                                      TranslatorTypes type,
-                                      Federate* fed,
-                                              std::string_view name = EMPTY_STRING);
-
-/** create a translator
-@param type the type of translator to create
-@param cr the core to create the translator through
-@param name the name of the translator (optional)
-@return a unique pointer to a source Translator object,  note destroying the object does not deactivate
-the translator
-*/
-HELICS_CXX_EXPORT std::unique_ptr<Translator>
-    make_translator(TranslatorTypes type, Core* cr, std::string_view name = EMPTY_STRING);
-
-/** create a translator
-@param type the type of translator to create
-@param cr the core to create the translator through
-@param name the name of the translator (optional)
-@return a unique pointer to a source Translator object,  note destroying the object does not deactivate
-the translator
-*/
-HELICS_CXX_EXPORT std::unique_ptr<Translator>
-    make_translator(TranslatorTypes type, CoreApp& cr, std::string_view name = EMPTY_STRING);
-
 
 }  // namespace helics

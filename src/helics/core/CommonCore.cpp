@@ -737,10 +737,15 @@ static const std::string unknownString("#unknown");
 const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateID) const noexcept
 {
     static const std::string filterString = getIdentifier() + "_filters";
-
+    static const std::string translatorString = getIdentifier() + "_translators";
+    if (federateID==filterFedID) {
+        return filterString;
+    }
+    if (federateID==translatorFedID) {
+        return translatorString;
+    }
     auto* fed = getFederateAt(LocalFederateId(federateID.localIndex()));
-    return (fed == nullptr) ? ((federateID == filterFedID) ? filterString : unknownString) :
-                              fed->getIdentifier();
+    return (fed == nullptr) ? unknownString:fed->getIdentifier();
 }
 
 LocalFederateId CommonCore::getFederateId(const std::string& name) const
@@ -2358,10 +2363,10 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     static std::shared_ptr<TranslatorOperator> nullTranslator = std::make_shared<NullTranslatorOperator>();
     const auto* hndl = getHandleInfo(translator);
     if (hndl == nullptr) {
-        throw(InvalidIdentifier("filter is not a valid handle"));
+        throw(InvalidIdentifier("translator handle is not valid"));
     }
-    if ((hndl->handleType != InterfaceType::FILTER)) {
-        throw(InvalidIdentifier("filter identifier does not point a filter"));
+    if ((hndl->handleType != InterfaceType::TRANSLATOR)) {
+        throw(InvalidIdentifier("translator identifier does not point to a valid translator"));
     }
     ActionMessage transOpUpdate(CMD_CORE_CONFIGURE);
     transOpUpdate.messageID = UPDATE_TRANSLATOR_OPERATOR;
@@ -2597,6 +2602,11 @@ void CommonCore::initializeMapBuilder(const std::string& request,
             std::string ret = filterFed->query(request);
             builder.addComponent(ret, brkindex);
         }
+        if (translatorFed != nullptr) {
+            int brkindex = builder.generatePlaceHolder("federates", translatorFedID.load().baseValue());
+            std::string ret = translatorFed->query(request);
+            builder.addComponent(ret, brkindex);
+        }
     }
 
     switch (index) {
@@ -2662,7 +2672,6 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         return generateStringVector(loopFederates,
                                     [](const auto& fed) { return fed->getIdentifier(); });
     }
-
     if (queryStr == "tags") {
         Json::Value tagBlock = Json::objectValue;
         for (const auto& tg : tags) {
@@ -3013,7 +3022,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 global_id = GlobalBrokerId(command.dest_id);
                 global_broker_id_local = GlobalBrokerId(command.dest_id);
                 filterFedID = getSpecialFederateId(global_broker_id_local, 0);
+                translatorFedID = getSpecialFederateId(global_broker_id_local, 1);
                 timeCoord->setSourceId(global_broker_id_local);
+                
                 higher_broker_id = GlobalBrokerId(command.source_id);
                 transmitDelayedMessages();
                 timeoutMon->setParentId(higher_broker_id);
@@ -3588,6 +3599,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (filterFed != nullptr && (filterTiming || globalTime)) {
                     filterFed->handleMessage(command);
                 }
+                if (translatorFed != nullptr) {
+                    translatorFed->handleMessage(command);
+                }
                 timeCoord->enteringExecMode();
                 auto res = timeCoord->checkExecEntry();
                 if (res == MessageProcessingResult::NEXT_STEP) {
@@ -3746,12 +3760,12 @@ void CommonCore::generateTranslatorFederate()
                             [this](ActionMessage&& m) { addActionMessage(std::move(m)); },
                             [this](const ActionMessage& m) { routeMessage(m); },
                             [this](ActionMessage&& m) { routeMessage(std::move(m)); });
-    hasFilters = true;
 
     translatorFed->setHandleManager(&loopHandles);
-    translatorFed->setLogger([this](int level, const std::string& name, const std::string& message) {
+    translatorFed->setLogger([this](int level, std::string_view name, std::string_view message) {
         sendToLogger(global_broker_id_local, level, name, message);
     });
+    translatorFed->setDeliver([this](ActionMessage& m) { deliverMessage(m); });
     translatorFed->setAirLockFunction([this](int index) { return std::ref(dataAirlocks[index]); });
     ActionMessage newFed(CMD_REG_FED);
     setActionFlag(newFed, child_flag);
@@ -4044,6 +4058,10 @@ void CommonCore::disconnectInterface(ActionMessage& command)
         if (filterFed != nullptr) {
             filterFed->handleMessage(command);
         }
+    } else if (handleInfo->getFederateId() == translatorFedID.load()) {
+        if (translatorFed != nullptr) {
+            translatorFed->handleMessage(command);
+        }
     } else {
         if (handleInfo->handleType != InterfaceType::FILTER) {
             auto* fed = getFederateCore(command.source_id);
@@ -4079,7 +4097,9 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
     } else if (command.dest_id == filterFedID) {
         // just forward these to the appropriate federate
         filterFed->handleMessage(command);
-
+    } else if (command.dest_id == translatorFedID) {
+        // just forward these to the appropriate federate
+        translatorFed->handleMessage(command);
     } else {
         auto* fed = getFederateCore(command.dest_id);
         if (fed != nullptr) {
@@ -4098,6 +4118,9 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
 {
     if (command.dest_id == filterFedID) {
         filterFed->handleMessage(command);
+    }
+    else if (command.dest_id == translatorFedID) {
+            translatorFed->handleMessage(command);
     } else {  // just forward these to the appropriate federate
         if (command.action() == CMD_REMOVE_FILTER) {
             command.dest_id = filterFedID;
@@ -4617,6 +4640,11 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                 filterFed->handleMessage(cmd);
             }
             break;
+        case UPDATE_TRANSLATOR_OPERATOR:
+            if (translatorFed != nullptr) {
+                translatorFed->handleMessage(cmd);
+            }
+            break;
         default:
             LOG_WARNING(global_broker_id_local,
                         identifier,
@@ -5014,6 +5042,8 @@ void CommonCore::routeMessage(ActionMessage& cmd, GlobalFederateId dest)
         processCommandsForCore(cmd);
     } else if (dest == filterFedID) {
         filterFed->handleMessage(cmd);
+    } else if (dest == translatorFedID) {
+        translatorFed->handleMessage(cmd);
     } else if (isLocal(dest)) {
         auto* fed = getFederateCore(dest);
         if (fed != nullptr) {
@@ -5041,6 +5071,9 @@ void CommonCore::routeMessage(const ActionMessage& cmd)
     } else if (cmd.dest_id == filterFedID) {
         auto ncmd{cmd};
         filterFed->handleMessage(ncmd);
+    } else if (cmd.dest_id == translatorFedID) {
+        auto ncmd{cmd};
+        translatorFed->handleMessage(ncmd);
     } else if (isLocal(cmd.dest_id)) {
         auto* fed = getFederateCore(cmd.dest_id);
         if (fed != nullptr) {
@@ -5072,6 +5105,8 @@ void CommonCore::routeMessage(ActionMessage&& cmd, GlobalFederateId dest)
         processCommandsForCore(cmd);
     } else if (cmd.dest_id == filterFedID) {
         filterFed->handleMessage(cmd);
+    } else if (dest == translatorFedID) {
+        translatorFed->handleMessage(cmd);
     } else if (isLocal(dest)) {
         auto* fed = getFederateCore(dest);
         if (fed != nullptr) {
@@ -5099,6 +5134,8 @@ void CommonCore::routeMessage(ActionMessage&& cmd)
         processCommandsForCore(cmd);
     } else if (dest == filterFedID) {
         filterFed->handleMessage(cmd);
+    } else if (dest == translatorFedID) {
+        translatorFed->handleMessage(cmd);
     } else if (isLocal(dest)) {
         auto* fed = getFederateCore(dest);
         if (fed != nullptr) {
