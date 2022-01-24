@@ -15,13 +15,13 @@ Sequencing Mode determines the priority of the command and can be either
 
 - `HELICS_SEQUENCING_MODE_FAST` : send on priority channel
 - `HELICS_SEQUENCING_MODE_ORDERED` : send on normal channels ordered with other communication
-- `HELICS_SEQUENCING_MODE_DEFAULT` : use HELICS determined default mode.
+- `HELICS_SEQUENCING_MODE_DEFAULT` : use HELICS determined default mode
 
 ```c
 helicsFederateSendCommand(HelicsFederate fed, const char* target, const char* command, HelicsError* err)
 ```
 
-All commands in C are send on the default ordering for now. The use case for ordered commands is primarily testing for the time being so the interface has not been added to the C API as of yet.
+All commands in C are sent with the default ordering for now. The use case for ordered commands is primarily testing for the time being so the interface has not been added to the C API as of yet.
 
 ## Targets
 
@@ -61,7 +61,7 @@ The following queries are defined directly in HELICS. Federates may specify a ca
 +------------------------+------------------------------------------------------------------------------------------------+
 | ``logbuffer <size>``   | [all objects] set the log buffer to a particular size or `stop`                                |
 +------------------------+------------------------------------------------------------------------------------------------+
-| ``monitor <args...>``  | [brokers] set up a federate the time monitor <args...> = <federate names> <logperiod>          |
+| ``monitor <args...>``  | [brokers] set up a federate as the time monitor <args...> = <federate names> <logperiod>       |
 +------------------------+------------------------------------------------------------------------------------------------+
 | ``remotelog <level>``  | [all object] instruct the object to send log messages to a remote location in addition to local|
 |                        |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |

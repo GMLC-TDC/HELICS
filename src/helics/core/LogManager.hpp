@@ -51,7 +51,7 @@ class LogManager {
     /** a logging function for logging or printing messages*/
     std::function<void(int, std::string_view, std::string_view)> loggerFunction;
     std::function<void(ActionMessage&& mm)> mTransmit;
-    std::string logFile;  //!< the file to log message to
+    std::string logFile;  //!< the file to log messages to
 
   public:
     /// force the log to flush after every message
@@ -61,7 +61,7 @@ class LogManager {
 
     void initializeLogging(const std::string& identifier);
 
-    /** send a Message to the logging system
+    /** send a message to the logging system
 @return true if the message was actually logged
 */
     bool sendToLogger(int logLevel,

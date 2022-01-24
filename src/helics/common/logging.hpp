@@ -25,10 +25,10 @@ enum LogLevels : int {
     WARNING = HELICS_LOG_LEVEL_WARNING,  //!< print/log warning and errors
     SUMMARY = HELICS_LOG_LEVEL_SUMMARY,  //!< print/log summary information
     CONNECTIONS =
-        HELICS_LOG_LEVEL_CONNECTIONS,  //!< print summary+ federate level connection information
+        HELICS_LOG_LEVEL_CONNECTIONS,  //!< print summary+federate level connection information
     INTERFACES =
-        HELICS_LOG_LEVEL_INTERFACES,  //!< print connections +interface level connection information
-    TIMING = HELICS_LOG_LEVEL_TIMING,  //!< print interfaces+ timing(exec/grant/disconnect)
+        HELICS_LOG_LEVEL_INTERFACES,  //!< print connections+interface level connection information
+    TIMING = HELICS_LOG_LEVEL_TIMING,  //!< print interfaces+timing(exec/grant/disconnect)
     DATA = HELICS_LOG_LEVEL_DATA,  //!< print timing+data transmissions
     DEBUG = HELICS_LOG_LEVEL_DEBUG,  //!< print data+additional debug info
     TRACE = HELICS_LOG_LEVEL_TRACE,  //!< trace level printing (all processed messages)

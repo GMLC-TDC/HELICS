@@ -49,7 +49,7 @@ There are several levels used inside HELICS for logging. The level can be set wi
 - `HELICS_LOG_LEVEL_DEBUG` Log messages related to debugging, similar to timing
 - `HELICS_LOG_LEVEL_TIMING` Log messages related to timing information such as mode transition and time advancement
 - `HELICS_LOG_LEVEL_DATA` Log messages related to data passage and information being sent or received
-- `HELICS_LOG_LEVEL_TRACE` Log all internal message being sent
+- `HELICS_LOG_LEVEL_TRACE` Log all internal messages being sent
 
 NOTE: the numerical values of these levels is subject to change
 
@@ -184,7 +184,7 @@ HELICS cores, brokers, and federates have the capability to buffer log messages.
 
 ## Remote Logging
 
-As of version 3.2 it is possible to have a HELICS object clone its logging to another object. For example a federate can request the broker log messages be send to a federate log via a [`remotelog` command](../advanced_topics/commandInterface.md). Multiple object can receive the same log a single object can receive multiple remote logs. The federate/broker/core that sends the remote log command is the one who will receive the logs and can include logging level to receive debugging logs from a particular location. This can be stopped as well via `remotelog stop` command.
+As of version 3.2 it is possible to have a HELICS object clone its logging to another object. For example a federate can request the broker log messages be sent to a federate log via a [`remotelog` command](../advanced_topics/commandInterface.md). Multiple objects can receive the same log and a single object can receive multiple remote logs. The federate/broker/core that sends the remote log command is the one who will receive the logs and can include logging level to receive debugging logs from a particular location. This can be stopped as well via the `remotelog stop` command.
 
 ## Additional Broker Features
 
