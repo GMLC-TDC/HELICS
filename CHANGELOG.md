@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.1.2][] - 2022-01-25
 
-This patch release primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms. It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
+This patch release is primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms. It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
 
 ### Fixed
 
@@ -20,7 +20,7 @@ This patch release primarily to address some build issues on MSYS2, MINGW, and C
 
 ### Changed
 
-- updates to FMT and SPDLOG
+- Updates to FMT and SPDLOG
 - Several documentation updates and cleanup
 - Copyright date changed to 2022
 - Targeted endpoints now allow all method calls, with the restriction being that the destination must be in the target list otherwise an error is generated. An empty destination in methods that allow destinations will operate identically to calls which do not specify a destination.
@@ -29,7 +29,7 @@ This patch release primarily to address some build issues on MSYS2, MINGW, and C
 ### Added
 
 - A process comms method for federates to instruct HELICS to process messages for a specific amount of wall clock time without granting time or changing state.
-- Added a threaded signal handler to deal some particular issues with killing processes in python and potentially other language interfaces.
+- Added a threaded signal handler to deal with some particular issues with killing processes in python and potentially other language interfaces.
 - Added a log buffer to brokers/cores/federates to store the latest N messages and retrieve it via a query. See [log buffer](./docs/user-guide/fundamental_topics/logging.md#log-buffer) for more details.
 - Added a time monitor object to brokers to use a particular federate as the query time standard for brokers, this does not affect the cosimulation only the logging and queries. See [time monitor](./docs/user-guide/fundamental_topics/logging.md#time-monitor) for more details.
 - Added a callback to be executed when the time is updated and before the value or message interface callbacks are executed.
