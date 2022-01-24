@@ -280,6 +280,7 @@ public class helicsJNI {
   public final static native double helicsFederateRequestTimeComplete(long jarg1);
   public final static native void helicsFederateRequestTimeIterativeAsync(long jarg1, double jarg2, int jarg3);
   public final static native double helicsFederateRequestTimeIterativeComplete(long jarg1, int[] jarg2);
+  public final static native void helicsFederateProcessCommunications(long jarg1, double jarg2);
   public final static native String helicsFederateGetName(long jarg1);
   public final static native void helicsFederateSetTimeProperty(long jarg1, int jarg2, double jarg3);
   public final static native void helicsFederateSetFlagOption(long jarg1, int jarg2, int jarg3);

@@ -1695,7 +1695,7 @@ HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFedera
  *
  * @param fed The federate to tell to process.
  *
- * @param period the length of time to process communications and then return control
+ * @param period The length of time to process communications and then return control.
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  */
