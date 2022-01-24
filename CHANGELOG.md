@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.1.2][] - 2022-01-25
 
-This patch release primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms.  It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
+This patch release primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms. It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
 
 ### Fixed
 
@@ -23,7 +23,7 @@ This patch release primarily to address some build issues on MSYS2, MINGW, and C
 - updates to FMT and SPDLOG
 - Several documentation updates and cleanup
 - Copyright date changed to 2022
-- Targeted endpoints now allow all method calls, with the restriction being that the destination must be in the target list otherwise an error is generated.  An empty destination in methods that allow destinations will operate identically to calls which do not specify a destination.
+- Targeted endpoints now allow all method calls, with the restriction being that the destination must be in the target list otherwise an error is generated. An empty destination in methods that allow destinations will operate identically to calls which do not specify a destination.
 - Code cleanup for defining the default port numbers for network core types.
 
 ### Added
@@ -33,8 +33,7 @@ This patch release primarily to address some build issues on MSYS2, MINGW, and C
 - Added a log buffer to brokers/cores/federates to store the latest N messages and retrieve it via a query. See [LogBuffer](./docs/user-guide/fundamental_topics/logging.md#log_buffer).
 - Added a time monitor object to brokers to use a particular federate as the query time standard for brokers, this does not affect the cosimulation only the logging and queries.
 - Added a callback to be executed when the time is updated and before the value or message interface callbacks are executed.
-- Added remote logging command to mirror logs from one HELICS object to another.  See [Remote Logging](./docs/user-guide/fundamental_topics/logging.md#remote_logging)
-
+- Added remote logging command to mirror logs from one HELICS object to another. See [Remote Logging](./docs/user-guide/fundamental_topics/logging.md#remote_logging)
 
 ## [3.1.1][] - 2021-12-14
 

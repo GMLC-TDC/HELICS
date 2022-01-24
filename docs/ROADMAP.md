@@ -10,14 +10,13 @@ Mainly includes any relevant bug fixes and other minor tweaks for compatibility,
 
 ## \[3.2\] ~ 2022-02-15
 
-Mostly things that didn't make it into the 3.1 release and a number of bug fixes that come from transitioning to HELICS 3.0.  Also including translators which is a late breaking feature coming from many discussions on domain API's and other capabilities.
+Mostly things that didn't make it into the 3.1 release and a number of bug fixes that come from transitioning to HELICS 3.0. Also including translators which is a late breaking feature coming from many discussions on domain API's and other capabilities.
 
 - Translators
 - SSL capable core
 - Full xSDK compatibility
 - Bug fixes, tests and tuning related to HELICS 3 increased use.
 - Separate out Matlab HELICS interface in Matlab oriented way vs current swig build
-
 
 ## \[3.3\] ~ Late Spring 2022
 
