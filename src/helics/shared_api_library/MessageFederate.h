@@ -191,7 +191,7 @@ HELICS_EXPORT void
  * @param inputDataLength The length of the data to send.
  *
  * @param dst The target destination. Use nullptr to send to the default destination.
- * 
+ *
  * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
