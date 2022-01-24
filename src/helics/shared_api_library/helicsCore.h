@@ -1544,8 +1544,7 @@ HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* quer
 
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
@@ -1561,8 +1560,7 @@ HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate f
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
@@ -1578,8 +1576,7 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
@@ -1605,8 +1602,7 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if query is an invalid object
+ * The return will be nullptr if query is an invalid object
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
@@ -1618,7 +1614,7 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsEr
  * @param query The query object to check if completed.
  *
  * @return Will return HELICS_TRUE if an asynchronous query has completed or a regular query call was made with a result,
- *         and false if an asynchronous query has not completed or is invalid
+ * and false if an asynchronous query has not completed or is invalid
  */
 HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
 
