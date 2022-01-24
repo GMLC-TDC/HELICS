@@ -2379,7 +2379,7 @@ std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
                "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\","
-            "\"data_flow_graph\",\"dependencies\",\"dependson\",\"logs\","
+               "\"data_flow_graph\",\"dependencies\",\"dependson\",\"logs\","
                "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
     }
     if (queryStr == "isconnected") {
