@@ -57,7 +57,7 @@ class GlobalBrokerId {
     static constexpr BaseType invalid_global_broker_id{-2'010'000'000};
 };
 
-/** constant to use for indicating that a command is for the core itself from the Core Public API*/
+/** constant to use for indicating that a command is for the parent object*/
 constexpr GlobalBrokerId parent_broker_id{0};
 /** constant to use for indicating the id of the root broker*/
 constexpr GlobalBrokerId gRootBrokerID{1};

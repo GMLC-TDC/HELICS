@@ -19,6 +19,8 @@ There are several levels used inside HELICS for logging. The level can be set wi
 +-----------------------------------+-----------------------+
 | ``HELICS_LOG_LEVEL_ERROR``        | ``error``             |
 +-----------------------------------+-----------------------+
+| ``HELICS_LOG_LEVEL_PROFILING``    | ``profiling``         |
++-----------------------------------+-----------------------+
 | ``HELICS_LOG_LEVEL_WARNING``      | ``warning``           |
 +-----------------------------------+-----------------------+
 | ``HELICS_LOG_LEVEL_SUMMARY``      | ``summary``           |
@@ -29,30 +31,34 @@ There are several levels used inside HELICS for logging. The level can be set wi
 +------------------------------------------+----------------+
 | ``HELICS_LOG_LEVEL_TIMING``       | ``timing``            |
 +------------------------------------------+----------------+
+| ``HELICS_LOG_LEVEL_DEBUG``        | ``debug``             |
++------------------------------------------+----------------+
 | ``HELICS_LOG_LEVEL_DATA``         | ``data``              |
 +------------------------------------------+----------------+
 | ``HELICS_LOG_LEVEL_TRACE``        | ``trace``             |
 +------------------------------------------+----------------+
 ```
 
-- `helics_log_level_no_print` Don't log anything
-- `helics_log_level_error` Log error and faults from within HELICS
-- `helics_log_level_warning` Log warning messages of things that might be incorrect or unusual
-- `helics_log_level_summary` Log summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
-- `helics_log_level_connections` Log a message for each connection event (federate connection/disconnection)
-- `helics_log_level_interfaces` Log messages when interfaces, such as endpoints, publications, and filters are created
-- `helics_log_level_timing` Log messages related to timing information such as mode transition and time advancement
-- `helics_log_level_data` Log messages related to data passage and information being sent or received
-- `helics_log_level_trace` Log all internal message being sent
+- `HELICS_LOG_LEVEL_NO_PRINT` Don't log anything
+- `HELICS_LOG_LEVEL_ERROR` Log error and faults from within HELICS
+- `HELICS_LOG_LEVEL_PROFILING` Log profiling messages
+- `HELICS_LOG_LEVEL_WARNING` Log warning messages of things that might be incorrect or unusual
+- `HELICS_LOG_LEVEL_SUMMARY` Log summary messages on startup and shutdown. The Broker will also generate a summary with the number of federates connected and a few other items of information
+- `HELICS_LOG_LEVEL_CONNECTIONS` Log a message for each connection event (federate connection/disconnection)
+- `HELICS_LOG_LEVEL_INTERFACES` Log messages when interfaces, such as endpoints, publications, and filters are created
+- `HELICS_LOG_LEVEL_DEBUG` Log messages related to debugging, similar to timing
+- `HELICS_LOG_LEVEL_TIMING` Log messages related to timing information such as mode transition and time advancement
+- `HELICS_LOG_LEVEL_DATA` Log messages related to data passage and information being sent or received
+- `HELICS_LOG_LEVEL_TRACE` Log all internal messages being sent
 
-NOTE: these levels currently correspond to (-1 through 7) but this may change in future major version numbers to allow more fine grained control.
+NOTE: the numerical values of these levels is subject to change
 
 `timing`, `data` and `trace` log levels can generate a large number of messages and should primarily be used for debugging. `trace` will produce a very large number of messages most of which deal with internal communications and is primarily for debugging timing in HELICS.
 
 Log lines will often look like
 
 ```text
-echo1 (131072) (0)::Time mismatch detected granted time >requested time 5.5 vs 5.0
+echo1 (131072) (0)[t=4.0]::Time mismatch detected granted time >requested time 5.5 vs 5.0
 ```
 
 or
@@ -175,6 +181,10 @@ The callback take 3 parameters about a message and in the case of `C` callbacks 
 
 As of Version 3.2,
 HELICS cores, brokers, and federates have the capability to buffer log messages. This can be activated via the `--logbuffer` flag, or `--logbuffer=X` option. The default size is 10 messages for the `--logbuffer` flag. For cores and federates there is a `HELICS_PROPERTY_INT_LOG_BUFFER_SIZE` property that can be set. And it can also be activated via the [`logbuffer <X>` command](../advanced_topics/commandInterface.md) remotely. `<X>` is the desired size of the buffer. `logbuffer stop` will deactivate the buffer in a remote command. The logs can be retrieved via the ["logs"](../advanced_topics/queries.md) query. The buffer is available even after disconnect for cores and brokers from the local object.
+
+## Remote Logging
+
+As of version 3.2 it is possible to have a HELICS object clone its logging to another object. For example a federate can request the broker log messages be sent to a federate log via a [`remotelog` command](../advanced_topics/commandInterface.md). Multiple objects can receive the same log and a single object can receive multiple remote logs. The federate/broker/core that sends the remote log command is the one who will receive the logs and can include logging level to receive debugging logs from a particular location. This can be stopped as well via the `remotelog stop` command.
 
 ## Additional Broker Features
 

@@ -20,6 +20,7 @@ and some common methods used cores and brokers
 #include <memory>
 #include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
 namespace spdlog {
@@ -30,6 +31,7 @@ class ForwardingTimeCoordinator;
 class helicsCLI11App;
 class ProfilerBuffer;
 class LogBuffer;
+class LogManager;
 /** base class for broker like objects
  */
 class BrokerBase {
@@ -41,9 +43,8 @@ class BrokerBase {
                                               //!< atomically protected
     GlobalBrokerId higher_broker_id{0};  //!< the id code of the broker 1 level about this broker
     /**the logging level to use,  levels >= this will be ignored*/
-    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_WARNING};
-    int32_t consoleLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for console display
-    int32_t fileLogLevel{HELICS_LOG_LEVEL_WARNING};  //!< the logging level for logging to a file
+    std::atomic<int32_t> maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
+
     /** the minimum number of federates that must connect before entering init mode */
     int32_t minFederateCount{1};
     /** the minimum number of brokers that must connect before entering init mode */
@@ -68,13 +69,8 @@ class BrokerBase {
     // consistent public interface for extracting it this variable may need to be updated in a
     // constant function
     mutable std::string address;  //!< network location of the broker
-    /// default logging object to use if the logging callback is not specified
-    std::shared_ptr<spdlog::logger> consoleLogger;
-    /// default logging object to use if the logging callback is not specified
-    std::shared_ptr<spdlog::logger> fileLogger;
+
     std::thread queueProcessingThread;  //!< thread for running the broker
-    /** a logging function for logging or printing messages*/
-    std::function<void(int, std::string_view, std::string_view)> loggerFunction;
     /// flag indicating that no further message should be processed
     std::atomic<bool> haltOperations{false};
     /// flag indicating the broker should use a conservative time policy
@@ -91,8 +87,6 @@ class BrokerBase {
     std::atomic<bool> mainLoopIsRunning{false};
     /// flag indicating the broker should capture a dump log
     bool dumplog{false};
-    /// force the log to flush after every message
-    std::atomic<bool> forceLoggingFlush{false};
     /// flag indicating that the message queue should not be used and all functions are called
     /// directly instead of in a distinct thread
     bool queueDisabled{false};
@@ -100,13 +94,11 @@ class BrokerBase {
     bool disable_timer{false};
     /// counter for the total number of message processed
     std::atomic<std::size_t> messageCounter{0};
-    std::size_t mlogBufferSize{0};  //!< logBufferSize
-  protected:
-    std::string logFile;  //!< the file to log message to
-    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
-    std::unique_ptr<LogBuffer> mLogBuffer;  //!< object for buffering a set of log messages
-    gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
 
+  protected:
+    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
+    gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
+    std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
         created = -6,  //!< the broker has been created
@@ -212,10 +204,12 @@ class BrokerBase {
 
     /** Generate the base CLI processor*/
     std::shared_ptr<helicsCLI11App> generateBaseCLI();
-    /** generate the loggers for the broker*/
-    void generateLoggers();
     /** handle some configuration options for the base*/
     void baseConfigure(ActionMessage& command);
+
+    /** move a action Message into the commandQueue allow const in this case to allow messages
+    to be sent internally in a few specific instances*/
+    void addActionMessage(ActionMessage&& m) const;
 
   protected:
     /** check whether a code contains a specific reason*/
@@ -246,10 +240,11 @@ class BrokerBase {
     /** send a Message to the logging system
     @return true if the message was actually logged
     */
-    virtual bool sendToLogger(GlobalFederateId federateID,
-                              int logLevel,
-                              std::string_view name,
-                              std::string_view message) const;
+    bool sendToLogger(GlobalFederateId federateID,
+                      int logLevel,
+                      std::string_view name,
+                      std::string_view message,
+                      bool disableRemote = false) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
     /** write profiler data to file*/
@@ -268,6 +263,8 @@ class BrokerBase {
     bool getFlagValue(int32_t flag) const;
     /** virtual function to return the current simulation time*/
     virtual double getSimulationTime() const { return mInvalidSimulationTime; }
+    /** process some common commands that can be processed by the broker base */
+    std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
 
   public:
     /** generate a callback function for the logging purposes*/

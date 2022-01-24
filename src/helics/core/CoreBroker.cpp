@@ -10,8 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
+#include "../common/logging.hpp"
 #include "BrokerFactory.hpp"
 #include "ForwardingTimeCoordinator.hpp"
+#include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
 #include "gmlc/utilities/stringConversion.h"
@@ -1054,87 +1056,11 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             break;
         }
-        case CMD_DATA_LINK: {
-            auto* pub = handles.getPublication(command.name());
-            if (pub != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_INPUT);
-                command.setSource(pub->handle);
-                checkForNamedInterface(command);
-            } else {
-                auto* input = handles.getInput(command.getString(targetStringLoc));
-                if (input == nullptr) {
-                    if (isRootc) {
-                        unknownHandles.addDataLink(std::string(command.name()),
-                                                   command.getString(targetStringLoc));
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_PUBLICATION);
-                    command.setSource(input->handle);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_ENDPOINT_LINK: {
-            auto* ept = handles.getEndpoint(command.name());
-            if (ept != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                setActionFlag(command, destination_target);
-                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                command.setSource(ept->handle);
-                checkForNamedInterface(command);
-            } else {
-                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
-                if (target == nullptr) {
-                    if (isRootc) {
-                        unknownHandles.addEndpointLink(std::string(command.name()),
-                                                       command.getString(targetStringLoc));
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    command.setSource(target->handle);
-                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_FILTER_LINK: {
-            auto* filt = handles.getFilter(command.name());
-            if (filt != nullptr) {
-                command.payload = command.getString(targetStringLoc);
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                command.setSource(filt->handle);
-                if (checkActionFlag(*filt, clone_flag)) {
-                    setActionFlag(command, clone_flag);
-                }
-                checkForNamedInterface(command);
-            } else {
-                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
-                if (ept == nullptr) {
-                    if (isRootc) {
-                        if (checkActionFlag(command, destination_target)) {
-                            unknownHandles.addDestinationFilterLink(std::string(command.name()),
-                                                                    command.getString(
-                                                                        targetStringLoc));
-                        } else {
-                            unknownHandles.addSourceFilterLink(std::string(command.name()),
-                                                               command.getString(targetStringLoc));
-                        }
-                    } else {
-                        routeMessage(command);
-                    }
-                } else {
-                    command.setAction(CMD_ADD_NAMED_FILTER);
-                    command.setSource(ept->handle);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
+        case CMD_DATA_LINK:
+        case CMD_ENDPOINT_LINK:
+        case CMD_FILTER_LINK:
+            linkInterfaces(command);
+            break;
         case CMD_DISCONNECT_NAME:
             if (command.dest_id == parent_broker_id) {
                 auto brk = mBrokers.find(std::string(command.name()));
@@ -1341,10 +1267,16 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
 
         case CMD_LOG:
-            if (isRootc) {
-                sendToLogger(command.source_id, command.counter, std::string(), command.name());
+        case CMD_REMOTE_LOG:
+            if (command.dest_id == global_broker_id_local || command.dest_id == parent_broker_id) {
+                sendToLogger(command.source_id,
+                             command.messageID,
+                             command.getString(0),
+                             command.name(),
+                             (command.action() == CMD_REMOTE_LOG));
+
             } else {
-                transmit(parent_route_id, command);
+                routeMessage(command);
             }
             break;
         case CMD_ERROR:
@@ -1987,6 +1919,95 @@ void CoreBroker::addFilter(ActionMessage& m)
         }
     } else {
         FindandNotifyFilterTargets(filt);
+    }
+}
+
+void CoreBroker::linkInterfaces(ActionMessage& command)
+{
+    switch (command.action()) {
+        case CMD_DATA_LINK: {
+            auto* pub = handles.getPublication(command.name());
+            if (pub != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_INPUT);
+                command.setSource(pub->handle);
+                checkForNamedInterface(command);
+            } else {
+                auto* input = handles.getInput(command.getString(targetStringLoc));
+                if (input == nullptr) {
+                    if (isRootc) {
+                        unknownHandles.addDataLink(std::string(command.name()),
+                                                   command.getString(targetStringLoc));
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    command.setSource(input->handle);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = handles.getEndpoint(command.name());
+            if (ept != nullptr) {
+                command.name(command.getString(targetStringLoc));
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                setActionFlag(command, destination_target);
+                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                command.setSource(ept->handle);
+                checkForNamedInterface(command);
+            } else {
+                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
+                if (target == nullptr) {
+                    if (isRootc) {
+                        unknownHandles.addEndpointLink(std::string(command.name()),
+                                                       command.getString(targetStringLoc));
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    command.setSource(target->handle);
+                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        case CMD_FILTER_LINK: {
+            auto* filt = handles.getFilter(command.name());
+            if (filt != nullptr) {
+                command.payload = command.getString(targetStringLoc);
+                command.setAction(CMD_ADD_NAMED_ENDPOINT);
+                command.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(command, clone_flag);
+                }
+                checkForNamedInterface(command);
+            } else {
+                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
+                if (ept == nullptr) {
+                    if (isRootc) {
+                        if (checkActionFlag(command, destination_target)) {
+                            unknownHandles.addDestinationFilterLink(std::string(command.name()),
+                                                                    command.getString(
+                                                                        targetStringLoc));
+                        } else {
+                            unknownHandles.addSourceFilterLink(std::string(command.name()),
+                                                               command.getString(targetStringLoc));
+                        }
+                    } else {
+                        routeMessage(command);
+                    }
+                } else {
+                    command.setAction(CMD_ADD_NAMED_FILTER);
+                    command.setSource(ept->handle);
+                    checkForNamedInterface(command);
+                }
+            }
+        } break;
+        default:
+            break;
     }
 }
 
@@ -2879,8 +2900,8 @@ std::string CoreBroker::query(const std::string& target,
                 if (uuid_like) {
                     base["uuid"] = getIdentifier();
                 }
-                base["id"] = global_broker_id_local.baseValue();
-                bufferToJson(*mLogBuffer, base);
+                base["id"] = global_id.load().baseValue();
+                bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
         }
@@ -3004,6 +3025,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     if ((request == "queries") || (request == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
                "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
+               "\"monitor\",\"logs\","
                "\"current_time\",\"current_state\",\"global_state\",\"status\",\"global_time\",\"global_status\",\"version\",\"version_all\",\"exists\",\"global_flush\"]";
     }
     if (request == "address") {
@@ -3053,6 +3075,9 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "summary") {
         return generateFederationSummary();
     }
+    if (request == "monitor") {
+        return std::string{"\""} + mTimeMonitorFederate + '"';
+    }
     if (request == "logs") {
         Json::Value base;
         base["name"] = getIdentifier();
@@ -3060,7 +3085,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
             base["uuid"] = getIdentifier();
         }
         base["id"] = global_broker_id_local.baseValue();
-        bufferToJson(*mLogBuffer, base);
+        bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (request == "federates") {
@@ -3731,46 +3756,12 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
 
 void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
 {
-    auto cmd = m.payload.to_string();
-    auto commentLoc = cmd.find('#');
-    if (commentLoc != std::string_view::npos) {
-        cmd = cmd.substr(0, commentLoc - 1);
-    }
-    gmlc::utilities::string_viewOps::trimString(cmd);
-    auto res = gmlc::utilities::string_viewOps::splitlineQuotes(
-        cmd,
-        " ",
-        gmlc::utilities::string_viewOps::default_quote_chars,
-        gmlc::utilities::string_viewOps::delimiter_compression::on);
-    if (res.empty()) {
+    auto [processed, res] = processBaseCommands(m);
+    if (processed) {
         return;
     }
-    if (res[0] == "terminate") {
-        LOG_SUMMARY(global_broker_id_local,
-                    getIdentifier(),
-                    " received terminate instruction via command instruction")
-        ActionMessage udisconnect(CMD_USER_DISCONNECT);
-        addActionMessage(udisconnect);
-    } else if (res[0] == "echo") {
-        LOG_SUMMARY(global_broker_id_local,
-                    getIdentifier(),
-                    " received echo command via command instruction")
-        m.swapSourceDest();
-        m.payload = "echo_reply";
-        m.setString(targetStringLoc, m.getString(sourceStringLoc));
-        m.setString(sourceStringLoc, getIdentifier());
-        addActionMessage(m);
-    } else if (res[0] == "log") {
-        LOG_SUMMARY(global_broker_id_local, m.getString(sourceStringLoc), cmd.substr(4));
-    } else if (res[0] == "logbuffer") {
-        if (res.size() > 1) {
-            mLogBuffer->resize(
-                gmlc::utilities::numeric_conversion<std::size_t>(res[1],
-                                                                 LogBuffer::cDefaultBufferSize));
-        } else {
-            mLogBuffer->enable(true);
-        }
-    } else if (res[0] == "monitor") {
+
+    if (res[0] == "monitor") {
         switch (res.size()) {
             case 1:
                 break;
@@ -3796,9 +3787,15 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
         }
 
     } else {
-        LOG_WARNING(global_broker_id_local,
-                    getIdentifier(),
-                    fmt::format(" unrecognized command instruction \"{}\"", cmd));
+        auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
+        LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);
+        if (m.source_id != global_broker_id_local) {
+            ActionMessage warn(CMD_WARNING, global_broker_id_local, m.source_id);
+            warn.payload = std::move(warnString);
+            warn.messageID = HELICS_LOG_LEVEL_WARNING;
+            warn.setString(0, getIdentifier());
+            routeMessage(warn);
+        }
     }
 }
 
@@ -3873,6 +3870,7 @@ void CoreBroker::checkDependencies()
                 logWarning.messageID = WARNING;
                 logWarning.payload =
                     "unable to locate " + newdep.first + " to establish dependency";
+                logWarning.setString(0, getIdentifier());
                 routeMessage(logWarning);
             }
         }

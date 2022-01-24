@@ -37,6 +37,7 @@ set(SRC_FILES
     ProfilerBuffer.cpp
     EmptyCore.cpp
     helicsVersion.cpp
+    LogManager.cpp
 )
 
 set(PUBLIC_INCLUDE_FILES
@@ -89,6 +90,7 @@ set(INCLUDE_FILES
     FilterFederate.hpp
     TimeCoordinatorProcessing.hpp
     ProfilerBuffer.hpp
+    LogManager.hpp
     ../helics_enums.h
 )
 

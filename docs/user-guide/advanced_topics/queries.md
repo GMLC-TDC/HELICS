@@ -258,7 +258,9 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``global_status``        | an aggregate query that returns a combo of global_time and current_state [structure]              |
 +--------------------------+---------------------------------------------------------------------------------------------------+
-| ``time_monitor``         | get the current time as recorded from the current monitor federate[structure]                     |
+| ``time_monitor``         | get the current time as recorded from the current monitor federate [structure]                    |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``monitor``              | The name of the object used as a time monitor [string]                                            |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 ```
 
