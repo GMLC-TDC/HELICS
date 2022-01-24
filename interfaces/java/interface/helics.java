@@ -1828,8 +1828,7 @@ public class helics implements helicsConstants {
    * <br>
    * <br>
    * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.<br>
-   * <br>
-   *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
+   * The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
    * invalid.
    */
   public static String helicsQueryExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void fed) {
@@ -1847,8 +1846,7 @@ public class helics implements helicsConstants {
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.<br>
-   * <br>
-   *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
+   * The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
    * invalid.
    */
   public static String helicsQueryCoreExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void core) {
@@ -1866,8 +1864,7 @@ public class helics implements helicsConstants {
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.<br>
-   * <br>
-   *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
+   * The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was<br>
    * invalid
    */
   public static String helicsQueryBrokerExecute(SWIGTYPE_p_void query, SWIGTYPE_p_void broker) {
@@ -1897,8 +1894,7 @@ public class helics implements helicsConstants {
    * ,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.<br>
    * <br>
    * @return A pointer to a string. The string will remain valid until the query is freed or executed again.<br>
-   * <br>
-   *         The return will be nullptr if query is an invalid object
+   * The return will be nullptr if query is an invalid object
    */
   public static String helicsQueryExecuteComplete(SWIGTYPE_p_void query) {
     return helicsJNI.helicsQueryExecuteComplete(SWIGTYPE_p_void.getCPtr(query));
@@ -1912,7 +1908,7 @@ public class helics implements helicsConstants {
    * @param query The query object to check if completed.<br>
    * <br>
    * @return Will return HELICS_TRUE if an asynchronous query has completed or a regular query call was made with a result,<br>
-   *         and false if an asynchronous query has not completed or is invalid
+   * and false if an asynchronous query has not completed or is invalid
    */
   public static int helicsQueryIsCompleted(SWIGTYPE_p_void query) {
     return helicsJNI.helicsQueryIsCompleted(SWIGTYPE_p_void.getCPtr(query));
@@ -3144,9 +3140,7 @@ public class helics implements helicsConstants {
    * ,out] err A pointer to an error object for catching errors.<br>
    * <br>
    * <br>
-   * @return An object containing the endpoint.<br>
-   * <br>
-   *         nullptr on failure.
+   * @return An object containing the endpoint, or nullptr on failure.
    */
   public static SWIGTYPE_p_void helicsFederateRegisterEndpoint(SWIGTYPE_p_void fed, String name, String type) {
     long cPtr = helicsJNI.helicsFederateRegisterEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
@@ -3166,9 +3160,7 @@ public class helics implements helicsConstants {
    * <br>
    * ,out] err A pointer to an error object for catching errors.<br>
    * <br>
-   * @return An object containing the endpoint.<br>
-   * <br>
-   *         nullptr on failure.
+   * @return An object containing the endpoint, or nullptr on failure.
    */
   public static SWIGTYPE_p_void helicsFederateRegisterGlobalEndpoint(SWIGTYPE_p_void fed, String name, String type) {
     long cPtr = helicsJNI.helicsFederateRegisterGlobalEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
@@ -3190,9 +3182,7 @@ public class helics implements helicsConstants {
    * ,out] err A pointer to an error object for catching errors.<br>
    * <br>
    * <br>
-   * @return An object containing the endpoint.<br>
-   * <br>
-   *         nullptr on failure.
+   * @return An object containing the endpoint, or nullptr on failure.
    */
   public static SWIGTYPE_p_void helicsFederateRegisterTargetedEndpoint(SWIGTYPE_p_void fed, String name, String type) {
     long cPtr = helicsJNI.helicsFederateRegisterTargetedEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
@@ -3213,9 +3203,7 @@ public class helics implements helicsConstants {
    * <br>
    * ,out] err A pointer to an error object for catching errors.<br>
    * <br>
-   * @return An object containing the endpoint.<br>
-   * <br>
-   *         nullptr on failure.
+   * @return An object containing the endpoint, or nullptr on failure.
    */
   public static SWIGTYPE_p_void helicsFederateRegisterGlobalTargetedEndpoint(SWIGTYPE_p_void fed, String name, String type) {
     long cPtr = helicsJNI.helicsFederateRegisterGlobalTargetedEndpoint(SWIGTYPE_p_void.getCPtr(fed), name, type);
@@ -3233,7 +3221,7 @@ public class helics implements helicsConstants {
    * <br>
    * @return A HelicsEndpoint object.<br>
    * <br>
-   *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
+   * The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
    */
   public static SWIGTYPE_p_void helicsFederateGetEndpoint(SWIGTYPE_p_void fed, String name) {
     long cPtr = helicsJNI.helicsFederateGetEndpoint(SWIGTYPE_p_void.getCPtr(fed), name);
@@ -3251,7 +3239,7 @@ public class helics implements helicsConstants {
    * <br>
    * @return A HelicsEndpoint.<br>
    * <br>
-   *         It will be NULL if given an invalid index.
+   * The HelicsEndpoint returned will be NULL if given an invalid index.
    */
   public static SWIGTYPE_p_void helicsFederateGetEndpointByIndex(SWIGTYPE_p_void fed, int index) {
     long cPtr = helicsJNI.helicsFederateGetEndpointByIndex(SWIGTYPE_p_void.getCPtr(fed), index);
@@ -3313,9 +3301,7 @@ public class helics implements helicsConstants {
    * @param data The data to send.<br>
    * <br>
    * @param inputDataLength The length of the data to send.<br>
-   * @param dst The target destination.<br>
-   * <br>
-   *             nullptr to use the default destination.<br>
+   * @param dst The target destination. Use nullptr to send to the default destination.<br>
    * ,out] err A pointer to an error object for catching errors.
    */
   public static void helicsEndpointSendBytesTo(SWIGTYPE_p_void endpoint, SWIGTYPE_p_void data, int inputDataLength, String dst) {
@@ -3330,9 +3316,8 @@ public class helics implements helicsConstants {
    * <br>
    * @param inputDataLength The length of the data to send.<br>
    * <br>
-   * @param dst The target destination.<br>
+   * @param dst The target destination. Use nullptr to send to the default destination.<br>
    * <br>
-   *             nullptr to use the default destination.<br>
    * @param time The time the message should be sent.<br>
    * <br>
    * ,out] err A pointer to an error object for catching errors.
@@ -3350,7 +3335,7 @@ public class helics implements helicsConstants {
    * <br>
    * @param inputDataLength The length of the data to send.<br>
    * <br>
-   *   @param time The time the message should be sent.<br>
+   * @param time The time the message should be sent.<br>
    * <br>
    * ,out] err A pointer to an error object for catching errors.
    */
