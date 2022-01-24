@@ -30,10 +30,10 @@ This patch release primarily to address some build issues on MSYS2, MINGW, and C
 
 - A process comms method for federates to instruct HELICS to process messages for a specific amount of wall clock time without granting time or changing state.
 - Added a threaded signal handler to deal some particular issues with killing processes in python and potentially other language interfaces.
-- Added a log buffer to brokers/cores/federates to store the latest N messages and retrieve it via a query. See [LogBuffer](./docs/user-guide/fundamental_topics/logging.md#log_buffer).
-- Added a time monitor object to brokers to use a particular federate as the query time standard for brokers, this does not affect the cosimulation only the logging and queries.
+- Added a log buffer to brokers/cores/federates to store the latest N messages and retrieve it via a query. See [log buffer](./docs/user-guide/fundamental_topics/logging.md#log-buffer) for more details.
+- Added a time monitor object to brokers to use a particular federate as the query time standard for brokers, this does not affect the cosimulation only the logging and queries. See [time monitor](./docs/user-guide/fundamental_topics/logging.md#time-monitor) for more details.
 - Added a callback to be executed when the time is updated and before the value or message interface callbacks are executed.
-- Added remote logging command to mirror logs from one HELICS object to another. See [Remote Logging](./docs/user-guide/fundamental_topics/logging.md#remote_logging)
+- Added remote logging command to mirror logs from one HELICS object to another. See [remote logging](./docs/user-guide/fundamental_topics/logging.md#remote-logging) for more details.
 
 ## [3.1.1][] - 2021-12-14
 
