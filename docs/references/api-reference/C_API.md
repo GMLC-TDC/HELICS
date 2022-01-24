@@ -21,7 +21,7 @@
 
 ## Enums
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenenumvalue:: HELICS_ITERATION_REQUEST_NO_ITERATION
     :project: helics
@@ -120,6 +120,12 @@
     :project: helics
 
 .. doxygenenumvalue:: HELICS_CORE_TYPE_NULL
+    :project: helics
+
+.. doxygenenumvalue:: HELICS_CORE_TYPE_EMPTY
+    :project: helics
+
+.. doxygenenumvalue:: HELICS_DATA_TYPE_UNKNOWN
     :project: helics
 
 .. doxygenenumvalue:: HELICS_DATA_TYPE_STRING
@@ -242,6 +248,9 @@
 .. doxygenenumvalue:: HELICS_FLAG_PROFILING_MARKER
     :project: helics
 
+.. doxygenenumvalue:: HELICS_LOG_LEVEL_DUMPLOG
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_NO_PRINT
     :project: helics
 
@@ -341,6 +350,9 @@
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_OUTPUT_DELAY
     :project: helics
 
+.. doxygenenumvalue:: HELICS_PROPERTY_TIME_GRANT_TIMEOUT
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_MAX_ITERATIONS
     :project: helics
 
@@ -351,6 +363,9 @@
     :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL
+    :project: helics
+
+.. doxygenenumvalue:: HELICS_PROPERTY_INT_LOG_BUFFER
     :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_NO_OP
@@ -456,7 +471,7 @@
 
 ### General
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsGetVersion
     :project: helics
@@ -467,6 +482,9 @@
 .. doxygenfunction:: helicsGetCompilerVersion
     :project: helics
 
+.. doxygenfunction:: helicsGetSystemInfo
+    :project: helics
+
 .. doxygenfunction:: helicsErrorInitialize
     :project: helics
 
@@ -474,6 +492,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsLoadSignalHandler
+    :project: helics
+
+.. doxygenfunction:: helicsLoadThreadedSignalHandler
     :project: helics
 
 .. doxygenfunction:: helicsClearSignalHandler
@@ -503,6 +524,9 @@
 .. doxygenfunction:: helicsGetOptionValue
     :project: helics
 
+.. doxygenfunction:: helicsGetDataType
+    :project: helics
+
 .. doxygenfunction:: helicsCloseLibrary
     :project: helics
 
@@ -513,7 +537,7 @@
 
 ### Creation
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsCreateCore
     :project: helics
@@ -555,7 +579,7 @@
 
 ### Broker
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsBrokerClone
     :project: helics
@@ -621,7 +645,7 @@
 
 ### Core
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsCoreClone
     :project: helics
@@ -693,12 +717,15 @@
 
 ### FederateInfo
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFederateInfoClone
     :project: helics
 
 .. doxygenfunction:: helicsFederateInfoLoadFromArgs
+    :project: helics
+
+.. doxygenfunction:: helicsFederateInfoLoadFromString
     :project: helics
 
 .. doxygenfunction:: helicsFederateInfoFree
@@ -747,7 +774,7 @@
 
 ### Federate
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFederateDestroy
     :project: helics
@@ -848,6 +875,9 @@
 .. doxygenfunction:: helicsFederateRequestTimeIterativeComplete
     :project: helics
 
+.. doxygenfunction:: helicsFederateProcessCommunications
+    :project: helics
+
 .. doxygenfunction:: helicsFederateGetName
     :project: helics
 
@@ -923,11 +953,14 @@
 .. doxygenfunction:: helicsFederateSetQueryCallback
     :project: helics
 
+.. doxygenfunction:: helicsFederateSetTimeUpdateCallback
+    :project: helics
+
 ```
 
 ### ValueFederate
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterSubscription
     :project: helics
@@ -990,7 +1023,7 @@
 
 ### Publication
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsPublicationIsValid
     :project: helics
@@ -1020,6 +1053,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishVector
+    :project: helics
+
+.. doxygenfunction:: helicsPublicationPublishComplexVector
     :project: helics
 
 .. doxygenfunction:: helicsPublicationPublishNamedPoint
@@ -1062,7 +1098,7 @@
 
 ### Input
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsInputIsValid
     :project: helics
@@ -1109,6 +1145,9 @@
 .. doxygenfunction:: helicsInputGetVector
     :project: helics
 
+.. doxygenfunction:: helicsInputGetComplexVector
+    :project: helics
+
 .. doxygenfunction:: helicsInputGetNamedPoint
     :project: helics
 
@@ -1139,6 +1178,9 @@
 .. doxygenfunction:: helicsInputSetDefaultVector
     :project: helics
 
+.. doxygenfunction:: helicsInputSetDefaultComplexVector
+    :project: helics
+
 .. doxygenfunction:: helicsInputSetDefaultNamedPoint
     :project: helics
 
@@ -1146,6 +1188,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsInputGetPublicationType
+    :project: helics
+
+.. doxygenfunction:: helicsInputGetPublicationDataType
     :project: helics
 
 .. doxygenfunction:: helicsInputGetName
@@ -1197,7 +1242,7 @@
 
 ### MessageFederate
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterEndpoint
     :project: helics
@@ -1239,7 +1284,7 @@
 
 ### Endpoint
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsEndpointIsValid
     :project: helics
@@ -1326,7 +1371,7 @@
 
 ### Message
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsMessageGetSource
     :project: helics
@@ -1416,7 +1461,7 @@
 
 ### FilterFederate
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFederateRegisterFilter
     :project: helics
@@ -1443,7 +1488,7 @@
 
 ### Filter
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsFilterSetCustomCallback
     :project: helics
@@ -1496,7 +1541,7 @@
 
 ### Query
 
-```{eval-rst}
+```eval_rst
 
 .. doxygenfunction:: helicsQueryExecute
     :project: helics

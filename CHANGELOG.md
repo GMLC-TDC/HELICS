@@ -8,6 +8,34 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.1.2][] - 2022-01-25
+
+This patch release primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms.  It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
+
+### Fixed
+
+- Fixed issue building on CYGWIN with the latest FMT library.
+- Build issues related to MSYS2 and Mingw in the networking submodule (submodule updated).
+- Fixed argument processing issue in the comboFed Example.
+
+### Changed
+
+- updates to FMT and SPDLOG
+- Several documentation updates and cleanup
+- Copyright date changed to 2022
+- Targeted endpoints now allow all method calls, with the restriction being that the destination must be in the target list otherwise an error is generated.  An empty destination in methods that allow destinations will operate identically to calls which do not specify a destination.
+- Code cleanup for defining the default port numbers for network core types.
+
+### Added
+
+- A process comms method for federates to instruct HELICS to process messages for a specific amount of wall clock time without granting time or changing state.
+- Added a threaded signal handler to deal some particular issues with killing processes in python and potentially other language interfaces.
+- Added a log buffer to brokers/cores/federates to store the latest N messages and retrieve it via a query. See [LogBuffer](./docs/user-guide/fundamental_topics/logging.md#log_buffer).
+- Added a time monitor object to brokers to use a particular federate as the query time standard for brokers, this does not affect the cosimulation only the logging and queries.
+- Added a callback to be executed when the time is updated and before the value or message interface callbacks are executed.
+- Added remote logging command to mirror logs from one HELICS object to another.  See [Remote Logging](./docs/user-guide/fundamental_topics/logging.md#remote_logging)
+
+
 ## [3.1.1][] - 2021-12-14
 
 Primarily a bug fix release to fix a build issue resulting in internal logging messages being disabled for some of the release packages. Also includes a `maxcosimduration` argument for brokers to kill the co-sim after a certain amount of wall clock time.
@@ -123,6 +151,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.0.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.0.1
 [3.1.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.0
 [3.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.1
+[3.1.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.2
 
 ## [2.7.1][] - 2021-06-05
 
