@@ -1602,8 +1602,7 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if query is an invalid object
+ * The return will be nullptr if query is an invalid object
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 

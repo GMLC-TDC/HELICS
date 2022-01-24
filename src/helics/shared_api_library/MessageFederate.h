@@ -176,9 +176,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* 
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
- * @param dst The target destination.
- *
- *             nullptr to use the default destination.
+ * @param dst The target destination. Use nullptr to send to the default destination.
  * @param[in,out] err A pointer to an error object for catching errors.
  */
 HELICS_EXPORT void
