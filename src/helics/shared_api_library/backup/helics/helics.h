@@ -2077,8 +2077,7 @@ HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* quer
 
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
@@ -2094,8 +2093,7 @@ HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate f
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
@@ -2111,8 +2109,7 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
@@ -2138,8 +2135,7 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if query is an invalid object
+ * The return will be nullptr if query is an invalid object
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
@@ -2151,7 +2147,7 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsEr
  * @param query The query object to check if completed.
  *
  * @return Will return HELICS_TRUE if an asynchronous query has completed or a regular query call was made with a result,
- *         and false if an asynchronous query has not completed or is invalid
+ * and false if an asynchronous query has not completed or is invalid
  */
 HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
 
@@ -3239,9 +3235,7 @@ HELICS_EXPORT int helicsFederateGetInputCount(HelicsFederate fed);
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -3258,10 +3252,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, 
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -3280,10 +3271,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
                                                                     const char* name,
@@ -3304,10 +3292,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFedera
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
                                                                           const char* name,
@@ -3325,8 +3310,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(Helics
  *
  * @return A HelicsEndpoint object.
  *
- *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
-
+ * The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
 
@@ -3341,8 +3325,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const
  *
  * @return A HelicsEndpoint.
  *
- *         It will be NULL if given an invalid index.
-
+ * The HelicsEndpoint returned will be NULL if given an invalid index.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
 
@@ -3362,7 +3345,6 @@ HELICS_EXPORT HelicsBool helicsEndpointIsValid(HelicsEndpoint endpoint);
  * @param dst A string naming the desired default endpoint.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, const char* dst, HelicsError* err);
 
@@ -3383,7 +3365,6 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint end
  *
  * @param inputDataLength The length of the data to send.
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 
@@ -3395,9 +3376,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* 
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
- * @param dst The target destination.
- *
- *             nullptr to use the default destination.
+ * @param dst The target destination. Use nullptr to send to the default destination.
  * @param[in,out] err A pointer to an error object for catching errors.
  */
 HELICS_EXPORT void
@@ -3410,10 +3389,9 @@ HELICS_EXPORT void
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
-
- * @param dst The target destination.
  *
- *             nullptr to use the default destination.
+ * @param dst The target destination. Use nullptr to send to the default destination.
+ *
  * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -3434,11 +3412,10 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
-
-  @param time The time the message should be sent.
+ *
+ * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 
 HELICS_EXPORT void
@@ -3451,7 +3428,6 @@ HELICS_EXPORT void
  * @param message The actual message to send which will be copied.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -3463,7 +3439,6 @@ HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMess
  * @param message The actual message to send which will be copied.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -3474,7 +3449,6 @@ HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, He
  * @param key The name of the publication.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSubscribe(HelicsEndpoint endpoint, const char* key, HelicsError* err);
 
