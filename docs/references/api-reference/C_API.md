@@ -122,6 +122,12 @@
 .. doxygenenumvalue:: HELICS_CORE_TYPE_NULL
     :project: helics
 
+.. doxygenenumvalue:: HELICS_CORE_TYPE_EMPTY
+    :project: helics
+
+.. doxygenenumvalue:: HELICS_DATA_TYPE_UNKNOWN
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_DATA_TYPE_STRING
     :project: helics
 
@@ -242,6 +248,9 @@
 .. doxygenenumvalue:: HELICS_FLAG_PROFILING_MARKER
     :project: helics
 
+.. doxygenenumvalue:: HELICS_LOG_LEVEL_DUMPLOG
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_LOG_LEVEL_NO_PRINT
     :project: helics
 
@@ -341,6 +350,9 @@
 .. doxygenenumvalue:: HELICS_PROPERTY_TIME_OUTPUT_DELAY
     :project: helics
 
+.. doxygenenumvalue:: HELICS_PROPERTY_TIME_GRANT_TIMEOUT
+    :project: helics
+
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_MAX_ITERATIONS
     :project: helics
 
@@ -351,6 +363,9 @@
     :project: helics
 
 .. doxygenenumvalue:: HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL
+    :project: helics
+
+.. doxygenenumvalue:: HELICS_PROPERTY_INT_LOG_BUFFER
     :project: helics
 
 .. doxygenenumvalue:: HELICS_MULTI_INPUT_NO_OP
@@ -467,6 +482,9 @@
 .. doxygenfunction:: helicsGetCompilerVersion
     :project: helics
 
+.. doxygenfunction:: helicsGetSystemInfo
+    :project: helics
+
 .. doxygenfunction:: helicsErrorInitialize
     :project: helics
 
@@ -474,6 +492,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsLoadSignalHandler
+    :project: helics
+
+.. doxygenfunction:: helicsLoadThreadedSignalHandler
     :project: helics
 
 .. doxygenfunction:: helicsClearSignalHandler
@@ -501,6 +522,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsGetOptionValue
+    :project: helics
+
+.. doxygenfunction:: helicsGetDataType
     :project: helics
 
 .. doxygenfunction:: helicsCloseLibrary
@@ -701,6 +725,9 @@
 .. doxygenfunction:: helicsFederateInfoLoadFromArgs
     :project: helics
 
+.. doxygenfunction:: helicsFederateInfoLoadFromString
+    :project: helics
+
 .. doxygenfunction:: helicsFederateInfoFree
     :project: helics
 
@@ -848,6 +875,9 @@
 .. doxygenfunction:: helicsFederateRequestTimeIterativeComplete
     :project: helics
 
+.. doxygenfunction:: helicsFederateProcessCommunications
+    :project: helics
+
 .. doxygenfunction:: helicsFederateGetName
     :project: helics
 
@@ -921,6 +951,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsFederateSetQueryCallback
+    :project: helics
+
+.. doxygenfunction:: helicsFederateSetTimeUpdateCallback
     :project: helics
 
 ```
@@ -1022,6 +1055,9 @@
 .. doxygenfunction:: helicsPublicationPublishVector
     :project: helics
 
+.. doxygenfunction:: helicsPublicationPublishComplexVector
+    :project: helics
+
 .. doxygenfunction:: helicsPublicationPublishNamedPoint
     :project: helics
 
@@ -1109,6 +1145,9 @@
 .. doxygenfunction:: helicsInputGetVector
     :project: helics
 
+.. doxygenfunction:: helicsInputGetComplexVector
+    :project: helics
+
 .. doxygenfunction:: helicsInputGetNamedPoint
     :project: helics
 
@@ -1139,6 +1178,9 @@
 .. doxygenfunction:: helicsInputSetDefaultVector
     :project: helics
 
+.. doxygenfunction:: helicsInputSetDefaultComplexVector
+    :project: helics
+
 .. doxygenfunction:: helicsInputSetDefaultNamedPoint
     :project: helics
 
@@ -1146,6 +1188,9 @@
     :project: helics
 
 .. doxygenfunction:: helicsInputGetPublicationType
+    :project: helics
+
+.. doxygenfunction:: helicsInputGetPublicationDataType
     :project: helics
 
 .. doxygenfunction:: helicsInputGetName
