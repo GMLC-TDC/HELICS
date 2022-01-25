@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -63,6 +63,11 @@ HELICS_EXPORT void helicsErrorClear(HelicsError* err);
 and federates then exits the process.*/
 HELICS_EXPORT void helicsLoadSignalHandler();
 
+/** Load a signal handler that handles Ctrl-C and shuts down all HELICS brokers, cores,
+and federates then exits the process.  This operation will execute in a newly created and detached thread returning control back to the
+calling program before completing operations.*/
+HELICS_EXPORT void helicsLoadThreadedSignalHandler();
+
 /** Clear HELICS based signal handlers.*/
 HELICS_EXPORT void helicsClearSignalHandler();
 
@@ -70,10 +75,11 @@ HELICS_EXPORT void helicsClearSignalHandler();
 @details  This function is not 100% reliable it will most likely work but uses some functions and
 techniques that are not 100% guaranteed to work in a signal handler
 and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
-but it is possible.  The callback has signature helics_bool(*handler)(int) and it will take the SIG_INT as an argument
-and return a boolean.  If the boolean return value is helics_true (or the callback is null) the default signal handler is run after the
-callback finishes; if it is helics_false the default callback is not run and the default signal handler is executed.*/
-HELICS_EXPORT void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int));
+but it is possible.  The callback has signature HelicsBool(*handler)(int) and it will take the SIG_INT as an argument
+and return a boolean.  If the boolean return value is HELICS_TRUE (or the callback is null) the default signal handler is run after the
+callback finishes; if it is HELICS_FALSE the default callback is not run and the default signal handler is executed. If the second
+argument is set to HELICS_TRUE the default signal handler will execute in a separate thread(this may be a bad idea). */
+HELICS_EXPORT void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useSeparateThread);
 
 /** Execute a global abort by sending an error code to all cores, brokers,
 and federates that were created through the current library instance.*/
@@ -130,9 +136,7 @@ HELICS_EXPORT HelicsCore helicsCreateCoreFromArgs(const char* type, const char* 
  * @details This will create a new broker object that references the existing broker. The new broker object must be freed as well.
  *
  * @param core An existing HelicsCore.
- *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
-
  *
  * @return A new reference to the same broker.
  */
@@ -169,9 +173,7 @@ HELICS_EXPORT HelicsBroker helicsCreateBroker(const char* type, const char* name
  *
  * @param type The type of the core to create.
  * @param name The name of the core. It can be a nullptr or empty string to have a name automatically assigned.
- *
  * @param argc The number of arguments.
-
  * @param argv The list of string values from a command line.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
@@ -1155,6 +1157,16 @@ HELICS_EXPORT void
 HELICS_EXPORT HelicsTime helicsFederateRequestTimeIterativeComplete(HelicsFederate fed,
                                                                     HelicsIterationResult* outIterate,
                                                                     HelicsError* err);
+/**
+ * Tell helics to process internal communications for a period of time.
+ *
+ * @param fed The federate to tell to process.
+ *
+ * @param period The length of time to process communications and then return control.
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ *
+ */
+HELICS_EXPORT void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, HelicsError* err);
 
 /**
  * Get the name of the federate.
@@ -1532,8 +1544,7 @@ HELICS_EXPORT HelicsQuery helicsCreateQuery(const char* target, const char* quer
 
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if fed or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err);
@@ -1549,8 +1560,7 @@ HELICS_EXPORT const char* helicsQueryExecute(HelicsQuery query, HelicsFederate f
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if core or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid.
  */
 HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err);
@@ -1566,8 +1576,7 @@ HELICS_EXPORT const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string.  The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
+ * The return will be nullptr if broker or query is an invalid object, the return string will be "#invalid" if the query itself was
  * invalid
  */
 HELICS_EXPORT const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err);
@@ -1593,8 +1602,7 @@ HELICS_EXPORT void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  *
  * @return A pointer to a string. The string will remain valid until the query is freed or executed again.
- *
- *         The return will be nullptr if query is an invalid object
+ * The return will be nullptr if query is an invalid object
  */
 HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err);
 
@@ -1606,7 +1614,7 @@ HELICS_EXPORT const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsEr
  * @param query The query object to check if completed.
  *
  * @return Will return HELICS_TRUE if an asynchronous query has completed or a regular query call was made with a result,
- *         and false if an asynchronous query has not completed or is invalid
+ * and false if an asynchronous query has not completed or is invalid
  */
 HELICS_EXPORT HelicsBool helicsQueryIsCompleted(HelicsQuery query);
 

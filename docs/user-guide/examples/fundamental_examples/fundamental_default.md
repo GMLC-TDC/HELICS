@@ -1,10 +1,6 @@
 # Base Example Co-Simulation
 
-The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation.
-
-![](../../../img/default_setup.png)
-
-The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.
+The Base Example walks through a simple HELICS co-simulation between two python federates. This example also serves as the recommended defaults for setting up a co-simulation. The base example described here will go into detail about the necessary components of a HELICS program. Subsequent examples in the Fundamental Examples section will change small components of the system.
 
 The Base Example tutorial is organized as follows:
 
@@ -19,7 +15,7 @@ The Base Example tutorial is organized as follows:
 
 All files necessary to run the Base Example can be found in the [Fundamental examples repository:](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_default)
 
-[![](../../../img/fund_default_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_default)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fund_default_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental/fundamental_default)
 
 The files include:
 
@@ -37,23 +33,23 @@ In the Base Example, the information being passed between the `Battery.py` feder
 
 When configuring the communication passage between federates, it is important to connect the federate to the correct **handle**. In the image below, we have a Battery federate and a Charger federate. Each federate has a **publication** handle (red) and a **subscription** handle (yellow). The publication handle is also called the **output**, and the subscription handle the **input**. How are values passed between federates with pubs and subs?
 
-![](../../../img/handles.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/handles.png)
 
 We have **named** the publication handle for the `Battery` federate `EV_current` to indicate the information being broadcast -- we can also call the pub handle the **named output**. This is what the publication is doing -- we are telling the Battery federate that we want to publish the EV_current. The full handle for the current is `Battery/EV_current` (within the JSON, this is also called the `key`).
 
-![](../../../img/battery_pub.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/battery_pub.png)
 
 How does the current value get from the Battery federate's publication to the Charger federate? The Charger must subscribe to this publication handle -- the Charger will subscribe to `Battery/EV_current`. The Charger subscription handle has not been given a name (e.g., `Charger/EV_current`), but it will receive **input** -- the Charger subscription is a defined unnamed input with a targeted publication. In this example, we configure the target of the Charger subscription in the JSON to the publication handle name `Battery/EV_current`.
 
-![](../../../img/charger_sub.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/charger_sub.png)
 
 Thus far we have established that the Battery is publishing its current from the named handle `Battery/EV_current` and the Charger is subscribing to this named handle. The Charger is also sending information about values. The Charger federate will be publishing the voltage value from the `Charger/EV_voltage` handle (a named output).
 
-![](../../../img/charger_pub.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/charger_pub.png)
 
 In order to guarantee that the Battery federate receives the voltage value from the Charger federate, the Battery will have an unnamed input subscription which targets the `Charger/EV_voltage` handle.
 
-![](../../../img/battery_sub.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/battery_sub.png)
 
 With a better understanding of how we want to configure the pubs and subs, we can now move on to the mechanics of integrating the two simulators.
 
@@ -164,8 +160,8 @@ The final step is to launch our Base Example with `helics_cli` from the command 
 
 If all goes well, this will reward us with two figures:
 
-![](../../../img/fundamental_default_resultbattery.png)
-![](../../../img/fundamental_default_resultcharger.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_default_resultbattery.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_default_resultcharger.png)
 
 We can see the state of charge of each battery over the duration of the co-simulation in the first figure, and the aggregated instantaneous power draw in the second. As the engineer tasked with assessing the power needs for this charging garage, do you think you have enough information at this stage? If not, how would you change the co-simulation to better model the research needs?
 

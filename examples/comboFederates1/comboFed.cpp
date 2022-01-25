@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
     app.add_option("--startbroker", brokerArgs, "start a broker with the specified arguments");
     app.allow_extras();
 
+    app.allow_extras();
     auto ret = app.helics_parse(argc, argv);
 
     helics::FederateInfo fi;

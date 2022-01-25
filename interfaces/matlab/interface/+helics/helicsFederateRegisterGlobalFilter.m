@@ -1,3 +1,3 @@
 function varargout = helicsFederateRegisterGlobalFilter(varargin)
-  [varargout{1:nargout}] = helicsMEX(324, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(326, varargin{:});
 end

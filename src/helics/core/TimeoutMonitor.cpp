@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TimeoutMonitor.h"
 
+#include "../common/logging.hpp"
 #include "CommonCore.hpp"
 #include "CoreBroker.hpp"
 #include "loggingHelper.hpp"
@@ -176,7 +177,7 @@ void TimeoutMonitor::pingSub(CoreBroker* brk)
 {
     auto now = std::chrono::steady_clock::now();
     bool activePing = false;
-    for (const auto& brkr : brk->_brokers) {
+    for (const auto& brkr : brk->mBrokers) {
         size_t cindex = connections.size();
         for (size_t ii = 0; ii < cindex; ++ii) {
             if (connections[ii].connection == brkr.global_id) {

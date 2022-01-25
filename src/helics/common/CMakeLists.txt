@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -18,10 +18,18 @@ set(common_headers
     addTargets.hpp
     configFileHelpers.hpp
     JsonGeneration.hpp
+    LogBuffer.hpp
+    logging.hpp
 )
 
-set(common_sources JsonProcessingFunctions.cpp JsonBuilder.cpp TomlProcessingFunctions.cpp
-                   configFileHelpers.cpp addTargets.cpp
+set(common_sources
+    JsonProcessingFunctions.cpp
+    JsonBuilder.cpp
+    TomlProcessingFunctions.cpp
+    configFileHelpers.cpp
+    addTargets.cpp
+    LogBuffer.cpp
+    logging.cpp
 )
 
 # headers that are part of the public interface

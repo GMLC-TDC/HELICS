@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -240,7 +240,7 @@ typedef enum {
 
 const int HELICS_INVALID_OPTION_INDEX = -101;
 
-/** enumeration of properties that apply to federates*/
+/** enumeration of properties that apply to federates and sometimes cores*/
 typedef enum {
     /** the property controlling the minimum time delta for a federate*/
     HELICS_PROPERTY_TIME_DELTA = 137,
@@ -271,9 +271,11 @@ typedef enum {
     /** integer property controlling the log level for file logging in a federate see \ref
        HelicsLogLevels*/
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
-    /** integer property controlling the log level for file logging in a federate see \ref
+    /** integer property controlling the log level for console logging in a federate see \ref
        HelicsLogLevels*/
-    HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274
+    HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
+    /** integer property controlling the size of the log buffer*/
+    HELICS_PROPERTY_INT_LOG_BUFFER = 276,
 } HelicsProperties;
 
 /** result returned for requesting the value of an invalid/unknown property */

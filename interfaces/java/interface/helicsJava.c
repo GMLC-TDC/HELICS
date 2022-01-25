@@ -1407,6 +1407,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1CO
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1PROPERTY_1INT_1LOG_1BUFFER_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsProperties result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsProperties)HELICS_PROPERTY_INT_LOG_BUFFER;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1INVALID_1PROPERTY_1VALUE_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   int result;
@@ -2257,6 +2269,13 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandler(J
   (void)jenv;
   (void)jcls;
   helicsLoadSignalHandler();
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadThreadedSignalHandler(JNIEnv *jenv, jclass jcls) {
+  (void)jenv;
+  (void)jcls;
+  helicsLoadThreadedSignalHandler();
 }
 
 
@@ -4834,6 +4853,31 @@ SWIGEXPORT jdouble JNICALL Java_com_java_helics_helicsJNI_helicsFederateRequestT
     }
   }
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateProcessCommunications(JNIEnv *jenv, jclass jcls, jlong jarg1, jdouble jarg2) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  HelicsTime arg2 ;
+  HelicsError *arg3 = (HelicsError *) 0 ;
+  HelicsError etemp3 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp3=helicsErrorInitialize();
+    arg3=&etemp3;
+  }
+  arg1 = *(HelicsFederate *)&jarg1; 
+  arg2 = (HelicsTime)jarg2; 
+  helicsFederateProcessCommunications(arg1,arg2,arg3);
+  {
+    if (arg3->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg3->message);
+    }
+  }
 }
 
 
@@ -10835,6 +10879,33 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_helicsFilterGetOption(JNI
   result = (int)helicsFilterGetOption(arg1,arg2);
   jresult = (jint)result; 
   return jresult;
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateSetTimeUpdateCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  void (*arg2)(HelicsTime,HelicsBool,void *) = (void (*)(HelicsTime,HelicsBool,void *)) 0 ;
+  void *arg3 = (void *) 0 ;
+  HelicsError *arg4 = (HelicsError *) 0 ;
+  HelicsError etemp4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  arg1 = *(HelicsFederate *)&jarg1; 
+  arg2 = *(void (**)(HelicsTime,HelicsBool,void *))&jarg2; 
+  arg3 = *(void **)&jarg3; 
+  helicsFederateSetTimeUpdateCallback(arg1,arg2,arg3,arg4);
+  {
+    if (arg4->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg4->message);
+    }
+  }
 }
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -130,7 +130,8 @@ namespace defs {
         MAX_ITERATIONS = HELICS_PROPERTY_INT_MAX_ITERATIONS,
         LOG_LEVEL = HELICS_PROPERTY_INT_LOG_LEVEL,
         FILE_LOG_LEVEL = HELICS_PROPERTY_INT_FILE_LOG_LEVEL,
-        CONSOLE_LOG_LEVEL = HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL
+        CONSOLE_LOG_LEVEL = HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL,
+        LOG_BUFFER = HELICS_PROPERTY_INT_LOG_BUFFER
     };
 
     /** options for handles */

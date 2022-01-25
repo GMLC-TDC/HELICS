@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -35,9 +35,7 @@ extern "C" {
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -54,10 +52,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, 
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const char* name, const char* type, HelicsError* err);
 
@@ -76,10 +71,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed,
                                                                     const char* name,
@@ -100,10 +92,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFedera
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
- * @return An object containing the endpoint.
- *
- *         nullptr on failure.
-
+ * @return An object containing the endpoint, or nullptr on failure.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed,
                                                                           const char* name,
@@ -121,8 +110,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(Helics
  *
  * @return A HelicsEndpoint object.
  *
- *         The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
-
+ * The object will not be valid and err will contain an error code if no endpoint with the specified name exists.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, HelicsError* err);
 
@@ -137,8 +125,7 @@ HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const
  *
  * @return A HelicsEndpoint.
  *
- *         It will be NULL if given an invalid index.
-
+ * The HelicsEndpoint returned will be NULL if given an invalid index.
  */
 HELICS_EXPORT HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, HelicsError* err);
 
@@ -158,7 +145,6 @@ HELICS_EXPORT HelicsBool helicsEndpointIsValid(HelicsEndpoint endpoint);
  * @param dst A string naming the desired default endpoint.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSetDefaultDestination(HelicsEndpoint endpoint, const char* dst, HelicsError* err);
 
@@ -179,7 +165,6 @@ HELICS_EXPORT const char* helicsEndpointGetDefaultDestination(HelicsEndpoint end
  *
  * @param inputDataLength The length of the data to send.
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err);
 
@@ -191,9 +176,7 @@ HELICS_EXPORT void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* 
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
- * @param dst The target destination.
- *
- *             nullptr to use the default destination.
+ * @param dst The target destination. Use nullptr to send to the default destination.
  * @param[in,out] err A pointer to an error object for catching errors.
  */
 HELICS_EXPORT void
@@ -206,10 +189,9 @@ HELICS_EXPORT void
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
-
- * @param dst The target destination.
  *
- *             nullptr to use the default destination.
+ * @param dst The target destination. Use nullptr to send to the default destination.
+ *
  * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -230,11 +212,10 @@ HELICS_EXPORT void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
  * @param data The data to send.
  *
  * @param inputDataLength The length of the data to send.
-
-  @param time The time the message should be sent.
+ *
+ * @param time The time the message should be sent.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 
 HELICS_EXPORT void
@@ -247,7 +228,6 @@ HELICS_EXPORT void
  * @param message The actual message to send which will be copied.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -259,7 +239,6 @@ HELICS_EXPORT void helicsEndpointSendMessage(HelicsEndpoint endpoint, HelicsMess
  * @param message The actual message to send which will be copied.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage message, HelicsError* err);
 
@@ -270,7 +249,6 @@ HELICS_EXPORT void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, He
  * @param key The name of the publication.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
  */
 HELICS_EXPORT void helicsEndpointSubscribe(HelicsEndpoint endpoint, const char* key, HelicsError* err);
 

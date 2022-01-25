@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -52,7 +52,7 @@ constexpr uint16_t child_flag = extra_flag4;
 constexpr uint16_t non_counting_flag = empty_flag;
 
 /// overload of extra_flag2 indicating an endpoint is targeted
-constexpr uint16_t targetted_flag = extra_flag2;
+constexpr uint16_t targeted_flag = extra_flag2;
 
 constexpr uint16_t filter_processing_required_flag =
     extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for

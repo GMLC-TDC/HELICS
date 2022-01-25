@@ -1,3 +1,3 @@
 function varargout = helicsInputGetPublicationType(varargin)
-  [varargout{1:nargout}] = helicsMEX(227, varargin{:});
+  [varargout{1:nargout}] = helicsMEX(229, varargin{:});
 end

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -114,6 +114,30 @@ void helicsFederateSetQueryCallback(HelicsFederate fed,
                 queryAnswer(query.data(), static_cast<int>(query.size()), &buffer, userdata);
                 buffer.pop_back();
                 return buffer;
+            });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
+
+void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
+                                         void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                         void* userdata,
+                                         HelicsError* err)
+{
+    auto* fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (timeUpdate == nullptr) {
+            fedptr->setTimeUpdateCallback({});
+        } else {
+            fedptr->setTimeUpdateCallback([timeUpdate, userdata](helics::Time newTime, bool iterating) {
+                timeUpdate(static_cast<HelicsTime>(newTime), iterating ? HELICS_TRUE : HELICS_FALSE, userdata);
             });
         }
     }

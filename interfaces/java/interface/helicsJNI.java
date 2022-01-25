@@ -108,6 +108,7 @@ public class helicsJNI {
   public final static native int HELICS_PROPERTY_INT_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_FILE_LOG_LEVEL_get();
   public final static native int HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL_get();
+  public final static native int HELICS_PROPERTY_INT_LOG_BUFFER_get();
   public final static native int HELICS_INVALID_PROPERTY_VALUE_get();
   public final static native int HELICS_MULTI_INPUT_NO_OP_get();
   public final static native int HELICS_MULTI_INPUT_VECTORIZE_OPERATION_get();
@@ -179,6 +180,7 @@ public class helicsJNI {
   public final static native String helicsGetCompilerVersion();
   public final static native String helicsGetSystemInfo();
   public final static native void helicsLoadSignalHandler();
+  public final static native void helicsLoadThreadedSignalHandler();
   public final static native void helicsClearSignalHandler();
   public final static native void helicsAbort(int jarg1, String jarg2);
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
@@ -278,6 +280,7 @@ public class helicsJNI {
   public final static native double helicsFederateRequestTimeComplete(long jarg1);
   public final static native void helicsFederateRequestTimeIterativeAsync(long jarg1, double jarg2, int jarg3);
   public final static native double helicsFederateRequestTimeIterativeComplete(long jarg1, int[] jarg2);
+  public final static native void helicsFederateProcessCommunications(long jarg1, double jarg2);
   public final static native String helicsFederateGetName(long jarg1);
   public final static native void helicsFederateSetTimeProperty(long jarg1, int jarg2, double jarg3);
   public final static native void helicsFederateSetFlagOption(long jarg1, int jarg2, int jarg3);
@@ -502,4 +505,5 @@ public class helicsJNI {
   public final static native void helicsFilterSetTag(long jarg1, String jarg2, String jarg3);
   public final static native void helicsFilterSetOption(long jarg1, int jarg2, int jarg3);
   public final static native int helicsFilterGetOption(long jarg1, int jarg2);
+  public final static native void helicsFederateSetTimeUpdateCallback(long jarg1, long jarg2, long jarg3);
 }

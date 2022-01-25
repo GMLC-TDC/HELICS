@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -262,6 +262,9 @@ TEST(broker_timeout, max_duration_core)
     auto cr = helics::CoreFactory::create(CORE_TYPE_TO_TEST, "--broker=" + brk->getIdentifier());
     EXPECT_TRUE(cr->connect());
     auto res = cr->waitForDisconnect(std::chrono::milliseconds(600));
+    if (!res) {
+        res = cr->waitForDisconnect(std::chrono::milliseconds(400));
+    }
     EXPECT_TRUE(res);
     if (!res) {
         brk->disconnect();

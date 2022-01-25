@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -901,5 +901,210 @@ TEST_F(mfed_tests, missing_endpoint)
         EXPECT_THAT(mm->back().second, HasSubstr("ep3"));
     }
     mm.unlock();
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, targeted_endpoint_send_error1)
+{
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
+
+    ep1.addDestinationTarget("ep2");
+    ep1.addDestinationTarget("ep4");
+    ep2.addDestinationTarget("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    EXPECT_NO_THROW(ep1.sendTo(message1.c_str(), 26, "ep2"));
+    EXPECT_THROW(ep1.sendTo(message1.c_str(), 26, "ep3"), helics::InvalidParameter);
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTimeAdvance(1.0);
+    mFed1->requestTimeComplete();
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_FALSE(ep4.hasMessage());
+    EXPECT_FALSE(ep3.hasMessage());
+    auto m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    mFed2->finalize();
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, targeted_endpoint_send_error2)
+{
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
+
+    ep1.addDestinationTarget("ep2");
+    ep1.addDestinationTarget("ep4");
+    ep2.addDestinationTarget("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    EXPECT_NO_THROW(ep1.sendToAt(message1.c_str(), 26, "ep2", 0.0));
+    EXPECT_THROW(ep1.sendToAt(message1.c_str(), 26, "ep3", 0.0), helics::InvalidParameter);
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTimeAdvance(1.0);
+    mFed1->requestTimeComplete();
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_FALSE(ep4.hasMessage());
+    EXPECT_FALSE(ep3.hasMessage());
+    auto m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    mFed2->finalize();
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, targeted_endpoint_send_error3)
+{
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
+
+    ep1.addDestinationTarget("ep2");
+    ep1.addDestinationTarget("ep4");
+    ep2.addDestinationTarget("ep1");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    helics::Message val;
+    val.dest = "ep2";
+    val.data = std::string_view(message1.c_str(), 26);
+    val.source = "ep1";
+
+    EXPECT_NO_THROW(ep1.send(val));
+    val.dest = "ep3";
+    EXPECT_THROW(ep1.send(val), helics::InvalidParameter);
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTimeAdvance(1.0);
+    mFed1->requestTimeComplete();
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_FALSE(ep4.hasMessage());
+    EXPECT_FALSE(ep3.hasMessage());
+    auto m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    mFed2->finalize();
+    mFed1->finalize();
+}
+
+TEST_F(mfed_tests, targeted_endpoint_send_all)
+{
+    SetupTest<helics::MessageFederate>("test", 2, 1.0);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    auto& ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
+
+    auto& ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
+    auto& ep3 = mFed2->registerGlobalTargetedEndpoint("ep3");
+    auto& ep4 = mFed2->registerGlobalTargetedEndpoint("ep4");
+
+    ep1.addDestinationTarget("ep2");
+    ep1.addDestinationTarget("ep4");
+
+    const std::string message1{"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"};
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    helics::Message val;
+    val.data = std::string_view(message1.c_str(), 26);
+    val.source = "ep1";
+
+    EXPECT_NO_THROW(ep1.send(val));
+
+    EXPECT_NO_THROW(ep1.sendToAt(message1.c_str(), 26, "", 0.0));
+    EXPECT_NO_THROW(ep1.sendTo(message1.c_str(), 26, ""));
+    mFed1->requestTimeAsync(1.0);
+    mFed2->requestTimeAdvance(1.0);
+    mFed1->requestTimeComplete();
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_TRUE(ep4.hasMessage());
+    EXPECT_FALSE(ep3.hasMessage());
+    auto m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    auto m2 = ep4.getMessage();
+    if (m2) {
+        EXPECT_EQ(m2->data.size(), 26U);
+        EXPECT_EQ(m2->time, helics::timeZero);
+    }
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_TRUE(ep4.hasMessage());
+    m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    m2 = ep4.getMessage();
+    if (m2) {
+        EXPECT_EQ(m2->data.size(), 26U);
+        EXPECT_EQ(m2->time, helics::timeZero);
+    }
+
+    EXPECT_TRUE(ep2.hasMessage());
+    EXPECT_TRUE(ep4.hasMessage());
+    m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->data.size(), 26U);
+        EXPECT_EQ(m->time, helics::timeZero);
+    }
+
+    m2 = ep4.getMessage();
+    if (m2) {
+        EXPECT_EQ(m2->data.size(), 26U);
+        EXPECT_EQ(m2->time, helics::timeZero);
+    }
+
+    mFed2->finalize();
     mFed1->finalize();
 }

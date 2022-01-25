@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -265,7 +265,16 @@ class Core {
      * Returns the current reiteration count for the specified federate.
      */
     virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const = 0;
-
+    /** blocking call that processes helics communication messages
+     * this call can be used when expecting communication from other federates or when the federate
+     * has nothing else to do and doesn't want to advance time
+     *
+     * @param fedId the ID of the federate to process communications for
+     * @param msToWait the amount of time to wait before the function returns from processing
+     * communications
+     */
+    virtual void processCommunications(LocalFederateId fedId,
+                                       std::chrono::milliseconds msToWait) = 0;
     /** set a timebased property on a federate
     @param federateID the federate to set a time based property on
     @param property the property to set see /ref defs::properties

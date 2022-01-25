@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -35,13 +35,13 @@ bool EmptyCore::isConnected() const
 
 const std::string& EmptyCore::getIdentifier() const
 {
-    static const std::string nullStr{""};
+    static const std::string nullStr;
     return nullStr;
 }
 
 const std::string& EmptyCore::getAddress() const
 {
-    static const std::string nullStr{""};
+    static const std::string nullStr;
     return nullStr;
 }
 
@@ -137,6 +137,11 @@ iteration_time EmptyCore::requestTimeIterative(LocalFederateId /*federateID*/,
                                                IterationRequest /*iterate*/)
 {
     throw(InvalidFunctionCall("time request should only be called in execution state"));
+}
+
+void EmptyCore::processCommunications(LocalFederateId /*federateID*/,
+                                      std::chrono::milliseconds /*msToWait*/)
+{
 }
 
 Time EmptyCore::getCurrentTime(LocalFederateId /*federateID*/) const

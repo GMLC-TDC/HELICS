@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -71,9 +71,9 @@ void zmqBrokerServer::stopServer()
     auto ctx = ZmqContextManager::getContextPointer();
     zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
     reqSocket.setsockopt(ZMQ_LINGER, 300);
-    int port = (mZmqPort != 0) ?
-        mZmqPort :
-        ((zmq_enabled_) ? DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1 : DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    int port = (mZmqPort != 0) ? mZmqPort :
+                                 ((zmq_enabled_) ? getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1 :
+                                                   getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS));
     if (zmq_enabled_) {
         if (config_->isMember("zmq")) {
             auto V = (*config_)["zmq"];
@@ -112,7 +112,7 @@ void zmqBrokerServer::stopServer()
 std::pair<std::unique_ptr<zmq::socket_t>, int> zmqBrokerServer::loadZMQsocket(zmq::context_t& ctx)
 {
     std::pair<std::unique_ptr<zmq::socket_t>, int> retval{nullptr,
-                                                          DEFAULT_ZMQ_BROKER_PORT_NUMBER + 1};
+                                                          getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1};
     std::string ext_interface = "tcp://*";
     std::chrono::milliseconds timeout(20000);
     if (config_->isMember("zmq")) {
@@ -135,7 +135,7 @@ std::pair<std::unique_ptr<zmq::socket_t>, int> zmqBrokerServer::loadZMQsocket(zm
 std::pair<std::unique_ptr<zmq::socket_t>, int> zmqBrokerServer::loadZMQSSsocket(zmq::context_t& ctx)
 {
     std::pair<std::unique_ptr<zmq::socket_t>, int> retval{nullptr,
-                                                          DEFAULT_ZMQSS_BROKER_PORT_NUMBER};
+                                                          getDefaultPort(HELICS_CORE_TYPE_ZMQ_SS)};
     std::string ext_interface = "tcp://*";
     std::chrono::milliseconds timeout(20000);
     if (config_->isMember("zmqss")) {

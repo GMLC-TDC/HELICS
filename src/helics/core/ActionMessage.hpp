@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -300,13 +300,31 @@ inline bool isDisconnectCommand(const ActionMessage& command) noexcept
     }
 }
 
-/** check if a command is a disconnect command*/
+/** check if a command is an error command*/
 inline bool isErrorCommand(const ActionMessage& command) noexcept
 {
     switch (command.action()) {
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
+            return true;
+        default:
+            return false;
+    }
+}
+/** check if the command can be ignored by a missing route*/
+inline bool isIgnoreableCommand(const ActionMessage& command) noexcept
+{
+    if (isDisconnectCommand(command)) {
+        return true;
+    }
+    if (isErrorCommand(command)) {
+        return true;
+    }
+    switch (command.action()) {
+        case CMD_LOG:
+        case CMD_WARNING:
+        case CMD_REMOTE_LOG:
             return true;
         default:
             return false;

@@ -12,8 +12,6 @@ The Fundamental Examples teach three concepts to build on a default setup:
 
 ```
 
-![](../../../img/user_guide_combinations_fundamental.png)
-
 The Fundamental examples are meant to build in complexity -- if you are new to HELICS, we recommend you start with the Base Example, which is also the recommended default setup. The examples in this section start with the simplest configuration method, which makes assumptions about the system which may not be completely valid but are reasonable for learning purposes.
 
 This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation:
@@ -38,7 +36,7 @@ Where is the code?
 
 The code for the [Fundamental examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/fundamental)
 
 <a name="what-is-this-co-simulation-doing">
 <strong>

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -64,7 +64,7 @@ ZmqComms::~ZmqComms()
 
 int ZmqComms::getDefaultBrokerPort() const
 {
-    return DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+    return getDefaultPort(HELICS_CORE_TYPE_ZMQ);
 }
 
 int ZmqComms::processIncomingMessage(zmq::message_t& msg)
@@ -252,7 +252,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
     if (hasBroker) {
         auto ctx = ZmqContextManager::getContextPointer();
         if (brokerPort < 0) {
-            brokerPort = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+            brokerPort = getDefaultBrokerPort();
         }
 
         zmq::socket_t brokerReq(ctx->getContext(), ZMQ_REQ);
@@ -405,7 +405,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
         }
     } else {
         if ((PortNumber < 0)) {
-            PortNumber = DEFAULT_ZMQ_BROKER_PORT_NUMBER;
+            PortNumber = getDefaultBrokerPort();
             ActionMessage setPorts(CMD_PROTOCOL);
             setPorts.messageID = PORT_DEFINITIONS;
             setPorts.setExtraData(PortNumber);
@@ -544,7 +544,7 @@ void ZmqComms::queue_tx_function()
                 if (hasBroker) {
                     brokerPushSocket.send(zmq::const_buffer(buffer.data(), buffer.size()));
                 } else {
-                    if (!isDisconnectCommand(cmd)) {
+                    if (!isIgnoreableCommand(cmd)) {
                         logWarning(std::string("unknown route and no broker, dropping message ") +
                                    prettyPrintString(cmd));
                     }

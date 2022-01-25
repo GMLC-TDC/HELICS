@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -63,9 +63,19 @@ inline void loadSignalHandler()
     helicsLoadSignalHandler();
 }
 
+inline void loadThreadedSignalHandler()
+{
+    helicsLoadThreadedSignalHandler();
+}
+
 inline void loadSignalHandler(HelicsBool (*handler)(int))
 {
-    helicsLoadSignalHandlerCallback(handler);
+    helicsLoadSignalHandlerCallback(handler, HELICS_FALSE);
+}
+
+inline void loadSignalHandler(HelicsBool (*handler)(int), bool val)
+{
+    helicsLoadSignalHandlerCallback(handler, val ? HELICS_TRUE : HELICS_FALSE);
 }
 
 inline void clearSignalHandler()

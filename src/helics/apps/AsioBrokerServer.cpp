@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -137,7 +137,7 @@ namespace apps {
         AsioBrokerServer::loadTCPserver(asio::io_context& ioctx)
     {
         std::string ext_interface = "0.0.0.0";
-        int tcpport = DEFAULT_TCP_BROKER_PORT_NUMBER;
+        int tcpport = getDefaultPort(HELICS_CORE_TYPE_TCP);
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("tcp")) {
             const auto& V = (*config_)["tcp"];
@@ -153,7 +153,7 @@ namespace apps {
     {
         pdata.clear();
         for (int ii = 0; ii < 20; ++ii) {
-            pdata.emplace_back(DEFAULT_TCP_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
+            pdata.emplace_back(getDefaultPort(HELICS_CORE_TYPE_TCP) + 4 + ii, false, nullptr);
         }
     }
 #endif  // HELICS_ENABLE_TCP_CORE
@@ -188,7 +188,7 @@ namespace apps {
     std::shared_ptr<udp::UdpServer> AsioBrokerServer::loadUDPserver(asio::io_context& ioctx)
     {
         std::string ext_interface = "0.0.0.0";
-        int udpport = DEFAULT_UDP_BROKER_PORT_NUMBER;
+        int udpport = getDefaultPort(HELICS_CORE_TYPE_UDP);
         // std::chrono::milliseconds timeout(20000);
         if (config_->isMember("udp")) {
             auto V = (*config_)["udp"];
@@ -202,7 +202,7 @@ namespace apps {
     {
         pdata.clear();
         for (int ii = 0; ii < 20; ++ii) {
-            pdata.emplace_back(DEFAULT_ZMQSS_BROKER_PORT_NUMBER + 4 + ii, false, nullptr);
+            pdata.emplace_back(getDefaultPort(HELICS_CORE_TYPE_UDP) + 4 + ii, false, nullptr);
         }
     }
 

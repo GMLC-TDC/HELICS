@@ -80,7 +80,7 @@ For the purposes of illustration, let's suppose that a co-simulation federation 
 
 Below is a timing diagram showing how these federates interact during a co-simulation. The filled blocks show when each federate has been woken up and is active.
 
-![](../../img/helics_timing_example.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/helics_timing_example.png)
 
 Items of notes:
 

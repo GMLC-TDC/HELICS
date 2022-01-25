@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -35,6 +35,7 @@ class CoreFederateInfo;
 
 class TimeCoordinator;
 class MessageTimer;
+class LogManager;
 
 constexpr Time startupTime = Time::minVal();
 constexpr Time initialTime{-1000000.0};
@@ -53,8 +54,9 @@ class FederateState {
 
   private:
     const std::string name;  //!< the name of the federate
-    std::unique_ptr<TimeCoordinator>
-        timeCoord;  //!< object that manages the time to determine granting
+    /// object that manages the time to determine granting
+    std::unique_ptr<TimeCoordinator> timeCoord;
+
   public:
     LocalFederateId local_id;  //!< id code for the local federate descriptor
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
@@ -66,14 +68,16 @@ class FederateState {
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool source_only{false};  //!< flag indicating the federate is a source_only
-    bool ignore_time_mismatch_warnings{
-        false};  //!< flag indicating that time mismatches should be ignored
-    bool strict_input_type_checking{
-        false};  //!< flag indicating that inputs should have strict type checking
+    /// flag indicating that time mismatches should be ignored
+    bool ignore_time_mismatch_warnings{false};
+    /// flag indicating that inputs should have strict type checking
+    bool strict_input_type_checking{false};
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     /// flag indicating that a federate is likely to be slow in responding
     bool slow_responding{false};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
+    std::unique_ptr<LogManager> mLogManager;
+    int maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
 
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
@@ -107,7 +111,6 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
-    int logLevel{HELICS_LOG_LEVEL_WARNING};  //!< the level of logging used in the federate
     /** counter for the number of times time or execution mode has been granted */
     std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */
@@ -127,12 +130,11 @@ class FederateState {
     Time allowed_send_time{startupTime};  //!< the next time a message can be sent;
     mutable std::atomic_flag processing = ATOMIC_FLAG_INIT;  //!< the federate is processing
 
-    /** a logging function for logging or printing messages*/
-    std::function<void(int, std::string_view, std::string_view)> loggerFunction;
     /** a callback for additional queries */
     std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
+
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -252,7 +254,7 @@ class FederateState {
     /** unlocks the processing*/
     void unlock() const { processing.clear(); }
     /** get the current logging level*/
-    int loggingLevel() const { return logLevel; }
+    int loggingLevel() const;
 
     /** set a tag (key-value pair)*/
     void setTag(const std::string& tag, const std::string& value);
@@ -318,6 +320,8 @@ class FederateState {
     void generateProfilingMessage(bool enterHelicsCode);
     /** generate a timing marker message system time + steady time*/
     void generateProfilingMarker();
+    /** go through and update the max log level*/
+    void updateMaxLogLevel();
 
   public:
     /** get the granted time of a federate*/
@@ -377,7 +381,8 @@ class FederateState {
     MessageProcessingResult genericUnspecifiedQueueProcess(bool busyReturn);
     /** function to process the queue until a disconnect_fed_ack is received*/
     void finalize();
-
+    /** process incoming messages for a certain amount of time*/
+    void processCommunications(std::chrono::milliseconds period);
     /** add an action message to the queue*/
     void addAction(const ActionMessage& action);
     /** move a message to the queue*/
@@ -392,17 +397,20 @@ class FederateState {
     @param level the logging level of the message
     @param logMessageSource the name of the object that sent the message
     @param message the message to log
+    @param fromRemote indicator that the message is from a remote source and should be treated
+    accordingly
     */
-    void logMessage(int level, std::string_view logMessageSource, std::string_view message) const;
+    void logMessage(int level,
+                    std::string_view logMessageSource,
+                    std::string_view message,
+                    bool fromRemote = false) const;
 
     /** set the logging function
     @details function must have signature void(int level, const std::string &sourceName, const
     std::string &message)
     */
-    void setLogger(std::function<void(int, std::string_view, std::string_view)> logFunction)
-    {
-        loggerFunction = std::move(logFunction);
-    }
+    void setLogger(std::function<void(int, std::string_view, std::string_view)> logFunction);
+
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)
     */

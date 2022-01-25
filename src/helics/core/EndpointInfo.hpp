@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -54,7 +54,7 @@ class EndpointInfo {
   public:
     bool hasFilter{false};  //!< indicator that the message has a filter
     bool required{false};
-    bool targettedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
+    bool targetedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
     /** get the number of messages in the queue up to the specified time*/

@@ -7,8 +7,6 @@
 
 ```
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This example shows how to configure a HELICS co-simulation to run across multiple computers.
 
 - [Where is the code?](#where-is-the-code)
@@ -88,11 +86,11 @@ To run this example you'll need to use two computers, running one part of the fe
 
 The peak charging results are shown below and are identical to the results from the similarly configured [broker hierarchy example](advanced_brokers_hierarchies.md).
 
-![](../../../img/advanced_hierarchy_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_charging_power.png)
 
-![](../../../img/advanced_hierarchy_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_estimated_SOCs.png)
 
-![](../../../img/advanced_hierarchy_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_battery_SOCs.png)
 
 ## [Questions and Help](../../support.md)
 

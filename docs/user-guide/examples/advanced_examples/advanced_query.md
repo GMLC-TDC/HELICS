@@ -1,7 +1,5 @@
 # Federation Queries
 
-![](../../../img/user_guide_combinations_advanced.png)
-
 This demonstrates the use of federation queries and performs dynamic configuration by using the information from the query to configure the Battery federate.
 
 - [Where is the code?](#where-is-the-code)
@@ -15,7 +13,7 @@ This demonstrates the use of federation queries and performs dynamic configurati
 
 This example on [queries can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/query). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-[![](../../../img/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
+[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
 ## What is this co-simulation doing?
 
@@ -86,11 +84,11 @@ Run the co-simulation:
 
 Since this is only a change to the configuration method of the federation, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![](../../../img/advanced_query_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_charging_power.png)
 
-![](../../../img/advanced_query_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_estimated_SOCs.png)
 
-![](../../../img/advanced_query_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_battery_SOCs.png)
 
 The dynamic configuration can also been seen by looking at the log file for the Battery federate (`Battery.log`). The pre-configure data flow graph only showed five subscriptions, all made by the Charger federate of the Battery federates current
 
