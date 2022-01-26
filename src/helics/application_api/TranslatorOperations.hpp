@@ -19,6 +19,7 @@ file defines some common filter operations
 #include <set>
 #include <string>
 #include <vector>
+#include <functional>
 
 namespace helics {
 class Core;
@@ -45,6 +46,22 @@ class BinaryTranslatorOperator: public TranslatorOperator {
     BinaryTranslatorOperator() = default;
     /** set the function to modify the data of the message*/
   private:
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
+
+    /** convert a value to a message*/
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
+};
+
+/** class defining a custom Translator operator*/
+class CustomTranslatorOperator: public TranslatorOperator {
+  public:
+    /** default constructor*/
+    CustomTranslatorOperator() = default;
+    /** set the function to modify the data of the message*/
+  private:
+    std::function<SmallBuffer(std::unique_ptr<Message> message)> toValueFunction;
+    std::function<std::unique_ptr<Message>(const SmallBuffer& value)> toMessageFunction;
+
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
 
     /** convert a value to a message*/

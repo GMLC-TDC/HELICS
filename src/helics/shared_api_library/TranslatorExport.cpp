@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Translators.h"
 #include "helicsCallbacks.h"
 #include "internal/api_objects.h"
+#include "../application_api/TranslatorOperations.hpp"
 
 #include <memory>
 #include <mutex>
@@ -399,7 +400,7 @@ int helicsTranslatorGetOption(HelicsTranslator trans, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsTranslatorSetCustomCallback(HelicsTranslator trans,
+void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
                                    void (*toValueCall)(HelicsMessage message, void *outData,void* userData),
                                        HelicsMessage (*toMessageCall)(const char *data, int dataSize, void *userData),
                                    void* userdata,
@@ -415,14 +416,8 @@ void helicsTranslatorSetCustomCallback(HelicsTranslator trans,
         assignError(err, HELICS_ERROR_INVALID_OBJECT, nonCustomTranslatorString);
         return;
     }
-    auto op = std::make_shared<helics::TranslatorOperator>();
-    op->set([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-        auto* ms = createAPIMessage(message);
-        if (filtCall != nullptr) {
-            filtCall(ms, userdata);
-        }
-        return message;
-    });
+    auto op = std::make_shared<helics::CustomTranslatorOperator>();
+    
     try {
         fObj->transPtr->setOperator(std::move(op));
     }

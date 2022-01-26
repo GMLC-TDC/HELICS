@@ -50,6 +50,24 @@ namespace helics {
         return m;
     }
 
+
+    SmallBuffer CustomTranslatorOperator::convertToValue(std::unique_ptr<Message> message)
+    {
+        if (toValueFunction) {
+            return toValueFunction(std::move(message));
+        }
+        return {};
+    }
+
+    /** convert a value to a message*/
+    std::unique_ptr<Message> CustomTranslatorOperator::convertToMessage(const SmallBuffer& value)
+    {
+        if (toMessageFunction) {
+            return toMessageFunction(value);
+        }
+        return {};
+    }
+
     void TranslatorOperations::set(const std::string& property, double /*val*/)
 {
     if (property == "delay") {
