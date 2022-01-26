@@ -388,6 +388,17 @@ typedef enum {
     HELICS_FILTER_TYPE_FIREWALL = 6
 } HelicsFilterTypes;
 
+/** enumeration of the predefined translator types*/
+typedef enum {
+    /** a custom filter type that executes a user defined callback*/
+    HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
+    /** a translator type that converts to and from JSON*/
+    HELICS_TRANSLATOR_TYPE_JSON = 11,
+    /** a translator type that just encodes the message again in binary*/
+    HELICS_TRANSLATOR_TYPE_BINARY = 12,
+
+} HelicsTranslatorTypes;
+
 /** enumeration of sequencing modes for queries and commands
 fast is the default, meaning the query travels along priority channels and takes precedence of over
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
@@ -431,6 +442,11 @@ typedef void* HelicsEndpoint;
  */
 // typedef void* helics_filter;
 typedef void* HelicsFilter;
+
+/**
+ * opaque object representing a translator
+ */
+typedef void* HelicsTranslator;
 
 /**
  * opaque object representing a core
@@ -539,8 +555,6 @@ typedef struct HelicsComplex {
     double imag;
 } HelicsComplex;
 
-// typedef HelicsComplex helics_complex;
-
 /**
  * helics error object
  *
@@ -553,6 +567,24 @@ typedef struct HelicsError {
 } HelicsError;
 
 // typedef helics_error HelicsError;
+
+/** convert an integer to serialized bytes*/
+HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, void* data, int datasize);
+
+/** convert a double to serialized bytes*/
+HELICS_EXPORT int32_t helicsDoubleToBytes(int64_t value, void* data, int datasize);
+
+/** convert a string to serialized bytes*/
+HELICS_EXPORT int32_t helicsStringToBytes(const char *str, void* data, int datasize);
+
+/** convert a bool to serialized bytes*/
+HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, void* data, int datasize);
+
+/** convert a bool to serialized bytes*/
+HELICS_EXPORT int32_t helicsCharToBytes(char value, void* data, int datasize);
+
+/** convert a bool to serialized bytes*/
+HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, void* data, int datasize);
 
 /**
  * @file
@@ -4296,6 +4328,244 @@ HELICS_EXPORT void helicsFilterSetOption(HelicsFilter filt, int option, int valu
  * @param option The option to query /ref helics_handle_options.
  */
 HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
+
+/**
+ * @}
+ */
+
+/**
+ * Create a source Translator on the specified federate.
+ *
+ * @details Translators can be created through a federate or a core, linking through a federate allows
+ *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+ *
+ * @param fed The federate to register through.
+ * @param type The type of translator to create /ref HelicsTranslatorTypes.
+ * @param name The name of the translator (can be NULL).
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ *
+ * @return A HelicsTranslator object.
+ */
+HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate fed, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+/**
+ * Create a global source translator through a federate.
+ *
+ * @details Translators can be created through a federate or a core, linking through a federate allows
+ *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+ *
+ * @param fed The federate to register through.
+ * @param type The type of translator to create /ref HelicsTranslatorTypes.
+ * @param name The name of the translator (can be NULL).
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ *
+ * @return A HelicsTranslator object.
+ */
+HELICS_EXPORT HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFederate fed,
+                                                                      HelicsTranslatorTypes type,
+                                                                      const char* name,
+                                                                      HelicsError* err);
+
+/**
+ * Create a source Translator on the specified core.
+ *
+ * @details Translators can be created through a federate or a core, linking through a federate allows
+ *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+ *
+ * @param core The core to register through.
+ * @param type The type of translator to create /ref HelicsTranslatorTypes.
+ * @param name The name of the translator (can be NULL).
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ *
+ * @return A HelicsTranslator object.
+ */
+HELICS_EXPORT HelicsTranslator helicsCoreRegisterTranslator(HelicsCore core, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+
+/**
+ * Get the number of translators registered through a federate.
+ *
+ * @param fed The federate object to use to get the translator.
+ *
+ * @return A count of the number of translators registered through a federate.
+ */
+HELICS_EXPORT int helicsFederateGetTranslatorCount(HelicsFederate fed);
+
+/**
+ * Get a translator by its name, typically already created via registerInterfaces file or something of that nature.
+ *
+ * @param fed The federate object to use to get the translator.
+ * @param name The name of the translator.
+ *
+ * @param[in,out] err The error object to complete if there is an error.
+
+ *
+ * @return A HelicsTranslator object, the object will not be valid and err will contain an error code if no translator with the specified name
+ * exists.
+ */
+HELICS_EXPORT HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* name, HelicsError* err);
+/**
+ * Get a translator by its index, typically already created via registerInterfaces file or something of that nature.
+ *
+ * @param fed The federate object in which to create a publication.
+ * @param index The index of the publication to get.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ *
+ * @return A HelicsTranslator, which will be NULL if an invalid index is given.
+ */
+HELICS_EXPORT HelicsTranslator helicsFederateGetTranslatorByIndex(HelicsFederate fed, int index, HelicsError* err);
+
+/**
+ * Check if a translator is valid.
+ *
+ * @param filt The translator object to check.
+ *
+ * @return HELICS_TRUE if the Translator object represents a valid translator.
+ */
+HELICS_EXPORT HelicsBool helicsTranslatorIsValid(HelicsTranslator filt);
+
+/**
+ * Get the name of the translator and store in the given string.
+ *
+ * @param filt The given translator.
+ *
+ * @return A string with the name of the translator.
+ */
+HELICS_EXPORT const char* helicsTranslatorGetName(HelicsTranslator filt);
+
+/**
+ * Set a property on a translator.
+ *
+ * @param filt The translator to modify.
+ * @param prop A string containing the property to set.
+ * @param val A numerical value for the property.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorSet(HelicsTranslator filt, const char* prop, double val, HelicsError* err);
+
+/**
+ * Set a string property on a translator.
+ *
+ * @param filt The translator to modify.
+ * @param prop A string containing the property to set.
+ * @param val A string containing the new value.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorSetString(HelicsTranslator filt, const char* prop, const char* val, HelicsError* err);
+
+/**
+ * Add a destination target to a translator.
+ *
+ * @details All messages going to a destination are copied to the delivery address(es).
+ * @param filt The given translator to add a destination target to.
+ * @param dst The name of the endpoint to add as a destination target.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorAddDestinationTarget(HelicsTranslator filt, const char* dst, HelicsError* err);
+
+/**
+ * Add a source target to a translator.
+ *
+ * @details All messages coming from a source are copied to the delivery address(es).
+ *
+ * @param filt The given translator.
+ * @param source The name of the endpoint to add as a source target.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorAddSourceTarget(HelicsTranslator filt, const char* source, HelicsError* err);
+
+/**
+ * \defgroup Clone translator functions
+ * @details Functions that manipulate cloning translators in some way.
+ * @{
+ */
+
+/**
+ * Remove a destination target from a translator.
+ *
+ * @param filt The given translator.
+ * @param target The named endpoint to remove as a target.
+ *
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorRemoveTarget(HelicsTranslator filt, const char* target, HelicsError* err);
+
+/**
+ * Get the data in the info field of a translator.
+ *
+ * @param filt The given translator.
+ *
+ * @return A string with the info field string.
+ */
+HELICS_EXPORT const char* helicsTranslatorGetInfo(HelicsTranslator filt);
+/**
+ * Set the data in the info field for a translator.
+ *
+ * @param filt The given translator.
+ * @param info The string to set.
+ *
+ * @param[in,out] err An error object to fill out in case of an error.
+
+ */
+HELICS_EXPORT void helicsTranslatorSetInfo(HelicsTranslator filt, const char* info, HelicsError* err);
+
+/**
+ * Get the data in a specified tag of a translator.
+ *
+ * @param filt The translator to query.
+ * @param tagname The name of the tag to query.
+ * @return A string with the tag data.
+ */
+HELICS_EXPORT const char* helicsTranslatorGetTag(HelicsTranslator filt, const char* tagname);
+
+/**
+ * Set the data in a specific tag for a translator.
+ *
+ * @param filt The translator object to set the tag for.
+ * @param tagname The string to set.
+ * @param tagvalue the string value to associate with a tag.
+ *
+ * @param[in,out] err An error object to fill out in case of an error.
+
+ */
+HELICS_EXPORT void helicsTranslatorSetTag(HelicsTranslator filt, const char* tagname, const char* tagvalue, HelicsError* err);
+
+/**
+ * Set an option value for a translator.
+ *
+ * @param filt The given translator.
+ * @param option The option to set /ref helics_handle_options.
+ * @param value The value of the option commonly 0 for false 1 for true.
+ *
+ * @param[in,out] err An error object to fill out in case of an error.
+
+ */
+
+HELICS_EXPORT void helicsTranslatorSetOption(HelicsTranslator filt, int option, int value, HelicsError* err);
+
+/**
+ * Get a handle option for the translator.
+ *
+ * @param filt The given translator to query.
+ * @param option The option to query /ref helics_handle_options.
+ */
+HELICS_EXPORT int helicsTranslatorGetOption(HelicsTranslator filt, int option);
 
 /**
  * @}
