@@ -43,6 +43,11 @@ typedef void* HelicsEndpoint;
 typedef void* HelicsFilter;
 
 /**
+ * opaque object representing a translator
+ */
+typedef void* HelicsTranslator;
+
+/**
  * opaque object representing a core
  */
 // typedef void* helics_core;
@@ -149,7 +154,6 @@ typedef struct HelicsComplex {
     double imag;
 } HelicsComplex;
 
-// typedef HelicsComplex helics_complex;
 
 /**
  * helics error object

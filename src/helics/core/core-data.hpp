@@ -148,7 +148,7 @@ class TranslatorOperator {
     Time minDelay{Time::epsilon()};
 };
 
-/** special filter operator defining no operation the original message is simply returned
+/** special translator operator defining no operation the original message is simply discarded
  */
 class NullTranslatorOperator final: public TranslatorOperator {
   public:

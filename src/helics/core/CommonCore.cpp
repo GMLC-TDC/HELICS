@@ -2107,7 +2107,7 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     if (fed->loggingLevel() >= HELICS_LOG_LEVEL_DATA) {
         fed->logMessage(HELICS_LOG_LEVEL_DATA,
                         "",
-                        fmt::format("receive_message {}", prettyPrintString(m)));
+                        fmt::format("send_message {}", prettyPrintString(m)));
     }
     if (m.getString(targetStringLoc).empty()) {
         if (checkActionFlag(*hndl, targeted_flag)) {
@@ -2166,7 +2166,12 @@ void CommonCore::deliverMessage(ActionMessage& message)
             auto* fed = getFederateCore(localP->getFederateId());
             if (fed != nullptr) {
                 fed->addAction(std::move(message));
+            } else if (localP->getFederateId()==translatorFedID) {
+                if (translatorFed) {
+                    translatorFed->handleMessage(message);
+                }
             }
+            // else we just drop it as that is a weird condition so ignore it 
         } break;
         case CMD_SEND_FOR_FILTER:
         case CMD_SEND_FOR_FILTER_AND_RETURN:

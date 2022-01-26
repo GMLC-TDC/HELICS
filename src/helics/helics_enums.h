@@ -367,9 +367,9 @@ typedef enum {
     /** a custom filter type that executes a user defined callback*/
     HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
     /** a translator type that converts to and from JSON*/
-    HELICS_TRANSLATOR_TYPE_JSON = 1,
+    HELICS_TRANSLATOR_TYPE_JSON = 11,
     /** a translator type that just encodes the message again in binary*/
-    HELICS_TRANSLATOR_TYPE_BINARY = 2,
+    HELICS_TRANSLATOR_TYPE_BINARY = 12,
    
 } HelicsTranslatorTypes;
 

@@ -202,11 +202,11 @@ class FederateState {
     void setProperties(const ActionMessage& cmd);
     /** set a property on a specific interface*/
     void setInterfaceProperty(const ActionMessage& cmd);
-    /** set a timeProperty for a the coordinator*/
+    /** set a timeProperty on the federate*/
     void setProperty(int timeProperty, Time propertyVal);
-    /** set a timeProperty for a the coordinator*/
+    /** set an integral property on the federate*/
     void setProperty(int intProperty, int propertyVal);
-    /** set an option Flag for a the coordinator*/
+    /** set an option Flag on the federate*/
     void setOptionFlag(int optionFlag, bool value);
     /** get a time Property*/
     Time getTimeProperty(int timeProperty) const;

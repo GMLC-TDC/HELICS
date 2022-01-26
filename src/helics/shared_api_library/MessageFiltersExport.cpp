@@ -17,8 +17,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static constexpr char invalidFilterString[] = "The given filter object is not valid";
 
-/** this is a random identifier put in place when the federate or core or broker gets created*/
+/** this is a random identifier put in place for valditing filters*/
 static const int filterValidationIdentifier = 0xEC26'0127;
+
+/** this is a random identifier for validating translators*/
+static const int translatorValidationIdentifier = 0xB37C'352E;
 
 static helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
 {
@@ -42,6 +45,16 @@ static inline HelicsFilter federateAddFilter(HelicsFederate fed, std::unique_ptr
     filt->valid = filterValidationIdentifier;
     HelicsFilter ret = filt.get();
     fedObj->filters.push_back(std::move(filt));
+    return ret;
+}
+
+// fed is assumed to be valid here
+static inline HelicsTranslator federateAddTranslator(HelicsFederate fed, std::unique_ptr<helics::TranslatorObject> trans)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    trans->valid = translatorValidationIdentifier;
+    HelicsTranslator ret = trans.get();
+    fedObj->translators.push_back(std::move(trans));
     return ret;
 }
 
@@ -78,7 +91,6 @@ HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, HelicsFilterTypes 
 
 HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err)
 {
-    // now generate a generic subscription
     auto fedObj = getFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -99,6 +111,7 @@ HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed, HelicsFilter
     }
     return nullptr;
 }
+
 
 HelicsFilter helicsCoreRegisterFilter(HelicsCore cr, HelicsFilterTypes type, const char* name, HelicsError* err)
 {

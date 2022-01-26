@@ -76,6 +76,7 @@ files = [
     "src/helics/shared_api_library/ValueFederate.h",
     "src/helics/shared_api_library/MessageFederate.h",
     "src/helics/shared_api_library/MessageFilters.h",
+    "src/helics/shared_api_library/Translators.h",
     "src/helics/shared_api_library/helicsCallbacks.h",
 ]
 

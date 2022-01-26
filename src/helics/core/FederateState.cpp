@@ -1637,7 +1637,6 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
     }
 }
 
-/** set a timeProperty for a the coordinator*/
 void FederateState::setProperty(int intProperty, int propertyVal)
 {
     switch (intProperty) {
@@ -1666,7 +1665,6 @@ void FederateState::setProperty(int intProperty, int propertyVal)
     }
 }
 
-/** set an option Flag for a the coordinator*/
 void FederateState::setOptionFlag(int optionFlag, bool value)
 {
     switch (optionFlag) {
@@ -1764,7 +1762,6 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
     }
 }
 
-/** get a time Property*/
 Time FederateState::getTimeProperty(int timeProperty) const
 {
     switch (timeProperty) {
@@ -1780,7 +1777,6 @@ Time FederateState::getTimeProperty(int timeProperty) const
     }
 }
 
-/** get an option flag value*/
 bool FederateState::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {

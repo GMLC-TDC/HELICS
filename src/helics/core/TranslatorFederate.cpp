@@ -66,7 +66,27 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
         return;
     }
     switch (command.action()) {
-        case CMD_SEND_MESSAGE:
+        case CMD_SEND_MESSAGE: {
+            auto targets = trans->getPubInfo()->subscribers;
+            if (targets.empty()) {
+                break;
+            }
+            auto m = createMessageFromCommand(command);
+            auto val = trans->tranOp->convertToValue(std::move(m));
+            if (!val.empty()) {
+                if (targets.size() == 1) {
+                    ActionMessage sendM(CMD_PUB);
+                    sendM.setDestination(targets.front());
+                    sendM.setSource(trans->id);
+                    sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
+                    sendM.payload = std::move(val);
+                    mSendMessageMove(std::move(sendM));
+                } else {
+                    for (const auto& tg : targets) {
+                    }
+                }
+            }
+        }
             break;
         case CMD_PUB: {
             auto message = trans->tranOp->convertToMessage(command.payload);
@@ -78,8 +98,9 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                 const auto &source=trans->getInputInfo()->getSourceName(command.getSource());
                 if (targets.size()==1) {
                     message->dest = targets.front().second;
-                    message->source = source;
-                    message->time = command.actionTime + 0.1;
+                    message->source = trans->key;
+                    message->original_source = source;
+                    message->time = trans->tranOp->computeNewMessageTime(command.actionTime);
                     ActionMessage sendM(std::move(message));
                     sendM.setDestination(targets.front().first);
                     sendM.setSource(command.getSource());
