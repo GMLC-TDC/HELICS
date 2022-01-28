@@ -82,7 +82,14 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                     sendM.payload = std::move(val);
                     mSendMessageMove(std::move(sendM));
                 } else {
+                    ActionMessage sendM(CMD_PUB);
+                    
+                    sendM.setSource(trans->id);
+                    sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
+                    sendM.payload = std::move(val);
                     for (const auto& tg : targets) {
+                        sendM.setDestination(tg);
+                        mSendMessage(sendM);
                     }
                 }
             }
@@ -96,17 +103,22 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                     break;
                 }
                 const auto &source=trans->getInputInfo()->getSourceName(command.getSource());
+                message->source = trans->key;
+                message->original_source = source;
+                message->time = trans->tranOp->computeNewMessageTime(command.actionTime);
+                ActionMessage sendM(std::move(message));
+                sendM.setSource(command.getSource());
+
                 if (targets.size()==1) {
-                    message->dest = targets.front().second;
-                    message->source = trans->key;
-                    message->original_source = source;
-                    message->time = trans->tranOp->computeNewMessageTime(command.actionTime);
-                    ActionMessage sendM(std::move(message));
+                    sendM.setString(targetStringLoc, targets.front().second);
                     sendM.setDestination(targets.front().first);
-                    sendM.setSource(command.getSource());
                     mDeliverMessage(sendM);
                 } else {
                     for (const auto& tg : targets) {
+                        auto messageCopy(sendM);
+                        messageCopy.setString(targetStringLoc, tg.second);
+                        messageCopy.setDestination(tg.first);
+                        mDeliverMessage(messageCopy);
                     }
                 }
                 

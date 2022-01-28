@@ -1459,7 +1459,7 @@ Translator& Federate::registerTranslator(std::int32_t translatorType,
 {
 
     std::string globalName = [this, translatorName]() {
-        if (translatorName.empty()) {
+        if (!translatorName.empty()) {
             std::string name = getName();
             name.push_back(nameSegmentSeparator);
             name.append(translatorName);

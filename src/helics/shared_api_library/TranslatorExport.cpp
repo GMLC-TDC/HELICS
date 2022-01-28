@@ -401,8 +401,8 @@ int helicsTranslatorGetOption(HelicsTranslator trans, int option)
 }
 
 void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
-                                   void (*toValueCall)(HelicsMessage message, void *outData,void* userData),
-                                       HelicsMessage (*toMessageCall)(const char *data, int dataSize, void *userData),
+                                   void (*toValueCall)(HelicsMessage message, HelicsDataBuffer out, void* userData),
+                                   void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage out, void *userData),
                                    void* userdata,
                                    HelicsError* err)
 {

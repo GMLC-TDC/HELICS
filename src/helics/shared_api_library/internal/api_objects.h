@@ -37,6 +37,7 @@ class Translator;
 
 class FilterObject;
 class TranslatorObject;
+class SmallBuffer;
 
 /** type code embedded in the objects so the library knows how to cast them appropriately*/
 enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, INVALID };

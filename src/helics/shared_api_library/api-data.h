@@ -76,6 +76,12 @@ typedef void* HelicsFederateInfo;
 // typedef void* helics_query;
 typedef void* HelicsQuery;
 
+
+/**
+ * opaque object representing a data buffer in HELICS
+ */
+typedef void* HelicsDataBuffer;
+
 /**
  * opaque object representing a string buffer for a query
  */

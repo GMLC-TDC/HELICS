@@ -28,11 +28,12 @@ constexpr IdentifierType invalid_id_value =
 
 /** the known types of identifiers*/
 enum class Identifiers : char {
-    PUBLICATION,
-    INPUT,
-    FILTER,
-    ENDPOINT,
-    QUERY,
+    PUBLICATION ='p',
+    INPUT ='i',
+    FILTER ='f',
+    ENDPOINT ='e',
+    QUERY ='q',
+    TRANSLATORS ='t'
 };
 
 /** enumeration of locality namespaces*/

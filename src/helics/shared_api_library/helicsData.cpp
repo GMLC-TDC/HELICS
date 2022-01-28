@@ -6,65 +6,213 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsData.h"
-
+#include "../core/SmallBuffer.hpp"
 #include "../application_api/HelicsPrimaryTypes.hpp"
 
+static const int bufferValidationIdentifier = 0x24EA'663F;
 
-HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, void* data, int datasize)
+HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
 {
-    if (datasize < helics::detail::getBinaryLength(value)) {
-        return (-1);
+    auto* ptr = new helics::SmallBuffer();
+    ptr->userKey = bufferValidationIdentifier;
+    ptr->reserve(initialCapacity);
+    return static_cast<HelicsDataBuffer>(ptr);
+}
+
+HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity) {
+    auto* ptr = new helics::SmallBuffer();
+    ptr->userKey = bufferValidationIdentifier;
+    ptr->spanAssign(data, dataSize, dataCapacity);
+    ptr->lock(true);
+    return static_cast<HelicsDataBuffer>(ptr);
+}
+
+static helics::SmallBuffer* getBuffer(HelicsDataBuffer data) {
+    helics::SmallBuffer* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
+    return (ptr != nullptr && ptr->userKey == bufferValidationIdentifier) ? ptr : nullptr;
+
+}
+
+void helicsDataBufferFree(HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr != nullptr) {
+        delete ptr;
     }
-    auto size=helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), value);
-    return static_cast<int32_t>(size);
+}
+
+int32_t helicsDataBufferSize(HelicsDataBuffer data) {
+    auto* ptr = getBuffer(data);
+    return (ptr != nullptr) ? static_cast<int32_t>(ptr->size()) : 0;
+}
+
+int32_t helicsDataBufferCapacity(HelicsDataBuffer data){
+    auto* ptr = getBuffer(data);
+    return (ptr != nullptr) ? static_cast<int32_t>(ptr->capacity()) : 0;
+}
+
+void* helicsDataBufferData(HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    return (ptr != nullptr) ? static_cast<void *>(ptr->data()) : nullptr;
+}
+
+HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return HELICS_FALSE;
+    }
+    try {
+        ptr->reserve(newCapacity);
+        return HELICS_TRUE;
+    }
+    catch (const std::bad_alloc &) {
+        return HELICS_FALSE;
+    }
+}
+
+HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
+    try {
+        helics::ValueConverter<int64_t>::convert(value, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
 }
 
 /** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(int64_t value, void* data, int datasize) {
-    if (datasize < helics::detail::getBinaryLength(value)) {
-        return (-1);
+HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
     }
-    auto size = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), value);
-    return static_cast<int32_t>(size);
+    try {
+        helics::ValueConverter<double>::convert(value, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
 }
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, void* data, int datasize) {
-    if (datasize < helics::detail::getBinaryLength(str)) {
-        return (-1);
+HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
     }
-    auto size = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), str);
-    return static_cast<int32_t>(size);
+    try {
+        helics::ValueConverter<std::string>::convert(str, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
 }
 
 
-int32_t helicsBoolToBytes(HelicsBool value, void* data, int datasize)
+int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data)
 {
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
      auto dataValue = (value == HELICS_FALSE) ? "0" : "1";
-    if (datasize < helics::detail::getBinaryLength(dataValue)) {
-        return (-1);
+    try {
+        helics::ValueConverter<std::string>::convert(dataValue, *ptr);
+        return static_cast<int32_t>(ptr->size());
     }
-    auto size = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), dataValue);
-    return static_cast<int32_t>(size);
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
 }
 
 /** convert a bool to serialized bytes*/
-int32_t helicsCharToBytes(char value, void* data, int datasize)
+int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
 {
-    if (datasize < helics::detail::getBinaryLength(std::string_view(&value,1))) {
-        return (-1);
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
     }
-    auto size = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), std::string_view(&value, 1));
-    return static_cast<int32_t>(size);
+    try {
+        helics::ValueConverter<int64_t>::convert(value, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
 }
 
 /** convert a bool to serialized bytes*/
-int32_t helicsTimeToBytes(HelicsTime value, void* data, int datasize)
+int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
 {
-    helics::Time dataValue(value);
-    if (datasize < helics::detail::getBinaryLength(dataValue)) {
-        return (-1);
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
     }
-    auto size = helics::detail::convertToBinary(reinterpret_cast<std::byte*>(data), dataValue);
-    return static_cast<int32_t>(size);
+    try {
+        helics::ValueConverter<int64_t>::convert(helics::Time(value).getBaseTimeCode(), *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
+}
+
+
+int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
+    try {
+        helics::ValueConverter<std::complex<double>>::convert(std::complex<double>(real,imag), *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
+}
+
+int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data) {
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
+    try {
+        helics::ValueConverter<double>::convert(value,dataSize, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
+}
+
+int helicsDataBufferType(HelicsDataBuffer data) {
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return HELICS_DATA_TYPE_UNKNOWN;
+    }
+    return static_cast<int>(helics::detail::detectType(ptr->data()));
+}
+
+
+int64_t helicsDataBufferToInt(HelicsDataBuffer data) {
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return helics::invalidValue<int64_t>();
+    }
+    int64_t val;
+    helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), val);
+    return val;
 }

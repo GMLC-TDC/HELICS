@@ -354,6 +354,23 @@ TEST(small_buffer_tests, buffer_borrow_full)
     // the Smallbuffer should not delete the object
 }
 
+TEST(small_buffer_tests, buffer_borrow_locked)
+{
+    SmallBuffer sb1(std::string(2354, 'b'));
+    std::vector<std::byte> buffer;
+    buffer.resize(5000);
+
+    sb1.spanAssign(buffer.data(), 4567, 5000);
+    sb1.lock();
+    EXPECT_TRUE(sb1.isLocked());
+    EXPECT_EQ(sb1.size(), 4567U);
+    EXPECT_EQ(sb1.capacity(), 5000U);
+    EXPECT_THROW(sb1.resize(5025), std::bad_alloc);
+    sb1.lock(false);
+    EXPECT_FALSE(sb1.isLocked());
+    EXPECT_NO_THROW(sb1.resize(5025));
+}
+
 TEST(small_buffer_tests, buffer_borrow_self_assign)
 {
     SmallBuffer sb1(std::string(2354, 'b'));
