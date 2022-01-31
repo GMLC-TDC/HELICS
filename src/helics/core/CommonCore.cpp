@@ -1391,6 +1391,24 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 cmd.setStringData(handleInfo->type, handleInfo->units);
             }
             break;
+        case InterfaceType::TRANSLATOR:
+            switch (hint) {
+                case InterfaceType::INPUT:
+                    cmd.setAction(CMD_ADD_NAMED_INPUT);
+                    break;
+                case InterfaceType::PUBLICATION:
+                    throw(InvalidIdentifier("translators cannot have publications as destination targets"));
+                    break;
+                case InterfaceType::ENDPOINT:
+                default:
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    break;
+                case InterfaceType::FILTER:
+                    cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
+            }
+            break;
         case InterfaceType::FILTER:
             cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
             if (handleInfo->key.empty()) {
@@ -1437,6 +1455,25 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                 cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+            }
+            break;
+        case InterfaceType::TRANSLATOR:
+            switch (hint)
+            {
+                case InterfaceType::PUBLICATION:
+                default:
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    break;
+                case InterfaceType::INPUT:
+                    throw(InvalidIdentifier("translators cannot have inputs as a source"));
+                    break;
+                case InterfaceType::ENDPOINT:
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    break;
+                case InterfaceType::FILTER:
+                    cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
             }
             break;
         case InterfaceType::FILTER:

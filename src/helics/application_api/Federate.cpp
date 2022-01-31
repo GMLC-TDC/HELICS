@@ -1558,20 +1558,20 @@ const std::string& Interface::getTarget() const
     return (cr != nullptr) ? cr->getSourceTargets(handle) : emptyStr;
 }
 
-void Interface::addSourceTarget(std::string_view newTarget)
+void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
     if (cr != nullptr) {
-        cr->addSourceTarget(handle, newTarget);
+        cr->addSourceTarget(handle, newTarget,hint);
     } else {
         throw(InvalidFunctionCall(
             "add source target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
-void Interface::addDestinationTarget(std::string_view newTarget)
+void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
 {
     if (cr != nullptr) {
-        cr->addDestinationTarget(handle, newTarget);
+        cr->addDestinationTarget(handle, newTarget, hint);
     } else {
         throw(InvalidFunctionCall(
             "add destination target cannot be called on a closed or uninitialized interface"));

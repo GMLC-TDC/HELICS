@@ -73,7 +73,19 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     */
     virtual void setString(const std::string& property, const std::string& val);
 
-    void addTarget(const std::string& target) { addSourceTarget(target); }
+    void addPublicationTarget(const std::string& target) { addSourceTarget(target,InterfaceType::PUBLICATION); }
+    void addInputTarget(const std::string& target)
+    {
+        addDestinationTarget(target, InterfaceType::INPUT);
+    }
+    void addSourceEndpoint(const std::string& target)
+    {
+        addSourceTarget(target, InterfaceType::ENDPOINT);
+    }
+    void addDestinationEndpoint(const std::string& target)
+    {
+        addDestinationTarget(target, InterfaceType::ENDPOINT);
+    }
     /** set the type of operations specifying how the translator should operate*/
     void setTranslatorType(std::int32_t type);
   protected:

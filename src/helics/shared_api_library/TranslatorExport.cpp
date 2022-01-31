@@ -250,15 +250,15 @@ void helicsTranslatorSetString(HelicsTranslator trans, const char* prop, const c
     }
 }
 
-void helicsTranslatorAddDestinationTarget(HelicsTranslator trans, const char* dest, HelicsError* err)
+void helicsTranslatorAddInputTarget(HelicsTranslator trans, const char* inp, HelicsError* err)
 {
     auto* translator = getTranslator(trans, err);
     if (translator == nullptr) {
         return;
     }
-    CHECK_NULL_STRING(dest, void());
+    CHECK_NULL_STRING(inp, void());
     try {
-        translator->addDestinationTarget(dest);
+        translator->addInputTarget(inp);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -267,15 +267,49 @@ void helicsTranslatorAddDestinationTarget(HelicsTranslator trans, const char* de
     // LCOV_EXCL_STOP
 }
 
-void helicsTranslatorAddSourceTarget(HelicsTranslator trans, const char* src, HelicsError* err)
+void helicsTranslatorAddPublicationTarget(HelicsTranslator trans, const char* pub, HelicsError* err)
 {
     auto* translator = getTranslator(trans, err);
     if (translator == nullptr) {
         return;
     }
-    CHECK_NULL_STRING(src, void());
+    CHECK_NULL_STRING(pub, void());
     try {
-        translator->addSourceTarget(src);
+        translator->addPublicationTarget(pub);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsTranslatorAddDestinationEndpoint(HelicsTranslator trans, const char* ept, HelicsError* err)
+{
+    auto* translator = getTranslator(trans, err);
+    if (translator == nullptr) {
+        return;
+    }
+    CHECK_NULL_STRING(ept, void());
+    try {
+        translator->addDestinationEndpoint(ept);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsTranslatorAddSourceEndpoint(HelicsTranslator trans, const char* ept, HelicsError* err)
+{
+    auto* translator = getTranslator(trans, err);
+    if (translator == nullptr) {
+        return;
+    }
+    CHECK_NULL_STRING(ept, void());
+    try {
+        translator->addSourceEndpoint(ept);
     }
     // LCOV_EXCL_START
     catch (...) {
