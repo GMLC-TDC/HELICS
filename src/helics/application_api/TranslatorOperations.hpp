@@ -19,8 +19,8 @@ file defines some common filter operations
 #include <memory>
 #include <set>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace helics {
 class Core;
@@ -97,7 +97,7 @@ class CustomTranslatorOperation: public TranslatorOperations {
     std::shared_ptr<TranslatorOperator> to;
 
   public:
-    explicit CustomTranslatorOperation(std::shared_ptr<TranslatorOperator> op): to(std::move(op)){}
+    explicit CustomTranslatorOperation(std::shared_ptr<TranslatorOperator> op): to(std::move(op)) {}
     virtual std::shared_ptr<TranslatorOperator> getOperator() override { return to; }
 };
 
