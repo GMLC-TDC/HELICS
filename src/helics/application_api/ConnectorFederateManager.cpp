@@ -14,15 +14,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-ConnectorFederateManager::ConnectorFederateManager(Core* coreObj, Federate* ffed, LocalFederateId id):
-    coreObject(coreObj), fed(ffed), fedID(id)
+ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,
+                                                   Federate* ffed,
+                                                   LocalFederateId id):
+    coreObject(coreObj),
+    fed(ffed), fedID(id)
 {
 }
 ConnectorFederateManager::~ConnectorFederateManager() = default;
 
 Filter& ConnectorFederateManager::registerFilter(const std::string& name,
-                                              const std::string& type_in,
-                                              const std::string& type_out)
+                                                 const std::string& type_in,
+                                                 const std::string& type_out)
 {
     auto handle = coreObject->registerFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -59,8 +62,8 @@ Translator& ConnectorFederateManager::registerTranslator(std::string_view name,
 }
 
 CloningFilter& ConnectorFederateManager::registerCloningFilter(const std::string& name,
-                                                            const std::string& type_in,
-                                                            const std::string& type_out)
+                                                               const std::string& type_in,
+                                                               const std::string& type_out)
 {
     auto handle = coreObject->registerCloningFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -83,7 +86,7 @@ Filter& ConnectorFederateManager::registerFilter(FilterTypes type, const std::st
 }
 
 CloningFilter& ConnectorFederateManager::registerCloningFilter(FilterTypes type,
-                                                            const std::string& name)
+                                                               const std::string& name)
 {
     return make_cloning_filter(type, fed, std::string(), name);
 }
@@ -124,7 +127,6 @@ const Filter& ConnectorFederateManager::getFilter(int index) const
     }
     return invalidFilt;
 }
-
 
 int ConnectorFederateManager::getFilterCount() const
 {

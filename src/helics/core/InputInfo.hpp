@@ -10,10 +10,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
-#include <string_view>
 
 namespace helics {
 /** data class for managing information about a subscription*/
@@ -45,8 +45,7 @@ class InputInfo {
         std::string units;
         sourceInformation() = default;
         sourceInformation(std::string_view key_, std::string_view type_, std::string_view units_):
-            key(key_),
-            type(type_), units(units_)
+            key(key_), type(type_), units(units_)
         {
         }
     };

@@ -403,24 +403,24 @@ Time InputInfo::nextValueTime() const
 }
 
 static const std::set<std::string_view> convertible_set{"double_vector",
-                                                   "complex_vector",
-                                                   "vector",
-                                                   "double",
-                                                   "float",
-                                                   "bool",
-                                                   "time",
-                                                   "char",
-                                                   "uchar",
-                                                   "json"
-                                                   "int32",
-                                                   "int64",
-                                                   "uint32",
-                                                   "uint64",
-                                                   "int16",
-                                                   "string",
-                                                   "complex",
-                                                   "complex_f",
-                                                   "named_point"};
+                                                        "complex_vector",
+                                                        "vector",
+                                                        "double",
+                                                        "float",
+                                                        "bool",
+                                                        "time",
+                                                        "char",
+                                                        "uchar",
+                                                        "json"
+                                                        "int32",
+                                                        "int64",
+                                                        "uint32",
+                                                        "uint64",
+                                                        "int16",
+                                                        "string",
+                                                        "complex",
+                                                        "complex_f",
+                                                        "named_point"};
 bool checkTypeMatch(std::string_view type1, std::string_view type2, bool strict_match)
 {
     if ((type1.empty()) || (type1 == type2) || (type1 == "def") || (type1 == "any") ||

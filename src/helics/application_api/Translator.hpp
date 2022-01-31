@@ -18,17 +18,18 @@ class TranslatorOperations;
 class TranslatorOperator;
 class CoreApp;
 /** a set of common defined translators*/
-enum TranslatorTypes:std::int32_t {
+enum TranslatorTypes : std::int32_t {
     CUSTOM = HELICS_TRANSLATOR_TYPE_CUSTOM,
     JSON = HELICS_TRANSLATOR_TYPE_JSON,
-    BINARY=HELICS_TRANSLATOR_TYPE_BINARY,
+    BINARY = HELICS_TRANSLATOR_TYPE_BINARY,
     UNRECOGNIZED = 7
 };
 
 constexpr std::string_view emptyString{""};
 
 /** get the translator type from a string*/
-HELICS_CXX_EXPORT TranslatorTypes translatorTypeFromString(const std::string& translatorType) noexcept;
+HELICS_CXX_EXPORT TranslatorTypes
+    translatorTypeFromString(const std::string& translatorType) noexcept;
 
 /** class for managing a particular translator*/
 class HELICS_CXX_EXPORT Translator: public Interface {
@@ -73,7 +74,10 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     */
     virtual void setString(const std::string& property, const std::string& val);
 
-    void addPublicationTarget(const std::string& target) { addSourceTarget(target,InterfaceType::PUBLICATION); }
+    void addPublicationTarget(const std::string& target)
+    {
+        addSourceTarget(target, InterfaceType::PUBLICATION);
+    }
     void addInputTarget(const std::string& target)
     {
         addDestinationTarget(target, InterfaceType::INPUT);
@@ -88,6 +92,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     }
     /** set the type of operations specifying how the translator should operate*/
     void setTranslatorType(std::int32_t type);
+
   protected:
     /** set a translator operations object */
     void setTranslatorOperations(std::shared_ptr<TranslatorOperations> translatorOps);

@@ -102,7 +102,7 @@ enum class InterfaceType : char {
     INPUT = 'i',  //!< handle to a input interface
     ENDPOINT = 'e',  //!< handle to an endpoint
     FILTER = 'f',  //!< handle to a filter
-    TRANSLATOR = 't' //!< handle to a translator object
+    TRANSLATOR = 't'  //!< handle to a translator object
 };
 
 }  // namespace helics

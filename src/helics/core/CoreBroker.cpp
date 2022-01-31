@@ -1970,11 +1970,11 @@ void CoreBroker::addTranslator(ActionMessage& m)
     }
 
     auto& trans = handles.addHandle(m.source_id,
-                                   m.source_handle,
-                                   InterfaceType::TRANSLATOR,
-                                   std::string(m.name()),
-                                   m.getString(typeStringLoc),
-                                   m.getString(typeOutStringLoc));
+                                    m.source_handle,
+                                    InterfaceType::TRANSLATOR,
+                                    std::string(m.name()),
+                                    m.getString(typeStringLoc),
+                                    m.getString(typeOutStringLoc));
     addLocalInfo(trans, m);
 
     if (!isRootc) {

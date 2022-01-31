@@ -11,15 +11,15 @@ file defines some common filter operations
 */
 
 #include "../common/GuardedTypes.hpp"
-#include "../core/helicsTime.hpp"
 #include "../core/core-data.hpp"
+#include "../core/helicsTime.hpp"
 
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <functional>
 
 namespace helics {
 class Core;
@@ -31,12 +31,10 @@ class JsonTranslatorOperator: public TranslatorOperator {
     JsonTranslatorOperator() = default;
     /** set the function to modify the data of the message*/
   private:
-
-      virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
 
     /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
-
 };
 
 /** class defining a message operator that can operate on any part of a message*/
@@ -92,7 +90,6 @@ class TranslatorOperations {
     virtual std::shared_ptr<TranslatorOperator> getOperator() = 0;
 };
 
-
 /**custom operation object*/
 class CustomTranslatorOperation: public TranslatorOperations {
   private:
@@ -100,16 +97,14 @@ class CustomTranslatorOperation: public TranslatorOperations {
 
   public:
     explicit CustomTranslatorOperation(std::shared_ptr<TranslatorOperator> op): to(std::move(op)){};
-    virtual std::shared_ptr<TranslatorOperator> getOperator() override
-    {
-        return to;
-    }
+    virtual std::shared_ptr<TranslatorOperator> getOperator() override { return to; }
 };
 
 /**translator for converting a message to JSON and vice versa*/
 class JsonTranslatorOperation: public TranslatorOperations {
   private:
     std::shared_ptr<JsonTranslatorOperator> to;
+
   public:
     JsonTranslatorOperation();
     virtual std::shared_ptr<TranslatorOperator> getOperator() override
@@ -118,20 +113,19 @@ class JsonTranslatorOperation: public TranslatorOperations {
     }
 };
 
-
 /** binary translator*/
 class BinaryTranslatorOperation: public TranslatorOperations {
   private:
     std::shared_ptr<BinaryTranslatorOperator> to;
+
   public:
     /** default constructor*/
     BinaryTranslatorOperation();
-    
+
     virtual std::shared_ptr<TranslatorOperator> getOperator() override
     {
         return std::static_pointer_cast<TranslatorOperator>(to);
     }
-
 };
 
 }  // namespace helics

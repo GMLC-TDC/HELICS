@@ -112,7 +112,6 @@ HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed, HelicsFilter
     return nullptr;
 }
 
-
 HelicsFilter helicsCoreRegisterFilter(HelicsCore cr, HelicsFilterTypes type, const char* name, HelicsError* err)
 {
     auto core = getCoreSharedPtr(cr, err);

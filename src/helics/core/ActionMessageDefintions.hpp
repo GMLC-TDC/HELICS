@@ -191,7 +191,6 @@ across different compilers*/
         cmd_remove_filter = 135,  //!< cmd to remove a filter from connection
         cmd_remove_publication = 136,  //!< cmd to remove a publication from connection
         cmd_remove_endpoint = 137,  //!< cmd to remove an endpoint
-        
 
         cmd_close_interface = 133,  //!< cmd to close all communications from an interface
         cmd_multi_message = 1037,  //!< cmd that encapsulates a bunch of messages in its payload
@@ -296,7 +295,6 @@ across different compilers*/
 #define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
 #define CMD_ADD_NAMED_PUBLICATION action_message_def::action_t::cmd_add_named_publication
 #define CMD_ADD_NAMED_INPUT action_message_def::action_t::cmd_add_named_input
-
 
 #define CMD_REMOVE_NAMED_ENDPOINT action_message_def::action_t::cmd_remove_named_endpoint
 #define CMD_REMOVE_NAMED_FILTER action_message_def::action_t::cmd_remove_named_filter

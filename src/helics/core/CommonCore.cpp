@@ -20,12 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FederateState.hpp"
 #include "FilterCoordinator.hpp"
 #include "FilterFederate.hpp"
-#include "TranslatorFederate.hpp"
 #include "FilterInfo.hpp"
 #include "InputInfo.hpp"
 #include "LogManager.hpp"
 #include "PublicationInfo.hpp"
 #include "TimeoutMonitor.h"
+#include "TranslatorFederate.hpp"
 #include "core-exceptions.hpp"
 #include "coreTypeOperations.hpp"
 #include "fileConnections.hpp"
@@ -738,14 +738,14 @@ const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateI
 {
     static const std::string filterString = getIdentifier() + "_filters";
     static const std::string translatorString = getIdentifier() + "_translators";
-    if (federateID==filterFedID) {
+    if (federateID == filterFedID) {
         return filterString;
     }
-    if (federateID==translatorFedID) {
+    if (federateID == translatorFedID) {
         return translatorString;
     }
     auto* fed = getFederateAt(LocalFederateId(federateID.localIndex()));
-    return (fed == nullptr) ? unknownString:fed->getIdentifier();
+    return (fed == nullptr) ? unknownString : fed->getIdentifier();
 }
 
 LocalFederateId CommonCore::getFederateId(const std::string& name) const
@@ -1397,7 +1397,8 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                     cmd.setAction(CMD_ADD_NAMED_INPUT);
                     break;
                 case InterfaceType::PUBLICATION:
-                    throw(InvalidIdentifier("translators cannot have publications as destination targets"));
+                    throw(InvalidIdentifier(
+                        "translators cannot have publications as destination targets"));
                     break;
                 case InterfaceType::ENDPOINT:
                 default:
@@ -1458,8 +1459,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
             }
             break;
         case InterfaceType::TRANSLATOR:
-            switch (hint)
-            {
+            switch (hint) {
                 case InterfaceType::PUBLICATION:
                 default:
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
@@ -1865,7 +1865,6 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
     return id;
 }
 
-
 InterfaceHandle CommonCore::getFilter(const std::string& name) const
 {
     const auto* filt = handles.read([&name](auto& hand) { return hand.getFilter(name); });
@@ -2203,12 +2202,12 @@ void CommonCore::deliverMessage(ActionMessage& message)
             auto* fed = getFederateCore(localP->getFederateId());
             if (fed != nullptr) {
                 fed->addAction(std::move(message));
-            } else if (localP->getFederateId()==translatorFedID) {
+            } else if (localP->getFederateId() == translatorFedID) {
                 if (translatorFed) {
                     translatorFed->handleMessage(message);
                 }
             }
-            // else we just drop it as that is a weird condition so ignore it 
+            // else we just drop it as that is a weird condition so ignore it
         } break;
         case CMD_SEND_FOR_FILTER:
         case CMD_SEND_FOR_FILTER_AND_RETURN:
@@ -2400,9 +2399,10 @@ void CommonCore::setFilterOperator(InterfaceHandle filter, std::shared_ptr<Filte
     actionQueue.push(filtOpUpdate);
 }
 void CommonCore::setTranslatorOperator(InterfaceHandle translator,
-    std::shared_ptr<TranslatorOperator> callbacks)
+                                       std::shared_ptr<TranslatorOperator> callbacks)
 {
-    static std::shared_ptr<TranslatorOperator> nullTranslator = std::make_shared<NullTranslatorOperator>();
+    static std::shared_ptr<TranslatorOperator> nullTranslator =
+        std::make_shared<NullTranslatorOperator>();
     const auto* hndl = getHandleInfo(translator);
     if (hndl == nullptr) {
         throw(InvalidIdentifier("translator handle is not valid"));
@@ -2423,8 +2423,7 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     actionQueue.push(transOpUpdate);
 }
 
-
-    void CommonCore::setIdentifier(const std::string& name)
+void CommonCore::setIdentifier(const std::string& name)
 {
     if (getBrokerState() == BrokerState::created) {
         identifier = name;
@@ -2645,7 +2644,8 @@ void CommonCore::initializeMapBuilder(const std::string& request,
             builder.addComponent(ret, brkindex);
         }
         if (translatorFed != nullptr) {
-            int brkindex = builder.generatePlaceHolder("federates", translatorFedID.load().baseValue());
+            int brkindex =
+                builder.generatePlaceHolder("federates", translatorFedID.load().baseValue());
             std::string ret = translatorFed->query(request);
             builder.addComponent(ret, brkindex);
         }
@@ -3773,11 +3773,11 @@ void CommonCore::registerInterface(ActionMessage& command)
                     generateTranslatorFederate();
                 }
                 translatorFed->createTranslator(translatorFedID.load(),
-                                        command.source_handle,
-                                        std::string(command.name()),
-                                        command.getString(typeStringLoc),
-                                        command.getString(unitStringLoc));
-                //connectFilterTiming();
+                                                command.source_handle,
+                                                std::string(command.name()),
+                                                command.getString(typeStringLoc),
+                                                command.getString(unitStringLoc));
+                // connectFilterTiming();
                 break;
             default:
                 return;
@@ -3794,14 +3794,15 @@ void CommonCore::generateTranslatorFederate()
 {
     auto fid = translatorFedID.load();
 
-    translatorFed = new TranslatorFederate(fid, getIdentifier() + "_translators", global_broker_id_local, this);
+    translatorFed =
+        new TranslatorFederate(fid, getIdentifier() + "_translators", global_broker_id_local, this);
     translatorThread.store(std::this_thread::get_id());
     translatorFedID.store(fid);
 
     translatorFed->setCallbacks([this](const ActionMessage& m) { addActionMessage(m); },
-                            [this](ActionMessage&& m) { addActionMessage(std::move(m)); },
-                            [this](const ActionMessage& m) { routeMessage(m); },
-                            [this](ActionMessage&& m) { routeMessage(std::move(m)); });
+                                [this](ActionMessage&& m) { addActionMessage(std::move(m)); },
+                                [this](const ActionMessage& m) { routeMessage(m); },
+                                [this](ActionMessage&& m) { routeMessage(std::move(m)); });
 
     translatorFed->setHandleManager(&loopHandles);
     translatorFed->setLogger([this](int level, std::string_view name, std::string_view message) {
@@ -4160,9 +4161,8 @@ void CommonCore::removeTargetFromInterface(ActionMessage& command)
 {
     if (command.dest_id == filterFedID) {
         filterFed->handleMessage(command);
-    }
-    else if (command.dest_id == translatorFedID) {
-            translatorFed->handleMessage(command);
+    } else if (command.dest_id == translatorFedID) {
+        translatorFed->handleMessage(command);
     } else {  // just forward these to the appropriate federate
         if (command.action() == CMD_REMOVE_FILTER) {
             command.dest_id = filterFedID;

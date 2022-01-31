@@ -6,10 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "basic_CoreTypes.hpp"
 #include "EndpointInfo.hpp"
-#include "PublicationInfo.hpp"
 #include "InputInfo.hpp"
+#include "PublicationInfo.hpp"
+#include "basic_CoreTypes.hpp"
 
 #include <memory>
 #include <string>
@@ -33,7 +33,7 @@ class TranslatorInfo {
   public:
     /** constructor from all fields*/
     TranslatorInfo(GlobalHandle handle,
-        std::string_view key_,
+                   std::string_view key_,
                    std::string_view endpointType,
                    std::string_view units):
         id(handle),
@@ -49,14 +49,13 @@ class TranslatorInfo {
     std::shared_ptr<TranslatorOperator> tranOp;  //!< the callback operation of the filter
 
   private:
-    PublicationInfo pub; //!< translator publication interface
-    InputInfo ipt; //!< translator input interface
-    EndpointInfo ept; //!< translator endpoint interface
+    PublicationInfo pub;  //!< translator publication interface
+    InputInfo ipt;  //!< translator input interface
+    EndpointInfo ept;  //!< translator endpoint interface
 
   public:
     PublicationInfo* getPubInfo() { return &pub; }
     InputInfo* getInputInfo() { return &ipt; }
     EndpointInfo* getEndpointInfo() { return &ept; }
-
 };
 }  // namespace helics

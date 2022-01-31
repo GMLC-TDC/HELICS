@@ -382,7 +382,8 @@ class SmallBuffer {
     bool usingAllocatedBuffer{false};
 
   public:
-    std::uint32_t userKey{0}; // 32 bits of user data for whatever purpose is desired has no impact on state or operations
+    std::uint32_t userKey{0};  // 32 bits of user data for whatever purpose is desired has no impact
+                               // on state or operations
 };
 
 /** operator to check if small buffers are equal to each other*/

@@ -76,7 +76,6 @@ typedef void* HelicsFederateInfo;
 // typedef void* helics_query;
 typedef void* HelicsQuery;
 
-
 /**
  * opaque object representing a data buffer in HELICS
  */
@@ -159,7 +158,6 @@ typedef struct HelicsComplex {
     double real;
     double imag;
 } HelicsComplex;
-
 
 /**
  * helics error object

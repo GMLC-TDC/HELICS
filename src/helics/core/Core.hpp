@@ -521,18 +521,18 @@ class Core {
                                            const std::string& type_in,
                                            const std::string& type_out) = 0;
 
-     /**
-    * Register translator.
-    *
-    @param translatorName the name of the translator (may be left blank and one will be automatically
-    assigned)
-    @param units the specified units for the value side of the translator
-    @param message_type a specified value type for the units
-    @return the handle for the new translator
-    */
+    /**
+   * Register translator.
+   *
+   @param translatorName the name of the translator (may be left blank and one will be automatically
+   assigned)
+   @param units the specified units for the value side of the translator
+   @param message_type a specified value type for the units
+   @return the handle for the new translator
+   */
     virtual InterfaceHandle registerTranslator(std::string_view translatorName,
-                                           std::string_view endpointType,
-                                           std::string_view units) = 0;
+                                               std::string_view endpointType,
+                                               std::string_view units) = 0;
 
     /**
     * add a destination target,  the handle can be for a filter or a publication
@@ -746,7 +746,7 @@ class Core {
     @param callback pointer to the operator class executing the translator
     */
     virtual void setTranslatorOperator(InterfaceHandle translator,
-                                   std::shared_ptr<TranslatorOperator> callback) = 0;
+                                       std::shared_ptr<TranslatorOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

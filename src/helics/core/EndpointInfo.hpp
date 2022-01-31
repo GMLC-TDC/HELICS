@@ -42,7 +42,7 @@ class EndpointInfo {
     const std::string type;  //!< type of the endpoint
   private:
     /// storage for the messages
-    shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;  
+    shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;
     std::atomic<int32_t> mAvailableMessages{0};  //!< indicator of how many message are available
 
     std::vector<EndpointInformation> sourceInformation;

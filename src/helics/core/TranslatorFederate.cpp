@@ -21,9 +21,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 TranslatorFederate::TranslatorFederate(GlobalFederateId fedID,
-                               std::string name,
-                               GlobalBrokerId coreID,
-                               Core* /*core*/):
+                                       std::string name,
+                                       GlobalBrokerId coreID,
+                                       Core* /*core*/):
     mFedID(fedID),
     mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
@@ -48,7 +48,6 @@ TranslatorFederate::~TranslatorFederate()
     mLogger = nullptr;
     mGetAirLock = nullptr;
 
-
     translators.clear();
 }
 
@@ -59,8 +58,7 @@ void TranslatorFederate::routeMessage(const ActionMessage& msg)
     }
 }
 
-void TranslatorFederate::executeTranslator(ActionMessage& command,
-                                                              TranslatorInfo* trans)
+void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInfo* trans)
 {
     if (!trans->tranOp) {
         return;
@@ -83,7 +81,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                     mSendMessageMove(std::move(sendM));
                 } else {
                     ActionMessage sendM(CMD_PUB);
-                    
+
                     sendM.setSource(trans->id);
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
@@ -93,23 +91,22 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                     }
                 }
             }
-        }
-            break;
+        } break;
         case CMD_PUB: {
             auto message = trans->tranOp->convertToMessage(command.payload);
             if (message) {
-                auto targets=trans->getEndpointInfo()->getTargets();
+                auto targets = trans->getEndpointInfo()->getTargets();
                 if (targets.empty()) {
                     break;
                 }
-                const auto &source=trans->getInputInfo()->getSourceName(command.getSource());
+                const auto& source = trans->getInputInfo()->getSourceName(command.getSource());
                 message->source = trans->key;
                 message->original_source = source;
                 message->time = trans->tranOp->computeNewMessageTime(command.actionTime);
                 ActionMessage sendM(std::move(message));
                 sendM.setSource(command.getSource());
 
-                if (targets.size()==1) {
+                if (targets.size() == 1) {
                     sendM.setString(targetStringLoc, targets.front().second);
                     sendM.setDestination(targets.front().first);
                     mDeliverMessage(sendM);
@@ -121,15 +118,13 @@ void TranslatorFederate::executeTranslator(ActionMessage& command,
                         mDeliverMessage(messageCopy);
                     }
                 }
-                
             }
         }
-            
-            break;
-    }
-    return ;
-}
 
+        break;
+    }
+    return;
+}
 
 void TranslatorFederate::handleMessage(ActionMessage& command)
 {
@@ -198,10 +193,9 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_CLOSE_INTERFACE: {
             auto* tran = translators.find(command.getSource());
             if (tran != nullptr) {
-                
             }
         } break;
-        
+
         case CMD_REMOVE_ENDPOINT: {
             auto* tranI = getTranslatorInfo(command.getDest());
             if (tranI != nullptr) {
@@ -211,9 +205,9 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_REMOVE_PUBLICATION: {
             auto* tranI = getTranslatorInfo(command.getDest());
             if (tranI != nullptr) {
-                tranI->getInputInfo()->removeSource(command.getSource(),timeZero);
+                tranI->getInputInfo()->removeSource(command.getSource(), timeZero);
             }
-           
+
         } break;
         case CMD_REMOVE_SUBSCRIBER: {
             auto* tranI = getTranslatorInfo(command.getDest());
@@ -225,12 +219,11 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_ADD_PUBLISHER: {
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
-               
-                    tranI->getInputInfo()->addSource(command.getSource(),
-                                                                   command.payload.to_string(),
-                                                                   command.getString(
-                                                                       typeStringLoc), command.getString(unitStringLoc));
-                
+                tranI->getInputInfo()->addSource(command.getSource(),
+                                                 command.payload.to_string(),
+                                                 command.getString(typeStringLoc),
+                                                 command.getString(unitStringLoc));
+
                 if (!checkActionFlag(command, error_flag)) {
                     mCoord.addDependency(command.source_id);
                 }
@@ -250,7 +243,10 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
                 if (checkActionFlag(command, destination_target)) {
-                    tranI->getEndpointInfo()->addDestinationTarget(command.getSource(),command.payload.to_string(),command.getString(typeStringLoc));
+                    tranI->getEndpointInfo()->addDestinationTarget(command.getSource(),
+                                                                   command.payload.to_string(),
+                                                                   command.getString(
+                                                                       typeStringLoc));
                     if (!checkActionFlag(command, error_flag)) {
                         mCoord.addDependent(command.source_id);
                     }
@@ -262,7 +258,6 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                         mCoord.addDependency(command.source_id);
                     }
                 }
-                
             }
 
         } break;
@@ -284,24 +279,24 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
             if (tranI != nullptr) {
                 executeTranslator(command, tranI);
             }
-        }
-            break;
+        } break;
         default:
             break;
     }
 }
 
 TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
-                                         InterfaceHandle handle,
-                                         const std::string& key,
-                                         const std::string& endpointType,
-                                         const std::string& units)
+                                                     InterfaceHandle handle,
+                                                     const std::string& key,
+                                                     const std::string& endpointType,
+                                                     const std::string& units)
 {
     auto tran = std::make_unique<TranslatorInfo>(
-        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest, handle},
-                                             key,
-                                             endpointType,
-                                             units);
+        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest,
+                     handle},
+        key,
+        endpointType,
+        units);
 
     auto cid = tran->id;
     auto* retTarget = tran.get();
@@ -323,7 +318,6 @@ TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
     return retTarget;
 }
 
-
 TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalHandle id)
 {
     return translators.find(id);
@@ -337,7 +331,8 @@ TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed, Inte
     return translators.find(GlobalHandle{fed, handle});
 }
 
-const TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle) const
+const TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed,
+                                                            InterfaceHandle handle) const
 {
     if (fed == parent_broker_id || fed == mCoreID) {
         fed = mFedID;

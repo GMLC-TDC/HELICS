@@ -190,7 +190,7 @@ class CommonCore: public Core, public BrokerBase {
                                                   const std::string& type_out) override final;
     virtual InterfaceHandle registerTranslator(std::string_view translatorName,
                                                std::string_view endpointType,
-                                               std::string_view units) override final; 
+                                               std::string_view units) override final;
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
     virtual InterfaceHandle getTranslator(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
@@ -229,8 +229,9 @@ class CommonCore: public Core, public BrokerBase {
                             const std::string& messageToLog) override final;
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) override final;
-    virtual void setTranslatorOperator(InterfaceHandle translator,
-                                   std::shared_ptr<TranslatorOperator> callbacks) override final;
+    virtual void
+        setTranslatorOperator(InterfaceHandle translator,
+                              std::shared_ptr<TranslatorOperator> callbacks) override final;
     /** set the local identification for the core*/
     void setIdentifier(const std::string& name);
     /** get the local identifier for the core*/
@@ -478,8 +479,7 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<GlobalFederateId> filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
     /// airlocks for updating filter operators and other functions
-    std::array<gmlc::containers::AirLock<std::any>, 4>
-        dataAirlocks;  
+    std::array<gmlc::containers::AirLock<std::any>, 4> dataAirlocks;
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     // generate a filter Federate

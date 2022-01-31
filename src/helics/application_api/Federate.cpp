@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics_definitions.hpp"
 #include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
-#include "CoreApp.hpp"
 #include "ConnectorFederateManager.hpp"
+#include "CoreApp.hpp"
 #include "Filters.hpp"
 #include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
@@ -1288,7 +1288,6 @@ const Translator& Federate::getTranslator(int index) const
     return cManager->getTranslator(index);
 }
 
-
 std::string Federate::localQuery(const std::string& /*queryStr*/) const
 {
     return std::string{};
@@ -1438,26 +1437,21 @@ CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterNa
     return cManager->registerCloningFilter(filterName, inputType, outputType);
 }
 
-
 Translator& Federate::registerGlobalTranslator(std::int32_t translatorType,
                                                std::string_view translatorName,
                                                std::string_view endpointType,
                                                std::string_view units)
 {
-    Translator& trans= cManager->registerTranslator(translatorName,
-                                    endpointType,
-                                    units);
+    Translator& trans = cManager->registerTranslator(translatorName, endpointType, units);
     trans.setTranslatorType(translatorType);
     return trans;
 }
-
 
 Translator& Federate::registerTranslator(std::int32_t translatorType,
                                          std::string_view translatorName,
                                          std::string_view endpointType,
                                          std::string_view units)
 {
-
     std::string globalName = [this, translatorName]() {
         if (!translatorName.empty()) {
             std::string name = getName();
@@ -1467,10 +1461,8 @@ Translator& Federate::registerTranslator(std::int32_t translatorType,
         }
         return std::string{};
     }();
-    
-    Translator& trans = cManager->registerTranslator(globalName,
-                                    endpointType,
-                                    units);
+
+    Translator& trans = cManager->registerTranslator(globalName, endpointType, units);
     trans.setTranslatorType(translatorType);
     return trans;
 }
@@ -1561,7 +1553,7 @@ const std::string& Interface::getTarget() const
 void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
     if (cr != nullptr) {
-        cr->addSourceTarget(handle, newTarget,hint);
+        cr->addSourceTarget(handle, newTarget, hint);
     } else {
         throw(InvalidFunctionCall(
             "add source target cannot be called on uninitialized federate or after finalize call"));

@@ -32,8 +32,12 @@ set(application_api_headers
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
 
 set(private_application_api_headers
-    MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp FilterOperations.hpp
-    ConnectorFederateManager.hpp TranslatorOperations.hpp
+    MessageFederateManager.hpp
+    ValueFederateManager.hpp
+    AsyncFedCallInfo.hpp
+    FilterOperations.hpp
+    ConnectorFederateManager.hpp
+    TranslatorOperations.hpp
 )
 
 set(application_api_sources

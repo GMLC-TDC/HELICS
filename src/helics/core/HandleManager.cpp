@@ -309,8 +309,6 @@ const BasicHandleInfo* HandleManager::getFilter(std::string_view name) const
     return &(handles[ar.first->second.baseValue()]);
 }
 
-
-
 BasicHandleInfo* HandleManager::getFilter(InterfaceHandle handle)
 {
     auto index = handle.baseValue();
@@ -323,7 +321,6 @@ BasicHandleInfo* HandleManager::getFilter(InterfaceHandle handle)
 
     return nullptr;
 }
-
 
 const BasicHandleInfo* HandleManager::getTranslator(std::string_view name) const
 {

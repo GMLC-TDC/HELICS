@@ -5,13 +5,13 @@ additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../application_api/TranslatorOperations.hpp"
 #include "../core/core-exceptions.hpp"
 #include "../helics.hpp"
 #include "MessageFederate.h"
 #include "Translators.h"
 #include "helicsCallbacks.h"
 #include "internal/api_objects.h"
-#include "../application_api/TranslatorOperations.hpp"
 
 #include <memory>
 #include <mutex>
@@ -100,7 +100,6 @@ HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFederate fed, Heli
     return nullptr;
 }
 
-
 HelicsTranslator helicsCoreRegisterTranslator(HelicsCore cr, HelicsTranslatorTypes type, const char* name, HelicsError* err)
 {
     auto core = getCoreSharedPtr(cr, err);
@@ -109,7 +108,7 @@ HelicsTranslator helicsCoreRegisterTranslator(HelicsCore cr, HelicsTranslatorTyp
     }
     try {
         auto trans = std::make_unique<helics::TranslatorObject>();
-        
+
         trans->mTrans = std::make_unique<helics::Translator>(core.get(), AS_STRING(name));
         trans->mTrans->setTranslatorType(type);
         trans->transPtr = trans->mTrans.get();
@@ -122,8 +121,6 @@ HelicsTranslator helicsCoreRegisterTranslator(HelicsCore cr, HelicsTranslatorTyp
     }
     return nullptr;
 }
-
-
 
 static constexpr char invalidTransName[] = "the specified Translator name is not recognized";
 static constexpr char invalidTransIndex[] = "the specified Translator index is not valid";
@@ -198,7 +195,6 @@ static helics::Translator* getTranslator(HelicsTranslator trans, HelicsError* er
     }
     return fObj->transPtr;
 }
-
 
 HelicsBool helicsTranslatorIsValid(HelicsTranslator trans)
 {
@@ -335,7 +331,6 @@ void helicsTranslatorRemoveTarget(HelicsTranslator trans, const char* target, He
     // LCOV_EXCL_STOP
 }
 
-
 const char* helicsTranslatorGetInfo(HelicsTranslator trans)
 {
     auto* transObj = getTranslatorObj(trans, nullptr);
@@ -435,10 +430,10 @@ int helicsTranslatorGetOption(HelicsTranslator trans, int option)
 }
 
 void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
-                                   void (*toValueCall)(HelicsMessage message, HelicsDataBuffer out, void* userData),
-                                   void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage out, void *userData),
-                                   void* userdata,
-                                   HelicsError* err)
+                                        void (*toValueCall)(HelicsMessage message, HelicsDataBuffer out, void* userData),
+                                        void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage out, void* userData),
+                                        void* userdata,
+                                        HelicsError* err)
 {
     auto* fObj = getTranslatorObj(trans, err);
     if (fObj == nullptr || fObj->transPtr == nullptr) {
@@ -451,7 +446,7 @@ void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
         return;
     }
     auto op = std::make_shared<helics::CustomTranslatorOperator>();
-    
+
     try {
         fObj->transPtr->setOperator(std::move(op));
     }

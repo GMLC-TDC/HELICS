@@ -16,10 +16,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-static const std::map<std::string, TranslatorTypes> translatorTypes{
-    {"json", TranslatorTypes::JSON},
-    {"binary", TranslatorTypes::BINARY},
-    {"custom", TranslatorTypes::CUSTOM}};
+static const std::map<std::string, TranslatorTypes> translatorTypes{{"json", TranslatorTypes::JSON},
+                                                                    {"binary",
+                                                                     TranslatorTypes::BINARY},
+                                                                    {"custom",
+                                                                     TranslatorTypes::CUSTOM}};
 
 TranslatorTypes translatorTypeFromString(const std::string& translatorType) noexcept
 {
@@ -104,11 +105,9 @@ void Translator::setString(const std::string& property, const std::string& val)
     }
 }
 
-
-void Translator::setTranslatorType(std::int32_t type) {
+void Translator::setTranslatorType(std::int32_t type)
+{
     addOperations(this, static_cast<TranslatorTypes>(type));
 }
-
-
 
 }  // namespace helics

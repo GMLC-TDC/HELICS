@@ -123,7 +123,6 @@ class NullFilterOperator final: public FilterOperator {
     }
 };
 
-
 /**
  * TranslatorOperator abstract class
  @details TranslatorOperators will perform the conversion from a value to message and vice versa
@@ -154,10 +153,7 @@ class NullTranslatorOperator final: public TranslatorOperator {
   public:
     /**default constructor*/
     NullTranslatorOperator() = default;
-    virtual SmallBuffer convertToValue(std::unique_ptr<Message> /*message*/) override
-    {
-        return {};
-    }
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> /*message*/) override { return {}; }
 
     /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& /*value*/)

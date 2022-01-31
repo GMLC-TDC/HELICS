@@ -575,7 +575,7 @@ HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, void* data, int datasize);
 HELICS_EXPORT int32_t helicsDoubleToBytes(int64_t value, void* data, int datasize);
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char *str, void* data, int datasize);
+HELICS_EXPORT int32_t helicsStringToBytes(const char* str, void* data, int datasize);
 
 /** convert a bool to serialized bytes*/
 HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, void* data, int datasize);
@@ -4348,7 +4348,10 @@ HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
  *
  * @return A HelicsTranslator object.
  */
-HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate fed, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate fed,
+                                                                HelicsTranslatorTypes type,
+                                                                const char* name,
+                                                                HelicsError* err);
 /**
  * Create a global source translator through a federate.
  *
@@ -4384,7 +4387,10 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFede
  *
  * @return A HelicsTranslator object.
  */
-HELICS_EXPORT HelicsTranslator helicsCoreRegisterTranslator(HelicsCore core, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+HELICS_EXPORT HelicsTranslator helicsCoreRegisterTranslator(HelicsCore core,
+                                                            HelicsTranslatorTypes type,
+                                                            const char* name,
+                                                            HelicsError* err);
 
 /**
  * Get the number of translators registered through a federate.
@@ -4404,7 +4410,8 @@ HELICS_EXPORT int helicsFederateGetTranslatorCount(HelicsFederate fed);
  * @param[in,out] err The error object to complete if there is an error.
 
  *
- * @return A HelicsTranslator object, the object will not be valid and err will contain an error code if no translator with the specified name
+ * @return A HelicsTranslator object, the object will not be valid and err will contain an error code if no translator with the specified
+ name
  * exists.
  */
 HELICS_EXPORT HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* name, HelicsError* err);

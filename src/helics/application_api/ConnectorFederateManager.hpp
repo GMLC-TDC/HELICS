@@ -71,7 +71,6 @@ class ConnectorFederateManager {
     Filter& getFilter(int index);
     const Filter& getFilter(int index) const;
 
-
     /** register a Translator
     @details call is only valid in startup mode
     @param name the name of the translator
@@ -79,9 +78,8 @@ class ConnectorFederateManager {
     @param type_out the type the translator for the endpoint
     */
     Translator& registerTranslator(std::string_view name,
-                           std::string_view type_in,
-                           std::string_view type_out);
-
+                                   std::string_view type_in,
+                                   std::string_view type_out);
 
     /** register a Translator
     @details call is only valid in startup mode
@@ -90,14 +88,13 @@ class ConnectorFederateManager {
     */
     Translator& registerTranslator(TranslatorTypes type, std::string_view name);
 
-
     /** get a registered Translator
     @param name the translator name
     @return invalid translator object if name is not recognized otherwise returns the translator*/
     Translator& getTranslator(const std::string& name);
     const Translator& getTranslator(const std::string& name) const;
     Translator& getTranslator(int index);
-    const Translator & getTranslator(int index) const;
+    const Translator& getTranslator(int index) const;
 
     /** get the number of registered filters in the federate*/
     int getFilterCount() const;
@@ -113,7 +110,8 @@ class ConnectorFederateManager {
   private:
     Core* coreObject{nullptr};
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
-    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Translator>, std::string>> translators;
+    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Translator>, std::string>>
+        translators;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
 };

@@ -8,9 +8,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonBuilder.hpp"
 #include "Core.hpp"
-#include "TranslatorInfo.hpp"
 #include "GlobalFederateId.hpp"
 #include "TimeCoordinator.hpp"
+#include "TranslatorInfo.hpp"
 #include "gmlc/containers/AirLock.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 
@@ -50,7 +50,7 @@ class TranslatorFederate {
     std::function<gmlc::containers::AirLock<std::any>&(int)> mGetAirLock;
 
     Time minReturnTime{Time::maxVal()};
-    
+
     /// storage for all the filters
     gmlc::containers::MappedPointerVector<TranslatorInfo, GlobalHandle> translators;
     // bool hasTiming{false};
@@ -60,10 +60,10 @@ class TranslatorFederate {
     ~TranslatorFederate();
     /** create a translator */
     TranslatorInfo* createTranslator(GlobalBrokerId dest,
-                             InterfaceHandle handle,
-                             const std::string& key,
-                             const std::string& endpointType,
-                             const std::string& units);
+                                     InterfaceHandle handle,
+                                     const std::string& key,
+                                     const std::string& endpointType,
+                                     const std::string& units);
 
     void setCallbacks(std::function<void(const ActionMessage&)> queueMessage,
                       std::function<void(ActionMessage&&)> queueMessageMove,
@@ -102,7 +102,6 @@ class TranslatorFederate {
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/
-
 
     TranslatorInfo* getTranslatorInfo(GlobalHandle id);
     TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle);

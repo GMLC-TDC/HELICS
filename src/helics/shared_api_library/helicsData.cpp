@@ -6,8 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsData.h"
-#include "../core/SmallBuffer.hpp"
+
 #include "../application_api/HelicsPrimaryTypes.hpp"
+#include "../core/SmallBuffer.hpp"
 
 static const int bufferValidationIdentifier = 0x24EA'663F;
 
@@ -19,7 +20,8 @@ HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
     return static_cast<HelicsDataBuffer>(ptr);
 }
 
-HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity) {
+HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity)
+{
     auto* ptr = new helics::SmallBuffer();
     ptr->userKey = bufferValidationIdentifier;
     ptr->spanAssign(data, dataSize, dataCapacity);
@@ -27,10 +29,10 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
     return static_cast<HelicsDataBuffer>(ptr);
 }
 
-static helics::SmallBuffer* getBuffer(HelicsDataBuffer data) {
+static helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
+{
     helics::SmallBuffer* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
     return (ptr != nullptr && ptr->userKey == bufferValidationIdentifier) ? ptr : nullptr;
-
 }
 
 void helicsDataBufferFree(HelicsDataBuffer data)
@@ -41,12 +43,14 @@ void helicsDataBufferFree(HelicsDataBuffer data)
     }
 }
 
-int32_t helicsDataBufferSize(HelicsDataBuffer data) {
+int32_t helicsDataBufferSize(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     return (ptr != nullptr) ? static_cast<int32_t>(ptr->size()) : 0;
 }
 
-int32_t helicsDataBufferCapacity(HelicsDataBuffer data){
+int32_t helicsDataBufferCapacity(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     return (ptr != nullptr) ? static_cast<int32_t>(ptr->capacity()) : 0;
 }
@@ -54,7 +58,7 @@ int32_t helicsDataBufferCapacity(HelicsDataBuffer data){
 void* helicsDataBufferData(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
-    return (ptr != nullptr) ? static_cast<void *>(ptr->data()) : nullptr;
+    return (ptr != nullptr) ? static_cast<void*>(ptr->data()) : nullptr;
 }
 
 HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity)
@@ -67,7 +71,7 @@ HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity)
         ptr->reserve(newCapacity);
         return HELICS_TRUE;
     }
-    catch (const std::bad_alloc &) {
+    catch (const std::bad_alloc&) {
         return HELICS_FALSE;
     }
 }
@@ -119,14 +123,13 @@ HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data
     }
 }
 
-
 int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return 0;
     }
-     auto dataValue = (value == HELICS_FALSE) ? "0" : "1";
+    auto dataValue = (value == HELICS_FALSE) ? "0" : "1";
     try {
         helics::ValueConverter<std::string>::convert(dataValue, *ptr);
         return static_cast<int32_t>(ptr->size());
@@ -168,7 +171,6 @@ int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
     }
 }
 
-
 int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
@@ -176,7 +178,7 @@ int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
         return 0;
     }
     try {
-        helics::ValueConverter<std::complex<double>>::convert(std::complex<double>(real,imag), *ptr);
+        helics::ValueConverter<std::complex<double>>::convert(std::complex<double>(real, imag), *ptr);
         return static_cast<int32_t>(ptr->size());
     }
     catch (const std::bad_alloc&) {
@@ -184,13 +186,14 @@ int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
     }
 }
 
-int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data) {
+int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return 0;
     }
     try {
-        helics::ValueConverter<double>::convert(value,dataSize, *ptr);
+        helics::ValueConverter<double>::convert(value, dataSize, *ptr);
         return static_cast<int32_t>(ptr->size());
     }
     catch (const std::bad_alloc&) {
@@ -198,7 +201,8 @@ int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer 
     }
 }
 
-int helicsDataBufferType(HelicsDataBuffer data) {
+int helicsDataBufferType(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return HELICS_DATA_TYPE_UNKNOWN;
@@ -206,8 +210,8 @@ int helicsDataBufferType(HelicsDataBuffer data) {
     return static_cast<int>(helics::detail::detectType(ptr->data()));
 }
 
-
-int64_t helicsDataBufferToInt(HelicsDataBuffer data) {
+int64_t helicsDataBufferToInt(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return helics::invalidValue<int64_t>();

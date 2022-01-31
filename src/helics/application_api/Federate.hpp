@@ -531,7 +531,7 @@ received
                                          const std::string& outputType = std::string());
 
     /** define a nameless filter interface
-    */
+     */
     Filter& registerFilter()
     {
         return registerGlobalFilter(std::string(), std::string(), std::string());
@@ -551,7 +551,7 @@ received
     /** define a translator interface
     @details a translator acts as a bridge between value and message interfaces
     @param translatorType a code defining a known type of translator (0 for custom)
-    @param translatorName the name of the globally visible translator can be empty for 
+    @param translatorName the name of the globally visible translator can be empty for
     @param endpointType the type associated with the translator endpoint
     @param units the units associated with the translator value interfaces
     */
@@ -566,8 +566,8 @@ received
     @param units the units associated with the translator value interfaces
     */
     Translator& registerGlobalTranslator(std::string_view translatorName,
-                                 std::string_view endpointType = std::string_view{},
-                                 std::string_view units = std::string_view())
+                                         std::string_view endpointType = std::string_view{},
+                                         std::string_view units = std::string_view())
     {
         return registerGlobalTranslator(0, translatorName, endpointType, units);
     }
@@ -584,14 +584,10 @@ received
     {
         return registerTranslator(0, translatorName, endpointType, units);
     }
-   
 
     /** define a nameless translator interface
      */
-    Translator& registerTranslator()
-    {
-        return registerGlobalTranslator("");
-    }
+    Translator& registerTranslator() { return registerGlobalTranslator(""); }
     /** define a nameless cloning filter interface on a source
      */
     CloningFilter& registerCloningFilter()
@@ -631,31 +627,35 @@ received
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
 
-    //translator retrieval
+    // translator retrieval
     /** get a translator from its name
     @param translatorName the name of the translator
-    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    @return a reference to a translator object which will be invalid if translatorName is not
+    valid*/
     const Translator& getTranslator(const std::string& translatorName) const;
 
     /** get a translator from its index
     @param index the index of a translator
-    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    @return a reference to a translator object which will be invalid if translatorName is not
+    valid*/
     const Translator& getTranslator(int index) const;
 
     /** get a translator from its name
       @param translatorName the name of the translator
-      @return a reference to a translator object which will be invalid if translatorName is not valid*/
+      @return a reference to a translator object which will be invalid if translatorName is not
+      valid*/
     Translator& getTranslator(const std::string& translatorName);
 
     /** get a translator from its index
     @param index the index of a translator
-    @return a reference to a translator object which will be invalid if translatorName is not valid*/
+    @return a reference to a translator object which will be invalid if translatorName is not
+    valid*/
     Translator& getTranslator(int index);
 
     /** @brief register a operator for the specified translator
     @details
-    The TranslatorOperator gets called when there is a message or value to translate, There is no order or state to
-    this messages can come in any order.
+    The TranslatorOperator gets called when there is a message or value to translate, There is no
+    order or state to this messages can come in any order.
     @param trans the translator object to set the operation on
     @param op a shared_ptr to a \ref TranslatorOperator
     */
@@ -793,7 +793,7 @@ class HELICS_CXX_EXPORT Interface {
     /** get an associated target*/
     const std::string& getTarget() const;
     /** subscribe to a named publication*/
-    void addSourceTarget(std::string_view newTarget, InterfaceType hint=InterfaceType::UNKNOWN);
+    void addSourceTarget(std::string_view newTarget, InterfaceType hint = InterfaceType::UNKNOWN);
     /** subscribe to a named publication*/
     void addDestinationTarget(std::string_view newTarget,
                               InterfaceType hint = InterfaceType::UNKNOWN);

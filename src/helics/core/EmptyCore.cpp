@@ -200,7 +200,7 @@ InterfaceHandle EmptyCore::registerTranslator(std::string_view /*translatorName*
     return {};
 }
 
-    InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/,
+InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/,
                                     const std::string& /*key*/) const
 {
     return {};
@@ -458,9 +458,8 @@ void EmptyCore::setFilterOperator(InterfaceHandle /*filter*/,
 void EmptyCore::setTranslatorOperator(InterfaceHandle /*translator*/,
                                       std::shared_ptr<TranslatorOperator> /*callback*/)
 {
-
 }
-    void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
+void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
                                  std::function<std::string(std::string_view)> /*queryFunction*/)
 {
 }

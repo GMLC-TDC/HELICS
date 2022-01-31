@@ -35,7 +35,7 @@ HELICS_EXPORT int32_t helicsDataBufferSize(HelicsDataBuffer data);
 HELICS_EXPORT int32_t helicsDataBufferCapacity(HelicsDataBuffer data);
 
 /** get a pointer to the raw data*/
-HELICS_EXPORT void * helicsDataBufferData(HelicsDataBuffer data);
+HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapabity);
 
