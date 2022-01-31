@@ -202,7 +202,7 @@ namespace details {
         auto cback =
             reinterpret_cast<std::function<void(HelicsFederateState, HelicsFederateState)>*>(
                 userData);
-        (*cback)(newState,oldState);
+        (*cback)(newState, oldState);
     }
 }  // namespace details
 #endif
@@ -570,8 +570,8 @@ class Federate {
 
     void setStateChangeCallback(void (*stateChange)(HelicsFederateState newState,
                                                     HelicsFederateState oldState,
-                                                  void* userdata),
-                               void* userdata)
+                                                    void* userdata),
+                                void* userdata)
 
     {
         helicsFederateSetStateChangeCallback(fed, stateChange, userdata, hThrowOnError());
@@ -603,12 +603,11 @@ class Federate {
 
     {
         stateChangeCallbackBuffer =
-            new std::function<void(HelicsFederateState, HelicsFederateState)>(
-                std::move(callback));
+            new std::function<void(HelicsFederateState, HelicsFederateState)>(std::move(callback));
         helicsFederateSetStateChangeCallback(fed,
-                                            details::helicCppStateChangeCallbackExecutor,
-                                            stateChangeCallbackBuffer,
-                                            hThrowOnError());
+                                             details::helicCppStateChangeCallbackExecutor,
+                                             stateChangeCallbackBuffer,
+                                             hThrowOnError());
     }
 #endif
     /** define a filter interface

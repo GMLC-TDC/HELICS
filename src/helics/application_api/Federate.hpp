@@ -95,6 +95,7 @@ class HELICS_CXX_EXPORT Federate {
     std::string mName;  //!< the name of the federate
     std::function<void(Time, bool)> timeUpdateCallback;
     std::function<void(Modes, Modes)> modeUpdateCallback;
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -334,10 +335,13 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
 
-    /** register a callback function to call when the federate mode is changed from one state to another
-    @details this callback is executed before other callbacks updating values and times, no values will have
-    been updated when this callback is executed. It will execute before timeUpdateCallback in sitations where both would be called.
-    @param callback the function to call; the function signature is void(Modes, Modes) the first argument is the new Mode and the second is the old Mode
+    /** register a callback function to call when the federate mode is changed from one state to
+    another
+    @details this callback is executed before other callbacks updating values and times, no values
+    will have been updated when this callback is executed. It will execute before timeUpdateCallback
+    in situations where both would be called.
+    @param callback the function to call; the function signature is void(Modes, Modes) the first
+    argument is the new Mode and the second is the old Mode
     */
     void setModeUpdateCallback(std::function<void(Modes, Modes)> callback);
 

@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
+#include "helicsCallbacks.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
-#include "helicsCallbacks.h"
 
 #include <iostream>
 #include <map>

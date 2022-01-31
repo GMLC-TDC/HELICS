@@ -172,7 +172,7 @@ TEST_F(vfed2_tests, state_change_callback)
     HelicsFederateState statev{HELICS_STATE_ERROR};
     helicsFederateSetStateChangeCallback(vFed1, stateChangeCallback, &statev, nullptr);
     CE(helicsFederateEnterExecutingMode(vFed1, &err));
-    
+
     HelicsFederateState state;
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);

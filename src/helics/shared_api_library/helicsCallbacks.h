@@ -153,12 +153,14 @@ HELICS_EXPORT void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsFederateSetStateChangeCallback(HelicsFederate fed,
-                                        void (*stateChange)(HelicsFederateState newState, HelicsFederateState oldState, void* userdata),
-                                                       void* userdata,
-                                                       HelicsError* err);
+HELICS_EXPORT void
+    helicsFederateSetStateChangeCallback(HelicsFederate fed,
+                                         void (*stateChange)(HelicsFederateState newState, HelicsFederateState oldState, void* userdata),
+                                         void* userdata,
+                                         HelicsError* err);
 
-// Definition of helicsFederateStateChangeCallback located in FederateExport since it makes use of some data only available in that compilation unit
+// Definition of helicsFederateStateChangeCallback located in FederateExport since it makes use of some data only available in that
+// compilation unit
 
 /**
  * Set the data for a query callback.

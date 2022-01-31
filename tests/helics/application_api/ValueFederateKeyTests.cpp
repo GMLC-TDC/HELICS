@@ -770,17 +770,15 @@ TEST_F(valuefed_tests, time_update_callback)
     vFed1->finalize();
 }
 
-
 TEST_F(valuefed_tests, mode_update_callback)
 {
-    using Modes=helics::Federate::Modes;
+    using Modes = helics::Federate::Modes;
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     helics::Federate::Modes cmode{Modes::STARTUP};
-    
-    vFed1->setModeUpdateCallback([&](Modes mNew, Modes /*mOld*/) { cmode = mNew;
-    });
+
+    vFed1->setModeUpdateCallback([&](Modes mNew, Modes /*mOld*/) { cmode = mNew; });
     vFed1->enterInitializingMode();
     EXPECT_EQ(cmode, Modes::INITIALIZING);
     vFed1->enterExecutingMode();

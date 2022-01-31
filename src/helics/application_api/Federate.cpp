@@ -506,13 +506,14 @@ void Federate::setTimeUpdateCallback(std::function<void(Time, bool)> callback)
 
 void Federate::setModeUpdateCallback(std::function<void(Modes, Modes)> callback)
 {
-    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME || currentMode == Modes::PENDING_EXEC ||currentMode==Modes::PENDING_INIT || currentMode == Modes::PENDING_FINALIZE) {
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME ||
+        currentMode == Modes::PENDING_EXEC || currentMode == Modes::PENDING_INIT ||
+        currentMode == Modes::PENDING_FINALIZE) {
         throw(InvalidFunctionCall(
             "cannot update mode update callback during an async operation"));  // LCOV_EXCL_LINE
     }
     modeUpdateCallback = std::move(callback);
 }
-
 
 void Federate::setFlagOption(int flag, bool flagValue)
 {
@@ -810,12 +811,14 @@ iteration_time Federate::requestTimeIterativeComplete()
         "cannot call requestTimeIterativeComplete without first calling requestTimeIterativeAsync function"));
 }
 
-void Federate::updateFederateMode(Modes newMode) {
-    
+void Federate::updateFederateMode(Modes newMode)
+{
     Modes oldMode = currentMode.load();
     currentMode.store(newMode);
     if (modeUpdateCallback && newMode != oldMode) {
-        if (newMode == Modes::PENDING_EXEC || newMode == Modes::PENDING_INIT || newMode == Modes::PENDING_ITERATIVE_TIME || newMode == Modes::PENDING_TIME ||newMode == Modes::PENDING_FINALIZE) {
+        if (newMode == Modes::PENDING_EXEC || newMode == Modes::PENDING_INIT ||
+            newMode == Modes::PENDING_ITERATIVE_TIME || newMode == Modes::PENDING_TIME ||
+            newMode == Modes::PENDING_FINALIZE) {
             return;
         }
         switch (oldMode) {
@@ -823,18 +826,18 @@ void Federate::updateFederateMode(Modes newMode) {
                 modeUpdateCallback(newMode, Modes::STARTUP);
                 break;
             case Modes::PENDING_EXEC:
-                if (newMode!=Modes::INITIALIZING) {
+                if (newMode != Modes::INITIALIZING) {
                     modeUpdateCallback(newMode, Modes::INITIALIZING);
                 }
                 break;
             case Modes::PENDING_ITERATIVE_TIME:
             case Modes::PENDING_TIME:
-                if (newMode!=Modes::EXECUTING) {
+                if (newMode != Modes::EXECUTING) {
                     modeUpdateCallback(newMode, Modes::EXECUTING);
                 }
                 break;
             case Modes::PENDING_FINALIZE:
-                 modeUpdateCallback(newMode, Modes::EXECUTING);
+                modeUpdateCallback(newMode, Modes::EXECUTING);
                 break;
             case Modes::FINALIZE:
             case Modes::INITIALIZING:
