@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../core/SmallBuffer.hpp"
 
+#include <string>
+
 static const int bufferValidationIdentifier = 0x24EA'663F;
 
 HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)

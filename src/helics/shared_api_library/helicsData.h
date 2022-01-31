@@ -69,4 +69,4 @@ HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
 /** convert a data buffer to an int*/
 HELICS_EXPORT int64_t helicsDataBufferToInt(HelicsDataBuffer data);
 
-#endif HELICS_APISHAREDDATA_FUNCTIONS_H_
+#endif /*HELICS_APISHAREDDATA_FUNCTIONS_H_ */
