@@ -4410,6 +4410,28 @@ HELICS_EXPORT void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
                                                        HelicsError* err);
 
 /**
+ * Set callback for the federate mode change.
+ *
+ * @details This callback will be executed every time the operating mode of the federate changes.
+ *
+ * @param fed The federate to set the callback for.
+ * @param timeUpdate A callback with signature void(HelicsTime newTime, bool iterating, void *userdata);
+ *                 The function arguments are the new time value, a bool indicating that the time is iterating, and pointer to the userdata.
+ * @param userdata A pointer to user data that is passed to the function when executing.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void
+    helicsFederateSetStateChangeCallback(HelicsFederate fed,
+                                         void (*stateChange)(HelicsFederateState newState, HelicsFederateState oldState, void* userdata),
+                                         void* userdata,
+                                         HelicsError* err);
+
+// Definition of helicsFederateStateChangeCallback located in FederateExport since it makes use of some data only available in that
+// compilation unit
+
+/**
  * Set the data for a query callback.
  *
  * @details There are many queries that HELICS understands directly, but it is occasionally useful to have a federate be able to respond
