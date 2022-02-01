@@ -616,50 +616,50 @@ def _auto_run(args):
     benchmarks = []
     assert isinstance(args.power, int)
     for i in range(0, args.power):
-        single = wrapper(BMecho_singleCore, 2 ** i)
+        single = wrapper(BMecho_singleCore, 2**i)
         single_real_time_start = time.time()
-        BMecho_singleCore(2 ** i)
+        BMecho_singleCore(2**i)
         single_real_time_stop = time.time()
         single_cpu_time = timeit.timeit(stmt=single, number=1)
         single_real_time = single_real_time_stop - single_real_time_start
         single_dict = create_bm_dictionary(
-            "BMecho_singleCore", 2 ** i, "singleCore", single_real_time, single_cpu_time, 1
+            "BMecho_singleCore", 2**i, "singleCore", single_real_time, single_cpu_time, 1
         )
-        inproc = wrapper(BMecho_multiCore, "inproc", 2 ** i)
+        inproc = wrapper(BMecho_multiCore, "inproc", 2**i)
         inproc_real_time_start = time.time()
-        BMecho_multiCore("inproc", 2 ** i)
+        BMecho_multiCore("inproc", 2**i)
         inproc_real_time_stop = time.time()
         inproc_cpu_time = timeit.timeit(stmt=inproc, number=1)
         inproc_real_time = inproc_real_time_stop - inproc_real_time_start
         inproc_dict = create_bm_dictionary(
-            "BMecho_multiCore", 2 ** i, "inproc", inproc_real_time, inproc_cpu_time, 1
+            "BMecho_multiCore", 2**i, "inproc", inproc_real_time, inproc_cpu_time, 1
         )
-        zmq = wrapper(BMecho_multiCore, "zmq", 2 ** i)
+        zmq = wrapper(BMecho_multiCore, "zmq", 2**i)
         zmq_real_time_start = time.time()
-        BMecho_multiCore("zmq", 2 ** i)
+        BMecho_multiCore("zmq", 2**i)
         zmq_real_time_stop = time.time()
         zmq_cpu_time = timeit.timeit(stmt=zmq, number=1)
         zmq_real_time = zmq_real_time_stop - zmq_real_time_start
         zmq_dict = create_bm_dictionary(
-            "BMecho_multiCore", 2 ** i, "zmq", zmq_real_time, zmq_cpu_time, 1
+            "BMecho_multiCore", 2**i, "zmq", zmq_real_time, zmq_cpu_time, 1
         )
-        zmqss = wrapper(BMecho_multiCore, "zmqss", 2 ** i)
+        zmqss = wrapper(BMecho_multiCore, "zmqss", 2**i)
         zmqss_real_time_start = time.time()
-        BMecho_multiCore("zmqss", 2 ** i)
+        BMecho_multiCore("zmqss", 2**i)
         zmqss_real_time_stop = time.time()
         zmqss_cpu_time = timeit.timeit(stmt=zmqss, number=1)
         zmqss_real_time = zmqss_real_time_stop - zmqss_real_time_start
         zmqss_dict = create_bm_dictionary(
-            "BMecho_multiCore", 2 ** i, "zmqss", zmqss_real_time, zmqss_cpu_time, 1
+            "BMecho_multiCore", 2**i, "zmqss", zmqss_real_time, zmqss_cpu_time, 1
         )
-        udp = wrapper(BMecho_multiCore, "udp", 2 ** i)
+        udp = wrapper(BMecho_multiCore, "udp", 2**i)
         udp_real_time_start = time.time()
-        BMecho_multiCore("udp", 2 ** i)
+        BMecho_multiCore("udp", 2**i)
         udp_real_time_stop = time.time()
         udp_cpu_time = timeit.timeit(stmt=udp, number=1)
         udp_real_time = udp_real_time_stop - udp_real_time_start
         udp_dict = create_bm_dictionary(
-            "BMecho_multiCore", 2 ** i, "udp", udp_real_time, udp_cpu_time, 1
+            "BMecho_multiCore", 2**i, "udp", udp_real_time, udp_cpu_time, 1
         )
         # NOTE: The following core types take way too long to complete.
         # This indicates there is an issue that cannot be fixed by Python,
