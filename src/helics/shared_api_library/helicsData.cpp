@@ -222,3 +222,26 @@ int64_t helicsDataBufferToInt(HelicsDataBuffer data)
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), val);
     return val;
 }
+
+
+double helicsDataBufferToDouble(HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return helics::invalidValue<double>();
+    }
+    double val;
+    helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), val);
+    return val;
+}
+
+HelicsBool helicsDataBufferToBool(HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return HELICS_FALSE;
+    }
+    bool val;
+    helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), val);
+    return val;
+}
