@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
 #ifndef HELICS_ENABLE_ENCRYPTED_COMMS
-#include <iostream>
+#    include <iostream>
 #endif
 #include <memory>
 #include <string>
