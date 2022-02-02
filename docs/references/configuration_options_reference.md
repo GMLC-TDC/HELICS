@@ -1365,7 +1365,8 @@ _API:_ (none)
 Maximum number of network retry attempts.
 
 ---
-### `encrypted`  [false]
+
+### `encrypted` [false]
 
 _API:_ (none)
 set to true to enable encryption on network types that support encryption

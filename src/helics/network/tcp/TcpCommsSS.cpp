@@ -35,7 +35,6 @@ TcpCommsSS::~TcpCommsSS()
     disconnect();
 }
 
-
 /** load network information into the comms object*/
 void TcpCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {

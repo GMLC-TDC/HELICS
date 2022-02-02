@@ -51,10 +51,10 @@ void TcpComms::setFlag(const std::string& flag, bool val)
             propertyUnLock();
         }
     } else if (flag == "encrypted") {
-            if (propertyLock()) {
-                encrypted = val;
-                propertyUnLock();
-            }
+        if (propertyLock()) {
+            encrypted = val;
+            propertyUnLock();
+        }
     } else {
         NetworkCommsInterface::setFlag(flag, val);
     }
