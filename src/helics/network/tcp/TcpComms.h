@@ -34,7 +34,8 @@ class TcpComms final: public NetworkCommsInterface {
     virtual void setFlag(const std::string& flag, bool val) override;
 
   private:
-    bool reuse_address = false;
+    bool reuse_address{false};
+    std::string encryption_config;
     virtual int getDefaultBrokerPort() const override;
     virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
     virtual void queue_tx_function() override;  //!< the loop for transmitting data

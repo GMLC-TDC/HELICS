@@ -131,6 +131,8 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "brokerport": 22608,
   "localport": 8080,
   "portstart": 22608,
+  "encrypted": false,
+  "encryption_config":"encryption_config.json",
 
 
   "publications" | "subscriptions" | "inputs": [
@@ -1361,6 +1363,19 @@ Maximum number of messages in queue. Can be increased for large volumes of messa
 
 _API:_ (none)
 Maximum number of network retry attempts.
+
+---
+### `encrypted`  [false]
+
+_API:_ (none)
+set to true to enable encryption on network types that support encryption
+
+---
+
+### `encryption_config`
+
+_API:_ (none)
+specify json or a file containing the configuration options for defining the encrypted interface
 
 ---
 
