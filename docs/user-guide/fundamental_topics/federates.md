@@ -116,10 +116,9 @@ The figure below is an example of a representation of the message topology of a 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/messages_and_filters_example.png)
 
 - In this figure, Federate 4 has a single endpoint for sending and receiving messages. Both a source filter and a destination filter can be set up on a single endpoint, or multiple source filters can be used on the same endpoint.
-- The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by 0.5 seconds. Without establishing a separate destination endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
+- The source filter on Federate 3 delays the messages to both Federate 2 and Federate 4 by 0.5 seconds. Without establishing a separate source endpoint devoted to each federate, there is no way to produce different delays in the messages sent along these two paths.
 - Because the filter on Federate 4 is a destination filter, the message it receives from Federate 3 is affected by the filter but the message it sends to Federate 2 is not affected.
 - The source filter on Federate 2 has no impact on this co-simulation as there are no messages sent from that endpoint.
-- Individual filters can be targeted to act on multiple endpoints and act as both source and destination filters.
 
 #### Interactions Between Messages and Values
 
@@ -142,7 +141,7 @@ The following table may be useful in understanding the differences between the t
 | Interface Type:                                | Publication/Subscription/Input   | Endpoint/Filter                        |
 | [Signal Route](../advanced_topics/queries.md): | Fixed, defined at initialization | Determined at time of transmission     |
 | Outgoing signal:                               | 1 to n (broadcast)               | 1 to 1 - defined sender and receiver   |
-| Incoming signal:                               | n to 1 (promiscuous)             | None                                   |
+| Incoming signal:                               | n to 1 (promiscuous)             | 1 to 1 - defined sender and receiver   |
 | Status on Message Bus:                         | Current value always available   | Removed when received                  |
 | Fidelity:                                      | Default value                    | Rerouting/modification through filters |
 | Signal Contents:                               | Physical units                   | Generic binary blobs                   |
