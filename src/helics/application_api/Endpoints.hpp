@@ -169,11 +169,14 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     void setCallback(const std::function<void(const Endpoint&, Time)>& callback);
 
     /** add a named filter to an endpoint for all message coming from the endpoint*/
-    void addSourceFilter(const std::string& filterName);
+    void addSourceFilter(std::string_view filterName);
     /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(const std::string& filterName);
+    void addDestinationFilter(std::string_view filterName);
     /** set a target destination for unspecified messages*/
     void setDefaultDestination(std::string_view target);
+    void addSourceEndpoint(std::string_view endpointName);
+    void addDestinationEndpoint(std::string_view endpointName);
+
     /** get the target destination for the endpoint TODO(PT):: make this work*/
     const std::string& getDefaultDestination() const;
     virtual const std::string& getDisplayName() const override { return getName(); }

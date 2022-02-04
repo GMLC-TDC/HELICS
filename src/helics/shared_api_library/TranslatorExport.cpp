@@ -271,7 +271,7 @@ void helicsTranslatorAddPublicationTarget(HelicsTranslator trans, const char* pu
     }
     CHECK_NULL_STRING(pub, void());
     try {
-        translator->addPublicationTarget(pub);
+        translator->addPublication(pub);
     }
     // LCOV_EXCL_START
     catch (...) {

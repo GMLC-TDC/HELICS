@@ -310,19 +310,20 @@ void FederateState::createInterface(InterfaceType htype,
                                     InterfaceHandle handle,
                                     const std::string& key,
                                     const std::string& type,
-                                    const std::string& units)
+                                    const std::string& units,
+                                    uint16_t flags)
 {
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
         case InterfaceType::PUBLICATION: {
             interfaceInformation.createPublication(handle, key, type, units);
-            if (checkActionFlag(getInterfaceFlags(), required_flag)) {
+            if (checkActionFlag(flags, required_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
                                                             defs::Options::CONNECTION_REQUIRED,
                                                             1);
             }
-            if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
+            if (checkActionFlag(flags, optional_flag)) {
                 interfaceInformation.setPublicationProperty(handle,
                                                             defs::Options::CONNECTION_OPTIONAL,
                                                             1);
@@ -340,12 +341,12 @@ void FederateState::createInterface(InterfaceType htype,
                                                       defs::Options::IGNORE_UNIT_MISMATCH,
                                                       1);
             }
-            if (checkActionFlag(getInterfaceFlags(), required_flag)) {
+            if (checkActionFlag(flags, required_flag)) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::Options::CONNECTION_REQUIRED,
                                                       1);
             }
-            if (checkActionFlag(getInterfaceFlags(), optional_flag)) {
+            if (checkActionFlag(flags, optional_flag)) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::Options::CONNECTION_OPTIONAL,
                                                       1);
@@ -353,7 +354,21 @@ void FederateState::createInterface(InterfaceType htype,
         } break;
         case InterfaceType::ENDPOINT: {
             interfaceInformation.createEndpoint(handle, key, type);
-        }
+            if (checkActionFlag(flags, required_flag)) {
+                interfaceInformation.setEndpointProperty(handle,
+                                                      defs::Options::CONNECTION_REQUIRED,
+                                                      1);
+            }
+            if (checkActionFlag(flags, optional_flag)) {
+                interfaceInformation.setEndpointProperty(handle,
+                                                      defs::Options::CONNECTION_OPTIONAL,
+                                                      1);
+            }
+            if (checkActionFlag(flags, targeted_flag)) {
+                auto* ept = interfaceInformation.getEndpoint(handle);
+                ept->targetedEndpoint = true;
+            }
+        } break;
         default:
             break;
     }
@@ -1349,7 +1364,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* subI = interfaceInformation.getInput(cmd.dest_handle);
             if (subI != nullptr) {
                 if (subI->addSource(cmd.getSource(),
-                                    std::string(cmd.name()),
+                                    cmd.name(),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
                     if (!usingGlobalTime) {
@@ -1359,8 +1374,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             } else {
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (eptI != nullptr) {
-                    eptI->addSourceTarget(cmd.getSource(),
-                                          std::string(cmd.name()),
+                    eptI->addSource(cmd.getSource(),
+                                          cmd.name(),
                                           cmd.getString(typeStringLoc));
                     if (!usingGlobalTime) {
                         addDependency(cmd.source_id);
@@ -1382,13 +1397,19 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (eptI != nullptr) {
                 if (checkActionFlag(cmd, destination_target)) {
-                    eptI->addDestinationTarget(cmd.getSource(),
-                                               std::string(cmd.name()),
+                    eptI->addDestination(cmd.getSource(),
+                                               cmd.name(),
                                                cmd.getString(typeStringLoc));
+                    if (eptI->targetedEndpoint) {
+                        addDependent(cmd.source_id);
+                    }
                 } else {
-                    eptI->addSourceTarget(cmd.getSource(),
-                                          std::string(cmd.name()),
+                    eptI->addSource(cmd.getSource(),
+                                          cmd.name(),
                                           cmd.getString(typeStringLoc));
+                    if (eptI->targetedEndpoint) {
+                        addDependency(cmd.source_id);
+                    }
                 }
             }
         } break;

@@ -85,12 +85,12 @@ class EndpointInfo {
     Time firstMessageTime() const;
     /** clear all the message queues*/
     void clearQueue();
-    /** add a target target*/
-    void addDestinationTarget(GlobalHandle dest,
+    /** add a target to send messages*/
+    void addDestination(GlobalHandle dest,
                               std::string_view destName,
                               std::string_view destType);
-    /** add a source to an endpoint*/
-    void addSourceTarget(GlobalHandle dest,
+    /** add an endpoint to receive information from*/
+    void addSource(GlobalHandle dest,
                          std::string_view sourceName,
                          std::string_view sourceType);
     /** remove a target from connection*/

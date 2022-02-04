@@ -619,7 +619,7 @@ size_t Input::getByteCount()
     return dv.size();
 }
 
-void Input::addTarget(const std::string& target)
+void Input::addPublication(std::string_view target)
 {
     if (givenTarget.empty()) {
         givenTarget = target;

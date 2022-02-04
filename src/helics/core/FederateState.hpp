@@ -441,7 +441,8 @@ class FederateState {
                          InterfaceHandle handle,
                          const std::string& key,
                          const std::string& type,
-                         const std::string& units);
+                         const std::string& units,
+                         uint16_t flags);
     /** close an interface*/
     void closeInterface(InterfaceHandle handle, InterfaceType type);
     /** send a command to a federate*/

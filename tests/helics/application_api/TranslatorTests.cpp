@@ -511,7 +511,7 @@ TEST_F(translator, translator_to_message_target_from_translator)
 
     t1.addSourceEndpoint("e1");
     t1.addDestinationEndpoint("e1");
-    t1.addPublicationTarget("p1");
+    t1.addPublication("p1");
 
     EXPECT_NO_THROW(cFed1->enterExecutingMode());
 
@@ -548,10 +548,10 @@ TEST_F(translator, translator_round_trip)
     e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
 
-    e1.addSourceTarget("t1");
-    p1.addDestinationTarget("t1");
-    i1.addSourceTarget("t1");
-    e1.addDestinationTarget("t1");
+    e1.addSourceEndpoint("t1");
+    p1.addInputTarget("t1");
+    i1.addPublication("t1");
+    e1.addDestinationEndpoint("t1");
 
     cFed1->registerGlobalTranslator(helics::TranslatorTypes::JSON, "t1");
 
@@ -592,7 +592,7 @@ TEST_F(translator, translator_round_trip_target_from_translator)
     t1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     t1.addSourceEndpoint("e1");
     t1.addDestinationEndpoint("e1");
-    t1.addPublicationTarget("p1");
+    t1.addPublication("p1");
     t1.addInputTarget("i1");
 
     EXPECT_NO_THROW(cFed1->enterExecutingMode());
@@ -632,11 +632,11 @@ TEST_F(translator, translator_to_multimessage)
     e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
     i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
 
-    e1.addSourceTarget("t1");
-    p1.addDestinationTarget("t1");
-    i1.addSourceTarget("t1");
-    e1.addDestinationTarget("t1");
-    e2.addDestinationTarget("t1");
+    e1.addDestinationEndpoint("t1");
+    p1.addInputTarget("t1");
+    i1.addPublication("t1");
+    e1.addSourceEndpoint("t1");
+    e2.addSourceEndpoint("t1");
 
     cFed1->registerGlobalTranslator(helics::TranslatorTypes::JSON, "t1");
 
@@ -707,6 +707,48 @@ TEST_F(translator, translator_from_message)
 
     cFed1->finalize();
 
+    FullDisconnect();
+}
+
+TEST_F(translator, translator_from_message_2fed)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::CombinationFederate>("test", 1, broker, 1.0, "A");
+    AddFederates<helics::CombinationFederate>("test", 1, broker, 1.0, "B");
+    auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto cFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& e1 = cFed1->registerGlobalTargetedEndpoint("e1", "any");
+    auto& i1 = cFed2->registerGlobalInput<double>("i1");
+
+    e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    i1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+
+    i1.addSourceTarget("t1");
+    e1.addDestinationTarget("t1");
+
+    cFed1->registerGlobalTranslator(helics::TranslatorTypes::JSON, "t1");
+
+    cFed2->enterExecutingModeAsync();
+    EXPECT_NO_THROW(cFed1->enterExecutingMode());
+    cFed2->enterExecutingModeComplete();
+
+    auto sm = helics::typeConvert(helics::DataType::HELICS_JSON, 20.7);
+    std::string val{sm.to_string()};
+
+    e1.send(val);
+    // there should be no dependencies here so it should grant immediately
+    auto tres = cFed1->requestTime(3.0);
+    EXPECT_EQ(tres, 3.0);
+
+    tres = cFed2->requestTime(3.0);
+    EXPECT_EQ(tres, 1.0);
+    EXPECT_TRUE(i1.isUpdated());
+    EXPECT_DOUBLE_EQ(i1.getValue<double>(), 20.7);
+
+    cFed1->finalize();
+    cFed2->finalize();
     FullDisconnect();
 }
 

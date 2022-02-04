@@ -157,7 +157,7 @@ int32_t EndpointInfo::queueSizeUpTo(Time maxTime) const
     return cnt;
 }
 
-void EndpointInfo::addDestinationTarget(GlobalHandle dest,
+void EndpointInfo::addDestination(GlobalHandle dest,
                                         std::string_view destName,
                                         std::string_view destType)
 {
@@ -176,7 +176,7 @@ void EndpointInfo::addDestinationTarget(GlobalHandle dest,
 }
 
 /** add a source to an endpoint*/
-void EndpointInfo::addSourceTarget(GlobalHandle dest,
+void EndpointInfo::addSource(GlobalHandle dest,
                                    std::string_view sourceName,
                                    std::string_view sourceType)
 {

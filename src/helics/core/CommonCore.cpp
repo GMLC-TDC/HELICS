@@ -1099,7 +1099,7 @@ InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
                                            fed->getInterfaceFlags());
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::INPUT, id, key, type, units);
+    fed->createInterface(InterfaceType::INPUT, id, key, type, units,fed->getInterfaceFlags());
 
     LOG_INTERFACES(parent_broker_id,
                    fed->getIdentifier(),
@@ -1148,7 +1148,8 @@ InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
                                            fed->getInterfaceFlags());
 
     auto id = handle.handle.handle;
-    fed->createInterface(InterfaceType::PUBLICATION, id, key, type, units);
+    fed->createInterface(
+        InterfaceType::PUBLICATION, id, key, type, units, fed->getInterfaceFlags());
 
     ActionMessage m(CMD_REG_PUB);
     m.source_id = fed->global_id.load();
@@ -1385,7 +1386,6 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             if (handleInfo->key.empty()) {
                 cmd.setStringData(handleInfo->type, handleInfo->units);
@@ -1403,7 +1403,6 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 case InterfaceType::ENDPOINT:
                 default:
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
@@ -1445,6 +1444,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
     }
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
+    cmd.counter = static_cast<uint16_t>(handleInfo->handleType);
     cmd.flags = handleInfo->flags;
     cmd.payload = targetName;
     switch (handleInfo->handleType) {
@@ -1455,7 +1455,6 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
             } else {
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
             }
             break;
         case InterfaceType::TRANSLATOR:
@@ -1469,7 +1468,6 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                     break;
                 case InterfaceType::ENDPOINT:
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
@@ -1687,7 +1685,8 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
                                            fed->getInterfaceFlags());
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr);
+    fed->createInterface(
+        InterfaceType::ENDPOINT, id, name, type, emptyStr, fed->getInterfaceFlags());
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -1717,7 +1716,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr);
+    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr,flags);
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -3725,6 +3724,9 @@ void CommonCore::registerInterface(ActionMessage& command)
                 if (globalTime) {
                     break;
                 }
+                if (checkActionFlag(command, targeted_flag)) {
+                    break;
+                }
                 if (timeCoord->addDependency(command.source_id)) {
                     auto* fed = getFederateCore(command.source_id);
                     if (fed != nullptr) {
@@ -3993,7 +3995,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
                     return;
                 }
 
-                if (command.counter == static_cast<uint16_t>(InterfaceType::ENDPOINT)) {
+                if (command.counter != static_cast<uint16_t>(InterfaceType::FILTER)) {
                     command.setAction(CMD_ADD_ENDPOINT);
                     toggleActionFlag(command, destination_target);
                 } else {

@@ -792,12 +792,12 @@ class HELICS_CXX_EXPORT Interface {
     const std::string& getName() const;
     /** get an associated target*/
     const std::string& getTarget() const;
-    /** subscribe to a named publication*/
+    /** add a source of information to an interface*/
     void addSourceTarget(std::string_view newTarget, InterfaceType hint = InterfaceType::UNKNOWN);
-    /** subscribe to a named publication*/
+    /** add destination for data sent via the interface*/
     void addDestinationTarget(std::string_view newTarget,
                               InterfaceType hint = InterfaceType::UNKNOWN);
-    /** remove a named publication from being a target*/
+    /** remove a named inteface from the target lists*/
     void removeTarget(std::string_view targetToRemove);
 
     /** get the interface information field of the input*/

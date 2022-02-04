@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-3-Clause
  * separate threads in order to function correctly.
  *
  *
- * Implementations should be thread safe.
  *
  * Note: Methods should all be pure virtual.
  */
@@ -535,7 +534,7 @@ class Core {
                                                std::string_view units) = 0;
 
     /**
-    * add a destination target,  the handle can be for a filter or a publication
+    * adds a destination for an interface data,  the handle can be a publication, endpoint, filter, or translators
     @details a filter will create an additional processing step for messages before they get to a
     destination endpoint, for publications this will establish a linkage from the publication to the
     named input
@@ -548,7 +547,7 @@ class Core {
                                       std::string_view dest,
                                       InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
-    /** add a source target,  the handle can be a subscription, input, filter or endpoint
+    /** adds a source of data to an interface,  the handle can be an input, filter,translator, or endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
     this creates a linkage to a particular publication, for filters it add a source endpoint to
     filter
@@ -561,12 +560,12 @@ class Core {
                                  InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
     /**
-    * get the destination targets for an interface
+    * get the destinations for an interface
     @param handle an interface get the destination targets for
     */
     virtual const std::string& getDestinationTargets(InterfaceHandle handle) const = 0;
 
-    /** get the source targets for an interface
+    /** get the sources of data for an interface
     @param handle the identifier of the interface
     */
     virtual const std::string& getSourceTargets(InterfaceHandle handle) const = 0;

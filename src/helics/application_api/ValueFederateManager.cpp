@@ -128,13 +128,13 @@ void ValueFederateManager::addAlias(const Publication& pub, const std::string& s
     }
 }
 
-void ValueFederateManager::addTarget(const Publication& pub, const std::string& target)
+void ValueFederateManager::addTarget(const Publication& pub, std::string_view target)
 {
     coreObject->addDestinationTarget(pub.handle, target);
     targetIDs.lock()->emplace(target, pub.handle);
 }
 
-void ValueFederateManager::addTarget(const Input& inp, const std::string& target)
+void ValueFederateManager::addTarget(const Input& inp, std::string_view target)
 {
     {
         auto iTHandle = inputTargets.lock();
@@ -142,7 +142,7 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
         for (auto el = rng.first; el != rng.second; ++el) {
             if (el->second == target) {
                 fed->logWarningMessage(std::string("Duplicate input targets detected for ") +
-                                       inp.getDisplayName() + "::" + target);
+                                       inp.getDisplayName() + "::" + std::string(target));
                 return;
             }
         }
@@ -154,13 +154,13 @@ void ValueFederateManager::addTarget(const Input& inp, const std::string& target
     targetIDs.lock()->emplace(target, inp.handle);
 }
 
-void ValueFederateManager::removeTarget(const Publication& pub, const std::string& target)
+void ValueFederateManager::removeTarget(const Publication& pub, std::string_view target)
 {
     // TODO(PT): erase from targetID's
     coreObject->removeTarget(pub.handle, target);
 }
 
-void ValueFederateManager::removeTarget(const Input& inp, const std::string& target)
+void ValueFederateManager::removeTarget(const Input& inp, std::string_view target)
 {
     auto iTHandle = inputTargets.lock();
     auto rng = iTHandle->equal_range(inp.handle);

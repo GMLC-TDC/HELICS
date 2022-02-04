@@ -243,16 +243,16 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
                 if (checkActionFlag(command, destination_target)) {
-                    tranI->getEndpointInfo()->addDestinationTarget(command.getSource(),
-                                                                   command.payload.to_string(),
+                    tranI->getEndpointInfo()->addDestination(command.getSource(),
+                                                                   command.name(),
                                                                    command.getString(
                                                                        typeStringLoc));
                     if (!checkActionFlag(command, error_flag)) {
                         mCoord.addDependent(command.source_id);
                     }
                 } else {
-                    tranI->getEndpointInfo()->addSourceTarget(command.getSource(),
-                                                              command.payload.to_string(),
+                    tranI->getEndpointInfo()->addSource(command.getSource(),
+                                                              command.name(),
                                                               command.getString(typeStringLoc));
                     if (!checkActionFlag(command, error_flag)) {
                         mCoord.addDependency(command.source_id);

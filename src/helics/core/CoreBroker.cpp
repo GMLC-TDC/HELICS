@@ -2593,7 +2593,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), m);
 
         const auto* iface = handles.findHandle(target.first);
-        if (iface->handleType == InterfaceType::ENDPOINT) {
+        if (iface->handleType != InterfaceType::FILTER) {
             // notify the endpoint about its endpoint
             m.setAction(CMD_ADD_ENDPOINT);
             m.name(iface->key);
@@ -2607,7 +2607,6 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         }
 
         m.swapSourceDest();
-        m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(handleInfo.key);
