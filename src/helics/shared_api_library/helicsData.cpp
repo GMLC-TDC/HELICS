@@ -223,7 +223,6 @@ int64_t helicsDataBufferToInt(HelicsDataBuffer data)
     return val;
 }
 
-
 double helicsDataBufferToDouble(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);

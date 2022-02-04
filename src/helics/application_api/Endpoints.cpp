@@ -185,12 +185,14 @@ void Endpoint::addDestinationFilter(std::string_view filterName)
     }
 }
 
-void Endpoint::addSourceEndpoint(std::string_view endpointName) {
+void Endpoint::addSourceEndpoint(std::string_view endpointName)
+{
     if (cr != nullptr) {
         cr->addSourceTarget(handle, endpointName, InterfaceType::ENDPOINT);
     }
 }
-void Endpoint::addDestinationEndpoint(std::string_view endpointName) {
+void Endpoint::addDestinationEndpoint(std::string_view endpointName)
+{
     if (cr != nullptr) {
         cr->addDestinationTarget(handle, endpointName, InterfaceType::ENDPOINT);
     }

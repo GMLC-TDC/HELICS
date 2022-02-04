@@ -797,7 +797,7 @@ class HELICS_CXX_EXPORT Interface {
     /** add destination for data sent via the interface*/
     void addDestinationTarget(std::string_view newTarget,
                               InterfaceType hint = InterfaceType::UNKNOWN);
-    /** remove a named inteface from the target lists*/
+    /** remove a named interface from the target lists*/
     void removeTarget(std::string_view targetToRemove);
 
     /** get the interface information field of the input*/

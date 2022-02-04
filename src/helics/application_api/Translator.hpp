@@ -90,11 +90,13 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     {
         addDestinationTarget(target, InterfaceType::ENDPOINT);
     }
-    void addSourceFilter(std::string_view filterName) {
+    void addSourceFilter(std::string_view filterName)
+    {
         addSourceTarget(filterName, InterfaceType::FILTER);
     }
     /** add a named filter to an endpoint for all message going to the endpoint*/
-    void addDestinationFilter(std::string_view filterName) {
+    void addDestinationFilter(std::string_view filterName)
+    {
         addDestinationTarget(filterName, InterfaceType::FILTER);
     }
     /** set the type of operations specifying how the translator should operate*/

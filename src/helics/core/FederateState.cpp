@@ -356,13 +356,13 @@ void FederateState::createInterface(InterfaceType htype,
             interfaceInformation.createEndpoint(handle, key, type);
             if (checkActionFlag(flags, required_flag)) {
                 interfaceInformation.setEndpointProperty(handle,
-                                                      defs::Options::CONNECTION_REQUIRED,
-                                                      1);
+                                                         defs::Options::CONNECTION_REQUIRED,
+                                                         1);
             }
             if (checkActionFlag(flags, optional_flag)) {
                 interfaceInformation.setEndpointProperty(handle,
-                                                      defs::Options::CONNECTION_OPTIONAL,
-                                                      1);
+                                                         defs::Options::CONNECTION_OPTIONAL,
+                                                         1);
             }
             if (checkActionFlag(flags, targeted_flag)) {
                 auto* ept = interfaceInformation.getEndpoint(handle);
@@ -1374,9 +1374,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             } else {
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (eptI != nullptr) {
-                    eptI->addSource(cmd.getSource(),
-                                          cmd.name(),
-                                          cmd.getString(typeStringLoc));
+                    eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (!usingGlobalTime) {
                         addDependency(cmd.source_id);
                     }
@@ -1397,16 +1395,12 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
             if (eptI != nullptr) {
                 if (checkActionFlag(cmd, destination_target)) {
-                    eptI->addDestination(cmd.getSource(),
-                                               cmd.name(),
-                                               cmd.getString(typeStringLoc));
+                    eptI->addDestination(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
                         addDependent(cmd.source_id);
                     }
                 } else {
-                    eptI->addSource(cmd.getSource(),
-                                          cmd.name(),
-                                          cmd.getString(typeStringLoc));
+                    eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
                         addDependency(cmd.source_id);
                     }

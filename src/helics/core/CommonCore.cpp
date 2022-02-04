@@ -1099,7 +1099,7 @@ InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
                                            fed->getInterfaceFlags());
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::INPUT, id, key, type, units,fed->getInterfaceFlags());
+    fed->createInterface(InterfaceType::INPUT, id, key, type, units, fed->getInterfaceFlags());
 
     LOG_INTERFACES(parent_broker_id,
                    fed->getIdentifier(),
@@ -1716,7 +1716,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr,flags);
+    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr, flags);
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;

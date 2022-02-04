@@ -158,8 +158,8 @@ int32_t EndpointInfo::queueSizeUpTo(Time maxTime) const
 }
 
 void EndpointInfo::addDestination(GlobalHandle dest,
-                                        std::string_view destName,
-                                        std::string_view destType)
+                                  std::string_view destName,
+                                  std::string_view destType)
 {
     for (const auto& ti : targetInformation) {
         if (ti.id == dest) {
@@ -177,8 +177,8 @@ void EndpointInfo::addDestination(GlobalHandle dest,
 
 /** add a source to an endpoint*/
 void EndpointInfo::addSource(GlobalHandle dest,
-                                   std::string_view sourceName,
-                                   std::string_view sourceType)
+                             std::string_view sourceName,
+                             std::string_view sourceType)
 {
     for (const auto& si : sourceInformation) {
         if (si.id == dest) {
