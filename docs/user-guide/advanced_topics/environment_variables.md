@@ -26,4 +26,4 @@ For setting up a federate a few environment variables are used
 ## Networking environment variables
 
 - `HELICS_ENCRYPTION`: set to 1 to activate encryption if built into HELICS for the TCP core types and ZMQ core types
-- `HELICS_ENCRYPTION_CONFIG`: set to a file location of a config file to specify the options for encryption including any necessary keys and certificate authorities
+- `HELICS_ENCRYPTION_CONFIG`: set to the path to a config file to specify the options for encryption including any necessary keys and certificate authorities
