@@ -173,9 +173,10 @@ h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 
 The callback take 3 parameters about a message and in the case of `C` callbacks a pointer to user data.
 
-- loglevel an integer code describing the level of the message as described above.
-- header a string with the name of the object generating the message and possibly some state and time information (may be empty)
-- message the actual message to log
+- **fed**: the helics.HelicsFederate that is created with helics.helicsCreateValueFederate, helics.helicsCreateMessageFederate or helics.helicsCreateCombinationFederate
+- **logger**: a callback with signature void(int, const char *, const char *, void *); the function arguments are loglevel, an identifier string, and a message string, and a pointer to user data
+- **user_data**: a pointer to user data that is passed to the function when executing
+
 
 ## Log Buffer
 
