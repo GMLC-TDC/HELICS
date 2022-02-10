@@ -155,6 +155,36 @@ TEST_F(vfed2_tests, file_load)
     helicsFederateFree(vFed);
 }
 
+static void stateChangeCallback(HelicsFederateState newState,
+                                HelicsFederateState /*oldState*/,
+                                void* userData)
+{
+    auto* state = reinterpret_cast<HelicsFederateState*>(userData);
+    *state = newState;
+}
+
+/** test the state change callback*/
+TEST_F(vfed2_tests, state_change_callback)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+    ASSERT_FALSE(vFed1 == nullptr);
+    HelicsFederateState statev{HELICS_STATE_ERROR};
+    helicsFederateSetStateChangeCallback(vFed1, stateChangeCallback, &statev, nullptr);
+    CE(helicsFederateEnterExecutingMode(vFed1, &err));
+
+    HelicsFederateState state;
+    CE(state = helicsFederateGetState(vFed1, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
+    EXPECT_TRUE(statev == HELICS_STATE_EXECUTION);
+
+    CE(helicsFederateFinalize(vFed1, &err));
+
+    CE(state = helicsFederateGetState(vFed1, &err));
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
+    EXPECT_TRUE(statev == HELICS_STATE_FINALIZE);
+}
+
 TEST_F(vfed2_tests, json_publish)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
