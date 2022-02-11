@@ -56,18 +56,15 @@ As discussed in the [User Guide](../../fundamental_topics/federates#native-helic
 
 The delay value is set to 900 seconds so that the impact of the fictitious communication system delay is obvious in the results of this example and the delay can be set to much lower or higher values.
 
-
-
 ## Co-simulation execution
 
- Execution of this co-simulation is done as before with `helics_cli`:
+Execution of this co-simulation is done as before with `helics_cli`:
 
 ```shell
 helics run --path=fundamental_combo_runner.json
 ```
 
 Below are pairs of output graphs with the first from each pair being from the original Combination Federate Example and the second from this Native Filter Example with the communication delay.
-
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_battery_SOCs.png)
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_native_battery_SOCs.png)
@@ -77,7 +74,6 @@ Below are pairs of output graphs with the first from each pair being from the or
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_combo_estimated_SOCs.png)
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/fundamental_filter_native_estimated_SOCs.png)
-
 
 ## [Questions and Help](../../support.md)
 
