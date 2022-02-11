@@ -398,7 +398,6 @@ class CoreBroker: public Broker, public BrokerBase {
                               bool force_ordering);
 
     std::string generateGlobalStatus(fileops::JsonMapBuilder& builder);
-
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int errorCode);
     /** send a disconnect message to time dependencies and child brokers*/

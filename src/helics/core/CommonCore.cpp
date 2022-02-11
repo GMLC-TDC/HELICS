@@ -2578,9 +2578,7 @@ void CommonCore::loadBasicJsonInfo(
     Json::Value& base,
     const std::function<void(Json::Value& fedval, const FedInfo& fed)>& fedLoader) const
 {
-    base["name"] = getIdentifier();
-    base["id"] = global_broker_id_local.baseValue();
-    base["parent"] = higher_broker_id.baseValue();
+    addBaseInformation(base, true);
     if (fedLoader) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
@@ -2606,9 +2604,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
-    base["name"] = getIdentifier();
-    base["id"] = global_broker_id_local.baseValue();
-    base["parent"] = higher_broker_id.baseValue();
+    addBaseInformation(base, true);
     ActionMessage queryReq(force_ordering ? CMD_QUERY_ORDERED : CMD_QUERY);
     if (index == GLOBAL_FLUSH) {
         queryReq.setAction(CMD_QUERY_ORDERED);
@@ -2616,7 +2612,7 @@ void CommonCore::initializeMapBuilder(const std::string& request,
     queryReq.payload = request;
     queryReq.source_id = global_broker_id_local;
     queryReq.counter = index;  // indicating which processing to use
-    if (loopFederates.size() > 0 || filterFed != nullptr) {
+    if (loopFederates.size() > 0 || filterFed != nullptr || translatorFed != nullptr) {
         base["federates"] = Json::arrayValue;
         for (const auto& fed : loopFederates) {
             int brkindex =
@@ -4492,10 +4488,9 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                 }
                 if (timeCoord && !timeCoord->empty()) {
                     Json::Value base;
-                    base["id"] = global_broker_id_local.baseValue();
+                    addBaseInformation(base, true);
                     base["state"] = brokerStateName(getBrokerState());
                     base["time"] = Json::Value();
-                    base["name"] = getIdentifier();
                     timeCoord->generateDebuggingTimeInfo(base["time"]);
                     base["federates"] = Json::arrayValue;
                     for (const auto& fed : loopFederates) {

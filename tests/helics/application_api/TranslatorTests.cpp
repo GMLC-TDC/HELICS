@@ -495,6 +495,51 @@ TEST_F(translator, translator_to_message)
     FullDisconnect();
 }
 
+TEST_F(translator, translator_to_message_2fed)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::CombinationFederate>("test", 1, broker, 1.0, "A");
+    AddFederates<helics::CombinationFederate>("test", 1, broker, 1.0, "B");
+
+    auto cFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto cFed2 = GetFederateAs<helics::CombinationFederate>(1);
+
+    auto& e1 = cFed2->registerGlobalTargetedEndpoint("e1", "any");
+    auto& p1 = cFed1->registerGlobalPublication<double>("p1");
+    p1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    e1.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+
+    e1.addSourceEndpoint("t1");
+    p1.addDestinationTarget("t1");
+
+    cFed1->registerGlobalTranslator(helics::TranslatorTypes::JSON, "t1");
+
+    cFed1->enterExecutingModeAsync();
+    cFed2->enterExecutingMode();
+    cFed1->enterExecutingModeComplete();
+
+    p1.publish(20.7);
+    auto tres = cFed1->requestTime(2.0);
+    EXPECT_EQ(tres, 2.0);
+    tres = cFed2->requestTime(3.0);
+    EXPECT_EQ(tres, 1.0);
+    EXPECT_TRUE(e1.hasMessage());
+    auto m = e1.getMessage();
+
+    cFed1->finalize();
+    cFed2->finalize();
+    ASSERT_TRUE(m);
+
+    auto b = helics::fileops::loadJsonStr(m->data.to_string());
+
+    ASSERT_TRUE(b.isMember("value"));
+    ASSERT_TRUE(b.isMember("type"));
+    EXPECT_DOUBLE_EQ(b["value"].asDouble(), 20.7);
+    EXPECT_STREQ(b["type"].asCString(), "double");
+    FullDisconnect();
+}
+
 TEST_F(translator, translator_to_message_target_from_translator)
 {
     auto broker = AddBroker("test", 1);

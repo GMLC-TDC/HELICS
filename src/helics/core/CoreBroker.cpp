@@ -724,6 +724,7 @@ std::string CoreBroker::generateFederationSummary() const
     int epts = 0;
     int ipts = 0;
     int filt = 0;
+    int translators = 0;
     for (const auto& hand : handles) {
         switch (hand.handleType) {
             case InterfaceType::PUBLICATION:
@@ -735,6 +736,9 @@ std::string CoreBroker::generateFederationSummary() const
             case InterfaceType::ENDPOINT:
                 ++epts;
                 break;
+            case InterfaceType::TRANSLATOR:
+                ++translators;
+                break;
             default:
                 ++filt;
                 break;
@@ -743,7 +747,9 @@ std::string CoreBroker::generateFederationSummary() const
     Json::Value summary;
     Json::Value block;
     block["federates"] = static_cast<int>(mFederates.size());
-    block["min_federates"] = minFederateCount;
+    block["allowed_federates"][0] = minFederateCount;
+    block["allowed_federates"][1] = maxFederateCount;
+    block["countable_federates"] = getCountableFederates();
     block["brokers"] =
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return !static_cast<bool>(brk._core);
@@ -752,13 +758,15 @@ std::string CoreBroker::generateFederationSummary() const
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return static_cast<bool>(brk._core);
         }));
-    block["min_brokers"] = minBrokerCount;
+    block["allowed_brokers"][0] = minBrokerCount;
+    block["allowed_brokers"][1] = maxBrokerCount;
     block["publications"] = pubs;
     block["inputs"] = ipts;
     block["filters"] = filt;
     block["endpoints"] = epts;
+    block["translators"] =translators;
     summary["summary"] = block;
-
+    addBaseInformation(summary,isRootc);
     return fileops::generateJsonString(summary);
 }
 
@@ -2970,11 +2978,7 @@ std::string CoreBroker::query(const std::string& target,
             }
             if (queryStr == "logs") {
                 Json::Value base;
-                base["name"] = getIdentifier();
-                if (uuid_like) {
-                    base["uuid"] = getIdentifier();
-                }
-                base["id"] = global_id.load().baseValue();
+                addBaseInformation(base,!isRoot());
                 bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
@@ -3153,10 +3157,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     }
     if (request == "status") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
+        addBaseInformation(base,!isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         return fileops::generateJsonString(base);
@@ -3167,14 +3168,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
     auto addHeader = [this](Json::Value& base) {
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addBaseInformation(base, !isRootc);
     };
 
     auto res = quickBrokerQueries(request);
@@ -3187,7 +3181,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         base["brokers"] = static_cast<int>(mBrokers.size());
         base["federates"] = static_cast<int>(mFederates.size());
         base["countable_federates"] = getCountableFederates();
-        base["handles"] = static_cast<int>(handles.size());
+        base["interfaces"] = static_cast<int>(handles.size());
         return fileops::generateJsonString(base);
     }
     if (request == "summary") {
@@ -3198,7 +3192,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "logs") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base, !isRootc);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
@@ -3210,7 +3204,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "current_state") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
@@ -3253,6 +3247,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "global_status") {
         if (!isConnected()) {
             Json::Value gs;
+            addBaseInformation(gs, !isRootc);
             gs["status"] = "disconnected";
             gs["timestep"] = -1;
             return fileops::generateJsonString(gs);
@@ -3305,7 +3300,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "dependencies") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base,!isRootc);
         base["dependents"] = Json::arrayValue;
         for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
@@ -3404,14 +3399,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
-    base["name"] = getIdentifier();
-    if (uuid_like) {
-        base["uuid"] = getIdentifier();
-    }
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
+    addBaseInformation(base, !isRootc);
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
     if (index == GLOBAL_FLUSH) {

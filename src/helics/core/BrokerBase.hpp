@@ -26,6 +26,11 @@ and some common methods used cores and brokers
 namespace spdlog {
 class logger;
 }
+/** forward declare Json::Value*/
+namespace Json {
+class Value;
+}
+
 namespace helics {
 class BaseTimeCoordinator;
 class helicsCLI11App;
@@ -273,7 +278,8 @@ class BrokerBase {
     virtual double getSimulationTime() const { return mInvalidSimulationTime; }
     /** process some common commands that can be processed by the broker base */
     std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
-
+    /** add some base information to a json structure */
+    void addBaseInformation(Json::Value& base, bool hasParent) const;
   public:
     /** generate a callback function for the logging purposes*/
     std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;
