@@ -106,11 +106,11 @@ Unlike the other advanced broker examples, this one can be run with a single hel
 
 As has been mentioned, since this is just a change to the co-simulation architecture, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_charging_power.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
 
 ## [Questions and Help](../../support.md)
 
