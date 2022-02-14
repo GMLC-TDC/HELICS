@@ -193,6 +193,17 @@ namespace details {
         auto cback = reinterpret_cast<std::function<void(HelicsTime, bool)>*>(userData);
         (*cback)(time, iterating == HELICS_TRUE);
     }
+
+    /** helper function for the callback executor for state change*/
+    inline void helicCppStateChangeCallbackExecutor(HelicsFederateState newState,
+                                                    HelicsFederateState oldState,
+                                                    void* userData)
+    {
+        auto cback =
+            reinterpret_cast<std::function<void(HelicsFederateState, HelicsFederateState)>*>(
+                userData);
+        (*cback)(newState, oldState);
+    }
 }  // namespace details
 #endif
 
@@ -556,6 +567,15 @@ class Federate {
     {
         helicsFederateSetTimeUpdateCallback(fed, timeUpdate, userdata, hThrowOnError());
     }
+
+    void setStateChangeCallback(void (*stateChange)(HelicsFederateState newState,
+                                                    HelicsFederateState oldState,
+                                                    void* userdata),
+                                void* userdata)
+
+    {
+        helicsFederateSetStateChangeCallback(fed, stateChange, userdata, hThrowOnError());
+    }
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
     void setQueryCallback(std::function<std::string(const std::string&)> callback)
 
@@ -578,6 +598,17 @@ class Federate {
                                             hThrowOnError());
     }
 
+    void setStateChangeCallback(
+        std::function<void(HelicsFederateState, HelicsFederateState)> callback)
+
+    {
+        stateChangeCallbackBuffer =
+            new std::function<void(HelicsFederateState, HelicsFederateState)>(std::move(callback));
+        helicsFederateSetStateChangeCallback(fed,
+                                             details::helicCppStateChangeCallbackExecutor,
+                                             stateChangeCallbackBuffer,
+                                             hThrowOnError());
+    }
 #endif
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
@@ -733,6 +764,7 @@ class Federate {
   private:
     void* callbackBuffer{nullptr};  //!< buffer to contain pointer to a callback
     void* timeUpdateCallbackBuffer{nullptr};  //!< buffer for pointer to time update callback
+    void* stateChangeCallbackBuffer{nullptr};  //!< buffer for pointer to state change callback
 #endif
 };
 

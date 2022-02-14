@@ -11,7 +11,7 @@ In HELICS, time synchronization across the federates is managed by each federate
 
 Sometimes this timing configuration is determined by the construction of the simulator (for example, if it has a fixed simulation time step size) and sometimes the simulator will have nothing to do until it receives a new input (for example, with a controller).
 
-In most federates there will be a line of code that look like this (at least if their [using the C API](../../references/api-reference/index.md)):
+In most federates there will be a line of code that look like this (at least if they are [using the Python API](../../references/api-reference/index.md)):
 
 ```python
 t = h.helicsFederateRequestTime(fed, time_requested)

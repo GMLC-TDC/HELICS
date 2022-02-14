@@ -94,6 +94,7 @@ class HELICS_CXX_EXPORT Federate {
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, bool)> timeUpdateCallback;
+    std::function<void(Modes, Modes)> modeUpdateCallback;
 
   public:
     /**constructor taking a federate information structure
@@ -333,6 +334,16 @@ class HELICS_CXX_EXPORT Federate {
     value is the new time and bool is true if this is an iteration
     */
     void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
+
+    /** register a callback function to call when the federate mode is changed from one state to
+    another
+    @details this callback is executed before other callbacks updating values and times, no values
+    will have been updated when this callback is executed. It will execute before timeUpdateCallback
+    in situations where both would be called.
+    @param callback the function to call; the function signature is void(Modes, Modes) the first
+    argument is the new Mode and the second is the old Mode
+    */
+    void setModeUpdateCallback(std::function<void(Modes, Modes)> callback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -625,6 +636,8 @@ received
     void completeOperation();
 
   private:
+    /** function to deal with any operations that occur on a mode switch*/
+    void updateFederateMode(Modes newMode);
     /** function to deal with any operations that need to occur on a time update*/
     void updateSimulationTime(Time newTime, Time oldTime, bool iterating);
     /** register filter interfaces defined in  file or string

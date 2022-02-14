@@ -506,4 +506,5 @@ public class helicsJNI {
   public final static native void helicsFilterSetOption(long jarg1, int jarg2, int jarg3);
   public final static native int helicsFilterGetOption(long jarg1, int jarg2);
   public final static native void helicsFederateSetTimeUpdateCallback(long jarg1, long jarg2, long jarg3);
+  public final static native void helicsFederateSetStateChangeCallback(long jarg1, long jarg2, long jarg3);
 }

@@ -67,7 +67,7 @@ In all instances, this function returns the federate object `fed` and requires a
 Additionally, there are ways to create and configure the federate directly through HELICS API calls, which may be appropriate in some instances. First, you need to create the federate info object, which will later be used to create the federate:
 
 ```python
-fed = h.helicsCreateFederateInfo()
+fedinfo = h.helicsCreateFederateInfo()
 ```
 
 Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference) as appropriate. For example, to set the `only_transmit_on_change` flag to true, you would use the following API call:
@@ -81,7 +81,7 @@ h.helicsFederateInfoSetFlagOption(fed, 6, True)
 Once the federate info object has been created and the appropriate options have been set, the helics federate can be created by passing in a unique federate name and the federate info object into the appropriate HELICS API call. For creating a value federate, that would look like this:
 
 ```python
-fed = h.helicsCreateValueFederate(federate_name, fi)
+fed = h.helicsCreateValueFederate(federate_name, fedinfo)
 ```
 
 Once the federate is created, you now need to define all of its publications, subscriptions and endpoints. The first step is to create them by registering them with the federate with an API call that looks like this:
@@ -96,7 +96,7 @@ This call takes in the federate object, a string containing the publication key 
 pub = h.helicsPublicationSetOption(pub, 454, True)
 ```
 
-Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntatically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revist the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
+Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntatically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revist the above example where the `only_transmit_on_change` flag is set to true in the federate info object, if operating on an existing federate, that call would be:
 
 ```python
 h.helicsFederateSetFlagOption(fed, 6, True)
@@ -134,7 +134,7 @@ If the federation needs to iterate in initialization mode prior to entering exec
 
    `ITERATING` - Federation has not ceased iterating and will iterate once again. During this time the federate will need to check all its inputs and subscriptions, recalculate its model, and produce new outputs for the rest of the federation.
 
-To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federate's internal evaluation of the stability of the solution to determine if needs to request another iteration. The returned value of the API will determine whether the federate needs to re-solve its model with new inputs from the of the federation or enter normal execution mode where it can enter execution mode.
+To implement this initialization iteration, all federates need to implement a loop where `helicsFederateEnterExecutingModeIterative()` is repeatedly called and the output of the call is evaluated. The call to the API needs to use the federate's internal evaluation of the stability of the solution to determine if needs to request another iteration. The returned value of the API will determine whether the federate needs to re-solve its model with new inputs from the of the federation or enter normal execution.
 
 ## Execution
 
@@ -146,7 +146,7 @@ h.helicsFederateEnterExecutingMode(fed)
 
 This method call is a blocking call; your custom federate will sit there and do nothing until all other federates have also finished any set-up work and have also requested to begin execution of the co-simulation. Once this method returns, the federation is effectively at simulation time of zero.
 
-At this point, each federate will now set through time, exchanging values with other federates in the cosimulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the cosimulation, time is at the zeroth time step (t = 0). Let's assume that the cosimulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the cosimulation loop will start with something like this:
+At this point, each federate will now step through time, exchanging values with other federates in the cosimulation as appropriate. This will be implemented in a loop where each federate will go through a set of prescribed steps at each time step. At the beginning of the cosimulation, time is at the zeroth time step (t = 0). Let's assume that the cosimulation will end at a pre-determined time, t = max_time. The nature of the simulator will dictate how the time loop is handled. However, it is likely that the cosimulation loop will start with something like this:
 
 ```python
 t = 0
@@ -176,7 +176,7 @@ updated = h.helicsInputIsUpdated(sid)
 
 Which returns true if the value has been updated and false if it has not.
 
-Receiving messages at an endpoint works a little bit differently than when receiving values through a subscription. Most fundamentally, there may be multiple messages queued at an endpoint while there will only ever be one value received at a subscription (the last value if more than one is sent prior to being retrieved). To receive all of the messages at an endpoint, they needed to be popped off the queue. An example of how this might be done is given below.
+Receiving messages at an endpoint works a little bit differently than when receiving values through a subscription. Most fundamentally, there may be multiple messages queued at an endpoint while there will only ever be one value received at a subscription (the last value if more than one is sent prior to being retrieved). To receive all of the messages at an endpoint, they need to be popped off the queue. An example of how this might be done is given below.
 
 ```python
 while h.helicsEndpointPendingMessages(end) > 0:
@@ -195,7 +195,7 @@ At this point, your federate has received all of its input information from the 
 
 ### Publish Outputs
 
-Once the new inputs have been collected and all necessary calculations made, the federate can publish whatever information it needs to for the rest of the federation to use. The code sample below shows how these output values can be published out to the federation using HELICS API calls. As in when reading in new values, these output values can published as a variety of data types and HELICS can handle type conversion if one of the receivers of the value asks for it in a type different than published.
+Once the new inputs have been collected and all necessary calculations made, the federate can publish whatever information it needs to for the rest of the federation to use. The code sample below shows how these output values can be published out to the federation using HELICS API calls. As in when reading in new values, these output values can be published as a variety of data types and HELICS can handle type conversion if one of the receivers of the value asks for it in a type different than published.
 
 ```python
 h.helicsPublicationPublishInteger(pub, int_value)
@@ -205,7 +205,7 @@ h.helicsPublicationPublishChar(pub, string_value)
 ...
 ```
 
-For sending a message through an endpoint, that once again looks a little bit different, in this case because - unlike with a publication - a message requires a destination. If a default destination was set when the endpoint was registered (either through the config file or through calling `h.helicsEndpointSetDefaultDestination()`), then an empty string can be passed. Otherwise, the destination must be provided as shown in API call below where dest is the destination and msg is the message to be sent.
+For sending a message through an endpoint, that once again looks a little bit different, in this case because - unlike with a publication - a message requires a destination. If a default destination was set when the endpoint was registered (either through the config file or through calling `h.helicsEndpointSetDefaultDestination()`), then an empty string can be passed. Otherwise, the destination must be provided as shown in API call below where `dest` is the destination and `msg` is the message to be sent.
 
 ```python
 h.helicsEndpointSendMessageRaw(end, dest, msg)

@@ -6,14 +6,14 @@
     :maxdepth: 2
 ```
 
-Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSON files for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things). As such
+Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSON files for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things).
 
 ## Configuration methods
 
 Generally, there are three ways in which a co-simulation can be configured and all the various options can be defined:
 
 1. Using direct API calls in the federate source code.
-2. Using command-line switches/flags which beginning execution of the federate
+2. Using command-line switches/flags while beginning execution of the federate
 3. Using a JSON configuration file (and calling helicsCreateValueFederateFromConfig, helicsCreateMessageFederateFromConfig, or helicsCreateComboFederateFromConfig)
 
 Not all configuration options are available in all three forms but often they are. For example, it is not possible (nor convenient) to configure a publication for a federate from the command line but it is possible to do so with the JSON config file and with API calls.
@@ -22,7 +22,7 @@ Not all configuration options are available in all three forms but often they ar
 
 Which method you use to configure your federate and co-simulation significantly depends on the circumstances of the co-simulation and details of any existing code-base being used. Here is some guidance, though, to help in guiding you're decision in how to do this:
 
-- **If possible, use a JSON configuration file** - Using a JSON configuration file allows creates separation between the code base of the federation and its use in a particular co-simulation. This allows for a modularity between the functionality the federate provides and the particular co-simulation in which it is applied. For example, a power system federate can easily be reconfigured to work on one model vs another through the use of a JSON configuration file. The particular publications and subscriptions may change but the main functionality of the federate (solving the power flow) does not.
+- **If possible, use a JSON configuration file** - Using a JSON configuration file creates separation between the code base of the federation and its use in a particular co-simulation. This allows for a modularity between the functionality the federate provides and the particular co-simulation in which it is applied. For example, a power system federate can easily be reconfigured to work on one model vs another through the use of a JSON configuration file. The particular publications and subscriptions may change but the main functionality of the federate (solving the power flow) does not.
   To use the JSON file for configuration, one of three specific APIs needs to be called: in the file:
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
@@ -52,11 +52,9 @@ Default values are shown in "[]" following the name(s) of the option.
 
 When an API exists, its name is shown along with links to the specific API documentation for a few (but, sadly, not all) of the supported languages. Many of the options are set with generic functions (_e.g._ `helicsFederateInfoSetFlagOption`) and in those cases the option being set is specified by an enumerated value. In C, these values (_e.g._ `helics_flag_uninterruptible`) are set to integer value (_e.g._ `1`); in this document that integer value follows the enumeration string in brackets. If using the C interface, the integer value must be used. The C++ interface supports the use of the enumerated value directly as do the Python and Julia interfaces with slight syntactical variations (Python: `helics.HELICS_FLAG_INTERRUPTIBLE` and Julia: `HELICS.HELICS_FLAG_INTERRUPTIBLE`).
 
-x
-
 ## Sample Configurations
 
-The JSON configuration file below shows all the configuration options in a single file along with their default values and shows what section of the file they should be placed in. Most JSON configuration files will require far fewer options than shown here; items marked with "\*\*" are required. Many items have alternative names that are
+The JSON configuration file below shows all the configuration options in a single file along with their default values and shows what section of the file they should be placed in. Most JSON configuration files will require far fewer options than shown here; items marked with "\*\*" are required.
 
 Many of the configuration parameters have alternate names that provide the same functionality. Only one of the names is shown in this configuration file but the alternative names are listed in the reference below. Generally, the supported names are the same string in nocase, camelCase, and snake_case.
 
