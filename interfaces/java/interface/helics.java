@@ -4348,4 +4348,20 @@ public class helics implements helicsConstants {
     helicsJNI.helicsFederateSetTimeUpdateCallback(SWIGTYPE_p_void.getCPtr(fed), SWIGTYPE_p_f_double_int_p_void__void.getCPtr(timeUpdate), SWIGTYPE_p_void.getCPtr(userdata));
   }
 
+  /**
+   * Set callback for the federate mode change.<br>
+   * <br>
+   * This callback will be executed every time the operating mode of the federate changes.<br>
+   * <br>
+   * @param fed The federate to set the callback for.<br>
+   * @param stateChange A callback with signature void(HelicsFederateState newState, HelicsFederateState oldState, void *userdata);<br>
+   *                 The function arguments are the new state, the old state, and pointer to the userdata.<br>
+   * @param userdata A pointer to user data that is passed to the function when executing.<br>
+   * <br>
+   * ,out] err A pointer to an error object for catching errors.
+   */
+  public static void helicsFederateSetStateChangeCallback(SWIGTYPE_p_void fed, SWIGTYPE_p_f_enum_HelicsFederateState_enum_HelicsFederateState_p_void__void stateChange, SWIGTYPE_p_void userdata) {
+    helicsJNI.helicsFederateSetStateChangeCallback(SWIGTYPE_p_void.getCPtr(fed), SWIGTYPE_p_f_enum_HelicsFederateState_enum_HelicsFederateState_p_void__void.getCPtr(stateChange), SWIGTYPE_p_void.getCPtr(userdata));
+  }
+
 }
