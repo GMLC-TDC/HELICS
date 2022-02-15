@@ -35,10 +35,14 @@ namespace tcp {
         /** allow outgoing connections*/
         virtual void setFlag(const std::string& flag, bool val) override;
 
+        /** load network information into the comms object*/
+        virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
+
       private:
         /// disable all outgoing connections- allow only incoming connections
         bool outgoingConnectionsAllowed{true};
         bool reuse_address{false};
+        std::string encryption_config;
         std::vector<std::string> connections;  //!< list of connections to make
         virtual int getDefaultBrokerPort() const override;
         virtual void queue_rx_function() override;  //!< the functional loop for the receive queue

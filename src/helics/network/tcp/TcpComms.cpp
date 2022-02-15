@@ -39,6 +39,7 @@ void TcpComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
         return;
     }
     reuse_address = netInfo.reuse_address;
+    encryption_config = netInfo.encryption_config;
     propertyUnLock();
 }
 
@@ -47,6 +48,11 @@ void TcpComms::setFlag(const std::string& flag, bool val)
     if (flag == "reuse_address") {
         if (propertyLock()) {
             reuse_address = val;
+            propertyUnLock();
+        }
+    } else if (flag == "encrypted") {
+        if (propertyLock()) {
+            encrypted = val;
             propertyUnLock();
         }
     } else {

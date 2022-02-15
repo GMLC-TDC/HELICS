@@ -153,6 +153,16 @@ std::shared_ptr<helicsCLI11App>
         ->transform(CLI::Transformer({{"auto", "-1"}, {"os", "-999"}}, CLI::ignore_case))
         ->envname("HELICS_LOCAL_PORT");
     nbparser->add_option("--portstart", portStart, "starting port for automatic port definitions");
+
+    auto* encrypt_group = nbparser->add_option_group("encryption", "options related to encryption");
+    encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network")
+        ->envname("HELICS_ENCRYPTION");
+    encrypt_group
+        ->add_option("--encryption_config",
+                     encryption_config,
+                     "set the configuration file for encryption options")
+        ->envname("HELICS_ENCRYPTION_CONFIG");
+
     nbparser->add_callback([this]() {
         if ((!brokerAddress.empty()) && (brokerPort == -1)) {
             if ((localInterface.empty()) && (portNumber != -1)) {
