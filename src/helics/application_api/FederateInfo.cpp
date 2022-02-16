@@ -543,11 +543,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "The minimum time between time grants for a Federate (default in ms)")
         ->configurable(false);
 
-      auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
+    auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
     encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network");
-      encrypt_group->add_option("--encryption_config",
-                                encryptionConfig,
-                                "set the configuration file for encryption options");
+    encrypt_group->add_option("--encryption_config",
+                              encryptionConfig,
+                              "set the configuration file for encryption options");
 
     auto* rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore();
