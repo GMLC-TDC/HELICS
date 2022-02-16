@@ -524,7 +524,7 @@ if(CYGWIN)
     )
 endif()
 
-option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" ON)
+option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" OFF)
 
 # -------------------------------------------------------------
 # Enable ZeroMQ
