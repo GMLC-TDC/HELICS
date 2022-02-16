@@ -52,10 +52,6 @@ jobs:
           ZMQ_FORCE_SUBPROJECT: $[variables['zmq_subproject']]
         displayName: 'Build HELICS'
 
-      - bash: ldd bin/helics_broker
-        workingDirectory: 'build'
-        displayName: '[DEBUG] Check libraries linked to HELICS'
-
       - bash: ../scripts/run-ci-tests.sh "$TEST_CONFIG"
         env:
           TEST_CONFIG: $[variables['test_config']]
