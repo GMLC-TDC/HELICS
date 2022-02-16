@@ -781,6 +781,68 @@ TEST_F(timing_tests2, wait_for_current_time_iterative)
     vFed1->finalize();
 }
 
+TEST_F(timing_tests2, wait_for_current_time_iterative_enter_exec)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<int>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(-6);
+    sub1_1.setDefault(-28);
+
+    vFed2->enterInitializingModeAsync();
+    vFed1->enterInitializingMode();
+
+    pub1_1.publish(4);
+
+    vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+
+    vFed2->enterInitializingModeComplete();
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    for (int ii=0;ii<10;++ii) {
+        auto it = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub2_1.getValue<int>(), ii+4);
+        pub2_1.publish(ii+27);
+        vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+        it = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub1_1.getValue<int>(), ii + 27);
+        pub1_1.publish(ii + 5);
+        vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    }
+    auto it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub2_1.getValue<int>(), 14);
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    it = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub1_1.getValue<int>(), 36);
+    vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    it=vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    it = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    
+
+    vFed2->finalize();
+
+    broker.reset();
+    vFed1->finalize();
+}
+
 // Tests out the time barrier
 TEST_F(timing_tests2, time_barrier1)
 {

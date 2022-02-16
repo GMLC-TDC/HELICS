@@ -15,14 +15,16 @@ namespace helics {
 class ActionMessage;
 
 /**enumeration of possible states for a federate to be in regards to time request*/
-enum class time_state_t : uint8_t {
+enum class TimeState : uint8_t {
     initialized = 0,
-    exec_requested_iterative = 1,
-    exec_requested = 2,
-    time_granted = 3,
-    time_requested_iterative = 4,
-    time_requested = 5,
-    error = 7
+    exec_requested_require_iteration=1,
+    exec_requested_iterative = 2,
+    exec_requested = 3,
+    time_granted = 5,
+    time_requested_require_iteration=6,
+    time_requested_iterative = 7,
+    time_requested = 8,
+    error = 10
 };
 
 enum class ConnectionType : uint8_t {
@@ -41,8 +43,11 @@ class TimeData {
     Time TeAlt{timeZero};  //!< the second min event
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
-    time_state_t time_state{time_state_t::initialized};
+    TimeState time_state{TimeState::initialized};
+    bool hasData{false}; //indicator that data was sent in the current interval
     std::int32_t timeoutCount{0};  // counter for timeout checking
+    std::int32_t grantedIteration{0};
+    std::int32_t iterationCount{0};
     TimeData() = default;
     explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
     /** check if there is an update to the current dependency info and assign*/
@@ -120,7 +125,7 @@ class TimeDependencies {
     DependencyInfo* getDependencyInfo(GlobalFederateId id);
 
     /** check if the dependencies would allow entry to exec mode*/
-    bool checkIfReadyForExecEntry(bool iterating) const;
+    bool checkIfReadyForExecEntry(bool iterating, bool waiting) const;
 
     /** check if the dependencies would allow a grant of the time
     @param iterating true if the object is iterating
@@ -145,6 +150,10 @@ class TimeDependencies {
 
     void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
 };
+
+GlobalFederateId getExecEntryMinFederate(const TimeDependencies& dependencies,
+                                 GlobalFederateId self,
+                                 GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,

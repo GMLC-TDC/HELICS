@@ -17,7 +17,7 @@ TEST(timeDep_tests, dependency_tests)
     deps.resize(2);
     deps[0].connection = ConnectionType::child;
     deps[0].fedID = GlobalFederateId{131073};
-    deps[0].time_state = time_state_t::time_requested;
+    deps[0].time_state = TimeState::time_requested;
     deps[0].dependent = true;
     deps[0].dependency = true;
     deps[0].forwarding = false;
@@ -27,7 +27,7 @@ TEST(timeDep_tests, dependency_tests)
 
     deps[1].connection = ConnectionType::child;
     deps[1].fedID = GlobalFederateId{1879048192};
-    deps[1].time_state = time_state_t::time_requested;
+    deps[1].time_state = TimeState::time_requested;
     deps[1].dependent = true;
     deps[1].dependency = true;
     deps[1].forwarding = true;

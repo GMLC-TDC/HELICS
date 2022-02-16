@@ -1227,6 +1227,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     time_granted));
                 }
                 epi->addMessage(createMessageFromCommand(std::move(cmd)));
+                if (state <= HELICS_EXECUTING) {
+                    timeCoord->processTimeMessage(cmd);
+                }
             }
         } break;
         case CMD_PUB: {
@@ -1255,6 +1258,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     mess->messageID = cmd.messageID;
                     mess->original_dest = eptI->key;
                     eptI->addMessage(std::move(mess));
+                    if (state <= HELICS_EXECUTING) {
+                        timeCoord->processTimeMessage(cmd);
+                    }
                 }
                 break;
             }
@@ -1272,6 +1278,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                          prettyPrintString(cmd),
                                          subI->getSourceName(src)));
                 }
+            }
+            if (state <= HELICS_EXECUTING) {
+                timeCoord->processTimeMessage(cmd);
             }
         } break;
         case CMD_WARNING:

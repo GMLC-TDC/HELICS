@@ -261,7 +261,7 @@ GlobalFederateId ForwardingTimeCoordinator::getMinDependency() const
 MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
-    if (!dependencies.checkIfReadyForExecEntry(false)) {
+    if (!dependencies.checkIfReadyForExecEntry(false,false)) {
         return ret;
     }
     executionMode = true;
@@ -285,7 +285,7 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
     }
 
     downstream.next = timeZero;
-    downstream.time_state = time_state_t::time_granted;
+    downstream.time_state = TimeState::time_granted;
     downstream.minDe = timeZero;
 
     ActionMessage execgrant(CMD_EXEC_GRANT);
@@ -303,18 +303,18 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
 
-    if (dep.time_state == time_state_t::time_granted) {
+    if (dep.time_state == TimeState::time_granted) {
         nTime.setAction(CMD_TIME_GRANT);
-    } else if (dep.time_state == time_state_t::time_requested) {
+    } else if (dep.time_state == TimeState::time_requested) {
         nTime.setExtraData(dep.minFed.baseValue());
         nTime.Tdemin = std::min(dep.minDe, dep.Te);
         nTime.Te = dep.Te;
-    } else if (dep.time_state == time_state_t::time_requested_iterative) {
+    } else if (dep.time_state == TimeState::time_requested_iterative) {
         nTime.setExtraData(dep.minFed.baseValue());
         setActionFlag(nTime, iteration_requested_flag);
         nTime.Tdemin = std::min(dep.minDe, dep.Te);
         nTime.Te = dep.Te;
-    } else if (dep.time_state == time_state_t::exec_requested) {
+    } else if (dep.time_state == TimeState::exec_requested) {
         nTime.setAction(CMD_IGNORE);
     }
     return nTime;
