@@ -33,10 +33,12 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     bool forceNewCore{false};  //!< indicator that the federate should not use an existing core
     /** indicate that the federate should use json serialization for all data transfers*/
     bool useJsonSerialization{false};
+    /** specify that the core should use encryption*/
+    bool encrypted{false};
     /** specify that the federate and associated core should enable profiling to the specified
      * file*/
     std::string profilerFileName;
-
+    std::string encryptionConfig; //!< encryption configuration string or file
     std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object

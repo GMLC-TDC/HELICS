@@ -542,6 +542,13 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_DELTA, val); },
            "The minimum time between time grants for a Federate (default in ms)")
         ->configurable(false);
+
+      auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
+    encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network");
+      encrypt_group->add_option("--encryption_config",
+                                encryptionConfig,
+                                "set the configuration file for encryption options");
+
     auto* rtgroup = app->add_option_group("realtime");
     rtgroup->option_defaults()->ignore_underscore();
     rtgroup
@@ -826,15 +833,15 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
 {
     auto res = fi.coreInitString;
     if (!fi.broker.empty()) {
-        res += " --broker=";
+        res.append(" --broker=");
         res.append(fi.broker);
     }
     if (fi.brokerPort >= 0) {
-        res += " --brokerport=";
+        res.append(" --brokerport=");
         res.append(std::to_string(fi.brokerPort));
     }
     if (!fi.localport.empty()) {
-        res += " --localport=";
+        res.append(" --localport=");
         res.append(fi.localport);
     }
     if (fi.autobroker) {
@@ -849,9 +856,18 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
     if (fi.useJsonSerialization) {
         res.append(" --json");
     }
+    if (fi.encrypted) {
+        res.append(" --encrypted");
+    }
+    if (!fi.encryptionConfig.empty()) {
+        res.append(" --encryption_config=\"");
+        res.append(fi.encryptionConfig);
+        res.append("\"");
+    }
     if (!fi.profilerFileName.empty()) {
-        res.append(" --profiler=");
+        res.append(" --profiler=\"");
         res.append(fi.profilerFileName);
+        res.append("\"");
     }
     if (!fi.brokerInitString.empty()) {
         res.append(" --broker_init_string \"");

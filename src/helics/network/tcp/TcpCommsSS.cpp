@@ -43,7 +43,7 @@ void TcpCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)
         return;
     }
     reuse_address = netInfo.reuse_address;
-    encryption_config = netInfo.encryption_config;
+    encryption_config = netInfo.encryptionConfig;
     propertyUnLock();
 }
 
