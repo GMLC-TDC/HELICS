@@ -36,6 +36,10 @@ if [[ "$USE_SWIG" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_SWIG=ON")
 fi
 
+if [[ "$ENCRYPTED" == 'true' ]]; then
+    OPTION_FLAGS_ARR+=("-DHELICS_ENABLE_ENCRYPTION=ON")
+fi
+
 if [[ "$BUILD_BENCHMARKS" == 'true' ]]; then
     OPTION_FLAGS_ARR+=("-DHELICS_BUILD_BENCHMARKS=ON")
 fi

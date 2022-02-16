@@ -523,6 +523,9 @@ if(CYGWIN)
         helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601
     )
 endif()
+
+option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" ON)
+
 # -------------------------------------------------------------
 # Enable ZeroMQ
 # -------------------------------------------------------------
@@ -708,6 +711,15 @@ set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
 set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
 set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
 set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO})
+
+if(HELICS_ENABLE_ENCRYPTION)
+    set(HELICS_ENABLE_ENCRYPTED_COMMS 1)
+    set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
+else()
+    unset(HELICS_ENABLE_ENCRYPTED_COMMS)
+    set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
+endif()
+
 add_subdirectory(ThirdParty/networking)
 
 hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)

@@ -35,6 +35,18 @@ TcpCommsSS::~TcpCommsSS()
     disconnect();
 }
 
+/** load network information into the comms object*/
+void TcpCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)
+{
+    NetworkCommsInterface::loadNetworkInfo(netInfo);
+    if (!propertyLock()) {
+        return;
+    }
+    reuse_address = netInfo.reuse_address;
+    encryption_config = netInfo.encryption_config;
+    propertyUnLock();
+}
+
 int TcpCommsSS::getDefaultBrokerPort() const
 {
     return getDefaultPort(HELICS_CORE_TYPE_TCP_SS);
@@ -71,6 +83,11 @@ void TcpCommsSS::setFlag(const std::string& flag, bool val)
     } else if (flag == "allow_outgoing") {
         if (propertyLock()) {
             outgoingConnectionsAllowed = val;
+            propertyUnLock();
+        }
+    } else if (flag == "encrypted") {
+        if (propertyLock()) {
+            encrypted = val;
             propertyUnLock();
         }
     } else {
