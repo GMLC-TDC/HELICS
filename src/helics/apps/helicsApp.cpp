@@ -31,8 +31,7 @@ std::map<std::string, int> pubids;
 std::map<std::string, int> eptids;
 */
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     App::App(const std::string& defaultAppName, std::vector<std::string> args)
     {
         auto app = generateParser();
@@ -209,5 +208,4 @@ namespace apps {
         fed->disconnect();
     }
 
-}  // namespace apps
 }  // namespace helics
