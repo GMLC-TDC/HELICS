@@ -151,6 +151,7 @@ void TcpCommsSS::queue_tx_function()
     }
     gmlc::networking::TcpServer::pointer server;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) : gmlc::networking::SocketFactory();
     auto contextLoop = ioctx->startContextLoop();
     auto dataCall =
         [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
@@ -162,7 +163,8 @@ void TcpCommsSS::queue_tx_function()
     };
 
     if (serverMode) {
-        server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+        server = gmlc::networking::TcpServer::create(sf,
+                                                     ioctx->getBaseContext(),
                                                      localTargetAddress,
                                                      static_cast<uint16_t>(PortNumber.load()),
                                                      true,
@@ -194,7 +196,7 @@ void TcpCommsSS::queue_tx_function()
     std::map<std::string, route_id> established_routes;
     if (outgoingConnectionsAllowed) {
         for (const auto& conn : connections) {
-            auto new_connect = gmlc::networking::establishConnection(ioctx->getBaseContext(), conn);
+            auto new_connect = gmlc::networking::establishConnection(sf, ioctx->getBaseContext(), conn);
 
             if (new_connect) {
                 new_connect->setDataCall(dataCall);
@@ -221,7 +223,8 @@ void TcpCommsSS::queue_tx_function()
         }
         if (outgoingConnectionsAllowed) {
             try {
-                brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
+                brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                         ioctx->getBaseContext(),
                                                                          brokerTargetAddress,
                                                                          std::to_string(brokerPort),
                                                                          std::chrono::milliseconds(
@@ -317,7 +320,7 @@ void TcpCommsSS::queue_tx_function()
                         if (!established) {
                             if (outgoingConnectionsAllowed) {
                                 auto new_connect = gmlc::networking::establishConnection(
-                                    ioctx->getBaseContext(), std::string(cmd.payload.to_string()));
+                                    sf, ioctx->getBaseContext(), std::string(cmd.payload.to_string()));
                                 if (new_connect) {
                                     new_connect->setDataCall(dataCall);
                                     new_connect->setErrorCall(errorCall);
