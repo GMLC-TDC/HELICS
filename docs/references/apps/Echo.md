@@ -29,7 +29,7 @@ configuration:
   --offset arg           the offset of the time steps
   --period arg           the period of the federate
   --timedelta arg        the time delta of the federate
-  -i [ --coreinit ] arg  the core initialization string
+  --coreinitstring arg   the core initialization string
   --separator arg        separator character for local federates
   --inputdelay arg       the input delay on incoming communication of the
                          federate

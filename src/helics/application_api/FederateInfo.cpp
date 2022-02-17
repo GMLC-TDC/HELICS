@@ -470,7 +470,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
         ->default_str("(" + to_string(coreType) + ")")
         ->envname("HELICS_CORE_TYPE");
     app->add_option("--corename", coreName, "the name of the core to create or find");
-    app->add_option("--coreinitstring,-i",
+    app->add_option("--coreinitstring",
                     coreInitString,
                     "The initialization arguments for the core")
         ->transform([](std::string arg) {

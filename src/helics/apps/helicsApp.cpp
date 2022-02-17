@@ -35,6 +35,12 @@ namespace helics {
 namespace apps {
     App::App(const std::string& defaultAppName, std::vector<std::string> args)
     {
+        if (args.size()>=1 && !args[0].empty() && args[0].front()!='-') {
+            if (CLI::ExistingFile(args[0]).empty()) {
+                masterFileName = args[0];
+                args.erase(args.begin());
+            }
+        }
         auto app = generateParser();
         app->helics_parse(std::move(args));
         processArgs(app, defaultAppName);
@@ -42,6 +48,15 @@ namespace apps {
 
     App::App(const std::string& defaultAppName, int argc, char* argv[])
     {
+        if (argc >=2 && argv[1][0] != '-') {
+            if (CLI::ExistingFile(argv[1]).empty()) {
+                masterFileName = argv[1];
+                for (int ii=2;ii<argc;++ii) {
+                    argv[ii - 1] = argv[ii];
+                }
+                --argc;
+            }
+        }
         auto app = generateParser();
         app->helics_parse(argc, argv);
         processArgs(app, defaultAppName);
@@ -114,10 +129,10 @@ namespace apps {
                       useLocal,
                       "specify otherwise unspecified endpoints and publications as local( "
                       "i.e.the names will be prepended with the player name)");
-        app->add_option("--stop", stopTime, "The time to stop the app");
-        app->add_option("--input,input", masterFileName, "The primary input file")
+        app->add_option("--stop", stopTime, "The simulation time to stop the app");
+        app->add_option("--input,-i", masterFileName, "The primary input file.  It must be supplied as the first argument or via these options")
             ->check(CLI::ExistingFile);
-        app->allow_extras()->validate_positionals();
+        app->allow_extras();
         return app;
     }
 
