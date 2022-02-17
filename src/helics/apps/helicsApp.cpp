@@ -36,18 +36,22 @@ namespace apps {
     App::App(const std::string& defaultAppName, std::vector<std::string> args)
     {
         auto app = generateParser();
+        FederateInfo fi;
+        fi.injectParser(app.get());
         app->helics_parse(std::move(args));
-        processArgs(app, defaultAppName);
+        processArgs(app,fi, defaultAppName);
     }
 
     App::App(const std::string& defaultAppName, int argc, char* argv[])
     {
         auto app = generateParser();
+        FederateInfo fi;
+        fi.injectParser(app.get());
         app->helics_parse(argc, argv);
-        processArgs(app, defaultAppName);
+        processArgs(app, fi,defaultAppName);
     }
 
-    void App::processArgs(std::unique_ptr<helicsCLI11App>& app, const std::string& defaultAppName)
+    void App::processArgs(std::unique_ptr<helicsCLI11App>& app,FederateInfo &fi, const std::string& defaultAppName)
     {
         remArgs = app->remaining_for_passthrough();
         auto ret = app->last_output;
@@ -72,7 +76,7 @@ namespace apps {
             }
         }
 
-        FederateInfo fi(remArgs);
+        //FederateInfo fi(remArgs);
         if (fi.defName.empty()) {
             fi.defName = defaultAppName;
         }

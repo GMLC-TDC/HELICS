@@ -363,7 +363,9 @@ void abortAllCores(int errorCode, const std::string& errorString)
 {
     auto cores = searchableCores.getObjects();
     for (auto& cr : cores) {
-        cr->globalError(gLocalCoreId, errorCode, cr->getIdentifier() + " sending-> " + errorString);
+        cr->globalError(gLocalCoreId,
+                        errorCode,
+                        cr->getIdentifier() + +" sent abort message: '" + errorString + "'");
         cr->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));

@@ -211,11 +211,14 @@ typedef enum {
     HELICS_ERROR_EXTERNAL_TYPE = -203,
     /** the function produced a helics error of some other type */
     HELICS_ERROR_OTHER = -101,
+    /** user code generated exception */
+    HELICS_USER_EXCEPTION = -29,
     /** user system abort*/
     HELICS_ERROR_USER_ABORT = -27,
     /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
-    HELICS_ERROR_EXECUTION_FAILURE = -14, /*!< the function execution has failed */
+    /** the function execution has failed */
+    HELICS_ERROR_EXECUTION_FAILURE = -14,
     /** the call made was invalid in the present state of the calling object */
     HELICS_ERROR_INVALID_FUNCTION_CALL = -10,
     /** error issued when an invalid state transition occurred */
