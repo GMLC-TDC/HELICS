@@ -140,7 +140,8 @@ void TcpComms::queue_rx_function()
         return;
     }
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
-    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) : gmlc::networking::SocketFactory();
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                          gmlc::networking::SocketFactory();
     auto server = gmlc::networking::TcpServer::create(sf,
                                                       ioctx->getBaseContext(),
                                                       localTargetAddress,
@@ -231,7 +232,8 @@ bool TcpComms::establishBrokerConnection(
         brokerPort = getDefaultBrokerPort();
     }
     try {
-        auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) : gmlc::networking::SocketFactory();
+        auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                              gmlc::networking::SocketFactory();
         brokerConnection = gmlc::networking::establishConnection(sf,
                                                                  ioctx->getBaseContext(),
                                                                  brokerTargetAddress,
@@ -367,7 +369,8 @@ void TcpComms::queue_tx_function()
 {
     // std::vector<char> buffer;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
-    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) : gmlc::networking::SocketFactory();
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                          gmlc::networking::SocketFactory();
     auto contextLoop = ioctx->startContextLoop();
     TcpConnection::pointer brokerConnection;
 
