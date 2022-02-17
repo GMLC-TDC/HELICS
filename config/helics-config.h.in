@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #cmakedefine HELICS_ENABLE_UDP_CORE
 #cmakedefine HELICS_ENABLE_TEST_CORE
 #cmakedefine HELICS_ENABLE_INPROC_CORE
-#cmakedefine HELICS_ENABLE_ENCRYPTED_COMMS
+#cmakedefine HELICS_ENABLE_ENCRYPTION
 
 
 #cmakedefine HELICS_ENABLE_LOGGING
