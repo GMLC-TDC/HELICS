@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-namespace CLI
-{
+namespace CLI {
 class App;
 }
 
@@ -116,6 +115,7 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
 
     /** inject the federateInfo parser into another CLI11 App*/
     void injectParser(CLI::App* app);
+
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();
     /** do some additional configuration from config files */
