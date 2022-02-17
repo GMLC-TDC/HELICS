@@ -860,12 +860,12 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
         res.append(" --encrypted");
     }
     if (!fi.encryptionConfig.empty()) {
-        res.append(" --encryption_config=\"");
+        res.append(" --encryption_config \"");
         res.append(fi.encryptionConfig);
         res.append("\"");
     }
     if (!fi.profilerFileName.empty()) {
-        res.append(" --profiler=\"");
+        res.append(" --profiler \"");
         res.append(fi.profilerFileName);
         res.append("\"");
     }
