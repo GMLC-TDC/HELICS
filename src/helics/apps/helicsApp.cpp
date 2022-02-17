@@ -56,11 +56,6 @@ namespace apps {
         remArgs = app->remaining_for_passthrough();
         auto ret = app->last_output;
         if (ret == helicsCLI11App::parse_output::help_call) {
-            if (!app->quiet) {
-                // this is just to run the help output
-                FederateInfo helpTemp("--help");
-                (void)helpTemp;
-            }
             helpMode = true;
         }
         if (ret != helicsCLI11App::parse_output::ok) {
@@ -76,7 +71,6 @@ namespace apps {
             }
         }
 
-        //FederateInfo fi(remArgs);
         if (fi.defName.empty()) {
             fi.defName = defaultAppName;
         }
