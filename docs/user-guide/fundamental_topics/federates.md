@@ -1,5 +1,17 @@
 # Federates
 
+```{eval-rst}
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    value_federates
+    message_federates
+    value_types
+    filters
+
+```
+
 This section on Federates covers:
 
 - [What is a Federate?](#what-is-a-federate)

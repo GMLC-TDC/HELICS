@@ -1,5 +1,16 @@
 # Timing Configuration
 
+
+```{eval-rst}
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    timing_exercise
+    timing_exercise_answers
+
+```
+
 The two fundamental roles of a co-simulation platform are to provide a means of data exchange between members of the co-simulation (federates) and a means of keeping the federation synchronized in simulated time.
 
 In HELICS, time synchronization across the federates is managed by each federate requesting a time (via a HELICS API call). When granted a time, the federate generally does the following:
