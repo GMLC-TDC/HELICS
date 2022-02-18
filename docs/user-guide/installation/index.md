@@ -3,6 +3,12 @@
 ```{eval-rst}
 .. toctree::
     :maxdepth: 2
+    :hidden:
+    
+    installing_the_pre_compiled_libraries
+    spack
+    build_from_source
+    package_manager
 ```
 
 ## HELICS Installation Methods
