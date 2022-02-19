@@ -30,7 +30,6 @@ Once the message topology considering endpoints has been determined, the definit
 
 ```json
 {
-     ...
      "endpoints" : [
         {
             "name" : "voltage_sensor",
@@ -54,7 +53,6 @@ Once the message topology considering endpoints has been determined, the definit
             "global" : true,
             "info" : ""
         }
-     ...
      ]
 }
 ```
@@ -108,8 +106,7 @@ Taking these assumptions and specifications, it is not too difficult to write a 
         "destination": "IEEE_123_feeder_0/EV5",
         "type": "genmessage",
         "global": true
-    },
-   ...
+    }
     ],
     "subscriptions":[
     {
@@ -126,8 +123,7 @@ Taking these assumptions and specifications, it is not too difficult to write a 
         "key": "IEEE_123_feeder_0/charge_EV5",
         "type": "complex",
         "required": true
-    },
-    ...
+    }
     ]
 }
 ```
@@ -172,8 +168,7 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
                     \"object\" : \"EV5\",
                     \"property\" : \"constant_power_B\"
                }"
-          },
-          ...
+          }
           ],
      "endpoints" : [
         {
@@ -193,8 +188,7 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
                 \"object\" : \"EV5\",
                 \"property\" : \"constant_power_B\"
             }"
-        },
-        ...
+        }
     ]
 }
 

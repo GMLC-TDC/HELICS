@@ -47,7 +47,6 @@ Though not shown in the Federation diagram, the use of native HELICS filters is 
  {
   "name": "Filter",
   "event_triggered": true,
-  ...
   "endpoints": [
     {
       "name": "filter/main",

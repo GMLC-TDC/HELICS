@@ -124,7 +124,6 @@ As with the Base Example, configuration can be done with JSON files. The first c
       "destination":"Charger/EV1_voltage",
       "global": true
     },
-    {...}
     ]
 ```
 
@@ -137,7 +136,6 @@ As with the Base Example, configuration can be done with JSON files. The first c
       "destination":"Battery/EV1_current",
       "global": true
     },
-    {...}
     ]
 ```
 
@@ -166,7 +164,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "offset": 10.0,
   "uninterruptible": false,
   "terminate_on_error": true,
-  "endpoints":[...]
+  "endpoints":[]
 ```
 
 `ChargerConfig.json`:
@@ -179,7 +177,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "period": 60,
   "uninterruptible": false,
   "terminate_on_error": true,
-  "endpoints":[...]
+  "endpoints":[]
 ```
 
 Notice that we have only introduced an `offset` into the Battery config file, as we have set up the federates such that the Battery is waiting for information from the Charger.

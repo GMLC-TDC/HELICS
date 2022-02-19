@@ -34,14 +34,14 @@ The format is json.
 
 Then it can be specified on the command line like so:
 
-```sh
-helics_broker_server --web --zmq --config broker_server_config.json
+```shell-session
+$ helics_broker_server --web --zmq --config broker_server_config.json
 ```
 
 The configuration will then make the REST web server accessible on any interface on port 8080 and a WebSocket server on port 8080. The port in use can be specified in a configuration file, or via command line such as
 
-```sh
-helics_broker_server --web --zmq --http_server_args="--http_port=80"
+```shell-session
+$ helics_broker_server --web --zmq --http_server_args="--http_port=80"
 ```
 
 Arguments are passed to servers using an option in the form `--<server>_server_args`, and in that arg field `--<server>_port` and `--<server>_interface` are valid arguments. Valid server names are `http`, `websocket`, `zmq`, 'tcp', and `udp`, and eventually `mpi`. The http web server also acknowledges `HELICS_HTTP_PORT` as an environment variable. The websocket server acknowledges `HELICS_WEBSOCKET_PORT` for the port numbers of the respective servers.
@@ -119,7 +119,7 @@ For queries that are not a json value the response will be:
 
 ```json
 {
-  "status": 401, //or some other code
+  "status": 401, 
   "error": "error message"
 }
 ```

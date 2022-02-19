@@ -57,8 +57,8 @@ also permissible are all arguments allowed for federates and any specific broker
 
 the player executable also takes an untagged argument of a file name for example
 
-```sh
-helics_player player_file.txt --stop 5
+```shell-session
+$ helics_player player_file.txt --stop 5
 ```
 
 Players support both delimited text files and JSON files some examples can be found in
@@ -152,23 +152,26 @@ JSON example
 
 ```json
  {
-    "messages": [{
+    "messages": [
+    	{
             "source": "src",
             "dest": "dest",
             "time": 1.0,
             "data":"this is a test message"
-        }, {
+        }, 
+        {
               "source": "src",
               "dest": "dest",
               "time": 1.0,
-        "encoding":"base64"
-              "data":AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
-          },{
+              "encoding":"base64"
+        },
+        {
             "source": "src",
             "dest": "dest",
             "time": 2.0,
-            "data":"this is test message2"
-        }, {
+            "data":"this is test message 2"
+        }, 
+        {
             "source": "src",
             "dest": "dest",
             "time": 3.0,

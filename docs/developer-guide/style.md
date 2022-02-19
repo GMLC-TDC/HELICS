@@ -86,7 +86,7 @@ for how to setup support in your preferred editor or IDE.
 
 10. All cmake commands (those defined in cmake itself) should be lower case
 
-```cmake
+```text
 if as opposed to IF
 install vs INSTALL
 ```

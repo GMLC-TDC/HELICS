@@ -62,7 +62,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
 
 (Note that the JSON standard does not support comments and thus the block below is not valid JSON. The JSON parser HELICS uses does support comments)
 
-```json
+```text
 {
   // General
   **"name": "arbitrary federate name",**
@@ -461,7 +461,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER` [276]
 
-When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user_guide/advanced_topics/queries.md). Also see discussion in [Logging](../user_guide/fundamental_topics/logging.md#log_buffer).
+When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user-guide/advanced_topics/queries.md). Also see discussion in [Logging](../user-guide/fundamental_topics/logging.md#log-buffer).
 
 ## Timing Options
 
@@ -1087,11 +1087,11 @@ Name of the filter; must be unique to a federate.
 
 ### `source_targets`, `sourcetargets`, `sourceTargets` []
 
-_API:_ ``
-[C++]()
-| [C]()
+_API:_ `helicsFilterAddSourceTarget`
+[C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#a40d2017f51dca63c1b034df70c35c655)
+| [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
 | [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddSourceTarget)
-| [Julia]()
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
 
@@ -1099,11 +1099,11 @@ Acts on previously registered filter and associated with a specific endpoint of 
 
 ### `destination_targets`, `destinationtargets`, `destinationtargets` []
 
-_API:_ ``
-[C++]()
-| [C]()
+_API:_ `helicsFilterAddDestinationTarget`
+[C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#aa197abc9f9c07f9d8fbe39aef588965f)
+| [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
 | [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddDestinationTarget)
-| [Julia]()
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddDestinationTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
 
@@ -1137,7 +1137,6 @@ This filter reroutes a message to a new destination. it also has an optional fil
 Example `property` object:
 
 ```json
-...
    "operation": "reroute",
     "properties": [
         {
@@ -1149,7 +1148,6 @@ Example `property` object:
             "value": "regular expression string"
         }
     ]
-...
 ```
 
 #### `delay`
@@ -1159,13 +1157,11 @@ This filter will delay a message by a certain amount fo time.
 Example `property` object:
 
 ```json
-...
    "operation": "delay",
     "properties": {
         "name": "delay",
         "value": "76 ms",
     },
-...
 ```
 
 #### `random_delay` | `randomdelay` | `randomDelay`
@@ -1218,23 +1214,21 @@ some distributions only take one parameter in which case the second is ignored. 
   - param1="n"
 
 ```json
-...
-   "operation": "randomdelay",
-    "properties": [
-        {
-            "name": "distribution",
-            "value": normal
-        },
-        {
-            "name": "mean",
-            "value": 0
-        },
-        {
-            "name": "stdev",
-            "value": 1
-        }
-    ],
-...
+  "operation": "randomdelay",
+  "properties": [
+    {
+      "name": "distribution",
+      "value": "normal"
+    },
+    {
+      "name": "mean",
+      "value": 0
+    },
+    {
+      "name": "stdev",
+      "value": 1
+    }
+  ]
 ```
 
 #### `random_drop` | `randomdrop` | `randomDrop`
@@ -1242,13 +1236,11 @@ some distributions only take one parameter in which case the second is ignored. 
 This filter will randomly drop a message, the drop probability is specified, and is modeled as a uniform distribution between zero and one.
 
 ```json
-...
    "operation": "random_drop",
     "properties": {
         "name": "prob",
         "value": 0.5,
     },
-...
 ```
 
 #### `clone`
@@ -1256,13 +1248,11 @@ This filter will randomly drop a message, the drop probability is specified, and
 This filter will copy a message and send it to the original destination plus a new one.
 
 ```json
-...
    "operation": "clone",
     "properties": {
         "name": "add delivery",
         "value": "endpoint name",
     },
-...
 ```
 
 ## Profiling

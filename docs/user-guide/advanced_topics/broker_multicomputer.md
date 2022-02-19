@@ -1,6 +1,6 @@
 # Multi-Computer Co-simulations
 
-Though often it may make sense to put a HELICS broker on every compute node used in the co-simulation (as shown in the [Broker Hierarchy example](./borker_hierarchies.md)), particularly for small co-simulations that for various reasons may not fit on a single computer, it may only be necessary to use a single broker on one computer and point the federates on the other computer(s) towards it.
+Though often it may make sense to put a HELICS broker on every compute node used in the co-simulation (as shown in the [Broker Hierarchy example](./broker_hierarchies.md)), particularly for small co-simulations that for various reasons may not fit on a single computer, it may only be necessary to use a single broker on one computer and point the federates on the other computer(s) towards it.
 
 ## Broker Configuration
 

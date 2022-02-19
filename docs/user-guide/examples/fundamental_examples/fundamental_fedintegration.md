@@ -100,8 +100,8 @@ For example, let's look at our JSON config file of the Battery federate from the
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[ ... ],
-  "subscriptions":[ ... ]
+  "publications":[],
+  "subscriptions":[]
   }
 
 ```
@@ -198,7 +198,7 @@ In the Base Example, we configured the pubs and subs with an external JSON file,
       "unit":"A",
       "global": true
     },
-    {...}
+    {}
     ],
   "subscriptions":[
     {
@@ -207,7 +207,7 @@ In the Base Example, we configured the pubs and subs with an external JSON file,
       "unit":"V",
       "global": true
     },
-    {...}
+    {}
     ]
 
 ```
@@ -233,7 +233,7 @@ for i in range(0, sub_count):
     subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "V")
 ```
 
-Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../inputs.md), and as such retain similar properties.
+Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../fundamental_topics/value_federates), and as such retain similar properties.
 
 ### Co-simulation Execution
 

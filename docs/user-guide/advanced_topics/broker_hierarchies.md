@@ -24,27 +24,25 @@ To implement a broker hierarchy, modifications to the configuration files for th
 
 For examples, the config JSON for the Distribution System A (where Broker A is at IP 127.0.0.1) would look something like this:
 
-```JSON
+```json
 {
     "name" : "DistributionSystemA",
     "coreInit": "--broker_address=tcp://127.0.0.1"
-    ...
 }
 ```
 
 The command line for launching Broker A also needs to be adjusted. For this examples, let's assume there is a total of 200 federates are expected by Broker A. Note that `broker_address` is used to define the address of the broker next up in the hierarchy; in this, case Broker C.
 
-```sh
-helics_broker -f200 --broker_address=tcp://127.0.0.127
+```shell-session
+$ helics_broker -f200 --broker_address=tcp://127.0.0.127
 ```
 
 Lastly, the JSON config file for the Transmission and Generation System federate needs to indicate where it's broker (Broker C) is at (IP 127.0.0.127):
 
-```JSON
+```json
 {
     "name" : "TransmissionGenerationSystem",
     "coreInit": "--broker_address=tcp://127.0.0.127"
-    ...
 }
 ```
 

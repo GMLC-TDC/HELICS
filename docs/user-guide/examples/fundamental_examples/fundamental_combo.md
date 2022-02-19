@@ -174,10 +174,8 @@ The Controller federate only operates when it receives a message -- it is a _pas
    ```json
    {
     "name": "Controller",
-    ...
     "timedelta": 1,
     "uninterruptible": false,
-    ...
    }
    ```
 

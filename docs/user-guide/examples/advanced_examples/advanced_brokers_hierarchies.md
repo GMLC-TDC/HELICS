@@ -47,17 +47,13 @@ When running across multiple compute nodes, the relevant portion of the helics_c
 `broker_hierarchy_runner_A.json`
 
 ```json
-...
 "exec": "helics_broker --loglevel=7 --timeout='10s' ",
-...
 ```
 
 `broker_hierarchy_runner_B.json` and `broker_hierarchy_runner_C.json`
 
 ```json
-...
 "exec": "helics_broker -f <number of federates> --loglevel=7 --timeout='10s' --broker_address=tcp://<IP address of broker A>",
-...
 ```
 
 Additionally, the federates would not need `brokerAddress` in their configuration since they would look on their local node for a broker by default.

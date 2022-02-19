@@ -57,7 +57,6 @@ With a single charger being used to charge five batteries, each battery still pu
       "unit":"A",
       "global": true
     },
-    ...
   ],
   "subscriptions":[
     {
@@ -115,7 +114,9 @@ The Charger federate configuration is also altered, using an `input` rather than
 
 Run the co-simulation:
 
-`$ helics run --path=./multi_input_runner.json`
+```shell-session
+$ helics run --path=./multi_input_runner.json
+```
 
 The primary result of interest is still the cumulative charging power.
 

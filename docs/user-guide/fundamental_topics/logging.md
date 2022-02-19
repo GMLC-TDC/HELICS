@@ -111,7 +111,6 @@ These properties can be set using the JSON configuration for each federate:
 {
   "name": "Battery",
   "log_level": 1,
-  ...
 }
 ```
 
@@ -150,8 +149,7 @@ Within the `helics_cli` runner JSON:
       "exec": "helics_broker -f 2 --loglevel=7",
       "host": "localhost",
       "name": "broker"
-    },
-    ...
+    }
     ],
   "name": "fundamental_default"
 }
@@ -201,14 +199,14 @@ TIME: granted time=2
 TIME: disconnected, last time=4
 ```
 
-The monitor can be stopped via the [command](../advanced_topics/command_interface.md) interface through the `monitor` keyword.
+The monitor can be stopped via the [command](../advanced_topics/commandInterface.md) interface through the `monitor` keyword.
 
 ```cpp
-\\changing the federate to use as a monitor or setting one up the first time
+//changing the federate to use as a monitor or setting one up the first time
 broker->sendCommand("broker","monitor newfed");
-\\changing the federate and period to use as a monitor or setting one up the first time
+//changing the federate and period to use as a monitor or setting one up the first time
 broker->sendCommand("broker","monitor newfed 4sec");
-\\stopping the time_monitor
+//stopping the time_monitor
 broker->sendCommand("broker","monitor stop");
 ```
 

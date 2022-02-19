@@ -68,8 +68,8 @@ There are [extensive ways](../../../references/configuration_options_reference.m
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[ ... ],
-  "subscriptions":[ ... ]
+  "publications":[],
+  "subscriptions":[]
   }
 
 ```
@@ -86,7 +86,6 @@ This federate is configured with pubs and subs, so it will need an option to ind
       "unit":"A",
       "global": true
     },
-    {...}
     ],
   "subscriptions":[
     {
@@ -95,7 +94,6 @@ This federate is configured with pubs and subs, so it will need an option to ind
       "unit":"V",
       "global": true
     },
-    {...}
     ]
 ```
 
