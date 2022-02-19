@@ -151,33 +151,33 @@ M 2.0 3.0 src dest "this is message 3"
 JSON example
 
 ```json
- {
-    "messages": [
-    	{
-            "source": "src",
-            "dest": "dest",
-            "time": 1.0,
-            "data":"this is a test message"
-        }, 
-        {
-              "source": "src",
-              "dest": "dest",
-              "time": 1.0,
-              "encoding":"base64"
-        },
-        {
-            "source": "src",
-            "dest": "dest",
-            "time": 2.0,
-            "data":"this is test message 2"
-        }, 
-        {
-            "source": "src",
-            "dest": "dest",
-            "time": 3.0,
-            "data":"this is message 3"
-        }
-    ]
+{
+  "messages": [
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 1.0,
+      "data": "this is a test message"
+    },
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 1.0,
+      "encoding": "base64"
+    },
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 2.0,
+      "data": "this is test message 2"
+    },
+    {
+      "source": "src",
+      "dest": "dest",
+      "time": 3.0,
+      "data": "this is message 3"
+    }
+  ]
 }
 ```
 

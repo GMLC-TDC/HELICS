@@ -44,30 +44,29 @@ With a single charger being used to charge five batteries, each battery still pu
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[
+  "publications": [
     {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
+      "key": "Battery/EV1_current",
+      "type": "double",
+      "unit": "A",
       "global": true
     },
     {
-      "key":"Battery/EV2_current",
-      "type":"double",
-      "unit":"A",
+      "key": "Battery/EV2_current",
+      "type": "double",
+      "unit": "A",
       "global": true
-    },
+    }
   ],
-  "subscriptions":[
+  "subscriptions": [
     {
-      "key":"Charger/EV_voltage",
-      "type":"double",
-      "unit":"V",
+      "key": "Charger/EV_voltage",
+      "type": "double",
+      "unit": "V",
       "global": true
     }
   ]
 }
-
 ```
 
 The Charger federate configuration is also altered, using an `input` rather than a `subscription` handle to allow all publications from the Battery federates to be received on one handle. The input has been configured to allow multiple inputs and lists the publications that should be targeted toward it and to handle these multiple inputs by summing them.

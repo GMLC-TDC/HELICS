@@ -119,7 +119,7 @@ For queries that are not a json value the response will be:
 
 ```json
 {
-  "status": 401, 
+  "status": 401,
   "error": "error message"
 }
 ```

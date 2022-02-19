@@ -68,10 +68,9 @@ There are [extensive ways](../../../references/configuration_options_reference.m
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[],
-  "subscriptions":[]
-  }
-
+  "publications": [],
+  "subscriptions": []
+}
 ```
 
 In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../../../references/configuration_options_reference.md#logging-options)), and set the `core_type` to `zmq` ([the most common](../../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.

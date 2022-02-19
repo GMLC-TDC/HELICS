@@ -30,30 +30,30 @@ Once the message topology considering endpoints has been determined, the definit
 
 ```json
 {
-     "endpoints" : [
-        {
-            "name" : "voltage_sensor",
-            "global" : true,
-            "destination" : "voltage_controller",
-            "info" : ""
-        },
-        {
-            "name" : "voltage_controller_1",
-            "global" : true,
-            "info" : ""
-        },
-        {
-            "name" : "voltage_controller_2",
-            "global" : true,
-            "destination" : "voltage_actuator",
-            "info" : ""
-        },
-        {
-            "name" : "voltage_actuator",
-            "global" : true,
-            "info" : ""
-        }
-     ]
+  "endpoints": [
+    {
+      "name": "voltage_sensor",
+      "global": true,
+      "destination": "voltage_controller",
+      "info": ""
+    },
+    {
+      "name": "voltage_controller_1",
+      "global": true,
+      "info": ""
+    },
+    {
+      "name": "voltage_controller_2",
+      "global": true,
+      "destination": "voltage_actuator",
+      "info": ""
+    },
+    {
+      "name": "voltage_actuator",
+      "global": true,
+      "info": ""
+    }
+  ]
 }
 ```
 
@@ -87,44 +87,43 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 
 ```json
 {
-    "name": "EV_Controller",
-    "loglevel": 5,
-    "coreType": "zmq",
-    "timeDelta": 1.0,
-    "uninterruptible": true,
+  "name": "EV_Controller",
+  "loglevel": 5,
+  "coreType": "zmq",
+  "timeDelta": 1.0,
+  "uninterruptible": true,
 
-    "endpoints":[
+  "endpoints": [
     {
-        "name": "EV_Controller/EV6",
-        "destination": "IEEE_123_feeder_0/EV6",
-        "type": "genmessage",
-        "global": true
-
+      "name": "EV_Controller/EV6",
+      "destination": "IEEE_123_feeder_0/EV6",
+      "type": "genmessage",
+      "global": true
     },
     {
-        "name": "EV_Controller/EV5",
-        "destination": "IEEE_123_feeder_0/EV5",
-        "type": "genmessage",
-        "global": true
+      "name": "EV_Controller/EV5",
+      "destination": "IEEE_123_feeder_0/EV5",
+      "type": "genmessage",
+      "global": true
     }
-    ],
-    "subscriptions":[
+  ],
+  "subscriptions": [
     {
-        "key": "IEEE_123_feeder_0/totalLoad",
-        "type": "complex",
-        "required": true
+      "key": "IEEE_123_feeder_0/totalLoad",
+      "type": "complex",
+      "required": true
     },
     {
-        "key": "IEEE_123_feeder_0/charge_EV6",
-        "type": "complex",
-        "required": true
+      "key": "IEEE_123_feeder_0/charge_EV6",
+      "type": "complex",
+      "required": true
     },
     {
-        "key": "IEEE_123_feeder_0/charge_EV5",
-        "type": "complex",
-        "required": true
+      "key": "IEEE_123_feeder_0/charge_EV5",
+      "type": "complex",
+      "required": true
     }
-    ]
+  ]
 }
 ```
 

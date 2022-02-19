@@ -1,6 +1,5 @@
 # Timing Configuration
 
-
 ```{eval-rst}
 .. toctree::
     :hidden:
@@ -52,12 +51,12 @@ Below is an example of how the most common of these are implemented in a federat
 
 ```json
 {
-  "name":"generic_federate",
-  "period":  1.0,
+  "name": "generic_federate",
+  "period": 1.0,
   "offset": 1.0,
   "time_delta": 10.0,
-  "uninterruptible":false,
-  "wait_for_current_time_update": true,
+  "uninterruptible": false,
+  "wait_for_current_time_update": true
 }
 ```
 

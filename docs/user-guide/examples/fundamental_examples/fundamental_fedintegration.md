@@ -100,10 +100,9 @@ For example, let's look at our JSON config file of the Battery federate from the
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[],
-  "subscriptions":[]
-  }
-
+  "publications": [],
+  "subscriptions": []
+}
 ```
 
 We can see from this config file that we need to find API method to assign the `name`, `loglevel`, `coreType`, `period`, `uninterruptible`, `terminate_on_error`, `wait_for_current_time_update`, and `pub`/`subs`. In this example, we will be using the [PyHELICS API methods](https://python.helics.org/api/capi-py). This section will discuss how to translate JSON config files to API methods, how to configure the federate with these API calls in the co-simulation, and how to dynamically register publications and subscriptions with other federates.

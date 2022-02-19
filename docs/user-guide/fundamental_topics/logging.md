@@ -110,7 +110,7 @@ These properties can be set using the JSON configuration for each federate:
 ```json
 {
   "name": "Battery",
-  "log_level": 1,
+  "log_level": 1
 }
 ```
 
@@ -150,7 +150,7 @@ Within the `helics_cli` runner JSON:
       "host": "localhost",
       "name": "broker"
     }
-    ],
+  ],
   "name": "fundamental_default"
 }
 ```

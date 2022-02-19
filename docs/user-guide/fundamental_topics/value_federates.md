@@ -36,8 +36,8 @@ Though contained here in this section on value federates, the options below are 
 
 ```json
 {
-    "name":"generic_federate",
-    "coreType": "zmq"
+  "name": "generic_federate",
+  "coreType": "zmq"
 }
 ```
 
