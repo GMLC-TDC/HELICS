@@ -1,0 +1,17 @@
+title: global_time_debugging_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brpkers:
+    $ref: ./global_time_debugging_query.yaml
+  cores:
+    $ref: ./global_time_debugging_query.yaml
+  federates:
+    $ref: ./global_time_debugging_query.yaml
+  state:
+    type: string
+  time:
+    oneOf:
+      - $ref: ./time_debugging_forward.yaml
+      - $ref: ./time_debugging_fed.yaml

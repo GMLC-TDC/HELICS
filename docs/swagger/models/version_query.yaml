@@ -1,0 +1,3 @@
+title: version_query
+type: string
+description: get the HELICS version number used in the library for an object

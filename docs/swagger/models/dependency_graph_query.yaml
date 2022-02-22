@@ -1,0 +1,20 @@
+title: dependency_graph_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brokers:
+    $ref: ./dependency_graph_query.yaml
+  cores:
+    $ref: ./dependency_graph_query.yaml
+  dependents:
+    type: array
+    items:
+      type: integer
+  dependencies:
+    type: array
+    items:
+      type: integer
+required:
+  - object
+  - dependents

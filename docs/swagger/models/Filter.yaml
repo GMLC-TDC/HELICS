@@ -1,0 +1,56 @@
+title: Filter
+description: Configuration for a Filter
+allOf:
+  - type: object
+    properties:
+      name:
+        type: string
+      inputType:
+        type: string
+      outputType:
+        type: string
+      cloning:
+        type: boolean
+      operation:
+        type: string
+      delivery:
+        type: string
+      sourcetargets:
+        type:
+          - string
+          - array
+        items:
+          type: string
+      destinationtargets:
+        type:
+          - string
+          - array
+        items:
+          type: string
+      properties:
+        oneOf:
+          - type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                value:
+                  type:
+                    - string
+                    - number
+              required:
+                - name
+                - value
+          - type: object
+            properties:
+              name:
+                type: string
+              value:
+                type:
+                  - string
+                  - number
+            required:
+              - name
+              - value
+  - $ref: ./interfaceOptions.yaml

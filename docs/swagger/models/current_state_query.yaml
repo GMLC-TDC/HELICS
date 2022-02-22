@@ -1,0 +1,21 @@
+title: current_state_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  state:
+    type: string
+  status:
+    type: boolean
+  federates:
+    type: array
+    items:
+      $ref: ./base_status_info.yaml
+  cores:
+    type: array
+    items:
+      $ref: ./base_status_info.yaml
+  brokers:
+    type: array
+    items:
+      $ref: ./base_status_info.yaml

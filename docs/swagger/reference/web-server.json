@@ -1,0 +1,585 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "web server",
+    "version": "1.0",
+    "summary": "HELICS web server API",
+    "description": "Description of the services from a Helics web server for broker management",
+    "contact": {
+      "name": "Philip Top"
+    },
+    "license": {
+      "name": "BSD-3",
+      "url": "https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/": {
+      "parameters": [],
+      "get": {
+        "summary": "Get Index page",
+        "tags": [],
+        "operationId": "index",
+        "description": "Get the index page"
+      },
+      "post": {
+        "summary": "",
+        "operationId": "post",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "create a new broker"
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "delete a broker"
+      }
+    },
+    "/{broker_id}": {
+      "post": {
+        "summary": "Create New User",
+        "operationId": "post-broker",
+        "responses": {
+          "200": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                },
+                "examples": {
+                  "New User Bob Fellow": {
+                    "value": {
+                      "id": 12,
+                      "firstName": "Bob",
+                      "lastName": "Fellow",
+                      "email": "bob.fellow@gmail.com",
+                      "dateOfBirth": "1996-08-24",
+                      "emailVerified": false,
+                      "createDate": "2020-11-18"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing Required Information"
+          },
+          "409": {
+            "description": "Email Already Taken"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string"
+                  },
+                  "lastName": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "dateOfBirth": {
+                    "type": "string",
+                    "format": "date"
+                  }
+                },
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "dateOfBirth"
+                ]
+              },
+              "examples": {
+                "Create User Bob Fellow": {
+                  "value": {
+                    "firstName": "Bob",
+                    "lastName": "Fellow",
+                    "email": "bob.fellow@gmail.com",
+                    "dateOfBirth": "1996-08-24"
+                  }
+                }
+              }
+            }
+          },
+          "description": "Post the necessary fields for the API to create a new user."
+        },
+        "description": "Create a new broker"
+      },
+      "get": {
+        "summary": "",
+        "operationId": "get-broker",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "Get basic information on a broker"
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the broker"
+        }
+      ],
+      "delete": {
+        "summary": "",
+        "operationId": "delete-broker_id",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/{broker_id}/{target_id}/{query}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the broker"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "target_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the query target"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "query",
+          "in": "path",
+          "required": true,
+          "description": "query to run"
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        },
+        "operationId": "run_query",
+        "description": "Run a query on the specified target through the specified broker"
+      }
+    },
+    "/brokers": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-brokers",
+        "description": "Get a summary of all the registered brokers"
+      }
+    },
+    "/{param1}/{param2}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "param1",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "param2",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-broker_id-query",
+        "description": "make a query on a specific broker or target on the default broker"
+      }
+    },
+    "/search/{target_id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "target_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-search-target_id",
+        "description": "search for a specific object or broker and get its information"
+      }
+    },
+    "/{broker_id}/barrier": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-broker_id-barrier",
+        "description": ""
+      },
+      "post": {
+        "summary": "",
+        "operationId": "post-broker_id-barrier",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "create a time barrier on a specific broker"
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete-broker_id-barrier",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "clear a time barrier on a specific broker"
+      }
+    },
+    "/{broker_id}/clearbarrier": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-broker_id-clearbarrier",
+        "description": "clear a time barrier on a specific broker"
+      }
+    },
+    "/create": {
+      "post": {
+        "summary": "",
+        "operationId": "broker-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "broker_uuid": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "broker_uuid"
+                  ],
+                  "x-examples": {
+                    "example-1": {
+                      "broker_uuid": "broker_name"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "error": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "error"
+                  ],
+                  "x-examples": {
+                    "example-1": {
+                      "status": 400,
+                      "error": "unable to generate broker"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "create a new broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "args",
+            "description": "command line arguments for the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "CoreType",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "core_type",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "num_feds",
+            "description": "the number of federates in the federation"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "num_brokers",
+            "description": "the number of brokers in the federation"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "port",
+            "description": "the network port number to use for the broker "
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "debug",
+                "trace",
+                "info",
+                "error",
+                "warning",
+                "none",
+                "data",
+                "connections"
+              ]
+            },
+            "in": "query",
+            "name": "log_level",
+            "description": "the logging level for the broker"
+          }
+        ]
+      }
+    },
+    "/delete": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-delete"
+      }
+    },
+    "/remove": {
+      "post": {
+        "summary": "",
+        "operationId": "post-remove",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "remove a broker"
+      }
+    },
+    "/query": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {},
+        "operationId": "get-query",
+        "description": "run a query on a broker"
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ],
+                  "x-examples": {
+                    "example-1": {
+                      "success": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-healthcheck",
+        "description": "general health check for the broker server",
+        "parameters": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "title": "broker",
+        "type": "object",
+        "description": "A broker object",
+        "examples": [
+          {
+            "id": 142,
+            "firstName": "Alice",
+            "lastName": "Smith",
+            "email": "alice.smith@gmail.com",
+            "dateOfBirth": "1997-10-31",
+            "emailVerified": true,
+            "signUpDate": "2019-08-24"
+          }
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique identifier for the given user."
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "format": "date",
+            "example": "1997-10-31"
+          },
+          "emailVerified": {
+            "type": "boolean",
+            "description": "Set to true if the user's email has been verified."
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date",
+            "description": "The date that the user was created."
+          }
+        },
+        "required": [
+          "name",
+          "firstName",
+          "lastName",
+          "email",
+          "emailVerified"
+        ]
+      }
+    }
+  }
+}

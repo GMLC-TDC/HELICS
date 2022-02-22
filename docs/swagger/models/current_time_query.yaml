@@ -1,0 +1,5 @@
+title: current_time_query
+type: object
+properties:
+  id:
+    type: string

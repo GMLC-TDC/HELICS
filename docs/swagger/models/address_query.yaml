@@ -1,0 +1,3 @@
+title: address_query
+type: string
+description: return the connection address for the query target

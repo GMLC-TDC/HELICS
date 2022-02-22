@@ -1,0 +1,20 @@
+title: CoreConfig
+type: object
+properties:
+  autobroker:
+    type: boolean
+  localport:
+    type: string
+  debugging:
+    type: boolean
+  observer:
+    type: boolean
+  json:
+    type: boolean
+  profiler:
+    type: boolean
+  brokerkey:
+    type: string
+  brokerinitstring:
+    type: string
+description: File configuration for the CoreConfiguration

@@ -1,0 +1,12 @@
+title: global_status_query
+type: object
+description: get the status of all system objects
+properties:
+  object:
+    $ref: ./base_response.yaml
+  status:
+    type: string
+  timestep:
+    type: number
+  next_time:
+    type: number

@@ -1,0 +1,16 @@
+title: error_response
+type: object
+properties:
+  error:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        description: HTML error code
+      message:
+        type: string
+required:
+  - error

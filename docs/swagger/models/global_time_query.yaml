@@ -1,0 +1,13 @@
+title: global_time_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brokers:
+    $ref: ./global_time_query.yaml
+  cores:
+    $ref: ./global_time_query.yaml
+  federates:
+    $ref: ./global_time_query.yaml
+  next_time:
+    type: number

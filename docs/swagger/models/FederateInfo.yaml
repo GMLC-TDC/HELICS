@@ -1,0 +1,60 @@
+title: FederateInfo
+type: object
+properties:
+  name:
+    type: string
+  core:
+    type: string
+  force_new_core:
+    type: boolean
+  coretype:
+    type: string
+  corename:
+    type: string
+  coreinitstring:
+    type: string
+  offset:
+    type:
+      - string
+      - number
+  period:
+    type:
+      - string
+      - number
+  timedelta:
+    type:
+      - string
+      - number
+  rtlag:
+    type:
+      - string
+      - number
+  rtlead:
+    type:
+      - string
+      - number
+  rttolerance:
+    type:
+      - string
+      - number
+  inputdelay:
+    type:
+      - string
+      - number
+  outputdelay:
+    type:
+      - string
+      - number
+  granttimeout:
+    type:
+      - string
+      - number
+  maxiteration:
+    type: integer
+  loglevel:
+    type: string
+  separator:
+    type: string
+  flags:
+    type: string
+description: Properties applying to the federate and its creation

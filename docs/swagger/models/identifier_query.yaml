@@ -1,0 +1,3 @@
+title: identifier_query
+type: string
+description: same as "name"  returns the identifier string of an object
