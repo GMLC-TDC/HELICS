@@ -9,7 +9,7 @@
 
 ```
 
-## [C++ API (doxygen)](https://docs.helics.org/en/latest/doxygen/index.html)
+## [C++ API (doxygen)](../../doxygen/index.md)
 
 ## [C API](./C_API.md)
 
