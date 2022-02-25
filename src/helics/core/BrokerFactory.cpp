@@ -289,7 +289,7 @@ void abortAllBrokers(int errorCode, const std::string& errorString)
     auto brokers = getAllBrokers();
     for (auto& brk : brokers) {
         brk->globalError(errorCode,
-                         brk->getIdentifier() + +"sent abort Message: '" + errorString + "'");
+                         brk->getIdentifier() + +" sent abort message: '" + errorString + "'");
         brk->disconnect();
     }
     cleanUpBrokers(std::chrono::milliseconds(250));
