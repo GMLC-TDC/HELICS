@@ -15,32 +15,32 @@ The Federate Integration Example extends the Base Example to demonstrate how to 
 
 This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the following computing environment.
 
--     Operating System
+- Operating System
 
-```shell
-$ sw_vers
-ProductName:    Mac OS X
-ProductVersion:    10.14.6
-BuildVersion:    18G6032
-```
+  ```shell
+  $ sw_vers
+  ProductName:    Mac OS X
+  ProductVersion:    10.14.6
+  BuildVersion:    18G6032
+  ```
 
 - python version
 
-```shell
-$ python
-Python 3.7.6 (default, Jan  8 2020, 13:42:34)
-[Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
-Type "help", "copyright", "credits" or "license" for more information.
-```
+  ```shell
+  $ python
+  Python 3.7.6 (default, Jan  8 2020, 13:42:34)
+  [Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
+  Type "help", "copyright", "credits" or "license" for more information.
+  ```
 
 - python modules for this example
 
-```shell
-$ pip list | grep matplotlib
-matplotlib                    3.1.3
-$ pip list | grep numpy
-numpy                         1.18.5
-```
+  ```shell
+  $ pip list | grep matplotlib
+  matplotlib                    3.1.3
+  $ pip list | grep numpy
+  numpy                         1.18.5
+  ```
 
 If these modules are not installed, you can install them with
 
@@ -49,29 +49,29 @@ $ pip install matplotlib
 $ pip install numpy
 ```
 
--     helics_broker version
+- helics_broker version
 
-```shell
-$ helics_broker --version
-2.4.0 (2020-02-04)
-```
+  ```shell
+  $ helics_broker --version
+  2.4.0 (2020-02-04)
+  ```
 
--     helics_cli version
+- helics_cli version
 
-```shell
-$ helics --version
-0.4.1-HEAD-ef36755
-```
+  ```shell
+  $ helics --version
+  0.4.1-HEAD-ef36755
+  ```
 
 - pyhelics init file
 
-```shell
-$ python
-
->>> import helics as h
->>> h.__file__
-'/Users/[username]/Software/pyhelics/helics/__init__.py'
-```
+  ```shell
+  $ python
+  
+  >>> import helics as h
+  >>> h.__file__
+  '/Users/[username]/Software/pyhelics/helics/__init__.py'
+  ```
 
 ## Example files
 
@@ -272,7 +272,7 @@ In this tutorial, we have covered how to integrate federates into a co-simulatio
 Execute the co-simulation with the same command as the Base Example
 
 ```shell
->helics run --path=fundamental_integration_runner.json
+helics run --path=fundamental_integration_runner.json
 ```
 
 This results in the same output; the only thing we have changed is the method of configuring the federates and integrating them.

@@ -152,7 +152,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 The final step is to launch our Base Example with `helics_cli` from the command line:
 
 ```shell
->helics run --path=fundamental_default_runner.json
+helics run --path=fundamental_default_runner.json
 ```
 
 If all goes well, this will reward us with two figures:
