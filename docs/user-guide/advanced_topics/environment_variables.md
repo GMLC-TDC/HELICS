@@ -14,7 +14,7 @@ For setting up a federate a few environment variables are used
 ## Core and Broker environment variables
 
 - `HELICS_BROKER_LOG_LEVEL`: the log level for the broker to use. Equivalent to `--loglevel=X`
-- `HELICS_BROKER_KEY`: the key to use for connecting a core to a broker. See [broker key](../../references/configuration_options_reference.md#core-init-string)
+- `HELICS_BROKER_KEY`: the key to use for connecting a core to a broker. See [broker key](../../references/configuration_options_reference.md#core-init-string-coreinitstring-coreinitstring-i)
 - `HELICS_BROKER_ADDRESS`: the interface address of the broker. Equivalent to `--brokeraddress=X`
 - `HELICS_BROKER_PORT`: the port number of the broker. Equivalent to `--brokerport=X`
 - `HELICS_CONNECTION_PORT`: the port number to use for connecting. This has different behavior for cores and brokers. For cores this is the broker port and for brokers this is the local port
