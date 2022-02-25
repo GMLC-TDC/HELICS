@@ -67,7 +67,7 @@ $ pip install numpy
 
   ```shell
   $ python
-  
+
   >>> import helics as h
   >>> h.__file__
   '/Users/[username]/Software/pyhelics/helics/__init__.py'
