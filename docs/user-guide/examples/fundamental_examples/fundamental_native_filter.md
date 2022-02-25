@@ -38,16 +38,14 @@ As discussed in the [User Guide](../../fundamental_topics/federates.md#native-he
       "global": true
     }
   ],
-  "filters":
-  [
+  "filters": [
     {
-      "name":"ep_filter",
-      "destination_target":"Controller/ep",
-      "operation":"delay",
-      "properties":
-      {
-        "name":"delay",
-        "value":"900s"
+      "name": "ep_filter",
+      "destination_target": "Controller/ep",
+      "operation": "delay",
+      "properties": {
+        "name": "delay",
+        "value": "900s"
       }
     }
   ]

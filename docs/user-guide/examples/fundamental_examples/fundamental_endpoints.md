@@ -164,7 +164,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "offset": 10.0,
   "uninterruptible": false,
   "terminate_on_error": true,
-  "endpoints":[]
+  "endpoints": []
 }
 ```
 
@@ -178,7 +178,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "period": 60,
   "uninterruptible": false,
   "terminate_on_error": true,
-  "endpoints":[]
+  "endpoints": []
 }
 ```
 

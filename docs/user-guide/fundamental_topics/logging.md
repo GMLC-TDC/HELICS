@@ -169,7 +169,6 @@ The logging callback function take 3 parameters about a message and in the case 
 - **identifier**: a string that may contain information on the source of the log message and state/time information
 - **message**: the actual message to log
 
-
 In PyHELICS:
 
 ```python
