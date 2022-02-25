@@ -933,16 +933,15 @@ TEST_F(timing_tests2, time_barrier_clear2)
     vFed2->finalize();
 }
 
-
 TEST_F(timing_tests2, value_to_endpoint_timing)
 {
     SetupTest<helics::CombinationFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
     /** establish dependencies between the federates*/
-    auto &pub1=vFed1->registerGlobalPublication<double>("pub1");
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
 
-    auto & ept2=vFed2->registerEndpoint("ept1");
+    auto& ept2 = vFed2->registerEndpoint("ept1");
 
     ept2.subscribe("pub1");
 
