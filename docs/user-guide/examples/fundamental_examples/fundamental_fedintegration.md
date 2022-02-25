@@ -198,7 +198,7 @@ In the Base Example, we configured the pubs and subs with an external JSON file,
       "global": true
     },
     {}
-    ],
+  ],
   "subscriptions":[
     {
       "key":"Charger/EV1_voltage",
@@ -207,8 +207,7 @@ In the Base Example, we configured the pubs and subs with an external JSON file,
       "global": true
     },
     {}
-    ]
-
+  ]
 ```
 
 With the PyHELICS API methods, you have the flexibility to define the connection configurations _dynamically_ within execution of the main program loop. For example, in the Base Example we defined **five** communication connections between the Battery and the Charger, meant to model the interactions of five EVs each with their own charging port. If we want to increase or decrease that number using JSON configuration, we need to update the JSON file (either manually or with a script).
@@ -232,7 +231,7 @@ for i in range(0, sub_count):
     subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "V")
 ```
 
-Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../fundamental_topics/value_federates), and as such retain similar properties.
+Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../fundamental_topics/value_federates.md), and as such retain similar properties.
 
 ### Co-simulation Execution
 

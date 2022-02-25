@@ -124,7 +124,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
       "destination":"Charger/EV1_voltage",
       "global": true
     },
-    ]
+  ]
 ```
 
 `ChargerConfig.json`:
@@ -136,7 +136,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
       "destination":"Battery/EV1_current",
       "global": true
     },
-    ]
+  ]
 ```
 
 If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-0) that the `period` controls the minimum time resolution for a federate.
@@ -165,6 +165,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "uninterruptible": false,
   "terminate_on_error": true,
   "endpoints":[]
+}
 ```
 
 `ChargerConfig.json`:
@@ -178,6 +179,7 @@ Introducing the `offset` into the config file (along with `"uninterruptible": fa
   "uninterruptible": false,
   "terminate_on_error": true,
   "endpoints":[]
+}
 ```
 
 Notice that we have only introduced an `offset` into the Battery config file, as we have set up the federates such that the Battery is waiting for information from the Charger.

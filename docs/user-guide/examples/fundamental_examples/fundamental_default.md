@@ -85,7 +85,7 @@ This federate is configured with pubs and subs, so it will need an option to ind
       "unit":"A",
       "global": true
     },
-    ],
+  ],
   "subscriptions":[
     {
       "key":"Charger/EV1_voltage",
@@ -93,7 +93,7 @@ This federate is configured with pubs and subs, so it will need an option to ind
       "unit":"V",
       "global": true
     },
-    ]
+  ]
 ```
 
 This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the named handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the named handle (`key`) `Charger/EV1_voltage`.
