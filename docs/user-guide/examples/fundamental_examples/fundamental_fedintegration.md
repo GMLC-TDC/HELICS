@@ -190,24 +190,24 @@ Notice that we pass to this API the `fedinfo` set by all preceding API calls.
 In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate handles needed to be explicitly defined for a predetermined number of connections:
 
 ```json
-  "publications":[
-    {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
-      "global": true
-    },
-    {}
-  ],
-  "subscriptions":[
-    {
-      "key":"Charger/EV1_voltage",
-      "type":"double",
-      "unit":"V",
-      "global": true
-    },
-    {}
-  ]
+"publications":[
+  {
+    "key":"Battery/EV1_current",
+    "type":"double",
+    "unit":"A",
+    "global": true
+  },
+  {}
+],
+"subscriptions":[
+  {
+    "key":"Charger/EV1_voltage",
+    "type":"double",
+    "unit":"V",
+    "global": true
+  },
+  {}
+]
 ```
 
 With the PyHELICS API methods, you have the flexibility to define the connection configurations _dynamically_ within execution of the main program loop. For example, in the Base Example we defined **five** communication connections between the Battery and the Charger, meant to model the interactions of five EVs each with their own charging port. If we want to increase or decrease that number using JSON configuration, we need to update the JSON file (either manually or with a script).

@@ -45,45 +45,49 @@ The easiest way to determine whether you should use pub/subs vs endpoints to con
 `BatteryConfig.json`:
 
 ```json
-  "publications":[
-    {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
-      "global": true
-    },
+"publications":[
+  {
+    "key":"Battery/EV1_current",
+    "type":"double",
+    "unit":"A",
+    "global": true
+  },
+]
 ```
 
 ```json
-  "subscriptions":[
-    {
-      "key":"Charger/EV1_voltage",
-      "type":"double",
-      "unit":"V",
-      "global": true
-    },
+"subscriptions":[
+  {
+    "key":"Charger/EV1_voltage",
+    "type":"double",
+    "unit":"V",
+    "global": true
+  },
+]
 ```
 
 `ChargerConfig.json`:
 
 ```json
-  "publications":[
-    {
-      "key":"Charger/EV1_voltage",
-      "type":"double",
-      "unit":"V",
-      "global": true
-    },
+"publications":[
+  {
+    "key":"Charger/EV1_voltage",
+    "type":"double",
+    "unit":"V",
+    "global": true
+  },
+]
 ```
 
 ```json
-  "subscriptions":[
-    {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
-      "global": true
-    },
+"subscriptions":[
+  {
+    "key":"Battery/EV1_current",
+    "type":"double",
+    "unit":"A",
+    "global": true
+  },
+]
 ```
 
 With this pub/sub configuration, we have established a **direct** communication link between the Battery and Charger:
@@ -118,25 +122,25 @@ As with the Base Example, configuration can be done with JSON files. The first c
 `BatteryConfig.json`:
 
 ```json
-  "endpoints":[
-    {
-      "key":"Battery/EV1_current",
-      "destination":"Charger/EV1_voltage",
-      "global": true
-    },
-  ]
+"endpoints":[
+  {
+    "key":"Battery/EV1_current",
+    "destination":"Charger/EV1_voltage",
+    "global": true
+  },
+]
 ```
 
 `ChargerConfig.json`:
 
 ```json
-  "endpoints":[
-    {
-      "key":"Charger/EV1_voltage",
-      "destination":"Battery/EV1_current",
-      "global": true
-    },
-  ]
+"endpoints":[
+  {
+    "key":"Charger/EV1_voltage",
+    "destination":"Battery/EV1_current",
+    "global": true
+  },
+]
 ```
 
 If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-0) that the `period` controls the minimum time resolution for a federate.
@@ -293,8 +297,8 @@ There's one final difference. Which API do we call to send the message to the Ba
 <p>
 
 ```
-                # Send message of voltage to Battery federate
-                h.helicsEndpointSendBytesTo(endid[j], "",f'{charging_voltage[j]:4f}'.encode())  #
+# Send message of voltage to Battery federate
+h.helicsEndpointSendBytesTo(endid[j], "",f'{charging_voltage[j]:4f}'.encode())  #
 ```
 
 </p>
@@ -305,7 +309,7 @@ There's one final difference. Which API do we call to send the message to the Ba
 We run the co-simulation just as before in the Base Example -- the `runner.json` is exactly the same:
 
 ```shell
->helics run --path=fundamental_endpoints_runner.json
+helics run --path=fundamental_endpoints_runner.json
 ```
 
 And we get these figures:
