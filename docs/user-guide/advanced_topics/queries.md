@@ -278,10 +278,10 @@ Queries that can't be processed or are not recognized return a JSON error struct
 
 ```json
 {
-    "error": {
-        "code": 404,
-        "message": "target not found"
-    }
+  "error": {
+    "code": 404,
+    "message": "target not found"
+  }
 }
 ```
 
