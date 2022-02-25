@@ -86,21 +86,21 @@ for how to setup support in your preferred editor or IDE.
 
 10. All cmake commands (those defined in cmake itself) should be lower case
 
-```text
-if as opposed to IF
-install vs INSTALL
-```
+    ```text
+    if as opposed to IF
+    install vs INSTALL
+    ```
 
 11. Public interface functions should be documented consistent with Doxygen style comments
     non public ones should be documented as well with doxygen but we are a ways from that goal
 
-```cpp
-/** get an identifier for the core
-    @param core the core to query
-    @return a string with the identifier of the core
-*/
-HELICS_EXPORT const char *helicsCoreGetIdentifier (HelicsCore core);
-```
+    ```cpp
+    /** get an identifier for the core
+        @param core the core to query
+        @return a string with the identifier of the core
+    */
+    HELICS_EXPORT const char *helicsCoreGetIdentifier (HelicsCore core);
+    ```
 
 12. File names should match class names if possible
 
