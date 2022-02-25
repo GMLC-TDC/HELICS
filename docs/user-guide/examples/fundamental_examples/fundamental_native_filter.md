@@ -22,9 +22,9 @@ All files necessary to run the Native Filter Example can be found in the [Fundam
 
 ## HELICS filters
 
-As discussed in the [User Guide](../../fundamental_topics/federates#native-helics-filters), filters have the ability to act on messages being sent between endpoints and perform various functions on them (delay, drop, reroute, etc). In this example, we're going to take the [Combination Federate Example](./fundamental_combo) and add a filter between the Charger and the Controller (since this is where the messages are flowing). Specifically, we're adding a destination filter to the controller endpoint such that all messages received by that endpoint will be delayed. Note that this filter will only act on the messages received at this endpoint and not those sent out from it. Here's the entire Controller JSON config:
+As discussed in the [User Guide](../../fundamental_topics/federates.md#native-helics-filters), filters have the ability to act on messages being sent between endpoints and perform various functions on them (delay, drop, reroute, etc). In this example, we're going to take the [Combination Federate Example](./fundamental_combo) and add a filter between the Charger and the Controller (since this is where the messages are flowing). Specifically, we're adding a destination filter to the controller endpoint such that all messages received by that endpoint will be delayed. Note that this filter will only act on the messages received at this endpoint and not those sent out from it. Here's the entire Controller JSON config:
 
-```JSON
+```json
 {
   "name": "Controller",
   "log_level": "warning",

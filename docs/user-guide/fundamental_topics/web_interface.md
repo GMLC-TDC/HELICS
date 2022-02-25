@@ -2,7 +2,7 @@
 
 Once a federate has been granted the ability to move forward to a specific time (the granted time), the federate will execute its simulation, calculating its new state, behavior, or control action to advance to that time. Prior to these calculations, it will receive any messages that have been sent to it by other federates and after simulating up to the granted time, may send out messages with new values other federates may need.
 
-Using the webserver that HELICS provides to access data about a cosimulation (without having to using the [HELICS APIs](../../references/api-reference/index) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
+Using the webserver that HELICS provides to access data about a cosimulation (without having to using the [HELICS APIs](../../references/api-reference/index.md) yourself), HELICS also has a GUI via a web page that allows users to more easily run, monitor and debug a co-simulation.
 
 ## Launching Web Interface
 
