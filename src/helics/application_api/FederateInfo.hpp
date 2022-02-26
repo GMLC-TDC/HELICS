@@ -13,6 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
+namespace CLI {
+class App;
+}
+
 namespace helics {
 class helicsCLI11App;
 /** data class defining federate properties and information
@@ -110,6 +114,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     Time checkTimeProperty(int propId, Time defVal) const;
     bool checkFlagProperty(int propId, bool defVal) const;
     int checkIntProperty(int propId, int defVal) const;
+
+    /** inject the federateInfo parser into another CLI11 App*/
+    void injectParser(CLI::App* app);
 
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();

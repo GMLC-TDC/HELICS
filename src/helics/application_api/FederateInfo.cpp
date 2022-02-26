@@ -427,6 +427,12 @@ int getOptionValue(std::string val)
     return HELICS_INVALID_OPTION_INDEX;
 }
 
+void FederateInfo::injectParser(CLI::App* app)
+{
+    auto lparser = makeCLIApp();
+    app->add_subcommand(std::move(lparser));
+}
+
 std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
 {
     /*

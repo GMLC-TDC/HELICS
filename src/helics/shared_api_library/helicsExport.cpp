@@ -1252,7 +1252,7 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, fed->fedptr->getName() + " sending->" + error);
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + error + "'");
             }
         }
     }
