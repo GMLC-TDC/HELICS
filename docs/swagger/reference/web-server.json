@@ -580,6 +580,7 @@
           "emailVerified"
         ]
       }
-    }
+    },
+    "securitySchemes": {}
   }
 }
