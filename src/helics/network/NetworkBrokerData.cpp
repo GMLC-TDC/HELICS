@@ -159,7 +159,7 @@ std::shared_ptr<helicsCLI11App>
         ->envname("HELICS_ENCRYPTION");
     encrypt_group
         ->add_option("--encryption_config",
-                     encryption_config,
+                     encryptionConfig,
                      "set the configuration file for encryption options")
         ->envname("HELICS_ENCRYPTION_CONFIG");
 

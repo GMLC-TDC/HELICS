@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "NetworkBrokerData.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
-#ifndef HELICS_ENABLE_ENCRYPTED_COMMS
+#ifndef HELICS_ENABLE_ENCRYPTION
 #    include <iostream>
 #endif
 #include <memory>
@@ -139,7 +139,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     noAckConnection = netInfo.noAckConnection;
     useJsonSerialization = netInfo.useJsonSerialization;
     encrypted = netInfo.encrypted;
-#ifndef HELICS_ENABLE_ENCRYPTED_COMMS
+#ifndef HELICS_ENABLE_ENCRYPTION
     if (encrypted) {
         std::cerr << "encryption not enabled in HELICS, recompile with encryption enabled"
                   << std::endl;

@@ -524,7 +524,7 @@ if(CYGWIN)
     )
 endif()
 
-option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" ON)
+option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" OFF)
 
 # -------------------------------------------------------------
 # Enable ZeroMQ
@@ -713,10 +713,8 @@ set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurr
 set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO})
 
 if(HELICS_ENABLE_ENCRYPTION)
-    set(HELICS_ENABLE_ENCRYPTED_COMMS 1)
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
 else()
-    unset(HELICS_ENABLE_ENCRYPTED_COMMS)
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
 endif()
 

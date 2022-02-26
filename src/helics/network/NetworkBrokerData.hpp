@@ -57,7 +57,7 @@ class NetworkBrokerData {
     bool observer{false};  //!< specify that the network connection is used for observation only
     ServerModeOptions server_mode{ServerModeOptions::UNSPECIFIED};  //!< setup a server mode
     bool encrypted{false};  // enable encryption
-    std::string encryption_config;
+    std::string encryptionConfig;
 
   public:
     NetworkBrokerData() = default;
