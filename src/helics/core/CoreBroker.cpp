@@ -2987,6 +2987,10 @@ void CoreBroker::sendCommand(const std::string& target,
                              const std::string& commandStr,
                              HelicsSequencingModes mode)
 {
+    if (commandStr == "flush") {
+        query(target, "global_flush", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        return;
+    }
     ActionMessage cmdcmd(mode == HELICS_SEQUENCING_MODE_ORDERED ? CMD_SEND_COMMAND_ORDERED :
                                                                   CMD_SEND_COMMAND);
     cmdcmd.source_id = global_id.load();
@@ -3785,7 +3789,6 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
-
     } else {
         auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
         LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);
