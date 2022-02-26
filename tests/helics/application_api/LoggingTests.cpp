@@ -534,7 +534,7 @@ TEST(logging, timeMonitorFederate_swap)
     EXPECT_EQ(rtime, 4.0);
     Fed->finalize();
     //make sure all communications have gone through
-    broker->query("root", "global_flush");
+    broker->sendCommand("root", "flush");
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 4U);
 

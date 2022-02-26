@@ -2804,6 +2804,10 @@ void CommonCore::sendCommand(const std::string& target,
                              const std::string& source,
                              HelicsSequencingModes mode)
 {
+    if (commandStr == "flush") {
+        query(target, "global_flush", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        return;
+    }
     ActionMessage cmdcmd(mode == HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED ?
                              CMD_SEND_COMMAND_ORDERED :
                              CMD_SEND_COMMAND);
