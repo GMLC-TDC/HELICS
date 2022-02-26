@@ -365,7 +365,7 @@ void abortAllCores(int errorCode, const std::string& errorString)
     for (auto& cr : cores) {
         cr->globalError(gLocalCoreId,
                         errorCode,
-                        cr->getIdentifier() + +" sent abort message: '" + errorString + "'");
+                        cr->getIdentifier() + " sent abort message: '" + errorString + "'");
         cr->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
