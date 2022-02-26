@@ -110,8 +110,7 @@ These properties can be set using the JSON configuration for each federate:
 ```json
 {
   "name": "Battery",
-  "log_level": 1,
-  ...
+  "log_level": 1
 }
 ```
 
@@ -150,9 +149,8 @@ Within the `helics_cli` runner JSON:
       "exec": "helics_broker -f 2 --loglevel=7",
       "host": "localhost",
       "name": "broker"
-    },
-    ...
-    ],
+    }
+  ],
   "name": "fundamental_default"
 }
 ```
@@ -165,17 +163,21 @@ In C++ the method on a federate is:
 setLoggingCallback (const std::function<void(int, const std::string &, const std::string &)> &logFunction);
 ```
 
+The logging callback function take 3 parameters about a message and in the case of `C` callbacks a pointer to user data.
+
+- **loglevel**: an integer describing the level of the message
+- **identifier**: a string that may contain information on the source of the log message and state/time information
+- **message**: the actual message to log
+
 In PyHELICS:
 
 ```python
 h.helicsFederateSetLoggingCallback(fed, logger, user_data)
 ```
 
-The callback take 3 parameters about a message and in the case of `C` callbacks a pointer to user data.
-
-- loglevel an integer code describing the level of the message as described above.
-- header a string with the name of the object generating the message and possibly some state and time information (may be empty)
-- message the actual message to log
+- **fed**: the helics.HelicsFederate that is created with helics.helicsCreateValueFederate, helics.helicsCreateMessageFederate or helics.helicsCreateCombinationFederate
+- **logger**: a callback with signature void(int, const char _, const char _, void \*); the function arguments are loglevel, an identifier string, and a message string to log, and a pointer to user data
+- **user_data**: a pointer to user data that is passed to the function when executing
 
 ## Log Buffer
 
@@ -201,14 +203,14 @@ TIME: granted time=2
 TIME: disconnected, last time=4
 ```
 
-The monitor can be stopped via the [command](../advanced_topics/command_interface.md) interface through the `monitor` keyword.
+The monitor can be stopped via the [command](../advanced_topics/commandInterface.md) interface through the `monitor` keyword.
 
 ```cpp
-\\changing the federate to use as a monitor or setting one up the first time
+//changing the federate to use as a monitor or setting one up the first time
 broker->sendCommand("broker","monitor newfed");
-\\changing the federate and period to use as a monitor or setting one up the first time
+//changing the federate and period to use as a monitor or setting one up the first time
 broker->sendCommand("broker","monitor newfed 4sec");
-\\stopping the time_monitor
+//stopping the time_monitor
 broker->sendCommand("broker","monitor stop");
 ```
 

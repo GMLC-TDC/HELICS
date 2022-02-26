@@ -1,5 +1,14 @@
 # API Reference
 
+```{eval-rst}
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    C_API
+
+```
+
 ## [C++ API (doxygen)](../../doxygen/index.md)
 
 ## [C API](./C_API.md)

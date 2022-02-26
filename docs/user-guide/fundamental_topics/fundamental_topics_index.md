@@ -13,6 +13,7 @@
     logging
     helics_cli
     web_interface
+    simulator_integration
 
 
 ```

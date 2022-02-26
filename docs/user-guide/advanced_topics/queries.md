@@ -276,12 +276,12 @@ The difference between `current_state` and `global_state` is that `current_state
 
 Queries that can't be processed or are not recognized return a JSON error structure. The structure will contain an error code and message such as:
 
-```JSON
+```json
 {
-    "error": {
-        "code": 404,
-        "message": "target not found"
-    }
+  "error": {
+    "code": 404,
+    "message": "target not found"
+  }
 }
 ```
 

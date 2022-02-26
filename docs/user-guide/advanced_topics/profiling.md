@@ -7,7 +7,7 @@ As of versions 2.8 or 3.0.1 HELICS includes a basic profiling capability. This i
 The profiling output can be either in the other log files or a separate file, and can be enabled at the federate, core, or broker levels.
 There are 3 messages which may be observed:
 
-```txt
+```text
 <PROFILING>test1[131072](created)MARKER<138286445040200|1627493672761320800>[t=-9223372036.854776]</PROFILING>
 <PROFILING>test1[131072](initializing)HELICS CODE ENTRY<138286445185500>[t=-1000000]</PROFILING>
 <PROFILING>test1[131072](executing)HELICS CODE EXIT<138286445241300>[t=0]</PROFILING>

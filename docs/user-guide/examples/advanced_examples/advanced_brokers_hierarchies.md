@@ -47,17 +47,13 @@ When running across multiple compute nodes, the relevant portion of the helics_c
 `broker_hierarchy_runner_A.json`
 
 ```json
-...
 "exec": "helics_broker --loglevel=7 --timeout='10s' ",
-...
 ```
 
 `broker_hierarchy_runner_B.json` and `broker_hierarchy_runner_C.json`
 
 ```json
-...
 "exec": "helics_broker -f <number of federates> --loglevel=7 --timeout='10s' --broker_address=tcp://<IP address of broker A>",
-...
 ```
 
 Additionally, the federates would not need `brokerAddress` in their configuration since they would look on their local node for a broker by default.
@@ -80,11 +76,11 @@ Since this example requires three brokers and their respective federates to run 
 
 The peak charging results are shown below. As can be seen, the peak power amplitude and the total time at peak power are impacted by the random number generator seed.
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_charging_power.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
 
 These results are identical to those in the base [Advanced Default example](./advanced_default.md); this is expected as only the structure of the co-simulation has been changed and not any of the federate code itself.
 

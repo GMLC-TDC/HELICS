@@ -68,10 +68,9 @@ There are [extensive ways](../../../references/configuration_options_reference.m
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[ ... ],
-  "subscriptions":[ ... ]
-  }
-
+  "publications": [],
+  "subscriptions": []
+}
 ```
 
 In this configuration, we have named the federate `Battery`, set the `log_level` to 1 ([what do loglevels mean and which one do I want?](../../../references/configuration_options_reference.md#logging-options)), and set the `core_type` to `zmq` ([the most common](../../advanced_topics/CoreTypes.md)). The next four options control timing for this federate. The final options are for message passing.
@@ -79,24 +78,22 @@ In this configuration, we have named the federate `Battery`, set the `log_level`
 This federate is configured with pubs and subs, so it will need an option to indicate the publication and the subscription configurations (for brevity, only the first pub and sub are printed below):
 
 ```json
-  "publications":[
-    {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
-      "global": true
-    },
-    {...}
-    ],
-  "subscriptions":[
-    {
-      "key":"Charger/EV1_voltage",
-      "type":"double",
-      "unit":"V",
-      "global": true
-    },
-    {...}
-    ]
+"publications":[
+  {
+    "key":"Battery/EV1_current",
+    "type":"double",
+    "unit":"A",
+    "global": true
+  },
+],
+"subscriptions":[
+  {
+    "key":"Charger/EV1_voltage",
+    "type":"double",
+    "unit":"V",
+    "global": true
+  },
+]
 ```
 
 This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the named handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the named handle (`key`) `Charger/EV1_voltage`.
@@ -155,7 +152,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 The final step is to launch our Base Example with `helics_cli` from the command line:
 
 ```shell
->helics run --path=fundamental_default_runner.json
+helics run --path=fundamental_default_runner.json
 ```
 
 If all goes well, this will reward us with two figures:

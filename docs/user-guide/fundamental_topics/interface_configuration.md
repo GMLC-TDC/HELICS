@@ -43,9 +43,6 @@ Below is a sample JSON configuration file with some of the more common options. 
       "name": "sample_federate/ep1",
       "destination": "other_federate/ep1",
       "global": true
-    },
-    {
-    ...
     }
   ],
   "publications":[
@@ -60,9 +57,6 @@ Below is a sample JSON configuration file with some of the more common options. 
         "period": 0.5,
         "description": "a test publication"
       }
-    },
-    {
-    ...
     }
   ],
   "subscriptions":[
@@ -73,9 +67,6 @@ Below is a sample JSON configuration file with some of the more common options. 
       "global": true,
       "only_update_on_change": true,
       "tolerance": 0.2
-    },
-    {
-    ...
     }
   ]
 }

@@ -15,32 +15,32 @@ The Federate Integration Example extends the Base Example to demonstrate how to 
 
 This example was successfully run on `Tue Nov 10 11:16:44 PST 2020` with the following computing environment.
 
--     Operating System
+- Operating System
 
-```shell
-$ sw_vers
-ProductName:    Mac OS X
-ProductVersion:    10.14.6
-BuildVersion:    18G6032
-```
+  ```shell
+  $ sw_vers
+  ProductName:    Mac OS X
+  ProductVersion:    10.14.6
+  BuildVersion:    18G6032
+  ```
 
 - python version
 
-```shell
-$ python
-Python 3.7.6 (default, Jan  8 2020, 13:42:34)
-[Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
-Type "help", "copyright", "credits" or "license" for more information.
-```
+  ```shell
+  $ python
+  Python 3.7.6 (default, Jan  8 2020, 13:42:34)
+  [Clang 4.0.1 (tags/RELEASE_401/final)] :: Anaconda, Inc. on darwin
+  Type "help", "copyright", "credits" or "license" for more information.
+  ```
 
 - python modules for this example
 
-```shell
-$ pip list | grep matplotlib
-matplotlib                    3.1.3
-$ pip list | grep numpy
-numpy                         1.18.5
-```
+  ```shell
+  $ pip list | grep matplotlib
+  matplotlib                    3.1.3
+  $ pip list | grep numpy
+  numpy                         1.18.5
+  ```
 
 If these modules are not installed, you can install them with
 
@@ -49,29 +49,29 @@ $ pip install matplotlib
 $ pip install numpy
 ```
 
--     helics_broker version
+- helics_broker version
 
-```shell
-$ helics_broker --version
-2.4.0 (2020-02-04)
-```
+  ```shell
+  $ helics_broker --version
+  2.4.0 (2020-02-04)
+  ```
 
--     helics_cli version
+- helics_cli version
 
-```shell
-$ helics --version
-0.4.1-HEAD-ef36755
-```
+  ```shell
+  $ helics --version
+  0.4.1-HEAD-ef36755
+  ```
 
 - pyhelics init file
 
-```shell
-$ python
+  ```shell
+  $ python
 
->>> import helics as h
->>> h.__file__
-'/Users/[username]/Software/pyhelics/helics/__init__.py'
-```
+  >>> import helics as h
+  >>> h.__file__
+  '/Users/[username]/Software/pyhelics/helics/__init__.py'
+  ```
 
 ## Example files
 
@@ -100,10 +100,9 @@ For example, let's look at our JSON config file of the Battery federate from the
   "uninterruptible": false,
   "terminate_on_error": true,
   "wait_for_current_time_update": true,
-  "publications":[ ... ],
-  "subscriptions":[ ... ]
-  }
-
+  "publications": [],
+  "subscriptions": []
+}
 ```
 
 We can see from this config file that we need to find API method to assign the `name`, `loglevel`, `coreType`, `period`, `uninterruptible`, `terminate_on_error`, `wait_for_current_time_update`, and `pub`/`subs`. In this example, we will be using the [PyHELICS API methods](https://python.helics.org/api/capi-py). This section will discuss how to translate JSON config files to API methods, how to configure the federate with these API calls in the co-simulation, and how to dynamically register publications and subscriptions with other federates.
@@ -191,25 +190,24 @@ Notice that we pass to this API the `fedinfo` set by all preceding API calls.
 In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate handles needed to be explicitly defined for a predetermined number of connections:
 
 ```json
-  "publications":[
-    {
-      "key":"Battery/EV1_current",
-      "type":"double",
-      "unit":"A",
-      "global": true
-    },
-    {...}
-    ],
-  "subscriptions":[
-    {
-      "key":"Charger/EV1_voltage",
-      "type":"double",
-      "unit":"V",
-      "global": true
-    },
-    {...}
-    ]
-
+"publications":[
+  {
+    "key":"Battery/EV1_current",
+    "type":"double",
+    "unit":"A",
+    "global": true
+  },
+  {}
+],
+"subscriptions":[
+  {
+    "key":"Charger/EV1_voltage",
+    "type":"double",
+    "unit":"V",
+    "global": true
+  },
+  {}
+]
 ```
 
 With the PyHELICS API methods, you have the flexibility to define the connection configurations _dynamically_ within execution of the main program loop. For example, in the Base Example we defined **five** communication connections between the Battery and the Charger, meant to model the interactions of five EVs each with their own charging port. If we want to increase or decrease that number using JSON configuration, we need to update the JSON file (either manually or with a script).
@@ -233,7 +231,7 @@ for i in range(0, sub_count):
     subid[i] = h.helicsFederateRegisterSubscription(fed, sub_name, "V")
 ```
 
-Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../inputs.md), and as such retain similar properties.
+Here we only need to designate the number of connections to register in one place: `num_EVs = 5`. Then we register the publications using the `h.helicsFederateRegisterGlobalTypePublication()` method, and the subscriptions with the `h.helicsFederateRegisterSubscription()` method. Note that subscriptions are analogous to [_inputs_](../../fundamental_topics/value_federates.md), and as such retain similar properties.
 
 ### Co-simulation Execution
 
@@ -274,7 +272,7 @@ In this tutorial, we have covered how to integrate federates into a co-simulatio
 Execute the co-simulation with the same command as the Base Example
 
 ```shell
->helics run --path=fundamental_integration_runner.json
+helics run --path=fundamental_integration_runner.json
 ```
 
 This results in the same output; the only thing we have changed is the method of configuring the federates and integrating them.

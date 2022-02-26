@@ -38,8 +38,8 @@ Running a HELICS co-simulation across multiple computers is useful in situations
 
 When running across multiple compute nodes, the relevant portion of the broker instantiation looks like this on the computer where broker is running:
 
-```shell
-"helics_broker --loglevel=debug --timeout='10s' --ipv4",
+```shell-session
+"$ helics_broker --loglevel=debug --timeout='10s' --ipv4",
 ```
 
 The "ipv4" flag opens up an externally accessible ports (by default, 23405) on externally facing network interfaces with an ipv4 address.
@@ -47,31 +47,25 @@ The "ipv4" flag opens up an externally accessible ports (by default, 23405) on e
 On the computer(s) where the broker is not running, each of the federates has to define the "broker_address" as part of the configuration. In this case, that's happening in a JSON configuration file and as such we just need to add a single line to the file:
 
 ```json
-...
 "broker_address": "tcp://<IP address of broker>",
-...
 ```
 
 If for whatever reason the federation need to run on a different port, this can easily be done with minor alterations. The broker instantiation would be:
 
-```shell
-"helics_broker --loglevel=debug --timeout='10s' --ipv4 --port=<port number>",
+```shell-session
+$ helics_broker --loglevel=debug --timeout='10s' --ipv4 --port=<port number>",
 ```
 
 All federates would also need to know to use the new port number. For those that have already specified the IP address of the broker, appending the port in standard networking syntax works:
 
 ```json
-...
 "brokerAddress": "tcp://<IP address>:<port number>",
-...
 ```
 
 Alternatively, the "broker_port" option can be set:
 
 ```json
-...
 "broker_port": "<port number>",
-...
 ```
 
 Note that any federates running on the same machine as the broker would also need to set this port option.
@@ -80,17 +74,21 @@ Note that any federates running on the same machine as the broker would also nee
 
 To run this example you'll need to use two computers, running one part of the federation on each. Each computer can launch its part of the federation with "helics_cli"
 
-`$ helics run --path=./multi_computer_1_runner.json`
+```shell-session
+$ helics run --path=./multi_computer_1_runner.json
+```
 
-`$ helics run --path=./multi_computer_2_runner.json`
+```shell-session
+$ helics run --path=./multi_computer_2_runner.json
+```
 
 The peak charging results are shown below and are identical to the results from the similarly configured [broker hierarchy example](advanced_brokers_hierarchies.md).
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_charging_power.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_hierarchy_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
 
 ## [Questions and Help](../../support.md)
 

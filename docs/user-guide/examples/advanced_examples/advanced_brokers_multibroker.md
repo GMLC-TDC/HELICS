@@ -34,9 +34,7 @@ In this example, we won't be doing anything like that but, for demonstration pur
 To configure a multibroker, the broker configuration line is slightly extended from a traditional federation. From the helics_cli runner configuration file `multi_broker_runner.json`
 
 ```json
-...
 "exec": "helics_broker -f 3 --coreType=multi --config=multi_broker_config.json --name=root_broker",
-...
 ```
 
 The `coreType` of the broker is set to `multi` and a configuration file is specified. That file looks like this:
@@ -68,49 +66,45 @@ The first and most important note: `master` and `comms` are reserved words in th
 BatteryConfig.json
 
 ```json
-  ...
   "name": "Battery",
   "loglevel": 1,
   "coreType": "zmq",
   "brokerPort": 23500,
-   ...
 ```
 
 ChargerConfig.json
 
 ```json
-  ...
   "name": "Charger",
   "loglevel": 1,
   "coreType": "tcp",
   "brokerPort": 23700,
-   ...
 ```
 
 ControllerConfig.json
 
 ```json
-  ...
   "name": "Controller",
   "loglevel": 1,
   "coreType": "udp",
   "brokerPort": 23900,
-   ...
 ```
 
 ## Execution and Results
 
 Unlike the other advanced broker examples, this one can be run with a single helics_cli command:
 
-`$ helics run --path=./multi_broker_runner.json`
+```shell-session
+$ helics run --path=./multi_broker_runner.json
+```
 
 As has been mentioned, since this is just a change to the co-simulation architecture, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_charging_power.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multibroker_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
 
 ## [Questions and Help](../../support.md)
 

@@ -44,10 +44,9 @@ We have:
 Though not shown in the Federation diagram, the use of native HELICS filters is an essential part of using a custom filter federate. A "reroute" native helix filter is installed on all the federeation endpoints as a part of the configuration of the filter federate. This reroute filter sends all messages from the M points to the filter federate for processing.
 
 ```json
- {
+{
   "name": "Filter",
   "event_triggered": true,
-  ...
   "endpoints": [
     {
       "name": "filter/main",
@@ -58,13 +57,13 @@ Though not shown in the Federation diagram, the use of native HELICS filters is 
     {
       "name": "filterFed",
       "sourcetargets": [
-                        "Charger/EV1.soc",
-                         "Charger/EV2.soc",
-                         "Charger/EV3.soc",
-                         "Charger/EV4.soc",
-                         "Charger/EV5.soc",
-                         "Controller/ep"
-                         ],
+        "Charger/EV1.soc",
+        "Charger/EV2.soc",
+        "Charger/EV3.soc",
+        "Charger/EV4.soc",
+        "Charger/EV5.soc",
+        "Controller/ep"
+      ],
       "operation": "reroute",
       "properties": {
         "name": "newdestination",
