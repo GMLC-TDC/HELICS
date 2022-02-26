@@ -81,6 +81,7 @@ public class helicsJNI {
   public final static native int HELICS_ERROR_FATAL_get();
   public final static native int HELICS_ERROR_EXTERNAL_TYPE_get();
   public final static native int HELICS_ERROR_OTHER_get();
+  public final static native int HELICS_USER_EXCEPTION_get();
   public final static native int HELICS_ERROR_USER_ABORT_get();
   public final static native int HELICS_ERROR_INSUFFICIENT_SPACE_get();
   public final static native int HELICS_ERROR_EXECUTION_FAILURE_get();

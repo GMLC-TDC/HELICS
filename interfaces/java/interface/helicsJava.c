@@ -1083,6 +1083,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1ERROR_1OTHER_1get
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1USER_1EXCEPTION_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsErrorTypes result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsErrorTypes)HELICS_USER_EXCEPTION;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1ERROR_1USER_1ABORT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsErrorTypes result;
