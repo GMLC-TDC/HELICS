@@ -933,9 +933,8 @@ TEST(logging, remote_log_fed)
     auto llock = mlog.lock();
     int remote_cnt{0};
     for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("broker9") != std::string::npos) {
-            ++remote_cnt;
-        } else if (std::get<1>(lg).find("root") != std::string::npos) {
+        if (std::get<1>(lg).find("broker9") != std::string::npos ||
+            std::get<1>(lg).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -975,9 +974,8 @@ TEST(logging, remote_log_core)
     auto llock = mlog.lock();
     int remote_cnt{0};
     for (const auto& lg : llock) {
-        if (std::get<1>(lg).find("broker10") != std::string::npos) {
-            ++remote_cnt;
-        } else if (std::get<1>(lg).find("root") != std::string::npos) {
+        if (std::get<1>(lg).find("broker10") != std::string::npos ||
+            std::get<1>(lg).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
@@ -1090,9 +1088,8 @@ TEST(logging, remote_log_multiObjects)
     int remote_cntFed2{0};
     int remote_cntBroker{0};
     for (const auto& lg : llock2) {
-        if (std::get<1>(lg).find("broker12") != std::string::npos) {
-            ++remote_cntBroker;
-        } else if (std::get<1>(lg).find("root") != std::string::npos) {
+        if (std::get<1>(lg).find("broker12") != std::string::npos ||
+            std::get<1>(lg).find("root") != std::string::npos) {
             ++remote_cntBroker;
         }
         if (std::get<1>(lg).find("monitor2") != std::string::npos) {

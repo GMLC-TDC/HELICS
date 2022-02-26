@@ -3785,7 +3785,8 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
-
+    } else if (res[0] == "flush") {
+        generateQueryAnswer("global_flush", true);
     } else {
         auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
         LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);
