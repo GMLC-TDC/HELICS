@@ -533,7 +533,8 @@ TEST(logging, timeMonitorFederate_swap)
     rtime = Fed->requestTime(4.0);
     EXPECT_EQ(rtime, 4.0);
     Fed->finalize();
-
+    //make sure all communications have gone through
+    broker->query("root", "global_flush");
     auto llock = mlog.lock();
     EXPECT_GE(llock->size(), 4U);
 
@@ -541,7 +542,6 @@ TEST(logging, timeMonitorFederate_swap)
     for (const auto& message : llock) {
         if (std::get<2>(message).find("granted time") != std::string::npos) {
             ++grantCount;
-            continue;
         }
     }
     EXPECT_EQ(grantCount, 2);
