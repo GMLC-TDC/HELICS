@@ -8,7 +8,7 @@ on:
   repository_dispatch:
   workflow_dispatch:
   schedule:
-    - cron: '15 09 * * *' # Run at in the early hours of the morning (UTC)
+    - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
   release:
     types: published
 

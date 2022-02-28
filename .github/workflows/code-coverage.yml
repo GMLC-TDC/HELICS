@@ -6,10 +6,12 @@ on:
       testConfig:
         description: 'Test Config'
         default: 'Coverage'
+  schedule:
+    - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
   push:
-    branches: [ main, develop]
-  pull_request:
-    branches: [ main, develop]
+    branches: [ main ]
+#  pull_request:
+#    branches: [ main, develop ]
 
 jobs:
   build:
@@ -33,16 +35,23 @@ jobs:
     - uses: actions/checkout@v2
       with:
         submodules: true
-      
+      if: github.event_name != 'schedule'
+
+    - name: Checkout develop branch
+      uses: actions/checkout@v2
+      with:
+        ref: develop
+      if: github.event_name == 'schedule'
+
     - name: Build HELICS
       run: |
         source scripts/setup-helics-ci-options.sh
         mkdir -p build && cd build
         ../scripts/ci-build.sh
-        
+
     - name: Setup coverage counters
       run: scripts/lcov-helper.sh setup-counters
-      
+
     - name: Run tests
       working-directory: build
       run: |
@@ -51,6 +60,6 @@ jobs:
         export CTEST_OPTIONS="--output-on-failure"
         echo "Running CI tests with flags ${CI_TEST_FLAGS}"
         ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
-      
+
     - name: Gather and upload coverage results
       run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov
