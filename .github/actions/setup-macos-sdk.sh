@@ -3,7 +3,7 @@
 XCODE_MACOS_PLATFORM_PATH="/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform"
 XCODE_MACOS_SDK_PATH="${XCODE_MACOS_PLATFORM_PATH}/Developer/SDKs"
 
-if [[ -z ${MACOS_SDK_VER+x} ]]; then
+if [[ -z "${MACOS_SDK_VER}" ]]; then
     MACOS_SDK_VER=10.14
 fi
 
