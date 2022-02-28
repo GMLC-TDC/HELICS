@@ -27,7 +27,7 @@ make install
 On windows using visual studio the command line cmake would look like
 
 ```bat
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DENABLE_SWIG=OFF -DHELICS_BUILD_MATLAB_INTERFACE=ON -G "Visual Studio 15 2017 Win64" ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="C:\local\helics-develop" -DENABLE_SWIG=OFF -DHELICS_BUILD_MATLAB_INTERFACE=ON -G "Visual Studio 16 2019 Win64" ..
 
 cmake --build . --config Release --target INSTALL
 ```

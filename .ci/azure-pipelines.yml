@@ -105,16 +105,17 @@ jobs:
           langArch: 'x86'
           vsArch: 'Win32'
           extraFlags: '-DHELICS_DISABLE_WEBSERVER=ON'
-        VS2017-64bit:
-          imageName: 'vs2017-win2016'
-          langArch: 'x64'
-          vsArch: 'x64'
-          extraFlags: ''
         VS2019-64bit:
           imageName: 'windows-2019'
           langArch: 'x64'
           vsArch: 'x64'
           extraFlags: ''
+        VS2022-64bit:
+          imageName: 'windows-2022'
+          langArch: 'x64'
+          vsArch: 'x64'
+          extraFlags: ''
+
     pool:
       vmImage: $(imageName)
     variables:

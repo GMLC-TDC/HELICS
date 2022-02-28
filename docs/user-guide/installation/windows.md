@@ -6,8 +6,8 @@ Windows installers are available with the different [releases](https://github.co
 
 ## Build Requirements
 
-- Microsoft Visual C++ 2017 or newer (MS Build Tools also works)
-- CMake 3.10 or newer (CMake should be newer than the Visual Studio and Boost version you are using; if using clang with libc++ use 3.18+)
+- Microsoft Visual C++ 2019 or newer (MS Build Tools also works; VC++ 2017 may work but is no longer tested by CI builds)
+- CMake 3.14 or newer (CMake should be newer than the Visual Studio and Boost version you are using; if using clang with libc++ use 3.18+)
 - git
 - Boost 1.67 or newer
 - MS-MPI v8 or newer (if MPI support is needed)
@@ -18,7 +18,7 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 
 To set up your environment:
 
-1.  Install Microsoft Visual C++ 2017 or newer (2019 or later is recommended)[MSVC](https://visualstudio.microsoft.com/)
+1.  Install Microsoft Visual C++ 2019 or newer (2017 may work, but is no longer tested by CI builds)[MSVC](https://visualstudio.microsoft.com/)
 2.  Install
     [Boost](https://www.boost.org/doc/libs/1_74_0/more/getting_started/windows.html)
     [Windows downloads](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
@@ -26,7 +26,7 @@ To set up your environment:
     extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
     environment variable to the install location. The CMake will only automatically find
     Boost 1.67 or newer.
-    Building with Visual Studio 2017 will require boost 1.67 or newer and CMake 3.10+
+    Building with Visual Studio 2019 will require boost 1.67 or newer and CMake 3.14+
     or newer.
     Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 
@@ -89,8 +89,8 @@ Getting and building from source:
     If you need CMake to use a generator other than the default (ex:
     selecting between a 32-bit or 64-bit project), the -G option can be
     used to specify one of the generators listed by CMake --help. For
-    Visual Studio 2017, the generator name would be
-    `Visual Studio 15 2017 [arch]`, where \[arch\] is optional and can be
+    Visual Studio 2019, the generator name would be
+    `Visual Studio 16 2019 [arch]`, where \[arch\] is optional and can be
     either Win64 for a 64-bit project, or left out to generate a 32-bit
     project. To avoid problems when building later, this should match the
     version of the Boost libraries you are using.
