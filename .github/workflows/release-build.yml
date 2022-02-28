@@ -155,7 +155,9 @@ jobs:
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
       if: runner.os == 'macOS'
-      run: ./.github/actions/setup-macos-10.9-sdk.sh
+      env:
+        MACOS_SDK_VER: ${{ matrix.macos_target_ver }}
+      run: ./.github/actions/setup-macos-sdk.sh
         
     # Compile HELICS and create the installer
     - name: Build installer
@@ -235,7 +237,9 @@ jobs:
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
       if: runner.os == 'macOS'
-      run: ./.github/actions/setup-macos-10.9-sdk.sh
+      env:
+        MACOS_SDK_VER: ${{ matrix.macos_target_ver }}
+      run: ./.github/actions/setup-macos-sdk.sh
    
     # Compile HELICS and create the installer
     - name: Build shared library

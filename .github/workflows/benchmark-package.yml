@@ -30,7 +30,7 @@ jobs:
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
-            macos_target_ver: '10.9'
+            macos_target_ver: '10.14'
           - id: linux-x64
             os: ubuntu-latest
             arch: x64
@@ -50,7 +50,9 @@ jobs:
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
       if: runner.os == 'macOS'
-      run: ./.github/actions/setup-macos-10.9-sdk.sh
+      env:
+        MACOS_SDK_VER: ${{ matrix.macos_target_ver }}
+      run: ./.github/actions/setup-macos-sdk.sh
         
     # Compile HELICS and create the benchmark package
     - name: Build benchmarks
