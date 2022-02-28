@@ -70,6 +70,7 @@ jobs:
       if: runner.os == 'Linux'
       uses: ./.github/actions/linux-release-builder
       with:
+        cpack_gen: ${{ matrix.cpack_gen }}
         script: ./.github/actions/benchmark-build/benchmark-${{ runner.os }}.sh
        
     # GitHub Actions combines artifacts uploaded with the same name
