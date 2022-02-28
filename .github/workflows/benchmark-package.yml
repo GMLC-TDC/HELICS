@@ -21,11 +21,11 @@ jobs:
         id: [windows-x64, macos-x64, linux-x64]
         include:
           - id: windows-x64
-            os: windows-latest
+            os: windows-2022
             arch: x64
             cpack_gen: ZIP
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: macos-x64
             os: macos-latest
             arch: x64
