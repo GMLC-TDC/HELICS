@@ -86,14 +86,25 @@ Getting and building from source:
 
     `cmake ..`
 
-    If you need CMake to use a generator other than the default (ex:
-    selecting between a 32-bit or 64-bit project), the -G option can be
-    used to specify one of the generators listed by CMake --help. For
-    Visual Studio 2019, the generator name would be
-    `Visual Studio 16 2019 [arch]`, where \[arch\] is optional and can be
-    either Win64 for a 64-bit project, or left out to generate a 32-bit
-    project. To avoid problems when building later, this should match the
-    version of the Boost libraries you are using.
+    If you need CMake to use a generator for an IDE or build system other
+    than the default (ex: Ninja instead of a Visual Studio project), the -G
+    option can be used to specify one of the generators listed by CMake --help.
+    If you are using a Visual Studio generator, such as Visual Studio 2019,
+    and need to select an architecutre other than the default (ex: building a
+    32-bit target on a 64-bit host or vice versa), the -A option can be used
+    to specify a target platform name. For example, for a 32-bit x86 build with
+    Visual Studio 2019 on a 64-bit copy of Windows, you would use the cmake
+    options `-G "Visual Studio 16 2019" -A Win32`. Similarly, `-A x64` can
+    be used to build for an x64 processor.
+
+    Information on CMake usage and cross-compiling for different target
+    architectures can be found in the CMake documentation at
+    https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html,
+    and is recommended as a source of information on CMake as it will be
+    more up-to-date on the latest version of CMake than this guide.
+
+    To avoid problems when building later, the target architecture and Visual
+    Studio version should match the version of the Boost libraries you are using.
 
     If you installed boost into the root of the C or D drives with the
     default location (or the BOOST_INSTALL_PATH environment variable has been set),
