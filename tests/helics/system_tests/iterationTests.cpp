@@ -108,16 +108,18 @@ class iteration_tests_type:
 
 TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
 {
-    SetupTest<helics::ValueFederate>(GetParam(), 3);
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0).get();
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1).get();
-    auto vFed3 = GetFederateAs<helics::ValueFederate>(2).get();
+    try {
+        SetupTest<helics::ValueFederate>(GetParam(), 3);
+    
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
     auto fut1 =
-        std::async(std::launch::async, [vFed1]() { return runInitIterations(vFed1, 0, 3); });
+        std::async(std::launch::async, [vFed1]() { return runInitIterations(vFed1.get(), 0, 3); });
     auto fut2 =
-        std::async(std::launch::async, [vFed2]() { return runInitIterations(vFed2, 1, 3); });
+        std::async(std::launch::async, [vFed2]() { return runInitIterations(vFed2.get(), 1, 3); });
 
-    auto res3 = runInitIterations(vFed3, 2, 3);
+    auto res3 = runInitIterations(vFed3.get(), 2, 3);
     auto res2 = fut2.get();
     auto res1 = fut1.get();
     EXPECT_NEAR(res3.first, 2.5, 0.1);
@@ -127,6 +129,11 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     vFed2->finalize();
     vFed3->finalize();
     helics::cleanupHelicsLibrary();
+    }
+    catch (...) {
+        std::cerr << "unable to run for " << GetParam() << std::endl;
+        return;
+    }
 }
 
 INSTANTIATE_TEST_SUITE_P(iteration_tests, iteration_tests_type, ::testing::ValuesIn(CoreTypes_all));

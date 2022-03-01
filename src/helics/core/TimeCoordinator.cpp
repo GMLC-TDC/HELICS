@@ -821,12 +821,12 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
 
 void TimeCoordinator::sendUpdatedExecRequest(
     GlobalFederateId target,GlobalFederateId minFed,
-    std::int32_t iteration)
+    std::int32_t minFedIteration)
 {
     if (!minFed.isValid()) {
         auto mfed = getExecEntryMinFederate(dependencies, source_id);
         minFed = mfed.first;
-        iteration = mfed.second;
+        minFedIteration = mfed.second;
     }
     
     ActionMessage execreq(CMD_EXEC_REQUEST);
@@ -834,7 +834,7 @@ void TimeCoordinator::sendUpdatedExecRequest(
     setIterationFlags(execreq, iterating);
     execreq.counter = iteration + 1;
     execreq.setExtraData(minFed.baseValue());
-    execreq.setExtraDestData(iteration);
+    execreq.setExtraDestData(minFedIteration);
 
     if (info.wait_for_current_time_updates) {
         setActionFlag(execreq, delayed_timing_flag);
