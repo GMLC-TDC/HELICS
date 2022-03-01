@@ -13,10 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** these test cases test out the value converters
  */
-#include "helics/application_api/MessageFederate.hpp"
-#include "helics/application_api/Subscriptions.hpp"
-#include "helics/application_api/ValueConverter.hpp"
-#include "helics/application_api/ValueFederate.hpp"
+#include "helics/helics.hpp"
 
 #include <future>
 #include <thread>
@@ -81,8 +78,8 @@ std::pair<double, int> runInitIterations(helics::ValueFederate* vfed, int index,
         auto val2 = sub_low.getValue<double>();
         cval = (val1 + val2) / 2.0;
         ++itcount;
-        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
-        //   index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
+       //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
+        //  index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
     return {cval, itcount};
 }
@@ -126,6 +123,10 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     EXPECT_NEAR(res3.first, 2.5, 0.1);
     EXPECT_NEAR(res2.first, 2.5, 0.1);
     EXPECT_NEAR(res1.first, 2.5, 0.1);
+    vFed1->finalize();
+    vFed2->finalize();
+    vFed3->finalize();
+    helics::cleanupHelicsLibrary();
 }
 
 INSTANTIATE_TEST_SUITE_P(iteration_tests, iteration_tests_type, ::testing::ValuesIn(CoreTypes_all));
@@ -440,4 +441,159 @@ TEST_F(iteration_tests, iteration_counter)
         }
     }
     deadlock.join();
+}
+
+
+
+TEST_F(iteration_tests, wait_for_current_time_iterative)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<double>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(9.9);
+    sub1_1.setDefault(10.22);
+
+    vFed2->enterExecutingModeAsync();
+    vFed1->enterExecutingMode();
+
+    pub1_1.publish(3.5);
+
+    vFed1->requestTimeAsync(1.0);
+
+    vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    vFed2->requestTimeAsync(1.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    auto retTime = vFed1->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    retTime = vFed2->requestTimeComplete();
+    EXPECT_EQ(retTime, 1.0);
+
+    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
+
+    pub2_1.publish(3.1);
+
+    vFed2->requestTimeIterativeAsync(7.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+
+    auto itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub1_1.getValue<double>(), 3.1);
+
+    pub1_1.publish(5.4);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+
+    // iteration 3
+
+    itTime = vFed2->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(sub2_1.getValue<double>(), 5.4);
+    pub2_1.publish(8.7);
+    vFed2->requestTimeIterativeAsync(7.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+
+    // iteration 4
+    itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub1_1.getValue<double>(), 8.7);
+
+    pub1_1.publish(7.3);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    // iteration 5
+
+    itTime = vFed2->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 1.0);
+    EXPECT_EQ(sub2_1.getValue<double>(), 7.3);
+
+    vFed2->finalize();
+
+    itTime = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(itTime.grantedTime, 3.0);
+    EXPECT_EQ(itTime.state, helics::IterationResult::NEXT_STEP);
+
+    broker.reset();
+    vFed1->finalize();
+}
+
+TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec)
+{
+    extraBrokerArgs = "--debugging";
+    auto broker = AddBroker("test", 2);
+    extraCoreArgs = "--debugging";
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<int>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(-6);
+    sub1_1.setDefault(-28);
+    vFed2->enterInitializingModeAsync();
+    vFed1->enterInitializingMode();
+
+    pub1_1.publish(4);
+
+    vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+
+    vFed2->enterInitializingModeComplete();
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    for (int ii = 0; ii < 10; ++ii) {
+        auto it = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub2_1.getValue<int>(), ii + 4);
+        pub2_1.publish(ii + 27);
+        vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+        it = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub1_1.getValue<int>(), ii + 27);
+        pub1_1.publish(ii + 5);
+        vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    }
+    auto it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub2_1.getValue<int>(), 14);
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    it = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    EXPECT_EQ(sub1_1.getValue<int>(), 36);
+    it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+
+    vFed2->finalize();
+
+    broker.reset();
+    vFed1->finalize();
 }

@@ -54,7 +54,11 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
     if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(execreq, iterating);
         execreq.counter = iteration+1;
-        execreq.setExtraData(getExecEntryMinFederate(dependencies,source_id).baseValue());
+        if (!hasInitUpdates) {
+            auto mfed = getExecEntryMinFederate(dependencies, source_id);
+            execreq.setExtraData(mfed.first.baseValue());
+            execreq.setExtraDestData(mfed.second);
+        }
     }
     if (info.wait_for_current_time_updates) {
         setActionFlag(execreq, delayed_timing_flag);
@@ -599,7 +603,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
     if (lastSend.minFed != GlobalFederateId(upd.getExtraData())) {
         changed = true;
     }
-    if (lastSend.time_state != TimeState::time_requested) {
+    if (lastSend.mTimeState != TimeState::time_requested) {
         changed = true;
     }
     if (changed) {
@@ -607,7 +611,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
         lastSend.minDe = upd.Tdemin;
         lastSend.Te = upd.Te;
         lastSend.minFed = GlobalFederateId(upd.getExtraData());
-        lastSend.time_state = TimeState::time_requested;
+        lastSend.mTimeState = TimeState::time_requested;
         return transmitTimingMessages(upd, skipFed);
     }
     return false;
@@ -685,7 +689,7 @@ void TimeCoordinator::updateTimeGrant()
     lastSend.next = treq.actionTime;
     lastSend.Te = treq.actionTime;
     lastSend.minDe = treq.actionTime;
-    lastSend.time_state = TimeState::time_granted;
+    lastSend.mTimeState = TimeState::time_granted;
     transmitTimingMessages(treq);
     // printf("%d GRANT allow=%f next=%f, exec=%f, Tdemin=%f\n", source_id,
     // static_cast<double>(time_allow), static_cast<double>(time_next),
@@ -815,13 +819,54 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
     return skipped;
 }
 
-MessageProcessingResult TimeCoordinator::checkExecEntry()
+void TimeCoordinator::sendUpdatedExecRequest(
+    GlobalFederateId target,GlobalFederateId minFed,
+    std::int32_t iteration)
+{
+    if (!minFed.isValid()) {
+        auto mfed = getExecEntryMinFederate(dependencies, source_id);
+        minFed = mfed.first;
+        iteration = mfed.second;
+    }
+    
+    ActionMessage execreq(CMD_EXEC_REQUEST);
+    execreq.source_id = source_id;
+    setIterationFlags(execreq, iterating);
+    execreq.counter = iteration + 1;
+    execreq.setExtraData(minFed.baseValue());
+    execreq.setExtraDestData(iteration);
+
+    if (info.wait_for_current_time_updates) {
+        setActionFlag(execreq, delayed_timing_flag);
+    }
+    if (target.isValid()) {
+        execreq.dest_id = target;
+        sendMessageFunction(execreq);
+    } else {
+        for (const auto &dep:dependencies) {
+            if (dep.dependent && dep.mTimeState<TimeState::time_granted) {
+                execreq.dest_id = dep.fedID;
+                sendMessageFunction(execreq);
+            }
+        }
+    }
+}
+
+MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId triggerFed)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     if (time_block <= timeZero) {
         return ret;
     }
     if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS,info.wait_for_current_time_updates)) {
+        if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
+            iterating != IterationRequest::NO_ITERATIONS) {
+            // if we are just continuing
+            auto mfed = getExecEntryMinFederate(dependencies, source_id);
+            if (mfed.first == triggerFed) {
+                sendUpdatedExecRequest(triggerFed,mfed.first,mfed.second);
+            }
+        }
         return ret;
     }
 
@@ -855,14 +900,16 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
             break;
         case IterationRequest::ITERATE_IF_NEEDED:
         case IterationRequest::FORCE_ITERATION:
-            if (hasInitUpdates) {
-                if (iteration >= info.maxIterations) {
-                    ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                        ret = MessageProcessingResult::ITERATING :
-                        MessageProcessingResult::NEXT_STEP;
-                } else {
+            if (iteration>= info.maxIterations) {
+                if (iterating==IterationRequest::FORCE_ITERATION) {
                     ret = MessageProcessingResult::ITERATING;
+                } else {
+                    ret = MessageProcessingResult::NEXT_STEP;
                 }
+                break;
+            }
+            if (hasInitUpdates) {
+                    ret = MessageProcessingResult::ITERATING;
             } else {
                 if (dependencies.checkIfReadyForExecEntry(false,
                     info.wait_for_current_time_updates))
@@ -879,14 +926,14 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
                             if (!dep.dependency) {
                                 continue;
                             }
-                            if (dep.time_state==TimeState::initialized) {
+                            if (dep.mTimeState==TimeState::initialized) {
                                 allowed = false;
                                 break;
                             }
-                            if (dep.time_state>=TimeState::exec_requested) {
+                            if (dep.mTimeState>=TimeState::exec_requested) {
                                 continue;
                             }
-                            if (dep.minFed==source_id) {
+                            if (dep.minFed==source_id && (dep.minFedIteration==iteration.load()+1)) {
                                 continue;
                             }
                             allowed = false;
@@ -944,13 +991,20 @@ MessageProcessingResult TimeCoordinator::checkExecEntry()
             transmitTimingMessages(execgrant);
         }
     }
+    if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
+        iterating != IterationRequest::NO_ITERATIONS) {
+        // if we are just continuing
+        auto mfed = getExecEntryMinFederate(dependencies, source_id);
+        if (mfed.first == triggerFed) {
+            sendUpdatedExecRequest(triggerFed,mfed.first,mfed.second);
+        }
+    }
     return ret;
 }
 
 static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localId)
 {
-    return (((cmd.action() == CMD_TIME_GRANT) || (cmd.action() == CMD_EXEC_GRANT && !checkActionFlag(cmd,iteration_requested_flag))) &&
-            (cmd.source_id != localId));
+    return (cmd.action() == CMD_TIME_GRANT && cmd.source_id != localId);
 }
 
 std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() const
@@ -961,7 +1015,7 @@ std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() con
         if (!dep.dependency) {
             continue;
         }
-        if (dep.time_state != TimeState::time_requested) {
+        if (dep.mTimeState != TimeState::time_requested) {
             if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;
@@ -990,7 +1044,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 lastSend.next = time_granted;
                 lastSend.Te = time_granted;
                 lastSend.minDe = time_granted;
-                lastSend.time_state = TimeState::time_granted;
+                lastSend.mTimeState = TimeState::time_granted;
                 transmitTimingMessages(treq);
                 return message_process_result::processed;
             }
@@ -1010,7 +1064,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             if (disconnected) {
                 ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
                 sendMessageFunction(treq);
-            } else if (lastSend.time_state == TimeState::time_granted) {
+            } else if (lastSend.mTimeState == TimeState::time_granted) {
                 ActionMessage treq(CMD_TIME_GRANT, source_id, cmd.source_id);
                 treq.actionTime = lastSend.next;
                 sendMessageFunction(treq);
@@ -1031,7 +1085,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         if (dep == nullptr) {
             return message_process_result::no_effect;
         }
-        switch (dep->time_state) {
+        switch (dep->mTimeState) {
             case TimeState::time_requested:
                 if (dep->next > time_exec) {
                     return message_process_result::delay_processing;

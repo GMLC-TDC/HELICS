@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(broker_timeout, core_fail_timeout)
 {
-    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=100ms --tick 40ms");
+    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=100ms --tick 30ms");
     brk->connect();
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -52,6 +52,9 @@ TEST(broker_timeout, core_fail_timeout)
     bool val = brk->waitForDisconnect(std::chrono::milliseconds(1000));
     if (!val) {
         val = brk->waitForDisconnect(std::chrono::milliseconds(2000));
+    }
+    if (val==false) {
+        brk->waitForDisconnect(std::chrono::milliseconds(1000));
     }
     EXPECT_TRUE(val);
     cr->disconnect();

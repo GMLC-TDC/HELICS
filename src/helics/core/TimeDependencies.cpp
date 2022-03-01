@@ -20,31 +20,33 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
 {
     switch (m.action()) {
         case CMD_EXEC_REQUEST:
-            dep.time_state = checkActionFlag(m, iteration_requested_flag) ?
+            dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
                 (checkActionFlag(m,required_flag)?TimeState::exec_requested_require_iteration:
                 TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
             dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
-            dep.iterationCount = m.counter;
+            dep.requestIteration = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
+            dep.minFedIteration = m.getExtraDestData();
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
-                dep.time_state = TimeState::time_granted;
+                dep.mTimeState = TimeState::time_granted;
                 dep.next = timeZero;
                 dep.minDe = timeZero;
                 dep.timeoutCount = 0;
                 dep.Te = timeZero;
-                dep.iterationCount = 0;
+                dep.requestIteration = 0;
                 dep.grantedIteration = 0;
+                dep.minFed = GlobalFederateId{};
             } else {
-                dep.time_state = TimeState::initialized;
-                dep.grantedIteration = dep.iterationCount;
+                dep.mTimeState = TimeState::initialized;
+                dep.requestIteration = m.counter;
             }
             dep.hasData = false;
             break;
         case CMD_TIME_REQUEST:
-            dep.time_state = checkActionFlag(m, iteration_requested_flag) ?
+            dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
                 (checkActionFlag(m, required_flag) ? TimeState::time_requested_require_iteration :
                                                      TimeState::time_requested_iterative) :
                 TimeState::time_requested;
@@ -62,10 +64,11 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
             dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
-            dep.iterationCount = m.counter;
+            dep.requestIteration = m.counter;
+            dep.minFedIteration = m.getExtraDestData();
             break;
         case CMD_TIME_GRANT:
-            dep.time_state = TimeState::time_granted;
+            dep.mTimeState = TimeState::time_granted;
             //    printf("%d Grant from %d time %f\n", fedID, m.source_id,
             //    static_cast<double>(m.actionTime));
             //   assert(m.actionTime >= Tnext);
@@ -74,7 +77,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.minDe = dep.next;
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
-            dep.iterationCount = m.counter;
+            dep.requestIteration = m.counter;
             dep.hasData = false;
             break;
         case CMD_DISCONNECT:
@@ -83,7 +86,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
         case CMD_DISCONNECT_FED:
-            dep.time_state = TimeState::time_granted;
+            dep.mTimeState = TimeState::time_granted;
             //   printf("%d disconnect from %d\n", fedID, m.source_id);
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
@@ -94,7 +97,7 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
-            dep.time_state = TimeState::error;
+            dep.mTimeState = TimeState::error;
             //   printf("%d disconnect from %d\n", fedID, m.source_id);
             dep.next = Time::maxVal();
             dep.Te = Time::maxVal();
@@ -114,8 +117,8 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
 
 bool TimeData::update(const TimeData& update)
 {
-    bool updated = (time_state != update.time_state);
-    time_state = update.time_state;
+    bool updated = (mTimeState != update.mTimeState);
+    mTimeState = update.mTimeState;
 
     Time prev_next = next;
     next = update.next;
@@ -193,9 +196,10 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["te"] = static_cast<double>(dep.Te);
     output["minde"] = static_cast<double>(dep.minDe);
     output["minfed"] = dep.minFed.baseValue();
-    auto sstring = timeStateString(dep.time_state);
+    output["minfedIteration"] = dep.minFedIteration;
+    auto sstring = timeStateString(dep.mTimeState);
     output["state"] = Json::Value(sstring.data(), sstring.data()+sstring.size());
-    output["iteration"] = dep.iterationCount;
+    output["iteration"] = dep.requestIteration;
     output["granted_iteration"] = dep.grantedIteration;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
@@ -372,15 +376,15 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating,bool waiting) con
             
             for (const auto &dep:dependencies) {
                 if (dep.dependency) {
-                    if (dep.time_state==TimeState::initialized) {
+                    if (dep.mTimeState==TimeState::initialized) {
                         if (dep.grantedIteration==0) {
                             return false;
                         }
                         
                     }
-                    if (dep.time_state == TimeState::exec_requested_iterative ||
-                        dep.time_state == TimeState::exec_requested_require_iteration) {
-                        if (dep.iterationCount == dep.grantedIteration) {
+                    if (dep.mTimeState == TimeState::exec_requested_iterative ||
+                        dep.mTimeState == TimeState::exec_requested_require_iteration) {
+                        if (dep.requestIteration < dep.grantedIteration) {
                             return false;
                         }
                     }
@@ -389,12 +393,12 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating,bool waiting) con
             return true;
         } else {
             return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-                return (dep.dependency && dep.time_state == TimeState::initialized);
+                return (dep.dependency && dep.mTimeState == TimeState::initialized);
             });
         }
     }
     return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && dep.time_state < TimeState::exec_requested);
+        return (dep.dependency && (!(dep.mTimeState >= TimeState::exec_requested||(dep.connection==ConnectionType::self && dep.mTimeState>=TimeState::initialized))));
     });
 }
 
@@ -430,9 +434,11 @@ GlobalFederateId TimeDependencies::getMinDependency() const
 void TimeDependencies::resetIteratingExecRequests()
 {
     for (auto& dep : dependencies) {
-        if (dep.dependency && dep.time_state <= TimeState::exec_requested_iterative) {
-            dep.time_state = TimeState::initialized;
-            dep.grantedIteration = dep.iterationCount;
+        if (dep.dependency && dep.mTimeState <= TimeState::exec_requested_iterative) {
+            dep.mTimeState = TimeState::initialized;
+            dep.grantedIteration = dep.requestIteration;
+            dep.requestIteration = 0;
+            dep.minFedIteration = 0;
             dep.minFed = GlobalFederateId();
         }
     }
@@ -448,7 +454,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
             if (dep.next < desiredGrantTime) {
                 return false;
             }
-            if ((dep.next == desiredGrantTime) && (dep.time_state == TimeState::time_granted)) {
+            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
                 return false;
             }
         }
@@ -461,10 +467,10 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
                 return false;
             }
             if (dep.next == desiredGrantTime) {
-                if (dep.time_state == TimeState::time_granted) {
+                if (dep.mTimeState == TimeState::time_granted) {
                     return false;
                 }
-                if (dep.time_state == TimeState::time_requested && dep.nonGranting) {
+                if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
                     return false;
                 }
             }
@@ -476,9 +482,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
 void TimeDependencies::resetIteratingTimeRequests(helics::Time requestTime)
 {
     for (auto& dep : dependencies) {
-        if (dep.dependency && dep.time_state == TimeState::time_requested_iterative) {
+        if (dep.dependency && dep.mTimeState == TimeState::time_requested_iterative) {
             if (dep.next == requestTime) {
-                dep.time_state = TimeState::time_granted;
+                dep.mTimeState = TimeState::time_granted;
                 dep.Te = requestTime;
                 dep.minDe = requestTime;
             }
@@ -522,11 +528,11 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
     if (dep.next < mTime.next) {
         mTime.next = dep.next;
-        mTime.time_state = dep.time_state;
+        mTime.mTimeState = dep.mTimeState;
 
     } else if (dep.next == mTime.next) {
-        if (dep.time_state == TimeState::time_granted) {
-            mTime.time_state = dep.time_state;
+        if (dep.mTimeState == TimeState::time_granted) {
+            mTime.mTimeState = dep.mTimeState;
         }
     }
     if (dep.connection != ConnectionType::self) {
@@ -546,11 +552,14 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
 }
 
-GlobalFederateId getExecEntryMinFederate(const TimeDependencies& dependencies,
+std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
                                          GlobalFederateId self,
                                          GlobalFederateId ignore)
 {
     GlobalFederateId minId;
+    std::int32_t minIteration{0};
+    TimeState minTimeState{TimeState::initialized};
+    bool delayedFed{false};
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -564,18 +573,24 @@ GlobalFederateId getExecEntryMinFederate(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        if (dep.time_state>TimeState::exec_requested_iterative) {
+        if (dep.mTimeState>TimeState::exec_requested_iterative) {
             continue;
         }
-        if (minId.isValid()) {
-            minId = GlobalFederateId{};
-            break;
-        } else {
+        
+        if (!minId.isValid() || dep.fedID<minId) {
             minId = dep.fedID;
+            minIteration = dep.requestIteration;
+            minTimeState = dep.mTimeState;
+            delayedFed = dep.delayedTiming;
+            if (minTimeState == TimeState::initialized) {
+                minId = GlobalFederateId{};
+                minIteration = 0;
+                break;
+            }
         }
         
     }
-    return minId;
+    return {minId, minIteration};
 }
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,

@@ -105,7 +105,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 break;
             }
             if (!timeGranted_mode) {
-                auto grant = timeCoord->checkExecEntry();
+                auto grant = timeCoord->checkExecEntry(
+                    cmd.action() == CMD_EXEC_REQUEST ? cmd.source_id : GlobalFederateId{});
                 switch (grant) {
                     case MessageProcessingResult::ITERATING:
                         newMode = true;
@@ -119,6 +120,9 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                         proc = grant;
                         break;
                     case MessageProcessingResult::CONTINUE_PROCESSING:
+                        if (cmd.action()==CMD_EXEC_GRANT && !checkActionFlag(cmd,iteration_requested_flag)) {
+                            timeCoord->sendUpdatedExecRequest();
+                        }
                         break;
                     default:
                         newMode = true;

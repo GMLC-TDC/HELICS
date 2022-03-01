@@ -43,11 +43,12 @@ class TimeData {
     Time TeAlt{timeZero};  //!< the second min event
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
-    TimeState time_state{TimeState::initialized};
+    TimeState mTimeState{TimeState::initialized};
     bool hasData{false}; //indicator that data was sent in the current interval
     std::int32_t timeoutCount{0};  // counter for timeout checking
-    std::int32_t grantedIteration{0};
-    std::int32_t iterationCount{0};
+    std::int32_t requestIteration{0}; //the iteration number of the request
+    std::int32_t minFedIteration{0}; //the iteration count of the min federate
+    std::int32_t grantedIteration{0}; //the iteration of the dependency when the local iteration was granted
     TimeData() = default;
     explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
     /** check if there is an update to the current dependency info and assign*/
@@ -151,7 +152,7 @@ class TimeDependencies {
     void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
 };
 
-GlobalFederateId getExecEntryMinFederate(const TimeDependencies& dependencies,
+std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
                                  GlobalFederateId self,
                                  GlobalFederateId ignore = GlobalFederateId{});
 

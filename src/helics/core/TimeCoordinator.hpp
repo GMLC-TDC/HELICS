@@ -228,7 +228,11 @@ class TimeCoordinator {
     GlobalFederateId getParent() const;
 
     /** check if entry to the executing state can be granted*/
-    MessageProcessingResult checkExecEntry();
+    MessageProcessingResult checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{});
+
+    /** send updated exec request to target or everyone if target is invalid*/
+    void sendUpdatedExecRequest(GlobalFederateId target = GlobalFederateId{},
+                                GlobalFederateId minFed = GlobalFederateId{},std::int32_t iteration=0);
     /** request a time
     @param nextTime the new requested time
     @param iterate the mode of iteration to use (no_iteration, FORCE_ITERATION, ITERATE_IF_NEEDED)
