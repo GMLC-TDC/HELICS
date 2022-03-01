@@ -90,7 +90,7 @@ Getting and building from source:
     than the default (ex: Ninja instead of a Visual Studio project), the -G
     option can be used to specify one of the generators listed by CMake --help.
     If you are using a Visual Studio generator, such as Visual Studio 2019,
-    and need to select an architecutre other than the default (ex: building a
+    and need to select an architecture other than the default (ex: building a
     32-bit target on a 64-bit host or vice versa), the -A option can be used
     to specify a target platform name. For example, for a 32-bit x86 build with
     Visual Studio 2019 on a 64-bit copy of Windows, you would use the cmake
