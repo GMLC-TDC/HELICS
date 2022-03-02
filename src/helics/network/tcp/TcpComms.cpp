@@ -241,9 +241,8 @@ bool TcpComms::establishBrokerConnection(
                                                                      std::to_string(brokerPort),
                                                                      connectionTimeout);
         }
-        catch (std::system_error& e)
-        {
-            logWarning(std::string("network error (retrying):: ")+e.what());
+        catch (std::system_error& e) {
+            logWarning(std::string("network error (retrying):: ") + e.what());
             brokerConnection = nullptr;
         }
         int retries = 0;
@@ -277,8 +276,8 @@ bool TcpComms::establishBrokerConnection(
                                                                          connectionTimeout);
             }
             catch (std::system_error& e) {
-                logWarning(std::string("network error (retry #") + std::to_string(retries) + "):: " +
-                           e.what());
+                logWarning(std::string("network error (retry #") + std::to_string(retries) +
+                           "):: " + e.what());
                 brokerConnection = nullptr;
             }
         }
