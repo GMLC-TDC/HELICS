@@ -99,7 +99,7 @@ Getting and building from source:
 
     Information on CMake usage and cross-compiling for different target
     architectures can be found in the CMake documentation at
-    https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html,
+    <https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html>,
     and is recommended as a source of information on CMake as it will be
     more up-to-date on the latest version of CMake than this guide.
 
