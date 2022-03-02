@@ -23,8 +23,8 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using asio::ip::udp;
-using helics::Core;
 using gmlc::networking::AsioContextManager;
+using helics::Core;
 
 #define UDP_BROKER_PORT 23901
 #define UDP_SECONDARY_PORT 23905

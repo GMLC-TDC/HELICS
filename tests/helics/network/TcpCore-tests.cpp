@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gmlc/networking/AsioContextManager.h"
+#include "gmlc/networking/TcpHelperClasses.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -15,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpComms.h"
 #include "helics/network/tcp/TcpCore.h"
-#include "gmlc/networking/TcpHelperClasses.h"
 
 #include "gtest/gtest.h"
 #include <future>
@@ -25,8 +25,8 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using asio::ip::tcp;
-using helics::Core;
 using gmlc::networking::AsioContextManager;
+using helics::Core;
 
 #define TCP_BROKER_PORT_STRING "24160"
 #define TCP_SECONDARY_PORT 24180
@@ -40,8 +40,8 @@ TEST(TcpCore, tcpComms_broker)
 
     auto srv = AsioContextManager::getContextPointer();
 
-    auto server =
-        gmlc::networking::TcpServer::create(srv->getBaseContext(), helics::network::DEFAULT_TCP_PORT);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      helics::network::DEFAULT_TCP_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     server->setDataCall([&counter](const gmlc::networking::TcpConnection::pointer& /*unused*/,
@@ -202,8 +202,8 @@ TEST(TcpCore, tcpServerConnections1)
 
     auto dataCheck = [&counter,
                       &validData](const gmlc::networking::TcpConnection::pointer& /*unused*/,
-                                            const char* datablock,
-                                            size_t datasize) {
+                                  const char* datablock,
+                                  size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20) {
             ++counter;
@@ -442,7 +442,7 @@ TEST(TcpCore, tcpCore_initialization)
     auto srv = AsioContextManager::getContextPointer();
 
     auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
-                                                 "localhost",
+                                                      "localhost",
                                                       helics::network::DEFAULT_TCP_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);

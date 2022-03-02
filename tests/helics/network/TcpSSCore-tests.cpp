@@ -5,6 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gmlc/networking/AsioContextManager.h"
+#include "gmlc/networking/TcpHelperClasses.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -15,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpCommsSS.h"
 #include "helics/network/tcp/TcpCore.h"
-#include "gmlc/networking/TcpHelperClasses.h"
 
 #include "gtest/gtest.h"
 #include <future>
@@ -25,8 +25,8 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using asio::ip::tcp;
-using helics::Core;
 using gmlc::networking::AsioContextManager;
+using helics::Core;
 
 #define TCP_BROKER_PORT_STRING "33133"
 
@@ -167,9 +167,9 @@ TEST(TcpSSCore, tcpSSComms_rx)
     ASSERT_TRUE(connected);
 
     auto txconn = gmlc::networking::TcpConnection::create(srv->getBaseContext(),
-                                                     host,
-                                                     TCP_BROKER_PORT_STRING,
-                                                     1024);
+                                                          host,
+                                                          TCP_BROKER_PORT_STRING,
+                                                          1024);
     auto res = txconn->waitUntilConnected(1000ms);
     ASSERT_EQ(res, true);
 
@@ -353,8 +353,9 @@ TEST(TcpSSCore, tcpSSCore_initialization)
     auto srv = AsioContextManager::getContextPointer();
     auto contextLoop = srv->startContextLoop();
 
-    auto server =
-        gmlc::networking::TcpServer::create(srv->getBaseContext(), "localhost", helics::network::DEFAULT_TCPSS_PORT);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      "localhost",
+                                                      helics::network::DEFAULT_TCPSS_PORT);
     std::vector<char> data(1024);
     std::atomic<size_t> len{0};
     server->setDataCall(
