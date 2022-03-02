@@ -1350,6 +1350,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     eptI->addSourceTarget(cmd.getSource(),
                                           std::string(cmd.name()),
                                           cmd.getString(typeStringLoc));
+                    addDependency(cmd.source_id);
                 }
             }
         } break;

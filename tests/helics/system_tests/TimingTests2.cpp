@@ -932,3 +932,33 @@ TEST_F(timing_tests2, time_barrier_clear2)
     vFed1->finalize();
     vFed2->finalize();
 }
+
+TEST_F(timing_tests2, value_to_endpoint_timing)
+{
+    SetupTest<helics::CombinationFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    /** establish dependencies between the federates*/
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+
+    auto& ept2 = vFed2->registerEndpoint("ept1");
+
+    ept2.subscribe("pub1");
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->requestTimeAsync(3.0);
+    pub1.publish(3.7);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    auto tm = vFed1->requestTime(2.0);
+    EXPECT_EQ(tm, 2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    auto tm2 = vFed2->requestTimeComplete();
+    EXPECT_LT(tm2, 2.0);
+    EXPECT_TRUE(ept2.hasMessage());
+    vFed1->finalize();
+    vFed2->finalize();
+}
