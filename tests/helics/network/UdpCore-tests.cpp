@@ -4,7 +4,7 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "helics/common/AsioContextManager.h"
+#include "gmlc/networking/AsioContextManager.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -24,6 +24,7 @@ using namespace std::literals::chrono_literals;
 
 using asio::ip::udp;
 using helics::Core;
+using gmlc::networking::AsioContextManager;
 
 #define UDP_BROKER_PORT 23901
 #define UDP_SECONDARY_PORT 23905
