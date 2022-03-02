@@ -234,11 +234,18 @@ bool TcpComms::establishBrokerConnection(
     try {
         auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
                               gmlc::networking::SocketFactory();
-        brokerConnection = gmlc::networking::establishConnection(sf,
-                                                                 ioctx->getBaseContext(),
-                                                                 brokerTargetAddress,
-                                                                 std::to_string(brokerPort),
-                                                                 connectionTimeout);
+        try {
+            brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                     ioctx->getBaseContext(),
+                                                                     brokerTargetAddress,
+                                                                     std::to_string(brokerPort),
+                                                                     connectionTimeout);
+        }
+        catch (std::system_error& e)
+        {
+            logWarning(std::string("network error (retrying):: ")+e.what());
+            brokerConnection = nullptr;
+        }
         int retries = 0;
         while (!brokerConnection) {
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
@@ -262,11 +269,18 @@ bool TcpComms::establishBrokerConnection(
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
             }
-            brokerConnection = gmlc::networking::establishConnection(sf,
-                                                                     ioctx->getBaseContext(),
-                                                                     brokerTargetAddress,
-                                                                     std::to_string(brokerPort),
-                                                                     connectionTimeout);
+            try {
+                brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                         ioctx->getBaseContext(),
+                                                                         brokerTargetAddress,
+                                                                         std::to_string(brokerPort),
+                                                                         connectionTimeout);
+            }
+            catch (std::system_error& e) {
+                logWarning(std::string("network error (retry #") + std::to_string(retries) + "):: " +
+                           e.what());
+                brokerConnection = nullptr;
+            }
         }
         if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
             return terminate(connection_status::terminated);
