@@ -210,7 +210,7 @@ void TcpCommsSS::queue_tx_function()
                     made_connections.emplace_back(conn, std::move(new_connect));
                 }
             }
-            catch (const std::exception &e) {
+            catch (const std::exception& e) {
                 logWarning(std::string("unable to establish connection with ") + conn +
                            "::" + e.what());
             }
@@ -256,7 +256,7 @@ void TcpCommsSS::queue_tx_function()
             }
             catch (std::exception& e) {
                 logError(std::string("unable to establish connection with ") + brokerTargetAddress +
-                           "::" + e.what());
+                         "::" + e.what());
                 setTxStatus(connection_status::error);
                 setRxStatus(connection_status::error);
                 return;

@@ -353,10 +353,10 @@ bool TcpComms::establishBrokerConnection(
                                                                       std::to_string(brokerPort),
                                                                       connectionTimeout);
                         }
-                        catch (const std::exception &e) {
+                        catch (const std::exception& e) {
                             brokerConnection == nullptr;
                             logError(std::string(" unable to create broker connection to ") +
-                                       brokerTargetAddress + "::" + e.what());
+                                     brokerTargetAddress + "::" + e.what());
                             return terminate(connection_status::error);
                         }
                         continue;
@@ -441,7 +441,7 @@ void TcpComms::queue_tx_function()
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
-                        catch (std::exception & e) {
+                        catch (std::exception& e) {
                             logWarning(std::string("unable to create route ") + newroute +
                                        "::" + e.what());
                         }
