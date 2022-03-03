@@ -345,12 +345,20 @@ bool TcpComms::establishBrokerConnection(
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
-                        brokerConnection =
-                            gmlc::networking::establishConnection(sf,
-                                                                  ioctx->getBaseContext(),
-                                                                  brokerTargetAddress,
-                                                                  std::to_string(brokerPort),
-                                                                  connectionTimeout);
+                        try {
+                            brokerConnection =
+                                gmlc::networking::establishConnection(sf,
+                                                                      ioctx->getBaseContext(),
+                                                                      brokerTargetAddress,
+                                                                      std::to_string(brokerPort),
+                                                                      connectionTimeout);
+                        }
+                        catch (const std::exception &e) {
+                            brokerConnection == nullptr;
+                            logError(std::string(" unable to create broker connection to ") +
+                                       brokerTargetAddress + "::" + e.what());
+                            return terminate(connection_status::error);
+                        }
                         continue;
                     }
                     if (mess->second.messageID == DELAY_CONNECTION) {
@@ -433,8 +441,9 @@ void TcpComms::queue_tx_function()
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
-                        catch (std::exception&) {
-                            // TODO(PT):: do something???
+                        catch (std::exception & e) {
+                            logWarning(std::string("unable to create route ") + newroute +
+                                       "::" + e.what());
                         }
                         processed = true;
                     } break;
