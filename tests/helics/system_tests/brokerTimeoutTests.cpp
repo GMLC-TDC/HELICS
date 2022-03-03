@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 TEST(broker_timeout, core_fail_timeout)
 {
-    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=200ms --tick 50ms");
+    auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=100ms --tick 40ms");
     brk->connect();
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
@@ -49,7 +49,10 @@ TEST(broker_timeout, core_fail_timeout)
     cms->haltComms();  // this will terminate communications abruptly
     tcr.reset();
 
-    bool val = brk->waitForDisconnect(std::chrono::milliseconds(2000));
+    bool val = brk->waitForDisconnect(std::chrono::milliseconds(1000));
+    if (!val) {
+        val = brk->waitForDisconnect(std::chrono::milliseconds(2000));
+    }
     EXPECT_TRUE(val);
     cr->disconnect();
     Fed2->finalize();
@@ -94,8 +97,8 @@ TEST(broker_timeout, core_fail_timeout_no_ping_ci_skip)
     Fed2->finalize();
 }
 
-// this test is exactly like the previous one except the core was specified with no_ping so it won't
-// fail
+// this test is exactly like the previous one except the core was specified with debugging so it
+// won't fail
 TEST(broker_timeout, core_fail_debugging_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "--timeout=200ms --tick 50ms ");
@@ -244,6 +247,10 @@ TEST(broker_timeout, max_duration)
     EXPECT_EQ(str, "true");
 
     auto res = brk->waitForDisconnect(std::chrono::milliseconds(900));
+    if (!res) {
+        // this may get to this condition in some slower CI test systems
+        res = brk->waitForDisconnect(std::chrono::milliseconds(500));
+    }
     EXPECT_TRUE(res);
     if (!res) {
         brk->disconnect();

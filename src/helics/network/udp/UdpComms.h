@@ -12,11 +12,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <set>
 
-class AsioContextManager;
-namespace asio {
-class io_context;
-}  // namespace asio
-
 namespace helics {
 namespace udp {
     /** implementation for the communication interface that uses ZMQ messages to communicate*/
