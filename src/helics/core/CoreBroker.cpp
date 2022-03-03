@@ -1112,7 +1112,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     } else {
                         LOG_ERROR(global_broker_id_local,
                                   getIdentifier(),
-                                  "receoved timeout disconnect");
+                                  "received timeout disconnect");
                     }
 
                     if (getBrokerState() <
