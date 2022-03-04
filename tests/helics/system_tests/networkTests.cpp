@@ -260,10 +260,12 @@ TEST_F(network_tests, test_core_type_env)
 #endif
 
 #ifdef HELICS_ENABLE_ENCRYPTION
-#ifdef HELICS_ENABLE_TCP_CORE
+#    ifdef HELICS_ENABLE_TCP_CORE
 TEST_F(network_tests, test_encrypted_tcp)
 {
-    const std::string brokerArgs = "-f 2 --core_type=tcp --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string brokerArgs =
+        "-f 2 --core_type=tcp --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) +
+        "encryption_config/openssl.json";
     exeTestRunner brokerExe(HELICS_BROKER_LOCATION, "helics_broker");
     if (!brokerExe.isActive()) {
         std::cout << " unable to locate helics_broker in " << HELICS_BROKER_LOCATION << std::endl;
@@ -274,7 +276,9 @@ TEST_F(network_tests, test_encrypted_tcp)
     // give the helics_broker some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
-    const std::string fedArgs = "--core_type=tcp --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string fedArgs =
+        "--core_type=tcp --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) +
+        "encryption_config/openssl.json";
     helics::FederateInfo fi_enc(fedArgs);
     helics::ValueFederate fed1("fed1", fi_enc);
 
@@ -291,7 +295,9 @@ TEST_F(network_tests, test_encrypted_tcp)
 
 TEST_F(network_tests, test_encrypted_tcpss)
 {
-    const std::string brokerArgs = "-f 2 --core_type=tcp_ss --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string brokerArgs =
+        "-f 2 --core_type=tcp_ss --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) +
+        "encryption_config/openssl.json";
     exeTestRunner brokerExe(HELICS_BROKER_LOCATION, "helics_broker");
     if (!brokerExe.isActive()) {
         std::cout << " unable to locate helics_broker in " << HELICS_BROKER_LOCATION << std::endl;
@@ -302,7 +308,9 @@ TEST_F(network_tests, test_encrypted_tcpss)
     // give the helics_broker some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
-    const std::string fedArgs = "--core_type=tcp_ss --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string fedArgs =
+        "--core_type=tcp_ss --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) +
+        "encryption_config/openssl.json";
     helics::FederateInfo fi_enc(fedArgs);
     helics::ValueFederate fed1("fed1", fi_enc);
 
@@ -319,7 +327,9 @@ TEST_F(network_tests, test_encrypted_tcpss)
 
 TEST_F(network_tests, test_encrypted_bridge)
 {
-    const std::string brokerArgs = "-f 2 --core_type=multi --config=" + std::string(TEST_BIN_DIR) + "encryption_config/multiBroker_encrypted_bridge.json --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string brokerArgs = "-f 2 --core_type=multi --config=" + std::string(TEST_BIN_DIR) +
+        "encryption_config/multiBroker_encrypted_bridge.json --encrypted --encryption_config=" +
+        std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
     exeTestRunner brokerExe(HELICS_BROKER_LOCATION, "helics_broker");
     if (!brokerExe.isActive()) {
         std::cout << " unable to locate helics_broker in " << HELICS_BROKER_LOCATION << std::endl;
@@ -330,7 +340,9 @@ TEST_F(network_tests, test_encrypted_bridge)
     // give the helics_broker some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(40));
 
-    const std::string fedArgs_enc = "--core_type=tcp_ss --brokerport=30000 --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
+    const std::string fedArgs_enc =
+        "--core_type=tcp_ss --brokerport=30000 --encrypted --encryption_config=" +
+        std::string(TEST_BIN_DIR) + "encryption_config/openssl.json";
     helics::FederateInfo fi_enc(fedArgs_enc);
     helics::ValueFederate fed_enc("fed_encrypted", fi_enc);
 
@@ -346,5 +358,5 @@ TEST_F(network_tests, test_encrypted_bridge)
     fed_unenc.finalize();
     res.get();
 }
-#endif
+#    endif
 #endif
