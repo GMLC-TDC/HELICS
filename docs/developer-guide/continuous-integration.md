@@ -35,18 +35,17 @@ On the develop branch a few additional tests are run on a daily basis. These wil
 
 ## Appveyor tests
 
-- MSVC 2015 CMake 3.13, and JAVA builds
+- Cygwin builds
 
 ## Azure tests
 
 PRs and commits to the main and develop branches that pass the tests on Travis will trigger builds on Azure for several other HELICS related repositories (such as HELICS-Examples). The result of the builds for those repositories will be reported as a comment on the PR (if any) that triggered the build.
 
-On the Primary HELICS repository there are 4 Azure builds:
+On the Primary HELICS repository there are 3 Azure builds:
 
-- MSVC2015 64bit Build and test, chocolatey swig/boost
-- MSVC2017 32bit Build and test
-- MSVC2017 64bit Build and test with Java
-- MSVC2019 64bit Build and test with Java
+- MSVC2019 32bit Build and test
+- MSVC2019 64bit Build and test
+- MSVC2022 64bit Build and test
 
 ## Circle CI
 
