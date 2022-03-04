@@ -229,12 +229,12 @@ TEST_F(network_tests, test_otherport_broker_local_env)
 
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 TEST_F(network_tests, test_core_type_env)
 {
     setEnvironmentVariable("HELICS_CORE_TYPE", "TCP");
     const std::string brokerArgs = "-f 2";
-    auto broker = helics::BrokerFactory::create(helics::core_type::TCP, brokerArgs);
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TCP, brokerArgs);
     EXPECT_TRUE(broker->isConnected());
 
     helics::FederateInfo fi("--corename=c1bt");

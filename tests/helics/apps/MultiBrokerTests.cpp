@@ -57,7 +57,7 @@ TEST(MultiBroker, connect1)
     helics::CoreFactory::terminateAllCores();
 }
 
-#if defined(ENABLE_ZMQ_CORE)
+#if defined(HELICS_ENABLE_ZMQ_CORE)
 TEST(MultiBroker, file2)
 {
     using helics::CoreType;
@@ -80,7 +80,7 @@ TEST(MultiBroker, file2)
     helics::cleanupHelicsLibrary();
 }
 
-#    if defined(ENABLE_TCP_CORE) && defined(ENABLE_IPC_CORE)
+#    if defined(HELICS_ENABLE_TCP_CORE) && defined(HELICS_ENABLE_IPC_CORE)
 TEST(MultiBroker, file3)
 {
     using helics::CoreType;
@@ -107,7 +107,7 @@ TEST(MultiBroker, file3)
 
 #    endif
 
-#    if defined(ENABLE_ZMQ_CORE) && defined(ENABLE_TCP_CORE)
+#    if defined(HELICS_ENABLE_ZMQ_CORE) && defined(HELICS_ENABLE_TCP_CORE)
 TEST(MultiBroker, file1)
 {
     using helics::CoreType;

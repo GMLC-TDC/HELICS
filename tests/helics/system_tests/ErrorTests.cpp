@@ -515,7 +515,7 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(CoreTypes_simple));
 
-#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
+#if defined(HELICS_ENABLE_ZMQ_CORE) || defined(HELICS_ENABLE_UDP_CORE)
 
 constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 
