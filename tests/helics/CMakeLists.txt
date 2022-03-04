@@ -38,6 +38,18 @@ if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
 endif()
 
+# Configure files for encryption tests
+if(HELICS_ENABLE_ENCRYPTION)
+    configure_file(
+        "test_files/encryption_config/openssl.json.in"
+        "test_files/encryption_config/openssl.json"
+    )
+    configure_file(
+        "test_files/encryption_config/multiBroker_encrypted_bridge.json.in"
+        "test_files/encryption_config/multiBroker_encrypted_bridge.json"
+    )
+endif()
+
 if(HELICS_INSTALL_PACKAGE_TESTS)
     set(HELICS_PACKAGE_SEARCH_LOC)
 else()
