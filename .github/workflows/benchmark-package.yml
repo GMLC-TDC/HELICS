@@ -21,16 +21,16 @@ jobs:
         id: [windows-x64, macos-x64, linux-x64]
         include:
           - id: windows-x64
-            os: windows-latest
+            os: windows-2022
             arch: x64
             cpack_gen: ZIP
-            cmake_gen: 'Visual Studio 16 2019'
-            msvc_ver: 'msvc2019'
+            cmake_gen: 'Visual Studio 17 2022'
+            msvc_ver: 'msvc2022'
           - id: macos-x64
             os: macos-latest
             arch: x64
             cpack_gen: ZIP
-            macos_target_ver: '10.9'
+            macos_target_ver: '10.14'
           - id: linux-x64
             os: ubuntu-latest
             arch: x64
@@ -50,7 +50,9 @@ jobs:
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
       if: runner.os == 'macOS'
-      run: ./.github/actions/setup-macos-10.9-sdk.sh
+      env:
+        MACOS_SDK_VER: ${{ matrix.macos_target_ver }}
+      run: ./.github/actions/setup-macos-sdk.sh
         
     # Compile HELICS and create the benchmark package
     - name: Build benchmarks
@@ -68,6 +70,7 @@ jobs:
       if: runner.os == 'Linux'
       uses: ./.github/actions/linux-release-builder
       with:
+        cpack_gen: ${{ matrix.cpack_gen }}
         script: ./.github/actions/benchmark-build/benchmark-${{ runner.os }}.sh
        
     # GitHub Actions combines artifacts uploaded with the same name

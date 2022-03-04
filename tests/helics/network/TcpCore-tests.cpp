@@ -4,7 +4,8 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "helics/common/AsioContextManager.h"
+#include "gmlc/networking/AsioContextManager.h"
+#include "gmlc/networking/TcpHelperClasses.h"
 #include "helics/common/GuardedTypes.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -15,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpComms.h"
 #include "helics/network/tcp/TcpCore.h"
-#include "helics/network/tcp/TcpHelperClasses.h"
 
 #include "gtest/gtest.h"
 #include <future>
@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 using namespace std::literals::chrono_literals;
 
 using asio::ip::tcp;
+using gmlc::networking::AsioContextManager;
 using helics::Core;
 
 #define TCP_BROKER_PORT_STRING "24160"
@@ -39,11 +40,11 @@ TEST(TcpCore, tcpComms_broker)
 
     auto srv = AsioContextManager::getContextPointer();
 
-    auto server =
-        helics::tcp::TcpServer::create(srv->getBaseContext(), DEFAULT_TCP_BROKER_PORT_NUMBER);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      helics::network::DEFAULT_TCP_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
-    server->setDataCall([&counter](const helics::tcp::TcpConnection::pointer& /*unused*/,
+    server->setDataCall([&counter](const gmlc::networking::TcpConnection::pointer& /*unused*/,
                                    const char* /*unused*/,
                                    size_t data_avail) {
         ++counter;
@@ -52,7 +53,7 @@ TEST(TcpCore, tcpComms_broker)
     server->start();
 
     comm.setCallback([&counter](const helics::ActionMessage& /*m*/) { ++counter; });
-    comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
+    comm.setBrokerPort(helics::network::DEFAULT_TCP_PORT);
     comm.setName("tests");
     comm.setTimeout(200ms);
     bool connected = comm.connect();
@@ -74,12 +75,13 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     comm.loadTargetInfo(host, host);
 
     auto srv = AsioContextManager::getContextPointer();
-    auto server =
-        helics::tcp::TcpServer::create(srv->getBaseContext(), host, DEFAULT_TCP_BROKER_PORT_NUMBER);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      host,
+                                                      helics::network::DEFAULT_TCP_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     server->setDataCall(
-        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+        [&data, &counter, &len](const gmlc::networking::TcpConnection::pointer& /*unused*/,
                                 const char* data_rec,
                                 size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
@@ -91,7 +93,7 @@ TEST(TcpCore, tcpComms_broker_test_transmit)
     server->start();
 
     comm.setCallback([](const helics::ActionMessage& /*m*/) {});
-    comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
+    comm.setBrokerPort(helics::network::DEFAULT_TCP_PORT);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
     comm.setFlag("noack_connect", true);
@@ -134,11 +136,11 @@ TEST(TcpCore, tcpComms_rx)
     auto srv = AsioContextManager::getContextPointer();
 
     auto server =
-        helics::tcp::TcpServer::create(srv->getBaseContext(), host, TCP_BROKER_PORT_STRING);
+        gmlc::networking::TcpServer::create(srv->getBaseContext(), host, TCP_BROKER_PORT_STRING);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     server->setDataCall(
-        [&data, &ServerCounter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+        [&data, &ServerCounter, &len](const gmlc::networking::TcpConnection::pointer& /*unused*/,
                                       const char* data_rec,
                                       size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());
@@ -154,7 +156,7 @@ TEST(TcpCore, tcpComms_rx)
         std::lock_guard<std::mutex> lock(actguard);
         act = std::move(m);
     });
-    comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER);
+    comm.setBrokerPort(helics::network::DEFAULT_TCP_PORT);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm.setName("tests");
     comm.setFlag("noack_connect", true);
@@ -162,7 +164,8 @@ TEST(TcpCore, tcpComms_rx)
     bool connected = comm.connect();
     ASSERT_TRUE(connected);
 
-    auto txconn = helics::tcp::TcpConnection::create(srv->getBaseContext(), host, "24180", 1024);
+    auto txconn =
+        gmlc::networking::TcpConnection::create(srv->getBaseContext(), host, "24180", 1024);
     auto res = txconn->waitUntilConnected(1000ms);
     ASSERT_EQ(res, true);
 
@@ -189,16 +192,18 @@ TEST(TcpCore, tcpServerConnections1)
     std::string host = "127.0.0.1";
 
     auto srv = AsioContextManager::getContextPointer();
-    auto server =
-        helics::tcp::TcpServer::create(srv->getBaseContext(), host, DEFAULT_TCP_BROKER_PORT_NUMBER);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      host,
+                                                      helics::network::DEFAULT_TCP_PORT);
     ASSERT_TRUE(server->isReady());
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     std::atomic<bool> validData{true};
 
-    auto dataCheck = [&counter, &validData](const helics::tcp::TcpConnection::pointer& /*unused*/,
-                                            const char* datablock,
-                                            size_t datasize) {
+    auto dataCheck = [&counter,
+                      &validData](const gmlc::networking::TcpConnection::pointer& /*unused*/,
+                                  const char* datablock,
+                                  size_t datasize) {
         size_t used = 0;
         while (datasize - used >= 20) {
             ++counter;
@@ -219,10 +224,14 @@ TEST(TcpCore, tcpServerConnections1)
     server->setDataCall(dataCheck);
     server->start();
 
-    auto conn1 = helics::tcp::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
-    auto conn2 = helics::tcp::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
-    auto conn3 = helics::tcp::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
-    auto conn4 = helics::tcp::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
+    auto conn1 =
+        gmlc::networking::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
+    auto conn2 =
+        gmlc::networking::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
+    auto conn3 =
+        gmlc::networking::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
+    auto conn4 =
+        gmlc::networking::TcpConnection::create(srv->getBaseContext(), host, "24160", 1024);
     ASSERT_TRUE(conn1);
     ASSERT_TRUE(conn2);
     ASSERT_TRUE(conn3);
@@ -236,7 +245,7 @@ TEST(TcpCore, tcpServerConnections1)
     res = conn4->waitUntilConnected(1000ms);
     EXPECT_EQ(res, true);
 
-    auto transmitFunc = [](const helics::tcp::TcpConnection::pointer& obj) {
+    auto transmitFunc = [](const gmlc::networking::TcpConnection::pointer& obj) {
         std::vector<char> dataB(20);
         for (char ii = 0; ii < 50; ++ii) {
             std::iota(dataB.begin(), dataB.end(), ii);
@@ -285,10 +294,10 @@ TEST(TcpCore, tcpComm_transmit_through)
     helics::tcp::TcpComms comm2;
     comm2.loadTargetInfo(host, std::string());
 
-    comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER + 1);
+    comm.setBrokerPort(helics::network::DEFAULT_TCP_PORT + 1);
     comm.setName("tests");
     comm2.setName("test2");
-    comm2.setPortNumber(DEFAULT_TCP_BROKER_PORT_NUMBER + 1);
+    comm2.setPortNumber(helics::network::DEFAULT_TCP_PORT + 1);
     comm2.setFlag("reuse_address", true);
     comm.setPortNumber(TCP_SECONDARY_PORT);
 
@@ -346,15 +355,15 @@ TEST(TcpCore, tcpComm_transmit_add_route)
     auto srv = AsioContextManager::getContextPointer();
     auto contextLoop = srv->startContextLoop();
 
-    comm.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER + 2);
+    comm.setBrokerPort(helics::network::DEFAULT_TCP_PORT + 2);
     comm.setFlag("reuse_address", true);
     comm.setName("tests");
     comm2.setName("broker");
     comm2.setFlag("reuse_address", true);
     comm3.setName("test3");
-    comm3.setBrokerPort(DEFAULT_TCP_BROKER_PORT_NUMBER + 2);
+    comm3.setBrokerPort(helics::network::DEFAULT_TCP_PORT + 2);
     comm3.setFlag("reuse_address", true);
-    comm2.setPortNumber(DEFAULT_TCP_BROKER_PORT_NUMBER + 2);
+    comm2.setPortNumber(helics::network::DEFAULT_TCP_PORT + 2);
     comm.setPortNumber(TCP_SECONDARY_PORT);
     comm3.setPortNumber(23920);
 
@@ -432,14 +441,14 @@ TEST(TcpCore, tcpCore_initialization)
     EXPECT_TRUE(core->isConfigured());
     auto srv = AsioContextManager::getContextPointer();
 
-    auto server = helics::tcp::TcpServer::create(srv->getBaseContext(),
-                                                 "localhost",
-                                                 DEFAULT_TCP_BROKER_PORT_NUMBER);
+    auto server = gmlc::networking::TcpServer::create(srv->getBaseContext(),
+                                                      "localhost",
+                                                      helics::network::DEFAULT_TCP_PORT);
     auto contextLoop = srv->startContextLoop();
     std::vector<char> data(1024);
     std::atomic<size_t> len{0};
     server->setDataCall(
-        [&data, &counter, &len](const helics::tcp::TcpConnection::pointer& /*unused*/,
+        [&data, &counter, &len](const gmlc::networking::TcpConnection::pointer& /*unused*/,
                                 const char* data_rec,
                                 size_t data_Size) {
             std::copy(data_rec, data_rec + data_Size, data.begin());

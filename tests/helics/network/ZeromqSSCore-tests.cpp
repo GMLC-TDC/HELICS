@@ -43,11 +43,11 @@ TEST(ZMQSSCore, transmit)
     // comm2 is the broker
     comm2.loadTargetInfo(host, std::string{});
 
-    comm.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setBrokerPort(helics::network::DEFAULT_ZMQSS_PORT);
     comm.setName("test_comms");
     comm.setServerMode(false);
     comm2.setName("test_broker");
-    comm2.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm2.setPortNumber(helics::network::DEFAULT_ZMQSS_PORT);
     comm2.setServerMode(true);
 
     comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
@@ -103,16 +103,16 @@ TEST(ZMQSSCore, addroute)
     // comm3 is the broker
     comm3.loadTargetInfo(host, std::string());
 
-    comm.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setBrokerPort(helics::network::DEFAULT_ZMQSS_PORT);
     comm.setName("test1");
     comm.setServerMode(false);
 
-    comm2.setBrokerPort(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm2.setBrokerPort(helics::network::DEFAULT_ZMQSS_PORT);
     comm2.setName("test2");
     comm2.setServerMode(false);
 
     comm3.setName("test_broker");
-    comm3.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm3.setPortNumber(helics::network::DEFAULT_ZMQSS_PORT);
     comm3.setServerMode(true);
 
     comm.setCallback([&counter, &act](const helics::ActionMessage& m) {
@@ -175,7 +175,7 @@ TEST(ZMQSSCore, initialization)
     std::mutex msgLock;
     comm.loadTargetInfo(host, std::string());
     comm.setName("test_broker");
-    comm.setPortNumber(DEFAULT_ZMQSS_BROKER_PORT_NUMBER);
+    comm.setPortNumber(helics::network::DEFAULT_ZMQSS_PORT);
     comm.setServerMode(true);
     comm.setCallback([&counter, &msgs, &msgLock](const helics::ActionMessage& m) {
         ++counter;
