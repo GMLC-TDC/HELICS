@@ -411,7 +411,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED, true);
+    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -515,7 +515,7 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(CoreTypes_simple));
 
-#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
+#if defined(HELICS_ENABLE_ZMQ_CORE) || defined(HELICS_ENABLE_UDP_CORE)
 
 constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 

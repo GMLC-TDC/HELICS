@@ -35,7 +35,7 @@ set(application_api_test_sources
     MultiInputTests.cpp
 )
 
-if(ENABLE_ZMQ_CORE)
+if(HEILCS_ENABLE_ZMQ_CORE)
     list(APPEND application-api-tests zmqSSTests.cpp)
 endif()
 

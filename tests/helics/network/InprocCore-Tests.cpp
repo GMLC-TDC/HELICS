@@ -19,11 +19,11 @@ using namespace helics::CoreFactory;
 
 TEST(InprocCore_tests, initialization_test)
 {
-    auto broker = helics::BrokerFactory::create(helics::core_type::INPROC, std::string{});
+    auto broker = helics::BrokerFactory::create(helics::CoreType::INPROC, std::string{});
     ASSERT_TRUE(broker);
     EXPECT_TRUE(broker->isConnected());
     std::string configureString = std::string("-f 4") + " --broker=" + broker->getIdentifier();
-    auto core = create(helics::core_type::INPROC, configureString);
+    auto core = create(helics::CoreType::INPROC, configureString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::inproc::InprocCore>(core);
 
@@ -44,11 +44,11 @@ TEST(InprocCore_tests, initialization_test)
 
 TEST(InprocCore_tests, initialization_test_with_test_broker)
 {
-    auto broker = helics::BrokerFactory::create(helics::core_type::TEST, std::string{});
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, std::string{});
     ASSERT_TRUE(broker);
     EXPECT_TRUE(broker->isConnected());
     std::string configureString = std::string("-f 4") + " --broker=" + broker->getIdentifier();
-    auto core = create(helics::core_type::INPROC, configureString);
+    auto core = create(helics::CoreType::INPROC, configureString);
 
     auto Tcore = std::dynamic_pointer_cast<helics::inproc::InprocCore>(core);
 
@@ -70,7 +70,7 @@ TEST(InprocCore_tests, initialization_test_with_test_broker)
 TEST(InprocCore_tests, pubsub_value_test)
 {
     const char* configureString = "-f 1 --autobroker";
-    auto core = create(helics::core_type::INPROC, configureString);
+    auto core = create(helics::CoreType::INPROC, configureString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -141,7 +141,7 @@ TEST(InprocCore_tests, send_receive_test)
 {
     const char* initializationString =
         "--autobroker --broker=\"brk1\" --broker_init_string=\"--name=brk1\"";
-    auto core = create(helics::core_type::INPROC, initializationString);
+    auto core = create(helics::CoreType::INPROC, initializationString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
@@ -206,7 +206,7 @@ TEST(InprocCore_tests, messagefilter_callback_test)
     };
 
     std::string configureString = "--autobroker";
-    auto core = create(helics::core_type::INPROC, configureString);
+    auto core = create(helics::CoreType::INPROC, configureString);
 
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());

@@ -87,7 +87,7 @@ class FedTest {
 TEST(ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
 {
     int feds = 20;
-    auto broker = helics::BrokerFactory::create(helics::core_type::ZMQ_SS,
+    auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ_SS,
                                                 "ZMQ_SS_broker",
                                                 std::string("-f ") + std::to_string(feds));
     std::vector<std::shared_ptr<helics::Core>> cores(feds);
@@ -95,7 +95,7 @@ TEST(ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
     SCOPED_TRACE("created broker");
     for (int ii = 0; ii < feds; ++ii) {
         std::string configureString = "-f 1 --name=core" + std::to_string(ii);
-        cores[ii] = helics::CoreFactory::create(helics::core_type::ZMQ_SS, configureString);
+        cores[ii] = helics::CoreFactory::create(helics::CoreType::ZMQ_SS, configureString);
         cores[ii]->connect();
         int s_index = ii + 1;
         if (ii == feds - 1) {
