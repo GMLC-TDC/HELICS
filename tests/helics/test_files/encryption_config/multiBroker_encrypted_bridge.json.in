@@ -1,0 +1,17 @@
+{
+  "master": {
+    "core_type": "test"
+  },
+  "comms": [
+    {
+      "core_type": "tcp_ss",
+      "local_port": 30000,
+      "encrypted": true,
+      "encryption_config": "${CMAKE_CURRENT_BINARY_DIR}/test_files/encryption_config/openssl.json"
+    },
+    {
+      "core_type": "tcp",
+      "local_port": 40000
+    }
+  ]
+}
