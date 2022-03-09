@@ -687,11 +687,13 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec)
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(sub1_1.getValue<int>(), 36);
+    vFed1->requestTimeAsync(1.0);
     it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-
+    auto tm= vFed1->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
     broker.reset();
     vFed1->finalize();
 }
@@ -755,11 +757,13 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
     EXPECT_FALSE(pub1.hasMessage());
+    vFed1->requestTimeAsync(1.0);
     it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-
+    auto tm = vFed1->requestTimeComplete();
+    EXPECT_EQ(tm, 1.0);
     broker.reset();
     vFed1->finalize();
 }

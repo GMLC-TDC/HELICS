@@ -383,6 +383,9 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating,bool waiting) con
             
             for (const auto &dep:dependencies) {
                 if (dep.dependency) {
+                    if (dep.connection==ConnectionType::self) {
+                        continue;
+                    }
                     if (dep.mTimeState==TimeState::initialized) {
                         if (dep.grantedIteration==0) {
                             return false;
@@ -404,9 +407,20 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating,bool waiting) con
             });
         }
     }
-    return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (!(dep.mTimeState >= TimeState::exec_requested||(dep.connection==ConnectionType::self && dep.mTimeState>=TimeState::initialized))));
-    });
+    if (waiting) {
+        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
+            return (dep.dependency && dep.connection!=ConnectionType::self && 
+                    (dep.mTimeState < TimeState::time_requested));
+        });
+    } else {
+        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
+            return (dep.dependency &&
+                    (!(dep.mTimeState >= TimeState::exec_requested ||
+                       (dep.connection == ConnectionType::self &&
+                        dep.mTimeState >= TimeState::initialized))));
+        });
+    }
+    
 }
 
 bool TimeDependencies::hasActiveTimeDependencies() const
@@ -514,6 +528,9 @@ static void generateMinTimeImplementation(TimeData& mTime,
                                           GlobalFederateId ignore)
 {
     if (dep.mTimeState < TimeState::time_granted) {
+        if (dep.fedID == ignore) {
+            return;
+        }
         if (dep.mTimeState<mTime.mTimeState) {
             mTime.minFed = dep.fedID;
             mTime.mTimeState = dep.mTimeState;
