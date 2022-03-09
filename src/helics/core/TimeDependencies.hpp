@@ -45,12 +45,14 @@ class TimeData {
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false}; //indicator that data was sent in the current interval
+    bool delayedTiming{false};  //!< indicator that the dependency is using
     std::int32_t timeoutCount{0};  // counter for timeout checking
     std::int32_t requestIteration{0}; //the iteration number of the request
     std::int32_t minFedIteration{0}; //the iteration count of the min federate
     std::int32_t grantedIteration{0}; //the iteration of the dependency when the local iteration was granted
     TimeData() = default;
-    explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
+    explicit TimeData(Time start, TimeState startState = TimeState::initialized):
+        next{start}, Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const TimeData& update);
 };
@@ -67,7 +69,6 @@ class DependencyInfo: public TimeData {
     bool dependency{false};  //!< indicator that the dependency is an actual dependency
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
     bool nonGranting{false};  //!< indicator that the dependency is a non granting time coordinator
-    bool delayedTiming{false};  //!< indicator that the dependency uses delayed timing
     // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
@@ -154,6 +155,7 @@ class TimeDependencies {
 
 std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
                                  GlobalFederateId self,
+                            ConnectionType ignoreType=ConnectionType::none,
                                  GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,

@@ -727,7 +727,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
         auto it = vFed2->enterExecutingModeComplete();
         EXPECT_EQ(it, helics::IterationResult::ITERATING);
         EXPECT_TRUE(pub2.hasMessage());
-        if (pub1.hasMessage()) {
+        if (pub2.hasMessage()) {
             EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
         }
         
@@ -741,14 +741,14 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
             EXPECT_EQ(pub1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
         }
         
-        pub1.sendTo("test_" + std::to_string(ii + 5), "pub2");
+        pub1.sendTo("test_" + std::to_string(ii + 6), "pub2");
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
     auto it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::ITERATING);
     EXPECT_TRUE(pub2.hasMessage());
     if (pub2.hasMessage()) {
-        EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_14");
+        EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_15");
     }
     
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);

@@ -25,10 +25,9 @@ void ForwardingTimeCoordinator::enteringExecMode()
         return;
     }
     checkingExec = true;
-    ActionMessage execreq(CMD_EXEC_REQUEST);
-    execreq.source_id = source_id;
-    transmitTimingMessagesUpstream(execreq);
-    transmitTimingMessagesDownstream(execreq);
+    if (!dependencies.empty()) {
+        updateTimeFactors();
+    }
     bool fedOnly = true;
     noParent = true;
     for (const auto& dep : dependencies) {
@@ -99,30 +98,33 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 
     if (updateUpstream && !noParent) {
         auto upd = generateTimeRequest(upstream, GlobalFederateId{});
-        transmitTimingMessagesUpstream(upd);
+        if (upd.action()!=CMD_IGNORE) {
+            transmitTimingMessagesUpstream(upd);
+        }
     }
     if (updateDownstream) {
-        if (hasDelayedTimingFederate) {
-            if (downstream.minFed == delayedFederate) {
+        if (hasDelayedTimingFederate && downstream.minFed == delayedFederate) {
                 auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-                transmitTimingMessagesDownstream(upd, delayedFederate);
-                auto td = generateMinTimeUpstream(dependencies,
-                                                  restrictive_time_policy,
-                                                  source_id,
-                                                  delayedFederate);
-                DependencyInfo di;
-                di.update(td);
-                auto upd_delayed = generateTimeRequest(di, delayedFederate);
-                if (sendMessageFunction) {
-                    sendMessageFunction(upd_delayed);
+            if (upd.action()!=CMD_IGNORE) {
+                    transmitTimingMessagesDownstream(upd, downstream.minFed);
+                    auto td = generateMinTimeUpstream(dependencies,
+                                                      restrictive_time_policy,
+                                                      source_id,
+                                                      downstream.minFed);
+                    DependencyInfo di;
+                    di.update(td);
+                    auto upd_delayed = generateTimeRequest(di, downstream.minFed);
+                    if (sendMessageFunction) {
+                        sendMessageFunction(upd_delayed);
+                    }
                 }
-            } else {
-                auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-                transmitTimingMessagesDownstream(upd);
-            }
+                
         } else {
             auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-            transmitTimingMessagesDownstream(upd);
+            if (upd.action()!=CMD_IGNORE) {
+                transmitTimingMessagesDownstream(upd);
+            }
+            
         }
     }
 }
@@ -261,8 +263,27 @@ GlobalFederateId ForwardingTimeCoordinator::getMinDependency() const
 MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
+    bool allowed{false};
     if (!dependencies.checkIfReadyForExecEntry(false,false)) {
-        return ret;
+        if (downstream.mTimeState==TimeState::exec_requested_iterative) {
+            allowed = true;
+            for (auto &dep:dependencies) {
+                if (dep.dependency) {
+                    if (dep.minFed!=source_id) {
+                        allowed = false;
+                        break;
+                    }
+                    if (dep.minFedIteration!=downstream.requestIteration) {
+                        allowed = false;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!allowed) {
+            return ret;
+        }
+        
     }
     executionMode = true;
     ret = MessageProcessingResult::NEXT_STEP;
@@ -302,21 +323,66 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
     nTime.source_id = source_id;
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
-
-    if (dep.mTimeState == TimeState::time_granted) {
-        nTime.setAction(CMD_TIME_GRANT);
-    } else if (dep.mTimeState == TimeState::time_requested) {
-        nTime.setExtraData(dep.minFed.baseValue());
-        nTime.Tdemin = std::min(dep.minDe, dep.Te);
-        nTime.Te = dep.Te;
-    } else if (dep.mTimeState == TimeState::time_requested_iterative) {
-        nTime.setExtraData(dep.minFed.baseValue());
-        setActionFlag(nTime, iteration_requested_flag);
-        nTime.Tdemin = std::min(dep.minDe, dep.Te);
-        nTime.Te = dep.Te;
-    } else if (dep.mTimeState == TimeState::exec_requested) {
-        nTime.setAction(CMD_IGNORE);
+    if (dep.delayedTiming) {
+        setActionFlag(nTime, delayed_timing_flag);
     }
+    switch (dep.mTimeState) {
+        case TimeState::time_granted:
+            nTime.setAction(CMD_TIME_GRANT);
+            break;
+        case TimeState::time_requested:
+            nTime.setExtraData(dep.minFed.baseValue());
+            nTime.Tdemin = std::min(dep.minDe, dep.Te);
+            nTime.Te = dep.Te;
+            break;
+        case TimeState::time_requested_iterative:
+            nTime.setExtraData(dep.minFed.baseValue());
+            setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
+            nTime.Tdemin = std::min(dep.minDe, dep.Te);
+            nTime.Te = dep.Te;
+            nTime.counter = dep.requestIteration;
+            break;
+        case TimeState::time_requested_require_iteration:
+            nTime.setExtraData(dep.minFed.baseValue());
+            setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
+            nTime.Tdemin = std::min(dep.minDe, dep.Te);
+            nTime.counter = dep.requestIteration;
+            nTime.Te = dep.Te;
+            break;
+        case TimeState::exec_requested:
+        case TimeState::error:
+            nTime.setAction(CMD_IGNORE);
+            //no need to send updates for this
+            break;
+        case TimeState::exec_requested_iterative:
+            nTime.setAction(CMD_EXEC_REQUEST);
+            setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
+            nTime.setExtraData(dep.minFed.baseValue());
+            nTime.setExtraDestData(dep.minFedIteration);
+            nTime.counter = dep.requestIteration;
+            break;
+        case TimeState::exec_requested_require_iteration:
+            nTime.setAction(CMD_EXEC_REQUEST);
+            setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
+            nTime.setExtraData(dep.minFed.baseValue());
+            nTime.setExtraDestData(dep.minFedIteration);
+            nTime.counter = dep.requestIteration;
+            break;
+        case TimeState::initialized:
+            if (dep.minFedIteration==0) {
+                nTime.setAction(CMD_IGNORE);
+            } else {
+                nTime.setAction(CMD_EXEC_GRANT);
+                nTime.setExtraData(dep.minFed.baseValue());
+                nTime.setExtraDestData(dep.minFedIteration);
+                setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
+                nTime.counter = dep.requestIteration;
+            }
+            
+            break;
+
+    }
+   
     return nTime;
 }
 

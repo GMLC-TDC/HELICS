@@ -145,6 +145,13 @@ bool TimeData::update(const TimeData& update)
         minFed = update.minFed;
         updated = true;
     }
+    if (update.requestIteration!=requestIteration) {
+        requestIteration = update.requestIteration;
+    }
+    if (update.minFedIteration!=minFedIteration) {
+        minFedIteration = update.minFedIteration;
+        updated = true;
+    }
     if (update.minFedActual != minFedActual) {
         minFedActual = update.minFedActual;
         updated = true;
@@ -506,6 +513,24 @@ static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
                                           GlobalFederateId ignore)
 {
+    if (dep.mTimeState < TimeState::time_granted) {
+        if (dep.mTimeState<mTime.mTimeState) {
+            mTime.minFed = dep.fedID;
+            mTime.mTimeState = dep.mTimeState;
+            mTime.minFedIteration = dep.requestIteration;
+            mTime.requestIteration = dep.requestIteration;
+            mTime.delayedTiming = dep.delayedTiming;
+        } else if (dep.mTimeState == mTime.mTimeState) {
+            if (dep.fedID<mTime.minFed) {
+                mTime.minFed = dep.fedID;
+                mTime.minFedIteration = dep.requestIteration;
+                mTime.requestIteration = dep.requestIteration;
+                mTime.delayedTiming = dep.delayedTiming;
+            }
+        }
+        return;
+    }
+
     if (dep.fedID == ignore) {
         if (dep.fedID.isBroker()) {
             if (dep.Te < mTime.minDe) {
@@ -515,6 +540,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
 
         return;
     }
+    
     if (dep.connection != ConnectionType::self) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
@@ -554,6 +580,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
 
 std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
                                          GlobalFederateId self,
+                                         ConnectionType ignoreType,
                                          GlobalFederateId ignore)
 {
     GlobalFederateId minId;
@@ -567,7 +594,7 @@ std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDepen
         if (dep.fedID==ignore) {
             continue;
         }
-        if (dep.connection==ConnectionType::self) {
+        if (dep.connection==ConnectionType::self || dep.connection==ignoreType) {
             continue;
         }
         if (self.isValid() && dep.minFedActual == self) {
@@ -598,7 +625,8 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  GlobalFederateId self,
                                  GlobalFederateId ignore)
 {
-    TimeData mTime(Time::maxVal());
+    TimeData mTime(Time::maxVal(),TimeState::error);
+    std::int32_t iterationCount{0};
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -609,6 +637,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
+        iterationCount += dep.requestIteration;
         generateMinTimeImplementation(mTime, dep, ignore);
     }
     if (mTime.Te < mTime.minDe) {
@@ -620,7 +649,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-
+    mTime.requestIteration = iterationCount;
     return mTime;
 }
 
@@ -629,7 +658,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    GlobalFederateId self,
                                    GlobalFederateId ignore)
 {
-    TimeData mTime(Time::maxVal());
+    TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -651,7 +680,11 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-
+    if (mTime.mTimeState < TimeState::exec_requested) {
+        auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
+        mTime.minFed = res.first;
+        
+    }
     return mTime;
 }
 
@@ -660,7 +693,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               GlobalFederateId self,
                               GlobalFederateId ignore)
 {
-    TimeData mTime(Time::maxVal());
+    TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
