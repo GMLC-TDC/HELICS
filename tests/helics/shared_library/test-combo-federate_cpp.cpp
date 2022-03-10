@@ -27,7 +27,6 @@ class cfed_type_tests:
 
 /** test block send and receive*/
 
-
 //
 TEST_F(cfed_tests, test_file_load)
 {

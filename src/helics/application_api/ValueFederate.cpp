@@ -371,10 +371,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
 
                 id = &registerInput(emptyStr, type, units);
                 if (!skipNameTarget) {
-                    //this check is to prevent some warnings since targets get added later
+                    // this check is to prevent some warnings since targets get added later
                     id->addTarget(name);
                 }
-                
             }
 
             loadOptions(this, sub, *id);

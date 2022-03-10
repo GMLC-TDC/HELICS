@@ -656,9 +656,7 @@ class Federate {
                                                                        hThrowOnError()));
     }
     /** get a count of the number of filters registered in a federate*/
-    int getFilterCount() const {
-        return helicsFederateGetFilterCount(fed);
-    }
+    int getFilterCount() const { return helicsFederateGetFilterCount(fed); }
     /** get the id of a source filter from the name of the endpoint
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
