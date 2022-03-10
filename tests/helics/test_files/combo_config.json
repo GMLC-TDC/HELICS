@@ -1,0 +1,71 @@
+{
+    "name": "combo_fed",
+    "period": 1.3,
+    "coretype": "test",
+    "flags":"autobroker",
+    "publications": [
+        {
+            "global": false,
+            "name": "complex_pub",
+            "type": "complex",
+            "unit": "VA",
+            "info": "{\"object\":\"tpxm\",\"property\":\"measured_power\"}"
+        },
+        {
+            "global": false,
+            "name": "double_pub",
+            "type": "double",
+            "unit": "W",
+            "info": "{\"object\":\"tpxm\",\"property\":\"measured_real_power\"}"
+        },
+        {
+            "global": false,
+            "name": "integer_pub",
+            "type": "integer",
+            "info": "{\"object\":\"house1\",\"property\":\"thermostat_cycle_time\"}"
+        },
+        {
+            "global": false,
+            "name": "string_pub",
+            "type": "string",
+            "info": "{\"object\":\"tpxm\",\"property\":\"bill_mode\"}"
+        }
+    ],
+    "subscriptions": [
+        {
+            "global": false,
+            "target": "python_federate/complex_pub",
+            "type": "complex",
+            "unit": "VA",
+            "info": "{\"object\":\"tpxl\",\"property\":\"constant_power_12\"}"
+        },
+        {
+            "global": false,
+            "target": "python_federate/double_pub",
+            "type": "double",
+            "unit": "degF",
+            "info": "{\"object\":\"house1\",\"property\":\"heating_setpoint\"}"
+        },
+        {
+            "global": false,
+            "target": "python_federate/integer_pub",
+            "type": "integer",
+            "info": "{\"object\":\"house1\",\"property\":\"thermostat_cycle_time\"}"
+        },
+        {
+            "global": false,
+            "target": "python_federate/string_pub",
+            "type": "string",
+            "info": "{\"object\":\"house1\",\"property\":\"heating_system_type\"}"
+        }
+    ],
+    "endpoints": [
+        {
+            "global": false,
+            "name": "string_ep",
+            "type": "string",
+            "destination": "python_federate/string_ep",
+            "info": "{\"publication_info\":{\"object\": \"tpxm\",\"property\": \"measured_real_power\"},\"subscription_info\":{\"object\":\"house1\",\"property\":\"cooling_setpoint\"}}"
+        }
+    ]
+}
