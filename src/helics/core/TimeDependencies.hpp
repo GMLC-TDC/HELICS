@@ -9,9 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_CoreTypes.hpp"
 
 #include "json/forwards.h"
-#include <vector>
-#include <utility>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace helics {
 class ActionMessage;

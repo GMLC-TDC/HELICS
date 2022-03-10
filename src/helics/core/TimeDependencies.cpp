@@ -412,9 +412,9 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
             }
             return true;
         }
-            return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-                return (dep.dependency && dep.mTimeState == TimeState::initialized);
-            });
+        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
+            return (dep.dependency && dep.mTimeState == TimeState::initialized);
+        });
     }
     if (waiting) {
         return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
@@ -422,12 +422,12 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                     (dep.mTimeState < TimeState::time_requested));
         });
     }
-        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-            return (dep.dependency &&
-                    (!(dep.mTimeState >= TimeState::exec_requested ||
-                       (dep.connection == ConnectionType::self &&
-                        dep.mTimeState >= TimeState::initialized))));
-        });
+    return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
+        return (dep.dependency &&
+                (!(dep.mTimeState >= TimeState::exec_requested ||
+                   (dep.connection == ConnectionType::self &&
+                    dep.mTimeState >= TimeState::initialized))));
+    });
 }
 
 bool TimeDependencies::hasActiveTimeDependencies() const

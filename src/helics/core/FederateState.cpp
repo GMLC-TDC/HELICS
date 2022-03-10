@@ -1230,7 +1230,6 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     timeCoord->processTimeMessage(cmd);
                 }
                 epi->addMessage(createMessageFromCommand(std::move(cmd)));
-                
             }
         } break;
         case CMD_PUB: {
