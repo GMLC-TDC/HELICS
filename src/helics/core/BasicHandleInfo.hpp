@@ -19,13 +19,11 @@ namespace helics {
 enum handle_flag_definitions {
     mapped_flag = extra_flag1,
     /// indicator that an endpoint or message has a source filter
-    has_source_filter_flag =
-        extra_flag2,
+    has_source_filter_flag = extra_flag2,
     /// indicator that an endpoint or message has a destination filter
-    has_dest_filter_flag =
-        extra_flag3,
+    has_dest_filter_flag = extra_flag3,
     /// indicator that the endpoint or filter has a destination filter that alters the message
-    has_non_cloning_dest_filter_flag = extra_flag4 
+    has_non_cloning_dest_filter_flag = extra_flag4
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -45,7 +43,6 @@ class BasicHandleInfo {
         type_out(units)
 
     {
-
     }
 
     const GlobalHandle handle{};  //!< the global federate id for the creator of the handle
