@@ -284,6 +284,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                     case message_process_result::no_effect:
                         returnable = true;
                         proc = MessageProcessingResult::CONTINUE_PROCESSING;
+                        break;
                     default:
                         break;
                 }

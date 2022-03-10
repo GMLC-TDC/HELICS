@@ -115,8 +115,9 @@ void ForwardingTimeCoordinator::updateTimeFactors()
     if (updateDownstream) {
         if (dependencies.hasDelayedDependency() && downstream.minFed == dependencies.delayedDependency()) {
                 auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-            if (upd.action()!=CMD_IGNORE) {
-                    transmitTimingMessagesDownstream(upd, downstream.minFed);
+            if (upd.action() != CMD_IGNORE) {
+                transmitTimingMessagesDownstream(upd, downstream.minFed);
+            }
                     auto td = generateMinTimeUpstream(dependencies,
                                                       restrictive_time_policy,
                                                       source_id,
@@ -127,7 +128,6 @@ void ForwardingTimeCoordinator::updateTimeFactors()
                     if (sendMessageFunction) {
                         sendMessageFunction(upd_delayed);
                     }
-                }
                 
         } else {
             auto upd = generateTimeRequest(downstream, GlobalFederateId{});
