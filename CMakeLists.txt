@@ -673,10 +673,10 @@ include(addSpdlog)
 add_library(HELICS::spdlog ALIAS spdlog)
 
 # --------------------------------------------------------------
-# Create the target for unitslib
+# Create the target for the units library
 # -----------------------------------------------------------
 include(addUnits)
-add_library(HELICS::units ALIAS units-static)
+add_library(HELICS::units ALIAS units)
 
 # -----------------------------------------------------------------------------
 # create utilities target

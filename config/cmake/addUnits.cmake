@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -11,19 +11,22 @@
 set(UNITS_INSTALL OFF CACHE INTERNAL "")
 
 if(NOT CMAKE_CXX_STANDARD)
-    set(CMAKE_CXX_STANDARD 14) # Supported values are ``11``, ``14``, and ``17``.
+    set(CMAKE_CXX_STANDARD 17) # Supported values are ``11``, ``14``, and ``17``.
 endif()
 
 set(UNITS_BUILD_OBJECT_LIBRARY OFF CACHE INTERNAL "")
 set(UNITS_BUILD_STATIC_LIBRARY ON CACHE INTERNAL "")
 set(UNITS_BUILD_SHARED_LIBRARY OFF CACHE INTERNAL "")
+set(UNITS_BUILD_CONVERTER_APP OFF CACHE INTERNAL "")
 set(UNITS_BUILD_WEBSERVER OFF CACHE INTERNAL "")
 set(UNITS_CLANG_TIDY_OPTIONS "" CACHE INTERNAL "")
+set(UNITS_BUILD_FUZZ_TARGETS OFF CACHE INTERNAL "")
+
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/ThirdParty/units"
                  "${PROJECT_BINARY_DIR}/ThirdParty/units")
 
-set_target_properties(units-static PROPERTIES FOLDER Extern)
+set_target_properties(units PROPERTIES FOLDER Extern)
 
 hide_variable(UNITS_HEADER_ONLY)
 hide_variable(UNITS_BUILD_OBJECT_LIBRARY)
