@@ -113,28 +113,28 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
     if (updateDownstream) {
-        if (dependencies.hasDelayedDependency() && downstream.minFed == dependencies.delayedDependency()) {
-                auto upd = generateTimeRequest(downstream, GlobalFederateId{});
+        if (dependencies.hasDelayedDependency() &&
+            downstream.minFed == dependencies.delayedDependency()) {
+            auto upd = generateTimeRequest(downstream, GlobalFederateId{});
             if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-                    auto td = generateMinTimeUpstream(dependencies,
-                                                      restrictive_time_policy,
-                                                      source_id,
-                                                      downstream.minFed);
-                    DependencyInfo di;
-                    di.update(td);
-                    auto upd_delayed = generateTimeRequest(di, downstream.minFed);
-                    if (sendMessageFunction) {
-                        sendMessageFunction(upd_delayed);
-                    }
-        } else {
-            auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-            if (upd.action() != CMD_IGNORE) {
-                transmitTimingMessagesDownstream(upd);
-            }
+            auto td = generateMinTimeUpstream(dependencies,
+                                              restrictive_time_policy,
+                                              source_id,
+                                              downstream.minFed);
+            DependencyInfo di;
+            di.update(td);
+            auto upd_delayed = generateTimeRequest(di, downstream.minFed);
+            if (sendMessageFunction) {
+                sendMessageFunction(upd_delayed);
+    } else {
+        auto upd = generateTimeRequest(downstream, GlobalFederateId{});
+        if (upd.action() != CMD_IGNORE) {
+            transmitTimingMessagesDownstream(upd);
         }
     }
+}
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
