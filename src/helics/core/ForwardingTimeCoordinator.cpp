@@ -135,7 +135,6 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 }
-}
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {

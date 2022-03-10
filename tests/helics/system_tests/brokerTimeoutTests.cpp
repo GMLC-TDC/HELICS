@@ -53,7 +53,7 @@ TEST(broker_timeout, core_fail_timeout)
     if (!val) {
         val = brk->waitForDisconnect(std::chrono::milliseconds(2000));
     }
-    if (val == false) {
+    if (!val) {
         brk->waitForDisconnect(std::chrono::milliseconds(1000));
     }
     EXPECT_TRUE(val);

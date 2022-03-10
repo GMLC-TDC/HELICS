@@ -909,7 +909,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 if (dependencies.checkIfReadyForExecEntry(false,
                                                           info.wait_for_current_time_updates)) {
                     ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                        ret = MessageProcessingResult::ITERATING :
+                        MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;
                 } else {
                     bool allowed{!info.wait_for_current_time_updates};
@@ -935,7 +935,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                     }
                     if (allowed) {
                         ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                            ret = MessageProcessingResult::ITERATING :
+                            MessageProcessingResult::ITERATING :
                             MessageProcessingResult::NEXT_STEP;
                     } else {
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;

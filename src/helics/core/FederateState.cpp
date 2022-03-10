@@ -1226,10 +1226,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.actionTime,
                                     time_granted));
                 }
-                epi->addMessage(createMessageFromCommand(std::move(cmd)));
                 if (state <= HELICS_EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
                 }
+                epi->addMessage(createMessageFromCommand(std::move(cmd)));
+                
             }
         } break;
         case CMD_PUB: {

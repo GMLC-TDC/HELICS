@@ -28,7 +28,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                                                      TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
             delayed = checkActionFlag(m, delayed_timing_flag);
-            if (delayed & !dep.delayedTiming) {
+            if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
@@ -71,7 +71,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
             delayed = checkActionFlag(m, delayed_timing_flag);
-            if (delayed & !dep.delayedTiming) {
+            if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
@@ -411,25 +411,23 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                 }
             }
             return true;
-        } else {
+        }
             return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
                 return (dep.dependency && dep.mTimeState == TimeState::initialized);
             });
-        }
     }
     if (waiting) {
         return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
             return (dep.dependency && dep.connection != ConnectionType::self &&
                     (dep.mTimeState < TimeState::time_requested));
         });
-    } else {
+    }
         return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
             return (dep.dependency &&
                     (!(dep.mTimeState >= TimeState::exec_requested ||
                        (dep.connection == ConnectionType::self &&
                         dep.mTimeState >= TimeState::initialized))));
         });
-    }
 }
 
 bool TimeDependencies::hasActiveTimeDependencies() const
@@ -537,7 +535,7 @@ std::pair<int, std::string> TimeDependencies::checkForIssues(bool waiting) const
     // check for timing deadlock with wait_for_current_time_flag
 
     bool hasDelayedTiming = waiting;
-    for (auto& dep : dependencies) {
+    for (const auto& dep : dependencies) {
         if (dep.dependency && dep.dependent && dep.delayedTiming &&
             dep.connection != ConnectionType::self) {
             mDelayedDependency = dep.fedID;
@@ -633,7 +631,6 @@ std::pair<GlobalFederateId, std::int32_t>
     GlobalFederateId minId;
     std::int32_t minIteration{0};
     TimeState minTimeState{TimeState::initialized};
-    bool delayedFed{false};
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -655,7 +652,6 @@ std::pair<GlobalFederateId, std::int32_t>
             minId = dep.fedID;
             minIteration = dep.requestIteration;
             minTimeState = dep.mTimeState;
-            delayedFed = dep.delayedTiming;
             if (minTimeState == TimeState::initialized) {
                 minId = GlobalFederateId{};
                 minIteration = 0;
