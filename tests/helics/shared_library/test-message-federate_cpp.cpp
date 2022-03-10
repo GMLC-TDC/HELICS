@@ -23,7 +23,7 @@ class mfed_type_tests:
 };
 
 /** test simple creation and destruction*/
-TEST_P(mfed_type_tests, message_federate_initialize_tests)
+TEST_P(mfed_type_tests, message_federate_initialize)
 {
     SetupTest<helicscpp::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);

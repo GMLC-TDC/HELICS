@@ -34,6 +34,7 @@ set(cpp_shared_library_test_sources
     test-value-federate2_cpp.cpp
     # FilterTests_cpp.cpp
     test-message-federate_cpp.cpp
+    test-combo-federate_cpp.cpp
     timingTests_cpp.cpp
     QueryTests_cpp.cpp
     MultiInputTests.cpp
