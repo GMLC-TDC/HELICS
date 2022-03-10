@@ -89,7 +89,7 @@ class ForwardingTimeCoordinator {
     /** process a message related to time
     @return a message_process_result if it did anything
     */
-    bool processTimeMessage(const ActionMessage& cmd);
+    DependencyProcessingResult processTimeMessage(const ActionMessage& cmd);
 
     /** process a dependency update message*/
     void processDependencyUpdateMessage(const ActionMessage& cmd);

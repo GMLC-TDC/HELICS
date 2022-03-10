@@ -16,15 +16,24 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
+
+
+static DependencyProcessingResult processMessage(const ActionMessage& m, DependencyInfo& dep)
 {
+    DependencyProcessingResult res{DependencyProcessingResult::PROCESSED};
+    bool delayed{false};
     switch (m.action()) {
         case CMD_EXEC_REQUEST:
             dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
                 (checkActionFlag(m,required_flag)?TimeState::exec_requested_require_iteration:
                 TimeState::exec_requested_iterative) :
                 TimeState::exec_requested;
-            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
+            delayed = checkActionFlag(m, delayed_timing_flag);
+            if (delayed & !dep.delayedTiming)
+            {
+                res = DependencyProcessingResult::PROCESSED_AND_CHECK;
+            }
+            dep.delayedTiming = delayed;
             dep.requestIteration = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.minFedIteration = m.getExtraDestData();
@@ -63,7 +72,11 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
 
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
-            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
+            delayed = checkActionFlag(m, delayed_timing_flag);
+            if (delayed & !dep.delayedTiming) {
+                res = DependencyProcessingResult::PROCESSED_AND_CHECK;
+            }
+            dep.delayedTiming = delayed;
             dep.requestIteration = m.counter;
             dep.minFedIteration = m.getExtraDestData();
             break;
@@ -110,9 +123,10 @@ static bool processMessage(const ActionMessage& m, DependencyInfo& dep)
             dep.hasData = true;
             break;
         default:
-            return false;
+            res = DependencyProcessingResult::NOT_PROCESSED;
+            break;
     }
-    return true;
+    return res;
 }
 
 bool TimeData::update(const TimeData& update)
@@ -365,13 +379,13 @@ void TimeDependencies::removeInterdependence(GlobalFederateId id)
     }
 }
 
-bool TimeDependencies::updateTime(const ActionMessage& m)
+DependencyProcessingResult TimeDependencies::updateTime(const ActionMessage& m)
 {
     auto dependency_id = m.source_id;
 
     auto* depInfo = getDependencyInfo(GlobalFederateId(dependency_id));
     if (depInfo == nullptr || !depInfo->dependency) {
-        return false;
+        return DependencyProcessingResult::NOT_PROCESSED;
     }
     return processMessage(m, *depInfo);
 }

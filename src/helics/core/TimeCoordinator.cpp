@@ -1108,8 +1108,15 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 break;
         }
     }
-    return (dependencies.updateTime(cmd)) ? message_process_result::processed :
-                                            message_process_result::no_effect;
+    auto procRes = dependencies.updateTime(cmd);
+    switch (procRes) {
+        case DependencyProcessingResult::NOT_PROCESSED:
+            return message_process_result::no_effect;
+        case DependencyProcessingResult::PROCESSED:
+            return message_process_result::processed;
+        case DependencyProcessingResult::PROCESSED_AND_CHECK:
+            return message_process_result::processed;
+    }
 }
 
 Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime)

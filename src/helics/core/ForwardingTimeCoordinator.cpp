@@ -442,7 +442,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     }
 }
 
-bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+DependencyProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_DISCONNECT:

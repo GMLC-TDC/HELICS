@@ -15,7 +15,7 @@ namespace helics {
 class ActionMessage;
 
 /**enumeration of possible states for a federate to be in regards to time request*/
-enum class TimeState : uint8_t {
+enum class TimeState : std::uint8_t {
     initialized = 0,
     exec_requested_require_iteration=1,
     exec_requested_iterative = 2,
@@ -27,13 +27,21 @@ enum class TimeState : uint8_t {
     error = 10
 };
 
-enum class ConnectionType : uint8_t {
+enum class ConnectionType : std::uint8_t {
     independent = 0,
     parent = 1,
     child = 2,
     self = 3,
     none = 4,
 };
+
+   /** enumeration of the possible message processing results*/
+enum class DependencyProcessingResult : std::uint8_t {
+    NOT_PROCESSED = 0,
+    PROCESSED = 1,
+    PROCESSED_AND_CHECK = 2
+};
+
 // helper class containing the basic timeData
 class TimeData {
   public:
@@ -102,7 +110,7 @@ class TimeDependencies {
     /** remove an interdependency from consideration*/
     void removeInterdependence(GlobalFederateId id);
     /** update the info about a dependency based on a message*/
-    bool updateTime(const ActionMessage& m);
+    DependencyProcessingResult updateTime(const ActionMessage& m);
     /** get the number of dependencies*/
     auto size() const { return dependencies.size(); }
     /** iterator to first dependency*/
