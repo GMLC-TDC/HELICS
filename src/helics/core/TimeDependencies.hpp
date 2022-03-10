@@ -17,11 +17,11 @@ class ActionMessage;
 /**enumeration of possible states for a federate to be in regards to time request*/
 enum class TimeState : std::uint8_t {
     initialized = 0,
-    exec_requested_require_iteration=1,
+    exec_requested_require_iteration = 1,
     exec_requested_iterative = 2,
     exec_requested = 3,
     time_granted = 5,
-    time_requested_require_iteration=6,
+    time_requested_require_iteration = 6,
     time_requested_iterative = 7,
     time_requested = 8,
     error = 10
@@ -35,7 +35,7 @@ enum class ConnectionType : std::uint8_t {
     none = 4,
 };
 
-   /** enumeration of the possible message processing results*/
+/** enumeration of the possible message processing results*/
 enum class DependencyProcessingResult : std::uint8_t {
     NOT_PROCESSED = 0,
     PROCESSED = 1,
@@ -52,12 +52,13 @@ class TimeData {
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
-    bool hasData{false}; //indicator that data was sent in the current interval
+    bool hasData{false};  // indicator that data was sent in the current interval
     bool delayedTiming{false};  //!< indicator that the dependency is using
     std::int32_t timeoutCount{0};  // counter for timeout checking
-    std::int32_t requestIteration{0}; //the iteration number of the request
-    std::int32_t minFedIteration{0}; //the iteration count of the min federate
-    std::int32_t grantedIteration{0}; //the iteration of the dependency when the local iteration was granted
+    std::int32_t requestIteration{0};  // the iteration number of the request
+    std::int32_t minFedIteration{0};  // the iteration count of the min federate
+    std::int32_t grantedIteration{
+        0};  // the iteration of the dependency when the local iteration was granted
     TimeData() = default;
     explicit TimeData(Time start, TimeState startState = TimeState::initialized):
         next{start}, Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState} {};
@@ -91,6 +92,7 @@ class TimeDependencies {
   private:
     std::vector<DependencyInfo> dependencies;  //!< container
     mutable GlobalFederateId mDelayedDependency{};
+
   public:
     /** default constructor*/
     TimeDependencies() = default;
@@ -168,10 +170,11 @@ class TimeDependencies {
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
-std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
-                                 GlobalFederateId self,
-                            ConnectionType ignoreType=ConnectionType::none,
-                                 GlobalFederateId ignore = GlobalFederateId{});
+std::pair<GlobalFederateId, std::int32_t>
+    getExecEntryMinFederate(const TimeDependencies& dependencies,
+                            GlobalFederateId self,
+                            ConnectionType ignoreType = ConnectionType::none,
+                            GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,

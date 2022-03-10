@@ -103,7 +103,7 @@ std::pair<double, int> runInitIterations(helics::ValueFederate* vfed, int index,
         auto val2 = sub_low.getValue<double>();
         cval = (val1 + val2) / 2.0;
         ++itcount;
-       //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
+        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
         //  index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
     return {cval, itcount};
@@ -135,25 +135,25 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
 {
     try {
         SetupTest<helics::ValueFederate>(GetParam(), 3);
-    
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
-    auto fut1 =
-        std::async(std::launch::async, [vFed1]() { return runInitIterations(vFed1.get(), 0, 3); });
-    auto fut2 =
-        std::async(std::launch::async, [vFed2]() { return runInitIterations(vFed2.get(), 1, 3); });
 
-    auto res3 = runInitIterations(vFed3.get(), 2, 3);
-    auto res2 = fut2.get();
-    auto res1 = fut1.get();
-    EXPECT_NEAR(res3.first, 2.5, 0.1);
-    EXPECT_NEAR(res2.first, 2.5, 0.1);
-    EXPECT_NEAR(res1.first, 2.5, 0.1);
-    vFed1->finalize();
-    vFed2->finalize();
-    vFed3->finalize();
-    helics::cleanupHelicsLibrary();
+        auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+        auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+        auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+        auto fut1 = std::async(std::launch::async,
+                               [vFed1]() { return runInitIterations(vFed1.get(), 0, 3); });
+        auto fut2 = std::async(std::launch::async,
+                               [vFed2]() { return runInitIterations(vFed2.get(), 1, 3); });
+
+        auto res3 = runInitIterations(vFed3.get(), 2, 3);
+        auto res2 = fut2.get();
+        auto res1 = fut1.get();
+        EXPECT_NEAR(res3.first, 2.5, 0.1);
+        EXPECT_NEAR(res2.first, 2.5, 0.1);
+        EXPECT_NEAR(res1.first, 2.5, 0.1);
+        vFed1->finalize();
+        vFed2->finalize();
+        vFed3->finalize();
+        helics::cleanupHelicsLibrary();
     }
     catch (...) {
         std::cerr << "unable to run for " << GetParam() << std::endl;
@@ -241,7 +241,6 @@ TEST_F(iteration_tests, execution_iteration_2fed_endpoint)
     vFed2->finalize();
     vFed1->finalize();
 }
-
 
 TEST_F(iteration_tests, execution_iteration_2fed_targeted_endpoint)
 {
@@ -541,8 +540,6 @@ TEST_F(iteration_tests, iteration_counter)
     deadlock.join();
 }
 
-
-
 TEST_F(iteration_tests, wait_for_current_time_iterative)
 {
     extraBrokerArgs = "--debugging";
@@ -692,12 +689,11 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec)
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
 
     vFed2->finalize();
-    auto tm= vFed1->requestTimeComplete();
+    auto tm = vFed1->requestTimeComplete();
     EXPECT_EQ(tm, 1.0);
     broker.reset();
     vFed1->finalize();
 }
-
 
 TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
 {
@@ -712,7 +708,6 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
     vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
 
     auto& pub1 = vFed1->registerGlobalEndpoint("pub1");
-
 
     auto& pub2 = vFed2->registerGlobalEndpoint("pub2");
 
@@ -732,7 +727,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
         if (pub2.hasMessage()) {
             EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
         }
-        
+
         pub2.sendTo("test_" + std::to_string(ii + 27), "pub1");
 
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
@@ -742,7 +737,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
         if (pub1.hasMessage()) {
             EXPECT_EQ(pub1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
         }
-        
+
         pub1.sendTo("test_" + std::to_string(ii + 6), "pub2");
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
@@ -752,7 +747,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
     if (pub2.hasMessage()) {
         EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_15");
     }
-    
+
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);

@@ -120,7 +120,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                         proc = grant;
                         break;
                     case MessageProcessingResult::CONTINUE_PROCESSING:
-                        if (cmd.action()==CMD_EXEC_GRANT && !checkActionFlag(cmd,iteration_requested_flag)) {
+                        if (cmd.action() == CMD_EXEC_GRANT &&
+                            !checkActionFlag(cmd, iteration_requested_flag)) {
                             timeCoord->sendUpdatedExecRequest();
                         }
                         break;

@@ -48,22 +48,22 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         return;
     }
     iterating = mode;
-    auto res=dependencies.checkForIssues(info.wait_for_current_time_updates);
-    if (res.first!=0) {
-            ActionMessage ge(CMD_GLOBAL_ERROR);
-            ge.dest_id = parent_broker_id;
-            ge.source_id = source_id;
-            ge.messageID = res.first;
-            ge.payload = res.second;
-            sendMessageFunction(ge);
-            return;
+    auto res = dependencies.checkForIssues(info.wait_for_current_time_updates);
+    if (res.first != 0) {
+        ActionMessage ge(CMD_GLOBAL_ERROR);
+        ge.dest_id = parent_broker_id;
+        ge.source_id = source_id;
+        ge.messageID = res.first;
+        ge.payload = res.second;
+        sendMessageFunction(ge);
+        return;
     }
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
     if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(execreq, iterating);
-        execreq.counter = iteration+1;
+        execreq.counter = iteration + 1;
         if (!hasInitUpdates) {
             auto mfed = getExecEntryMinFederate(dependencies, source_id);
             execreq.setExtraData(mfed.first.baseValue());
@@ -74,7 +74,6 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         setActionFlag(execreq, delayed_timing_flag);
     }
     transmitTimingMessages(execreq);
-    
 }
 
 void TimeCoordinator::disconnect()
@@ -830,16 +829,16 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
     return skipped;
 }
 
-void TimeCoordinator::sendUpdatedExecRequest(
-    GlobalFederateId target,GlobalFederateId minFed,
-    std::int32_t minFedIteration)
+void TimeCoordinator::sendUpdatedExecRequest(GlobalFederateId target,
+                                             GlobalFederateId minFed,
+                                             std::int32_t minFedIteration)
 {
     if (!minFed.isValid()) {
         auto mfed = getExecEntryMinFederate(dependencies, source_id);
         minFed = mfed.first;
         minFedIteration = mfed.second;
     }
-    
+
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
     setIterationFlags(execreq, iterating);
@@ -854,8 +853,8 @@ void TimeCoordinator::sendUpdatedExecRequest(
         execreq.dest_id = target;
         sendMessageFunction(execreq);
     } else {
-        for (const auto &dep:dependencies) {
-            if (dep.dependent && dep.mTimeState<TimeState::time_granted) {
+        for (const auto& dep : dependencies) {
+            if (dep.dependent && dep.mTimeState < TimeState::time_granted) {
                 execreq.dest_id = dep.fedID;
                 sendMessageFunction(execreq);
             }
@@ -869,13 +868,14 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
     if (time_block <= timeZero) {
         return ret;
     }
-    if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS,info.wait_for_current_time_updates)) {
+    if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS,
+                                               info.wait_for_current_time_updates)) {
         if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
             iterating != IterationRequest::NO_ITERATIONS) {
             // if we are just continuing
             auto mfed = getExecEntryMinFederate(dependencies, source_id);
             if (mfed.first == triggerFed) {
-                sendUpdatedExecRequest(triggerFed,mfed.first,mfed.second);
+                sendUpdatedExecRequest(triggerFed, mfed.first, mfed.second);
             }
         }
         return ret;
@@ -895,8 +895,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             break;
         case IterationRequest::ITERATE_IF_NEEDED:
         case IterationRequest::FORCE_ITERATION:
-            if (iteration>= info.maxIterations) {
-                if (iterating==IterationRequest::FORCE_ITERATION) {
+            if (iteration >= info.maxIterations) {
+                if (iterating == IterationRequest::FORCE_ITERATION) {
                     ret = MessageProcessingResult::ITERATING;
                 } else {
                     ret = MessageProcessingResult::NEXT_STEP;
@@ -904,31 +904,29 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 break;
             }
             if (hasInitUpdates) {
-                    ret = MessageProcessingResult::ITERATING;
+                ret = MessageProcessingResult::ITERATING;
             } else {
                 if (dependencies.checkIfReadyForExecEntry(false,
-                    info.wait_for_current_time_updates))
-                {
+                                                          info.wait_for_current_time_updates)) {
                     ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                         ret = MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;
-                }
-                else
-                {
+                } else {
                     bool allowed{!info.wait_for_current_time_updates};
                     if (allowed) {
-                        for (const auto &dep:dependencies) {
+                        for (const auto& dep : dependencies) {
                             if (!dep.dependency) {
                                 continue;
                             }
-                            if (dep.mTimeState==TimeState::initialized) {
+                            if (dep.mTimeState == TimeState::initialized) {
                                 allowed = false;
                                 break;
                             }
-                            if (dep.mTimeState>=TimeState::exec_requested) {
+                            if (dep.mTimeState >= TimeState::exec_requested) {
                                 continue;
                             }
-                            if (dep.minFed==source_id && (dep.minFedIteration==iteration.load()+1)) {
+                            if (dep.minFed == source_id &&
+                                (dep.minFedIteration == iteration.load() + 1)) {
                                 continue;
                             }
                             allowed = false;
@@ -943,7 +941,6 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
                 }
-                
             }
             break;
     }
@@ -991,7 +988,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
         // if we are just continuing
         auto mfed = getExecEntryMinFederate(dependencies, source_id);
         if (mfed.first == triggerFed) {
-            sendUpdatedExecRequest(triggerFed,mfed.first,mfed.second);
+            sendUpdatedExecRequest(triggerFed, mfed.first, mfed.second);
         }
     }
     return ret;
@@ -1095,7 +1092,8 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 }
                 break;
             case TimeState::exec_requested_iterative:
-                if ((iterating != IterationRequest::NO_ITERATIONS) && (checkingExec)&&(dep->hasData)) {
+                if ((iterating != IterationRequest::NO_ITERATIONS) && (checkingExec) &&
+                    (dep->hasData)) {
                     return message_process_result::delay_processing;
                 }
                 break;
@@ -1112,7 +1110,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             return message_process_result::processed;
         case DependencyProcessingResult::PROCESSED_AND_CHECK: {
             auto checkRes = dependencies.checkForIssues(info.wait_for_current_time_updates);
-            if (checkRes.first!=0) {
+            if (checkRes.first != 0) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
                 ge.dest_id = parent_broker_id;
                 ge.source_id = source_id;

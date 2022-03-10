@@ -108,7 +108,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 
     if (updateUpstream && !noParent) {
         auto upd = generateTimeRequest(upstream, GlobalFederateId{});
-        if (upd.action()!=CMD_IGNORE) {
+        if (upd.action() != CMD_IGNORE) {
             transmitTimingMessagesUpstream(upd);
         }
     }
@@ -128,13 +128,11 @@ void ForwardingTimeCoordinator::updateTimeFactors()
                     if (sendMessageFunction) {
                         sendMessageFunction(upd_delayed);
                     }
-                
         } else {
             auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-            if (upd.action()!=CMD_IGNORE) {
+            if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd);
             }
-            
         }
     }
 }
@@ -274,16 +272,16 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     bool allowed{false};
-    if (!dependencies.checkIfReadyForExecEntry(false,false)) {
-        if (downstream.mTimeState==TimeState::exec_requested_iterative) {
+    if (!dependencies.checkIfReadyForExecEntry(false, false)) {
+        if (downstream.mTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
-            for (auto &dep:dependencies) {
+            for (auto& dep : dependencies) {
                 if (dep.dependency) {
-                    if (dep.minFed!=source_id) {
+                    if (dep.minFed != source_id) {
                         allowed = false;
                         break;
                     }
-                    if (dep.minFedIteration!=downstream.requestIteration) {
+                    if (dep.minFedIteration != downstream.requestIteration) {
                         allowed = false;
                         break;
                     }
@@ -293,7 +291,6 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
         if (!allowed) {
             return ret;
         }
-        
     }
     executionMode = true;
     ret = MessageProcessingResult::NEXT_STEP;
@@ -345,7 +342,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
         case TimeState::exec_requested:
         case TimeState::error:
             nTime.setAction(CMD_IGNORE);
-            //no need to send updates for this
+            // no need to send updates for this
             break;
         case TimeState::exec_requested_iterative:
             nTime.setAction(CMD_EXEC_REQUEST);
@@ -362,7 +359,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.counter = dep.requestIteration;
             break;
         case TimeState::initialized:
-            if (dep.minFedIteration==0) {
+            if (dep.minFedIteration == 0) {
                 nTime.setAction(CMD_IGNORE);
             } else {
                 nTime.setAction(CMD_EXEC_GRANT);
@@ -371,11 +368,10 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
                 setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
                 nTime.counter = dep.requestIteration;
             }
-            
-            break;
 
+            break;
     }
-   
+
     return nTime;
 }
 
@@ -434,7 +430,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         }
     }
 }
- bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_DISCONNECT:
@@ -461,8 +457,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                 ge.dest_id = parent_broker_id;
                 ge.source_id = source_id;
                 ge.messageID = checkRes.first;
-                ge.payload =
-                    checkRes.second;
+                ge.payload = checkRes.second;
                 sendMessageFunction(ge);
             }
             return true;
