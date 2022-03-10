@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-void BasicHandleInfo::setTag(const std::string& tag, const std::string& value)
+void BasicHandleInfo::setTag(std::string_view tag, std::string_view value)
 {
     for (auto& tg : tags) {
         if (tg.first == tag) {
@@ -22,7 +22,7 @@ void BasicHandleInfo::setTag(const std::string& tag, const std::string& value)
 
 static const std::string emptyStr;
 
-const std::string& BasicHandleInfo::getTag(const std::string& tag) const
+const std::string& BasicHandleInfo::getTag(std::string_view tag) const
 {
     for (const auto& tg : tags) {
         if (tg.first == tag) {

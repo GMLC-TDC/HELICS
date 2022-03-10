@@ -7,18 +7,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "HandleManager.hpp"
 
 #include "ActionMessage.hpp"
-// TODO(PT): move the flags out of actionMessage
 
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           InterfaceType what,
-                                          const std::string& key,
-                                          const std::string& type,
-                                          const std::string& units)
+                                          std::string_view key,
+                                          std::string_view type,
+                                          std::string_view units)
 {
     InterfaceHandle local_id(static_cast<InterfaceHandle::BaseType>(handles.size()));
-    std::string actKey = (!key.empty()) ? key : generateName(what);
-    handles.emplace_back(fed_id, local_id, what, actKey, type, units);
+    std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
+    handles.emplace_back(fed_id, local_id, what, std::move(actKey), type, units);
     addSearchFields(handles.back(), local_id.baseValue());
     return handles.back();
 }
@@ -26,13 +25,13 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           InterfaceHandle local_id,
                                           InterfaceType what,
-                                          const std::string& key,
-                                          const std::string& type,
-                                          const std::string& units)
+                                          std::string_view key,
+                                          std::string_view type,
+                                          std::string_view units)
 {
     auto index = static_cast<int32_t>(handles.size());
-    std::string actKey = (!key.empty()) ? key : generateName(what);
-    handles.emplace_back(fed_id, local_id, what, actKey, type, units);
+    std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
+    handles.emplace_back(fed_id, local_id, what, std::move(actKey), type, units);
     addSearchFields(handles.back(), index);
     return handles.back();
 }

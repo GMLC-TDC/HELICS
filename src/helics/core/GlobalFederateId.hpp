@@ -49,7 +49,7 @@ class GlobalBrokerId {
     {
         return (gid != invalid_global_broker_id && gid != detail::gInvalidInterfaceHandle);
     }
-    BaseType localIndex() const { return gid - gGlobalBrokerIdShift; }
+    BaseType localIndex() const { return (gid>=gGlobalBrokerIdShift)?(gid - gGlobalBrokerIdShift):gid; } 
 
   private:
     BaseType gid = invalid_global_broker_id;  //!< the underlying index value
@@ -109,7 +109,7 @@ class GlobalFederateId {
     }
     /** generate a local offset index
         @details the global_id is shifted by a certain amount*/
-    constexpr BaseType localIndex() const { return gid - gGlobalFederateIdShift; }
+    constexpr BaseType localIndex() const { return(gid>=gGlobalFederateIdShift)?(gid - gGlobalFederateIdShift):gid; }
 
     /** get a pointer to the index value type for copying from memory*/
     BaseType* getBaseTypePointer() { return &gid; }

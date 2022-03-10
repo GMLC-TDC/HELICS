@@ -18,12 +18,14 @@ namespace helics {
 /** define extra flag definitions*/
 enum handle_flag_definitions {
     mapped_flag = extra_flag1,
+    /// indicator that an endpoint or message has a source filter
     has_source_filter_flag =
-        extra_flag2,  //!< indicator that an endpoint or message has a source filter
+        extra_flag2,
+    /// indicator that an endpoint or message has a destination filter
     has_dest_filter_flag =
-        extra_flag3,  //!< indicator that an endpoint or message has a destination filter
-    has_non_cloning_dest_filter_flag = extra_flag4  //!< indicator that the endpoint or filter has a
-                                                    //!< destination filter that alters the message
+        extra_flag3,
+    /// indicator that the endpoint or filter has a destination filter that alters the message
+    has_non_cloning_dest_filter_flag = extra_flag4 
 };
 
 /** class defining and capturing basic information about a handle*/
@@ -35,17 +37,15 @@ class BasicHandleInfo {
     BasicHandleInfo(GlobalFederateId federate_id,
                     InterfaceHandle handle_id,
                     InterfaceType type_of_handle,
-                    const std::string& key_name,
-                    const std::string& type_name,
-                    const std::string& unit_name):
+                    std::string_view key_name,
+                    std::string_view type_name,
+                    std::string_view unit_name):
         handle{federate_id, handle_id},
         handleType(type_of_handle), key(key_name), type(type_name), units(unit_name), type_in(type),
         type_out(units)
 
     {
-        /* NOTE:: all current cases already have std::string they are passing into the function and
-        most are short,so we are taking by reference to avoid a copy then move  and just have a
-        copy*/
+
     }
 
     const GlobalHandle handle{};  //!< the global federate id for the creator of the handle
@@ -65,9 +65,9 @@ class BasicHandleInfo {
     /** extract a global federate id */
     GlobalFederateId getFederateId() const { return handle.fed_id; }
     /** set a tag (key-value pair)*/
-    void setTag(const std::string& tag, const std::string& value);
+    void setTag(std::string_view tag, std::string_view value);
     /** search for a tag by name*/
-    const std::string& getTag(const std::string& tag) const;
+    const std::string& getTag(std::string_view tag) const;
     /** get a tag (key-value pair) by index*/
     const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
     {
