@@ -55,12 +55,12 @@ TEST_F(iteration_tests, execution_iteration_endpoint)
     SetupTest<helics::MessageFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
     // register the publications
-    auto& epid1 = vFed1->registerGlobalEndpoint("pub1");
+    auto& epid1 = vFed1->registerGlobalEndpoint("ep1");
 
-    auto& epid2 = vFed1->registerGlobalEndpoint("pub2");
+    auto& epid2 = vFed1->registerGlobalEndpoint("ep2");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     vFed1->enterInitializingMode();
-    epid1.sendTo("test", "pub2");
+    epid1.sendTo("test", "ep2");
 
     auto comp = vFed1->enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
 
@@ -217,14 +217,14 @@ TEST_F(iteration_tests, execution_iteration_2fed_endpoint)
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
     // register the publications
-    auto& epid1 = vFed1->registerGlobalEndpoint("pub1");
+    auto& epid1 = vFed1->registerGlobalEndpoint("ep1");
 
-    auto& epid2 = vFed2->registerGlobalEndpoint("pub2");
+    auto& epid2 = vFed2->registerGlobalEndpoint("ep2");
 
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
     vFed1->enterInitializingModeComplete();
-    epid1.sendTo("test122", "pub2");
+    epid1.sendTo("test122", "ep2");
     vFed1->enterExecutingModeAsync();
     auto comp = vFed2->enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
 
@@ -248,11 +248,11 @@ TEST_F(iteration_tests, execution_iteration_2fed_targeted_endpoint)
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
     // register the publications
-    auto& epid1 = vFed1->registerGlobalTargetedEndpoint("pub1");
+    auto& epid1 = vFed1->registerGlobalTargetedEndpoint("ep1");
 
-    auto& epid2 = vFed2->registerGlobalTargetedEndpoint("pub2");
+    auto& epid2 = vFed2->registerGlobalTargetedEndpoint("ep2");
 
-    epid2.addSourceTarget("pub1");
+    epid2.addSourceTarget("ep1");
 
     vFed1->enterInitializingModeAsync();
     vFed2->enterInitializingMode();
@@ -707,14 +707,14 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
     auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
     vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
 
-    auto& pub1 = vFed1->registerGlobalEndpoint("pub1");
+    auto& epid1 = vFed1->registerGlobalEndpoint("ep1");
 
-    auto& pub2 = vFed2->registerGlobalEndpoint("pub2");
+    auto& epid2 = vFed2->registerGlobalEndpoint("ep2");
 
     vFed2->enterInitializingModeAsync();
     vFed1->enterInitializingMode();
 
-    pub1.sendTo("test_5", "pub2");
+    epid1.sendTo("test_5", "ep2");
 
     vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
 
@@ -723,35 +723,35 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
     for (int ii = 0; ii < 10; ++ii) {
         auto it = vFed2->enterExecutingModeComplete();
         EXPECT_EQ(it, helics::IterationResult::ITERATING);
-        EXPECT_TRUE(pub2.hasMessage());
-        if (pub2.hasMessage()) {
-            EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
+        EXPECT_TRUE(epid2.hasMessage());
+        if (epid2.hasMessage()) {
+            EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
         }
 
-        pub2.sendTo("test_" + std::to_string(ii + 27), "pub1");
+        epid2.sendTo("test_" + std::to_string(ii + 27), "ep1");
 
         vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
         it = vFed1->enterExecutingModeComplete();
         EXPECT_EQ(it, helics::IterationResult::ITERATING);
-        EXPECT_TRUE(pub1.hasMessage());
-        if (pub1.hasMessage()) {
-            EXPECT_EQ(pub1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
+        EXPECT_TRUE(epid1.hasMessage());
+        if (epid1.hasMessage()) {
+            EXPECT_EQ(epid1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
         }
 
-        pub1.sendTo("test_" + std::to_string(ii + 6), "pub2");
+        epid1.sendTo("test_" + std::to_string(ii + 6), "ep2");
         vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     }
     auto it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::ITERATING);
-    EXPECT_TRUE(pub2.hasMessage());
-    if (pub2.hasMessage()) {
-        EXPECT_EQ(pub2.getMessage()->data.to_string(), "test_15");
+    EXPECT_TRUE(epid2.hasMessage());
+    if (epid2.hasMessage()) {
+        EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_15");
     }
 
     vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
-    EXPECT_FALSE(pub1.hasMessage());
+    EXPECT_FALSE(epid1.hasMessage());
     vFed1->requestTimeAsync(1.0);
     it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);

@@ -128,6 +128,8 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             auto upd_delayed = generateTimeRequest(di, downstream.minFed);
             if (sendMessageFunction) {
                 sendMessageFunction(upd_delayed);
+            }
+        }
     } else {
         auto upd = generateTimeRequest(downstream, GlobalFederateId{});
         if (upd.action() != CMD_IGNORE) {
