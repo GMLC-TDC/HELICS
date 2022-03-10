@@ -27,6 +27,16 @@ void ForwardingTimeCoordinator::enteringExecMode()
     checkingExec = true;
     if (!dependencies.empty()) {
         updateTimeFactors();
+        auto res = dependencies.checkForIssues(false);
+        if (res.first != 0) {
+            ActionMessage ge(CMD_GLOBAL_ERROR);
+            ge.dest_id = parent_broker_id;
+            ge.source_id = source_id;
+            ge.messageID = res.first;
+            ge.payload = res.second;
+            sendMessageFunction(ge);
+            return;
+        }
     }
     bool fedOnly = true;
     noParent = true;
@@ -103,7 +113,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
     if (updateDownstream) {
-        if (hasDelayedTimingFederate && downstream.minFed == delayedFederate) {
+        if (dependencies.hasDelayedDependency() && downstream.minFed == dependencies.delayedDependency()) {
                 auto upd = generateTimeRequest(downstream, GlobalFederateId{});
             if (upd.action()!=CMD_IGNORE) {
                     transmitTimingMessagesDownstream(upd, downstream.minFed);
@@ -288,23 +298,6 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
     executionMode = true;
     ret = MessageProcessingResult::NEXT_STEP;
 
-    for (auto& dep : dependencies) {
-        if (dep.dependency && dep.dependent && dep.delayedTiming) {
-            if (hasDelayedTimingFederate) {
-                ActionMessage ge(CMD_GLOBAL_ERROR);
-                ge.dest_id = parent_broker_id;
-                ge.source_id = source_id;
-                ge.messageID = multiple_wait_for_current_time_flags;
-                ge.payload =
-                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
-                sendMessageFunction(ge);
-                return MessageProcessingResult::ERROR_RESULT;
-            }
-            hasDelayedTimingFederate = true;
-            delayedFederate = dep.fedID;
-        }
-    }
-
     downstream.next = timeZero;
     downstream.mTimeState = TimeState::time_granted;
     downstream.minDe = timeZero;
@@ -441,8 +434,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         }
     }
 }
-
-DependencyProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+ bool ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_DISCONNECT:
@@ -455,7 +447,27 @@ DependencyProcessingResult ForwardingTimeCoordinator::processTimeMessage(const A
         default:
             break;
     }
-    return dependencies.updateTime(cmd);
+    auto procRes = dependencies.updateTime(cmd);
+    switch (procRes) {
+        case DependencyProcessingResult::NOT_PROCESSED:
+        default:
+            return false;
+        case DependencyProcessingResult::PROCESSED:
+            return true;
+        case DependencyProcessingResult::PROCESSED_AND_CHECK: {
+            auto checkRes = dependencies.checkForIssues(false);
+            if (checkRes.first != 0) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = checkRes.first;
+                ge.payload =
+                    checkRes.second;
+                sendMessageFunction(ge);
+            }
+            return true;
+        }
+    }
 }
 
 void ForwardingTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)

@@ -48,6 +48,16 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         return;
     }
     iterating = mode;
+    auto res=dependencies.checkForIssues(info.wait_for_current_time_updates);
+    if (res.first!=0) {
+            ActionMessage ge(CMD_GLOBAL_ERROR);
+            ge.dest_id = parent_broker_id;
+            ge.source_id = source_id;
+            ge.messageID = res.first;
+            ge.payload = res.second;
+            sendMessageFunction(ge);
+            return;
+    }
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
     execreq.source_id = source_id;
@@ -64,6 +74,7 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         setActionFlag(execreq, delayed_timing_flag);
     }
     transmitTimingMessages(execreq);
+    
 }
 
 void TimeCoordinator::disconnect()
@@ -870,22 +881,6 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
         return ret;
     }
 
-    // check for timing deadlock with wait_for_current_time_flag
-    if (info.wait_for_current_time_updates && iteration==0) {
-        for (auto& dep : dependencies) {
-            if (dep.dependency && dep.dependent && dep.delayedTiming && dep.fedID != source_id) {
-                ActionMessage ge(CMD_GLOBAL_ERROR);
-                ge.dest_id = parent_broker_id;
-                ge.source_id = source_id;
-                ge.messageID = multiple_wait_for_current_time_flags;
-                ge.payload =
-                    "Multiple federates declaring wait_for_current_time flag will result in deadlock";
-                sendMessageFunction(ge);
-                return MessageProcessingResult::ERROR_RESULT;
-            }
-        }
-    }
-
     switch (iterating) {
         case IterationRequest::NO_ITERATIONS:
             if (!info.wait_for_current_time_updates) {
@@ -1111,11 +1106,22 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
     auto procRes = dependencies.updateTime(cmd);
     switch (procRes) {
         case DependencyProcessingResult::NOT_PROCESSED:
+        default:
             return message_process_result::no_effect;
         case DependencyProcessingResult::PROCESSED:
             return message_process_result::processed;
-        case DependencyProcessingResult::PROCESSED_AND_CHECK:
+        case DependencyProcessingResult::PROCESSED_AND_CHECK: {
+            auto checkRes = dependencies.checkForIssues(info.wait_for_current_time_updates);
+            if (checkRes.first!=0) {
+                ActionMessage ge(CMD_GLOBAL_ERROR);
+                ge.dest_id = parent_broker_id;
+                ge.source_id = source_id;
+                ge.messageID = checkRes.first;
+                ge.payload = checkRes.second;
+                sendMessageFunction(ge);
+            }
             return message_process_result::processed;
+        }
     }
 }
 

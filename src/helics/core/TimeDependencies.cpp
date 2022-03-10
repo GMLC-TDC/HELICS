@@ -537,6 +537,25 @@ void TimeDependencies::resetDependentEvents(helics::Time grantTime)
     }
 }
 
+std::pair<int, std::string> TimeDependencies::checkForIssues(bool waiting) const {
+    // check for timing deadlock with wait_for_current_time_flag
+
+    bool hasDelayedTiming = waiting;
+        for (auto& dep : dependencies) {
+            if (dep.dependency && dep.dependent && dep.delayedTiming && dep.connection!=ConnectionType::self) {
+                mDelayedDependency = dep.fedID;
+                if (hasDelayedTiming) {
+                    return {
+                        multiple_wait_for_current_time_flags,
+                        "Multiple federates declaring wait_for_current_time flag will result in deadlock"};
+                }
+                hasDelayedTiming = true;
+            }
+        }
+    return {0, ""};
+}
+
+
 static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
                                           GlobalFederateId ignore)

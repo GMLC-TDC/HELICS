@@ -90,6 +90,7 @@ class DependencyInfo: public TimeData {
 class TimeDependencies {
   private:
     std::vector<DependencyInfo> dependencies;  //!< container
+    mutable GlobalFederateId mDelayedDependency{};
   public:
     /** default constructor*/
     TimeDependencies() = default;
@@ -159,6 +160,12 @@ class TimeDependencies {
     GlobalFederateId getMinDependency() const;
 
     void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
+    /** check the dependency set for any issues
+    @return an error code and string containing an error description */
+    std::pair<int, std::string> checkForIssues(bool waiting) const;
+
+    bool hasDelayedDependency() const { return mDelayedDependency.isValid(); }
+    GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
 std::pair<GlobalFederateId,std::int32_t> getExecEntryMinFederate(const TimeDependencies& dependencies,
