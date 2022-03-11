@@ -541,7 +541,14 @@ TEST_F(filter_tests, clone_test)
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
-    CE(helicsFederateEnterExecutingMode(dFed, &err));
+    
+    CE(helicsFederateEnterExecutingModeAsync(dFed, &err));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+    auto q = helicsCreateQuery("root", "global_time_debugging");
+    std::string qres = helicsQueryExecute(q, dFed, &err);
+
+    CE(helicsFederateEnterExecutingModeComplete(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 

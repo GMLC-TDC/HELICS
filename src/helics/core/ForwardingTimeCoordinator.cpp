@@ -214,6 +214,7 @@ void ForwardingTimeCoordinator::setAsParent(GlobalFederateId fedID)
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::parent;
+        noParent = false;
     }
 }
 
@@ -341,6 +342,9 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.Te = dep.Te;
             break;
         case TimeState::exec_requested:
+            nTime.setAction(CMD_EXEC_REQUEST);
+            nTime.actionTime = Time::zeroVal();
+            break;
         case TimeState::error:
             nTime.setAction(CMD_IGNORE);
             // no need to send updates for this

@@ -45,7 +45,7 @@ class ForwardingTimeCoordinator {
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
-    bool noParent{false};  //!< indicator that the coordinator does not have parents
+    bool noParent{true};  //!< indicator that the coordinator does not have parents
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:
