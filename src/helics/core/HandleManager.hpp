@@ -42,16 +42,16 @@ class HandleManager {
     /** add a handle to manage*/
     BasicHandleInfo& addHandle(GlobalFederateId fed_id,
                                InterfaceType what,
-                               const std::string& key,
-                               const std::string& type,
-                               const std::string& units);
+                               std::string_view key,
+                               std::string_view type,
+                               std::string_view units);
     /** add a handle to manage*/
     BasicHandleInfo& addHandle(GlobalFederateId fed_id,
                                InterfaceHandle local_id,
                                InterfaceType what,
-                               const std::string& key,
-                               const std::string& type,
-                               const std::string& units);
+                               std::string_view key,
+                               std::string_view type,
+                               std::string_view units);
 
     void addHandle(const BasicHandleInfo& otherHandle);
     /** add a handle at the specified index*/
