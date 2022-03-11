@@ -197,7 +197,7 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
                 break;
         }
     }
-    return rvalue;
+    return rvalue?1:0;
 }
 
 BasicHandleInfo* HandleManager::getEndpoint(std::string_view name)
@@ -235,7 +235,7 @@ const BasicHandleInfo* HandleManager::getEndpoint(InterfaceHandle handle) const
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
-        auto& hand = handles[index];
+        const auto& hand = handles[index];
         if (hand.handleType == InterfaceType::ENDPOINT) {
             return &hand;
         }
