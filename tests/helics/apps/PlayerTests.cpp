@@ -270,7 +270,7 @@ TEST(player_tests, bigfile)
     // helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
     helics::Time period = 60.0;
     auto retTime = vfed.requestTime(60.0);
-    
+
     while (retTime <= 200.0) {
         double val1{0.0};
         double val2{0.0};

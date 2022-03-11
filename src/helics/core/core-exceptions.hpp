@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 #include <stdexcept>
-#include <string_view>
 #include <string>
+#include <string_view>
 
 /** @file
 @details definitions of exceptions used in HELICS
@@ -28,7 +28,8 @@ class HelicsException: public std::exception {
 /** exception class indicating that a function has failed for some reason*/
 class FunctionExecutionFailure: public HelicsException {
   public:
-    explicit FunctionExecutionFailure(std::string_view message = "HELICS execution failure") noexcept:
+    explicit FunctionExecutionFailure(
+        std::string_view message = "HELICS execution failure") noexcept:
         HelicsException(message)
     {
     }
