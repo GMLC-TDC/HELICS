@@ -64,7 +64,7 @@ class SmallBuffer {
         std::memcpy(heap, data, size);
     }
     /** create a buffer with a specific size*/
-    SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
+    explicit SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
 
     /** create a buffer with a specific size and contents*/
     SmallBuffer(std::size_t size, std::byte val): heap(buffer.data()) { resize(size, val); }
