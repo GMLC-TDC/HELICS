@@ -38,7 +38,7 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 FROM ubuntu:21.10
 
 # Install the runtime libraries needed for ZeroMQ without development files
-RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
+RUN apt-get update && apt-get install -y libzmq5 openssl && apt-get clean
 
 ARG GIT_COMMIT=unspecified
 
