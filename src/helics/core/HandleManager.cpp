@@ -197,7 +197,7 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
                 break;
         }
     }
-    return rvalue?1:0;
+    return rvalue ? 1 : 0;
 }
 
 BasicHandleInfo* HandleManager::getEndpoint(std::string_view name)
