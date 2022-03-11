@@ -135,7 +135,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
                 transmitTimingMessagesDownstream(upd);
             }
         }
-    } 
+    }
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
