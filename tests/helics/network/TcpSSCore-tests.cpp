@@ -132,7 +132,7 @@ TEST(TcpSSCore, tcpSSComms_broker_test_transmit)
     EXPECT_GT(len.load(), 50U);
     helics::ActionMessage rM;
     auto loc = rM.depacketize(data.data(), static_cast<int>(len));
-    if ((counter == 1) && (loc < static_cast<int>(len.load()))) {
+    if ((counter == 1) && (loc < len.load())) {
         rM.depacketize(data.data() + loc, static_cast<int>(len.load() - loc));
     }
     EXPECT_TRUE(rM.action() == helics::action_message_def::action_t::cmd_ignore);
@@ -389,7 +389,7 @@ TEST(TcpSSCore, tcpSSCore_initialization)
         helics::ActionMessage rM;
         helics::ActionMessage rM2;
         auto used = rM.depacketize(data.data(), static_cast<int>(len.load()));
-        if (used < static_cast<int>(len.load())) {
+        if (used < len.load()) {
             auto use2 = rM2.depacketize(data.data() + used, static_cast<int>(len.load() - used));
             if (use2 == 0) {
                 while (counter != 2) {

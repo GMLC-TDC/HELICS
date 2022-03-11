@@ -354,7 +354,7 @@ bool TcpComms::establishBrokerConnection(
                                                                       connectionTimeout);
                         }
                         catch (const std::exception& e) {
-                            brokerConnection == nullptr;
+                            brokerConnection = nullptr;
                             logError(std::string(" unable to create broker connection to ") +
                                      brokerTargetAddress + "::" + e.what());
                             return terminate(connection_status::error);

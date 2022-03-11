@@ -232,9 +232,8 @@ class Federate {
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor*/
-    Federate(Federate&& fedObj) HELICS_NOTHROW: exec_async_iterate(fedObj.exec_async_iterate)
+    Federate(Federate&& fedObj) HELICS_NOTHROW: fed(fedObj.fed),exec_async_iterate(fedObj.exec_async_iterate)
     {
-        fed = fedObj.fed;
         fedObj.fed = HELICS_NULL_POINTER;
     }
     /** move assignment operator*/
