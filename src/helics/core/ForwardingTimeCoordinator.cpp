@@ -129,13 +129,13 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             if (sendMessageFunction) {
                 sendMessageFunction(upd_delayed);
             }
+        } else {
+            auto upd = generateTimeRequest(downstream, GlobalFederateId{});
+            if (upd.action() != CMD_IGNORE) {
+                transmitTimingMessagesDownstream(upd);
+            }
         }
-    } else {
-        auto upd = generateTimeRequest(downstream, GlobalFederateId{});
-        if (upd.action() != CMD_IGNORE) {
-            transmitTimingMessagesDownstream(upd);
-        }
-    }
+    } 
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
