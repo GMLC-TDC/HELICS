@@ -1,14 +1,13 @@
-name: docker develop image
+name: docker release images
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - develop
+  release:
+    types: published
 
 jobs:
   build:
-    name: Build develop docker image
+    name: Build release docker image
     runs-on: ubuntu-latest
  
     steps:
@@ -18,4 +17,4 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push updated Docker containers
-      run: .github/actions/docker/develop_docker.sh "${{ github.sha }}"
+      run: .github/actions/docker/release_docker.sh "${{ github.sha }}" "${{github.ref_name}}"

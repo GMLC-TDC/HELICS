@@ -2,8 +2,9 @@ name: docker main image
 
 on:
   workflow_dispatch:
-  release:
-    types: published
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -17,4 +18,4 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push updated Docker containers
-      run: .github/actions/docker/release_docker.sh "${{ github.sha }}" "${{github.ref_name}}"
+      run: .github/actions/docker/main_docker.sh "${{ github.sha }}"

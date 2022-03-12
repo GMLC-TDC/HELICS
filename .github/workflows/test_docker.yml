@@ -1,14 +1,14 @@
-name: docker develop image
+name: docker test images
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - develop
+      - 'docker/**'
 
 jobs:
   build:
-    name: Build develop docker image
+    name: Build test docker images
     runs-on: ubuntu-latest
  
     steps:
@@ -18,4 +18,4 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build and push updated Docker containers
-      run: .github/actions/docker/develop_docker.sh "${{ github.sha }}"
+      run: .github/actions/docker/test_docker.sh "${{ github.sha }}"
