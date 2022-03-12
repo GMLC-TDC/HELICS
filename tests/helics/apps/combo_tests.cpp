@@ -372,8 +372,8 @@ TEST(combo_tests, save_load_file_binary)
 {
     auto tpath = ghc::filesystem::temp_directory_path();
 
-    auto filename1 = ghc::filesystem::temp_directory_path() / "savefile_binary.txt";
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile_binary.json";
+    auto filename1 = tpath / "savefile_binary.txt";
+    auto filename2 = tpath / "savefile_binary.json";
 
     generateFiles_binary(filename1, filename2);
     ASSERT_TRUE(ghc::filesystem::exists(filename1));
