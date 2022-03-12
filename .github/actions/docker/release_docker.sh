@@ -1,6 +1,6 @@
 #! /bin/sh
 # Require a tag name for the docker build image
-if [ "$#" -ne 1 ] then
+if [ "$#" -ne 1 ]; then
     echo "Usage: $0 TAG_NAME" >&2
     exit 1
 fi
