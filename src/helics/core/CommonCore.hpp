@@ -6,13 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "FederateIdExtra.hpp"
-
 #include "../common/GuardedTypes.hpp"
 #include "../common/JsonBuilder.hpp"
 #include "ActionMessage.hpp"
 #include "BrokerBase.hpp"
 #include "Core.hpp"
+#include "FederateIdExtra.hpp"
 #include "HandleManager.hpp"
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
