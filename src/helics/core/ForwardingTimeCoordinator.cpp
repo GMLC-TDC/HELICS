@@ -100,14 +100,13 @@ void ForwardingTimeCoordinator::updateTimeFactors()
 
     bool updateDownstream = downstream.update(mTimeDownstream);
 
-    if (upstream.mTimeState==TimeState::time_requested) {
-        if (upstream.minDe<downstream.minDe) {
+    if (upstream.mTimeState == TimeState::time_requested) {
+        if (upstream.minDe < downstream.minDe) {
             downstream.minDe = upstream.minDe;
         }
-        if (upstream.Te<downstream.Te) {
+        if (upstream.Te < downstream.Te) {
             downstream.Te = upstream.Te;
         }
-
     }
     if (!restrictive_time_policy && upstream.minDe < Time::maxVal()) {
         if (downstream.minDe > downstream.next) {
