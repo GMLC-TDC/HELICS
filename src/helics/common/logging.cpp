@@ -7,10 +7,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "logging.hpp"
 
-#include "gmlc/utilities/string_viewOps.h"
-#include <unordered_map>
-#include <map>
 #include "gmlc/utilities/string_viewConversion.h"
+#include "gmlc/utilities/string_viewOps.h"
+
+#include <map>
+#include <unordered_map>
 
 namespace helics {
 extern const std::unordered_map<std::string, int> gLogLevelMap{
@@ -63,30 +64,28 @@ LogLevels logLevelFromString(std::string_view level)
     if (res != gLogLevelMap.end()) {
         return static_cast<LogLevels>(res->second);
     }
-    if (level.compare(0,9,"loglevel_")==0) {
-        return static_cast<LogLevels>(gmlc::utilities::numeric_conversion<int>(level.substr(9),-999999));
+    if (level.compare(0, 9, "loglevel_") == 0) {
+        return static_cast<LogLevels>(
+            gmlc::utilities::numeric_conversion<int>(level.substr(9), -999999));
     } else {
         return static_cast<LogLevels>(-999999);
     }
 }
 
-const std::map<LogLevels, std::string_view> levelMaps{
-    {static_cast<LogLevels>(-999999), "no_print"},
-    {LogLevels::NO_PRINT, "no_print"},
-    {LogLevels::ERROR_LEVEL, "error"},
-    {LogLevels::PROFILING, "profiling"},
-    {LogLevels::WARNING, "warning"},
-    {LogLevels::SUMMARY, "summary"},
-    {LogLevels::CONNECTIONS, "connections"},
-    {LogLevels::INTERFACES, "interfaces"},
-    {LogLevels::TIMING, "timing"},
-    {LogLevels::DATA, "data"},
-    {LogLevels::DEBUG, "debug"},
-    {LogLevels::TRACE, "trace"}
-};
+const std::map<LogLevels, std::string_view> levelMaps{{static_cast<LogLevels>(-999999), "no_print"},
+                                                      {LogLevels::NO_PRINT, "no_print"},
+                                                      {LogLevels::ERROR_LEVEL, "error"},
+                                                      {LogLevels::PROFILING, "profiling"},
+                                                      {LogLevels::WARNING, "warning"},
+                                                      {LogLevels::SUMMARY, "summary"},
+                                                      {LogLevels::CONNECTIONS, "connections"},
+                                                      {LogLevels::INTERFACES, "interfaces"},
+                                                      {LogLevels::TIMING, "timing"},
+                                                      {LogLevels::DATA, "data"},
+                                                      {LogLevels::DEBUG, "debug"},
+                                                      {LogLevels::TRACE, "trace"}};
 
-std::string
-    logLevelToString(LogLevels level)
+std::string logLevelToString(LogLevels level)
 {
     auto res = levelMaps.find(level);
     if (res != levelMaps.end()) {

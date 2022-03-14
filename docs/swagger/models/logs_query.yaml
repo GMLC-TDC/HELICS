@@ -12,7 +12,7 @@ properties:
           description: logging level
         header:
           type: string
-          description: 'header information for the message(time, source,etc)'
+          description: "header information for the message(time, source,etc)"
         message:
           type: string
           description: actual log message

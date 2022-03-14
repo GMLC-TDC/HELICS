@@ -1,6 +1,6 @@
 title: webQueryInfo
 type: object
-description: 'basic information contained in a web query body, all parts are optional and may also be contained in the query parameters'
+description: "basic information contained in a web query body, all parts are optional and may also be contained in the query parameters"
 properties:
   broker:
     type: string

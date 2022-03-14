@@ -9,6 +9,6 @@ anyOf:
           - array
         items:
           type: string
-      '':
+      "":
         type: string
   - $ref: ./interfaceOptions.yaml

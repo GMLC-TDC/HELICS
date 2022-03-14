@@ -2999,13 +2999,11 @@ void CoreBroker::sendCommand(const std::string& target,
     cmdcmd.setString(sourceStringLoc, getIdentifier());
 
     if (target == "broker" || target == getIdentifier() || target.empty() ||
-        (target == "root" && _isRoot) || (target == "federation" && _isRoot))
-    {
+        (target == "root" && _isRoot) || (target == "federation" && _isRoot)) {
         addActionMessage(std::move(cmdcmd));
     } else {
         transmitToParent(std::move(cmdcmd));
     }
-    
 }
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{

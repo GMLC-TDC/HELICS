@@ -5,4 +5,4 @@ properties:
     type: array
     items:
       type: string
-description: return a list of avaialble queries
+description: return a list of available queries

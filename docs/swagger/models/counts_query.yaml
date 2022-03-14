@@ -16,7 +16,7 @@ examples:
     federates: 0
     countable_federates: 0
     interfaces: 0
-title: ''
+title: ""
 properties:
   brokers:
     type: number

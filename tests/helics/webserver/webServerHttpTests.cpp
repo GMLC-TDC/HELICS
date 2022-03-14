@@ -473,7 +473,7 @@ TEST_F(httpTest, timeBlock)
     auto brk = helics::BrokerFactory::findBroker("brk_timer");
     EXPECT_TRUE(brk);
 
-    auto res = brk->query("brk_timer","config");
+    auto res = brk->query("brk_timer", "config");
 
     EXPECT_TRUE(res.find("\"timing\"") != std::string::npos);
     brk.reset();
@@ -484,10 +484,8 @@ TEST_F(httpTest, timeBlock)
     sendCommand(http::verb::post, "delete", generateJsonString(v1));
 }
 
-
 TEST_F(httpTest, healthcheck)
 {
-    
     auto result = sendGet("healthcheck");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);

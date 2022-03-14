@@ -224,7 +224,7 @@ enum class return_val : std::int32_t {
 };
 
 // set of possible commands that the web server can implement
-enum class cmd { query, create, remove, barrier, clear_barrier,command, unknown };
+enum class cmd { query, create, remove, barrier, clear_barrier, command, unknown };
 
 std::pair<return_val, std::string>
     generateResults(cmd command,
@@ -428,7 +428,7 @@ std::pair<return_val, std::string>
             }
             if (fields.find("command_str") == fields.end()) {
                 brkr->sendCommand(std::string(target), fields.at("command_str"));
-            } else if (!query.empty()){
+            } else if (!query.empty()) {
                 brkr->sendCommand(std::string(target), fields.at("command_str"));
             } else {
                 return {return_val::bad_request, "no valid command string"};
@@ -441,7 +441,7 @@ std::pair<return_val, std::string>
                     return {return_val::not_found, "unable to locate broker"};
                 }
             }
-            
+
             brkr->clearTimeBarrier();
             return {return_val::ok, emptyString};
         default:
