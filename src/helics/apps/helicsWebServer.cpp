@@ -223,7 +223,8 @@ enum class return_val : std::int32_t {
     not_implemented = static_cast<std::int32_t>(http::status::not_implemented)
 };
 
-enum class cmd { query, create, remove, barrier, clear_barrier, unknown };
+// set of possible commands that the web server can implement
+enum class cmd { query, create, remove, barrier, clear_barrier,command, unknown };
 
 std::pair<return_val, std::string>
     generateResults(cmd command,
@@ -249,6 +250,9 @@ std::pair<return_val, std::string>
 
             if (cmdstr == "barrier") {
                 command = cmd::barrier;
+            }
+            if (cmdstr == "command") {
+                command = cmd::command;
             }
             if (cmdstr == "clearbarrier") {
                 command = cmd::clear_barrier;
@@ -400,7 +404,7 @@ std::pair<return_val, std::string>
             if (!brkr) {
                 brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
-                    return {return_val::bad_request, "unable to locate broker"};
+                    return {return_val::not_found, "unable to locate broker"};
                 }
             }
             if (fields.find("time") == fields.end()) {
@@ -415,13 +419,29 @@ std::pair<return_val, std::string>
             }
             return {return_val::ok, emptyString};
         }
+        case cmd::command:
+            if (!brkr) {
+                brkr = helics::BrokerFactory::getConnectedBroker();
+                if (!brkr) {
+                    return {return_val::not_found, "unable to locate broker"};
+                }
+            }
+            if (fields.find("command_str") == fields.end()) {
+                brkr->sendCommand(std::string(target), fields.at("command_str"));
+            } else if (!query.empty()){
+                brkr->sendCommand(std::string(target), fields.at("command_str"));
+            } else {
+                return {return_val::bad_request, "no valid command string"};
+            }
+            return {return_val::ok, emptyString};
         case cmd::clear_barrier:
             if (!brkr) {
                 brkr = helics::BrokerFactory::getConnectedBroker();
                 if (!brkr) {
-                    return {return_val::bad_request, "unable to locate broker"};
+                    return {return_val::not_found, "unable to locate broker"};
                 }
             }
+            
             brkr->clearTimeBarrier();
             return {return_val::ok, emptyString};
         default:
@@ -667,11 +687,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 
     beast::string_view target(req.target());
     auto psize = req.payload_size();
-    if (target == "/index.html" || (target == "/" && (!psize || *psize < 4))) {
+    if (target == "/index.html" || target == "index.html" ||
+        (target == "/" && (!psize || *psize < 4))) {
         return send(response_ok(index_page, "text/html"));
     }
 
-    if (target == "/healthcheck" ) {
+    if (target == "/healthcheck" || target == "healthcheck") {
         return send(response_ok("{\"success\":true}", "application/json"));
     }
 
@@ -691,6 +712,9 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             brokerName.clear();
         } else if (brokerName == "query" || brokerName == "search") {
             command = cmd::query;
+            brokerName.clear();
+        } else if (brokerName == "command") {
+            command = cmd::command;
             brokerName.clear();
         }
     }

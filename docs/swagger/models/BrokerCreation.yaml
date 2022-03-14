@@ -1,0 +1,35 @@
+title: BrokerCreation
+type: object
+properties:
+  type:
+    type: string
+    description: the HELICS core type to use when creating a broker
+  CoreType:
+    type: string
+    description: same as type
+  core_type:
+    type: string
+    description: same as type
+  args:
+    type: string
+    description: extra command line arguments for the broker
+  num_feds:
+    type: number
+  num_brokers:
+    type: number
+  port:
+    type: string
+  host:
+    type: string
+  interface:
+    type: string
+    description: same as host
+  log_level:
+    type: string
+    description: helics logging level to use on the broker
+  uuid:
+    type: string
+    description: the uuid to use for the broker
+  broker_uuid:
+    type: string
+    description: the uuid to use for the broker
