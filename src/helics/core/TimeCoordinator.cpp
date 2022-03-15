@@ -887,7 +887,10 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 ret = MessageProcessingResult::NEXT_STEP;
             } else {
                 // on wait for current time flag all other federates must have entered exec mode
-                total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, source_id,source_id);
+                total = generateMinTimeTotal(dependencies,
+                                             info.restrictive_time_policy,
+                                             source_id,
+                                             source_id);
                 if (total.next > timeZero) {
                     ret = MessageProcessingResult::NEXT_STEP;
                 }

@@ -731,11 +731,11 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         mTime.next = initializationTime;
         mTime.minDe = initializationTime;
         mTime.Te = initializationTime;
-    
-    if (mTime.mTimeState < TimeState::exec_requested) {
-        auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
-        mTime.minFed = res.first;
-    }
+
+        if (mTime.mTimeState < TimeState::exec_requested) {
+            auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
+            mTime.minFed = res.first;
+        }
     }
     return mTime;
 }
@@ -766,7 +766,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-    if (mTime.mTimeState<TimeState::time_granted) {
+    if (mTime.mTimeState < TimeState::time_granted) {
         mTime.next = initializationTime;
         mTime.minDe = initializationTime;
         mTime.Te = initializationTime;
