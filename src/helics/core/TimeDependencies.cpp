@@ -568,14 +568,13 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.delayedTiming = dep.delayedTiming;
             mTime.restrictionLevel = dep.restrictionLevel;
         } else if (dep.mTimeState == mTime.mTimeState) {
-            if (dep.restrictionLevel<mTime.restrictionLevel) {
+            if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;
                 mTime.minFedIteration = dep.requestIteration;
                 mTime.requestIteration = dep.requestIteration;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.restrictionLevel = dep.restrictionLevel;
-            }
-            else if (dep.restrictionLevel==mTime.restrictionLevel && dep.fedID < mTime.minFed) {
+            } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
                 mTime.minFedIteration = dep.requestIteration;
                 mTime.requestIteration = dep.requestIteration;
@@ -658,7 +657,7 @@ std::pair<GlobalFederateId, std::int32_t>
         if (dep.mTimeState > TimeState::exec_requested_iterative) {
             continue;
         }
-        if (dep.restrictionLevel>resLevel) {
+        if (dep.restrictionLevel > resLevel) {
             continue;
         }
         if (!minId.isValid() || dep.fedID < minId) {

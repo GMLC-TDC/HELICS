@@ -56,7 +56,7 @@ class TimeData {
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false};  // indicator that data was sent in the current interval
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
-    std::uint8_t restrictionLevel{0}; //!< timing restriction level
+    std::uint8_t restrictionLevel{0};  //!< timing restriction level
     std::int32_t timeoutCount{0};  // counter for timeout checking
     std::int32_t requestIteration{0};  // the iteration number of the request
     std::int32_t minFedIteration{0};  // the iteration count of the min federate

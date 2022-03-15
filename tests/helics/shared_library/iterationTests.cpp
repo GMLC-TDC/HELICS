@@ -137,7 +137,10 @@ TEST_F(iteration_tests, execution_iteration_loop3)
     std::vector<HelicsFederate> vfeds(N);
     for (int ii = 0; ii < N; ++ii) {
         vfeds[ii] = GetFederateAt(ii);
-        helicsFederateSetFlagOption(vfeds[ii],HELICS_FLAG_RESTRICTIVE_TIME_POLICY,HELICS_TRUE,nullptr);
+        helicsFederateSetFlagOption(vfeds[ii],
+                                    HELICS_FLAG_RESTRICTIVE_TIME_POLICY,
+                                    HELICS_TRUE,
+                                    nullptr);
     }
     auto results = run_iteration_round_robin(vfeds);
     for (int ii = 1; ii < N; ++ii) {

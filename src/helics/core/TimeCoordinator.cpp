@@ -934,7 +934,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                                 (dep.minFedIteration == iteration.load() + 1)) {
                                 if (restricted) {
                                     restrictionLevel =
-                                        (std::min)(restrictionLevel, static_cast<int>(dep.restrictionLevel));
+                                        (std::min)(restrictionLevel,
+                                                   static_cast<int>(dep.restrictionLevel));
                                 }
                                 continue;
                             }
@@ -944,7 +945,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                     }
                     if (allowed) {
                         if (restricted) {
-                            if (restrictionLevel>=1) {
+                            if (restrictionLevel >= 1) {
                                 ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                                     MessageProcessingResult::ITERATING :
                                     MessageProcessingResult::NEXT_STEP;
@@ -957,7 +958,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                                 MessageProcessingResult::ITERATING :
                                 MessageProcessingResult::NEXT_STEP;
                         }
-                        
+
                     } else {
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
