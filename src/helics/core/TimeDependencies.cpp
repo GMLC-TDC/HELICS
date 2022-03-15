@@ -32,6 +32,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
+            dep.restrictionLevel = m.messageID;
             dep.requestIteration = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.minFedIteration = m.getExtraDestData();
@@ -45,6 +46,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 dep.Te = timeZero;
                 dep.requestIteration = 0;
                 dep.grantedIteration = 0;
+                dep.restrictionLevel = 0;
                 dep.minFed = GlobalFederateId{};
             } else {
                 dep.mTimeState = TimeState::initialized;
@@ -564,8 +566,16 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.minFedIteration = dep.requestIteration;
             mTime.requestIteration = dep.requestIteration;
             mTime.delayedTiming = dep.delayedTiming;
+            mTime.restrictionLevel = dep.restrictionLevel;
         } else if (dep.mTimeState == mTime.mTimeState) {
-            if (dep.fedID < mTime.minFed) {
+            if (dep.restrictionLevel<mTime.restrictionLevel) {
+                mTime.minFed = dep.fedID;
+                mTime.minFedIteration = dep.requestIteration;
+                mTime.requestIteration = dep.requestIteration;
+                mTime.delayedTiming = dep.delayedTiming;
+                mTime.restrictionLevel = dep.restrictionLevel;
+            }
+            else if (dep.restrictionLevel==mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
                 mTime.minFedIteration = dep.requestIteration;
                 mTime.requestIteration = dep.requestIteration;
@@ -631,6 +641,7 @@ std::pair<GlobalFederateId, std::int32_t>
     GlobalFederateId minId;
     std::int32_t minIteration{0};
     TimeState minTimeState{TimeState::initialized};
+    std::int32_t resLevel{50};
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -647,11 +658,14 @@ std::pair<GlobalFederateId, std::int32_t>
         if (dep.mTimeState > TimeState::exec_requested_iterative) {
             continue;
         }
-
+        if (dep.restrictionLevel>resLevel) {
+            continue;
+        }
         if (!minId.isValid() || dep.fedID < minId) {
             minId = dep.fedID;
             minIteration = dep.requestIteration;
             minTimeState = dep.mTimeState;
+            resLevel = dep.restrictionLevel;
             if (minTimeState == TimeState::initialized) {
                 minId = GlobalFederateId{};
                 minIteration = 0;

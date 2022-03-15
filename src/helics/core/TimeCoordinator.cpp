@@ -845,7 +845,7 @@ void TimeCoordinator::sendUpdatedExecRequest(GlobalFederateId target,
     execreq.counter = iteration + 1;
     execreq.setExtraData(minFed.baseValue());
     execreq.setExtraDestData(minFedIteration);
-
+    execreq.messageID = currentRestrictionLevel;
     if (info.wait_for_current_time_updates) {
         setActionFlag(execreq, delayed_timing_flag);
     }
@@ -916,6 +916,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         MessageProcessingResult::NEXT_STEP;
                 } else {
                     bool allowed{!info.wait_for_current_time_updates};
+                    bool restricted{info.restrictive_time_policy};
+                    int restrictionLevel{50};
                     if (allowed) {
                         for (const auto& dep : dependencies) {
                             if (!dep.dependency) {
@@ -930,6 +932,10 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                             }
                             if (dep.minFed == source_id &&
                                 (dep.minFedIteration == iteration.load() + 1)) {
+                                if (restricted) {
+                                    restrictionLevel =
+                                        (std::min)(restrictionLevel, static_cast<int>(dep.restrictionLevel));
+                                }
                                 continue;
                             }
                             allowed = false;
@@ -937,9 +943,21 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         }
                     }
                     if (allowed) {
-                        ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                            MessageProcessingResult::ITERATING :
-                            MessageProcessingResult::NEXT_STEP;
+                        if (restricted) {
+                            if (restrictionLevel>=1) {
+                                ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                                    MessageProcessingResult::ITERATING :
+                                    MessageProcessingResult::NEXT_STEP;
+                            } else {
+                                currentRestrictionLevel = restrictionLevel + 1;
+                                ret = MessageProcessingResult::CONTINUE_PROCESSING;
+                            }
+                        } else {
+                            ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                                MessageProcessingResult::ITERATING :
+                                MessageProcessingResult::NEXT_STEP;
+                        }
+                        
                     } else {
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
@@ -953,7 +971,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             time_grantBase = time_granted;
             executionMode = true;
             iteration = 0;
-
+            currentRestrictionLevel = 0;
             ActionMessage execgrant(CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             transmitTimingMessages(execgrant);
@@ -966,6 +984,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             execgrant.counter = iteration;
             setActionFlag(execgrant, iteration_requested_flag);
             transmitTimingMessages(execgrant);
+            currentRestrictionLevel = 0;
         }
     } else {
         if (ret == MessageProcessingResult::NEXT_STEP) {
@@ -979,7 +998,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             time_grantBase = time_granted;
             executionMode = true;
             iteration = 0;
-
+            currentRestrictionLevel = 0;
             ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             execgrant.actionTime = time_granted;

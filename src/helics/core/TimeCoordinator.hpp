@@ -84,6 +84,7 @@ class TimeCoordinator {
     std::vector<std::pair<Time, int32_t>> timeBlocks;
     /// basic time control information
     tcoptions info;
+    std::uint8_t currentRestrictionLevel{0};
     /// callback used to send the messages
     std::function<void(const ActionMessage&)> sendMessageFunction;
 

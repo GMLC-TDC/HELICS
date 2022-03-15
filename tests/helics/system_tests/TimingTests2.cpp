@@ -708,7 +708,6 @@ TEST_F(timing_tests2, time_barrier1)
     vFed2->finalize();
 }
 
-// Tests out the restrictive time policy
 TEST_F(timing_tests2, time_barrier_update)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);

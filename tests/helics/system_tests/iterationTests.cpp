@@ -139,6 +139,10 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
         auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
         auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
         auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+        vFed1->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
+        vFed2->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
+        vFed3->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
+
         auto fut1 = std::async(std::launch::async,
                                [vFed1]() { return runInitIterations(vFed1.get(), 0, 3); });
         auto fut2 = std::async(std::launch::async,
@@ -170,6 +174,7 @@ TEST_F(iteration_tests, execution_iteration_loop3)
     std::vector<std::shared_ptr<helics::ValueFederate>> vfeds(N);
     for (int ii = 0; ii < N; ++ii) {
         vfeds[ii] = GetFederateAs<helics::ValueFederate>(ii);
+        vfeds[ii]->setFlagOption(helics::defs::RESTRICTIVE_TIME_POLICY);
     }
     auto results = run_iteration_round_robin(vfeds);
     for (int ii = 1; ii < N; ++ii) {
