@@ -114,7 +114,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 
-    if (updateUpstream && !noParent) {
+    if (updateUpstream) {
         auto upd = generateTimeRequest(upstream, GlobalFederateId{});
         if (upd.action() != CMD_IGNORE) {
             transmitTimingMessagesUpstream(upd);
