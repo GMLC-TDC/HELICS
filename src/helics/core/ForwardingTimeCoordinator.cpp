@@ -281,8 +281,9 @@ GlobalFederateId ForwardingTimeCoordinator::getMinDependency() const
 MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
-    bool allowed{false};
+    
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
+        bool allowed{false};
         if (downstream.mTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
             for (auto& dep : dependencies) {
