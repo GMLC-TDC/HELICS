@@ -8,6 +8,42 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
+## [3.2.0][] - 2022-03-17
+
+Major new features include beta release for Translators and Data API and the addition of Support for encrypted communication through the TCP and TCP SS core types
+
+### Fixed
+
+- Fix some undefined behavior warnings with duplicate named federates
+- Fix a discrepancy in the way subscriptions were processed for config files to better match how they are handled for inputs
+- Fix some accidently disabled test cases testing different network configurations
+- Fix missing dependency generation when subscribing to publications from Endpoints
+- Fixed a few sporadic failures in the test cases
+- Fixed some issues with iterations particularly in initialization mode
+
+### Changed
+
+- Docker images were updated to be based on Ubuntu 21.10
+- Update asio, json_cpp, and units to recent releases
+- Errors in the networking layer are now propagated through the logging system in HELICS for better diagnostics of networking issues
+- Benchmark tests are now built with Visual studio 2022
+- Code coverage tests are now run nightly instead of on develop PR's
+- Refactored how Apps were handling arguments to the federate to resolve some oddities in argument processing
+
+### Added
+
+- Added support for openSSL based encryption on the tcp tcpss cores and some tests using that capability
+- Added a callback option which triggers when a federate changes mode
+- Added [Translators]() as a beta API, this is not fixed and likely has a few bugs.  The API is subject to minor revisions based on user feedback
+- Added Data API to the C interface as a beta.  API is subject to further revisions based on user feedback in  upcoming releases.
+- Added support for command operations through the REST API on the webserver
+- Added swagger documentation for the REST API and queries
+
+### Deprecated
+
+- CI tests for visual studio 2017 were deprecated.  HELICS still compiles fine on Visual studio 2017.  But this is the last release that is specified for.  Future releases will not be tested on Visual Studio 2017.
+
+
 ## [3.1.2][] - 2022-01-25
 
 This patch release is primarily to address some build issues on MSYS2, MINGW, and CYGWIN platforms. It also includes some preliminary features for the 3.2 release that were already merged including time monitors, remote logging, and a log buffer.
@@ -151,6 +187,7 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.1.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.0
 [3.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.1
 [3.1.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.2
+[3.2.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.0
 
 ## [2.7.1][] - 2021-06-05
 
