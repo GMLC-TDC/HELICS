@@ -53,7 +53,7 @@ TEST_F(iteration_tests, execution_iteration_test)
 std::pair<double, int> runInitIterations(HelicsFederate vfed, int index, int total)
 {
     auto pub = helicsFederateRegisterPublication(vfed, "pub", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
-    helicsPublicationSetMinimumChange(pub, 0.01, nullptr);
+    helicsPublicationSetMinimumChange(pub, 0.001, nullptr);
     std::string low_target = "fed";
     low_target += std::to_string((index == 0) ? total - 1 : index - 1);
     low_target += "/pub";
