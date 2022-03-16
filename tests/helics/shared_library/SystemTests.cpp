@@ -397,12 +397,13 @@ TEST(other_tests, signal_handler_death_ci_skip)
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
     helicsClearSignalHandler();
+    helicsCloseLibrary();
 }
 
 /** test the default signal handler*/
 TEST(other_tests, signal_handler_threaded_death_ci_skip)
 {
-    helicsLoadThreadedSignalHandler();
+    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
     auto hb = helicsCreateBroker("TEST", "zbroker1", nullptr, nullptr);
     EXPECT_TRUE(helicsBrokerIsConnected(hb));
     raise(SIGINT);
@@ -412,13 +413,14 @@ TEST(other_tests, signal_handler_threaded_death_ci_skip)
     }
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
+    helicsCloseLibrary();
 }
 
 /** test the threaded signal handler*/
 TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
 {
     handlerCount.store(0);
-    helicsLoadSignalHandlerCallback(testHandlerTrue, HELICS_TRUE);
+    helicsLoadSignalHandlerCallbackNoExit(testHandlerTrue, HELICS_TRUE);
 
     auto hb = helicsCreateBroker("TEST", "zbroker2", nullptr, nullptr);
     EXPECT_TRUE(helicsBrokerIsConnected(hb));
@@ -430,6 +432,7 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
     EXPECT_EQ(handlerCount.load(), 1);
+    helicsCloseLibrary();
 }
 
 
@@ -437,7 +440,7 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
 TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
 {
     handlerCount.store(0);
-    helicsLoadThreadedSignalHandler();
+    helicsLoadSignalHandlerCallbackNoExit(nullptr, HELICS_TRUE);
     HelicsError err = helicsErrorInitialize();
     auto fedGen = [&err]() {
         auto fedInfo = helicsCreateFederateInfo();

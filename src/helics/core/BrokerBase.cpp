@@ -364,7 +364,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
     lastErrorCode.store(eCode);
     auto cBrokerState = brokerState.load();
     if (cBrokerState != BrokerState::errored && cBrokerState!=BrokerState::connected_error) {
-        if (cBrokerState > BrokerState::configured && cBrokerState <= BrokerState::terminating) {
+        if (cBrokerState > BrokerState::configured && cBrokerState < BrokerState::terminating) {
             brokerState.store(BrokerState::connected_error);
         } else {
             brokerState.store(BrokerState::errored);

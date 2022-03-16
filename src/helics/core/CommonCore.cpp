@@ -2946,7 +2946,6 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
-            checkAndProcessDisconnect();
             break;
         case CMD_SEND_COMMAND:
             if (command.dest_id == global_broker_id_local) {
@@ -3378,7 +3377,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                       command.source_id == gRootBrokerID)) {
                     transmit(parent_route_id, std::move(command));
                 }
-            } 
+            }
             break;
         case CMD_DATA_LINK: {
             auto* pub = loopHandles.getPublication(command.name());

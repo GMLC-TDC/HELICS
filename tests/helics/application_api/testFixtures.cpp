@@ -111,10 +111,10 @@ std::shared_ptr<helics::Broker>
     std::shared_ptr<helics::Broker> broker;
     if (extraBrokerArgs.empty()) {
         broker = StartBrokerImp(CoreType_name,
-                                std::string("--maxcosimduration=180000 ") + initialization_string);
+                                std::string("--maxcosimduration=180000 --errortimeout=0") + initialization_string);
     } else {
         broker = StartBrokerImp(CoreType_name,
-                                std::string("--maxcosimduration=180000 ") + initialization_string +
+                                std::string("--maxcosimduration=180000 --errortimeout=0") + initialization_string +
                                     " " + extraBrokerArgs);
     }
     broker->setLoggingLevel(HELICS_LOG_LEVEL_WARNING);

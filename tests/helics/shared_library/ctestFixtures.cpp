@@ -107,10 +107,15 @@ HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name,
                                             const std::string& initialization_string)
 {
     HelicsBroker broker;
+
     if (extraBrokerArgs.empty()) {
-        broker = StartBrokerImp(CoreType_name, initialization_string);
+        broker = StartBrokerImp(CoreType_name,
+                                std::string("--maxcosimduration=180000 --errortimeout=0 ") +
+                                    initialization_string);
     } else {
-        broker = StartBrokerImp(CoreType_name, initialization_string + " " + extraBrokerArgs);
+        broker = StartBrokerImp(CoreType_name,
+                                std::string("--maxcosimduration=180000 --errortimeout=0 ") +
+                                    initialization_string + " " + extraBrokerArgs);
     }
     assert(helicsBrokerIsValid(broker) == HELICS_TRUE);
     brokers.push_back(broker);
@@ -147,7 +152,7 @@ void FederateTestFixture::AddFederates(FedCreator ctor,
     initString += helicsBrokerGetIdentifier(broker);
     initString += " --broker_address=";
     initString += helicsBrokerGetAddress(broker);
-
+    initString += " --error_timeout=0";
     if (!extraCoreArgs.empty()) {
         initString.push_back(' ');
         initString.append(extraCoreArgs);
