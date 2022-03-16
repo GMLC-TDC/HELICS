@@ -101,15 +101,16 @@ class BrokerBase {
     std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
-        created = -6,  //!< the broker has been created
-        configuring = -5,  //!< the broker is in the processing of configuring
-        configured = -4,  //!< the broker itself has been configured and is ready to connect
-        connecting = -3,  //!< the connection process has started
-        connected = -2,  //!< the connection process has completed
+        created = -10,  //!< the broker has been created
+        configuring = -7,  //!< the broker is in the processing of configuring
+        configured = -6,  //!< the broker itself has been configured and is ready to connect
+        connecting = -4,  //!< the connection process has started
+        connected = -3,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
         operating = 0,  //!< normal operating conditions
-        terminating = 1,  //!< the termination process has started
-        terminated = 3,  //!< the termination process has started
+        connected_error = 2, //!< error state but still connected
+        terminating = 5,  //!< the termination process has started
+        terminated = 6,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
 

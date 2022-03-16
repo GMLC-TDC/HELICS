@@ -2174,7 +2174,7 @@ void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
 bool CoreBroker::isConnected() const
 {
     auto state = getBrokerState();
-    return ((state == BrokerState::operating) || (state == BrokerState::connected));
+    return ((state >= BrokerState::connected) && (state <= BrokerState::connected_error));
 }
 
 bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
@@ -2189,15 +2189,22 @@ bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CoreBroker::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if ((cBrokerState == BrokerState::terminating) || (cBrokerState == BrokerState::terminated)) {
+    if (cBrokerState >= BrokerState::terminating) {
         return;
     }
     if (cBrokerState > BrokerState::configured) {
         LOG_CONNECTIONS(parent_broker_id, getIdentifier(), "||disconnecting");
-        setBrokerState(BrokerState::terminating);
+        if (cBrokerState!=BrokerState::connected_error) {
+            setBrokerState(BrokerState::terminating);
+        }
+        
         brokerDisconnect();
     }
-    setBrokerState(BrokerState::terminated);
+    if (cBrokerState!=BrokerState::connected_error) {
+        setBrokerState(BrokerState::terminated);
+    } else {
+        setBrokerState(BrokerState::errored);
+    }
 
     if (!skipUnregister) {
         unregister();

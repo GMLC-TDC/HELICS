@@ -362,8 +362,13 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
     lastErrorString = std::string(estring);
     lastErrorCode.store(eCode);
-    if (brokerState.load() != BrokerState::errored) {
-        brokerState.store(BrokerState::errored);
+    auto cBrokerState = brokerState.load();
+    if (cBrokerState != BrokerState::errored && cBrokerState!=BrokerState::connected_error) {
+        if (cBrokerState > BrokerState::configured && cBrokerState <= BrokerState::terminating) {
+            brokerState.store(BrokerState::connected_error);
+        } else {
+            brokerState.store(BrokerState::errored);
+        }
         if (errorDelay <= timeZero) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
@@ -670,7 +675,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error ) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -725,7 +730,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td > errorDelay.to_ms()) {
@@ -810,8 +815,18 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
 
 bool BrokerBase::setBrokerState(BrokerState newState)
 {
-    if (brokerState.load() == BrokerState::errored) {
+    auto currentState = brokerState.load();
+    if (currentState == BrokerState::errored) {
         return false;
+    }
+    if (currentState == BrokerState::connected_error && newState!=BrokerState::errored) {
+        return false;
+    }
+    if (newState==BrokerState::errored) {
+        if (currentState > BrokerState::connecting && currentState < BrokerState::terminating)
+        {
+            newState = BrokerState::connected_error;
+        }
     }
     brokerState.store(newState);
     return true;
@@ -890,6 +905,7 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
     static const std::string terminatingString = "terminating";
     static const std::string terminatedString = "terminated";
     static const std::string erroredString = "error";
+    static const std::string connectedErrorString = "connected_error";
     static const std::string otherString = "other";
     switch (state) {
         case BrokerBase::BrokerState::created:
@@ -911,6 +927,8 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
         case BrokerBase::BrokerState::terminated:
             return terminatedString;
         case BrokerBase::BrokerState::errored:
+            return erroredString;
+        case BrokerBase::BrokerState::connected_error:
             return erroredString;
         default:
             return otherString;
