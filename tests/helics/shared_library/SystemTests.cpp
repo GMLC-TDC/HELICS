@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <atomic>
 #include <csignal>
 #include <thread>
+#include <future>
 
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
@@ -413,7 +414,7 @@ TEST(other_tests, signal_handler_threaded_death_ci_skip)
     helicsClearSignalHandler();
 }
 
-/** test the default signal handler*/
+/** test the threaded signal handler*/
 TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
 {
     handlerCount.store(0);
@@ -429,4 +430,33 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
     EXPECT_EQ(handlerCount.load(), 1);
+}
+
+
+/** test the threaded signal handler during disconnected fed construction*/
+TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
+{
+    handlerCount.store(0);
+    helicsLoadThreadedSignalHandler();
+    HelicsError err = helicsErrorInitialize();
+    auto fedGen = [&err]() {
+        auto fedInfo = helicsCreateFederateInfo();
+        helicsFederateInfoSetCoreInitString(fedInfo, "--networktimeout=300ms",nullptr);
+        auto federate=helicsCreateCombinationFederate("test", fedInfo, &err);
+        helicsFederateInfoFree(fedInfo);
+        helicsFederateDestroy(federate);
+    };
+
+    auto t1 = std::async(std::launch::async, fedGen);
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    helicsAbort(-44, "zippity_zoo_za");
+    auto status = t1.wait_for(std::chrono::milliseconds(3000));
+    EXPECT_EQ(status, std::future_status::ready);
+    t1.wait();
+    EXPECT_NE(err.error_code, HELICS_OK);
+    EXPECT_TRUE(std::string(err.message).find("zippity_zoo_za") != std::string::npos);
+    helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
 }

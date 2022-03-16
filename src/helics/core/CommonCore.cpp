@@ -3367,11 +3367,18 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_GLOBAL_ERROR:
-            setErrorState(command.messageID, command.payload.to_string());
-            sendErrorToFederates(command.messageID, command.payload.to_string());
-            if (!(command.source_id == higher_broker_id || command.source_id == gRootBrokerID)) {
-                transmit(parent_route_id, std::move(command));
+
+            if (getBrokerState() == BrokerState::connecting) {
+                processDisconnect();
             }
+            setErrorState(command.messageID, command.payload.to_string());
+            if (isConnected()) {
+                sendErrorToFederates(command.messageID, command.payload.to_string());
+                if (!(command.source_id == higher_broker_id ||
+                      command.source_id == gRootBrokerID)) {
+                    transmit(parent_route_id, std::move(command));
+                }
+            } 
             break;
         case CMD_DATA_LINK: {
             auto* pub = loopHandles.getPublication(command.name());
