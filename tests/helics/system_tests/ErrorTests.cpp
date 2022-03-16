@@ -474,7 +474,7 @@ TEST_F(error_tests, mismatched_units)
 TEST_F(error_tests, mismatched_units_terminate_on_error)
 {
     auto broker = AddBroker("test", "-f 3 --error_timeout=0");
-
+    extraCoreArgs = "--error_timeout=0";
     AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
 
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
