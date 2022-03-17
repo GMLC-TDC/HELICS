@@ -86,7 +86,7 @@ HELICS_EXPORT void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), H
 techniques that are not 100% guaranteed to work in a signal handler
 and in worst case it could deadlock.  That is somewhat unlikely given usage patterns
 but it is possible.  The callback has signature HelicsBool(*handler)(int) and it will take the SIG_INT as an argument
-and return a boolean.  If the boolean return value is HELICS_TRUE (or the callback is null) the default signal handler is run after the
+and return a boolean.  If the boolean return value is HELICS_TRUE (or the callback is null) the no exit signal handler is run after the
 callback finishes; if it is HELICS_FALSE the default callback is not run and the default signal handler is executed. If the second
 argument is set to HELICS_TRUE the default signal handler will execute in a separate thread(this may be a bad idea). */
 HELICS_EXPORT void helicsLoadSignalHandlerCallbackNoExit(HelicsBool (*handler)(int), HelicsBool useSeparateThread);

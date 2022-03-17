@@ -1009,7 +1009,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.setAction(CMD_DISCONNECT);
                     command.dest_id = parent_broker_id;
                     setActionFlag(command, error_flag);
-                    processDisconnect(command);
+                    processDisconnectCommand(command);
                 } else {
                     if (isRootc) {
                         std::string lcom =
@@ -1072,7 +1072,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
-            processDisconnect(command);
+            processDisconnectCommand(command);
             break;
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
@@ -1789,7 +1789,11 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
             cmd.setAction(CMD_GLOBAL_ERROR);
             setErrorState(cmd.messageID, cmd.payload.to_string());
             broadcast(cmd);
-            transmitToParent(std::move(cmd));
+            if (!isRoot()) {
+                transmitToParent(std::move(cmd));
+            } else {
+
+            }
             return;
         }
     }
@@ -2197,11 +2201,7 @@ void CoreBroker::processDisconnect(bool skipUnregister)
         setBrokerState(BrokerState::terminating);
         brokerDisconnect();
     }
-    if (cBrokerState!=BrokerState::connected_error) {
-        setBrokerState(BrokerState::terminated);
-    } else {
-        setBrokerState(BrokerState::errored);
-    }
+    setBrokerState(BrokerState::terminated);
 
     if (!skipUnregister) {
         unregister();
@@ -2677,7 +2677,7 @@ void CoreBroker::processError(ActionMessage& command)
     }
 }
 
-void CoreBroker::processDisconnect(ActionMessage& command)
+void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
     auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
     switch (command.action()) {
