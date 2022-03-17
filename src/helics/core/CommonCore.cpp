@@ -178,7 +178,8 @@ bool CommonCore::connect()
 bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
-    return ((currentState >= BrokerState::connected) && (currentState <= BrokerState::connected_error));
+    return ((currentState >= BrokerState::connected) &&
+            (currentState <= BrokerState::connected_error));
 }
 
 const std::string& CommonCore::getIdentifier() const
@@ -1708,7 +1709,8 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
     }
     if (!waitCoreRegistration()) {
         if (getBrokerState() >= BrokerState::connected_error) {
-            throw(RegistrationFailure("core is terminated or in error state no further registration possible"));
+            throw(RegistrationFailure(
+                "core is terminated or in error state no further registration possible"));
         }
         throw(RegistrationFailure("registration timeout exceeded"));
     }
@@ -3318,8 +3320,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id || command.source_id == gRootBrokerID) {
-                    sendErrorToFederates(command.messageID,
-                                         command.payload.to_string());
+                    sendErrorToFederates(command.messageID, command.payload.to_string());
                     setErrorState(command.messageID, command.payload.to_string());
 
                 } else {
@@ -3340,7 +3341,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
                 if (terminate_on_error) {
-                    if (getBrokerState() != BrokerState::errored && getBrokerState() !=BrokerState::connected_error) {
+                    if (getBrokerState() != BrokerState::errored &&
+                        getBrokerState() != BrokerState::connected_error) {
                         sendErrorToFederates(command.messageID, command.payload.to_string());
                         setBrokerState(BrokerState::errored);
                     }

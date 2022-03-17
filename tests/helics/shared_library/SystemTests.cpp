@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <atomic>
 #include <csignal>
-#include <thread>
 #include <future>
+#include <thread>
 
 // test generating a global from a broker and some of its error pathways
 TEST(other_tests, broker_global_value)
@@ -435,7 +435,6 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
     helicsCloseLibrary();
 }
 
-
 /** test the threaded signal handler during disconnected fed construction*/
 TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
 {
@@ -444,14 +443,14 @@ TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
     HelicsError err = helicsErrorInitialize();
     auto fedGen = [&err]() {
         auto fedInfo = helicsCreateFederateInfo();
-        helicsFederateInfoSetCoreInitString(fedInfo, "--networktimeout=300ms",nullptr);
-        auto federate=helicsCreateCombinationFederate("test", fedInfo, &err);
+        helicsFederateInfoSetCoreInitString(fedInfo, "--networktimeout=300ms", nullptr);
+        auto federate = helicsCreateCombinationFederate("test", fedInfo, &err);
         helicsFederateInfoFree(fedInfo);
         helicsFederateDestroy(federate);
     };
 
     auto t1 = std::async(std::launch::async, fedGen);
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(300));
     helicsAbort(-44, "zippity_zoo_za");
     auto status = t1.wait_for(std::chrono::milliseconds(3000));

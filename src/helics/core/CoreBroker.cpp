@@ -1792,7 +1792,6 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
             if (!isRoot()) {
                 transmitToParent(std::move(cmd));
             } else {
-
             }
             return;
         }

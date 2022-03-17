@@ -363,7 +363,7 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
     lastErrorString.assign(estring.data(), estring.size());
     lastErrorCode.store(eCode);
     auto cBrokerState = brokerState.load();
-    if (cBrokerState != BrokerState::errored && cBrokerState!=BrokerState::connected_error) {
+    if (cBrokerState != BrokerState::errored && cBrokerState != BrokerState::connected_error) {
         if (cBrokerState > BrokerState::configured && cBrokerState < BrokerState::terminating) {
             brokerState.store(BrokerState::connected_error);
         } else {
@@ -675,7 +675,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == BrokerState::connected_error ) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -815,15 +815,14 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
 
 bool BrokerBase::setBrokerState(BrokerState newState)
 {
-   
     auto currentState = brokerState.load();
     switch (currentState) {
         case BrokerState::errored:
             return (newState == BrokerState::errored);
         case BrokerState::connected_error:
-            if (newState==BrokerState::terminating) {
+            if (newState == BrokerState::terminating) {
                 newState = BrokerState::terminating_error;
-            } else if (newState==BrokerState::terminated || newState==BrokerState::errored) {
+            } else if (newState == BrokerState::terminated || newState == BrokerState::errored) {
                 newState = BrokerState::errored;
             } else {
                 return (newState == BrokerState::connected_error);
@@ -845,7 +844,7 @@ bool BrokerBase::setBrokerState(BrokerState newState)
             }
             break;
     }
-   
+
     brokerState.store(newState);
     return true;
 }

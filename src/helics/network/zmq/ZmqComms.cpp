@@ -315,7 +315,8 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                             logWarning(std::string("sending message to ") +
                                        makePortAddress(brokerTargetAddress, brokerPort + 1));
                         } else if (cnt2 > maxRetries) {
-                            logError("zmq broker connection timed out after trying "+std::to_string(maxRetries)+ " times (2)");
+                            logError("zmq broker connection timed out after trying " +
+                                     std::to_string(maxRetries) + " times (2)");
                             setTxStatus(connection_status::error);
                             break;
                         }

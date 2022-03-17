@@ -108,9 +108,9 @@ class BrokerBase {
         connected = -3,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
         operating = 0,  //!< normal operating conditions
-        connected_error = 3, //!< error state but still connected
+        connected_error = 3,  //!< error state but still connected
         terminating = 4,  //!< the termination process has started
-        terminating_error=5, //!< the termination process has started while in an error state
+        terminating_error = 5,  //!< the termination process has started while in an error state
         terminated = 6,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
