@@ -410,7 +410,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
             if (!dep.dependency) {
                 continue;
             }
-            if (dep.time_state<time_state_t::time_granted) {
+            if (dep.time_state < time_state_t::time_granted) {
                 return false;
             }
             if (dep.next < desiredGrantTime) {
