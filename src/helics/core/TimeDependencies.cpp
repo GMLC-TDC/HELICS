@@ -395,6 +395,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
             if (!dep.dependency) {
                 continue;
             }
+            if (dep.time_state < time_state_t::time_granted) {
+                return false;
+            }
             if (dep.next < desiredGrantTime) {
                 return false;
             }
@@ -406,6 +409,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGran
         for (const auto& dep : dependencies) {
             if (!dep.dependency) {
                 continue;
+            }
+            if (dep.time_state<time_state_t::time_granted) {
+                return false;
             }
             if (dep.next < desiredGrantTime) {
                 return false;
@@ -524,6 +530,11 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
         }
     }
 
+    /* if (mTime.time_state < time_state_t::time_granted) {
+        mTime.next = initializationTime;
+        mTime.minDe = initializationTime;
+        mTime.Te = initializationTime;
+    }*/
     return mTime;
 }
 
@@ -554,7 +565,11 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-
+    /* if (mTime.time_state < time_state_t::time_granted) {
+        mTime.next = initializationTime;
+        mTime.minDe = initializationTime;
+        mTime.Te = initializationTime;
+    }*/
     return mTime;
 }
 
@@ -584,7 +599,11 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-
+    /* if (mTime.time_state < time_state_t::time_granted) {
+        mTime.next = initializationTime;
+        mTime.minDe = initializationTime;
+        mTime.Te = initializationTime;
+    }*/
     return mTime;
 }
 }  // namespace helics
