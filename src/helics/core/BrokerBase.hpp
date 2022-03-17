@@ -59,7 +59,7 @@ class BrokerBase {
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     Time queryTimeout{15.0};  //!< timeout for queries, if the query isn't answered within this time
                               //!< period respond with timeout error
-    Time errorDelay{10.0};  //!< time to delay before terminating after error state
+    Time errorDelay{0.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
     Time maxCoSimDuration{-1.0};  //!< the maximum lifetime (wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
@@ -108,8 +108,9 @@ class BrokerBase {
         connected = -3,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
         operating = 0,  //!< normal operating conditions
-        connected_error = 2, //!< error state but still connected
-        terminating = 5,  //!< the termination process has started
+        connected_error = 3, //!< error state but still connected
+        terminating = 4,  //!< the termination process has started
+        terminating_error=5, //!< the termination process has started while in an error state
         terminated = 6,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };

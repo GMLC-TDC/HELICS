@@ -110,11 +110,11 @@ HelicsBroker FederateTestFixture::AddBroker(const std::string& CoreType_name,
 
     if (extraBrokerArgs.empty()) {
         broker = StartBrokerImp(CoreType_name,
-                                std::string("--maxcosimduration=180000 --errortimeout=0 ") +
+                                std::string("--maxcosimduration=180000 ") +
                                     initialization_string);
     } else {
         broker = StartBrokerImp(CoreType_name,
-                                std::string("--maxcosimduration=180000 --errortimeout=0 ") +
+                                std::string("--maxcosimduration=180000 ") +
                                     initialization_string + " " + extraBrokerArgs);
     }
     assert(helicsBrokerIsValid(broker) == HELICS_TRUE);

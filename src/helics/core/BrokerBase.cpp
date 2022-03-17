@@ -360,7 +360,7 @@ void BrokerBase::writeProfilingData()
 
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
-    lastErrorString = std::string(estring);
+    lastErrorString.assign(estring.data(), estring.size());
     lastErrorCode.store(eCode);
     auto cBrokerState = brokerState.load();
     if (cBrokerState != BrokerState::errored && cBrokerState!=BrokerState::connected_error) {
@@ -815,19 +815,37 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
 
 bool BrokerBase::setBrokerState(BrokerState newState)
 {
+   
     auto currentState = brokerState.load();
-    if (currentState == BrokerState::errored) {
-        return false;
+    switch (currentState) {
+        case BrokerState::errored:
+            return (newState == BrokerState::errored);
+        case BrokerState::connected_error:
+            if (newState==BrokerState::terminating) {
+                newState = BrokerState::terminating_error;
+            } else if (newState==BrokerState::terminated || newState==BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::connected_error);
+            }
+            break;
+        case BrokerState::terminating_error:
+            if (newState == BrokerState::terminated || newState == BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::terminating_error);
+            }
+            break;
+        default:
+            if (newState == BrokerState::errored) {
+                if (currentState > BrokerState::connecting &&
+                    currentState < BrokerState::terminating) {
+                    newState = BrokerState::connected_error;
+                }
+            }
+            break;
     }
-    if (currentState == BrokerState::connected_error && newState!=BrokerState::errored) {
-        return false;
-    }
-    if (newState==BrokerState::errored) {
-        if (currentState > BrokerState::connecting && currentState < BrokerState::terminating)
-        {
-            newState = BrokerState::connected_error;
-        }
-    }
+   
     brokerState.store(newState);
     return true;
 }
@@ -903,6 +921,7 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
     static const std::string initializingString = "initializing";
     static const std::string operatingString = "operating";
     static const std::string terminatingString = "terminating";
+    static const std::string terminatingErrorString = "terminating_error";
     static const std::string terminatedString = "terminated";
     static const std::string erroredString = "error";
     static const std::string connectedErrorString = "connected_error";
@@ -924,12 +943,14 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
             return operatingString;
         case BrokerBase::BrokerState::terminating:
             return terminatingString;
+        case BrokerBase::BrokerState::terminating_error:
+            return terminatingErrorString;
         case BrokerBase::BrokerState::terminated:
             return terminatedString;
         case BrokerBase::BrokerState::errored:
             return erroredString;
         case BrokerBase::BrokerState::connected_error:
-            return erroredString;
+            return connectedErrorString;
         default:
             return otherString;
     }
