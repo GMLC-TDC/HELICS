@@ -329,7 +329,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
-    return mLogManager->sendToLogger(logLevel, name, message, fromRemote);
+    return mLogManager->sendToLogger(logLevel, header, message, fromRemote);
 }
 
 void BrokerBase::generateNewIdentifier()

@@ -241,12 +241,13 @@ class BrokerBase {
 
     /** send a Message to the logging system
     @return true if the message was actually logged
+    @param fromRemote set to true if the message to be logged came from a different object
     */
     bool sendToLogger(GlobalFederateId federateID,
                       int logLevel,
                       std::string_view name,
                       std::string_view message,
-                      bool disableRemote = false) const;
+                      bool fromRemote = false) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
     /** write profiler data to file*/
