@@ -32,11 +32,11 @@ Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started). It is slower
 because it builds all dependencies but handles getting the right install paths to dependencies set correctly.
 To use it:
- 
-1. Follow the [vcpkg getting started directions](https://github.com/microsoft/vcpkg#getting-started) to install vcpkg 
+
+1. Follow the [vcpkg getting started directions](https://github.com/microsoft/vcpkg#getting-started) to install vcpkg
 2. Run `cmake` using
-`-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
-variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
+   `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
+   variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
 
 **3.** _Optional_ Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start). We **highly recommend skipping** this step and building HELICS via CMake with the `HELICS_ZMQ_SUBPROJECT=ON` option enabled (which is default on Windows) to automatically set up a project-only copy of ZeroMQ. The ZeroMQ Windows installer is **very** outdated and will not work with new versions of Visual Studio. The CMake generator from ZeroMQ on Windows also works and can be used to store ZMQ in another location that will need to be specified for HELICS.
 
@@ -49,7 +49,7 @@ if you wish to generate the interface libraries for Java, appropriate build file
      choco install swig
 ```
 
-**6.** Open a Developer PowerShell for Visual Studio command line and make sure _CMake_ and _git_ are available in the Command Prompt. This can be done with `Get-Command`. If they aren't, add them to the system PATH variable. 
+**6.** Open a Developer PowerShell for Visual Studio command line and make sure _CMake_ and _git_ are available in the Command Prompt. This can be done with `Get-Command`. If they aren't, add them to the system PATH variable.
 
 ```powershell
 PS C:\Users\sampleUser\localrepos\HELICS> Get-Command cmake
