@@ -18,12 +18,10 @@ _Note_: Keep in mind that your CMake version should be newer than the boost vers
 
 ### Set up your Environment:
 
-**1.** Install Microsoft Visual C++ 2019 or newer (2017 may work, but is no longer tested by CI builds)[MSVC](https://visualstudio.microsoft.com/)
+**1.** Install Microsoft Visual C++ 2019 or newer (2017 may work, but is no longer tested by CI builds) [MSVC](https://visualstudio.microsoft.com/)
 
-**2.** Install
-[Boost](https://www.boost.org/doc/libs/1_74_0/more/getting_started/windows.html)
-[Windows downloads](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
-1.67 or later recommended. For CMake to detect it automatically either
+**2.** Install [Boost](https://dl.bintray.com/boostorg/release/1.74.0/binaries/)
+1.67 or later. For CMake to detect it automatically either
 extract Boost to the root of your drive, or set the `BOOST_INSTALL_PATH`
 environment variable to the install location. The CMake will only automatically find
 Boost 1.67 or newer.
@@ -31,48 +29,44 @@ Building with Visual Studio 2019 will require boost 1.67 or newer and CMake 3.14
 or newer.
 Boost 1.72 with CMake 3.18+ is the current recommended configuration.
 
-As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started) -- it is slower
+As an (experimental) alternative for installing Boost (and ZeroMQ), you can use [vcpkg](https://github.com/microsoft/vcpkg#getting-started). It is slower
 because it builds all dependencies but handles getting the right install paths to dependencies set correctly.
-To use it, follow the vcpkg getting started directions to install vcpkg and then run `cmake` using
+To use it:
+ 
+1. Follow the [vcpkg getting started directions](https://github.com/microsoft/vcpkg#getting-started) to install vcpkg 
+2. Run `cmake` using
 `-DCMAKE_TOOLCHAIN_FILE=[path to vcpkg]/scripts/buildsystems/vcpkg.cmake`, or by setting the environment
 variable `VCPKG_ROOT=[path to vcpkg]` prior to running `cmake`.
 
-**3.** _Optional_ Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start).
-We **highly recommend skipping** this step and running CMake with the
-`HELICS_ZMQ_SUBPROJECT=ON` option enabled(which is default on windows) to automatically set up a project-only
-copy of ZeroMQ. The ZeroMQ Windows installer is **very**
-outdated and will not work with new versions of Visual Studio. The CMake generator from ZeroMQ on windows is also functional and can be used to store ZMQ in another location that will need to be specified for HELICS.
+**3.** _Optional_ Only if you need a global Install of ZeroMQ [ZeroMQ](http://zeromq.org/build:_start). We **highly recommend skipping** this step and building HELICS via CMake with the `HELICS_ZMQ_SUBPROJECT=ON` option enabled (which is default on Windows) to automatically set up a project-only copy of ZeroMQ. The ZeroMQ Windows installer is **very** outdated and will not work with new versions of Visual Studio. The CMake generator from ZeroMQ on Windows also works and can be used to store ZMQ in another location that will need to be specified for HELICS.
 
-**4.** _Optional_ Install
-[MS-MPI](<https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx>)
-if you need MPI support.
+**4.** _Optional_ Install [MS-MPI](<https://msdn.microsoft.com/en-us/library/bb524831(v=vs.85).aspx>) if you need MPI support.
 
-**5.** _Optional_ Install
-[SWIG](http://www.swig.org/download.html)
-if you wish to generate the interface libraries for MATLAB and Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. If you do need to regenerate the MATLAB interface a modified version of swig is necessary, see [MATLAB Swig](language.md#helics-with-matlab). For Octave and C\# a swig install is necessary. The simplest way to install swig is to use [chocolatey](https://chocolatey.org/) from windows power shell with
+**5.** _Optional_ Install [SWIG](http://www.swig.org/download.html)
+if you wish to generate the interface libraries for Java, appropriate build files are included in the repository so it shouldn't be necessary to regenerate unless the libraries are modified. For C\# a SWIG install is necessary. The simplest way to install SWIG is to use [chocolatey](https://chocolatey.org/) from Windows PowerShell with
 
 ```shell
      choco install swig
 ```
 
-**6.** Open a Developer PowerShell for Visual Studio command line and make sure _CMake_ and _git_ are available in the Command Prompt. This can be done with `Get-Command`. If they aren't, add them to the system PATH variable.
+**6.** Open a Developer PowerShell for Visual Studio command line and make sure _CMake_ and _git_ are available in the Command Prompt. This can be done with `Get-Command`. If they aren't, add them to the system PATH variable. 
 
 ```powershell
-PS C:\Users\schw197\localrepos\HELICS> Get-Command cmake
+PS C:\Users\sampleUser\localrepos\HELICS> Get-Command cmake
 
 CommandType   Name          Version    Source
 -----------   ----          -------    ------
 Application   cmake.exe     3.22.3.0   C:\Program Files\CMake\bin\cmake.exe
 
 
-PS C:\Users\schw197\localrepos\HELICS> Get-Command git
+PS C:\Users\sampleUser\localrepos\HELICS> Get-Command git
 
 CommandType   Name          Version    Source
 -----------   ----          -------    ------
 Application   git.exe       2.35.1.2   C:\Program Files\Git\cmd\git.exe
 
 
-PS C:\Users\schw197\localrepos\HELICS> Get-Command cmake-gui
+PS C:\Users\sampleUser\localrepos\HELICS> Get-Command cmake-gui
 
 CommandType   Name          Version    Source
 -----------   ----          -------    ------
@@ -98,17 +92,17 @@ folder.
     cd build
 ```
 
-**3.** Run CMake or CMake GUI. It should automatically detect where MPI is installed if the system path variables are set up correctly, otherwise you will have to set the CMake path manually. `ZMQ_LOCAL_BUILD` is set to ON
+**3.** Run CMake or CMake GUI. It should automatically detect where MPI is installed if the system path variables are set up correctly, otherwise you will have to set the CMake path manually. `ZMQ_LOCAL_BUILD` is set to `ON` by default
 so ZeroMQ will automatically be built unless the option is changed.
 
-Make sure to provide the path to the install folder to option `CMAKE_INSTALL_PREFIX`.
+Make sure to set `CMAKE_INSTALL_PREFIX` to the path of the install folder.
 
 If you need CMake to use a generator for an IDE or build system other
-than the default (ex: Ninja instead of a Visual Studio project), the -G
-option can be used to specify one of the generators listed by CMake --help.
+than the default (ex: Ninja instead of a Visual Studio project), the `-G`
+option can be used to specify one of the generators listed by `CMake --help`.
 If you are using a Visual Studio generator, such as Visual Studio 2019,
 and need to select an architecture other than the default (ex: building a
-32-bit target on a 64-bit host or vice versa), the -A option can be used
+32-bit target on a 64-bit host or vice versa), the `-A` option can be used
 to specify a target platform name. For example, for a 32-bit x86 build with
 Visual Studio 2019 on a 64-bit copy of Windows, you would use the cmake
 options `-G "Visual Studio 16 2019" -A Win32`. Similarly, `-A x64` can
@@ -123,7 +117,7 @@ more up-to-date on the latest version of CMake than this guide.
 To avoid problems when building later, the target architecture and Visual
 Studio version should match the version of the Boost libraries you are using.
 
-If you installed boost into the root of the C or D drives with the
+If you installed Boost into the root of the C or D drives with the
 default location (or the `BOOST_INSTALL_PATH` environment variable has been set), CMake should automatically detect their location. Otherwise the
 location will need to be manually given to CMake.
 NOTE: CMake 3.14 and later separate the architecture into a separate field for the generator
@@ -131,22 +125,20 @@ NOTE: CMake 3.14 and later separate the architecture into a separate field for t
 A basic call with `cmake` using Visual Studio 2022 on a 64bit Windows machine and installing to a folder called `install` inside the repository would be:
 
 ```
- cmake --install-prefix 'C:\Users\schw197\localrepos\HELICS - Copy\install' -G "Visual Studio 17 2022" ..
+ cmake --install-prefix 'C:\Users\sampleUser\localrepos\HELICS - Copy\install' -G "Visual Studio 17 2022" ..
 ```
 
-**4.** Open the Visual Studio solution generated by CMake (his can be done from the command prompt with `start HELICS.sln`).
-In the _Solution Explorer_ Under `Solution 'HELICS'\CMakePredefinedTargets`, right-click on `INSTALL` and select `Build`:
+**4.** Open the Visual Studio solution generated by CMake (his can be done from the command prompt with `start HELICS.sln`). In the _Solution Explorer_ Under `Solution 'HELICS'\CMakePredefinedTargets`, right-click on `INSTALL` and select `Build`:
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/windows_build_vs.png?raw=true)
 
-Alternatively, in the MSBuild command prompt, run the command msbuild HELICS.sln from the build folder to compile the entire solution.
+Alternatively, in the MSBuild command prompt, run the command `msbuild HELICS.sln` from the build folder to compile the entire solution.
 
-HELICS.sln can be replaced with the name of one of the projects to build only that part of HELICS.
+"HELICS.sln" can be replaced with the name of one of the projects to build only that part of HELICS.
 
-If the build was successful there should be a `bin` folder inside the `install` folder with `helics.dll` inside (or `helicsd.dll` if Debug mode).
+If the build was successful there should be a "bin" folder inside the "install" folder with `helics.dll` inside (or `helicsd.dll` if Debug mode).
 
-**5.** _Optional_ If interfacing with [PYHELICS](https://python.helics.org/) (assuming already installed via e.g. `pip install helics`) the `PYHELICS_INSTALL` environment variable needs to be set to point to the `install` folder, and `install\bin` (folder with `helics.dll`) needs to be added to the system path.
-This can be done via the environment variable GUI in windows or temporarily via the command line[^1]
+**5.** _Optional_ If interfacing with [PYHELICS](https://python.helics.org/) (assuming already installed via `pip install helics`) the `PYHELICS_INSTALL` environment variable needs to be set to the path of the "install" folder, and "install\bin" (the folder with "helics.dll") needs to be added to the system path. This can be done via the environment variable GUI in windows or temporarily via the command line[^1]
 
 [^1]: Especially if you plan on regularly switching between versions of HELICS temporarily setting `PYHELICS_INSTALL` might not be such a bad idea.
 
