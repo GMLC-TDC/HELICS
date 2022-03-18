@@ -54,11 +54,7 @@ class Broker {
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor*/
-    Broker(Broker&& brk) HELICS_NOTHROW
-    {
-        broker = brk.broker;
-        brk.broker = HELICS_NULL_POINTER;
-    }
+    Broker(Broker&& brk) HELICS_NOTHROW: broker(brk.broker) { brk.broker = HELICS_NULL_POINTER; }
     /** move assignment*/
     Broker& operator=(Broker&& brk) HELICS_NOTHROW
     {

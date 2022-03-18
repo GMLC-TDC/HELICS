@@ -51,11 +51,7 @@ class Core {
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor*/
-    Core(Core&& cr) HELICS_NOTHROW
-    {
-        core = cr.core;
-        cr.core = HELICS_NULL_POINTER;
-    }
+    Core(Core&& cr) HELICS_NOTHROW: core(cr.core) { cr.core = HELICS_NULL_POINTER; }
     /** move assignment*/
     Core& operator=(Core&& cr) HELICS_NOTHROW
     {

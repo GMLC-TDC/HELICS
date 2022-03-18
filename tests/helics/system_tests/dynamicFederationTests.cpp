@@ -112,7 +112,7 @@ TEST_F(dynFed, observer_subscriber)
     EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
     // now we try to join the federation with an observer
     if (fobs) {
-        auto obsSubs = fobs->registerSubscription("pub1");
+        fobs->registerSubscription("pub1");
         fobs->query("root", "global_flush");
 
         EXPECT_NO_THROW(fobs->enterInitializingMode());
@@ -183,6 +183,7 @@ TEST_F(dynFed, observer_subscriber_value)
 
     EXPECT_NO_THROW(fobs->enterExecutingMode());
     res = vFed1->requestTime(3.0);
+    EXPECT_EQ(res, 3.0);
     pub.publish(0.8987);
     res = vFed1->requestTime(4.0);
     EXPECT_EQ(res, 4.0);
