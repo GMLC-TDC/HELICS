@@ -101,3 +101,5 @@ const char *helicsFederateWaitCommand(HelicsFederate fed, HelicsError *err);
 
 The only error paths are if the federate is not valid or not in a state to receive commands.
 The python calls are similar to other python calls.
+
+Only one command is returned per use of the `helicsFederateGetCommand()` or `helicsFederateWaitCommand()` API calls. It is possible multiple commands have been queued and to retrieve all of them, the API must be called multiple times. An API call when the command queue is empty will return a null string.
