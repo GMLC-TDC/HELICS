@@ -122,6 +122,20 @@ public class helics implements helicsConstants {
   }
 
   /**
+   *  Load a custom signal handler to execute prior to the abort signal handler. The signal handler does not call exit.<br>
+   * This function is not 100% reliable. It will most likely work but uses some functions and<br>
+   * techniques that are not 100% guaranteed to work in a signal handler<br>
+   * and in worst case it could deadlock.  That is somewhat unlikely given usage patterns<br>
+   * but it is possible.  The callback has signature HelicsBool(*handler)(int) and it will take the SIG_INT as an argument<br>
+   * and return a boolean.  If the boolean return value is HELICS_TRUE (or the callback is null) the no exit signal handler is run after the<br>
+   * callback finishes; if it is HELICS_FALSE the default callback is not run and the default signal handler is executed. If the second<br>
+   * argument is set to HELICS_TRUE the default signal handler will execute in a separate thread (this may be a bad idea). 
+   */
+  public static void helicsLoadSignalHandlerCallbackNoExit(SWIGTYPE_p_f_int__int handler, int useSeparateThread) {
+    helicsJNI.helicsLoadSignalHandlerCallbackNoExit(SWIGTYPE_p_f_int__int.getCPtr(handler), useSeparateThread);
+  }
+
+  /**
    *  Execute a global abort by sending an error code to all cores, brokers,<br>
    * and federates that were created through the current library instance.
    */

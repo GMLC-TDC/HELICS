@@ -183,6 +183,7 @@ public class helicsJNI {
   public final static native void helicsLoadSignalHandler();
   public final static native void helicsLoadThreadedSignalHandler();
   public final static native void helicsClearSignalHandler();
+  public final static native void helicsLoadSignalHandlerCallbackNoExit(long jarg1, int jarg2);
   public final static native void helicsAbort(int jarg1, String jarg2);
   public final static native int helicsIsCoreTypeAvailable(String jarg1);
   public final static native long helicsCreateCore(String jarg1, String jarg2, String jarg3);

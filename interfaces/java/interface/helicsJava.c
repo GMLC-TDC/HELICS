@@ -2298,6 +2298,18 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsClearSignalHandler(
 }
 
 
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandlerCallbackNoExit(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  HelicsBool (*arg1)(int) = (HelicsBool (*)(int)) 0 ;
+  HelicsBool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(HelicsBool (**)(int))&jarg1; 
+  arg2 = (HelicsBool)jarg2; 
+  helicsLoadSignalHandlerCallbackNoExit(arg1,arg2);
+}
+
+
 SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsAbort(JNIEnv *jenv, jclass jcls, jint jarg1, jstring jarg2) {
   int arg1 ;
   char *arg2 = (char *) 0 ;
