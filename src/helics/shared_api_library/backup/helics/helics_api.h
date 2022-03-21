@@ -262,6 +262,7 @@ void helicsLoadSignalHandler();
 void helicsLoadThreadedSignalHandler();
 void helicsClearSignalHandler();
 void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useSeparateThread);
+void helicsLoadSignalHandlerCallbackNoExit(HelicsBool (*handler)(int), HelicsBool useSeparateThread);
 void helicsAbort(int errorCode, const char* errorString);
 HelicsBool helicsIsCoreTypeAvailable(const char* type);
 HelicsCore helicsCreateCore(const char* type, const char* name, const char* initString, HelicsError* err);

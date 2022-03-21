@@ -191,7 +191,7 @@ TEST_F(error_tests, duplicate_publication_names2)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    auto broker = AddBroker("test", "-f 2");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -228,7 +228,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    auto broker = AddBroker("test", "-f 2");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -270,7 +270,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0 --terminate_on_error");
+    auto broker = AddBroker("test", "-f 2 --terminate_on_error");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -473,8 +473,8 @@ TEST_F(error_tests, mismatched_units)
 
 TEST_F(error_tests, mismatched_units_terminate_on_error)
 {
-    auto broker = AddBroker("test", "-f 3 --error_timeout=0");
-
+    auto broker = AddBroker("test", "-f 3 ");
+    extraCoreArgs = "--error_timeout=0";
     AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
 
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);

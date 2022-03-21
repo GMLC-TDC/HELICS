@@ -178,7 +178,8 @@ bool CommonCore::connect()
 bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
-    return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
+    return ((currentState >= BrokerState::connected) &&
+            (currentState <= BrokerState::connected_error));
 }
 
 const std::string& CommonCore::getIdentifier() const
@@ -463,6 +464,7 @@ void CommonCore::finalize(LocalFederateId federateID)
     switch (cbrokerState) {
         case BrokerState::terminated:
         case BrokerState::terminating:
+        case BrokerState::terminating_error:
         case BrokerState::errored: {
             ActionMessage bye(CMD_STOP);
             bye.source_id = fed->global_id.load();
@@ -619,6 +621,8 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::terminating_error:
+        case BrokerState::connected_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -767,6 +771,8 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::terminating_error:
+        case BrokerState::connected_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -836,6 +842,8 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::connected_error:
+        case BrokerState::terminating_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -1700,8 +1708,9 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
         }
     }
     if (!waitCoreRegistration()) {
-        if (getBrokerState() >= BrokerState::terminating) {
-            throw(RegistrationFailure("core is terminated no further registration possible"));
+        if (getBrokerState() >= BrokerState::connected_error) {
+            throw(RegistrationFailure(
+                "core is terminated or in error state no further registration possible"));
         }
         throw(RegistrationFailure("registration timeout exceeded"));
     }
@@ -2946,7 +2955,6 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
-            checkAndProcessDisconnect();
             break;
         case CMD_SEND_COMMAND:
             if (command.dest_id == global_broker_id_local) {
@@ -3312,9 +3320,8 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id || command.source_id == gRootBrokerID) {
-                    sendErrorToFederates(command.messageID,
-                                         std::string(command.payload.to_string()));
-                    setErrorState(command.messageID, std::string(command.payload.to_string()));
+                    sendErrorToFederates(command.messageID, command.payload.to_string());
+                    setErrorState(command.messageID, command.payload.to_string());
 
                 } else {
                     sendToLogger(parent_broker_id,
@@ -3334,7 +3341,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
                 if (terminate_on_error) {
-                    if (getBrokerState() != BrokerState::errored) {
+                    if (getBrokerState() != BrokerState::errored &&
+                        getBrokerState() != BrokerState::connected_error) {
                         sendErrorToFederates(command.messageID, command.payload.to_string());
                         setBrokerState(BrokerState::errored);
                     }
@@ -3367,10 +3375,17 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_GLOBAL_ERROR:
+
+            if (getBrokerState() == BrokerState::connecting) {
+                processDisconnect();
+            }
             setErrorState(command.messageID, command.payload.to_string());
-            sendErrorToFederates(command.messageID, command.payload.to_string());
-            if (!(command.source_id == higher_broker_id || command.source_id == gRootBrokerID)) {
-                transmit(parent_route_id, std::move(command));
+            if (isConnected()) {
+                sendErrorToFederates(command.messageID, command.payload.to_string());
+                if (!(command.source_id == higher_broker_id ||
+                      command.source_id == gRootBrokerID)) {
+                    transmit(parent_route_id, std::move(command));
+                }
             }
             break;
         case CMD_DATA_LINK: {
@@ -4649,8 +4664,8 @@ void CommonCore::manageTimeBlocks(const ActionMessage& command)
 
 bool CommonCore::checkAndProcessDisconnect()
 {
-    if ((getBrokerState() == BrokerState::terminating) ||
-        (getBrokerState() == BrokerState::terminated)) {
+    if ((getBrokerState() >= BrokerState::terminating) &&
+        (getBrokerState() <= BrokerState::terminated)) {
         return true;
     }
     if (allDisconnected()) {

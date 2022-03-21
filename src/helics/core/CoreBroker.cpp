@@ -1009,7 +1009,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.setAction(CMD_DISCONNECT);
                     command.dest_id = parent_broker_id;
                     setActionFlag(command, error_flag);
-                    processDisconnect(command);
+                    processDisconnectCommand(command);
                 } else {
                     if (isRootc) {
                         std::string lcom =
@@ -1072,7 +1072,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
-            processDisconnect(command);
+            processDisconnectCommand(command);
             break;
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
@@ -1789,7 +1789,10 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
             cmd.setAction(CMD_GLOBAL_ERROR);
             setErrorState(cmd.messageID, cmd.payload.to_string());
             broadcast(cmd);
-            transmitToParent(std::move(cmd));
+            if (!isRoot()) {
+                transmitToParent(std::move(cmd));
+            } else {
+            }
             return;
         }
     }
@@ -2174,7 +2177,7 @@ void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
 bool CoreBroker::isConnected() const
 {
     auto state = getBrokerState();
-    return ((state == BrokerState::operating) || (state == BrokerState::connected));
+    return ((state >= BrokerState::connected) && (state < BrokerState::terminating));
 }
 
 bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
@@ -2189,7 +2192,7 @@ bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CoreBroker::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if ((cBrokerState == BrokerState::terminating) || (cBrokerState == BrokerState::terminated)) {
+    if (cBrokerState >= BrokerState::terminating) {
         return;
     }
     if (cBrokerState > BrokerState::configured) {
@@ -2673,7 +2676,7 @@ void CoreBroker::processError(ActionMessage& command)
     }
 }
 
-void CoreBroker::processDisconnect(ActionMessage& command)
+void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
     auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
     switch (command.action()) {

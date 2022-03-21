@@ -329,7 +329,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
-    return mLogManager->sendToLogger(logLevel, name, message, fromRemote);
+    return mLogManager->sendToLogger(logLevel, header, message, fromRemote);
 }
 
 void BrokerBase::generateNewIdentifier()
@@ -360,10 +360,15 @@ void BrokerBase::writeProfilingData()
 
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
-    lastErrorString = std::string(estring);
+    lastErrorString.assign(estring.data(), estring.size());
     lastErrorCode.store(eCode);
-    if (brokerState.load() != BrokerState::errored) {
-        brokerState.store(BrokerState::errored);
+    auto cBrokerState = brokerState.load();
+    if (cBrokerState != BrokerState::errored && cBrokerState != BrokerState::connected_error) {
+        if (cBrokerState > BrokerState::configured && cBrokerState < BrokerState::terminating) {
+            brokerState.store(BrokerState::connected_error);
+        } else {
+            brokerState.store(BrokerState::errored);
+        }
         if (errorDelay <= timeZero) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
@@ -670,7 +675,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -725,7 +730,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td > errorDelay.to_ms()) {
@@ -810,9 +815,36 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
 
 bool BrokerBase::setBrokerState(BrokerState newState)
 {
-    if (brokerState.load() == BrokerState::errored) {
-        return false;
+    auto currentState = brokerState.load();
+    switch (currentState) {
+        case BrokerState::errored:
+            return (newState == BrokerState::errored);
+        case BrokerState::connected_error:
+            if (newState == BrokerState::terminating) {
+                newState = BrokerState::terminating_error;
+            } else if (newState == BrokerState::terminated || newState == BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::connected_error);
+            }
+            break;
+        case BrokerState::terminating_error:
+            if (newState == BrokerState::terminated || newState == BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::terminating_error);
+            }
+            break;
+        default:
+            if (newState == BrokerState::errored) {
+                if (currentState > BrokerState::connecting &&
+                    currentState < BrokerState::terminating) {
+                    newState = BrokerState::connected_error;
+                }
+            }
+            break;
     }
+
     brokerState.store(newState);
     return true;
 }
@@ -888,8 +920,10 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
     static const std::string initializingString = "initializing";
     static const std::string operatingString = "operating";
     static const std::string terminatingString = "terminating";
+    static const std::string terminatingErrorString = "terminating_error";
     static const std::string terminatedString = "terminated";
     static const std::string erroredString = "error";
+    static const std::string connectedErrorString = "connected_error";
     static const std::string otherString = "other";
     switch (state) {
         case BrokerBase::BrokerState::created:
@@ -908,10 +942,14 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
             return operatingString;
         case BrokerBase::BrokerState::terminating:
             return terminatingString;
+        case BrokerBase::BrokerState::terminating_error:
+            return terminatingErrorString;
         case BrokerBase::BrokerState::terminated:
             return terminatedString;
         case BrokerBase::BrokerState::errored:
             return erroredString;
+        case BrokerBase::BrokerState::connected_error:
+            return connectedErrorString;
         default:
             return otherString;
     }
