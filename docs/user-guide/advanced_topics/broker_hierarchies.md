@@ -30,6 +30,7 @@ For examples, the config JSON for the Distribution System A (where Broker A is a
   "coreInit": "--broker_address=tcp://127.0.0.1"
 }
 ```
+
 The command line for launching Broker A also needs to be adjusted. For this examples, let's assume there is a total of 200 federates are expected by Broker A. Note that `broker_address` is used to define the address of the broker next up in the hierarchy; in this, case Broker C.
 
 ```shell-session
@@ -51,8 +52,8 @@ Lastly, when broker C, the root broker, is instantiated, it needs to specify the
 $ helics_broker -f1 --sub_brokers=2
 ```
 
-
 ## Hierarchies with Complex Networks
+
 In more complex networking environments ([see dedicated documentation](./networking)), it may be necessary to include an additional specification of the interface the broker, sub-broker, or federate would like to talk to the rest of the federation on. In these cases, typically only a port specification is added to the configuration. Adding the port can be done in one of two ways:
 
 1. Appending a `:<port number>` after the IP address (_e.g._ `tcp://127.0.0.1:23405`)
@@ -93,14 +94,11 @@ Broker B would need the same details so it could contact its parent broker and c
 $ helics_broker -f200 --broker_address=tcp://127.0.0.127:24000 --local_port=27000
 ```
 
-
 Lastly, to complete the configuration implied by the above, Broker C would need to be called like this:
 
 ```shell-session
 $ helics_broker -f1 --sub_brokers=2 --local_port=24000
 ```
-
-
 
 ## Example
 
