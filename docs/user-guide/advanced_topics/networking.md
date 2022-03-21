@@ -8,7 +8,7 @@ When starting up a HELICS-based co-simulation using the ZMQ core, HELICS opens t
 Again, when all federates are running on a single computer, this prolific use of port numbers (at high federate counts) is generally not a problem. There may need to be permission granted on the local computer to open those ports in a firewall for localhost traffic but no traffic ever leaves the local machine.  
 
 ## Speciality Cores for Complex Networks
-When a co-simulation grows to the point where it starts spanning multiple compute nodes, the default ZMQ core may start running into networking problems. In situations where all the compute nodes are still in the same subnet or administered by the same organization, IT policies may easily accommodate the ZMQ core's need for ports. This may not always be the case, though, and to allow HELICS to operate in these environments, the HELICS developers have created two speciality cores to simplify the impact of HELICS in a networked environment
+When a co-simulation grows to the point where it starts spanning multiple compute nodes, the default ZMQ core may start running into networking problems. In situations where all the compute nodes are still in the same subnet or administered by the same organization, IT policies may easily accommodate the ZMQ core's need for ports. This may not always be the case, though, and to allow HELICS to operate in these environments, the HELICS developers have created two speciality cores to simplify the impact of HELICS in a networked environment.
 
 
 ### `zmq_ss` core
@@ -18,17 +18,25 @@ The zmq_ss core is a version of the ZMQ core with modified behavior to only use 
 The tcp_ss core is similar in nature to the zmq_ss core in that it uses a single socket but is based on the tcp core. This core removes the extra complexity of the zmq core and just uses the tcp protocol directly and has been designed as the go-to core when needing to work in complex networking environments. In addition to only using a single socket, the tcp core allows the broker to initiate connections with federates which can be important when trying to work in networking environments when firewalls prevent connections to be initiated in particular directions. 
 
 
-## `broker_address`, `local_address`, `broker_port`, and `local_port`
+## `broker_address`, `broker_port`, `local_interface` and `local_port`
 Regardless of which core you're using, there are a few specific networking options that allow for changes to default values to enable working in a more restrictive networking environment.
 
-- **`broker_address`** - defines the IP address the broker will listen on for connection requests from federates
-- **`broker_port`** - defines the port number the broker will listen on for connection requests from federates
-- **`local_address`** - defines the IP address the federate will use when communicating with the rest of the federation
-- **`local_port`** - defines the port the federate will use when communicating with the rest of the federation
+- **`broker_address`** and **`broker_port`** - for sub-brokers or federates, defines the IP address (`broker_address`) and port (`broker_port`) which should be used to connect to a parent broker
+- **`local_interface`** and **`local_port`** - defines the IP address (`local_interface`) and port (`local_port`) where a broker, sub-broker, or federate will look for connections to the federation.
  
  
-The `broker_address` and `broker_port` are typically defined as part of the `core_init_string` or as a command line switch when instantiating the broker. Similarly, the `local_address` and `local_port` options can be defined as part of their `core_ini_string` when instantiating a federate or can be included as options in a JSON configuration for that federate. Further details are available in the [Configuration Options Reference](../../references/configuration_options_reference#network). 
+The `broker_port` is typically defined as a command line switch when instantiating the broker. `broker_address` and `broker_port` are also used as options when configuring federates to define the socket they should connect to. These options can be set as part of the `fed_init_string`, `core_init_string` or part of the JSON configuration for that federate. The  `local_port` options can be similarly configured. Further details on these configuration methods can be found in the [Configuration Options Reference](../../references/configuration_options_reference). 
  
-It is also possible to use `broker address` to define the port number (effectively defining the broker's socket) such as `192.169.0.1:23400`. Doing so would then not require the `broker_port` option to be defined.
+It is also possible to include the port number when defining `broker_address` (effectively defining the broker's socket) in addition to the IP address such as in the format: `192.169.0.1:23400`. Doing so would then not require the `broker_port` option to be defined.
 
-As of this writing there is a generic `port` option that acts like `broker_port` for brokers and `local_port` for federates. Experience has shown that though well-intentioned, the feature of it being generic has become a bug in that it causes confusion among users. You may still see if lurking in examples or documentation but it is recommended that its use be avoided and the more explicit `broker_port` and `local_port` be used instead.
+As of this writing there is a generic `port` option supported in HELICS that tries to be all things to all people. Experience has shown that though well-intentioned, the feature of it being generic has become a bug in that it causes confusion among users. You may still see it lurking in examples or documentation but it is recommended that its use be avoided and the more explicit `broker_port` and `local_port` be used instead.
+
+## Broker Hierarchies and Multi-Computer Federations
+Once a federation reaches a certain size, it is not unusual for it to end up deployed across multiple compute nodes and often this results in establishing a broker hierarchy to reduce traffic between compute nodes (and help the co-simulation to run faster). In complex networking environments, this will likely entail the use of the `tcp_ss` core and the specification of the broker and sub-broker sockets. 
+
+The good news is that we already have two other pages of documentation devoted to this and both include running examples that show how these features can be put to use. Here's the [documentation on broker hierarchies](./broker_hierarchies) and here's the one on [running across multiple compute nodes](./borker_multicomputer).
+
+
+Nadia's stuff:
+When multiple brokers are needed in a broker hierarchy the explicit differentiation between `broker_port` and `broker_address` vs. `local_port`,  `local_interface` can be used to differentiate how a sub-broker connects to a higher level broker as opposed to how a federate connects to a sub-broker. The top broker should specify a `local_interface` and `local_port` for the node and port where it will communicate with the sub-brokers. The top broker should also specify the number of `sub_brokers` it communicates with. The sub-brokers will specify a `local_interface` and `local_port` for where it will communicate with its federates. The sub-brokers should also specify the `broker_address` and `broker_port` for where it will communicate with the top broker. The sub-brokers `broker_address` and `broker_port` specifications should match the top broker entries for `local_interface` and `local_port`. Finally, the federates will speicify a `broker_address` and `local_port` that should match the sub-broker's entries for `local_interface` and `local_port`. 
+
