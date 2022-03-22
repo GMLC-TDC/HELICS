@@ -10,11 +10,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <type_traits>
+#include <string_view>
+#include <functional>
 
 namespace helics {
 class HandleManager;
 class GlobalFederateId;
 class FederateState;
+class InterfaceInfo;
 
 // enumeration of subqueries that cascade and need multiple levels of processing
 enum Subqueries : std::uint16_t {
@@ -79,4 +82,13 @@ Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
                                     const helics::GlobalFederateId& fed);
 
 void addFederateTags(Json::Value& v, const helics::FederateState* fed);
+/** generate results from a query related to interfaces*/
+std::string generateInterfaceQueryResults(std::string_view query,
+                                          const HandleManager& handles,
+                                          const GlobalFederateId fed,
+                                          const std::function<void(Json::Value&)>& addHeaderInfo);
+
+std::string generateInterfaceQueryResults(std::string_view query,
+                                          const InterfaceInfo& info,
+                                          const std::function<void(Json::Value&)>& addHeaderInfo);
 }  // namespace helics

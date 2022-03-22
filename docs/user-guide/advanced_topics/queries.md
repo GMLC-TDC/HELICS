@@ -51,51 +51,57 @@ As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing m
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
 ```{eval-rst}
-+--------------------+------------------------------------------------------------+
-| queryString        | Description                                                |
-+====================+============================================================+
-| ``name``           | the identifier of the federate [string]                    |
-+--------------------+------------------------------------------------------------+
-| ``exists``         | basic query if the federate exists in the Federation [T/F] |
-+--------------------+------------------------------------------------------------+
-| ``isinit``         | federate has entered init mode? [T/F]                      |
-+--------------------+------------------------------------------------------------+
-| ``state``          | current state of the federate as a string [string]         |
-+--------------------+------------------------------------------------------------+
-| ``global_state``   | current state of the federate as a string [structure]      |
-+--------------------+------------------------------------------------------------+
-| ``publications``   | current publications of a federate [sv]                    |
-+--------------------+------------------------------------------------------------+
-| ``subscriptions``  | current subscriptions of a federate [sv]                   |
-+--------------------+------------------------------------------------------------+
-| ``inputs``         | current inputs of a federate [sv]                          |
-+--------------------+------------------------------------------------------------+
-| ``endpoints``      | current endpoints of a federate [sv]                       |
-+--------------------+------------------------------------------------------------+
-| ``dependencies``   | list of the objects this federate depends on [sv]          |
-+--------------------+------------------------------------------------------------+
-| ``dependents``     | list of dependent objects [sv]                             |
-+--------------------+------------------------------------------------------------+
-| ``current_time``   | the current time of the federate [structure]               |
-+--------------------+------------------------------------------------------------+
-|``endpoint_filters``| data structure with the filters for endpoints[structure]   |
-+--------------------+------------------------------------------------------------+
-|``dependency_graph``| a graph of the dependencies in a federation [structure]    |
-+--------------------+------------------------------------------------------------+
-|``data_flow_graph`` | a structure with all the data connections [structure]      |
-+--------------------+------------------------------------------------------------+
-| ``queries``        | list of available queries [sv]                             |
-+--------------------+------------------------------------------------------------+
-| ``version``        | the version string of the helics library [string]          |
-+--------------------+------------------------------------------------------------+
-| ``tags``           | a JSON structure with the tags and values [structure]      |
-+--------------------+------------------------------------------------------------+
-| ``logs``           | any log messages stored in the log buffer [structure]      |
-+--------------------+------------------------------------------------------------+
-| ``tag/<tagname>``  | the value associated with a tagname [string]               |
-+--------------------+------------------------------------------------------------+
-| ``<tagname>``      | the value associated with a tagname [string]               |
-+--------------------+------------------------------------------------------------+
++-------------------------+------------------------------------------------------------+
+| queryString             | Description                                                |
++=========================+============================================================+
+| ``name``                | the identifier of the federate [string]                    |
++-------------------------+------------------------------------------------------------+
+| ``exists``              | basic query if the federate exists in the Federation [T/F] |
++-------------------------+------------------------------------------------------------+
+| ``isinit``              | federate has entered init mode? [T/F]                      |
++-------------------------+------------------------------------------------------------+
+| ``state``               | current state of the federate as a string [string]         |
++-------------------------+------------------------------------------------------------+
+| ``global_state``        | current state of the federate as a string [structure]      |
++-------------------------+------------------------------------------------------------+
+| ``publications``        | current publications of a federate [sv]                    |
++-------------------------+------------------------------------------------------------+
+| ``publication_details`` | details of current publications of a federate [sv]         |
++-------------------------+------------------------------------------------------------+
+| ``subscriptions``       | current subscriptions of a federate [sv]                   |
++-------------------------+------------------------------------------------------------+
+| ``inputs``              | current inputs of a federate [sv]                          |
++-------------------------+------------------------------------------------------------+
+| ``endpoints``           | current endpoints of a federate [sv]                       |
++-------------------------+------------------------------------------------------------+
+| ``input_details``       | details of current inputs of a federate [structure]        |
++-------------------------+------------------------------------------------------------+
+| ``endpoint_details``    | details of current endpoints of a federate [structure]     |
++-------------------------+------------------------------------------------------------+
+| ``dependencies``        | list of the objects this federate depends on [sv]          |
++-------------------------+------------------------------------------------------------+
+| ``dependents``          | list of dependent objects [sv]                             |
++-------------------------+------------------------------------------------------------+
+| ``current_time``        | the current time of the federate [structure]               |
++-------------------------+------------------------------------------------------------+
+| ``endpoint_filters``    | data structure with the filters for endpoints[structure]   |
++-------------------------+------------------------------------------------------------+
+| ``dependency_graph``    | a graph of the dependencies in a federation [structure]    |
++-------------------------+------------------------------------------------------------+
+| ``data_flow_graph``     | a structure with all the data connections [structure]      |
++-------------------------+------------------------------------------------------------+
+| ``queries``             | list of available queries [sv]                             |
++-------------------------+------------------------------------------------------------+
+| ``version``             | the version string of the helics library [string]          |
++-------------------------+------------------------------------------------------------+
+| ``tags``                | a JSON structure with the tags and values [structure]      |
++-------------------------+------------------------------------------------------------+
+| ``logs``                | any log messages stored in the log buffer [structure]      |
++-------------------------+------------------------------------------------------------+
+| ``tag/<tagname>``       | the value associated with a tagname [string]               |
++-------------------------+------------------------------------------------------------+
+| ``<tagname>``           | the value associated with a tagname [string]               |
++-------------------------+------------------------------------------------------------+
 ```
 
 The `global_time_debugging` and `global_flush` queries are also acknowledged by federates but it is not usually recommended to run those queries on a particular federate as they are more useful at higher levels. See the `Core` and `Broker` queries for more description of them. The difference between `tag/<tagname>` and `<tagname>` is that using the `tag/` prefix can retrieve any tag and will return an empty string if the tag doesn't exist. Just using the tag name will not return tags of the same name as other queries and will generate an error response if the tag doesn't exist. The `logs` query will only contain information if log buffer size is set to greater than 0 by property or command. The logs query also works on cores and brokers that have been disconnected to retrieve buffered logs after the co-simulation has completed. This of course only works with the local instance.
@@ -143,6 +149,14 @@ The following queries will be answered by a core:
 | ``endpoints``            | current endpoints defined in a core [sv]                                            |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``filters``              | current filters of the core [sv]                                                    |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``publication_details``  | details of current publications defined in a core [structure]                       |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``input_details``        | details of current named inputs defined in a core [structure]                       |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``endpoint_details``     | details of current endpoints defined in a core [structure]                          |
++--------------------------+-------------------------------------------------------------------------------------+
+| ``filter_details``       | details of current filters of the core [structure]                                  |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``federates``            | current federates defined in a core [sv]                                            |
 +--------------------------+-------------------------------------------------------------------------------------+
@@ -214,7 +228,19 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``endpoints``            | current endpoints known to a broker [sv]                                                          |
 +--------------------------+---------------------------------------------------------------------------------------------------+
+| ``inputs``               | current inputs known to a broker [sv]                                                       |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``filters``              | current filters known to a broker [sv]                                                          |
++--------------------------+---------------------------------------------------------------------------------------------------+
 | ``federates``            | current federates under the brokers hierarchy [sv]                                                |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``publication_details``  | details of current publications defined in a core [structure]                                     |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``input_details``        | details of current named inputs defined in a core [structure]                                     |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``endpoint_details``     | details of current endpoints defined in a core [structure]                                        |
++--------------------------+---------------------------------------------------------------------------------------------------+
+| ``filter_details``       | details of current filters of the core [structure]                                                |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``brokers``              | current cores/brokers connected to a broker [sv]                                                  |
 +--------------------------+---------------------------------------------------------------------------------------------------+

@@ -44,6 +44,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <limits>
 #include <map>
+#include <set>
 #include <memory>
 #include <string>
 #include <utility>
@@ -2353,13 +2354,21 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     }
     if (queryStr == "state") {
         if (!force_ordering) {
-            return fedStateString(fed->getState());
+            return fmt::format("\"{}\"", fedStateString(fed->getState()));
         }
     }
     if (queryStr == "filtered_endpoints") {
         if (!force_ordering) {
             return filteredEndpointQuery(fed);
         }
+    }
+    auto resultString = generateInterfaceQueryResults(
+        queryStr,
+        loopHandles,
+        fed->global_id,
+        [](Json::Value &){});
+    if (!resultString.empty()) {
+        return resultString;
     }
     if (queryStr == "interfaces") {
         auto jv = generateInterfaceConfig(loopHandles, fed->global_id);
@@ -2368,19 +2377,52 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","global_state","version","queries","interfaces","filtered_endpoints",)") +
+                   R"(["exists","isinit","global_state","version","state","queries","interfaces","filtered_endpoints",)") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr, force_ordering);
 }
 
+static const std::set<std::string> querySet{"isinit",
+                                                 "isconnected",
+                                                 "exists",
+                                                 "name",
+                                                 "identifier",
+                                                 "address",
+                                                 "queries",
+                                                 "address",
+                                                 "federates",
+                                                 "inputs",
+                                                 "input_details",
+                                                 "endpoints",
+                                                 "endpoint_details",
+                                                 "filtered_endpoints",
+                                                 "publications",
+                                                 "publication_details",
+                                                 "filters",
+                                                 "filter_details",
+                                                 "interface_details",
+                                                 "tags",
+                                                 "version",
+                                                 "version_all",
+                                                 "federate_map",
+                                                 "dependency_graph",
+                                                 "data_flow_graph",
+                                                 "dependencies",
+                                                 "dependson",
+                                                 "logs",
+                                                 "dependents",
+                                                 "current_time",
+                                                 "global_time",
+                                                 "global_state",
+                                                 "global_flush",
+                                                 "current_state",
+                                                 "logs"};
+
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\","
-               "\"data_flow_graph\",\"dependencies\",\"dependson\",\"logs\","
-               "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
+        return generateStringVector(querySet, [](const std::string& data) { return data; });
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2520,6 +2562,10 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
 
 std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
 {
+    auto addHeader = [this](Json::Value& base) {
+        loadBasicJsonInfo(base, nullptr);
+    };
+
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
         return res;
@@ -2546,33 +2592,13 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
         return "\"\"";
     }
-    if (queryStr == "publications") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::PUBLICATION); });
+    auto interfaceQueryResult = generateInterfaceQueryResults(
+        queryStr, loopHandles, GlobalFederateId {} ,addHeader);
+    if (!interfaceQueryResult.empty())
+    {
+        return interfaceQueryResult;
     }
-    if (queryStr == "inputs") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) {
-                return ((handle.handleType == InterfaceType::INPUT) && !handle.key.empty());
-            });
-    }
-    if (queryStr == "filters") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
-    }
-
-    if (queryStr == "endpoints") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::ENDPOINT); });
-    }
+    
     if (queryStr == "dependson") {
         return generateStringVector(timeCoord->getDependencies(),
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
