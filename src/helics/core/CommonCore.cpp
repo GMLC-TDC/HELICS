@@ -44,8 +44,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <limits>
 #include <map>
-#include <set>
 #include <memory>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -2362,11 +2362,8 @@ std::string CommonCore::federateQuery(const FederateState* fed,
             return filteredEndpointQuery(fed);
         }
     }
-    auto resultString = generateInterfaceQueryResults(
-        queryStr,
-        loopHandles,
-        fed->global_id,
-        [](Json::Value &){});
+    auto resultString =
+        generateInterfaceQueryResults(queryStr, loopHandles, fed->global_id, [](Json::Value&) {});
     if (!resultString.empty()) {
         return resultString;
     }
@@ -2384,40 +2381,40 @@ std::string CommonCore::federateQuery(const FederateState* fed,
 }
 
 static const std::set<std::string> querySet{"isinit",
-                                                 "isconnected",
-                                                 "exists",
-                                                 "name",
-                                                 "identifier",
-                                                 "address",
-                                                 "queries",
-                                                 "address",
-                                                 "federates",
-                                                 "inputs",
-                                                 "input_details",
-                                                 "endpoints",
-                                                 "endpoint_details",
-                                                 "filtered_endpoints",
-                                                 "publications",
-                                                 "publication_details",
-                                                 "filters",
-                                                 "filter_details",
-                                                 "interface_details",
-                                                 "tags",
-                                                 "version",
-                                                 "version_all",
-                                                 "federate_map",
-                                                 "dependency_graph",
-                                                 "data_flow_graph",
-                                                 "dependencies",
-                                                 "dependson",
-                                                 "logs",
-                                                 "dependents",
-                                                 "current_time",
-                                                 "global_time",
-                                                 "global_state",
-                                                 "global_flush",
-                                                 "current_state",
-                                                 "logs"};
+                                            "isconnected",
+                                            "exists",
+                                            "name",
+                                            "identifier",
+                                            "address",
+                                            "queries",
+                                            "address",
+                                            "federates",
+                                            "inputs",
+                                            "input_details",
+                                            "endpoints",
+                                            "endpoint_details",
+                                            "filtered_endpoints",
+                                            "publications",
+                                            "publication_details",
+                                            "filters",
+                                            "filter_details",
+                                            "interface_details",
+                                            "tags",
+                                            "version",
+                                            "version_all",
+                                            "federate_map",
+                                            "dependency_graph",
+                                            "data_flow_graph",
+                                            "dependencies",
+                                            "dependson",
+                                            "logs",
+                                            "dependents",
+                                            "current_time",
+                                            "global_time",
+                                            "global_state",
+                                            "global_flush",
+                                            "current_state",
+                                            "logs"};
 
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
@@ -2562,9 +2559,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
 
 std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
 {
-    auto addHeader = [this](Json::Value& base) {
-        loadBasicJsonInfo(base, nullptr);
-    };
+    auto addHeader = [this](Json::Value& base) { loadBasicJsonInfo(base, nullptr); };
 
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
@@ -2592,13 +2587,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
         return "\"\"";
     }
-    auto interfaceQueryResult = generateInterfaceQueryResults(
-        queryStr, loopHandles, GlobalFederateId {} ,addHeader);
-    if (!interfaceQueryResult.empty())
-    {
+    auto interfaceQueryResult =
+        generateInterfaceQueryResults(queryStr, loopHandles, GlobalFederateId{}, addHeader);
+    if (!interfaceQueryResult.empty()) {
         return interfaceQueryResult;
     }
-    
+
     if (queryStr == "dependson") {
         return generateStringVector(timeCoord->getDependencies(),
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });

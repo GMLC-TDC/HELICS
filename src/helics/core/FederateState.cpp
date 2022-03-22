@@ -2094,10 +2094,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["parent"] = parent_->getGlobalId().baseValue();
     };
 
-    auto qres =
-        generateInterfaceQueryResults(query,
-                                      interfaceInformation,
-                                      addHeader);
+    auto qres = generateInterfaceQueryResults(query, interfaceInformation, addHeader);
     if (query == "global_flush") {
         return "{\"status\":true}";
     }
@@ -2243,7 +2240,7 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
         qstring =
             R"("publications","inputs","logs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
     } else if (query == "state") {
-        qstring= fmt::format("\"{}\"", fedStateString(getState()));
+        qstring = fmt::format("\"{}\"", fedStateString(getState()));
     } else {  // the rest might need be locked to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

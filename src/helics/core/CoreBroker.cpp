@@ -3215,8 +3215,8 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         return "#wait";
     }
-    auto interfaceQueryResult = generateInterfaceQueryResults(
-        request, handles, GlobalFederateId {}, addHeader);
+    auto interfaceQueryResult =
+        generateInterfaceQueryResults(request, handles, GlobalFederateId{}, addHeader);
     if (!interfaceQueryResult.empty()) {
         return interfaceQueryResult;
     }
