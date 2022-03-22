@@ -2362,8 +2362,10 @@ std::string CommonCore::federateQuery(const FederateState* fed,
             return filteredEndpointQuery(fed);
         }
     }
-    auto resultString =
-        generateInterfaceQueryResults(queryStr, loopHandles, fed->global_id, [](Json::Value&) {});
+    auto resultString = generateInterfaceQueryResults(queryStr,
+                                                      loopHandles,
+                                                      fed->global_id,
+                                                      [](Json::Value& /*unused*/) {});
     if (!resultString.empty()) {
         return resultString;
     }
