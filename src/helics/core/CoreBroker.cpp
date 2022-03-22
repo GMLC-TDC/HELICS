@@ -27,10 +27,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <limits>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
-#include <set>
 
 namespace helics {
 
