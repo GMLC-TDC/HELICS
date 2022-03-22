@@ -227,7 +227,7 @@ uint64_t FederateState::getQueueSize() const
 void FederateState::setLogger(
     std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
-    mLogManager->setLoggerFunction(logFunction);
+    mLogManager->setLoggerFunction(std::move(logFunction));
 }
 
 std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)

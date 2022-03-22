@@ -83,12 +83,12 @@ Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
 
 void addFederateTags(Json::Value& v, const helics::FederateState* fed);
 /** generate results from a query related to interfaces*/
-std::string generateInterfaceQueryResults(std::string_view query,
+std::string generateInterfaceQueryResults(std::string_view request,
                                           const HandleManager& handles,
                                           const GlobalFederateId fed,
                                           const std::function<void(Json::Value&)>& addHeaderInfo);
 
-std::string generateInterfaceQueryResults(std::string_view query,
+std::string generateInterfaceQueryResults(std::string_view request,
                                           const InterfaceInfo& info,
                                           const std::function<void(Json::Value&)>& addHeaderInfo);
 }  // namespace helics

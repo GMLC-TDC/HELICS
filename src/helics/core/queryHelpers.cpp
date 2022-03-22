@@ -31,40 +31,43 @@ static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
 void addFederateTags(Json::Value& v, const FederateState* fed)
 {
     if (fed->tagCount() > 0) {
-        Json::Value tagBlock = Json::objectValue;
+        v["tags"] = Json::arrayValue;
+       
         for (size_t ii = 0; ii < fed->tagCount(); ++ii) {
+            Json::Value tagBlock = Json::arrayValue;
             const auto& tg = fed->getTagByIndex(ii);
-            tagBlock[tg.first] = tg.second;
+            tagBlock["name"] = tg.first;
+            tagBlock["value"] = tg.second;
+            v["tags"].append(tagBlock);
         }
-        v["tags"] = tagBlock;
     }
 }
 
- static void storeEndpoint(const BasicHandleInfo& handle, Json::Value block,bool includeID=false)
+ static void storeEndpoint(const BasicHandleInfo& handle, Json::Value& block,bool includeID=false)
 {
     Json::Value ept = Json::objectValue;
-    ept["key"] = handle.key;
+    ept["name"] = handle.key;
     if (includeID) {
         ept["parent"] = handle.getFederateId().baseValue();
         ept["handle"] = handle.getInterfaceHandle().baseValue();
     }
     ept["type"] = handle.type;
-    addTags(block, handle);
+    addTags(ept, handle);
     block["endpoints"].append(ept);
 }
 
- static void storeEndpoint(const EndpointInfo& handle, Json::Value block)
+ static void storeEndpoint(const EndpointInfo& handle, Json::Value& block)
 {
     Json::Value ept = Json::objectValue;
-    ept["key"] = handle.key;
+    ept["name"] = handle.key;
     ept["type"] = handle.type;
     block["endpoints"].append(ept);
 }
 
-static void storeInput(const BasicHandleInfo& handle, Json::Value block, bool includeID = false)
+static void storeInput(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
 {
     Json::Value ipt = Json::objectValue;
-    ipt["key"] = handle.key;
+    ipt["name"] = handle.key;
     if (includeID) {
         ipt["parent"] = handle.getFederateId().baseValue();
         ipt["handle"] = handle.getInterfaceHandle().baseValue();
@@ -72,54 +75,54 @@ static void storeInput(const BasicHandleInfo& handle, Json::Value block, bool in
     
     ipt["units"] = handle.units;
     ipt["type"] = handle.type;
-    addTags(block,handle);
+    addTags(ipt,handle);
     block["inputs"].append(ipt);
 }
 
-static void storeInput(const InputInfo& handle, Json::Value block)
+static void storeInput(const InputInfo& handle, Json::Value& block)
 {
     Json::Value ipt = Json::objectValue;
-    ipt["key"] = handle.key;
+    ipt["name"] = handle.key;
     ipt["units"] = handle.units;
     ipt["type"] = handle.type;
     block["inputs"].append(ipt);
 }
 
 static void
-    storePublication(const BasicHandleInfo& handle, Json::Value block, bool includeID = false)
+    storePublication(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
 {
     Json::Value pub = Json::objectValue;
-    pub["key"] = handle.key;
+    pub["name"] = handle.key;
     if (includeID) {
         pub["parent"] = handle.getFederateId().baseValue();
         pub["handle"] = handle.getInterfaceHandle().baseValue();
     }
     pub["units"] = handle.units;
     pub["type"] = handle.type;
-    addTags(block, handle);
+    addTags(pub, handle);
     block["publications"].append(pub);
 }
 
 static void
-    storePublication(const PublicationInfo& handle, Json::Value block)
+    storePublication(const PublicationInfo& handle, Json::Value& block)
 {
     Json::Value pub = Json::objectValue;
-    pub["key"] = handle.key;
+    pub["name"] = handle.key;
     pub["units"] = handle.units;
     pub["type"] = handle.type;
     block["publications"].append(pub);
 }
-static void storeFilter(const BasicHandleInfo& handle, Json::Value block, bool includeID = false)
+static void storeFilter(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
 {
     Json::Value filt = Json::objectValue;
-    filt["key"] = handle.key;
+    filt["name"] = handle.key;
     if (includeID) {
         filt["parent"] = handle.getFederateId().baseValue();
         filt["handle"] = handle.getInterfaceHandle().baseValue();
     }
     filt["type_in"] = handle.type_in;
     filt["type_out"] = handle.type_out;
-    addTags(block, handle);
+    addTags(filt, handle);
     block["filters"].append(filt);
 }
 
