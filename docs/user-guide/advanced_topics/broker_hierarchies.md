@@ -46,7 +46,7 @@ The JSON config file for the Transmission and Generation System federate needs t
 }
 ```
 
-Lastly, when broker C, the root broker, is instantiated, it needs to specify the number of sub-brokers it is connecting to (as well as the number of federates). Since it is the root broker, there is no parent broker address to specify.
+Lastly, when broker C, the root broker, is instantiated, it may optionally specify the number of sub-brokers that are expected to connect to it (as well as the number of federates). Since it is the root broker, there is no parent broker address to specify.
 
 ```shell-session
 $ helics_broker -f1 --sub_brokers=2
