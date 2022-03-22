@@ -8,10 +8,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 #include "../common/JsonGeneration.hpp"
 
-#include <string>
-#include <type_traits>
-#include <string_view>
 #include <functional>
+#include <string>
+#include <string_view>
+#include <type_traits>
 
 namespace helics {
 class HandleManager;
