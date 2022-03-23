@@ -7,33 +7,122 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "queryHelpers.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "FederateState.hpp"
 #include "HandleManager.hpp"
+#include "InterfaceInfo.hpp"
 
 namespace helics {
 
 static void addTags(Json::Value& v, const BasicHandleInfo& bhi)
 {
     if (bhi.tagCount() > 0) {
-        Json::Value tagBlock = Json::objectValue;
+        v["tags"] = Json::arrayValue;
         for (size_t ii = 0; ii < bhi.tagCount(); ++ii) {
+            Json::Value tagBlock = Json::objectValue;
             const auto& tg = bhi.getTagByIndex(ii);
-            tagBlock[tg.first] = tg.second;
+            tagBlock["name"] = tg.first;
+            tagBlock["value"] = tg.second;
+            v["tags"].append(tagBlock);
         }
-        v["tags"] = tagBlock;
     }
 }
 
 void addFederateTags(Json::Value& v, const FederateState* fed)
 {
     if (fed->tagCount() > 0) {
-        Json::Value tagBlock = Json::objectValue;
+        v["tags"] = Json::arrayValue;
+
         for (size_t ii = 0; ii < fed->tagCount(); ++ii) {
+            Json::Value tagBlock = Json::arrayValue;
             const auto& tg = fed->getTagByIndex(ii);
-            tagBlock[tg.first] = tg.second;
+            tagBlock["name"] = tg.first;
+            tagBlock["value"] = tg.second;
+            v["tags"].append(tagBlock);
         }
-        v["tags"] = tagBlock;
     }
+}
+
+static void storeEndpoint(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
+{
+    Json::Value ept = Json::objectValue;
+    ept["name"] = handle.key;
+    if (includeID) {
+        ept["parent"] = handle.getFederateId().baseValue();
+        ept["handle"] = handle.getInterfaceHandle().baseValue();
+    }
+    ept["type"] = handle.type;
+    addTags(ept, handle);
+    block["endpoints"].append(ept);
+}
+
+static void storeEndpoint(const EndpointInfo& handle, Json::Value& block)
+{
+    Json::Value ept = Json::objectValue;
+    ept["name"] = handle.key;
+    ept["type"] = handle.type;
+    block["endpoints"].append(ept);
+}
+
+static void storeInput(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
+{
+    Json::Value ipt = Json::objectValue;
+    ipt["name"] = handle.key;
+    if (includeID) {
+        ipt["parent"] = handle.getFederateId().baseValue();
+        ipt["handle"] = handle.getInterfaceHandle().baseValue();
+    }
+
+    ipt["units"] = handle.units;
+    ipt["type"] = handle.type;
+    addTags(ipt, handle);
+    block["inputs"].append(ipt);
+}
+
+static void storeInput(const InputInfo& handle, Json::Value& block)
+{
+    Json::Value ipt = Json::objectValue;
+    ipt["name"] = handle.key;
+    ipt["units"] = handle.units;
+    ipt["type"] = handle.type;
+    block["inputs"].append(ipt);
+}
+
+static void
+    storePublication(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
+{
+    Json::Value pub = Json::objectValue;
+    pub["name"] = handle.key;
+    if (includeID) {
+        pub["parent"] = handle.getFederateId().baseValue();
+        pub["handle"] = handle.getInterfaceHandle().baseValue();
+    }
+    pub["units"] = handle.units;
+    pub["type"] = handle.type;
+    addTags(pub, handle);
+    block["publications"].append(pub);
+}
+
+static void storePublication(const PublicationInfo& handle, Json::Value& block)
+{
+    Json::Value pub = Json::objectValue;
+    pub["name"] = handle.key;
+    pub["units"] = handle.units;
+    pub["type"] = handle.type;
+    block["publications"].append(pub);
+}
+static void storeFilter(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
+{
+    Json::Value filt = Json::objectValue;
+    filt["name"] = handle.key;
+    if (includeID) {
+        filt["parent"] = handle.getFederateId().baseValue();
+        filt["handle"] = handle.getInterfaceHandle().baseValue();
+    }
+    filt["type_in"] = handle.type_in;
+    filt["type_out"] = handle.type_out;
+    addTags(filt, handle);
+    block["filters"].append(filt);
 }
 
 Json::Value generateInterfaceConfig(const helics::HandleManager& hm,
@@ -53,60 +142,210 @@ void generateInterfaceConfig(Json::Value& iblock,
     bool hasEpts{false};
     bool hasInputs{false};
     bool hasFilt{false};
+    bool allInfo = !fed.isValid();
     for (const auto& handle : hm) {
-        if (handle.handle.fed_id == fed) {
+        if (handle.handle.fed_id == fed || allInfo) {
             switch (handle.handleType) {
-                case InterfaceType::ENDPOINT: {
-                    Json::Value block;
-                    block["name"] = handle.key;
-                    block["type"] = handle.type;
-                    addTags(block, handle);
+                case InterfaceType::ENDPOINT:
                     if (!hasEpts) {
                         iblock["endpoints"] = Json::arrayValue;
                         hasEpts = true;
                     }
-                    iblock["endpoints"].append(block);
-                } break;
-                case InterfaceType::INPUT: {
-                    Json::Value block;
-                    block["name"] = handle.key;
-                    block["type"] = handle.type;
-                    block["units"] = handle.units;
-                    addTags(block, handle);
+                    storeEndpoint(handle, iblock, allInfo);
+                    break;
+                case InterfaceType::INPUT:
                     if (!hasInputs) {
                         iblock["inputs"] = Json::arrayValue;
                         hasInputs = true;
                     }
-                    iblock["inputs"].append(block);
-                } break;
-                case InterfaceType::PUBLICATION: {
-                    Json::Value block;
-                    block["name"] = handle.key;
-                    block["type"] = handle.type;
-                    block["units"] = handle.units;
-                    addTags(block, handle);
+                    storeInput(handle, iblock, allInfo);
+                    break;
+                case InterfaceType::PUBLICATION:
                     if (!hasPubs) {
                         iblock["publications"] = Json::arrayValue;
                         hasPubs = true;
                     }
-                    iblock["publications"].append(block);
-                } break;
-                case InterfaceType::FILTER: {
-                    Json::Value block;
-                    block["name"] = handle.key;
-                    block["type_in"] = handle.type_in;
-                    block["type_out"] = handle.type_out;
-                    addTags(block, handle);
+                    storePublication(handle, iblock, allInfo);
+                    break;
+                case InterfaceType::FILTER:
                     if (!hasFilt) {
                         iblock["filters"] = Json::arrayValue;
                         hasFilt = true;
                     }
-                    iblock["filters"].append(block);
-                } break;
+                    storeFilter(handle, iblock, allInfo);
+                    break;
                 default:
                     break;
             }
         }
     }
 }
+
+std::string generateInterfaceQueryResults(std::string_view request,
+                                          const HandleManager& handles,
+                                          const GlobalFederateId fed,
+                                          const std::function<void(Json::Value&)>& addHeaderInfo)
+{
+    if (request == "inputs") {
+        return generateStringVector_if(
+            handles,
+            [](auto& handle) { return handle.key; },
+            [fed](auto& handle) {
+                return ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                        handle.handleType == InterfaceType::INPUT && !handle.key.empty());
+            });
+    }
+    if (request == "input_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["inputs"] = Json::arrayValue;
+        for (const auto& handle : handles) {
+            if ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                handle.handleType == InterfaceType::INPUT && !handle.key.empty()) {
+                storeInput(handle, base, !fed.isValid());
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+    if (request == "publications") {
+        return generateStringVector_if(
+            handles,
+            [](auto& handle) { return handle.key; },
+            [fed](auto& handle) {
+                return ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                        handle.handleType == InterfaceType::PUBLICATION && !handle.key.empty());
+            });
+    }
+    if (request == "publication_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["publications"] = Json::arrayValue;
+        for (const auto& handle : handles) {
+            if ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                handle.handleType == InterfaceType::PUBLICATION && !handle.key.empty()) {
+                storePublication(handle, base, !fed.isValid());
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+    if (request == "filters") {
+        return generateStringVector_if(
+            handles,
+            [](auto& handle) { return handle.key; },
+            [fed](auto& handle) {
+                return ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                        handle.handleType == InterfaceType::FILTER && !handle.key.empty());
+            });
+    }
+    if (request == "filter_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["filters"] = Json::arrayValue;
+        for (const auto& handle : handles) {
+            if ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                handle.handleType == InterfaceType::FILTER && !handle.key.empty()) {
+                storeFilter(handle, base, !fed.isValid());
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+    if (request == "endpoints") {
+        return generateStringVector_if(
+            handles,
+            [](auto& handle) { return handle.key; },
+            [fed](auto& handle) {
+                return ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                        handle.handleType == InterfaceType::ENDPOINT && !handle.key.empty());
+            });
+    }
+    if (request == "endpoint_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["endpoints"] = Json::arrayValue;
+        for (const auto& handle : handles) {
+            if ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                handle.handleType == InterfaceType::ENDPOINT && !handle.key.empty()) {
+                storeEndpoint(handle, base, !fed.isValid());
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+    if (request == "interface_details") {
+        Json::Value base = generateInterfaceConfig(handles, fed);
+        addHeaderInfo(base);
+        return fileops::generateJsonString(base);
+    }
+
+    return std::string{};
+}
+
+std::string generateInterfaceQueryResults(std::string_view request,
+                                          const InterfaceInfo& info,
+                                          const std::function<void(Json::Value&)>& addHeaderInfo)
+{
+    if (request == "publications") {
+        return generateStringVector_if(
+            info.getPublications(),
+            [](auto& pub) { return pub->key; },
+            [](auto& pub) { return !pub->key.empty(); });
+    }
+    if (request == "inputs") {
+        return generateStringVector_if(
+            info.getInputs(),
+            [](auto& inp) { return inp->key; },
+            [](auto& inp) { return !inp->key.empty(); });
+    }
+
+    if (request == "endpoints") {
+        return generateStringVector_if(
+            info.getEndpoints(),
+            [](auto& ept) { return ept->key; },
+            [](auto& ept) { return !ept->key.empty(); });
+    }
+
+    if (request == "input_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["inputs"] = Json::arrayValue;
+        for (const auto& handle : info.getInputs()) {
+            if (!handle->key.empty()) {
+                storeInput(*handle, base);
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+
+    if (request == "publication_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["publications"] = Json::arrayValue;
+        for (const auto& handle : info.getPublications()) {
+            if (!handle->key.empty()) {
+                storePublication(*handle, base);
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+
+    if (request == "endpoint_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["endpoints"] = Json::arrayValue;
+        for (const auto& handle : info.getEndpoints()) {
+            if (!handle->key.empty()) {
+                storeEndpoint(*handle, base);
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
+    if (request == "interface_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        info.generateInferfaceConfig(base);
+        return fileops::generateJsonString(base);
+    }
+
+    return std::string{};
+}
+
 }  // namespace helics
