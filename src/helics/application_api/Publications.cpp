@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-exceptions.hpp"
 #include "ValueFederate.hpp"
-#include "units/units/units.hpp"
+#include "units/units.hpp"
 
 #include <memory>
 #include <string>
