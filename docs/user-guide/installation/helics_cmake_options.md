@@ -77,7 +77,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 
 These options are for making HELICS look for an external installation or system copy of libraries instead of using the vendored copy included with HELICS. The search process for locating the external copy of libraries follows the typical [CMake Config Mode Search Procedure](https://cmake.org/cmake/help/latest/command/find_package.html#config-mode-search-procedure). Most users should leave these options `OFF`.
 
-When enabling these options, if the static library variant is found it *must* have been compiled using the option `CMAKE_POSITION_INDEPENDENT_CODE=ON` or *you will encounter linking errors*.
+When enabling these options, if the static library variant is found it _must_ have been compiled using the option `CMAKE_POSITION_INDEPENDENT_CODE=ON` or _you will encounter linking errors_.
 
 Furthermore, there are no guarantees that HELICS will compile using arbitrary versions of these libraries other than the exact version that is included as a vendored library in the HELICS repository.
 
