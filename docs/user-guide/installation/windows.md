@@ -16,7 +16,7 @@ Windows installers are available with the different [releases](https://github.co
 
 _Note_: Keep in mind that your CMake version should be newer than the boost version and your visual studio version. If you have an older CMake, you may want an older boost version. Alternatively, you can choose to upgrade your version of CMake.
 
-### Set up your Environment:
+### Set up your Environment
 
 **1.** Install Microsoft Visual C++ 2019 or newer (2017 may work, but is no longer tested by CI builds) [MSVC](https://visualstudio.microsoft.com/)
 
@@ -73,7 +73,7 @@ CommandType   Name          Version    Source
 Application   cmake-gui.exe 3.22.3.0   C:\Program Files\CMake\bin\cmake-gui.exe
 ```
 
-### Getting and building from source:
+### Getting and building from source
 
 **1.** Open the Developer PowerShell VS Command prompt. Navigate to where you would like to project to be and use `git clone` to check out a copy of
 HELICS.
@@ -124,7 +124,7 @@ NOTE: CMake 3.14 and later separate the architecture into a separate field for t
 
 A basic call with `cmake` using Visual Studio 2022 on a 64bit Windows machine and installing to a folder called `install` inside the repository would be:
 
-```
+```shell
  cmake --install-prefix 'C:\Users\sampleUser\localrepos\HELICS - Copy\install' -G "Visual Studio 17 2022" ..
 ```
 
@@ -144,21 +144,21 @@ If the build was successful there should be a "bin" folder inside the "install" 
 
 In Cmd:
 
-```
+```shell
 set PYHELICS_INSTALL=C:\path\to\HELICS\install
 set PATH=%PATH%;%PYHELICS_INSTALL%\bin
 ```
 
 In Powershell:
 
-```
+```powershell
 $env:PYHELICS_INSTALL = "C:\path\to\HELICS\install"
 $env:Path += ";$env:PYHELICS_INSTALL\bin"
 ```
 
 To verify PYHELICS is pointing to the right version try:
 
-```
+```shell
 helics --version
 ```
 
@@ -167,7 +167,7 @@ helics --version
 A quick test is to double check the versions of the HELICS player and
 recorder (located in the 'build/src/helics/apps/player/Debug' folder):
 
-```bat
+```shell
 > cd C:/Path/To/build/src/helics/apps/Debug
 
 > helics_player.exe --version
