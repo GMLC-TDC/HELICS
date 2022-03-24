@@ -57,7 +57,7 @@ if [[ -n "$tag" ]]; then
 fi
 
 # Get git submodule source code
-git submodule update --init
+git submodule update --init --recursive
 
 # Set the output name based on if a release name was provided
 OUTPUT_BASENAME="Helics-source"
@@ -73,7 +73,9 @@ echo "> appending submodule archives"
 # for each of git submodules append to the root archive
 # uses single quotes because it is the command run recursively by git submodule foreach and should not expand variables
 # shellcheck disable=SC2016
-git submodule foreach --recursive 'git archive --verbose --prefix=$path/ --format tar "$(git rev-parse --abbrev-ref HEAD)" --output $ROOT_ARCHIVE_DIR/repo-output-sub-$sha1.tar'
+git submodule foreach --recursive 'git archive --verbose --prefix=$displaypath/ --format tar "$(git rev-parse --abbrev-ref HEAD)" --output $ROOT_ARCHIVE_DIR/repo-output-sub-$(echo $displaypath | sed s,/,_,g)-$sha1.tar'
+
+#pushd ThirdParty/networking/ThirdParty/NetIF && git archive --verbose --prefix=ThirdParty/networking/ThirdParty/NetIF --format "tar" --output "${ROOT_ARCHIVE_DIR}/repo-output-sub-$sha1.tar" "$(git rev-parse --abbrev-ref HEAD)" && popd
 
 if (($(find repo-output-sub*.tar | wc -l) != 0)); then
     # combine all archives into one tar
@@ -99,7 +101,7 @@ rmdir_list=(
     'units/.circleci'
     'utilities/tests'
     'utilities/.ci'
-    'toml11/tests'
+    'toml/tests'
     'json_cpp/test'
     'json_cpp/.travis_scripts'
     'json_cpp/devtools'
@@ -116,6 +118,8 @@ rmdir_list=(
     'concurrency/docs'
     'concurrency/.ci'
     'concurrency/.circleci'
+    'networking/ThirdParty/concurrency'
+    'networking/ThirdParty/asio'
 )
 for i in "${rmdir_list[@]}"; do
     tar --delete -f "${OUTPUT_BASENAME}.tar" "ThirdParty/$i" || true
