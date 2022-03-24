@@ -73,6 +73,19 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `HELICS_ENABLE_SUBPROJECT_TESTS`: \[Default=OFF\] Turn on some additional tests for using HELICS as a subproject, mainly used in some of the CI testing to make sure HELICS works as a subproject.
 - `HELICS_ENABLE_CLANG_TOOLS`: \[Default=OFF\] Enables some helper targets for using clang-tidy and clang-format.
 
+#### Options related to using external/vendored libraries
+
+These options are for making HELICS look for an external installation or system copy of libraries instead of using the vendored copy included with HELICS. The search process for locating the external copy of libraries follows the typical [CMake Config Mode Search Procedure](https://cmake.org/cmake/help/latest/command/find_package.html#config-mode-search-procedure). Most users should leave these options `OFF`.
+
+When enabling these options, if the static library variant is found it *must* have been compiled using the option `CMAKE_POSITION_INDEPENDENT_CODE=ON` or *you will encounter linking errors*.
+
+Furthermore, there are no guarantees that HELICS will compile using arbitrary versions of these libraries other than the exact version that is included as a vendored library in the HELICS repository.
+
+- `HELICS_USE_EXTERNAL_FMT` : Use an external copy of the fmt library.
+- `HELICS_USE_EXTERNAL_JSONCPP` : Use an external copy of the jsoncpp library.
+- `HELICS_USE_EXTERNAL_SPDLOG` : Use an external copy of the spdlog library. Note that an external spdlog library may itself depend on an external fmt library, resulting in weird, confusing errors if it is incompabile with the internal fmt library used by HELICS.
+- `HELICS_USE_EXTERNAL_UNITS` : Use an external copy of the LLNL units library.
+
 ## Hidden Options
 
 There are a few options in the CMake system that are not visible in the GUI they mainly deal with particular situations related to release, testing, benchmarks, and code generation and should not be normally used. They are all default off unless otherwise noted.
