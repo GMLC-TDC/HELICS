@@ -45,6 +45,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <limits>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -178,7 +179,8 @@ bool CommonCore::connect()
 bool CommonCore::isConnected() const
 {
     auto currentState = getBrokerState();
-    return ((currentState == BrokerState::operating) || (currentState == BrokerState::connected));
+    return ((currentState >= BrokerState::connected) &&
+            (currentState <= BrokerState::connected_error));
 }
 
 const std::string& CommonCore::getIdentifier() const
@@ -463,6 +465,7 @@ void CommonCore::finalize(LocalFederateId federateID)
     switch (cbrokerState) {
         case BrokerState::terminated:
         case BrokerState::terminating:
+        case BrokerState::terminating_error:
         case BrokerState::errored: {
             ActionMessage bye(CMD_STOP);
             bye.source_id = fed->global_id.load();
@@ -619,6 +622,8 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::terminating_error:
+        case BrokerState::connected_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -767,6 +772,8 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::terminating_error:
+        case BrokerState::connected_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -836,6 +843,8 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     switch (cBrokerState) {
         case BrokerState::terminating:
         case BrokerState::terminated:
+        case BrokerState::connected_error:
+        case BrokerState::terminating_error:
         case BrokerState::errored: {
             ActionMessage terminate(CMD_STOP);
             terminate.dest_id = fed->global_id;
@@ -1700,8 +1709,9 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
         }
     }
     if (!waitCoreRegistration()) {
-        if (getBrokerState() >= BrokerState::terminating) {
-            throw(RegistrationFailure("core is terminated no further registration possible"));
+        if (getBrokerState() >= BrokerState::connected_error) {
+            throw(RegistrationFailure(
+                "core is terminated or in error state no further registration possible"));
         }
         throw(RegistrationFailure("registration timeout exceeded"));
     }
@@ -2353,13 +2363,20 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     }
     if (queryStr == "state") {
         if (!force_ordering) {
-            return fedStateString(fed->getState());
+            return fmt::format("\"{}\"", fedStateString(fed->getState()));
         }
     }
     if (queryStr == "filtered_endpoints") {
         if (!force_ordering) {
             return filteredEndpointQuery(fed);
         }
+    }
+    auto resultString = generateInterfaceQueryResults(queryStr,
+                                                      loopHandles,
+                                                      fed->global_id,
+                                                      [](Json::Value& /*unused*/) {});
+    if (!resultString.empty()) {
+        return resultString;
     }
     if (queryStr == "interfaces") {
         auto jv = generateInterfaceConfig(loopHandles, fed->global_id);
@@ -2368,19 +2385,52 @@ std::string CommonCore::federateQuery(const FederateState* fed,
     }
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return std::string(
-                   R"(["exists","isinit","global_state","version","queries","interfaces","filtered_endpoints",)") +
+                   R"(["exists","isinit","global_state","version","state","queries","interfaces","filtered_endpoints",)") +
             fed->processQuery(queryStr) + "]";
     }
     return fed->processQuery(queryStr, force_ordering);
 }
 
+static const std::set<std::string> querySet{"isinit",
+                                            "isconnected",
+                                            "exists",
+                                            "name",
+                                            "identifier",
+                                            "address",
+                                            "queries",
+                                            "address",
+                                            "federates",
+                                            "inputs",
+                                            "input_details",
+                                            "endpoints",
+                                            "endpoint_details",
+                                            "filtered_endpoints",
+                                            "publications",
+                                            "publication_details",
+                                            "filters",
+                                            "filter_details",
+                                            "interface_details",
+                                            "tags",
+                                            "version",
+                                            "version_all",
+                                            "federate_map",
+                                            "dependency_graph",
+                                            "data_flow_graph",
+                                            "dependencies",
+                                            "dependson",
+                                            "logs",
+                                            "dependents",
+                                            "current_time",
+                                            "global_time",
+                                            "global_state",
+                                            "global_flush",
+                                            "current_state",
+                                            "logs"};
+
 std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
-               "\"publications\",\"filters\",\"tags\",\"version\",\"version_all\",\"federate_map\",\"dependency_graph\","
-               "\"data_flow_graph\",\"dependencies\",\"dependson\",\"logs\","
-               "\"dependents\",\"current_time\",\"global_time\",\"global_state\",\"global_flush\",\"current_state\",\"logs\"]";
+        return generateStringVector(querySet, [](const std::string& data) { return data; });
     }
     if (queryStr == "isconnected") {
         return (isConnected()) ? "true" : "false";
@@ -2520,6 +2570,8 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
 
 std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
 {
+    auto addHeader = [this](Json::Value& base) { loadBasicJsonInfo(base, nullptr); };
+
     auto res = quickCoreQueries(queryStr);
     if (!res.empty()) {
         return res;
@@ -2546,33 +2598,12 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         }
         return "\"\"";
     }
-    if (queryStr == "publications") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::PUBLICATION); });
-    }
-    if (queryStr == "inputs") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) {
-                return ((handle.handleType == InterfaceType::INPUT) && !handle.key.empty());
-            });
-    }
-    if (queryStr == "filters") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
+    auto interfaceQueryResult =
+        generateInterfaceQueryResults(queryStr, loopHandles, GlobalFederateId{}, addHeader);
+    if (!interfaceQueryResult.empty()) {
+        return interfaceQueryResult;
     }
 
-    if (queryStr == "endpoints") {
-        return generateStringVector_if(
-            loopHandles,
-            [](const auto& handle) { return handle.key; },
-            [](const auto& handle) { return (handle.handleType == InterfaceType::ENDPOINT); });
-    }
     if (queryStr == "dependson") {
         return generateStringVector(timeCoord->getDependencies(),
                                     [](auto& dep) { return std::to_string(dep.baseValue()); });
@@ -2946,7 +2977,6 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
-            checkAndProcessDisconnect();
             break;
         case CMD_SEND_COMMAND:
             if (command.dest_id == global_broker_id_local) {
@@ -3312,9 +3342,8 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 if (command.source_id == higher_broker_id ||
                     command.source_id == parent_broker_id || command.source_id == gRootBrokerID) {
-                    sendErrorToFederates(command.messageID,
-                                         std::string(command.payload.to_string()));
-                    setErrorState(command.messageID, std::string(command.payload.to_string()));
+                    sendErrorToFederates(command.messageID, command.payload.to_string());
+                    setErrorState(command.messageID, command.payload.to_string());
 
                 } else {
                     sendToLogger(parent_broker_id,
@@ -3334,7 +3363,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
                 if (terminate_on_error) {
-                    if (getBrokerState() != BrokerState::errored) {
+                    if (getBrokerState() != BrokerState::errored &&
+                        getBrokerState() != BrokerState::connected_error) {
                         sendErrorToFederates(command.messageID, command.payload.to_string());
                         setBrokerState(BrokerState::errored);
                     }
@@ -3367,10 +3397,17 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         case CMD_GLOBAL_ERROR:
+
+            if (getBrokerState() == BrokerState::connecting) {
+                processDisconnect();
+            }
             setErrorState(command.messageID, command.payload.to_string());
-            sendErrorToFederates(command.messageID, command.payload.to_string());
-            if (!(command.source_id == higher_broker_id || command.source_id == gRootBrokerID)) {
-                transmit(parent_route_id, std::move(command));
+            if (isConnected()) {
+                sendErrorToFederates(command.messageID, command.payload.to_string());
+                if (!(command.source_id == higher_broker_id ||
+                      command.source_id == gRootBrokerID)) {
+                    transmit(parent_route_id, std::move(command));
+                }
             }
             break;
         case CMD_DATA_LINK: {
@@ -4649,8 +4686,8 @@ void CommonCore::manageTimeBlocks(const ActionMessage& command)
 
 bool CommonCore::checkAndProcessDisconnect()
 {
-    if ((getBrokerState() == BrokerState::terminating) ||
-        (getBrokerState() == BrokerState::terminated)) {
+    if ((getBrokerState() >= BrokerState::terminating) &&
+        (getBrokerState() <= BrokerState::terminated)) {
         return true;
     }
     if (allDisconnected()) {

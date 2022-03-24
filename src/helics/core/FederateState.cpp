@@ -227,7 +227,7 @@ uint64_t FederateState::getQueueSize() const
 void FederateState::setLogger(
     std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
-    mLogManager->setLoggerFunction(logFunction);
+    mLogManager->setLoggerFunction(std::move(logFunction));
 }
 
 std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)
@@ -2088,18 +2088,13 @@ std::pair<std::string, std::string> FederateState::waitCommand()
 
 std::string FederateState::processQueryActual(std::string_view query) const
 {
-    if (query == "publications") {
-        return generateStringVector(interfaceInformation.getPublications(),
-                                    [](auto& pub) { return pub->key; });
-    }
-    if (query == "inputs") {
-        return generateStringVector(interfaceInformation.getInputs(),
-                                    [](auto& inp) { return inp->key; });
-    }
-    if (query == "endpoints") {
-        return generateStringVector(interfaceInformation.getEndpoints(),
-                                    [](auto& ept) { return ept->key; });
-    }
+    auto addHeader = [this](Json::Value& base) {
+        base["name"] = getIdentifier();
+        base["id"] = global_id.load().baseValue();
+        base["parent"] = parent_->getGlobalId().baseValue();
+    };
+
+    auto qres = generateInterfaceQueryResults(query, interfaceInformation, addHeader);
     if (query == "global_flush") {
         return "{\"status\":true}";
     }
@@ -2130,9 +2125,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     }
     if (query == "current_state") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         base["state"] = fedStateString(state.load());
         base["publications"] = publicationCount();
         base["input"] = inputCount();
@@ -2142,17 +2135,13 @@ std::string FederateState::processQueryActual(std::string_view query) const
     }
     if (query == "global_state") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         base["state"] = fedStateString(state.load());
         return fileops::generateJsonString(base);
     }
     if (query == "global_time_debugging") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         base["state"] = fedStateString(state.load());
         timeCoord->generateDebuggingTimeInfo(base);
         return fileops::generateJsonString(base);
@@ -2194,33 +2183,26 @@ std::string FederateState::processQueryActual(std::string_view query) const
     }
     if (query == "logs") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
+        addHeader(base);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
     if (query == "data_flow_graph") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         interfaceInformation.GenerateDataFlowGraph(base);
         return fileops::generateJsonString(base);
     }
     if (query == "global_time" || query == "global_status") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         base["granted_time"] = static_cast<double>(timeCoord->getGrantedTime());
         base["send_time"] = static_cast<double>(timeCoord->allowedSendTime());
         return fileops::generateJsonString(base);
     }
     if (query == "dependency_graph") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        addHeader(base);
         base["dependents"] = Json::arrayValue;
         for (auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
@@ -2257,6 +2239,8 @@ std::string FederateState::processQuery(const std::string& query, bool force_ord
     } else if ((query == "queries") || (query == "available_queries")) {
         qstring =
             R"("publications","inputs","logs","endpoints","subscriptions","current_state","global_state","dependencies","timeconfig","config","dependents","current_time","global_time","global_status")";
+    } else if (query == "state") {
+        qstring = fmt::format("\"{}\"", fedStateString(getState()));
     } else {  // the rest might need be locked to prevent a race condition
         if (try_lock()) {
             qstring = processQueryActual(query);

@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <limits>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -1009,7 +1010,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.setAction(CMD_DISCONNECT);
                     command.dest_id = parent_broker_id;
                     setActionFlag(command, error_flag);
-                    processDisconnect(command);
+                    processDisconnectCommand(command);
                 } else {
                     if (isRootc) {
                         std::string lcom =
@@ -1072,7 +1073,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
-            processDisconnect(command);
+            processDisconnectCommand(command);
             break;
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
@@ -1789,7 +1790,10 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
             cmd.setAction(CMD_GLOBAL_ERROR);
             setErrorState(cmd.messageID, cmd.payload.to_string());
             broadcast(cmd);
-            transmitToParent(std::move(cmd));
+            if (!isRoot()) {
+                transmitToParent(std::move(cmd));
+            } else {
+            }
             return;
         }
     }
@@ -2174,7 +2178,7 @@ void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
 bool CoreBroker::isConnected() const
 {
     auto state = getBrokerState();
-    return ((state == BrokerState::operating) || (state == BrokerState::connected));
+    return ((state >= BrokerState::connected) && (state < BrokerState::terminating));
 }
 
 bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
@@ -2189,7 +2193,7 @@ bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CoreBroker::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if ((cBrokerState == BrokerState::terminating) || (cBrokerState == BrokerState::terminated)) {
+    if (cBrokerState >= BrokerState::terminating) {
         return;
     }
     if (cBrokerState > BrokerState::configured) {
@@ -2673,7 +2677,7 @@ void CoreBroker::processError(ActionMessage& command)
     }
 }
 
-void CoreBroker::processDisconnect(ActionMessage& command)
+void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
     auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
     switch (command.action()) {
@@ -3000,6 +3004,45 @@ void CoreBroker::sendCommand(const std::string& target,
     transmitToParent(std::move(cmdcmd));
 }
 
+static const std::set<std::string> querySet{"isinit",
+                                            "isconnected",
+                                            "exists",
+                                            "name",
+                                            "identifier",
+                                            "address",
+                                            "queries",
+                                            "address",
+                                            "counts",
+                                            "summary",
+                                            "federates",
+                                            "brokers",
+                                            "inputs",
+                                            "input_details",
+                                            "endpoints",
+                                            "endpoint_details",
+                                            "publications",
+                                            "publication_details",
+                                            "filters",
+                                            "filter_details",
+                                            "interface_details",
+                                            "version",
+                                            "version_all",
+                                            "federate_map",
+                                            "dependency_graph",
+                                            "data_flow_graph",
+                                            "dependencies",
+                                            "dependson",
+                                            "logs",
+                                            "monitor",
+                                            "dependents",
+                                            "status",
+                                            "current_time",
+                                            "global_time",
+                                            "global_state",
+                                            "global_flush",
+                                            "current_state",
+                                            "logs"};
+
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
     {"federate_map", {FEDERATE_MAP, false}},
@@ -3027,10 +3070,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
-               "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
-               "\"monitor\",\"logs\","
-               "\"current_time\",\"current_state\",\"global_state\",\"status\",\"global_time\",\"global_status\",\"version\",\"version_all\",\"exists\",\"global_flush\"]";
+        return generateStringVector(querySet, [](const std::string& data) { return data; });
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -3056,12 +3096,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
-    auto res = quickBrokerQueries(request);
-    if (!res.empty()) {
-        return res;
-    }
-    if (request == "counts") {
-        Json::Value base;
+    auto addHeader = [this](Json::Value& base) {
         base["name"] = getIdentifier();
         if (uuid_like) {
             base["uuid"] = getIdentifier();
@@ -3070,6 +3105,15 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         if (!isRootc) {
             base["parent"] = higher_broker_id.baseValue();
         }
+    };
+
+    auto res = quickBrokerQueries(request);
+    if (!res.empty()) {
+        return res;
+    }
+    if (request == "counts") {
+        Json::Value base;
+        addHeader(base);
         base["brokers"] = static_cast<int>(mBrokers.size());
         base["federates"] = static_cast<int>(mFederates.size());
         base["countable_federates"] = getCountableFederates();
@@ -3084,11 +3128,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "logs") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
+        addHeader(base);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
@@ -3100,14 +3140,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "current_state") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addHeader(base);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
@@ -3185,32 +3218,11 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         return "#wait";
     }
-
-    if (request == "inputs") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::INPUT); });
+    auto interfaceQueryResult =
+        generateInterfaceQueryResults(request, handles, GlobalFederateId{}, addHeader);
+    if (!interfaceQueryResult.empty()) {
+        return interfaceQueryResult;
     }
-    if (request == "publications") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::PUBLICATION); });
-    }
-    if (request == "filters") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
-    }
-    if (request == "endpoints") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::ENDPOINT); });
-    }
-
     if (request == "dependson") {
         return generateStringVector(timeCoord->getDependencies(), [](const auto& dep) {
             return std::to_string(dep.baseValue());
@@ -3223,14 +3235,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "dependencies") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addHeader(base);
         base["dependents"] = Json::arrayValue;
         for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());

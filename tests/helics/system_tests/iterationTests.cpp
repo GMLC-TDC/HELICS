@@ -275,9 +275,9 @@ TEST_F(iteration_tests, time_iteration_test_2fed_message)
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     // register the publications
-    auto eptid1 = mFed1->registerGlobalEndpoint("ept1");
+    auto& eptid1 = mFed1->registerGlobalEndpoint("ept1");
 
-    auto eptid2 = mFed2->registerGlobalEndpoint("ept2");
+    auto& eptid2 = mFed2->registerGlobalEndpoint("ept2");
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1);
     mFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
@@ -292,7 +292,8 @@ TEST_F(iteration_tests, time_iteration_test_2fed_message)
 
     EXPECT_TRUE(comp.state == helics::IterationResult::ITERATING);
     EXPECT_EQ(comp.grantedTime, helics::timeZero);
-    auto message = mFed2->getMessage();
+    EXPECT_TRUE(eptid2.hasMessage());
+    auto message = eptid2.getMessage();
     EXPECT_EQ(message->to_string(), "message1");
 
     comp = mFed2->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
