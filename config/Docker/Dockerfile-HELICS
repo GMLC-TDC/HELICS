@@ -4,13 +4,7 @@
 # 2. run git submodule update --init after a normal git clone
 # 3. download and extract a tar file from a HELICS release that includes submodules
 
-FROM ubuntu:19.04 as builder
-
-# Installs dependencies needed for building, with headers needed for development
-RUN apt-get update && apt-get install -y \
-  libzmq5-dev \
-  g++ \
-  cmake git
+FROM helics/buildenv:gcc11-builder as builder
 
 # Copies the current directory from the host to use as the source code for building HELICS
 COPY . /root/HELICS
@@ -39,7 +33,7 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 ##############################################################################
 
 # Create final image with the HELICS apps
-FROM ubuntu:19.04
+FROM ubuntu:21.10
 
 # Install the runtime libraries needed for ZeroMQ without development files
 RUN apt-get update && apt-get install -y libzmq5 && apt-get clean
@@ -50,10 +44,11 @@ ARG GIT_COMMIT=unspecified
 LABEL maintainer="helicsdevelopers@helics.org"
 
 LABEL name="helics.helics"
-LABEL org.helics.description="Helics basic docker image"
+LABEL org.helics.description="HELICS basic docker image"
 LABEL org.helics.vcs-ref=$GIT_COMMIT
 LABEL org.helics.vcs-url="https://github.com/GMLC-TDC/helics"
-LABEL version="2.5.1"
+LABEL version="3.2.0"
+LABEL date="2022-03-11"
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr

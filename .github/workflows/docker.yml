@@ -1,0 +1,78 @@
+name: Build Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'test'
+        type: choice
+        options:
+          - main
+          - develop
+          - release
+          - test
+  push:
+    branches:
+      - main
+      - develop
+      - 'docker/**'
+    tags:
+      - 'v*'
+  release:
+    types: published
+
+jobs:
+  build-and-push-image:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+ 
+    steps:
+    - uses: actions/checkout@v1
+    - name: Docker meta data
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: |
+          helics/helics
+          ghcr.io/${{ github.repository }}
+        flavor: |
+          latest=${{ github.ref_name == 'main' }}
+          prefix=
+          suffix=
+        tags: |
+          type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
+          type=edge,branch=main
+          type=ref,event=branch,enable=${{ github.ref_name == 'develop' }}
+          type=raw,value=test-apps,enable=${{ startsWith(github.ref_name, 'docker/') }}
+          type=semver,pattern={{version}}
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push updated main Docker containers
+      run: .github/actions/docker/main_docker.sh
+      if: (github.event_name == 'push' && github.ref_name == 'main') || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'main'))
+
+    - name: Build and push updated develop Docker containers
+      run: .github/actions/docker/develop_docker.sh
+      if: (github.event_name == 'push' && github.ref_name == 'develop') || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'develop'))
+
+    - name: Build push updated release Docker containers
+      run: .github/actions/docker/release_docker.sh "${{github.ref_name}}"
+      if: github.event.action == 'published' || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'release'))
+      
+    - name: Build and push updated test Docker containers
+      run: .github/actions/docker/test_docker.sh
+      if: (github.event_name == 'push' && startsWith(github.ref_name, 'docker/')) || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.build_type, 'test'))
