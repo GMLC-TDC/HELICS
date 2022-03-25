@@ -117,6 +117,7 @@ extensions = [
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
+    "sphinxcontrib.redoc"
 ]
 
 myst_enable_extensions = [
@@ -169,6 +170,17 @@ pygments_style = "sphinx"
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
+
+# redoc config
+redoc = [
+    {
+        'name': 'HELICS REST API',
+        'page': 'references/api-reference/index',
+        'spec': 'swagger/reference/queries.yaml',
+        'embed': True,
+    }
+]
+
 
 # -- Options for HTML output ----------------------------------------------
 
