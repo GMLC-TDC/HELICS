@@ -118,6 +118,8 @@ rmdir_list=(
     'concurrency/docs'
     'concurrency/.ci'
     'concurrency/.circleci'
+    'networking/docs'
+    'networking/tests'
     'networking/ThirdParty/concurrency'
     'networking/ThirdParty/asio'
 )
