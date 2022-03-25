@@ -175,7 +175,7 @@ todo_include_todos = False
 redoc = [
     {
         "name": "HELICS REST API",
-        "page": "references/api-reference/index",
+        "page": "references/api-reference/rest_queries_api",
         "spec": "swagger/reference/queries.yaml",
         "embed": True,
     }

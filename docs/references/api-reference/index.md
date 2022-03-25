@@ -17,4 +17,4 @@
 
 ## [Julia API](https://gmlc-tdc.github.io/HELICS.jl/latest/api/)
 
-## [REST Queries API](./REST_queries.html)
+## [REST Queries API](./api-reference/rest_queries_api.html)
