@@ -664,19 +664,19 @@ include(addfmt)
 # Create the target for jsoncpp
 # -----------------------------------------------------------
 include(addJsoncpp)
-add_library(HELICS::jsoncpp ALIAS jsoncpp_static)
+if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
+    add_library(HELICS::jsoncpp ALIAS jsoncpp_static)
+endif()
 
 # --------------------------------------------------------------
 # Create the target for spdlog
 # -----------------------------------------------------------
 include(addSpdlog)
-add_library(HELICS::spdlog ALIAS spdlog)
 
 # --------------------------------------------------------------
 # Create the target for the units library
 # -----------------------------------------------------------
 include(addUnits)
-add_library(HELICS::units ALIAS units)
 
 # -----------------------------------------------------------------------------
 # create utilities target
