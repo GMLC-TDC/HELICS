@@ -117,7 +117,7 @@ extensions = [
     "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
-    "sphinxcontrib.redoc"
+    "sphinxcontrib.redoc",
 ]
 
 myst_enable_extensions = [
@@ -174,10 +174,10 @@ todo_include_todos = False
 # redoc config
 redoc = [
     {
-        'name': 'HELICS REST API',
-        'page': 'references/api-reference/index',
-        'spec': 'swagger/reference/queries.yaml',
-        'embed': True,
+        "name": "HELICS REST API",
+        "page": "references/api-reference/index",
+        "spec": "swagger/reference/queries.yaml",
+        "embed": True,
     }
 ]
 
