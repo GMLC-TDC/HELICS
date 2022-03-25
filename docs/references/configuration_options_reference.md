@@ -1385,14 +1385,15 @@ specify that the network connection should be a server or client. By default nei
 ### `local_interface` | `localinterface` | `localInterface` [local address]
 
 _API:_ (none)
-the local interface to use for the receive ports.
+Specifies the IP address (and optionally port) the rest of the federation should use when contacting this federate.
 
 ---
 
-### `port` | `-p` []
+### `broker_address` | `brokeraddress` | `brokerAddress` []
 
 _API:_ (none)
-Port number to use.
+
+Specifies the IP address (and optionally port) a federate or sub-broker should use when contacting its parent broker
 
 ---
 
@@ -1400,7 +1401,7 @@ Port number to use.
 
 _API:_ (none)
 
-The port to use to connect to the broker.
+Specifies the port a federate or sub-broker should use when contacting its parent broker
 
 ---
 
@@ -1413,7 +1414,7 @@ _API:_ (none)
 ### `local_port` | `localport` | `localPort` []
 
 _API:_ (none)
-port number for the local receive port.
+Specifies the port the rest of the federation should use when contacting this federate.
 
 ---
 

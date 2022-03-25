@@ -37,13 +37,67 @@ The command line for launching Broker A also needs to be adjusted. For this exam
 $ helics_broker -f200 --broker_address=tcp://127.0.0.127
 ```
 
-Lastly, the JSON config file for the Transmission and Generation System federate needs to indicate where it's broker (Broker C) is at (IP 127.0.0.127):
+The JSON config file for the Transmission and Generation System federate needs to indicate where it's broker (Broker C) is at (IP 127.0.0.127):
 
 ```json
 {
   "name": "TransmissionGenerationSystem",
   "coreInit": "--broker_address=tcp://127.0.0.127"
 }
+```
+
+Lastly, when broker C, the root broker, is instantiated, it may optionally specify the number of sub-brokers that are expected to connect to it (as well as the number of federates). Since it is the root broker, there is no parent broker address to specify.
+
+```shell-session
+$ helics_broker -f1 --sub_brokers=2
+```
+
+## Hierarchies with Complex Networks
+
+In more complex networking environments ([see dedicated documentation](./networking)), it may be necessary to include an additional specification of the interface the broker, sub-broker, or federate would like to talk to the rest of the federation on. In these cases, typically only a port specification is added to the configuration. Adding the port can be done in one of two ways:
+
+1. Appending a `:<port number>` after the IP address (_e.g._ `tcp://127.0.0.1:23405`)
+2. Using `broker_port=<broker_port>` and/or `local_port=<local_port>`
+
+`broker_port` is used to specify the port on which a broker or sub-broker should talk to its broker. `local_port` is used to define which port a broker, sub-broker, or federate will be listening on for its communication with the rest of the federation. For example, a federate may define its `local_port` as 23500; as HELICS is setting-up the federation anything that needs to talk to the federate in question will know to use port 23500. Again, this can be particularly important if firewalls and networking policies are making it difficult or impossible to connect in using the defaults.
+
+Lastly, there is a full IP and/or socket specification that is analogous to `local_port`: `local_interface`. This is analogous to `broker_address` in that it allows the specification of an IP and/or a socket and is the complement to `local_port` in that it specifies how the federation could talk to the federate, broker, or sub-broker that is specifying it.
+
+Using the above example, if the networking environment were more complex, the Distribution System A configuration could have been extended as follows to force the rest of the federation to talk to it on port 23500 as well as indicate the port its broker wants to use for communication (25000):
+
+```json
+{
+  "name": "DistributionSystemA",
+  "coreInit": "--broker_address=tcp://127.0.0.1:25000",
+  "local_port": 23500
+}
+```
+
+Similarly, Broker A could have been instantiated to force communication on certain ports:
+
+```shell-session
+$ helics_broker -f200 --broker_address=tcp://127.0.0.127:24000 --local_port=25000
+```
+
+Adding the port number to the broker address indicates Broker C (the broker for Broker A) should be contacted on port 24000 and that the rest of the federation (including Broker C) should contact Broker A on port 25000. Similarly, the transmission federate would need similar additional specification to contact Broker C. Note that the port number is just appended to the IP; this could have also been specified with a new line in the JSON file defining `broker_port`.
+
+```json
+{
+  "name": "TransmissionGenerationSystem",
+  "coreInit": "--broker_address=tcp://127.0.0.127:24000"
+}
+```
+
+Broker B would need the same details so it could contact its parent broker and could additionally specify a unique port for its federates to contact it on:
+
+```shell-session
+$ helics_broker -f200 --broker_address=tcp://127.0.0.127:24000 --local_port=27000
+```
+
+Lastly, to complete the configuration implied by the above, Broker C would need to be called like this:
+
+```shell-session
+$ helics_broker -f1 --sub_brokers=2 --local_port=24000
 ```
 
 ## Example
