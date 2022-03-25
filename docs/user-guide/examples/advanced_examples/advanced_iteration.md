@@ -277,7 +277,14 @@ In other situations this _could_ be different.
 The underlying assumption here is that any changes between time requests are effectively "too fast" to change the output.
 
 ## Execution Results
-TODO
+### Initialization
+Two figures are produced following the initialization iteration, which show how the currents and voltages converge.
+Note that all batteries are in the constant current phase of charging, as such they all converge to their rated current (30A for EV1-4 and 104A for EV5).
+THe voltages meanwhile are _not_ nominal (240V or 630V) but rather determined based on the effective impedance, which is dependent on the initialized soc.
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_current_init.png?raw=true)
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_voltage_init.png?raw=true)
 
 ## [Questions and Help](../../support.md)
 
