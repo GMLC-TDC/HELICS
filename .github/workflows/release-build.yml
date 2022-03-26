@@ -1,6 +1,7 @@
 name: Build release artifacts
 
 on:
+  # Picking a workflow branch that is a tag, in combination with using the commit field is likely to fail for magic git clone/checkout reasons
   workflow_dispatch:
     inputs:
       packages:
@@ -8,7 +9,7 @@ on:
         required: true
         default: 'everything'
       commit:
-        description: 'Commit-ish (tag, branchname, sha) to do the release build with (uses scripts from the same branch as the workflow)'
+        description: 'Commit-ish (tag, branchname, sha) for code to build (uses scripts from the same branch as the workflow)'
         default: ''
   schedule:
     - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
@@ -24,15 +25,28 @@ jobs:
     runs-on: ubuntu-latest
     if: (github.event.action == 'published') || (github.event_name == 'workflow_dispatch' && (contains(github.event.inputs.packages, 'archive') || contains(github.event.inputs.packages, 'everything')))
     steps:
+    - name: Determine fetch depth
+      id: determine_fd
+      shell: bash
+      run: |
+        unset DEPTH
+        if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
+        echo "::set-output name=DEPTH::${DEPTH}"
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.commit }}
+        fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event.action == 'published' || github.event_name == 'workflow_dispatch'
 
     - name: Checkout shell scripts for workflow
+      shell: bash
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.commit
-      run: git checkout ${{ github.ref_name }} -- scripts/_git-all-archive.sh
+      run: |
+        git checkout ${{ github.event.inputs.commit }}
+        git checkout ${{ github.ref_name }} -- scripts/_git-all-archive.sh || exit $?
+        for i in $(git status --short | cut -f2 -d " "); do sha256sum $i; done
+        exit 0
 
     - name: Create archive
       if: github.event_name != 'workflow_dispatch'
@@ -74,10 +88,18 @@ jobs:
             cmake_gen: 'Visual Studio 17 2022'
             msvc_ver: 'msvc2022'
     steps:
+    - name: Determine fetch depth
+      id: determine_fd
+      shell: bash
+      run: |
+        unset DEPTH
+        if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
+        echo "::set-output name=DEPTH::${DEPTH}"
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.commit }}
+        fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
@@ -87,8 +109,13 @@ jobs:
       if: github.event_name == 'schedule'
 
     - name: Checkout shell scripts for workflow
+      shell: bash
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.commit
-      run: git checkout ${{ github.ref_name }} -- .github/actions/
+      run: |
+        git checkout ${{ github.event.inputs.commit }}
+        git checkout ${{ github.ref_name }} -- .github/actions/ || exit $?
+        for i in $(git status --short | cut -f2 -d " "); do sha256sum $i; done
+        exit 0
 
     # Compile HELICS and create the installer
     - name: Build installer
@@ -148,12 +175,20 @@ jobs:
             cpack_gen: TGZ
 
     steps:
+    - name: Determine fetch depth
+      id: determine_fd
+      shell: bash
+      run: |
+        unset DEPTH
+        if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
+        echo "::set-output name=DEPTH::${DEPTH}"
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.commit }}
+        fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
-    
+
     - name: Checkout develop branch
       uses: actions/checkout@v3
       with:
@@ -161,8 +196,13 @@ jobs:
       if: github.event_name == 'schedule'
  
     - name: Checkout shell scripts for workflow
+      shell: bash
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.commit
-      run: git checkout ${{ github.ref_name }} -- .github/actions/
+      run: |
+        git checkout ${{ github.event.inputs.commit }}
+        git checkout ${{ github.ref_name }} -- .github/actions/ || exit $?
+        for i in $(git status --short | cut -f2 -d " "); do sha256sum $i; done
+        exit 0
 
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
@@ -234,10 +274,18 @@ jobs:
             arch: x64
 
     steps:
+    - name: Determine fetch depth
+      id: determine_fd
+      shell: bash
+      run: |
+        unset DEPTH
+        if [ -n '${{ github.event.inputs.commit }}' ]; then DEPTH='0'; else DEPTH='1'; fi
+        echo "::set-output name=DEPTH::${DEPTH}"
+
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.commit }}
+        fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
@@ -247,8 +295,13 @@ jobs:
       if: github.event_name == 'schedule'
 
     - name: Checkout shell scripts for workflow
+      shell: bash
       if: github.event_name == 'workflow_dispatch' && github.event.inputs.commit
-      run: git checkout ${{ github.ref_name }} -- .github/actions/
+      run: |
+        git checkout ${{ github.event.inputs.commit }}
+        git checkout ${{ github.ref_name }} -- .github/actions/ || exit $?
+        for i in $(git status --short | cut -f2 -d " "); do sha256sum $i; done
+        exit 0
 
     # Setup a copy of the macOS SDK
     - name: Setup macOS SDK
