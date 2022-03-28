@@ -18,6 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
+const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 struct iteration_tests: public FederateTestFixture, public ::testing::Test {
 };
 
@@ -165,7 +169,10 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(iteration_tests, iteration_tests_type, ::testing::ValuesIn(CoreTypes_all));
+INSTANTIATE_TEST_SUITE_P(iteration_tests,
+                         iteration_tests_type,
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);
 
 TEST_F(iteration_tests, execution_iteration_loop3)
 {

@@ -101,7 +101,6 @@ class TimeCoordinator {
     bool hasInitUpdates{false};
 
   protected:
-    std::atomic<int32_t> iteration{0};  //!< iteration counter
     bool disconnected{false};
     /// specify that the timeCoordinator should not grant times and instead operate in a continuous
     /// manner until completion
@@ -109,6 +108,9 @@ class TimeCoordinator {
     /// if set to true the time coordinator is joining an ongoing co-simulation
     bool dynamicJoining{false};
 
+    std::atomic<int32_t> iteration{0};  //!< current number of iterations
+    int32_t sequenceCounter{0}; //!< sequence counter for tracking responses
+    
   public:
     /** default constructor*/
     TimeCoordinator();

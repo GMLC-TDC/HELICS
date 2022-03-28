@@ -173,7 +173,7 @@ class TimeDependencies {
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
-std::pair<GlobalFederateId, std::int32_t>
+std::tuple<GlobalFederateId, std::int32_t,std::int32_t>
     getExecEntryMinFederate(const TimeDependencies& dependencies,
                             GlobalFederateId self,
                             ConnectionType ignoreType = ConnectionType::none,

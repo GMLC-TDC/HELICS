@@ -66,8 +66,8 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         execreq.counter = iteration + 1;
         if (!hasInitUpdates) {
             auto mfed = getExecEntryMinFederate(dependencies, source_id);
-            execreq.setExtraData(mfed.first.baseValue());
-            execreq.setExtraDestData(mfed.second);
+            execreq.setExtraData(std::get<0>(mfed).baseValue());
+            execreq.setExtraDestData(std::get<1>(mfed));
         }
     }
     if (info.wait_for_current_time_updates) {
@@ -835,8 +835,8 @@ void TimeCoordinator::sendUpdatedExecRequest(GlobalFederateId target,
 {
     if (!minFed.isValid()) {
         auto mfed = getExecEntryMinFederate(dependencies, source_id);
-        minFed = mfed.first;
-        minFedIteration = mfed.second;
+        minFed = std::get<0>(mfed);
+        minFedIteration = std::get<1>(mfed);
     }
 
     ActionMessage execreq(CMD_EXEC_REQUEST);
@@ -874,13 +874,13 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             iterating != IterationRequest::NO_ITERATIONS) {
             // if we are just continuing
             auto mfed = getExecEntryMinFederate(dependencies, source_id);
-            if (mfed.first == triggerFed) {
-                sendUpdatedExecRequest(triggerFed, mfed.first, mfed.second);
+            if (std::get<0>(mfed) == triggerFed) {
+                sendUpdatedExecRequest(triggerFed, std::get<0>(mfed), std::get<1>(mfed));
             }
         }
         return ret;
     }
-
+    bool sendAll{false};
     switch (iterating) {
         case IterationRequest::NO_ITERATIONS:
             if (!info.wait_for_current_time_updates) {
@@ -950,6 +950,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                                     MessageProcessingResult::ITERATING :
                                     MessageProcessingResult::NEXT_STEP;
                             } else {
+                                sendAll = true;
                                 currentRestrictionLevel = restrictionLevel + 1;
                                 ret = MessageProcessingResult::CONTINUE_PROCESSING;
                             }
@@ -960,6 +961,12 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         }
 
                     } else {
+                        if (restricted) {
+                            auto mfed = getExecEntryMinFederate(dependencies, source_id);
+                            if (std::get<0>(mfed) == triggerFed) {
+                                currentRestrictionLevel = std::get<2>(mfed);
+                            }
+                        }
                         ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
                 }
@@ -1010,9 +1017,14 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
         iterating != IterationRequest::NO_ITERATIONS) {
         // if we are just continuing
         auto mfed = getExecEntryMinFederate(dependencies, source_id);
-        if (mfed.first == triggerFed) {
-            sendUpdatedExecRequest(triggerFed, mfed.first, mfed.second);
+        if (sendAll) {
+            sendUpdatedExecRequest(GlobalFederateId{}, std::get<0>(mfed), std::get<1>(mfed));
+        } else {
+            if (std::get<0>(mfed) == triggerFed) {
+                sendUpdatedExecRequest(triggerFed, std::get<0>(mfed), std::get<1>(mfed));
+            }
         }
+        
     }
     return ret;
 }

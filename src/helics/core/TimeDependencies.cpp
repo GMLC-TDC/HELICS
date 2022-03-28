@@ -631,7 +631,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
 }
 
-std::pair<GlobalFederateId, std::int32_t>
+std::tuple<GlobalFederateId, std::int32_t, std::int32_t>
     getExecEntryMinFederate(const TimeDependencies& dependencies,
                             GlobalFederateId self,
                             ConnectionType ignoreType,
@@ -672,7 +672,7 @@ std::pair<GlobalFederateId, std::int32_t>
             }
         }
     }
-    return {minId, minIteration};
+    return {minId, minIteration,resLevel};
 }
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
@@ -747,7 +747,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 
         if (mTime.mTimeState < TimeState::exec_requested) {
             auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
-            mTime.minFed = res.first;
+            mTime.minFed = std::get<0>(res);
         }
     }
     return mTime;
