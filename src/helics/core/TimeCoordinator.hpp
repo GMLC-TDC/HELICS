@@ -109,8 +109,8 @@ class TimeCoordinator {
     bool dynamicJoining{false};
 
     std::atomic<int32_t> iteration{0};  //!< current number of iterations
-    int32_t sequenceCounter{0}; //!< sequence counter for tracking responses
-    
+    int32_t sequenceCounter{0};  //!< sequence counter for tracking responses
+
   public:
     /** default constructor*/
     TimeCoordinator();

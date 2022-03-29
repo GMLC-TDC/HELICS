@@ -60,7 +60,7 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
     }
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
-    
+
     execreq.source_id = source_id;
     if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(execreq, iterating);
@@ -824,7 +824,7 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
                 continue;
             }
             msg.dest_id = dep.fedID;
-            if (msg.action()==CMD_EXEC_REQUEST) {
+            if (msg.action() == CMD_EXEC_REQUEST) {
                 msg.setExtraDestData(dep.sequenceCounter);
             }
             sendMessageFunction(msg);
@@ -838,7 +838,7 @@ void TimeCoordinator::sendUpdatedExecRequest(GlobalFederateId target,
                                              std::int32_t responseSequenceCounter)
 {
     if (!minFed.isValid()) {
-        const auto &mfed = getExecEntryMinFederate(dependencies, source_id);
+        const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
         minFed = mfed.fedID;
         responseSequenceCounter = mfed.sequenceCounter;
     }
@@ -848,7 +848,7 @@ void TimeCoordinator::sendUpdatedExecRequest(GlobalFederateId target,
     setIterationFlags(execreq, iterating);
     execreq.counter = sequenceCounter;
     execreq.setExtraData(minFed.baseValue());
-    
+
     execreq.messageID = currentRestrictionLevel;
     if (info.wait_for_current_time_updates) {
         setActionFlag(execreq, delayed_timing_flag);
@@ -892,170 +892,169 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                     }
                 }
             }
-            
         }
         return ret;
     }
-        bool sendAll{false};
-        switch (iterating) {
-            case IterationRequest::NO_ITERATIONS:
-                if (!info.wait_for_current_time_updates) {
+    bool sendAll{false};
+    switch (iterating) {
+        case IterationRequest::NO_ITERATIONS:
+            if (!info.wait_for_current_time_updates) {
+                ret = MessageProcessingResult::NEXT_STEP;
+            } else {
+                // on wait for current time flag all other federates must have entered exec mode
+                total = generateMinTimeTotal(dependencies,
+                                             info.restrictive_time_policy,
+                                             source_id,
+                                             source_id);
+                if (total.next > timeZero) {
                     ret = MessageProcessingResult::NEXT_STEP;
-                } else {
-                    // on wait for current time flag all other federates must have entered exec mode
-                    total = generateMinTimeTotal(dependencies,
-                                                 info.restrictive_time_policy,
-                                                 source_id,
-                                                 source_id);
-                    if (total.next > timeZero) {
-                        ret = MessageProcessingResult::NEXT_STEP;
-                    }
                 }
-                break;
-            case IterationRequest::ITERATE_IF_NEEDED:
-            case IterationRequest::FORCE_ITERATION:
-                if (iteration >= info.maxIterations) {
-                    if (iterating == IterationRequest::FORCE_ITERATION) {
-                        ret = MessageProcessingResult::ITERATING;
-                    } else {
-                        ret = MessageProcessingResult::NEXT_STEP;
-                    }
-                    break;
-                }
-                if (hasInitUpdates) {
+            }
+            break;
+        case IterationRequest::ITERATE_IF_NEEDED:
+        case IterationRequest::FORCE_ITERATION:
+            if (iteration >= info.maxIterations) {
+                if (iterating == IterationRequest::FORCE_ITERATION) {
                     ret = MessageProcessingResult::ITERATING;
                 } else {
-                    if (dependencies.checkIfReadyForExecEntry(false,
-                                                              info.wait_for_current_time_updates)) {
-                        ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                            MessageProcessingResult::ITERATING :
-                            MessageProcessingResult::NEXT_STEP;
-                    } else {
-                        bool allowed{!info.wait_for_current_time_updates};
-                        bool restricted{info.restrictive_time_policy};
-                        bool restrictionAdvance{restricted};
-                        int restrictionLevel{50};
-                        if (allowed) {
-                            for (const auto& dep : dependencies) {
-                                if (!dep.dependency) {
-                                    continue;
+                    ret = MessageProcessingResult::NEXT_STEP;
+                }
+                break;
+            }
+            if (hasInitUpdates) {
+                ret = MessageProcessingResult::ITERATING;
+            } else {
+                if (dependencies.checkIfReadyForExecEntry(false,
+                                                          info.wait_for_current_time_updates)) {
+                    ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                        MessageProcessingResult::ITERATING :
+                        MessageProcessingResult::NEXT_STEP;
+                } else {
+                    bool allowed{!info.wait_for_current_time_updates};
+                    bool restricted{info.restrictive_time_policy};
+                    bool restrictionAdvance{restricted};
+                    int restrictionLevel{50};
+                    if (allowed) {
+                        for (const auto& dep : dependencies) {
+                            if (!dep.dependency) {
+                                continue;
+                            }
+                            if (dep.mTimeState == TimeState::initialized) {
+                                allowed = false;
+                                continue;
+                            }
+                            if (dep.mTimeState >= TimeState::exec_requested) {
+                                continue;
+                            }
+                            if (dep.minFed != source_id) {
+                                allowed = false;
+                            }
+                            if (dep.responseSequenceCounter == sequenceCounter) {
+                                if (restricted) {
+                                    restrictionLevel =
+                                        (std::min)(restrictionLevel,
+                                                   static_cast<int>(dep.restrictionLevel));
                                 }
-                                if (dep.mTimeState == TimeState::initialized) {
-                                    allowed = false;
-                                    continue;
-                                }
-                                if (dep.mTimeState >= TimeState::exec_requested) {
-                                    continue;
-                                }
-                                if (dep.minFed != source_id) {
-                                    allowed = false;
-                                }
-                                if (dep.responseSequenceCounter == sequenceCounter) {
-                                    if (restricted) {
-                                        restrictionLevel =
-                                            (std::min)(restrictionLevel,
-                                                       static_cast<int>(dep.restrictionLevel));
-                                    }
 
-                                } else {
-                                    restrictionAdvance = false;
-                                    allowed = false;
-                                    break;
-                                }
+                            } else {
+                                restrictionAdvance = false;
+                                allowed = false;
+                                break;
                             }
                         }
-                        if (allowed) {
-                            if (restricted) {
-                                if (restrictionLevel >= 1) {
-                                    ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                                        MessageProcessingResult::ITERATING :
-                                        MessageProcessingResult::NEXT_STEP;
-                                } else {
-                                    if (currentRestrictionLevel != restrictionLevel + 1) {
-                                        currentRestrictionLevel = restrictionLevel + 1;
-                                        sendAll = true;
-                                        ++sequenceCounter;
-                                    }
-
-                                    ret = MessageProcessingResult::CONTINUE_PROCESSING;
-                                }
-                            } else {
+                    }
+                    if (allowed) {
+                        if (restricted) {
+                            if (restrictionLevel >= 1) {
                                 ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                                     MessageProcessingResult::ITERATING :
                                     MessageProcessingResult::NEXT_STEP;
-                            }
+                            } else {
+                                if (currentRestrictionLevel != restrictionLevel + 1) {
+                                    currentRestrictionLevel = restrictionLevel + 1;
+                                    sendAll = true;
+                                    ++sequenceCounter;
+                                }
 
-                        } else {
-                            if (restrictionAdvance) {
-                                currentRestrictionLevel = restrictionLevel + 1;
-                                sendAll = true;
-                                ++sequenceCounter;
+                                ret = MessageProcessingResult::CONTINUE_PROCESSING;
                             }
-                            ret = MessageProcessingResult::CONTINUE_PROCESSING;
+                        } else {
+                            ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                                MessageProcessingResult::ITERATING :
+                                MessageProcessingResult::NEXT_STEP;
                         }
-                    }
-                }
-                break;
-        }
-        if (!dynamicJoining) {
-            if (ret == MessageProcessingResult::NEXT_STEP) {
-                time_granted = timeZero;
-                time_grantBase = time_granted;
-                executionMode = true;
-                iteration = 0;
-                currentRestrictionLevel = 0;
-                ActionMessage execgrant(CMD_EXEC_GRANT);
-                execgrant.source_id = source_id;
-                transmitTimingMessages(execgrant);
-            } else if (ret == MessageProcessingResult::ITERATING) {
-                dependencies.resetIteratingExecRequests();
-                hasInitUpdates = false;
-                ++iteration;
-                ActionMessage execgrant(CMD_EXEC_GRANT);
-                execgrant.source_id = source_id;
-                execgrant.counter = iteration;
-                setActionFlag(execgrant, iteration_requested_flag);
-                transmitTimingMessages(execgrant);
-                currentRestrictionLevel = 0;
-            }
-        } else {
-            if (ret == MessageProcessingResult::NEXT_STEP) {
-                updateTimeFactors();
-                if (dependencyCount() > 0) {
-                    time_granted =
-                        generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
-                } else {
-                    time_granted = timeZero;
-                }
-                time_grantBase = time_granted;
-                executionMode = true;
-                iteration = 0;
-                currentRestrictionLevel = 0;
-                ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
-                execgrant.source_id = source_id;
-                execgrant.actionTime = time_granted;
-                transmitTimingMessages(execgrant);
-            }
-        }
-        if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
-            iterating != IterationRequest::NO_ITERATIONS) {
-            // if we are just continuing
-            const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
-            if (sendAll) {
-                sendUpdatedExecRequest(GlobalFederateId{}, mfed.fedID, mfed.sequenceCounter);
-            } else {
-                if (triggerFed == mfed.fedID && mfed.dependent) {
-                    sendUpdatedExecRequest(triggerFed, mfed.fedID, mfed.sequenceCounter);
-                } else {
-                    const auto* tfed = dependencies.getDependencyInfo(triggerFed);
-                    if (tfed->dependent) {
-                        sendUpdatedExecRequest(triggerFed, mfed.fedID, tfed->sequenceCounter);
+
+                    } else {
+                        if (restrictionAdvance) {
+                            currentRestrictionLevel = restrictionLevel + 1;
+                            sendAll = true;
+                            ++sequenceCounter;
+                        }
+                        ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
                 }
             }
-        }
-        return ret;
+            break;
     }
+    if (!dynamicJoining) {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
+            time_granted = timeZero;
+            time_grantBase = time_granted;
+            executionMode = true;
+            iteration = 0;
+            currentRestrictionLevel = 0;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            transmitTimingMessages(execgrant);
+        } else if (ret == MessageProcessingResult::ITERATING) {
+            dependencies.resetIteratingExecRequests();
+            hasInitUpdates = false;
+            ++iteration;
+            ActionMessage execgrant(CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.counter = iteration;
+            setActionFlag(execgrant, iteration_requested_flag);
+            transmitTimingMessages(execgrant);
+            currentRestrictionLevel = 0;
+        }
+    } else {
+        if (ret == MessageProcessingResult::NEXT_STEP) {
+            updateTimeFactors();
+            if (dependencyCount() > 0) {
+                time_granted =
+                    generateAllowedTime(total.next) - (std::max)(info.period, info.timeDelta);
+            } else {
+                time_granted = timeZero;
+            }
+            time_grantBase = time_granted;
+            executionMode = true;
+            iteration = 0;
+            currentRestrictionLevel = 0;
+            ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
+            execgrant.source_id = source_id;
+            execgrant.actionTime = time_granted;
+            transmitTimingMessages(execgrant);
+        }
+    }
+    if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
+        iterating != IterationRequest::NO_ITERATIONS) {
+        // if we are just continuing
+        const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
+        if (sendAll) {
+            sendUpdatedExecRequest(GlobalFederateId{}, mfed.fedID, mfed.sequenceCounter);
+        } else {
+            if (triggerFed == mfed.fedID && mfed.dependent) {
+                sendUpdatedExecRequest(triggerFed, mfed.fedID, mfed.sequenceCounter);
+            } else {
+                const auto* tfed = dependencies.getDependencyInfo(triggerFed);
+                if (tfed->dependent) {
+                    sendUpdatedExecRequest(triggerFed, mfed.fedID, tfed->sequenceCounter);
+                }
+            }
+        }
+    }
+    return ret;
+}
 
 static bool isDelayableMessage(const ActionMessage& cmd, GlobalFederateId localId)
 {

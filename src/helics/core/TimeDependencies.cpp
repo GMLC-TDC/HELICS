@@ -634,13 +634,12 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
 }
 
-const DependencyInfo &
-    getExecEntryMinFederate(const TimeDependencies& dependencies,
-                            GlobalFederateId self,
-                            ConnectionType ignoreType,
-                            GlobalFederateId ignore)
+const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
+                                              GlobalFederateId self,
+                                              ConnectionType ignoreType,
+                                              GlobalFederateId ignore)
 {
-    static DependencyInfo maxDep{Time::maxVal(),TimeState::initialized,50U};
+    static DependencyInfo maxDep{Time::maxVal(), TimeState::initialized, 50U};
 
     const DependencyInfo* minDep = &maxDep;
 

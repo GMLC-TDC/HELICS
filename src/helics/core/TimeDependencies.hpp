@@ -61,9 +61,11 @@ class TimeData {
     std::int32_t sequenceCounter{0};  //!< the sequence Counter of the request
     std::int32_t responseSequenceCounter{0};  //!< the iteration count of the min federate
     /// the iteration of the dependency when the local iteration was granted
-    std::int32_t grantedIteration{0};  
+    std::int32_t grantedIteration{0};
     TimeData() = default;
-    explicit TimeData(Time start, TimeState startState = TimeState::initialized, std::uint8_t resLevel=0U):
+    explicit TimeData(Time start,
+                      TimeState startState = TimeState::initialized,
+                      std::uint8_t resLevel = 0U):
         next{start},
         Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState}, restrictionLevel{
                                                                            resLevel} {};
@@ -90,7 +92,7 @@ class DependencyInfo: public TimeData {
     explicit DependencyInfo(GlobalFederateId id): fedID(id), forwarding{id.isBroker()} {}
 
     template<class... Args>
-    explicit DependencyInfo(Args&&... args): TimeData(std::forward<Args>(args)... )
+    explicit DependencyInfo(Args&&... args): TimeData(std::forward<Args>(args)...)
     {
     }
 };
@@ -178,11 +180,10 @@ class TimeDependencies {
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
-const DependencyInfo&
-    getExecEntryMinFederate(const TimeDependencies& dependencies,
-                            GlobalFederateId self,
-                            ConnectionType ignoreType = ConnectionType::none,
-                            GlobalFederateId ignore = GlobalFederateId{});
+const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
+                                              GlobalFederateId self,
+                                              ConnectionType ignoreType = ConnectionType::none,
+                                              GlobalFederateId ignore = GlobalFederateId{});
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
