@@ -67,7 +67,7 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         ++sequenceCounter;
         execreq.counter = sequenceCounter;
         if (!hasInitUpdates) {
-            auto mfed = getExecEntryMinFederate(dependencies, source_id);
+            const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
             execreq.setExtraData(mfed.fedID.baseValue());
         }
     }
@@ -941,7 +941,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                             }
                             if (dep.mTimeState == TimeState::initialized) {
                                 allowed = false;
-                                continue;
+                                restrictionAdvance = false;
+                                break;
                             }
                             if (dep.mTimeState >= TimeState::exec_requested) {
                                 continue;

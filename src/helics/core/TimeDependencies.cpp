@@ -409,7 +409,7 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                     }
                     if (dep.mTimeState == TimeState::exec_requested_iterative ||
                         dep.mTimeState == TimeState::exec_requested_require_iteration) {
-                        if (dep.responseSequenceCounter < dep.grantedIteration) {
+                        if (dep.sequenceCounter < dep.grantedIteration) {
                             return false;
                         }
                     }
@@ -472,6 +472,7 @@ void TimeDependencies::resetIteratingExecRequests()
             dep.grantedIteration = dep.sequenceCounter;
             dep.sequenceCounter = 0;
             dep.responseSequenceCounter = 0;
+            dep.restrictionLevel = 0;
             dep.minFed = GlobalFederateId();
         }
     }

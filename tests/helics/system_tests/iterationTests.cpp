@@ -107,8 +107,8 @@ std::pair<double, int> runInitIterations(helics::ValueFederate* vfed, int index,
         auto val2 = sub_low.getValue<double>();
         cval = (val1 + val2) / 2.0;
         ++itcount;
-        //   printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
-        //  index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
+           printf("[%d]<%d> (%d)=%f,(%d)=%f, curr=%f\n", itcount,index, (index == 0) ? total - 1 :
+          index - 1,val2, (index == total - 1) ? (0) : index + 1, val1, cval);
     }
     return {cval, itcount};
 }
