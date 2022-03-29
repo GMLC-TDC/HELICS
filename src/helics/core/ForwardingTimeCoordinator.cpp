@@ -292,7 +292,7 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
                         allowed = false;
                         break;
                     }
-                    if (dep.minFedIteration != downstream.requestIteration) {
+                    if (dep.responseSequenceCounter != downstream.sequenceCounter) {
                         allowed = false;
                         break;
                     }
@@ -341,13 +341,13 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
             nTime.Te = dep.Te;
-            nTime.counter = dep.requestIteration;
+            nTime.counter = dep.sequenceCounter;
             break;
         case TimeState::time_requested_require_iteration:
             nTime.setExtraData(dep.minFed.baseValue());
             setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
-            nTime.counter = dep.requestIteration;
+            nTime.counter = dep.sequenceCounter;
             nTime.Te = dep.Te;
             break;
         case TimeState::exec_requested:
@@ -362,25 +362,25 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.setExtraDestData(dep.minFedIteration);
-            nTime.counter = dep.requestIteration;
+            nTime.setExtraDestData(dep.responseSequenceCounter);
+            nTime.counter = dep.sequenceCounter;
             break;
         case TimeState::exec_requested_require_iteration:
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.setExtraDestData(dep.minFedIteration);
-            nTime.counter = dep.requestIteration;
+            nTime.setExtraDestData(dep.responseSequenceCounter);
+            nTime.counter = dep.sequenceCounter;
             break;
         case TimeState::initialized:
-            if (dep.minFedIteration == 0) {
+            if (dep.responseSequenceCounter == 0) {
                 nTime.setAction(CMD_IGNORE);
             } else {
                 nTime.setAction(CMD_EXEC_GRANT);
                 nTime.setExtraData(dep.minFed.baseValue());
-                nTime.setExtraDestData(dep.minFedIteration);
+                nTime.setExtraDestData(dep.responseSequenceCounter);
                 setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
-                nTime.counter = dep.requestIteration;
+                nTime.counter = dep.sequenceCounter;
             }
 
             break;

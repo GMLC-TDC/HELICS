@@ -54,17 +54,19 @@ class TimeData {
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
-    bool hasData{false};  // indicator that data was sent in the current interval
+    bool hasData{false};  //!< indicator that data was sent in the current interval
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
     std::uint8_t restrictionLevel{0};  //!< timing restriction level
-    std::int32_t timeoutCount{0};  // counter for timeout checking
-    std::int32_t requestIteration{0};  // the iteration number of the request
-    std::int32_t minFedIteration{0};  // the iteration count of the min federate
-    std::int32_t grantedIteration{
-        0};  // the iteration of the dependency when the local iteration was granted
+    std::int32_t timeoutCount{0};  //!< counter for timeout checking
+    std::int32_t sequenceCounter{0};  //!< the sequence Counter of the request
+    std::int32_t responseSequenceCounter{0};  //!< the iteration count of the min federate
+    /// the iteration of the dependency when the local iteration was granted
+    std::int32_t grantedIteration{0};  
     TimeData() = default;
-    explicit TimeData(Time start, TimeState startState = TimeState::initialized):
-        next{start}, Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState} {};
+    explicit TimeData(Time start, TimeState startState = TimeState::initialized, std::uint8_t resLevel=0U):
+        next{start},
+        Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState}, restrictionLevel{
+                                                                           resLevel} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const TimeData& update);
 };
@@ -87,7 +89,10 @@ class DependencyInfo: public TimeData {
     /** construct from a federate id*/
     explicit DependencyInfo(GlobalFederateId id): fedID(id), forwarding{id.isBroker()} {}
 
-    explicit DependencyInfo(Time start): TimeData(start) {}
+    template<class... Args>
+    explicit DependencyInfo(Args&&... args): TimeData(std::forward<Args>(args)... )
+    {
+    }
 };
 
 /** class for managing a set of dependencies*/
@@ -173,7 +178,7 @@ class TimeDependencies {
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
-std::tuple<GlobalFederateId, std::int32_t,std::int32_t>
+const DependencyInfo&
     getExecEntryMinFederate(const TimeDependencies& dependencies,
                             GlobalFederateId self,
                             ConnectionType ignoreType = ConnectionType::none,

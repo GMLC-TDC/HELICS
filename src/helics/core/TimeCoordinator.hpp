@@ -236,7 +236,7 @@ class TimeCoordinator {
     /** send updated exec request to target or everyone if target is invalid*/
     void sendUpdatedExecRequest(GlobalFederateId target = GlobalFederateId{},
                                 GlobalFederateId minFed = GlobalFederateId{},
-                                std::int32_t minFedIteration = 0);
+                                std::int32_t responseSequenceCounter = 0);
     /** request a time
     @param nextTime the new requested time
     @param iterate the mode of iteration to use (no_iteration, FORCE_ITERATION, ITERATE_IF_NEEDED)

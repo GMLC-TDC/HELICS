@@ -33,9 +33,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             }
             dep.delayedTiming = delayed;
             dep.restrictionLevel = m.messageID;
-            dep.requestIteration = m.counter;
+            dep.sequenceCounter = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
-            dep.minFedIteration = m.getExtraDestData();
+            dep.responseSequenceCounter = m.getExtraDestData();
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
@@ -44,13 +44,16 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 dep.minDe = timeZero;
                 dep.timeoutCount = 0;
                 dep.Te = timeZero;
-                dep.requestIteration = 0;
+                dep.sequenceCounter = 0;
+                dep.responseSequenceCounter = 0;
                 dep.grantedIteration = 0;
                 dep.restrictionLevel = 0;
                 dep.minFed = GlobalFederateId{};
             } else {
                 dep.mTimeState = TimeState::initialized;
-                dep.requestIteration = m.counter;
+                dep.sequenceCounter = m.counter;
+                dep.responseSequenceCounter = 0;
+                dep.restrictionLevel = 0;
             }
             dep.hasData = false;
             break;
@@ -77,8 +80,8 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
-            dep.requestIteration = m.counter;
-            dep.minFedIteration = m.getExtraDestData();
+            dep.sequenceCounter = m.counter;
+            dep.responseSequenceCounter = m.getExtraDestData();
             break;
         case CMD_TIME_GRANT:
             dep.mTimeState = TimeState::time_granted;
@@ -90,7 +93,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minDe = dep.next;
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
-            dep.requestIteration = m.counter;
+            dep.sequenceCounter = m.counter;
             dep.hasData = false;
             break;
         case CMD_DISCONNECT:
@@ -159,11 +162,11 @@ bool TimeData::update(const TimeData& update)
         minFed = update.minFed;
         updated = true;
     }
-    if (update.requestIteration != requestIteration) {
-        requestIteration = update.requestIteration;
+    if (update.sequenceCounter != sequenceCounter) {
+        sequenceCounter = update.sequenceCounter;
     }
-    if (update.minFedIteration != minFedIteration) {
-        minFedIteration = update.minFedIteration;
+    if (update.responseSequenceCounter != responseSequenceCounter) {
+        responseSequenceCounter = update.responseSequenceCounter;
         updated = true;
     }
     if (update.minFedActual != minFedActual) {
@@ -217,10 +220,10 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["te"] = static_cast<double>(dep.Te);
     output["minde"] = static_cast<double>(dep.minDe);
     output["minfed"] = dep.minFed.baseValue();
-    output["minfedIteration"] = dep.minFedIteration;
+    output["responseSequence"] = dep.responseSequenceCounter;
     auto sstring = timeStateString(dep.mTimeState);
     output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
-    output["iteration"] = dep.requestIteration;
+    output["iteration"] = dep.sequenceCounter;
     output["granted_iteration"] = dep.grantedIteration;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
@@ -406,7 +409,7 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                     }
                     if (dep.mTimeState == TimeState::exec_requested_iterative ||
                         dep.mTimeState == TimeState::exec_requested_require_iteration) {
-                        if (dep.requestIteration < dep.grantedIteration) {
+                        if (dep.responseSequenceCounter < dep.grantedIteration) {
                             return false;
                         }
                     }
@@ -466,9 +469,9 @@ void TimeDependencies::resetIteratingExecRequests()
     for (auto& dep : dependencies) {
         if (dep.dependency && dep.mTimeState <= TimeState::exec_requested_iterative) {
             dep.mTimeState = TimeState::initialized;
-            dep.grantedIteration = dep.requestIteration;
-            dep.requestIteration = 0;
-            dep.minFedIteration = 0;
+            dep.grantedIteration = dep.sequenceCounter;
+            dep.sequenceCounter = 0;
+            dep.responseSequenceCounter = 0;
             dep.minFed = GlobalFederateId();
         }
     }
@@ -563,21 +566,21 @@ static void generateMinTimeImplementation(TimeData& mTime,
         if (dep.mTimeState < mTime.mTimeState) {
             mTime.minFed = dep.fedID;
             mTime.mTimeState = dep.mTimeState;
-            mTime.minFedIteration = dep.requestIteration;
-            mTime.requestIteration = dep.requestIteration;
+            mTime.responseSequenceCounter = dep.responseSequenceCounter;
+            mTime.sequenceCounter = dep.sequenceCounter;
             mTime.delayedTiming = dep.delayedTiming;
             mTime.restrictionLevel = dep.restrictionLevel;
         } else if (dep.mTimeState == mTime.mTimeState) {
             if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;
-                mTime.minFedIteration = dep.requestIteration;
-                mTime.requestIteration = dep.requestIteration;
+                mTime.responseSequenceCounter = dep.responseSequenceCounter;
+                mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.restrictionLevel = dep.restrictionLevel;
             } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
-                mTime.minFedIteration = dep.requestIteration;
-                mTime.requestIteration = dep.requestIteration;
+                mTime.responseSequenceCounter = dep.responseSequenceCounter;
+                mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.delayedTiming = dep.delayedTiming;
             }
         }
@@ -631,16 +634,16 @@ static void generateMinTimeImplementation(TimeData& mTime,
     }
 }
 
-std::tuple<GlobalFederateId, std::int32_t, std::int32_t>
+const DependencyInfo &
     getExecEntryMinFederate(const TimeDependencies& dependencies,
                             GlobalFederateId self,
                             ConnectionType ignoreType,
                             GlobalFederateId ignore)
 {
-    GlobalFederateId minId;
-    std::int32_t minIteration{0};
-    TimeState minTimeState{TimeState::initialized};
-    std::int32_t resLevel{50};
+    static DependencyInfo maxDep{Time::maxVal(),TimeState::initialized,50U};
+
+    const DependencyInfo* minDep = &maxDep;
+
     for (const auto& dep : dependencies) {
         if (!dep.dependency) {
             continue;
@@ -657,22 +660,18 @@ std::tuple<GlobalFederateId, std::int32_t, std::int32_t>
         if (dep.mTimeState > TimeState::exec_requested_iterative) {
             continue;
         }
-        if (dep.restrictionLevel > resLevel) {
+        if (dep.restrictionLevel > minDep->restrictionLevel) {
             continue;
         }
-        if (!minId.isValid() || dep.fedID < minId) {
-            minId = dep.fedID;
-            minIteration = dep.requestIteration;
-            minTimeState = dep.mTimeState;
-            resLevel = dep.restrictionLevel;
-            if (minTimeState == TimeState::initialized) {
-                minId = GlobalFederateId{};
-                minIteration = 0;
+        if (!minDep->fedID.isValid() || dep.fedID < minDep->fedID) {
+            minDep = &dep;
+            if (minDep->mTimeState == TimeState::initialized) {
+                minDep = &maxDep;
                 break;
             }
         }
     }
-    return {minId, minIteration,resLevel};
+    return *minDep;
 }
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
@@ -692,7 +691,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        iterationCount += dep.requestIteration;
+        iterationCount += dep.sequenceCounter;
         generateMinTimeImplementation(mTime, dep, ignore);
     }
     if (mTime.Te < mTime.minDe) {
@@ -704,7 +703,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             mTime.next = mTime.minDe;
         }
     }
-    mTime.requestIteration = iterationCount;
+    mTime.sequenceCounter = iterationCount;
     if (mTime.mTimeState < TimeState::time_granted) {
         mTime.next = initializationTime;
         mTime.minDe = initializationTime;
@@ -747,7 +746,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 
         if (mTime.mTimeState < TimeState::exec_requested) {
             auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
-            mTime.minFed = std::get<0>(res);
+            mTime.minFed = res.fedID;
         }
     }
     return mTime;
