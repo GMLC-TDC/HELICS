@@ -3214,9 +3214,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (!command.dest_id.isValid() && command.source_id == global_broker_id_local) {
-                    for (auto& dep : timeCoord->getDependents()) {
-                        routeMessage(command, dep);
-                    }
+                for (auto& dep : timeCoord->getDependents()) {
+                    routeMessage(command, dep);
+                }
             } else {
                 routeMessage(command);
             }
