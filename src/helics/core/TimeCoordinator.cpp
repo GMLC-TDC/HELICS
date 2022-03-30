@@ -876,26 +876,32 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
     }
     if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS,
                                                info.wait_for_current_time_updates)) {
-        if (!hasInitUpdates) {
-            if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
-                iterating != IterationRequest::NO_ITERATIONS) {
-                // if we are just continuing
-                const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
-                if (mfed.fedID == triggerFed) {
-                    sendUpdatedExecRequest(triggerFed, GlobalFederateId{}, mfed.sequenceCounter);
-                } else {
-                    const auto* tfed = dependencies.getDependencyInfo(triggerFed);
-                    if (tfed->dependent) {
+        if (!hasInitUpdates ) {
+            if (triggerFed.isValid() && iterating != IterationRequest::NO_ITERATIONS) {
+                if (dependencies.checkIfReadyForExecEntry(false, false)) {
+                    // if we are just continuing but would have granted in other curcumstances
+                    const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
+                    if (mfed.fedID == triggerFed) {
                         sendUpdatedExecRequest(triggerFed,
                                                GlobalFederateId{},
-                                               tfed->sequenceCounter);
+                                               mfed.sequenceCounter);
+                    } else {
+                        const auto* tfed = dependencies.getDependencyInfo(triggerFed);
+                        if (tfed->dependent) {
+                            sendUpdatedExecRequest(triggerFed,
+                                                   GlobalFederateId{},
+                                                   tfed->sequenceCounter);
+                        }
                     }
+                } else {
+                    needSendAll=true;
                 }
             }
         }
         return ret;
     }
-    bool sendAll{false};
+    bool sendAll{needSendAll};
+    needSendAll = false;
     switch (iterating) {
         case IterationRequest::NO_ITERATIONS:
             if (!info.wait_for_current_time_updates) {

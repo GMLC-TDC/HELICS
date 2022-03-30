@@ -342,6 +342,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
             nTime.Te = dep.Te;
             nTime.counter = dep.sequenceCounter;
+            nTime.setExtraDestData(dep.responseSequenceCounter);
             break;
         case TimeState::time_requested_require_iteration:
             nTime.setExtraData(dep.minFed.baseValue());
@@ -349,6 +350,7 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
             nTime.counter = dep.sequenceCounter;
             nTime.Te = dep.Te;
+            nTime.setExtraDestData(dep.responseSequenceCounter);
             break;
         case TimeState::exec_requested:
             nTime.setAction(CMD_EXEC_REQUEST);
@@ -362,14 +364,12 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.setExtraDestData(dep.responseSequenceCounter);
             nTime.counter = dep.sequenceCounter;
             break;
         case TimeState::exec_requested_require_iteration:
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.setExtraDestData(dep.responseSequenceCounter);
             nTime.counter = dep.sequenceCounter;
             break;
         case TimeState::initialized:
@@ -378,7 +378,6 @@ ActionMessage ForwardingTimeCoordinator::generateTimeRequest(const DependencyInf
             } else {
                 nTime.setAction(CMD_EXEC_GRANT);
                 nTime.setExtraData(dep.minFed.baseValue());
-                nTime.setExtraDestData(dep.responseSequenceCounter);
                 setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
                 nTime.counter = dep.sequenceCounter;
             }
@@ -403,6 +402,9 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
             continue;
         }
         msg.dest_id = dep.fedID;
+        if (msg.action() == CMD_EXEC_REQUEST) {
+            msg.setExtraDestData(dep.sequenceCounter);
+        }
         sendMessageFunction(msg);
     }
 }
@@ -437,6 +439,9 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
             if (dep.dependent) {
                 if (dep.fedID == skipFed) {
                     continue;
+                }
+                if (msg.action() == CMD_EXEC_REQUEST) {
+                    msg.setExtraDestData(dep.sequenceCounter);
                 }
                 msg.dest_id = dep.fedID;
                 sendMessageFunction(msg);

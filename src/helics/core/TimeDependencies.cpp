@@ -567,22 +567,22 @@ static void generateMinTimeImplementation(TimeData& mTime,
         if (dep.mTimeState < mTime.mTimeState) {
             mTime.minFed = dep.fedID;
             mTime.mTimeState = dep.mTimeState;
-            mTime.responseSequenceCounter = dep.responseSequenceCounter;
-            mTime.sequenceCounter = dep.sequenceCounter;
             mTime.delayedTiming = dep.delayedTiming;
             mTime.restrictionLevel = dep.restrictionLevel;
+            mTime.sequenceCounter = dep.sequenceCounter;
+            mTime.responseSequenceCounter = dep.sequenceCounter;
         } else if (dep.mTimeState == mTime.mTimeState) {
             if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;
-                mTime.responseSequenceCounter = dep.responseSequenceCounter;
-                mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.delayedTiming = dep.delayedTiming;
                 mTime.restrictionLevel = dep.restrictionLevel;
+                mTime.sequenceCounter = dep.sequenceCounter;
+                mTime.responseSequenceCounter = dep.sequenceCounter;
             } else if (dep.restrictionLevel == mTime.restrictionLevel && dep.fedID < mTime.minFed) {
                 mTime.minFed = dep.fedID;
-                mTime.responseSequenceCounter = dep.responseSequenceCounter;
-                mTime.sequenceCounter = dep.sequenceCounter;
                 mTime.delayedTiming = dep.delayedTiming;
+                mTime.sequenceCounter = dep.sequenceCounter;
+                mTime.responseSequenceCounter = dep.sequenceCounter;
             }
         }
         return;
@@ -745,7 +745,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         mTime.Te = initializationTime;
 
         if (mTime.mTimeState < TimeState::exec_requested) {
-            auto res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
+            const auto& res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
             mTime.minFed = res.fedID;
         }
     }
