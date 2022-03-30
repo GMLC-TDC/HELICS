@@ -61,7 +61,7 @@ enum class CoreType : int {
 };
 
 /** enumeration of the possible message processing results*/
-enum class MessageProcessingResult : signed char {
+enum class MessageProcessingResult : std::int8_t {
 
     CONTINUE_PROCESSING = -2,  //!< the current loop should continue
     DELAY_MESSAGE = -1,  //!< delay the current message and continue processing

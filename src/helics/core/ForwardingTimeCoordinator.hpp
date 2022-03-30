@@ -38,7 +38,6 @@ class ForwardingTimeCoordinator {
   public:
     /// the identifier for inserting into the source id field of any generated messages;
     GlobalFederateId source_id{0};
-    GlobalFederateId delayedFederate{};
     /// flag indicating that the coordinator is trying to enter the exec mode
     bool checkingExec{false};
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
@@ -46,8 +45,7 @@ class ForwardingTimeCoordinator {
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
-    bool noParent{false};  //!< indicator that the coordinator does not have parents
-    bool hasDelayedTimingFederate{false};  //!< indicator that federate is using delayed timing
+    bool noParent{true};  //!< indicator that the coordinator does not have parents
   private:
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
   public:

@@ -1169,6 +1169,8 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
                         LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
+                    } else {
+                        timeCoord->updateTimeFactors();
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {

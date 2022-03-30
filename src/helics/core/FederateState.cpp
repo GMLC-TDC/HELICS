@@ -1226,6 +1226,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.actionTime,
                                     time_granted));
                 }
+                if (state <= HELICS_EXECUTING) {
+                    timeCoord->processTimeMessage(cmd);
+                }
                 epi->addMessage(createMessageFromCommand(std::move(cmd)));
             }
         } break;
@@ -1255,6 +1258,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     mess->messageID = cmd.messageID;
                     mess->original_dest = eptI->key;
                     eptI->addMessage(std::move(mess));
+                    if (state <= HELICS_EXECUTING) {
+                        timeCoord->processTimeMessage(cmd);
+                    }
                 }
                 break;
             }
@@ -1272,6 +1278,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                          prettyPrintString(cmd),
                                          subI->getSourceName(src)));
                 }
+            }
+            if (state <= HELICS_EXECUTING) {
+                timeCoord->processTimeMessage(cmd);
             }
         } break;
         case CMD_WARNING:
@@ -1926,15 +1935,21 @@ void FederateState::logMessage(int level,
         return;
     }
     std::string header;
+    auto t = grantedTime();
+    std::string timeString;
+    if (t < timeZero) {
+        timeString = fmt::format("[{}]", fedStateString(getState()));
+    } else if (t == Time::maxVal()) {
+        timeString = "[MAXTIME]";
+    } else {
+        timeString = fmt::format("[{}]", static_cast<double>(grantedTime()));
+    }
     if (logMessageSource.empty()) {
-        header = fmt::format("{} ({})[t={}]",
-                             name,
-                             global_id.load().baseValue(),
-                             static_cast<double>(grantedTime()));
+        header = fmt::format("{} ({}){}", name, global_id.load().baseValue(), timeString);
     } else if (logMessageSource.back() == ']') {
         header = logMessageSource;
     } else {
-        header = fmt::format("{}[t={}]", logMessageSource, static_cast<double>(grantedTime()));
+        header = fmt::format("{}{}", logMessageSource, timeString);
     }
 
     mLogManager->sendToLogger(level, header, message, fromRemote);

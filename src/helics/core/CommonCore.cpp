@@ -3208,9 +3208,12 @@ void CommonCore::processCommand(ActionMessage&& command)
                     auto res = timeCoord->checkExecEntry();
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
+                        LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
+                    } else {
+                        timeCoord->updateTimeFactors();
                     }
                 }
-            } else if (command.source_id == global_broker_id_local) {
+            } else if (!command.dest_id.isValid() && command.source_id == global_broker_id_local) {
                 for (auto& dep : timeCoord->getDependents()) {
                     routeMessage(command, dep);
                 }

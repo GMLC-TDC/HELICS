@@ -389,6 +389,8 @@ TEST(other_tests, signal_handler_callback)
     raise(SIGINT);
     EXPECT_EQ(handlerCount.load(), 1);
     helicsClearSignalHandler();
+    helicsCleanupLibrary();
+    helicsCloseLibrary();
 }
 
 /** test the default signal handler*/
@@ -397,6 +399,7 @@ TEST(other_tests, signal_handler_death_ci_skip)
     helicsLoadSignalHandler();
     EXPECT_EXIT(raise(SIGINT), testing::ExitedWithCode(HELICS_ERROR_USER_ABORT), "");
     helicsClearSignalHandler();
+    helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
@@ -413,6 +416,7 @@ TEST(other_tests, signal_handler_threaded_death_ci_skip)
     }
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
+    helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 
@@ -432,6 +436,7 @@ TEST(other_tests, signal_handler_callback_threaded_death_ci_skip)
     EXPECT_TRUE(res);
     helicsClearSignalHandler();
     EXPECT_EQ(handlerCount.load(), 1);
+    helicsCleanupLibrary();
     helicsCloseLibrary();
 }
 

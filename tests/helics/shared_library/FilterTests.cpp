@@ -541,7 +541,10 @@ TEST_F(filter_tests, clone_test)
 
     CE(helicsFederateEnterExecutingModeAsync(sFed, &err));
     CE(helicsFederateEnterExecutingModeAsync(dcFed, &err));
-    CE(helicsFederateEnterExecutingMode(dFed, &err));
+
+    CE(helicsFederateEnterExecutingModeAsync(dFed, &err));
+
+    CE(helicsFederateEnterExecutingModeComplete(dFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(sFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(dcFed, &err));
 
