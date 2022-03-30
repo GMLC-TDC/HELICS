@@ -99,7 +99,8 @@ class TimeCoordinator {
     bool executionMode{false};
     /// flag indicating that a value or message was received during initialization stage
     bool hasInitUpdates{false};
-    /// flag indicating that we need to send updates to all dependencies on receipt of addition request
+    /// flag indicating that we need to send updates to all dependencies on receipt of addition
+    /// request
     bool needSendAll{false};
 
   protected:

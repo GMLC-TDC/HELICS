@@ -745,7 +745,8 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         mTime.Te = initializationTime;
 
         if (mTime.mTimeState < TimeState::exec_requested) {
-            const auto& res = getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
+            const auto& res =
+                getExecEntryMinFederate(dependencies, self, ConnectionType::child, ignore);
             mTime.minFed = res.fedID;
         }
     }

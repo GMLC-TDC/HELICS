@@ -876,10 +876,10 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
     }
     if (!dependencies.checkIfReadyForExecEntry(iterating != IterationRequest::NO_ITERATIONS,
                                                info.wait_for_current_time_updates)) {
-        if (!hasInitUpdates ) {
+        if (!hasInitUpdates) {
             if (triggerFed.isValid() && iterating != IterationRequest::NO_ITERATIONS) {
                 if (dependencies.checkIfReadyForExecEntry(false, false)) {
-                    // if we are just continuing but would have granted in other curcumstances
+                    // if we are just continuing but would have granted in other circumstances
                     const auto& mfed = getExecEntryMinFederate(dependencies, source_id);
                     if (mfed.fedID == triggerFed) {
                         sendUpdatedExecRequest(triggerFed,
@@ -894,7 +894,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                         }
                     }
                 } else {
-                    needSendAll=true;
+                    needSendAll = true;
                 }
             }
         }
