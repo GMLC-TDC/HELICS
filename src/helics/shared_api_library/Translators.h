@@ -97,7 +97,7 @@ HELICS_EXPORT int helicsFederateGetTranslatorCount(HelicsFederate fed);
  * @param[in,out] err The error object to complete if there is an error.
 
  *
- * @return A HelicsTranslator object. If no translator with the specified name exists, the object will not be valid and  
+ * @return A HelicsTranslator object. If no translator with the specified name exists, the object will not be valid and
  * err will contain an error code.
  */
 HELICS_EXPORT HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* name, HelicsError* err);
