@@ -764,9 +764,9 @@ std::string CoreBroker::generateFederationSummary() const
     block["inputs"] = ipts;
     block["filters"] = filt;
     block["endpoints"] = epts;
-    block["translators"] =translators;
+    block["translators"] = translators;
     summary["summary"] = block;
-    addBaseInformation(summary,isRootc);
+    addBaseInformation(summary, isRootc);
     return fileops::generateJsonString(summary);
 }
 
@@ -2978,7 +2978,7 @@ std::string CoreBroker::query(const std::string& target,
             }
             if (queryStr == "logs") {
                 Json::Value base;
-                addBaseInformation(base,!isRoot());
+                addBaseInformation(base, !isRoot());
                 bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
@@ -3157,7 +3157,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     }
     if (request == "status") {
         Json::Value base;
-        addBaseInformation(base,!isRootc);
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         return fileops::generateJsonString(base);
@@ -3167,9 +3167,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
-    auto addHeader = [this](Json::Value& base) {
-        addBaseInformation(base, !isRootc);
-    };
+    auto addHeader = [this](Json::Value& base) { addBaseInformation(base, !isRootc); };
 
     auto res = quickBrokerQueries(request);
     if (!res.empty()) {
@@ -3300,7 +3298,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "dependencies") {
         Json::Value base;
-        addBaseInformation(base,!isRootc);
+        addBaseInformation(base, !isRootc);
         base["dependents"] = Json::arrayValue;
         for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());

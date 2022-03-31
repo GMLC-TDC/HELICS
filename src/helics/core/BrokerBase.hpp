@@ -280,6 +280,7 @@ class BrokerBase {
     std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
     /** add some base information to a json structure */
     void addBaseInformation(Json::Value& base, bool hasParent) const;
+
   public:
     /** generate a callback function for the logging purposes*/
     std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;

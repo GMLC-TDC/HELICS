@@ -17,11 +17,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/string_viewConversion.h"
+#include "helics/common/JsonGeneration.hpp"
 #include "helics/common/LogBuffer.hpp"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
-#include "helics/common/JsonGeneration.hpp"
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "gmlc/networking/AsioContextManager.h"
@@ -484,7 +484,6 @@ std::pair<bool, std::vector<std::string_view>>
     }
     return {true, res};
 }
-
 
 void BrokerBase::addBaseInformation(Json::Value& base, bool hasParent) const
 {
