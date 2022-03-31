@@ -111,6 +111,22 @@ static void storePublication(const PublicationInfo& handle, Json::Value& block)
     pub["type"] = handle.type;
     block["publications"].append(pub);
 }
+
+static void
+    storeTranslator(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
+{
+    Json::Value trans = Json::objectValue;
+    trans["name"] = handle.key;
+    if (includeID) {
+        trans["parent"] = handle.getFederateId().baseValue();
+        trans["handle"] = handle.getInterfaceHandle().baseValue();
+    }
+    trans["units"] = handle.units;
+    trans["type"] = handle.type;
+    addTags(trans, handle);
+    block["translators"].append(trans);
+}
+
 static void storeFilter(const BasicHandleInfo& handle, Json::Value& block, bool includeID = false)
 {
     Json::Value filt = Json::objectValue;
@@ -142,6 +158,7 @@ void generateInterfaceConfig(Json::Value& iblock,
     bool hasEpts{false};
     bool hasInputs{false};
     bool hasFilt{false};
+    bool hasTranslators{false};
     bool allInfo = !fed.isValid();
     for (const auto& handle : hm) {
         if (handle.handle.fed_id == fed || allInfo) {
@@ -159,6 +176,13 @@ void generateInterfaceConfig(Json::Value& iblock,
                         hasInputs = true;
                     }
                     storeInput(handle, iblock, allInfo);
+                    break;
+                case InterfaceType::TRANSLATOR:
+                    if (!hasTranslators) {
+                        iblock["translators"] = Json::arrayValue;
+                        hasTranslators = true;
+                    }
+                    storeTranslator(handle, iblock, allInfo);
                     break;
                 case InterfaceType::PUBLICATION:
                     if (!hasPubs) {
@@ -192,7 +216,7 @@ std::string generateInterfaceQueryResults(std::string_view request,
             [](auto& handle) { return handle.key; },
             [fed](auto& handle) {
                 return ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                        handle.handleType == InterfaceType::INPUT && !handle.key.empty());
+                        (handle.handleType == InterfaceType::INPUT || handle.handleType==InterfaceType::TRANSLATOR) && !handle.key.empty());
             });
     }
     if (request == "input_details") {
@@ -201,7 +225,8 @@ std::string generateInterfaceQueryResults(std::string_view request,
         base["inputs"] = Json::arrayValue;
         for (const auto& handle : handles) {
             if ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                handle.handleType == InterfaceType::INPUT && !handle.key.empty()) {
+                   ( handle.handleType == InterfaceType::INPUT ||
+                handle.handleType == InterfaceType::TRANSLATOR) && !handle.key.empty()) {
                 storeInput(handle, base, !fed.isValid());
             }
         }
@@ -213,7 +238,7 @@ std::string generateInterfaceQueryResults(std::string_view request,
             [](auto& handle) { return handle.key; },
             [fed](auto& handle) {
                 return ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                        handle.handleType == InterfaceType::PUBLICATION && !handle.key.empty());
+                        (handle.handleType == InterfaceType::PUBLICATION || handle.handleType==InterfaceType::TRANSLATOR) && !handle.key.empty());
             });
     }
     if (request == "publication_details") {
@@ -222,7 +247,8 @@ std::string generateInterfaceQueryResults(std::string_view request,
         base["publications"] = Json::arrayValue;
         for (const auto& handle : handles) {
             if ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                handle.handleType == InterfaceType::PUBLICATION && !handle.key.empty()) {
+                   ( handle.handleType == InterfaceType::PUBLICATION ||
+                handle.handleType == InterfaceType::TRANSLATOR) && !handle.key.empty()) {
                 storePublication(handle, base, !fed.isValid());
             }
         }
@@ -249,13 +275,34 @@ std::string generateInterfaceQueryResults(std::string_view request,
         }
         return fileops::generateJsonString(base);
     }
+    if (request == "translators") {
+        return generateStringVector_if(
+            handles,
+            [](auto& handle) { return handle.key; },
+            [fed](auto& handle) {
+                return ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                        handle.handleType == InterfaceType::TRANSLATOR && !handle.key.empty());
+            });
+    }
+    if (request == "translator_details") {
+        Json::Value base;
+        addHeaderInfo(base);
+        base["translators"] = Json::arrayValue;
+        for (const auto& handle : handles) {
+            if ((!fed.isValid() || handle.handle.fed_id == fed) &&
+                handle.handleType == InterfaceType::TRANSLATOR && !handle.key.empty()) {
+                storeTranslator(handle, base, !fed.isValid());
+            }
+        }
+        return fileops::generateJsonString(base);
+    }
     if (request == "endpoints") {
         return generateStringVector_if(
             handles,
             [](auto& handle) { return handle.key; },
             [fed](auto& handle) {
                 return ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                        handle.handleType == InterfaceType::ENDPOINT && !handle.key.empty());
+                        (handle.handleType == InterfaceType::ENDPOINT || handle.handleType==InterfaceType::TRANSLATOR) && !handle.key.empty());
             });
     }
     if (request == "endpoint_details") {
@@ -264,7 +311,8 @@ std::string generateInterfaceQueryResults(std::string_view request,
         base["endpoints"] = Json::arrayValue;
         for (const auto& handle : handles) {
             if ((!fed.isValid() || handle.handle.fed_id == fed) &&
-                handle.handleType == InterfaceType::ENDPOINT && !handle.key.empty()) {
+                    (handle.handleType == InterfaceType::ENDPOINT ||
+                handle.handleType == InterfaceType::TRANSLATOR) && !handle.key.empty()) {
                 storeEndpoint(handle, base, !fed.isValid());
             }
         }
