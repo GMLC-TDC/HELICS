@@ -156,7 +156,7 @@ class NullTranslatorOperator final: public TranslatorOperator {
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> /*message*/) override { return {}; }
 
     /** convert a value to a message*/
-    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& /*value*/)
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& /*value*/) override
     {
         return nullptr;
     }

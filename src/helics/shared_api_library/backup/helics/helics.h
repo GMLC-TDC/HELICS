@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -395,7 +395,7 @@ typedef enum {
     /** a translator type that converts to and from JSON*/
     HELICS_TRANSLATOR_TYPE_JSON = 11,
     /** a translator type that just encodes the message again in binary*/
-    HELICS_TRANSLATOR_TYPE_BINARY = 12,
+    HELICS_TRANSLATOR_TYPE_BINARY = 12
 
 } HelicsTranslatorTypes;
 
@@ -4379,7 +4379,7 @@ HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
 /**
  * Create a source Translator on the specified federate.
  *
- * @details Translators can be created through a federate or a core, linking through a federate allows
+ * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
  *
  * @param fed The federate to register through.
@@ -4398,7 +4398,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate f
 /**
  * Create a global source translator through a federate.
  *
- * @details Translators can be created through a federate or a core, linking through a federate allows
+ * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
  *
  * @param fed The federate to register through.
@@ -4418,7 +4418,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFede
 /**
  * Create a source Translator on the specified core.
  *
- * @details Translators can be created through a federate or a core, linking through a federate allows
+ * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
  *
  * @param core The core to register through.
@@ -4453,9 +4453,8 @@ HELICS_EXPORT int helicsFederateGetTranslatorCount(HelicsFederate fed);
  * @param[in,out] err The error object to complete if there is an error.
 
  *
- * @return A HelicsTranslator object, the object will not be valid and err will contain an error code if no translator with the specified
- name
- * exists.
+ * @return A HelicsTranslator object. If no translator with the specified name exists, the object will not be valid and
+ * err will contain an error code.
  */
 HELICS_EXPORT HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* name, HelicsError* err);
 /**

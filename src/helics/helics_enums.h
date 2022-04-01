@@ -369,7 +369,7 @@ typedef enum {
     /** a translator type that converts to and from JSON*/
     HELICS_TRANSLATOR_TYPE_JSON = 11,
     /** a translator type that just encodes the message again in binary*/
-    HELICS_TRANSLATOR_TYPE_BINARY = 12,
+    HELICS_TRANSLATOR_TYPE_BINARY = 12
 
 } HelicsTranslatorTypes;
 

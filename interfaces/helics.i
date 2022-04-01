@@ -29,6 +29,7 @@
 %ignore helicsCoreSetLoggingCallback;
 %ignore helicsFederateSetLoggingCallback;
 %ignore helicsFilterSetCustomCallback;
+%ignore helicsTranslatorSetCustomCallback;
 %ignore helicsFederateSetQueryCallback;
 %ignore helicsQueryBufferFill;
 %ignore helicsLoadSignalHandlerCallback;
