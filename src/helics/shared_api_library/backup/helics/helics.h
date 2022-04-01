@@ -623,6 +623,12 @@ HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
 /** convert a data buffer to an int*/
 HELICS_EXPORT int64_t helicsDataBufferToInt(HelicsDataBuffer data);
 
+/** convert a data buffer to a double*/
+HELICS_EXPORT double helicsDataBufferToDouble(HelicsDataBuffer data);
+
+/** convert a data buffer to a boolean*/
+HELICS_EXPORT HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
+
 /**
  * @file
  * @brief Common functions for the HELICS C api.
