@@ -2584,8 +2584,7 @@ void CommonCore::loadBasicJsonInfo(
         for (const auto& fed : loopFederates) {
             Json::Value fedval;
             fedval["attributes"] = Json::objectValue;
-            fedval["attributes"]
-                ["id"] = fed.fed->global_id.load().baseValue();
+            fedval["attributes"]["id"] = fed.fed->global_id.load().baseValue();
             fedval["attributes"]["name"] = fed.fed->getIdentifier();
             fedval["attributes"]["parent"] = global_broker_id_local.baseValue();
             fedLoader(fedval, fed);
@@ -4690,56 +4689,44 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
 void CommonCore::processErrorCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
-    case CMD_WARNING:
-        if (cmd.dest_id == global_broker_id_local) {
-            sendToLogger(cmd.source_id,
-                         LogLevels::WARNING,
-                         cmd.getString(0),
-                         cmd.payload.to_string());
-        } else {
-            routeMessage(cmd);
-        }
-        break;
-    case CMD_ERROR:
-    case CMD_LOCAL_ERROR:
-        if (cmd.dest_id == global_broker_id_local) {
-            if (cmd.source_id == higher_broker_id || cmd.source_id == parent_broker_id ||
-                cmd.source_id == gRootBrokerID) {
-                sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                setErrorState(cmd.messageID, cmd.payload.to_string());
-
-            } else {
-                sendToLogger(parent_broker_id,
-                             LogLevels::ERROR_LEVEL,
-                             getFederateNameNoThrow(cmd.source_id),
+        case CMD_WARNING:
+            if (cmd.dest_id == global_broker_id_local) {
+                sendToLogger(cmd.source_id,
+                             LogLevels::WARNING,
+                             cmd.getString(0),
                              cmd.payload.to_string());
-                auto fed = loopFederates.find(cmd.source_id);
-                if (fed != loopFederates.end()) {
-                    fed->state = OperatingState::ERROR_STATE;
-                } else if (cmd.source_id == filterFedID) {
-                    filterFed->handleMessage(cmd);
-                    // filterFed->
-                }
-
-                if (hasTimeDependency) {
-                    timeCoord->processTimeMessage(cmd);
-                }
+            } else {
+                routeMessage(cmd);
             }
-            if (terminate_on_error) {
-                if (getBrokerState() != BrokerState::errored &&
-                    getBrokerState() != BrokerState::connected_error) {
+            break;
+        case CMD_ERROR:
+        case CMD_LOCAL_ERROR:
+            if (cmd.dest_id == global_broker_id_local) {
+                if (cmd.source_id == higher_broker_id || cmd.source_id == parent_broker_id ||
+                    cmd.source_id == gRootBrokerID) {
                     sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                    setBrokerState(BrokerState::errored);
+                    setErrorState(cmd.messageID, cmd.payload.to_string());
+
+                } else {
+                    sendToLogger(parent_broker_id,
+                                 LogLevels::ERROR_LEVEL,
+                                 getFederateNameNoThrow(cmd.source_id),
+                                 cmd.payload.to_string());
+                    auto fed = loopFederates.find(cmd.source_id);
+                    if (fed != loopFederates.end()) {
+                        fed->state = OperatingState::ERROR_STATE;
+                    } else if (cmd.source_id == filterFedID) {
+                        filterFed->handleMessage(cmd);
+                        // filterFed->
+                    }
+
+                    if (hasTimeDependency) {
+                        timeCoord->processTimeMessage(cmd);
+                    }
                 }
-                cmd.setAction(CMD_GLOBAL_ERROR);
-                cmd.source_id = global_broker_id_local;
-                cmd.dest_id = gRootBrokerID;
-                transmit(parent_route_id, std::move(cmd));
-            }
-        } else {
-            if (cmd.dest_id == parent_broker_id) {
                 if (terminate_on_error) {
-                    if (getBrokerState() != BrokerState::errored) {
+                    if (getBrokerState() != BrokerState::errored &&
+                        getBrokerState() != BrokerState::connected_error) {
                         sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
                         setBrokerState(BrokerState::errored);
                     }
@@ -4747,33 +4734,45 @@ void CommonCore::processErrorCommand(ActionMessage& cmd)
                     cmd.source_id = global_broker_id_local;
                     cmd.dest_id = gRootBrokerID;
                     transmit(parent_route_id, std::move(cmd));
-                    break;
                 }
-                if (cmd.source_id.isValid()) {
-                    auto fed = loopFederates.find(cmd.source_id);
-                    if (fed != loopFederates.end()) {
-                        fed->state = OperatingState::ERROR_STATE;
+            } else {
+                if (cmd.dest_id == parent_broker_id) {
+                    if (terminate_on_error) {
+                        if (getBrokerState() != BrokerState::errored) {
+                            sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
+                            setBrokerState(BrokerState::errored);
+                        }
+                        cmd.setAction(CMD_GLOBAL_ERROR);
+                        cmd.source_id = global_broker_id_local;
+                        cmd.dest_id = gRootBrokerID;
+                        transmit(parent_route_id, std::move(cmd));
+                        break;
+                    }
+                    if (cmd.source_id.isValid()) {
+                        auto fed = loopFederates.find(cmd.source_id);
+                        if (fed != loopFederates.end()) {
+                            fed->state = OperatingState::ERROR_STATE;
+                        }
                     }
                 }
+                routeMessage(cmd);
             }
-            routeMessage(cmd);
-        }
-        break;
-    case CMD_GLOBAL_ERROR:
+            break;
+        case CMD_GLOBAL_ERROR:
 
-        if (getBrokerState() == BrokerState::connecting) {
-            processDisconnect();
-        }
-        setErrorState(cmd.messageID, cmd.payload.to_string());
-        if (isConnected()) {
-            sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-            if (!(cmd.source_id == higher_broker_id || cmd.source_id == gRootBrokerID)) {
-                transmit(parent_route_id, std::move(cmd));
+            if (getBrokerState() == BrokerState::connecting) {
+                processDisconnect();
             }
-        }
-        break;
-    default:
-        break;
+            setErrorState(cmd.messageID, cmd.payload.to_string());
+            if (isConnected()) {
+                sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
+                if (!(cmd.source_id == higher_broker_id || cmd.source_id == gRootBrokerID)) {
+                    transmit(parent_route_id, std::move(cmd));
+                }
+            }
+            break;
+        default:
+            break;
     }
 }
 
