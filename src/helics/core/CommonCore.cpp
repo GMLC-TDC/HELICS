@@ -4581,7 +4581,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
                         if (minFederateState() != OperatingState::DISCONNECTED ||
-                            filterFed != nullptr || translatorFed !=nullptr) {
+                            filterFed != nullptr || translatorFed != nullptr) {
                             cmd.setAction(CMD_DISCONNECT_FED_ACK);
                             cmd.dest_id = cmd.source_id;
                             cmd.source_id = parent_broker_id;
@@ -5073,7 +5073,7 @@ bool CommonCore::checkAndProcessDisconnect()
             return true;
         }
     }
-    if (translatorFed!=nullptr) {
+    if (translatorFed != nullptr) {
         if (!translatorFed->hasActiveTimeDependencies()) {
             ActionMessage dis(CMD_DISCONNECT);
             dis.source_id = global_broker_id_local;
