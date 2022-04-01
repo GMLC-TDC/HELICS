@@ -335,6 +335,9 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                         timeUpdateCallback(currentTime, false);
                     }
                     initializeToExecuteStateTransition(res);
+                    if (timeRequestReturnCallback) {
+                        timeRequestReturnCallback(currentTime, false);
+                    }
                     break;
                 case IterationResult::ITERATING:
                     updateFederateMode(Modes::INITIALIZING);
@@ -426,6 +429,9 @@ IterationResult Federate::enterExecutingModeComplete()
                             timeUpdateCallback(currentTime, false);
                         }
                         initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
+                        if (timeRequestReturnCallback) {
+                            timeRequestReturnCallback(currentTime, false);
+                        }
                         break;
                     case IterationResult::ITERATING:
                         updateFederateMode(Modes::INITIALIZING);
@@ -495,11 +501,20 @@ void Federate::setLoggingCallback(
     coreObject->setLoggingCallback(fedID, logFunction);
 }
 
+void Federate::setTimeRequestEntryCallback(std::function<void(Time,Time, bool)> callback)
+{
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
+        throw(InvalidFunctionCall(
+            "cannot update time request callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    timeRequestEntryCallback = std::move(callback);
+}
+
 void Federate::setTimeUpdateCallback(std::function<void(Time, bool)> callback)
 {
     if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
         throw(InvalidFunctionCall(
-            "cannot update time callback during an async operation"));  // LCOV_EXCL_LINE
+            "cannot update time update callback during an async operation"));  // LCOV_EXCL_LINE
     }
     timeUpdateCallback = std::move(callback);
 }
@@ -513,6 +528,15 @@ void Federate::setModeUpdateCallback(std::function<void(Modes, Modes)> callback)
             "cannot update mode update callback during an async operation"));  // LCOV_EXCL_LINE
     }
     modeUpdateCallback = std::move(callback);
+}
+
+void Federate::setTimeRequestReturnCallback(std::function<void(Time, bool)> callback)
+{
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
+        throw(InvalidFunctionCall(
+            "cannot update time request return callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    timeRequestReturnCallback = std::move(callback);
 }
 
 void Federate::setFlagOption(int flag, bool flagValue)
@@ -687,10 +711,13 @@ Time Federate::requestTime(Time nextInternalTimeStep)
     switch (currentMode) {
         case Modes::EXECUTING:
             try {
+                if (timeRequestEntryCallback) {
+                    timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
+                }
                 auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
                 updateSimulationTime(newTime, currentTime, false);
-                if (newTime == Time::maxVal()) {
-                    updateFederateMode(Modes::FINISHED);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(newTime, false);
                 }
                 return newTime;
             }
@@ -712,13 +739,22 @@ Time Federate::requestTime(Time nextInternalTimeStep)
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
 {
     if (currentMode == Modes::EXECUTING) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime, nextInternalTimeStep, iterate!=IterationRequest::NO_ITERATIONS);
+        }
         auto iterativeTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterate);
         switch (iterativeTime.state) {
             case IterationResult::NEXT_STEP:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, false);
+                }
                 break;
             case IterationResult::ITERATING:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, true);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, true);
+                }
                 break;
             case IterationResult::HALTED:
                 updateFederateMode(Modes::FINISHED);
@@ -742,6 +778,9 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_TIME)) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
+        }
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep]() {
@@ -756,6 +795,9 @@ void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationReq
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_ITERATIVE_TIME)) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime, nextInternalTimeStep, iterate!=IterationRequest::NO_ITERATIONS);
+        }
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestIterativeFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep, iterate]() {
@@ -774,6 +816,9 @@ Time Federate::requestTimeComplete()
         auto newTime = asyncInfo->timeRequestFuture.get();
         asyncInfo.unlock();  // remove the lock;
         updateSimulationTime(newTime, currentTime, false);
+        if (timeRequestReturnCallback) {
+            timeRequestReturnCallback(newTime, false);
+        }
         return newTime;
     }
     throw(InvalidFunctionCall(
@@ -791,9 +836,15 @@ iteration_time Federate::requestTimeIterativeComplete()
         switch (iterativeTime.state) {
             case IterationResult::NEXT_STEP:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, false);
+                }
                 break;
             case IterationResult::ITERATING:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, true);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, true);
+                }
                 break;
             case IterationResult::HALTED:
                 updateFederateMode(Modes::FINISHED);
@@ -858,6 +909,9 @@ void Federate::updateSimulationTime(Time newTime, Time oldTime, bool iterating)
         timeUpdateCallback(newTime, iterating);
     }
     updateTime(newTime, oldTime);
+    if (newTime == Time::maxVal()) {
+        updateFederateMode(Modes::FINISHED);
+    }
 }
 
 void Federate::updateTime(Time /*newTime*/, Time /*oldTime*/)

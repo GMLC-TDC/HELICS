@@ -349,23 +349,17 @@ void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage me
         return;
     }
 
+    auto ptr = getMessageUniquePtr(message, err);
     auto* mess = getMessageObj(message, err);
-    if (mess == nullptr) {
+    if (!ptr) {
         return;
     }
-    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
-    if (messages != nullptr) {
-        auto ptr = messages->extractMessage(mess->counter);
-        if (ptr) {
-            try {
-                endObj->endPtr->send(std::move(ptr));
-            }
-            catch (...) {
-                helicsErrorHandler(err);
-            }
-        }
-    } else {
-        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, emptyMessageErrorString);
+
+    try {
+        endObj->endPtr->send(std::move(ptr));
+    }
+    catch (...) {
+        helicsErrorHandler(err);
     }
 }
 
@@ -830,6 +824,26 @@ helics::Message* getMessageObj(HelicsMessage message, HelicsError* err)
     return mess;
 }
 
+std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, HelicsError* err)
+{
+    static constexpr char invalidLocationString[] = "the message is NULL";
+    auto* mess = getMessageObj(message, err);
+    if (mess == nullptr) {
+        return nullptr;
+    }
+    auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
+    if (messages != nullptr) {
+        auto ptr = messages->extractMessage(mess->counter);
+        if (ptr) {
+            return ptr;
+        } else {
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidLocationString);
+        }
+    } else {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, emptyMessageErrorString);
+    }
+    return nullptr;
+}
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& message)
 {
     if (message) {

@@ -1059,10 +1059,11 @@ TEST_F(filter_tests, file_load)
     // mFed.disconnect ();
 }
 
-static void filterFunc1(HelicsMessage mess, void* /*unused*/)
+static HelicsMessage filterFunc1(HelicsMessage mess, void* /*unused*/)
 {
     auto time = helicsMessageGetTime(mess);
     helicsMessageSetTime(mess, time + 2.5, nullptr);
+    return mess;
 }
 
 TEST_F(filter_tests, callback_test)
