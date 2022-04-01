@@ -3200,6 +3200,14 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "brokers") {
         return generateStringVector(mBrokers, [](auto& brk) { return brk.name; });
     }
+    if (request == "subbrokers") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return !brk._core; });
+    }
+    if (request == "cores") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return brk._core; });
+    }
     if (request == "current_state") {
         Json::Value base;
         addBaseInformation(base, !isRootc);
@@ -3208,9 +3216,11 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         base["federates"] = Json::arrayValue;
         for (const auto& fed : mFederates) {
             Json::Value fedstate;
-            fedstate["name"] = fed.name;
+            fedstate["attributes"] = Json::objectValue;
+            fedstate["attributes"]["name"] = fed.name;
             fedstate["state"] = state_string(fed.state);
-            fedstate["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["parent"] = fed.parent.baseValue();
             base["federates"].append(std::move(fedstate));
         }
         base["cores"] = Json::arrayValue;
@@ -3218,8 +3228,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         for (const auto& brk : mBrokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
-            brkstate["name"] = brk.name;
-            brkstate["id"] = brk.global_id.baseValue();
+            brkstate["attributes"] = Json::objectValue;
+            brkstate["attributes"]["name"] = brk.name;
+            brkstate["attributes"]["id"] = brk.global_id.baseValue();
+            brkstate["attributes"]["parent"] = brk.parent.baseValue();
             if (brk._core) {
                 base["cores"].append(std::move(brkstate));
             } else {
@@ -3440,8 +3452,10 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                     if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
-                        brkstate["name"] = broker.name;
-                        brkstate["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"] = Json::objectValue;
+                        brkstate["attributes"]["name"] = broker.name;
+                        brkstate["attributes"]["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"]["parent"] = broker.parent.baseValue();
                         if (broker._core) {
                             if (!hasCores) {
                                 base["cores"] = Json::arrayValue;

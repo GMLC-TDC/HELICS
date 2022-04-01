@@ -4506,6 +4506,11 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                         auto element = fileops::loadJsonStr(str);
                         base["federates"].append(element);
                     }
+                    if (translatorFed != nullptr) {
+                        auto str = translatorFed->query("global_time_debugging");
+                        auto element = fileops::loadJsonStr(str);
+                        base["federates"].append(element);
+                    }
                     auto debugString = fileops::generateJsonString(base);
                     debugString.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(global_broker_id_local, identifier, debugString);
@@ -4553,6 +4558,13 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     filterThread.store(std::thread::id{});
                 }
             }
+            if (translatorThread.load() == std::this_thread::get_id()) {
+                if (translatorFed != nullptr) {
+                    delete translatorFed;
+                    translatorFed = nullptr;
+                    translatorThread.store(std::thread::id{});
+                }
+            }
             activeQueries.fulfillAllPromises("#disconnected");
             break;
         case CMD_DISCONNECT:
@@ -4569,7 +4581,7 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                         cmd.setAction(CMD_DISCONNECT_FED);
                         transmit(parent_route_id, cmd);
                         if (minFederateState() != OperatingState::DISCONNECTED ||
-                            filterFed != nullptr) {
+                            filterFed != nullptr || translatorFed !=nullptr) {
                             cmd.setAction(CMD_DISCONNECT_FED_ACK);
                             cmd.dest_id = cmd.source_id;
                             cmd.source_id = parent_broker_id;
@@ -4717,7 +4729,8 @@ void CommonCore::processErrorCommand(ActionMessage& cmd)
                         fed->state = OperatingState::ERROR_STATE;
                     } else if (cmd.source_id == filterFedID) {
                         filterFed->handleMessage(cmd);
-                        // filterFed->
+                    } else if (cmd.source_id == translatorFedID) {
+                        translatorFed->handleMessage(cmd);
                     }
 
                     if (hasTimeDependency) {
@@ -5057,6 +5070,16 @@ bool CommonCore::checkAndProcessDisconnect()
             transmit(parent_route_id, dis);
             dis.source_id = filterFedID;
             filterFed->handleMessage(dis);
+            return true;
+        }
+    }
+    if (translatorFed!=nullptr) {
+        if (!translatorFed->hasActiveTimeDependencies()) {
+            ActionMessage dis(CMD_DISCONNECT);
+            dis.source_id = global_broker_id_local;
+            transmit(parent_route_id, dis);
+            dis.source_id = translatorFedID;
+            translatorFed->handleMessage(dis);
             return true;
         }
     }

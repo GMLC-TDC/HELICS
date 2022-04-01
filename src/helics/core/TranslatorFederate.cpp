@@ -372,9 +372,10 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
     }
     if (queryStr == "current_state") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
         base["publications"] = 0;
         base["input"] = 0;
@@ -384,17 +385,19 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
     }
     if (queryStr == "global_state") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
         return fileops::generateJsonString(base);
     }
     if (queryStr == "global_time_debugging") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
         mCoord.generateDebuggingTimeInfo(base);
         return fileops::generateJsonString(base);
@@ -415,9 +418,10 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
     }
     if (queryStr == "data_flow_graph") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         if (translators.size() > 0) {
             base["translators"] = Json::arrayValue;
             for (const auto& trans : translators) {
@@ -441,18 +445,20 @@ std::string TranslatorFederate::query(const std::string& queryStr) const
     }
     if (queryStr == "global_time") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         base["granted_time"] = static_cast<double>(mCoord.getGrantedTime());
         base["send_time"] = static_cast<double>(mCoord.allowedSendTime());
         return fileops::generateJsonString(base);
     }
     if (queryStr == "dependency_graph") {
         Json::Value base;
-        base["name"] = mName;
-        base["id"] = mFedID.baseValue();
-        base["parent"] = mCoreID.baseValue();
+        base["attributes"] = Json::objectValue;
+        base["attributes"]["name"] = mName;
+        base["attributes"]["id"] = mFedID.baseValue();
+        base["attributes"]["parent"] = mCoreID.baseValue();
         base["dependents"] = Json::arrayValue;
         for (auto& dep : mCoord.getDependents()) {
             base["dependents"].append(dep.baseValue());
