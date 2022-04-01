@@ -128,9 +128,9 @@ TEST_F(query, federate_map)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -150,9 +150,9 @@ TEST_F(query, federate_map2)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(val["cores"][1]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][1]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto v2 = val["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][1]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][1]["attributes"]["id"].asInt());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -172,14 +172,14 @@ TEST_F(query, federate_map3)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["brokers"].size(), 1U);
-    EXPECT_EQ(val["brokers"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["brokers"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto brk = val["brokers"][0];
     EXPECT_EQ(brk["cores"].size(), 2U);
     EXPECT_EQ(brk["brokers"].size(), 0U);
     EXPECT_EQ(brk["cores"][1]["federates"].size(), 1U);
-    EXPECT_EQ(brk["cores"][1]["parent"].asInt(), brk["id"].asInt());
+    EXPECT_EQ(brk["cores"][1]["attributes"]["parent"].asInt(), brk["attributes"]["id"].asInt());
     auto v2 = brk["cores"][1]["federates"][0];
-    EXPECT_EQ(v2["parent"].asInt(), brk["cores"][1]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), brk["cores"][1]["attributes"]["id"].asInt());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -199,9 +199,9 @@ TEST_F(query, dependency_graph)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
     core = nullptr;
     vFed1->finalize();
     vFed2->finalize();
@@ -470,7 +470,7 @@ TEST_F(query, global_state)
     val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 2U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 1U);
-    if (val["cores"][0]["federates"][0]["name"].asString() == "fed0") {
+    if (val["cores"][0]["federates"][0]["attributes"]["name"].asString() == "fed0") {
         EXPECT_STREQ(val["cores"][0]["federates"][0]["state"].asCString(), "error");
     } else {
         EXPECT_STREQ(val["cores"][1]["federates"][0]["state"].asCString(), "error");
@@ -717,10 +717,10 @@ TEST_F(query, data_flow_graph_ordered)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");
@@ -752,13 +752,13 @@ TEST_F(query, data_flow_graph_concurrent)
     auto val = loadJsonStr(res);
     EXPECT_EQ(val["cores"].size(), 1U);
     EXPECT_EQ(val["cores"][0]["federates"].size(), 2U);
-    EXPECT_EQ(val["cores"][0]["parent"].asInt(), val["id"].asInt());
+    EXPECT_EQ(val["cores"][0]["attributes"]["parent"].asInt(), val["attributes"]["id"].asInt());
     auto v2 = val["cores"][0]["federates"][1];
     auto v1 = val["cores"][0]["federates"][0];
-    if (v1["id"].asInt() > v2["id"].asInt()) {
+    if (v1["attributes"]["id"].asInt() > v2["attributes"]["id"].asInt()) {
         std::swap(v1, v2);
     }
-    EXPECT_EQ(v2["parent"].asInt(), val["cores"][0]["id"].asInt());
+    EXPECT_EQ(v2["attributes"]["parent"].asInt(), val["cores"][0]["attributes"]["id"].asInt());
     EXPECT_EQ(v2["publications"].size(), 1U);
     EXPECT_EQ(v1["inputs"].size(), 1U);
     EXPECT_EQ(v1["inputs"][0]["key"], "ipt1");

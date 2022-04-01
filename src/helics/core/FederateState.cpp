@@ -2129,9 +2129,11 @@ std::pair<std::string, std::string> FederateState::waitCommand()
 std::string FederateState::processQueryActual(std::string_view query) const
 {
     auto addHeader = [this](Json::Value& base) {
-        base["name"] = getIdentifier();
-        base["id"] = global_id.load().baseValue();
-        base["parent"] = parent_->getGlobalId().baseValue();
+        Json::Value att = Json::objectValue;
+        att["name"] = getIdentifier();
+        att["id"] = global_id.load().baseValue();
+        att["parent"] = parent_->getGlobalId().baseValue();
+        base["attributes"] = att;
     };
 
     auto qres = generateInterfaceQueryResults(query, interfaceInformation, addHeader);

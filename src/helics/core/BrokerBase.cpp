@@ -496,8 +496,10 @@ void BrokerBase::addBaseInformation(Json::Value& base, bool hasParent) const
     object["id"] = global_id.load().baseValue();
     if (hasParent) {
         object["parent"] = higher_broker_id.baseValue();
+    } else {
+        object["parent"] = 0;
     }
-    base["object"] = object;
+    base["attributes"] = object;
 }
 
 void BrokerBase::setLoggerFunction(
