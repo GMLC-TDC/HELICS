@@ -97,6 +97,10 @@ class Filter {
     }
     int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
 
+    void setCallback(HelicsMessage (*filtCall)(HelicsMessage message, void* userData))
+    {
+        helicsFilterSetCustomCallback(filt, filtCall, userData, HELICS_IGNORE_ERROR);
+    }
   protected:
     HelicsFilter filt;  //!< the reference to the underlying publication
 };
