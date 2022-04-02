@@ -101,6 +101,7 @@ class Filter {
     {
         helicsFilterSetCustomCallback(filt, filtCall, userData, HELICS_IGNORE_ERROR);
     }
+
   protected:
     HelicsFilter filt;  //!< the reference to the underlying publication
 };
