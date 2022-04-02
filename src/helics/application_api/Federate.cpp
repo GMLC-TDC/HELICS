@@ -501,7 +501,7 @@ void Federate::setLoggingCallback(
     coreObject->setLoggingCallback(fedID, logFunction);
 }
 
-void Federate::setTimeRequestEntryCallback(std::function<void(Time,Time, bool)> callback)
+void Federate::setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback)
 {
     if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
         throw(InvalidFunctionCall(
@@ -740,7 +740,9 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
 {
     if (currentMode == Modes::EXECUTING) {
         if (timeRequestEntryCallback) {
-            timeRequestEntryCallback(currentTime, nextInternalTimeStep, iterate!=IterationRequest::NO_ITERATIONS);
+            timeRequestEntryCallback(currentTime,
+                                     nextInternalTimeStep,
+                                     iterate != IterationRequest::NO_ITERATIONS);
         }
         auto iterativeTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterate);
         switch (iterativeTime.state) {
@@ -796,7 +798,9 @@ void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationReq
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_ITERATIVE_TIME)) {
         if (timeRequestEntryCallback) {
-            timeRequestEntryCallback(currentTime, nextInternalTimeStep, iterate!=IterationRequest::NO_ITERATIONS);
+            timeRequestEntryCallback(currentTime,
+                                     nextInternalTimeStep,
+                                     iterate != IterationRequest::NO_ITERATIONS);
         }
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestIterativeFuture =

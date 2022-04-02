@@ -1065,10 +1065,11 @@ HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
     // LCOV_EXCL_STOP
 }
 
-void helicsFederateSetTimeRequestEntryCallback(HelicsFederate fed,
-                                                void (*requestTimeEntry)(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userdata),
-                                                void* userdata,
-                                                HelicsError* err)
+void helicsFederateSetTimeRequestEntryCallback(
+    HelicsFederate fed,
+    void (*requestTimeEntry)(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userdata),
+    void* userdata,
+    HelicsError* err)
 {
     auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
@@ -1081,8 +1082,8 @@ void helicsFederateSetTimeRequestEntryCallback(HelicsFederate fed,
         } else {
             fedptr->setTimeRequestEntryCallback(
                 [requestTimeEntry, userdata](helics::Time currentTime, helics::Time requestTime, bool iterating) {
-                requestTimeEntry(currentTime, requestTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
-            });
+                    requestTimeEntry(currentTime, requestTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
+                });
         }
     }
     catch (...) {  // LCOV_EXCL_LINE
@@ -1114,12 +1115,10 @@ void helicsFederateSetStateChangeCallback(HelicsFederate fed,
     }
 }
 
-
-void helicsFederateSetTimeRequestReturnCallback(
-    HelicsFederate fed,
-    void (*requestTimeReturn)(HelicsTime newTime, HelicsBool iterating, void* userdata),
-    void* userdata,
-    HelicsError* err)
+void helicsFederateSetTimeRequestReturnCallback(HelicsFederate fed,
+                                                void (*requestTimeReturn)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                                void* userdata,
+                                                HelicsError* err)
 {
     auto* fedptr = getFed(fed, err);
     if (fedptr == nullptr) {
@@ -1131,7 +1130,7 @@ void helicsFederateSetTimeRequestReturnCallback(
             fedptr->setTimeRequestReturnCallback({});
         } else {
             fedptr->setTimeRequestReturnCallback([requestTimeReturn, userdata](helics::Time newTime, bool iterating) {
-                requestTimeReturn(newTime, (iterating)?HELICS_TRUE:HELICS_FALSE, userdata);
+                requestTimeReturn(newTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
             });
         }
     }

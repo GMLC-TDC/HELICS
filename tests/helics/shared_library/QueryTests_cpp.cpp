@@ -88,8 +88,8 @@ TEST_F(query_tests, exists)
     core1.waitForDisconnect();
 }
 
-
-TEST_F(query_tests, callback) {
+TEST_F(query_tests, callback)
+{
     SetupTest<helicscpp::MessageFederate>("test_2", 2, 1.0);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helicscpp::MessageFederate>(1);

@@ -106,13 +106,13 @@ TEST_F(timing_tests, callbackSequence)
     vFed1->setTimeRequestReturnCallback(timeRequestReturn);
 
     vFed1->enterExecutingMode();
-    //state change callback would have been called twice
-    EXPECT_EQ(seqVal[0], 0); //should not have been called
+    // state change callback would have been called twice
+    EXPECT_EQ(seqVal[0], 0);  // should not have been called
     EXPECT_EQ(seqVal[1], 2);
     EXPECT_EQ(seqVal[2], 3);
     EXPECT_EQ(seqVal[3], 4);
-    
-    //reset the sequence counter
+
+    // reset the sequence counter
     sequence = 1;
     seqVal[0] = 99;
     seqVal[1] = 99;
@@ -120,7 +120,7 @@ TEST_F(timing_tests, callbackSequence)
     seqVal[3] = 99;
     vFed1->requestTime(4.0);
 
-    EXPECT_EQ(seqVal[0], 1); 
+    EXPECT_EQ(seqVal[0], 1);
     EXPECT_EQ(seqVal[1], 99);
     EXPECT_EQ(seqVal[2], 2);
     EXPECT_EQ(seqVal[3], 3);

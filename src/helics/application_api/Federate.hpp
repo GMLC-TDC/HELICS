@@ -93,10 +93,11 @@ class HELICS_CXX_EXPORT Federate {
         asyncCallInfo;  //!< pointer to a class defining the async call information
     std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
-    std::function<void(Time,Time, bool)> timeRequestEntryCallback;
+    std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
     std::function<void(Modes, Modes)> modeUpdateCallback;
     std::function<void(Time, bool)> timeRequestReturnCallback;
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -327,11 +328,13 @@ class HELICS_CXX_EXPORT Federate {
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
     /** register a callback function to call when a timeRequest function is called
-    @details this callback is executed prior to any blocking operation on any valid timeRequest method it will execute in the calling thread
-    @param callback the function to call; the function signature is void(Time, Time,bool) where the first Time
-    value is the current time and the second is the requestedTime.  The boolean is set to true if the request is possibly iterating
+    @details this callback is executed prior to any blocking operation on any valid timeRequest
+    method it will execute in the calling thread
+    @param callback the function to call; the function signature is void(Time, Time,bool) where the
+    first Time value is the current time and the second is the requestedTime.  The boolean is set to
+    true if the request is possibly iterating
     */
-    void setTimeRequestEntryCallback(std::function<void(Time, Time,bool)> callback);
+    void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
 
     /** register a callback function to call when the time gets updated and before other value
     callbacks are executed
@@ -353,12 +356,13 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setModeUpdateCallback(std::function<void(Modes, Modes)> callback);
 
-     /** register a callback function to call when a timeRequest function returns
-   @details this callback is executed after all other callbacks and is the last thing executed before returning
-   @param callback the function to call; the function signature is void(Time, bool) where the
-   Time value is the new time and the boolean is set to
-   true if the request is an iteration
-   */
+    /** register a callback function to call when a timeRequest function returns
+  @details this callback is executed after all other callbacks and is the last thing executed before
+  returning
+  @param callback the function to call; the function signature is void(Time, bool) where the
+  Time value is the new time and the boolean is set to
+  true if the request is an iteration
+  */
     void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
 
     /** make a query of the core
