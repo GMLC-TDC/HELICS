@@ -136,7 +136,7 @@ HELICS_EXPORT void
 
  */
 
-HELICS_EXPORT void helicsFederateSetTimeRequestCallback(HelicsFederate fed,
+HELICS_EXPORT void helicsFederateSetTimeRequestEntryCallback(HelicsFederate fed,
                                                        void (*requestTime)(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userdata),
                                                        void* userdata,
                                                        HelicsError* err);

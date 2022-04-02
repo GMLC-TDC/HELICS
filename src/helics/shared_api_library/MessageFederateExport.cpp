@@ -350,7 +350,6 @@ void helicsEndpointSendMessageZeroCopy(HelicsEndpoint endpoint, HelicsMessage me
     }
 
     auto ptr = getMessageUniquePtr(message, err);
-    auto* mess = getMessageObj(message, err);
     if (!ptr) {
         return;
     }
