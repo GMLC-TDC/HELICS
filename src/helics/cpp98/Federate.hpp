@@ -206,18 +206,20 @@ namespace details {
     }
 
     /** helper function for the callback executor for time request entry*/
-    inline void
-        helicCppTimeRequestEntryCallbackExecutor(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userData)
+    inline void helicCppTimeRequestEntryCallbackExecutor(HelicsTime currentTime,
+                                                         HelicsTime requestTime,
+                                                         HelicsBool iterating,
+                                                         void* userData)
     {
-        auto cback = reinterpret_cast<std::function<void(HelicsTime,HelicsTime, bool)>*>(userData);
+        auto cback = reinterpret_cast<std::function<void(HelicsTime, HelicsTime, bool)>*>(userData);
         (*cback)(currentTime, requestTime, iterating == HELICS_TRUE);
     }
     /** helper function for the callback executor for time request return*/
     inline void helicCppTimeRequestReturnCallbackExecutor(HelicsTime newTime,
-                                                         HelicsBool iterating,
-                                                         void* userData)
+                                                          HelicsBool iterating,
+                                                          void* userData)
     {
-        auto cback = reinterpret_cast<std::function<void( HelicsTime, bool)>*>(userData);
+        auto cback = reinterpret_cast<std::function<void(HelicsTime, bool)>*>(userData);
         (*cback)(newTime, iterating == HELICS_TRUE);
     }
 }  // namespace details
@@ -569,10 +571,10 @@ class Federate {
     }
 
     void setTimeRequestEntryCallback(void (*timeRequestEntry)(HelicsTime currentTime,
-        HelicsTime requestTime,
-                                                  HelicsBool iterating,
-                                                  void* userdata),
-                               void* userdata)
+                                                              HelicsTime requestTime,
+                                                              HelicsBool iterating,
+                                                              void* userdata),
+                                     void* userdata)
 
     {
         helicsFederateSetTimeRequestEntryCallback(fed, timeRequestEntry, userdata, hThrowOnError());
@@ -597,35 +599,41 @@ class Federate {
     }
 
     void setTimeRequestReturnCallback(void (*timeRequestReturn)(HelicsTime newTime,
-                                                  HelicsBool iterating,
-                                                  void* userdata),
-                               void* userdata)
+                                                                HelicsBool iterating,
+                                                                void* userdata),
+                                      void* userdata)
 
     {
-        helicsFederateSetTimeRequestReturnCallback(fed, timeRequestReturn, userdata, hThrowOnError());
+        helicsFederateSetTimeRequestReturnCallback(fed,
+                                                   timeRequestReturn,
+                                                   userdata,
+                                                   hThrowOnError());
     }
 #if defined(HELICS_HAS_FUNCTIONAL) && HELICS_HAS_FUNCTIONAL != 0
     void setQueryCallback(std::function<std::string(const std::string&)> callback)
 
     {
         checkCallbackAllocation();
-        callbackBuffers[queryCallbackLocation] = new std::function<std::string(const std::string&)>(std::move(callback));
+        callbackBuffers[queryCallbackLocation] =
+            new std::function<std::string(const std::string&)>(std::move(callback));
         helicsFederateSetQueryCallback(fed,
                                        details::helicCppQueryCallbackExecutor,
                                        callbackBuffers[queryCallbackLocation],
                                        hThrowOnError());
     }
 
-    void setTimeRequestEntryCallback(std::function<void(HelicsTime currentTime, HelicsTime requestTime, bool iterating)> callback)
+    void setTimeRequestEntryCallback(
+        std::function<void(HelicsTime currentTime, HelicsTime requestTime, bool iterating)>
+            callback)
 
     {
         checkCallbackAllocation();
         callbackBuffers[timeRequestEntryCallbackLocation] =
-            new std::function<void(HelicsTime,HelicsTime, bool)>(std::move(callback));
+            new std::function<void(HelicsTime, HelicsTime, bool)>(std::move(callback));
         helicsFederateSetTimeRequestEntryCallback(fed,
-                                            details::helicCppTimeRequestEntryCallbackExecutor,
-            callbackBuffers[timeRequestEntryCallbackLocation],
-                                            hThrowOnError());
+                                                  details::helicCppTimeRequestEntryCallbackExecutor,
+                                                  callbackBuffers[timeRequestEntryCallbackLocation],
+                                                  hThrowOnError());
     }
 
     void setTimeUpdateCallback(std::function<void(HelicsTime time, bool iterating)> callback)
@@ -654,8 +662,7 @@ class Federate {
     }
 
     void setTimeRequestReturnCallback(
-        std::function<void(HelicsTime newTime, bool iterating)>
-            callback)
+        std::function<void(HelicsTime newTime, bool iterating)> callback)
 
     {
         checkCallbackAllocation();
@@ -830,7 +837,8 @@ class Federate {
     static constexpr int timeRequestReturnCallbackLocation = 4;
     void** callbackBuffers{nullptr};
 
-    void checkCallbackAllocation() {
+    void checkCallbackAllocation()
+    {
         if (callbackBuffers == nullptr) {
             callbackBuffers = new void*[numberOfCallbacks];
             for (int ii = 0; ii < numberOfCallbacks; ++ii) {
@@ -838,29 +846,30 @@ class Federate {
             }
         }
     }
-    void freeCallbacks() {
-        if (callbackBuffers==nullptr) {
+    void freeCallbacks()
+    {
+        if (callbackBuffers == nullptr) {
             return;
         }
         if (callbackBuffers[queryCallbackLocation] != nullptr) {
-            auto cback =
-                reinterpret_cast<std::function<std::string(const std::string&)>*>(callbackBuffers[queryCallbackLocation]);
+            auto cback = reinterpret_cast<std::function<std::string(const std::string&)>*>(
+                callbackBuffers[queryCallbackLocation]);
             delete cback;
         }
         if (callbackBuffers[timeRequestEntryCallbackLocation] != nullptr) {
-            auto cback = reinterpret_cast<std::function<void(HelicsTime,HelicsTime, bool)>*>(
+            auto cback = reinterpret_cast<std::function<void(HelicsTime, HelicsTime, bool)>*>(
                 callbackBuffers[timeRequestEntryCallbackLocation]);
             delete cback;
         }
         if (callbackBuffers[timeUpdateCallbackLocation] != nullptr) {
-            auto cback = reinterpret_cast<std::function<void(HelicsTime,bool)>*>(
+            auto cback = reinterpret_cast<std::function<void(HelicsTime, bool)>*>(
                 callbackBuffers[timeUpdateCallbackLocation]);
             delete cback;
         }
         if (callbackBuffers[stateChangeCallbackLocation] != nullptr) {
             auto cback =
                 reinterpret_cast<std::function<void(HelicsFederateState, HelicsFederateState)>*>(
-                callbackBuffers[stateChangeCallbackLocation]);
+                    callbackBuffers[stateChangeCallbackLocation]);
             delete cback;
         }
         if (callbackBuffers[timeRequestReturnCallbackLocation] != nullptr) {

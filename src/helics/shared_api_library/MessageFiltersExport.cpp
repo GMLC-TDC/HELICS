@@ -523,11 +523,11 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
     op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
         HelicsMessage ms = createAPIMessage(message);
         if (filtCall != nullptr) {
-            ms=filtCall(ms, userdata);
+            ms = filtCall(ms, userdata);
         }
-        if (ms==nullptr || reinterpret_cast<helics::Message*>(ms) == message.get()) {
+        if (ms == nullptr || reinterpret_cast<helics::Message*>(ms) == message.get()) {
             return message;
-        } else{
+        } else {
             return getMessageUniquePtr(ms, nullptr);
         }
     });
