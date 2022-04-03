@@ -833,11 +833,10 @@ std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, Heli
     auto* messages = reinterpret_cast<helics::MessageHolder*>(mess->backReference);
     if (messages != nullptr) {
         auto ptr = messages->extractMessage(mess->counter);
-        if (ptr) {
-            return ptr;
-        } else {
+        if (!ptr) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidLocationString);
         }
+        return ptr;
     } else {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, emptyMessageErrorString);
     }

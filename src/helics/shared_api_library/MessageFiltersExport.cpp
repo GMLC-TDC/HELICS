@@ -525,11 +525,10 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
         if (filtCall != nullptr) {
             ms = filtCall(ms, userdata);
         }
-        if (ms == nullptr || reinterpret_cast<helics::Message*>(ms) == message.get()) {
-            return message;
-        } else {
+        if (ms != nullptr && reinterpret_cast<helics::Message*>(ms) != message.get()) {
             return getMessageUniquePtr(ms, nullptr);
         }
+        return message;
     });
     try {
         fObj->filtPtr->setOperator(std::move(op));
