@@ -97,7 +97,7 @@ class Filter {
     }
     int32_t getOption(int32_t option) { return helicsFilterGetOption(filt, option); }
 
-    void setCallback(HelicsMessage (*filtCall)(HelicsMessage message, void* userData))
+    void setCallback(HelicsMessage (*filtCall)(HelicsMessage message, void* userData), void *userData)
     {
         helicsFilterSetCustomCallback(filt, filtCall, userData, HELICS_IGNORE_ERROR);
     }
