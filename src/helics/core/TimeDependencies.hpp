@@ -56,7 +56,9 @@ class TimeData {
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false};  //!< indicator that data was sent in the current interval
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
+    std::int8_t timingVersion{-2};  //!< version indicator
     std::uint8_t restrictionLevel{0};  //!< timing restriction level
+
     std::int32_t timeoutCount{0};  //!< counter for timeout checking
     std::int32_t sequenceCounter{0};  //!< the sequence Counter of the request
     std::int32_t responseSequenceCounter{0};  //!< the iteration count of the min federate
@@ -186,21 +188,25 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
                                               GlobalFederateId self,
                                               ConnectionType ignoreType = ConnectionType::none,
                                               GlobalFederateId ignore = GlobalFederateId{});
+static constexpr GlobalFederateId NoIgores{};
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
                                  GlobalFederateId self,
-                                 GlobalFederateId ignore = GlobalFederateId{});
+                                 GlobalFederateId ignore,
+                                 std::int32_t responseCode);
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
                                    GlobalFederateId self,
-                                   GlobalFederateId ignore = GlobalFederateId{});
+                                   GlobalFederateId ignore,
+                                   std::int32_t responseCode);
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
                               GlobalFederateId self,
-                              GlobalFederateId ignore = GlobalFederateId{});
+                              GlobalFederateId ignore,
+                              std::int32_t responseCode);
 
 void generateJsonOutputTimeData(Json::Value& output,
                                 const TimeData& dep,

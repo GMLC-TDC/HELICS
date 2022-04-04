@@ -55,6 +55,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 dep.responseSequenceCounter = 0;
                 dep.restrictionLevel = 0;
             }
+            dep.timingVersion = static_cast<std::int8_t>(m.getExtraDestData());
             dep.hasData = false;
             break;
         case CMD_TIME_REQUEST:
@@ -82,6 +83,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.delayedTiming = delayed;
             dep.sequenceCounter = m.counter;
             dep.responseSequenceCounter = m.getExtraDestData();
+
             break;
         case CMD_TIME_GRANT:
             dep.mTimeState = TimeState::time_granted;
@@ -95,6 +97,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.timeoutCount = 0;
             dep.sequenceCounter = m.counter;
             dep.hasData = false;
+            if (dep.timingVersion<0) {
+                dep.timingVersion = static_cast<std::int8_t>(m.getExtraDestData());
+            }
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -564,7 +569,7 @@ std::pair<int, std::string> TimeDependencies::checkForIssues(bool waiting) const
 
 static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
-                                          GlobalFederateId ignore)
+                                          GlobalFederateId ignore,std::int32_t sequenceCode)
 {
     if (dep.mTimeState < TimeState::time_granted) {
         if (dep.fedID == ignore) {
@@ -604,7 +609,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
         return;
     }
 
-    if (dep.connection != ConnectionType::self) {
+    if (dep.connection != ConnectionType::self && dep.responseSequenceCounter==sequenceCode || dep.timingVersion==0) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
@@ -685,7 +690,8 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
                                  GlobalFederateId self,
-                                 GlobalFederateId ignore)
+                                 GlobalFederateId ignore,
+                                 std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     std::int32_t iterationCount{0};
@@ -700,7 +706,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         iterationCount += dep.sequenceCounter;
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -723,7 +729,8 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
                                    GlobalFederateId self,
-                                   GlobalFederateId ignore)
+                                   GlobalFederateId ignore,
+                                   std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
@@ -736,7 +743,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -764,7 +771,8 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
                               GlobalFederateId self,
-                              GlobalFederateId ignore)
+                              GlobalFederateId ignore,
+                              std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
@@ -775,7 +783,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
     }
 
     if (mTime.Te < mTime.minDe) {

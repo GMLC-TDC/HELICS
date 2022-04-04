@@ -255,7 +255,7 @@ class TimeCoordinator {
     */
     void enteringExecMode(IterationRequest mode);
     /** check if it is valid to grant a time*/
-    MessageProcessingResult checkTimeGrant();
+    MessageProcessingResult checkTimeGrant(GlobalFederateId triggerFed = GlobalFederateId{});
     /** disconnect*/
     void disconnect();
     /** generate a local Error*/
