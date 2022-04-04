@@ -247,7 +247,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 break;
             }
             if (!timeGranted_mode) {
-                proc = timeCoord->checkTimeGrant();
+                proc = timeCoord->checkTimeGrant(
+                    cmd.action() == CMD_TIME_REQUEST ? cmd.source_id : GlobalFederateId{});
                 if (returnableResult(proc)) {
                     newMode = true;
                 }

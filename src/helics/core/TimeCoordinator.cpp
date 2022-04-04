@@ -22,6 +22,8 @@ namespace helics {
 
 static const Time bigTime(HELICS_BIG_NUMBER);
 
+static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
+
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 
@@ -538,7 +540,8 @@ bool TimeCoordinator::updateTimeFactors()
     return update;
 }
 
-MessageProcessingResult TimeCoordinator::checkTimeGrant()
+MessageProcessingResult
+    TimeCoordinator::checkTimeGrant(GlobalFederateId triggerFed)
 {
     updateTimeFactors();
     if (time_exec == Time::maxVal()) {
@@ -1017,6 +1020,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             currentRestrictionLevel = 0;
             ActionMessage execgrant(CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
+            execgrant.setExtraDestData(TIME_COORDINATOR_VERSION); //version
             transmitTimingMessages(execgrant);
         } else if (ret == MessageProcessingResult::ITERATING) {
             dependencies.resetIteratingExecRequests();
@@ -1025,6 +1029,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             ActionMessage execgrant(CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             execgrant.counter = iteration;
+            execgrant.setExtraDestData(TIME_COORDINATOR_VERSION);  // version
             setActionFlag(execgrant, iteration_requested_flag);
             transmitTimingMessages(execgrant);
             currentRestrictionLevel = 0;
@@ -1045,6 +1050,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             ActionMessage execgrant(time_granted > timeZero ? CMD_TIME_GRANT : CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
             execgrant.actionTime = time_granted;
+            execgrant.setExtraDestData(TIME_COORDINATOR_VERSION);  // version
             transmitTimingMessages(execgrant);
         }
     }
