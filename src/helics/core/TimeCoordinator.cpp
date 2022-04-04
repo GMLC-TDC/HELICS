@@ -617,10 +617,14 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
     if (lastSend.mTimeState != TimeState::time_requested) {
         changed = true;
     }
+    if (lastSend.sequenceCounter!=sequenceCounter) {
+        changed = true;
+    }
     if (changed) {
         lastSend.next = upd.actionTime;
         lastSend.minDe = upd.Tdemin;
         lastSend.Te = upd.Te;
+        lastSend.sequenceCounter = sequenceCounter;
         lastSend.minFed = GlobalFederateId(upd.getExtraData());
         lastSend.mTimeState = TimeState::time_requested;
         return transmitTimingMessages(upd, skipFed);
@@ -638,6 +642,7 @@ void TimeCoordinator::sendTimeRequest() const
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
     upd.actionTime = time_next;
+    upd.counter = sequenceCounter;
     if (nonGranting) {
         setActionFlag(upd, non_granting_flag);
     }
@@ -824,7 +829,7 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
                 continue;
             }
             msg.dest_id = dep.fedID;
-            if (msg.action() == CMD_EXEC_REQUEST) {
+            if (msg.action() == CMD_EXEC_REQUEST || msg.action()==CMD_TIME_REQUEST) {
                 msg.setExtraDestData(dep.sequenceCounter);
             }
             sendMessageFunction(msg);

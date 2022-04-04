@@ -623,6 +623,8 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.TeAlt = mTime.Te;
             mTime.Te = dep.Te;
             mTime.minFed = dep.fedID;
+            mTime.sequenceCounter = dep.sequenceCounter;
+            mTime.responseSequenceCounter = dep.sequenceCounter;
             if (dep.minFed.isValid()) {
                 mTime.minFedActual = dep.minFed;
             } else {
