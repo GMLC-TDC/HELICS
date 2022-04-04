@@ -837,9 +837,8 @@ std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, Heli
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidLocationString);
         }
         return ptr;
-    } else {
-        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, emptyMessageErrorString);
     }
+    assignError(err, HELICS_ERROR_INVALID_ARGUMENT, emptyMessageErrorString);
     return nullptr;
 }
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& message)
