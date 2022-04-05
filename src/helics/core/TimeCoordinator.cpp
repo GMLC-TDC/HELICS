@@ -503,7 +503,11 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, GlobalFederateId{},NoIgnoredFederates,sequenceCounter);
+    total = generateMinTimeTotal(dependencies,
+                                 info.restrictive_time_policy,
+                                 GlobalFederateId{},
+                                 NoIgnoredFederates,
+                                 sequenceCounter);
     upstream = generateMinTimeUpstream(dependencies,
                                        info.restrictive_time_policy,
                                        GlobalFederateId{},
@@ -543,8 +547,7 @@ bool TimeCoordinator::updateTimeFactors()
     return update;
 }
 
-MessageProcessingResult
-    TimeCoordinator::checkTimeGrant(GlobalFederateId triggerFed)
+MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId triggerFed)
 {
     updateTimeFactors();
     if (time_exec == Time::maxVal()) {
@@ -623,7 +626,7 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
     if (lastSend.mTimeState != TimeState::time_requested) {
         changed = true;
     }
-    if (lastSend.sequenceCounter!=sequenceCounter) {
+    if (lastSend.sequenceCounter != sequenceCounter) {
         changed = true;
     }
     if (changed) {
@@ -835,7 +838,7 @@ bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateI
                 continue;
             }
             msg.dest_id = dep.fedID;
-            if (msg.action() == CMD_EXEC_REQUEST || msg.action()==CMD_TIME_REQUEST) {
+            if (msg.action() == CMD_EXEC_REQUEST || msg.action() == CMD_TIME_REQUEST) {
                 msg.setExtraDestData(dep.sequenceCounter);
             }
             sendMessageFunction(msg);
@@ -922,7 +925,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 total = generateMinTimeTotal(dependencies,
                                              info.restrictive_time_policy,
                                              source_id,
-                                             source_id,sequenceCounter);
+                                             source_id,
+                                             sequenceCounter);
                 if (total.next > timeZero) {
                     ret = MessageProcessingResult::NEXT_STEP;
                 }
@@ -1023,7 +1027,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             currentRestrictionLevel = 0;
             ActionMessage execgrant(CMD_EXEC_GRANT);
             execgrant.source_id = source_id;
-            execgrant.setExtraDestData(TIME_COORDINATOR_VERSION); //version
+            execgrant.setExtraDestData(TIME_COORDINATOR_VERSION);  // version
             transmitTimingMessages(execgrant);
         } else if (ret == MessageProcessingResult::ITERATING) {
             dependencies.resetIteratingExecRequests();
