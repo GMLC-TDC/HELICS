@@ -37,6 +37,6 @@ TEST(timeDep_tests, dependency_tests)
 
     TimeDependencies depTest;
     depTest.setDependencyVector(deps);
-    auto total = generateMinTimeTotal(depTest, false, GlobalFederateId{1}, GlobalFederateId{});
+    auto total = generateMinTimeTotal(depTest, false, GlobalFederateId{1}, GlobalFederateId{},0);
     EXPECT_EQ(total.next, 2.0);
 }

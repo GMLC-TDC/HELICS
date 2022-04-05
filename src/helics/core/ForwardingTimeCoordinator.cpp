@@ -23,10 +23,17 @@ namespace helics {
 
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
-    auto mTimeUpstream = generateMinTimeUpstream(dependencies, restrictive_time_policy, mSourceId);
+    auto mTimeUpstream = generateMinTimeUpstream(dependencies,
+                                                 restrictive_time_policy,
+                                                 source_id,
+                                                 NoIgnoredFederates,0);
     auto mTimeDownstream = (noParent) ?
         mTimeUpstream :
-        generateMinTimeDownstream(dependencies, restrictive_time_policy, mSourceId);
+                                        generateMinTimeDownstream(dependencies,
+                                                                  restrictive_time_policy,
+                                                                  source_id,
+                                                                  NoIgnoredFederates,
+                                                                  0);
 
     bool updateUpstream = upstream.update(mTimeUpstream);
 
@@ -62,7 +69,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             auto td = generateMinTimeUpstream(dependencies,
                                               restrictive_time_policy,
                                               mSourceId,
-                                              downstream.minFed);
+                                              downstream.minFed,0);
             DependencyInfo di;
             di.update(td);
             auto upd_delayed = generateTimeRequest(di, downstream.minFed);

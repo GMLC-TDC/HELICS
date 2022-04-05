@@ -188,7 +188,7 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
                                               GlobalFederateId self,
                                               ConnectionType ignoreType = ConnectionType::none,
                                               GlobalFederateId ignore = GlobalFederateId{});
-static constexpr GlobalFederateId NoIgores{};
+static constexpr GlobalFederateId NoIgnoredFederates{};
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
