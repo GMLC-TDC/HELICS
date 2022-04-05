@@ -97,7 +97,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.timeoutCount = 0;
             dep.sequenceCounter = m.counter;
             dep.hasData = false;
-            if (dep.timingVersion<0) {
+            if (dep.timingVersion < 0) {
                 dep.timingVersion = static_cast<std::int8_t>(m.getExtraDestData());
             }
             break;
@@ -569,7 +569,8 @@ std::pair<int, std::string> TimeDependencies::checkForIssues(bool waiting) const
 
 static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
-                                          GlobalFederateId ignore,std::int32_t sequenceCode)
+                                          GlobalFederateId ignore,
+                                          std::int32_t sequenceCode)
 {
     if (dep.mTimeState < TimeState::time_granted) {
         if (dep.fedID == ignore) {
@@ -609,7 +610,9 @@ static void generateMinTimeImplementation(TimeData& mTime,
         return;
     }
 
-    if (dep.connection != ConnectionType::self && (sequenceCode==0||dep.responseSequenceCounter==sequenceCode || dep.timingVersion==0)) {
+    if (dep.connection != ConnectionType::self &&
+        (sequenceCode == 0 || dep.responseSequenceCounter == sequenceCode ||
+         dep.timingVersion == 0)) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
@@ -706,7 +709,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         iterationCount += dep.sequenceCounter;
-        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -743,7 +746,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -783,7 +786,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore,responseCode);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
 
     if (mTime.Te < mTime.minDe) {
