@@ -503,9 +503,12 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
 
 bool TimeCoordinator::updateTimeFactors()
 {
-    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, GlobalFederateId{});
-    upstream =
-        generateMinTimeUpstream(dependencies, info.restrictive_time_policy, GlobalFederateId{});
+    total = generateMinTimeTotal(dependencies, info.restrictive_time_policy, GlobalFederateId{},NoIgnoredFederates,sequenceCounter);
+    upstream = generateMinTimeUpstream(dependencies,
+                                       info.restrictive_time_policy,
+                                       GlobalFederateId{},
+                                       NoIgnoredFederates,
+                                       sequenceCounter);
 
     maxTime = Time::maxVal() - info.outputDelay - (std::max)(info.period, info.timeDelta);
     bool update = false;
@@ -919,7 +922,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 total = generateMinTimeTotal(dependencies,
                                              info.restrictive_time_policy,
                                              source_id,
-                                             source_id);
+                                             source_id,sequenceCounter);
                 if (total.next > timeZero) {
                     ret = MessageProcessingResult::NEXT_STEP;
                 }

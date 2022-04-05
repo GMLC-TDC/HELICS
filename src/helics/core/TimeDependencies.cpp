@@ -603,7 +603,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
         return;
     }
 
-    if (dep.connection != ConnectionType::self && dep.responseSequenceCounter==sequenceCode || dep.timingVersion==0) {
+    if (dep.connection != ConnectionType::self && (sequenceCode==0||dep.responseSequenceCounter==sequenceCode || dep.timingVersion==0)) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
