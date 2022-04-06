@@ -91,12 +91,9 @@ void ForwardingTimeCoordinator::disconnect()
 
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
-    auto mTimeUpstream = generateMinTimeUpstream(dependencies,
-                                                 restrictive_time_policy,
-                                                 source_id,
-                                                 NoIgnoredFederates,0);
-    auto mTimeDownstream = (noParent) ?
-        mTimeUpstream :
+    auto mTimeUpstream = generateMinTimeUpstream(
+        dependencies, restrictive_time_policy, source_id, NoIgnoredFederates, 0);
+    auto mTimeDownstream = (noParent) ? mTimeUpstream :
                                         generateMinTimeDownstream(dependencies,
                                                                   restrictive_time_policy,
                                                                   source_id,
@@ -134,10 +131,8 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             if (upd.action() != CMD_IGNORE) {
                 transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-            auto td = generateMinTimeUpstream(dependencies,
-                                              restrictive_time_policy,
-                                              source_id,
-                                              downstream.minFed,0);
+            auto td = generateMinTimeUpstream(
+                dependencies, restrictive_time_policy, source_id, downstream.minFed, 0);
             DependencyInfo di;
             di.update(td);
             auto upd_delayed = generateTimeRequest(di, downstream.minFed);
