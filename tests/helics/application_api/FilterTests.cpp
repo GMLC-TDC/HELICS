@@ -30,6 +30,9 @@ class filter_single_type_test:
     public FederateTestFixture {
 };
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
 /*
 class filter_all_type_test:
     public ::testing::TestWithParam<const char*>,
@@ -2314,7 +2317,7 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_single_type_test,
-                         ::testing::ValuesIn(CoreTypes_simple));
+                         ::testing::ValuesIn(CoreTypes_simple),testNamer);
 /*
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
 */

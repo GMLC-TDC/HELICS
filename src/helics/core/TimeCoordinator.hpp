@@ -187,10 +187,13 @@ class TimeCoordinator {
     /** get the next possible time that a time coordinator could grant*/
     Time getNextPossibleTime() const;
     Time generateAllowedTime(Time testTime) const;
-    /* return true if the skip federate was detected*/
-    bool checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
+    /* return true,true if the message was sent and skip federate was detected
+    true,false if the message was sent and skip federate was not detected
+    false,false, if the message was not sent
+    */
+    std::pair<bool,bool> checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
 
-    void sendTimeRequest() const;
+    void sendTimeRequest(GlobalFederateId triggerFed) const;
     void updateTimeGrant();
     /** transmit message to all federates except the skipFed,  return true if skipFed was used*/
     bool transmitTimingMessages(ActionMessage& msg,

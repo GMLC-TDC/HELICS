@@ -28,6 +28,11 @@ namespace testcore {
       private:
         virtual void queue_rx_function() override;  //!< the functional loop for the receive queue
         virtual void queue_tx_function() override;  //!< the loop for transmitting data
+        void callback(std::function<void(const ActionMessage&)> captureTest)
+        {
+            preProcCallback = std::move(captureTest);
+        }
+        std::function<void(const ActionMessage&)> preProcCallback;
       public:
         /** user function in the test comms to force the communication to stop immediately for
          * testing purposes*/
