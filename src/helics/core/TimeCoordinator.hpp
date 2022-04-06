@@ -191,7 +191,7 @@ class TimeCoordinator {
     true,false if the message was sent and skip federate was not detected
     false,false, if the message was not sent
     */
-    std::pair<bool,bool> checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
+    std::pair<bool, bool> checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
 
     void sendTimeRequest(GlobalFederateId triggerFed) const;
     void updateTimeGrant();

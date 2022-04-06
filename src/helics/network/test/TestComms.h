@@ -33,6 +33,7 @@ namespace testcore {
             preProcCallback = std::move(captureTest);
         }
         std::function<void(const ActionMessage&)> preProcCallback;
+
       public:
         /** user function in the test comms to force the communication to stop immediately for
          * testing purposes*/

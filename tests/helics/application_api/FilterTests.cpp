@@ -2317,7 +2317,8 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_single_type_test,
-                         ::testing::ValuesIn(CoreTypes_simple),testNamer);
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
 /*
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
 */
