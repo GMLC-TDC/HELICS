@@ -164,7 +164,9 @@ namespace testcore {
             } else {
                 std::tie(rid, cmd) = txQueue.pop();
             }
-
+            if (preProcCallback) {
+                preProcCallback(cmd);
+            }
             bool processed = false;
             if (isProtocolCommand(cmd)) {
                 if (rid == control_route) {
@@ -291,6 +293,7 @@ namespace testcore {
     {
         if (getTxStatus() == connection_status::connected) {
             ActionMessage cmd(CMD_PROTOCOL);
+            cmd.messageID = ALLOW_MESSAGES;
             cmd.setExtraData(count);
             transmit(control_route, cmd);
         }

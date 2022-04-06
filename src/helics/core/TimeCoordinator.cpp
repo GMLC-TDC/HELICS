@@ -195,10 +195,11 @@ void TimeCoordinator::timeRequest(Time nextTime,
         }
     }
     dependencies.resetDependentEvents(time_granted);
+    ++sequenceCounter;
     updateTimeFactors();
 
     if (!dependencies.empty()) {
-        sendTimeRequest();
+        sendTimeRequest(GlobalFederateId{});
     }
 }
 
@@ -289,7 +290,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSen
         if (time_value < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 if (allowRequestSend) {
-                    sendTimeRequest();
+                    sendTimeRequest(GlobalFederateId{});
                 }
             }
         }
@@ -494,7 +495,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
         if (time_message < ptime && !disconnected) {
             if (updateNextExecutionTime()) {
                 if (allowRequestSend) {
-                    sendTimeRequest();
+                    sendTimeRequest(GlobalFederateId{});
                 }
             }
         }
@@ -555,8 +556,10 @@ MessageProcessingResult
             return MessageProcessingResult::HALTED;
         }
     }
-    if ((time_block <= time_exec && time_block < Time::maxVal()) ||
-        (nonGranting && time_exec < time_requested)) {
+    if (time_block <= time_exec && time_block < Time::maxVal()) {
+        return MessageProcessingResult::CONTINUE_PROCESSING;
+    }
+    if ((nonGranting && time_exec < time_requested)) {
         return MessageProcessingResult::CONTINUE_PROCESSING;
     }
     if ((iterating == IterationRequest::NO_ITERATIONS) ||
@@ -600,12 +603,13 @@ MessageProcessingResult
 
     // if we haven't returned we may need to update the time messages
     if ((!dependencies.empty())) {
-        sendTimeRequest();
+        sendTimeRequest(triggerFed);
     }
     return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
-bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skipFed) const
+std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd,
+                                                               GlobalFederateId skipFed) const
 {
     bool changed{false};
     if (lastSend.next != upd.actionTime) {
@@ -633,9 +637,9 @@ bool TimeCoordinator::checkAndSendTimeRequest(ActionMessage& upd, GlobalFederate
         lastSend.sequenceCounter = sequenceCounter;
         lastSend.minFed = GlobalFederateId(upd.getExtraData());
         lastSend.mTimeState = TimeState::time_requested;
-        return transmitTimingMessages(upd, skipFed);
+        return {true, transmitTimingMessages(upd, skipFed)};
     }
-    return false;
+    return {false, false};
 }
 
 static inline Time checkAdd(Time val, Time increment)
@@ -643,7 +647,7 @@ static inline Time checkAdd(Time val, Time increment)
     return (val < Time::maxVal() - increment) ? val + increment : Time::maxVal();
 }
 
-void TimeCoordinator::sendTimeRequest() const
+void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
 {
     ActionMessage upd(CMD_TIME_REQUEST);
     upd.source_id = source_id;
@@ -678,15 +682,26 @@ void TimeCoordinator::sendTimeRequest() const
         setIterationFlags(upd, iterating);
         upd.counter = iteration;
     }
-    if (checkAndSendTimeRequest(upd, upstream.minFed)) {
-        if (upstream.minFed.isValid()) {
-            upd.dest_id = upstream.minFed;
-            upd.setExtraData(GlobalFederateId{}.baseValue());
-            if (info.event_triggered || time_requested >= bigTime) {
-                upd.Te = checkAdd(time_exec, info.outputDelay);
-                upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
+    auto check = checkAndSendTimeRequest(upd, upstream.minFed);
+    if (check.first) {
+        if (check.second) {
+            if (upstream.minFed.isValid()) {
+                upd.dest_id = upstream.minFed;
+                upd.setExtraData(GlobalFederateId{}.baseValue());
+                upd.setExtraDestData(upstream.responseSequenceCounter);
+                if (info.event_triggered || time_requested >= bigTime) {
+                    upd.Te = checkAdd(time_exec, info.outputDelay);
+                    upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
+                }
+                upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+                sendMessageFunction(upd);
             }
-            upd.Tdemin = std::min(upstream.TeAlt, upd.Te);
+        }
+    } else if (triggerFed.isValid()) {
+        upd.dest_id = triggerFed;
+        auto *dep=dependencies.getDependencyInfo(triggerFed);
+        if (dep->dependent) {
+            upd.setExtraDestData(dep->sequenceCounter);
             sendMessageFunction(upd);
         }
     }
