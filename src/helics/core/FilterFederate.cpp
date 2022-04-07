@@ -629,7 +629,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
             auto* filtI = getFilterInfo(mFedID, command.dest_handle);
             if (filtI != nullptr) {
                 filtI->sourceTargets.emplace_back(command.source_id, command.source_handle);
-                mCoord.addDependency(command.source_id);
+                if (!usingGlobalTime) {
+                    mCoord.addDependency(command.source_id);
+                }
             }
             auto* filthandle = mHandles->getFilter(command.dest_handle);
             if (filthandle != nullptr) {
@@ -648,7 +650,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
                     filtI->sourceTargets.emplace_back(command.getSource());
                 }
                 if (!checkActionFlag(command, error_flag)) {
-                    mCoord.addDependency(command.source_id);
+                    if (!usingGlobalTime) {
+                        mCoord.addDependency(command.source_id);
+                    }
                 }
             }
 

@@ -1350,7 +1350,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     std::string(cmd.name()),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                    addDependency(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependency(cmd.source_id);
+                    }
                 }
             } else {
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
@@ -1358,7 +1360,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     eptI->addSourceTarget(cmd.getSource(),
                                           std::string(cmd.name()),
                                           cmd.getString(typeStringLoc));
-                    addDependency(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependency(cmd.source_id);
+                    }
                 }
             }
         } break;
@@ -1366,7 +1370,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 if (pubI->addSubscriber(cmd.getSource())) {
-                    addDependent(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependent(cmd.source_id);
+                    }
                 }
             }
         } break;
@@ -1420,6 +1426,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     setState(HELICS_ERROR);
                     errorString = commandErrorString(cmd.messageID);
                     return MessageProcessingResult::ERROR_RESULT;
+                }
+                if (checkActionFlag(cmd, indicator_flag)) {
+                    usingGlobalTime = true;
+                    addDependent(gRootBrokerID);
+                    addDependency(gRootBrokerID);
                 }
                 global_id = cmd.dest_id;
                 interfaceInformation.setGlobalId(cmd.dest_id);

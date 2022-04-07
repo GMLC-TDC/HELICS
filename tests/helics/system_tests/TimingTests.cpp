@@ -113,6 +113,41 @@ TEST_F(timing_tests, simple_timing_test_message)
                         // it will time out.
 }
 
+TEST_F(timing_tests, simple_global_timing_test_message)
+{
+    extraBrokerArgs = " --globaltime ";
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.6);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.45);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    auto& ept1 = vFed1->registerGlobalEndpoint("e1");
+    vFed2->registerGlobalEndpoint("e2");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->requestTimeAsync(3.5);
+    auto res = vFed1->requestTime(0.32);
+    // check that the request is only granted at the appropriate period
+    EXPECT_EQ(res, 0.6);
+    ept1.sendTo("test1", "e2");
+    vFed1->requestTimeAsync(1.85);
+    res = vFed2->requestTimeComplete();
+    EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync(2.0);
+    res = vFed2->requestTimeComplete();
+    EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync(3.0);
+    res = vFed1->requestTimeComplete();
+    EXPECT_EQ(res, 2.4);
+    vFed1->finalize();
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
+}
+
 TEST_F(timing_tests, test_uninteruptible_flag)
 {
     SetupTest<helics::ValueFederate>("test", 2);

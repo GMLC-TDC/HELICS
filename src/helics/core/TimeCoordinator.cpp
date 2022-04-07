@@ -1124,10 +1124,12 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_REQUEST_CURRENT_TIME:
             if (disconnected) {
                 ActionMessage treq(CMD_DISCONNECT, source_id, cmd.source_id);
+                treq.setExtraDestData(cmd.counter);
                 sendMessageFunction(treq);
             } else if (lastSend.mTimeState == TimeState::time_granted) {
                 ActionMessage treq(CMD_TIME_GRANT, source_id, cmd.source_id);
                 treq.actionTime = lastSend.next;
+                treq.setExtraDestData(cmd.counter);
                 sendMessageFunction(treq);
             } else {
                 ActionMessage treq(CMD_TIME_REQUEST, source_id, cmd.source_id);
@@ -1135,6 +1137,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 treq.Tdemin = lastSend.minDe;
                 treq.Te = lastSend.Te;
                 treq.setExtraData(lastSend.minFed.baseValue());
+                treq.setExtraDestData(cmd.counter);
                 sendMessageFunction(treq);
             }
             return message_process_result::processed;

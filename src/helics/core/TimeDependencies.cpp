@@ -442,6 +442,12 @@ bool TimeDependencies::hasActiveTimeDependencies() const
     });
 }
 
+
+bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq) {
+    return std::all_of(dependencies.begin(), dependencies.end(), [tmin,sq](const auto& dep) {
+        return (dep.dependency && ((dep.next> tmin) || (dep.responseSequenceCounter==sq)));
+    });
+}
 int TimeDependencies::activeDependencyCount() const
 {
     return std::count_if(dependencies.begin(), dependencies.end(), [](const auto& dep) {
@@ -570,7 +576,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.delayedTiming = dep.delayedTiming;
             mTime.restrictionLevel = dep.restrictionLevel;
             mTime.sequenceCounter = dep.sequenceCounter;
-            mTime.responseSequenceCounter = dep.sequenceCounter;
+            mTime.responseSequenceCounter = dep.responseSequenceCounter;
         } else if (dep.mTimeState == mTime.mTimeState) {
             if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;

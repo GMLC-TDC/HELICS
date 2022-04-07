@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "BrokerFactory.hpp"
-#include "ForwardingTimeCoordinator.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
@@ -254,6 +254,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             if (no_ping) {
                 setActionFlag(brokerReply, slow_responding_flag);
             }
+            if (globalTime) {
+                setActionFlag(brokerReply, indicator_flag);
+            }
             transmit(brk->route, brokerReply);
             return;
         }
@@ -428,6 +431,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         if (no_ping) {
             setActionFlag(brokerReply, slow_responding_flag);
         }
+        if (globalTime) {
+            setActionFlag(brokerReply, indicator_flag);
+        }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -532,6 +538,11 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
+        if (globalTime) {
+            setActionFlag(fedReply, indicator_flag);
+            timeCoord->addDependency(global_fedid);
+            timeCoord->addDependent(global_fedid);
+        }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -571,7 +582,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_BROKER_SETUP: {
             global_broker_id_local = global_id.load();
             isRootc = _isRoot.load();
-            timeCoord->source_id = global_broker_id_local;
+            timeCoord->setSourceId(global_broker_id_local);
             connectionEstablished = true;
             if (!earlyMessages.empty()) {
                 for (auto& M : earlyMessages) {
@@ -634,7 +645,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 global_broker_id_local = command.dest_id;
                 global_id.store(global_broker_id_local);
                 higher_broker_id = command.source_id;
-                timeCoord->source_id = global_broker_id_local;
+                timeCoord->setSourceId(global_broker_id_local);
                 transmitDelayedMessages();
                 mBrokers.apply([localid = global_broker_id_local](auto& brk) {
                     if (!brk._nonLocal) {

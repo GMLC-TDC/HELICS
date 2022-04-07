@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "ForwardingTimeCoordinator.hpp"
+#include "GlobalTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
@@ -145,6 +146,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+    hApp->add_flag(
+        "--globaltime",
+        globalTime,
+        "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
     hApp->add_flag("--observer",
                    observer,
                    "specify that the broker/core should be added as an observer only");
@@ -288,9 +293,15 @@ void BrokerBase::configureBase()
             uuid_like = true;
         }
     }
-    timeCoord = std::make_unique<ForwardingTimeCoordinator>();
+    if (globalTime) {
+        timeCoord = std::make_unique<GlobalTimeCoordinator>();
+        hasTimeDependency = true;
+    } else {
+        timeCoord = std::make_unique<ForwardingTimeCoordinator>();
+    }
+    
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
-    timeCoord->restrictive_time_policy = restrictive_time_policy;
+    timeCoord->setRestrictivePolicy(restrictive_time_policy);
 
     mLogManager->setTransmitCallback([this](ActionMessage&& m) {
         if (getBrokerState() < BrokerState::terminating) {

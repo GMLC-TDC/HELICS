@@ -198,7 +198,7 @@ TEST(ftc_tests, timing_test1)
 
     ftc.addDependent(GlobalFederateId(5));
     ActionMessage lastMessage(CMD_INVALID);
-    ftc.source_id = GlobalFederateId(1);
+    ftc.setSourceId(GlobalFederateId(1));
     ftc.setMessageSender([&lastMessage](const helics::ActionMessage& mess) { lastMessage = mess; });
 
     ActionMessage timeUpdate(CMD_TIME_REQUEST, fed2, GlobalFederateId(1));

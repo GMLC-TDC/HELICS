@@ -7,9 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "ActionMessage.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "CoreFederateInfo.hpp"
 #include "TimeDependencies.hpp"
-#include "BaseTimeCoordinator.hpp"
+
 #include "json/forwards.h"
 #include <atomic>
 #include <functional>
@@ -23,19 +24,19 @@ namespace helics {
 the time coordinator manages dependencies and computes whether time can advance or enter execution
 mode
 */
-class ForwardingTimeCoordinator:public BaseTimeCoordinator {
+class GlobalTimeCoordinator: public BaseTimeCoordinator {
   private:
     // the variables for time coordination
-    DependencyInfo upstream;
-    DependencyInfo downstream;
+    Time currentMinTime{Time::minVal()};
+    TimeState currentTimeState{TimeState::initialized};
+    Time nextEvent{Time::maxVal()};
+    std::int32_t sequenceCounter{0};
 
   protected:
-   
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
-    bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
-    
+
   public:
-    ForwardingTimeCoordinator() = default;
+    GlobalTimeCoordinator() = default;
 
     /** compute updates to time values
     and send an update if needed
@@ -48,7 +49,6 @@ class ForwardingTimeCoordinator:public BaseTimeCoordinator {
                                           GlobalFederateId skipFed = GlobalFederateId{}) const;
 
   public:
-    
     /** check if entry to the executing state can be granted*/
     virtual MessageProcessingResult checkExecEntry() override;
 
@@ -58,7 +58,7 @@ class ForwardingTimeCoordinator:public BaseTimeCoordinator {
     virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
 
     /** get the current next time*/
-    virtual Time getNextTime() const override { return downstream.next; }
-    
+    Time getNextTime() const { return currentMinTime; }
+
 };
 }  // namespace helics

@@ -27,7 +27,7 @@ namespace spdlog {
 class logger;
 }
 namespace helics {
-class ForwardingTimeCoordinator;
+class BaseTimeCoordinator;
 class helicsCLI11App;
 class ProfilerBuffer;
 class LogBuffer;
@@ -81,7 +81,8 @@ class BrokerBase {
     bool debugging{false};
     /// flag indicating that the broker is an observer only
     bool observer{false};
-
+  /// flag indicating that the broker should use a global time coordinator
+    bool globalTime{false};
   private:
     /// flag indicating that the main processing loop is running
     std::atomic<bool> mainLoopIsRunning{false};
@@ -96,7 +97,7 @@ class BrokerBase {
     std::atomic<std::size_t> messageCounter{0};
 
   protected:
-    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<BaseTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/

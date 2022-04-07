@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterCoordinator.hpp"
 #include "FilterFederate.hpp"
 #include "FilterInfo.hpp"
-#include "ForwardingTimeCoordinator.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "InputInfo.hpp"
 #include "LogManager.hpp"
 #include "PublicationInfo.hpp"
@@ -1831,7 +1831,7 @@ void CommonCore::addDependency(LocalFederateId federateID, const std::string& fe
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        throw(InvalidIdentifier("federateID not valid (registerDependency)"));
+        throw(InvalidIdentifier("federateID not valid (addDependency)"));
     }
     ActionMessage search(CMD_SEARCH_DEPENDENCY);
     search.source_id = fed->global_id.load();
@@ -2926,12 +2926,15 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 global_id = GlobalBrokerId(command.dest_id);
                 global_broker_id_local = GlobalBrokerId(command.dest_id);
                 filterFedID = getSpecialFederateId(global_broker_id_local, 0);
-                timeCoord->source_id = global_broker_id_local;
+                timeCoord->setSourceId( global_broker_id_local);
                 higher_broker_id = GlobalBrokerId(command.source_id);
                 transmitDelayedMessages();
                 timeoutMon->setParentId(higher_broker_id);
                 if (checkActionFlag(command, slow_responding_flag)) {
                     timeoutMon->disableParentPing();
+                }
+                if (checkActionFlag(command,indicator_flag)) {
+                    globalTime = true;
                 }
                 timeoutMon->reset();
                 if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
@@ -3645,6 +3648,9 @@ void CommonCore::registerInterface(ActionMessage& command)
             case CMD_REG_PUB:
                 break;
             case CMD_REG_ENDPOINT:
+                if (globalTime) {
+                    break;
+                }
                 if (timeCoord->addDependency(command.source_id)) {
                     auto* fed = getFederateCore(command.source_id);
                     if (fed != nullptr) {
@@ -3726,6 +3732,9 @@ void CommonCore::generateFilterFederate()
     newFed.setExtraData(fid.baseValue());
     newFed.name(getIdentifier() + "_filters");
     transmit(getRoute(higher_broker_id), newFed);
+    if (globalTime) {
+        filterFed->useGlobalTimeCoordinator(true);
+    }
 }
 
 void CommonCore::connectFilterTiming()
@@ -3734,26 +3743,45 @@ void CommonCore::connectFilterTiming()
         return;
     }
     filterTiming = true;
+    
     auto fid = filterFedID.load();
-    if (timeCoord->addDependent(higher_broker_id)) {
-        ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
-        setActionFlag(add, child_flag);
-        transmit(getRoute(higher_broker_id), add);
-        timeCoord->addDependency(higher_broker_id);
-        timeCoord->setAsParent(higher_broker_id);
+    if (globalTime)
+    {
+        ActionMessage ad(CMD_ADD_DEPENDENT);
+        setActionFlag(ad, parent_flag);
+        ad.dest_id = fid;
+        ad.source_id = gRootBrokerID;
+        filterFed->handleMessage(ad);
+        
+        ad.setAction(CMD_ADD_DEPENDENCY);
+        filterFed->handleMessage(ad);
+        ad.swapSourceDest();
+        transmit(parent_route_id, ad);
+        ad.setAction(CMD_ADD_DEPENDENT);
+        transmit(parent_route_id, ad);
     }
-    // now add the filterFederate as a timeDependency
-    timeCoord->addDependency(fid);
-    timeCoord->setAsChild(fid);
-    ActionMessage ad(CMD_ADD_DEPENDENT);
-    setActionFlag(ad, parent_flag);
-    ad.dest_id = fid;
-    ad.source_id = global_broker_id_local;
-    filterFed->handleMessage(ad);
-    // TODO(PT) this should be conditional as it probably isn't needed in all cases
-    ad.setAction(CMD_ADD_DEPENDENCY);
-    timeCoord->addDependent(fid);
-    filterFed->handleMessage(ad);
+    else {
+        if (timeCoord->addDependent(higher_broker_id)) {
+            ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
+            setActionFlag(add, child_flag);
+            transmit(getRoute(higher_broker_id), add);
+            timeCoord->addDependency(higher_broker_id);
+            timeCoord->setAsParent(higher_broker_id);
+        }
+        // now add the filterFederate as a timeDependency
+        timeCoord->addDependency(fid);
+        timeCoord->setAsChild(fid);
+        ActionMessage ad(CMD_ADD_DEPENDENT);
+        setActionFlag(ad, parent_flag);
+        ad.dest_id = fid;
+        ad.source_id = global_broker_id_local;
+        filterFed->handleMessage(ad);
+        // TODO(PT) this should be conditional as it probably isn't needed in all cases
+        ad.setAction(CMD_ADD_DEPENDENCY);
+        timeCoord->addDependent(fid);
+        filterFed->handleMessage(ad);
+    }
+    
     //
     filterTiming = true;
 }

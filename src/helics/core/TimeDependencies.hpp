@@ -166,6 +166,8 @@ class TimeDependencies {
     void resetDependentEvents(Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
+    /** verify that all the sequence Counters match*/
+    bool verifySequenceCounter(Time tmin, std::int32_t sq);
     /** get a count of the active dependencies*/
     int activeDependencyCount() const;
     /** get a count of the active dependencies*/
