@@ -986,7 +986,7 @@ class rfcheck {
     void join() { id.join(); }
 };
 
-/** this test case fails as of yet with no good path to resolving it yet
+/** this test case fails as of yet with no good path to resolving it yet*/
 TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 {
     auto broker = AddBroker("test", 18);
@@ -1007,7 +1007,7 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
     std::vector<helics::Filter> filters;
     for (int ii = 0; ii < 8; ++ii) {
         auto filt = GetFederateAs<helics::MessageFederate>(10 + ii);
-        auto& f1 = helics::make_filter(helics::filter_types::reroute,
+        auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE,
                                        filt.get(),
                                        std::string("rrfilt") + std::to_string(ii));
         f1.addDestinationTarget(std::string("rec") + std::to_string(ii + 1));
@@ -1065,7 +1065,7 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
         ffed->finalize();
     }
 }
-*/
+
 TEST_F(filter_tests, reroute_separate2)
 {
     auto broker = AddBroker(rerouteType, 3);
