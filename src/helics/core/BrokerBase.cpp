@@ -299,7 +299,7 @@ void BrokerBase::configureBase()
     } else {
         timeCoord = std::make_unique<ForwardingTimeCoordinator>();
     }
-    
+
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
     timeCoord->setRestrictivePolicy(restrictive_time_policy);
 

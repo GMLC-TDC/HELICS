@@ -59,6 +59,5 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
 
     /** get the current next time*/
     Time getNextTime() const { return currentMinTime; }
-
 };
 }  // namespace helics

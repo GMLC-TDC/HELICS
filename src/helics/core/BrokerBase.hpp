@@ -81,8 +81,9 @@ class BrokerBase {
     bool debugging{false};
     /// flag indicating that the broker is an observer only
     bool observer{false};
-  /// flag indicating that the broker should use a global time coordinator
+    /// flag indicating that the broker should use a global time coordinator
     bool globalTime{false};
+
   private:
     /// flag indicating that the main processing loop is running
     std::atomic<bool> mainLoopIsRunning{false};

@@ -111,7 +111,7 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
-    bool usingGlobalTime{false}; // indicator that the federation is using global time
+    bool usingGlobalTime{false};  // indicator that the federation is using global time
     /** counter for the number of times time or execution mode has been granted */
     std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */

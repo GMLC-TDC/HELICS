@@ -89,10 +89,8 @@ void BaseTimeCoordinator::disconnect()
     }
 }
 
-
 void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {
-    
     base["dependencies"] = Json::arrayValue;
     base["federatesonly"] = federatesOnly;
     for (const auto& dep : dependencies) {
@@ -106,7 +104,6 @@ void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
         }
     }
 }
-
 
 Json::Value BaseTimeCoordinator::grantTimeoutCheck(const ActionMessage& cmd)
 {
@@ -207,10 +204,8 @@ GlobalFederateId BaseTimeCoordinator::getMinDependency() const
     return dependencies.getMinDependency();
 }
 
-
-
 ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep,
-                                                             GlobalFederateId fed) const
+                                                       GlobalFederateId fed) const
 {
     ActionMessage nTime(CMD_TIME_REQUEST);
     nTime.source_id = mSourceId;
@@ -279,7 +274,6 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep
 
     return nTime;
 }
-
 
 bool BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {

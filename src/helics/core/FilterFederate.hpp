@@ -129,6 +129,7 @@ class FilterFederate {
     bool hasActiveTimeDependencies() const;
 
     void useGlobalTimeCoordinator(bool value) { usingGlobalTime = value; }
+
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/

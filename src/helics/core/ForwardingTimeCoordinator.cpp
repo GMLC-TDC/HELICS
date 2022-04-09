@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(
@@ -91,7 +90,6 @@ void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) con
     generateJsonOutputTimeData(downBlock, downstream);
     base["downstream"] = downBlock;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
-    
 }
 
 std::string ForwardingTimeCoordinator::printTimeStatus() const
@@ -140,8 +138,6 @@ MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
     transmitTimingMessagesUpstream(execgrant);
     return ret;
 }
-
-
 
 void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) const
 {

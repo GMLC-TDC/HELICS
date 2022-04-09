@@ -5,8 +5,9 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "../common/fmt_format.h"
 #include "GlobalTimeCoordinator.hpp"
+
+#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
@@ -19,42 +20,42 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
-    static Time findNextTriggerEvent(const TimeDependencies &deps)
-    {
-        Time me{Time::maxVal()};
-        for (auto &dep:deps) {
-            if (!dep.nonGranting) {
-                if (dep.Te<me) {
-                    me = dep.Te;
-                }
+static Time findNextTriggerEvent(const TimeDependencies& deps)
+{
+    Time me{Time::maxVal()};
+    for (auto& dep : deps) {
+        if (!dep.nonGranting) {
+            if (dep.Te < me) {
+                me = dep.Te;
             }
         }
-        return me;
     }
+    return me;
+}
 
-    static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps,Time nextEvent) {
-        Time me{Time::maxVal()};
-        bool triggered{false};
-        for (auto& dep : deps) {
-            if (dep.next>nextEvent) {
-                continue;
+static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Time nextEvent)
+{
+    Time me{Time::maxVal()};
+    bool triggered{false};
+    for (auto& dep : deps) {
+        if (dep.next > nextEvent) {
+            continue;
+        }
+        if (!dep.nonGranting) {
+            if (dep.Te < me) {
+                me = dep.Te;
             }
-            if (!dep.nonGranting) {
-                if (dep.Te < me) {
-                    me = dep.Te;
-                }
-            } else {
-                if (dep.triggered) {
-                    triggered = true;
-                }
+        } else {
+            if (dep.triggered) {
+                triggered = true;
             }
         }
-        return {triggered, me};
     }
+    return {triggered, me};
+}
 
-    void GlobalTimeCoordinator::updateTimeFactors()
-    {
+void GlobalTimeCoordinator::updateTimeFactors()
+{
     auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
     if (timeStream.mTimeState == TimeState::time_granted) {
         currentTimeState = TimeState::time_granted;
@@ -63,15 +64,15 @@ namespace helics {
         return;
     }
     if (timeStream.mTimeState == TimeState::time_requested) {
-        if (currentTimeState==TimeState::time_granted) {
+        if (currentTimeState == TimeState::time_granted) {
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
-            ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId,mSourceId);
+            ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
             ++sequenceCounter;
             updateTime.counter = sequenceCounter;
-            for (const auto &dep:dependencies) {
-                if (dep.next<=nextEvent && dep.next<Time::maxVal()) {
+            for (const auto& dep : dependencies) {
+                if (dep.next <= nextEvent && dep.next < Time::maxVal()) {
                     updateTime.dest_id = dep.fedID;
                     updateTime.setExtraDestData(dep.sequenceCounter);
                     sendMessageFunction(updateTime);
@@ -79,10 +80,9 @@ namespace helics {
             }
             return;
         }
-        if (currentTimeState==TimeState::time_requested) {
-            if (dependencies.verifySequenceCounter(nextEvent,sequenceCounter)) {
-
-                auto trig = checkForTriggered(dependencies,nextEvent);
+        if (currentTimeState == TimeState::time_requested) {
+            if (dependencies.verifySequenceCounter(nextEvent, sequenceCounter)) {
+                auto trig = checkForTriggered(dependencies, nextEvent);
                 nextEvent = trig.second;
                 if (trig.first) {
                     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
@@ -98,7 +98,7 @@ namespace helics {
                     return;
                 }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
-                updateTime.actionTime = nextEvent+Time::epsilon();
+                updateTime.actionTime = nextEvent + Time::epsilon();
                 updateTime.Te = nextEvent + Time::epsilon();
                 updateTime.Tdemin = nextEvent + Time::epsilon();
                 updateTime.counter = sequenceCounter;
@@ -120,8 +120,7 @@ namespace helics {
 void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {
     base["type"] = "global";
-    
-    
+
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -129,8 +128,7 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 {
     return fmt::format(R"raw({{"time_next":{}, "Te":{}}})raw",
                        static_cast<double>(currentMinTime),
-                       static_cast<double>(nextEvent)
-                       );
+                       static_cast<double>(nextEvent));
 }
 
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry()
@@ -194,7 +192,7 @@ void GlobalTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) c
 }
 
 void GlobalTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
-                                                                 GlobalFederateId skipFed) const
+                                                             GlobalFederateId skipFed) const
 {
     if (!sendMessageFunction) {
         return;

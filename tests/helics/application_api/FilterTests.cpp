@@ -990,7 +990,7 @@ class rfcheck {
 /** this test case fails as of yet with no good path to resolving it yet*/
 TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 {
-    extraBrokerArgs=" --globaltime ";
+    extraBrokerArgs = " --globaltime ";
     auto broker = AddBroker("test", 18);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test_2", 9, broker, 1.0, "receiver");
@@ -1048,7 +1048,7 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 
     t1.join();
 
-     for (auto& rfed : recFeds) {
+    for (auto& rfed : recFeds) {
         rfed.join();
     }
 
@@ -2316,7 +2316,8 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
 
 INSTANTIATE_TEST_SUITE_P(filter_tests,
                          filter_single_type_test,
-                         ::testing::ValuesIn(CoreTypes_simple),testNamer);
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
 /*
 INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
 */

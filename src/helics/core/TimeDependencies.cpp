@@ -448,10 +448,10 @@ bool TimeDependencies::hasActiveTimeDependencies() const
     });
 }
 
-
-bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq) {
-    return std::all_of(dependencies.begin(), dependencies.end(), [tmin,sq](const auto& dep) {
-        return (dep.dependency && ((dep.next> tmin) || (dep.responseSequenceCounter==sq)));
+bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
+{
+    return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
+        return (dep.dependency && ((dep.next > tmin) || (dep.responseSequenceCounter == sq)));
     });
 }
 int TimeDependencies::activeDependencyCount() const
@@ -704,7 +704,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         if (dep.connection == ConnectionType::parent) {
-            if (dependencies.size()>1) {
+            if (dependencies.size() > 1) {
                 continue;
             }
         }

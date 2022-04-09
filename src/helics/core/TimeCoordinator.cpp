@@ -702,7 +702,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         }
     } else if (triggerFed.isValid()) {
         upd.dest_id = triggerFed;
-        auto *dep=dependencies.getDependencyInfo(triggerFed);
+        auto* dep = dependencies.getDependencyInfo(triggerFed);
         if (dep->dependent) {
             upd.setExtraDestData(dep->sequenceCounter);
             sendMessageFunction(upd);
@@ -1179,7 +1179,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 }
                 if (triggered) {
                     setActionFlag(treq, destination_target);
-                    if (cmd.source_id==gRootBrokerID) {
+                    if (cmd.source_id == gRootBrokerID) {
                         triggered = false;
                     }
                 }

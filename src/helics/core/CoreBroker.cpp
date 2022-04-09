@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
-#include "BrokerFactory.hpp"
 #include "BaseTimeCoordinator.hpp"
+#include "BrokerFactory.hpp"
 #include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
@@ -1188,13 +1188,12 @@ void CoreBroker::processCommand(ActionMessage&& command)
             } else if (command.source_id == global_broker_id_local) {
                 if (command.dest_id.isValid()) {
                     transmit(getRoute(command.dest_id), command);
-                }
-                else {
+                } else {
                     for (auto& dep : timeCoord->getDependents()) {
                         routeMessage(command, dep);
                     }
                 }
-                
+
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {

@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "ActionMessage.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "BasicHandleInfo.hpp"
 #include "CoreFactory.hpp"
 #include "CoreFederateInfo.hpp"
@@ -20,7 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "FilterCoordinator.hpp"
 #include "FilterFederate.hpp"
 #include "FilterInfo.hpp"
-#include "BaseTimeCoordinator.hpp"
 #include "InputInfo.hpp"
 #include "LogManager.hpp"
 #include "PublicationInfo.hpp"
@@ -2926,14 +2926,14 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 global_id = GlobalBrokerId(command.dest_id);
                 global_broker_id_local = GlobalBrokerId(command.dest_id);
                 filterFedID = getSpecialFederateId(global_broker_id_local, 0);
-                timeCoord->setSourceId( global_broker_id_local);
+                timeCoord->setSourceId(global_broker_id_local);
                 higher_broker_id = GlobalBrokerId(command.source_id);
                 transmitDelayedMessages();
                 timeoutMon->setParentId(higher_broker_id);
                 if (checkActionFlag(command, slow_responding_flag)) {
                     timeoutMon->disableParentPing();
                 }
-                if (checkActionFlag(command,indicator_flag)) {
+                if (checkActionFlag(command, indicator_flag)) {
                     globalTime = true;
                 }
                 timeoutMon->reset();
@@ -3743,16 +3743,15 @@ void CommonCore::connectFilterTiming()
         return;
     }
     filterTiming = true;
-    
+
     auto fid = filterFedID.load();
-    if (globalTime)
-    {
+    if (globalTime) {
         ActionMessage ad(CMD_ADD_DEPENDENT);
         setActionFlag(ad, parent_flag);
         ad.dest_id = fid;
         ad.source_id = gRootBrokerID;
         filterFed->handleMessage(ad);
-        
+
         ad.setAction(CMD_ADD_DEPENDENCY);
         filterFed->handleMessage(ad);
         clearActionFlag(ad, parent_flag);
@@ -3760,8 +3759,7 @@ void CommonCore::connectFilterTiming()
         transmit(parent_route_id, ad);
         ad.setAction(CMD_ADD_DEPENDENT);
         transmit(parent_route_id, ad);
-    }
-    else {
+    } else {
         if (timeCoord->addDependent(higher_broker_id)) {
             ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
             setActionFlag(add, child_flag);
@@ -3783,7 +3781,7 @@ void CommonCore::connectFilterTiming()
         timeCoord->setAsChild(fid);
         filterFed->handleMessage(ad);
     }
-    
+
     //
     filterTiming = true;
 }

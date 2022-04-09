@@ -104,6 +104,7 @@ class TimeCoordinator {
     bool needSendAll{false};
     /// indicator the federate was triggered recently
     bool triggered{false};
+
   protected:
     bool disconnected{false};
     /// specify that the timeCoordinator should not grant times and instead operate in a continuous
@@ -192,7 +193,7 @@ class TimeCoordinator {
     true,false if the message was sent and skip federate was not detected
     false,false, if the message was not sent
     */
-    std::pair<bool,bool> checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
+    std::pair<bool, bool> checkAndSendTimeRequest(ActionMessage& upd, GlobalFederateId skip) const;
 
     void sendTimeRequest(GlobalFederateId triggerFed) const;
     void updateTimeGrant();

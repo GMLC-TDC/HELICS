@@ -25,14 +25,13 @@ mode
 */
 class BaseTimeCoordinator {
   protected:
-
     // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
     // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     /// callback used to send the messages
     std::function<void(const ActionMessage&)> sendMessageFunction;
     /// the identifier for inserting into the source id field of any generated messages;
-  
+
     GlobalFederateId mSourceId{0};
     bool noParent{true};  //!< indicator that the coordinator does not have parents
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
@@ -40,6 +39,7 @@ class BaseTimeCoordinator {
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
+
   public:
     BaseTimeCoordinator() = default;
     virtual ~BaseTimeCoordinator() = default;
@@ -59,7 +59,7 @@ class BaseTimeCoordinator {
     /** compute updates to time values
     and send an update if needed
     */
-    virtual void updateTimeFactors()=0;
+    virtual void updateTimeFactors() = 0;
 
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
@@ -73,6 +73,7 @@ class BaseTimeCoordinator {
   protected:
     /** generate a timeRequest message based on the dependency info data*/
     ActionMessage generateTimeRequest(const DependencyInfo& dep, GlobalFederateId fed) const;
+
   public:
     /** process a message related to time
     @return a message_process_result if it did anything
@@ -102,14 +103,14 @@ class BaseTimeCoordinator {
     /** disconnect*/
     void disconnect();
     /** check if entry to the executing state can be granted*/
-    virtual MessageProcessingResult checkExecEntry()=0;
+    virtual MessageProcessingResult checkExecEntry() = 0;
 
     /** function to enter the exec Mode
      */
     void enteringExecMode();
 
     /** generate a string with the current time status*/
-    virtual std::string printTimeStatus() const=0;
+    virtual std::string printTimeStatus() const = 0;
     /** generate debugging time information*/
     virtual void generateDebuggingTimeInfo(Json::Value& base) const;
 
