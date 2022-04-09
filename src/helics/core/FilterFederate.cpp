@@ -30,8 +30,7 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
 {
     mCoord.source_id = fedID;
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
-    mCoord.specifyNonGranting(true);
-    mCoord.specifyNonGranting(true);
+    mCoord.specifyNonGranting(true);;
 }
 
 FilterFederate::~FilterFederate()
@@ -76,6 +75,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
         // deal with local source filters
         auto* FiltI = getFilterInfo(cmd.getDest());
         if (FiltI != nullptr) {
+            mCoord.triggered = true;
             if ((!checkActionFlag(*FiltI, disconnected_flag)) && (FiltI->filterOp)) {
                 if (FiltI->cloning) {
                     auto new_messages =
@@ -326,6 +326,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
 std::pair<ActionMessage&, bool> FilterFederate::executeFilter(ActionMessage& command,
                                                               FilterInfo* filt)
 {
+    mCoord.triggered = true;
     if (filt->core_id == mFedID) {
         if (filt->cloning) {
             // cloning filter returns a vector

@@ -102,7 +102,8 @@ class TimeCoordinator {
     /// flag indicating that we need to send updates to all dependencies on receipt of addition
     /// request
     bool needSendAll{false};
-
+    /// indicator the federate was triggered recently
+    bool triggered{false};
   protected:
     bool disconnected{false};
     /// specify that the timeCoordinator should not grant times and instead operate in a continuous

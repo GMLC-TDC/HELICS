@@ -542,6 +542,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             setActionFlag(fedReply, indicator_flag);
             timeCoord->addDependency(global_fedid);
             timeCoord->addDependent(global_fedid);
+            timeCoord->setAsChild(global_fedid);
         }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,
@@ -1185,9 +1186,15 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto& dep : timeCoord->getDependents()) {
-                    routeMessage(command, dep);
+                if (command.dest_id.isValid()) {
+                    transmit(getRoute(command.dest_id), command);
                 }
+                else {
+                    for (auto& dep : timeCoord->getDependents()) {
+                        routeMessage(command, dep);
+                    }
+                }
+                
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
@@ -1886,7 +1893,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
-        if (!hasTimeDependency) {
+        if (!hasTimeDependency && !globalTime) {
             if (timeCoord->addDependency(higher_broker_id)) {
                 hasTimeDependency = true;
                 ActionMessage add(CMD_ADD_INTERDEPENDENCY,
@@ -1927,11 +1934,13 @@ void CoreBroker::addFilter(ActionMessage& m)
         transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
-            if (timeCoord->addDependent(higher_broker_id)) {
-                hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
-                setActionFlag(add, child_flag);
-                transmit(parent_route_id, add);
+            if (!globalTime) {
+                if (timeCoord->addDependent(higher_broker_id)) {
+                    hasTimeDependency = true;
+                    ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
+                    setActionFlag(add, child_flag);
+                    transmit(parent_route_id, add);
+                }
             }
         }
     } else {

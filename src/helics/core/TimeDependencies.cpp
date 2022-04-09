@@ -80,6 +80,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
+            dep.triggered = checkActionFlag(m, destination_target);
             dep.delayedTiming = delayed;
             dep.sequenceCounter = m.counter;
             dep.responseSequenceCounter = m.getExtraDestData();
@@ -703,7 +704,9 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         if (dep.connection == ConnectionType::parent) {
-            continue;
+            if (dependencies.size()>1) {
+                continue;
+            }
         }
         if (self.isValid() && dep.minFedActual == self) {
             continue;

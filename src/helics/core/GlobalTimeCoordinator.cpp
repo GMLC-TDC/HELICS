@@ -20,9 +20,42 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 
-void GlobalTimeCoordinator::updateTimeFactors()
+    static Time findNextTriggerEvent(const TimeDependencies &deps)
     {
-    auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId);
+        Time me{Time::maxVal()};
+        for (auto &dep:deps) {
+            if (!dep.nonGranting) {
+                if (dep.Te<me) {
+                    me = dep.Te;
+                }
+            }
+        }
+        return me;
+    }
+
+    static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps,Time nextEvent) {
+        Time me{Time::maxVal()};
+        bool triggered{false};
+        for (auto& dep : deps) {
+            if (dep.next>nextEvent) {
+                continue;
+            }
+            if (!dep.nonGranting) {
+                if (dep.Te < me) {
+                    me = dep.Te;
+                }
+            } else {
+                if (dep.triggered) {
+                    triggered = true;
+                }
+            }
+        }
+        return {triggered, me};
+    }
+
+    void GlobalTimeCoordinator::updateTimeFactors()
+    {
+    auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
     if (timeStream.mTimeState == TimeState::time_granted) {
         currentTimeState = TimeState::time_granted;
         currentMinTime = timeStream.next;
@@ -33,12 +66,12 @@ void GlobalTimeCoordinator::updateTimeFactors()
         if (currentTimeState==TimeState::time_granted) {
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
-            nextEvent = timeStream.Te;
+            nextEvent = findNextTriggerEvent(dependencies);
             ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId,mSourceId);
             ++sequenceCounter;
             updateTime.counter = sequenceCounter;
             for (const auto &dep:dependencies) {
-                if (dep.next<=nextEvent) {
+                if (dep.next<=nextEvent && dep.next<Time::maxVal()) {
                     updateTime.dest_id = dep.fedID;
                     updateTime.setExtraDestData(dep.sequenceCounter);
                     sendMessageFunction(updateTime);
@@ -48,10 +81,26 @@ void GlobalTimeCoordinator::updateTimeFactors()
         }
         if (currentTimeState==TimeState::time_requested) {
             if (dependencies.verifySequenceCounter(nextEvent,sequenceCounter)) {
+
+                auto trig = checkForTriggered(dependencies,nextEvent);
+                nextEvent = trig.second;
+                if (trig.first) {
+                    ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
+                    ++sequenceCounter;
+                    updateTime.counter = sequenceCounter;
+                    for (const auto& dep : dependencies) {
+                        if (dep.next <= nextEvent && dep.next < Time::maxVal()) {
+                            updateTime.dest_id = dep.fedID;
+                            updateTime.setExtraDestData(dep.sequenceCounter);
+                            sendMessageFunction(updateTime);
+                        }
+                    }
+                    return;
+                }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
-                updateTime.actionTime = timeStream.Te+Time::epsilon();
-                updateTime.Te = timeStream.Te + Time::epsilon();
-                updateTime.Tdemin = timeStream.Te + Time::epsilon();
+                updateTime.actionTime = nextEvent+Time::epsilon();
+                updateTime.Te = nextEvent + Time::epsilon();
+                updateTime.Tdemin = nextEvent + Time::epsilon();
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
                     if (dep.next <= nextEvent) {

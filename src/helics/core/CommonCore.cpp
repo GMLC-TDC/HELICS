@@ -3567,7 +3567,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 }
 
                 loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
-                if (filterFed != nullptr && filterTiming) {
+                if (filterFed != nullptr && (filterTiming || globalTime)) {
                     filterFed->handleMessage(command);
                 }
                 timeCoord->enteringExecMode();
@@ -3755,6 +3755,7 @@ void CommonCore::connectFilterTiming()
         
         ad.setAction(CMD_ADD_DEPENDENCY);
         filterFed->handleMessage(ad);
+        clearActionFlag(ad, parent_flag);
         ad.swapSourceDest();
         transmit(parent_route_id, ad);
         ad.setAction(CMD_ADD_DEPENDENT);
@@ -3779,6 +3780,7 @@ void CommonCore::connectFilterTiming()
         // TODO(PT) this should be conditional as it probably isn't needed in all cases
         ad.setAction(CMD_ADD_DEPENDENCY);
         timeCoord->addDependent(fid);
+        timeCoord->setAsChild(fid);
         filterFed->handleMessage(ad);
     }
     
@@ -4006,11 +4008,13 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
         }
         filterFed->processFilterInfo(command);
         if (command.source_id != global_broker_id_local) {
-            if (!checkActionFlag(command, error_flag)) {
-                auto* fed = getFederateCore(command.dest_id);
-                if (fed != nullptr) {
-                    command.setAction(CMD_ADD_DEPENDENT);
-                    fed->addAction(command);
+            if (!globalTime) {
+                if (!checkActionFlag(command, error_flag)) {
+                    auto* fed = getFederateCore(command.dest_id);
+                    if (fed != nullptr) {
+                        command.setAction(CMD_ADD_DEPENDENT);
+                        fed->addAction(command);
+                    }
                 }
             }
         }

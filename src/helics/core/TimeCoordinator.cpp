@@ -1171,6 +1171,18 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 treq.Te = lastSend.Te;
                 treq.setExtraData(lastSend.minFed.baseValue());
                 treq.setExtraDestData(cmd.counter);
+                if (nonGranting) {
+                    setActionFlag(treq, non_granting_flag);
+                }
+                if (info.wait_for_current_time_updates) {
+                    setActionFlag(treq, delayed_timing_flag);
+                }
+                if (triggered) {
+                    setActionFlag(treq, destination_target);
+                    if (cmd.source_id==gRootBrokerID) {
+                        triggered = false;
+                    }
+                }
                 sendMessageFunction(treq);
             }
             return message_process_result::processed;

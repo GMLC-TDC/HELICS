@@ -650,6 +650,7 @@ static const std::string rerouteType("test");
 
 TEST_F(filter_tests, reroute_separate)
 {
+    extraBrokerArgs = " --globaltime ";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
@@ -989,6 +990,7 @@ class rfcheck {
 /** this test case fails as of yet with no good path to resolving it yet*/
 TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 {
+    extraBrokerArgs=" --globaltime ";
     auto broker = AddBroker("test", 18);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test_2", 9, broker, 1.0, "receiver");
