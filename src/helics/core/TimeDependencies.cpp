@@ -36,7 +36,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.sequenceCounter = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.responseSequenceCounter = m.getExtraDestData();
-            if (dep.connection==ConnectionType::self) {
+            if (dep.connection == ConnectionType::self) {
                 dep.responseSequenceCounter = dep.sequenceCounter;
             }
             break;
@@ -617,7 +617,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
 
     if (dep.connection != ConnectionType::self &&
         (sequenceCode == 0 || dep.responseSequenceCounter == sequenceCode ||
-         dep.timingVersion == 0||!dep.dependent)) {
+         dep.timingVersion == 0 || !dep.dependent)) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
@@ -628,7 +628,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.minDe = -1;
         }
     } else {
-        if(dep.next<mTime.minDe) {
+        if (dep.next < mTime.minDe) {
             mTime.minDe = dep.next;
         }
     }
@@ -712,7 +712,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         if (dep.connection == ConnectionType::parent) {
-                continue;
+            continue;
         }
         if (self.isValid() && dep.minFedActual == self) {
             continue;

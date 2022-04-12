@@ -275,7 +275,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSen
         }
         return;
     }
-    if (valueUpdateTime<=time_granted) {
+    if (valueUpdateTime <= time_granted) {
         hasIterationData = true;
     }
     if (valueUpdateTime < time_value) {
@@ -482,7 +482,7 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
         }
         return;
     }
-    if (messageUpdateTime<=time_granted) {
+    if (messageUpdateTime <= time_granted) {
         hasIterationData = true;
     }
     if (messageUpdateTime < time_message) {
@@ -519,7 +519,7 @@ bool TimeCoordinator::updateTimeFactors()
                                        GlobalFederateId{},
                                        NoIgnoredFederates,
                                        sequenceCounter);
-    if (globalTime && dependencies.size()==1) {
+    if (globalTime && dependencies.size() == 1) {
         upstream = total;
     }
 
@@ -573,50 +573,50 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
     if ((nonGranting && time_exec < time_requested)) {
         return MessageProcessingResult::CONTINUE_PROCESSING;
     }
-    //if ((iterating == IterationRequest::NO_ITERATIONS) ||
-    //    (time_exec > time_granted && iterating == IterationRequest::ITERATE_IF_NEEDED)) {
-    //    
-    //    if (time_allow > time_exec) {
-    //        iteration = 0;
-    //        updateTimeGrant();
-    //        return MessageProcessingResult::NEXT_STEP;
-    //    }
-    //    if (time_allow == time_exec) {
-    //        if (!info.wait_for_current_time_updates) {
-    //            if (time_requested <= time_exec) {
-    //                // this is the non interrupted case
-    //                iteration = 0;
-    //                updateTimeGrant();
-    //                return MessageProcessingResult::NEXT_STEP;
-    //            }
-    //            if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
-    //                iteration = 0;
-    //                updateTimeGrant();
-    //                return MessageProcessingResult::NEXT_STEP;
-    //            }
-    //        } else {
-    //            // if the wait_for_current_time_updates flag is set then time_allow must be greater
-    //            // than time_exec
-    //        }
-    //    }
-    //} else {
-    //    if (time_allow > time_exec) {
-    //        ++iteration;
-    //        updateTimeGrant();
-    //        return MessageProcessingResult::ITERATING;
-    //    }
-    //    if (time_allow == time_exec)  // time_allow==time_exec==time_granted
-    //    {
-    //        if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
-    //            ++iteration;
-    //            updateTimeGrant();
-    //            return MessageProcessingResult::ITERATING;
-    //        }
-    //    }
-    //}
+    // if ((iterating == IterationRequest::NO_ITERATIONS) ||
+    //     (time_exec > time_granted && iterating == IterationRequest::ITERATE_IF_NEEDED)) {
+    //
+    //     if (time_allow > time_exec) {
+    //         iteration = 0;
+    //         updateTimeGrant();
+    //         return MessageProcessingResult::NEXT_STEP;
+    //     }
+    //     if (time_allow == time_exec) {
+    //         if (!info.wait_for_current_time_updates) {
+    //             if (time_requested <= time_exec) {
+    //                 // this is the non interrupted case
+    //                 iteration = 0;
+    //                 updateTimeGrant();
+    //                 return MessageProcessingResult::NEXT_STEP;
+    //             }
+    //             if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
+    //                 iteration = 0;
+    //                 updateTimeGrant();
+    //                 return MessageProcessingResult::NEXT_STEP;
+    //             }
+    //         } else {
+    //             // if the wait_for_current_time_updates flag is set then time_allow must be
+    //             greater
+    //             // than time_exec
+    //         }
+    //     }
+    // } else {
+    //     if (time_allow > time_exec) {
+    //         ++iteration;
+    //         updateTimeGrant();
+    //         return MessageProcessingResult::ITERATING;
+    //     }
+    //     if (time_allow == time_exec)  // time_allow==time_exec==time_granted
+    //     {
+    //         if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
+    //             ++iteration;
+    //             updateTimeGrant();
+    //             return MessageProcessingResult::ITERATING;
+    //         }
+    //     }
+    // }
 
-     if (iterating == IterationRequest::NO_ITERATIONS)
-     {
+    if (iterating == IterationRequest::NO_ITERATIONS) {
         if (time_allow > time_exec) {
             iteration = 0;
             updateTimeGrant();
@@ -636,11 +636,10 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     return MessageProcessingResult::NEXT_STEP;
                 }
             }
-                // if the wait_for_current_time_updates flag is set then time_allow must be greater
-                // than time_exec
+            // if the wait_for_current_time_updates flag is set then time_allow must be greater
+            // than time_exec
         }
     } else {
-
         if (time_allow > time_exec) {
             ++iteration;
             updateTimeGrant();
@@ -735,7 +734,6 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
 
     if (iterating != IterationRequest::NO_ITERATIONS) {
         setIterationFlags(upd, iterating);
-        
     }
     upd.counter = sequenceCounter;
     auto check = checkAndSendTimeRequest(upd, upstream.minFed);

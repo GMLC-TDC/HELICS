@@ -108,6 +108,7 @@ class TimeCoordinator {
     bool triggered{false};
     /// true if using a global time manager parent
     bool globalTime{false};
+
   protected:
     bool disconnected{false};
     /// specify that the timeCoordinator should not grant times and instead operate in a continuous
@@ -115,7 +116,7 @@ class TimeCoordinator {
     bool nonGranting{false};
     /// if set to true the time coordinator is joining an ongoing co-simulation
     bool dynamicJoining{false};
-   
+
     std::atomic<int32_t> iteration{0};  //!< current number of iterations
     int32_t sequenceCounter{0};  //!< sequence counter for tracking responses
 

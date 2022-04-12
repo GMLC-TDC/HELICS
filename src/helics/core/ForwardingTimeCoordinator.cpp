@@ -153,7 +153,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
             continue;
         }
         msg.dest_id = dep.fedID;
-        if (msg.action() == CMD_EXEC_REQUEST||msg.action()==CMD_TIME_REQUEST) {
+        if (msg.action() == CMD_EXEC_REQUEST || msg.action() == CMD_TIME_REQUEST) {
             msg.setExtraDestData(dep.sequenceCounter);
         }
         sendMessageFunction(msg);
