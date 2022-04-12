@@ -23,13 +23,13 @@ namespace helics {
 void ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(
-        dependencies, restrictive_time_policy, mSourceId, NoIgnoredFederates, 0);
+        dependencies, restrictive_time_policy, mSourceId, NoIgnoredFederates, sequenceCounter);
     auto mTimeDownstream = (noParent) ? mTimeUpstream :
                                         generateMinTimeDownstream(dependencies,
                                                                   restrictive_time_policy,
                                                                   mSourceId,
                                                                   NoIgnoredFederates,
-                                                                  0);
+                                                                  sequenceCounter);
 
     bool updateUpstream = upstream.update(mTimeUpstream);
 
@@ -48,7 +48,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             //     downstream.next = downstream.minminDe;
         }
     }
-
+    sequenceCounter = upstream.sequenceCounter;
     if (updateUpstream) {
         auto upd = generateTimeRequest(upstream, GlobalFederateId{});
         if (upd.action() != CMD_IGNORE) {
@@ -153,7 +153,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
             continue;
         }
         msg.dest_id = dep.fedID;
-        if (msg.action() == CMD_EXEC_REQUEST) {
+        if (msg.action() == CMD_EXEC_REQUEST||msg.action()==CMD_TIME_REQUEST) {
             msg.setExtraDestData(dep.sequenceCounter);
         }
         sendMessageFunction(msg);
@@ -181,6 +181,9 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                 if (dep.next > msg.actionTime) {
                     continue;
                 }
+            }
+            if (msg.action() == CMD_TIME_REQUEST) {
+                msg.setExtraDestData(dep.sequenceCounter);
             }
             msg.dest_id = dep.fedID;
             sendMessageFunction(msg);

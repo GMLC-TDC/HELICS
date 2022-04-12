@@ -36,6 +36,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.sequenceCounter = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.responseSequenceCounter = m.getExtraDestData();
+            if (dep.connection==ConnectionType::self) {
+                dep.responseSequenceCounter = dep.sequenceCounter;
+            }
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
@@ -83,8 +86,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.triggered = checkActionFlag(m, destination_target);
             dep.delayedTiming = delayed;
             dep.sequenceCounter = m.counter;
-            dep.responseSequenceCounter = m.getExtraDestData();
-
+            dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
+                m.getExtraDestData() :
+                dep.sequenceCounter;
             break;
         case CMD_TIME_GRANT:
             dep.mTimeState = TimeState::time_granted;
@@ -613,7 +617,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
 
     if (dep.connection != ConnectionType::self &&
         (sequenceCode == 0 || dep.responseSequenceCounter == sequenceCode ||
-         dep.timingVersion == 0)) {
+         dep.timingVersion == 0||!dep.dependent)) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
@@ -622,6 +626,10 @@ static void generateMinTimeImplementation(TimeData& mTime,
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
             mTime.minDe = -1;
+        }
+    } else {
+        if(dep.next<mTime.minDe) {
+            mTime.minDe = dep.next;
         }
     }
     if (dep.next < mTime.next) {
@@ -704,9 +712,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         if (dep.connection == ConnectionType::parent) {
-            if (dependencies.size() > 1) {
                 continue;
-            }
         }
         if (self.isValid() && dep.minFedActual == self) {
             continue;

@@ -33,6 +33,7 @@ class BaseTimeCoordinator {
     /// the identifier for inserting into the source id field of any generated messages;
 
     GlobalFederateId mSourceId{0};
+    std::int32_t sequenceCounter{0};  //!< storage for sequence counter
     bool noParent{true};  //!< indicator that the coordinator does not have parents
     bool federatesOnly{false};  //!< indicator that the forwarder only operates with federates
     bool checkingExec{false};

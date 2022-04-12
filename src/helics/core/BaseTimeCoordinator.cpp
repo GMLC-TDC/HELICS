@@ -222,26 +222,28 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep
             nTime.setExtraData(dep.minFed.baseValue());
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
             nTime.Te = dep.Te;
+            nTime.counter = sequenceCounter;
             break;
         case TimeState::time_requested_iterative:
             nTime.setExtraData(dep.minFed.baseValue());
             setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
             nTime.Te = dep.Te;
-            nTime.counter = dep.sequenceCounter;
+            nTime.counter = sequenceCounter;
             nTime.setExtraDestData(dep.responseSequenceCounter);
             break;
         case TimeState::time_requested_require_iteration:
             nTime.setExtraData(dep.minFed.baseValue());
             setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
             nTime.Tdemin = std::min(dep.minDe, dep.Te);
-            nTime.counter = dep.sequenceCounter;
+            nTime.counter = sequenceCounter;
             nTime.Te = dep.Te;
             nTime.setExtraDestData(dep.responseSequenceCounter);
             break;
         case TimeState::exec_requested:
             nTime.setAction(CMD_EXEC_REQUEST);
             nTime.actionTime = Time::zeroVal();
+            nTime.counter = sequenceCounter;
             break;
         case TimeState::error:
             nTime.setAction(CMD_IGNORE);
@@ -251,13 +253,13 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.counter = dep.sequenceCounter;
+            nTime.counter = sequenceCounter;
             break;
         case TimeState::exec_requested_require_iteration:
             nTime.setAction(CMD_EXEC_REQUEST);
             setIterationFlags(nTime, IterationRequest::FORCE_ITERATION);
             nTime.setExtraData(dep.minFed.baseValue());
-            nTime.counter = dep.sequenceCounter;
+            nTime.counter = sequenceCounter;
             break;
         case TimeState::initialized:
             if (dep.responseSequenceCounter == 0) {
@@ -266,7 +268,7 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep
                 nTime.setAction(CMD_EXEC_GRANT);
                 nTime.setExtraData(dep.minFed.baseValue());
                 setIterationFlags(nTime, IterationRequest::ITERATE_IF_NEEDED);
-                nTime.counter = dep.sequenceCounter;
+                nTime.counter = sequenceCounter;
             }
 
             break;

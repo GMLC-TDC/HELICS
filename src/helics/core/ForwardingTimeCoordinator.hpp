@@ -33,7 +33,7 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
-
+    
   public:
     ForwardingTimeCoordinator() = default;
 

@@ -128,7 +128,11 @@ class FilterFederate {
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
 
-    void useGlobalTimeCoordinator(bool value) { usingGlobalTime = value; }
+    void useGlobalTimeCoordinator(bool value)
+    {
+        usingGlobalTime = value;
+        mCoord.globalTime = value;
+    }
 
   private:
     void routeMessage(const ActionMessage& msg);
