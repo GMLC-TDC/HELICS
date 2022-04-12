@@ -24,26 +24,6 @@ static const Time bigTime(HELICS_BIG_NUMBER);
 
 static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
 
-static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
-TimeCoordinator::TimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
-
-TimeCoordinator::TimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction):
-    sendMessageFunction(std::move(userSendMessageFunction))
-{
-    if (!sendMessageFunction) {
-        sendMessageFunction = nullMessageFunction;
-    }
-}
-
-void TimeCoordinator::setMessageSender(
-    std::function<void(const ActionMessage&)> userSendMessageFunction)
-{
-    sendMessageFunction = std::move(userSendMessageFunction);
-    if (!sendMessageFunction) {
-        sendMessageFunction = nullMessageFunction;
-    }
-}
-
 void TimeCoordinator::enteringExecMode(IterationRequest mode)
 {
     if (executionMode) {
@@ -77,43 +57,6 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         setActionFlag(execreq, delayed_timing_flag);
     }
     transmitTimingMessages(execreq);
-}
-
-void TimeCoordinator::disconnect()
-{
-    if (sendMessageFunction) {
-        if (dependencies.empty()) {
-            return;
-        }
-        ActionMessage bye(CMD_DISCONNECT);
-        bye.source_id = source_id;
-        if (dependencies.size() == 1) {
-            auto& dep = *dependencies.begin();
-            if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
-                bye.dest_id = dep.fedID;
-                if (bye.dest_id == source_id) {
-                    processTimeMessage(bye);
-                } else {
-                    sendMessageFunction(bye);
-                }
-            }
-
-        } else {
-            ActionMessage multi(CMD_MULTI_MESSAGE);
-            for (const auto& dep : dependencies) {
-                if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
-                    bye.dest_id = dep.fedID;
-                    if (dep.fedID == source_id) {
-                        processTimeMessage(bye);
-                    } else {
-                        appendMessage(multi, bye);
-                    }
-                }
-            }
-            sendMessageFunction(multi);
-        }
-    }
-    disconnected = true;
 }
 
 void TimeCoordinator::localError()
@@ -350,17 +293,7 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     generateJsonOutputTimeData(sent, lastSend);
 
     base["last_send"] = sent;
-    base["dependencies"] = Json::arrayValue;
-    for (const auto& dep : dependencies) {
-        if (dep.dependency) {
-            Json::Value depblock;
-            generateJsonOutputDependency(depblock, dep);
-            base["dependencies"].append(depblock);
-        }
-        if (dep.dependent) {
-            base["dependents"].append(dep.fedID.baseValue());
-        }
-    }
+    BaseTimeCoordinator::generateDebuggingTimeInfo(base);
     // now add any time blocks that may be present
     base["blocks"] = Json::arrayValue;
     for (const auto& blk : timeBlocks) {
@@ -369,22 +302,6 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
         timeblock["id"] = blk.second;
         base["blocks"].append(timeblock);
     }
-}
-
-bool TimeCoordinator::hasActiveTimeDependencies() const
-{
-    return dependencies.hasActiveTimeDependencies();
-}
-
-int TimeCoordinator::dependencyCount() const
-{
-    return dependencies.activeDependencyCount();
-}
-
-/** get a count of the active dependencies*/
-GlobalFederateId TimeCoordinator::getMinDependency() const
-{
-    return dependencies.getMinDependency();
 }
 
 void TimeCoordinator::enterInitialization()
@@ -403,6 +320,11 @@ void TimeCoordinator::enterInitialization()
             }
         }
     }
+}
+
+Time TimeCoordinator::getNextTime() const
+{
+    return getGrantedTime();
 }
 
 void TimeCoordinator::requestTimeCheck()
@@ -615,8 +537,12 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
     //         }
     //     }
     // }
+    auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
+    bool sendAll{needSendAll};
+    needSendAll = false;
+    switch (iterating) {
 
-    if (iterating == IterationRequest::NO_ITERATIONS) {
+    case IterationRequest::NO_ITERATIONS:
         if (time_allow > time_exec) {
             iteration = 0;
             updateTimeGrant();
@@ -630,7 +556,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
                 }
-                if (dependencies.checkIfReadyForTimeGrant(false, time_exec)) {
+                if (dependencies.checkIfReadyForTimeGrant(false, time_exec,info.wait_for_current_time_updates)) {
                     iteration = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
@@ -639,26 +565,99 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
             // if the wait_for_current_time_updates flag is set then time_allow must be greater
             // than time_exec
         }
-    } else {
+        break;
+    case IterationRequest::ITERATE_IF_NEEDED:
+    case IterationRequest::FORCE_ITERATION:
         if (time_allow > time_exec) {
-            ++iteration;
-            updateTimeGrant();
-            return MessageProcessingResult::ITERATING;
-        }
-        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
-        {
-            if (dependencies.checkIfReadyForTimeGrant(true, time_exec)) {
+            if (time_exec<=time_granted) {
                 ++iteration;
                 updateTimeGrant();
                 return MessageProcessingResult::ITERATING;
+            } else {
+                iteration = 0;
+                updateTimeGrant();
+                return (iterating == IterationRequest::FORCE_ITERATION) ?
+                    MessageProcessingResult::ITERATING :
+                    MessageProcessingResult::NEXT_STEP;
             }
+        }
+        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
+        {
+            if (dependencies.checkIfReadyForTimeGrant(true, time_exec,info.wait_for_current_time_updates)) {
+                bool allowed{!info.wait_for_current_time_updates};
+                bool restricted{info.restrictive_time_policy};
+                bool restrictionAdvance{restricted};
+                int restrictionLevel{50};
+                if (allowed) {
+                    for (const auto& dep : dependencies) {
+                        if (!dep.dependency) {
+                            continue;
+                        }
+                        if (dep.next > time_exec) {
+                            continue;
+                        }
+                       
+                        if (dep.minFed != source_id) {
+                            allowed = false;
+                        }
+                        if (dep.responseSequenceCounter == sequenceCounter) {
+                            if (restricted) {
+                                restrictionLevel =
+                                    (std::min)(restrictionLevel,
+                                               static_cast<int>(dep.restrictionLevel));
+                            }
+
+                        } else {
+                            restrictionAdvance = false;
+                            allowed = false;
+                            break;
+                        }
+                    }
+                }
+                if (allowed) {
+                    if (restricted) {
+                        if (restrictionLevel >= 1) {
+                            ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                                MessageProcessingResult::ITERATING :
+                                MessageProcessingResult::NEXT_STEP;
+                        } else {
+                            if (currentRestrictionLevel != restrictionLevel + 1) {
+                                currentRestrictionLevel = restrictionLevel + 1;
+                                sendAll = true;
+                                ++sequenceCounter;
+                            }
+
+                            ret = MessageProcessingResult::CONTINUE_PROCESSING;
+                        }
+                    } else {
+                        ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                            MessageProcessingResult::ITERATING :
+                            MessageProcessingResult::NEXT_STEP;
+                    }
+
+                } else {
+                    if (restrictionAdvance) {
+                        currentRestrictionLevel = restrictionLevel + 1;
+                        sendAll = true;
+                        ++sequenceCounter;
+                    }
+                    ret = MessageProcessingResult::CONTINUE_PROCESSING;
+                }
+            }
+            }
+    
+        break;
+    }
+    
+    if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
+        iterating != IterationRequest::NO_ITERATIONS) {
+        if (sendAll) {
+            sendTimeRequest(GlobalFederateId{});
+        } else {
+            sendTimeRequest(triggerFed);
         }
     }
 
-    // if we haven't returned we may need to update the time messages
-    if ((!dependencies.empty())) {
-        sendTimeRequest(triggerFed);
-    }
     return MessageProcessingResult::CONTINUE_PROCESSING;
 }
 
@@ -801,21 +800,9 @@ std::string TimeCoordinator::printTimeStatus() const
         static_cast<double>(time_minminDe));
 }
 
-bool TimeCoordinator::isDependency(GlobalFederateId ofed) const
-{
-    return dependencies.isDependency(ofed);
-}
-
 bool TimeCoordinator::addDependency(GlobalFederateId fedID)
 {
-    if (dependencies.addDependency(fedID)) {
-        if (fedID == source_id) {
-            auto* dep = dependencies.getDependencyInfo(fedID);
-            if (dep != nullptr) {
-                dep->connection = ConnectionType::self;
-            }
-        }
-
+    if (BaseTimeCoordinator::addDependency(fedID)) {
         dependency_federates.lock()->push_back(fedID);
         return true;
     }
@@ -824,43 +811,11 @@ bool TimeCoordinator::addDependency(GlobalFederateId fedID)
 
 bool TimeCoordinator::addDependent(GlobalFederateId fedID)
 {
-    if (dependencies.addDependent(fedID)) {
+    if (BaseTimeCoordinator::addDependent(fedID)) {
         dependent_federates.lock()->push_back(fedID);
         return true;
     }
     return false;
-}
-
-void TimeCoordinator::setAsChild(GlobalFederateId fedID)
-{
-    if (fedID == source_id) {
-        return;
-    }
-    auto* dep = dependencies.getDependencyInfo(fedID);
-    if (dep != nullptr) {
-        dep->connection = ConnectionType::child;
-    }
-}
-
-void TimeCoordinator::setAsParent(GlobalFederateId fedID)
-{
-    if (fedID == source_id) {
-        return;
-    }
-    auto* dep = dependencies.getDependencyInfo(fedID);
-    if (dep != nullptr) {
-        dep->connection = ConnectionType::parent;
-    }
-}
-
-GlobalFederateId TimeCoordinator::getParent() const
-{
-    for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::parent) {
-            return dep.fedID;
-        }
-    }
-    return {};
 }
 
 void TimeCoordinator::removeDependency(GlobalFederateId fedID)
@@ -883,11 +838,6 @@ void TimeCoordinator::removeDependent(GlobalFederateId fedID)
     if (res != dlock.end()) {
         dlock->erase(res);
     }
-}
-
-DependencyInfo* TimeCoordinator::getDependencyInfo(GlobalFederateId ofed)
-{
-    return dependencies.getDependencyInfo(ofed);
 }
 
 std::vector<GlobalFederateId> TimeCoordinator::getDependencies() const
@@ -1336,42 +1286,6 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
     return message_process_result::no_effect;
 }
 
-void TimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
-{
-    bool added{false};
-    switch (cmd.action()) {
-        case CMD_ADD_DEPENDENCY:
-            added = addDependency(cmd.source_id);
-            break;
-        case CMD_REMOVE_DEPENDENCY:
-            removeDependency(cmd.source_id);
-            break;
-        case CMD_ADD_DEPENDENT:
-            addDependent(cmd.source_id);
-            break;
-        case CMD_REMOVE_DEPENDENT:
-            removeDependent(cmd.source_id);
-            break;
-        case CMD_ADD_INTERDEPENDENCY:
-            added = addDependency(cmd.source_id);
-            addDependent(cmd.source_id);
-            break;
-        case CMD_REMOVE_INTERDEPENDENCY:
-            removeDependency(cmd.source_id);
-            removeDependent(cmd.source_id);
-            break;
-        default:
-            break;
-    }
-    if (added) {
-        if (checkActionFlag(cmd, child_flag)) {
-            setAsChild(cmd.source_id);
-        }
-        if (checkActionFlag(cmd, parent_flag)) {
-            setAsParent(cmd.source_id);
-        }
-    }
-}
 
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)

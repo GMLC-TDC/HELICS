@@ -408,7 +408,9 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
     if (iterating) {
         if (waiting) {
             for (const auto& dep : dependencies) {
-                if (dep.dependency) {
+                if (!dep.dependency) {
+                    continue;
+                }
                     if (dep.connection == ConnectionType::self) {
                         continue;
                     }
@@ -423,7 +425,6 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                             return false;
                         }
                     }
-                }
             }
             return true;
         }
@@ -444,6 +445,60 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                     dep.mTimeState >= TimeState::initialized))));
     });
 }
+
+
+bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
+                                                Time desiredGrantTime,
+                                                bool waiting) const
+{
+    if (iterating) {
+        
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
+                    return false;
+                }
+                if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
+                    return false;
+                }
+                if (waiting) {
+                    if (dep.mTimeState == TimeState::time_requested_iterative ||
+                        dep.mTimeState == TimeState::time_requested_require_iteration) {
+                        if (dep.sequenceCounter < dep.grantedIteration) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+       
+        
+    } else {
+        for (const auto& dep : dependencies) {
+            if (!dep.dependency) {
+                continue;
+            }
+            if (dep.next < desiredGrantTime) {
+                return false;
+            }
+            if (dep.next == desiredGrantTime) {
+                if (dep.mTimeState == TimeState::time_granted) {
+                    return false;
+                }
+                if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 
 bool TimeDependencies::hasActiveTimeDependencies() const
 {
@@ -492,41 +547,6 @@ void TimeDependencies::resetIteratingExecRequests()
             dep.minFed = GlobalFederateId();
         }
     }
-}
-
-bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const
-{
-    if (iterating) {
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next < desiredGrantTime) {
-                return false;
-            }
-            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
-                return false;
-            }
-        }
-    } else {
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next < desiredGrantTime) {
-                return false;
-            }
-            if (dep.next == desiredGrantTime) {
-                if (dep.mTimeState == TimeState::time_granted) {
-                    return false;
-                }
-                if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
 }
 
 void TimeDependencies::resetIteratingTimeRequests(helics::Time requestTime)

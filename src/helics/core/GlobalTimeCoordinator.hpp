@@ -41,7 +41,7 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     /** compute updates to time values
     and send an update if needed
     */
-    virtual void updateTimeFactors() override;
+    virtual bool updateTimeFactors() override;
 
   private:
     void transmitTimingMessagesUpstream(ActionMessage& msg) const;
@@ -50,7 +50,8 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
 
   public:
     /** check if entry to the executing state can be granted*/
-    virtual MessageProcessingResult checkExecEntry() override;
+    virtual MessageProcessingResult
+        checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) override;
 
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const override;

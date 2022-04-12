@@ -40,15 +40,14 @@ class BaseTimeCoordinator {
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
-
+    bool disconnected{false};
   public:
-    BaseTimeCoordinator() = default;
+    BaseTimeCoordinator();
+    explicit BaseTimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction);
     virtual ~BaseTimeCoordinator() = default;
     /** set the callback function used for the sending messages*/
-    void setMessageSender(std::function<void(const ActionMessage&)> userSendMessageFunction)
-    {
-        sendMessageFunction = std::move(userSendMessageFunction);
-    }
+    void setMessageSender(std::function<void(const ActionMessage&)> userSendMessageFunction);
+    
     void setRestrictivePolicy(bool policy) { restrictive_time_policy = policy; }
     /** get a list of actual dependencies*/
     std::vector<GlobalFederateId> getDependencies() const;
@@ -60,7 +59,7 @@ class BaseTimeCoordinator {
     /** compute updates to time values
     and send an update if needed
     */
-    virtual void updateTimeFactors() = 0;
+    virtual bool updateTimeFactors() = 0;
 
     /** take a global id and get a pointer to the dependencyInfo for the other fed
     will be nullptr if it doesn't exist
@@ -86,25 +85,27 @@ class BaseTimeCoordinator {
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency(GlobalFederateId fedID);
+    virtual bool addDependency(GlobalFederateId fedID);
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent(GlobalFederateId fedID);
+    virtual bool addDependent(GlobalFederateId fedID);
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency(GlobalFederateId fedID);
+    virtual void removeDependency(GlobalFederateId fedID);
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent(GlobalFederateId fedID);
+    virtual void removeDependent(GlobalFederateId fedID);
 
     void setAsChild(GlobalFederateId fedID);
     void setAsParent(GlobalFederateId fedID);
+    GlobalFederateId getParent() const;
 
     /** disconnect*/
     void disconnect();
     /** check if entry to the executing state can be granted*/
-    virtual MessageProcessingResult checkExecEntry() = 0;
+    virtual MessageProcessingResult
+        checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) = 0;
 
     /** function to enter the exec Mode
      */

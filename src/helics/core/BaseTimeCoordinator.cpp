@@ -19,6 +19,34 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics {
+
+static const Time bigTime(HELICS_BIG_NUMBER);
+
+static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
+
+static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
+
+BaseTimeCoordinator::BaseTimeCoordinator():sendMessageFunction(nullMessageFunction) {
+
+}
+BaseTimeCoordinator::BaseTimeCoordinator(
+    std::function<void(const ActionMessage&)> userSendMessageFunction):
+    sendMessageFunction(std::move(userSendMessageFunction))
+{
+    if (!sendMessageFunction) {
+        sendMessageFunction = nullMessageFunction;
+    }
+}
+
+void BaseTimeCoordinator::setMessageSender(
+    std::function<void(const ActionMessage&)> userSendMessageFunction)
+{
+    sendMessageFunction = std::move(userSendMessageFunction);
+    if (!sendMessageFunction) {
+        sendMessageFunction = nullMessageFunction;
+    }
+}
+
 void BaseTimeCoordinator::enteringExecMode()
 {
     if (executionMode) {
@@ -55,7 +83,10 @@ void BaseTimeCoordinator::enteringExecMode()
 
 void BaseTimeCoordinator::disconnect()
 {
-    if (sendMessageFunction) {
+    if (disconnected) {
+        return;
+    }
+
         if (dependencies.empty()) {
             return;
         }
@@ -86,7 +117,7 @@ void BaseTimeCoordinator::disconnect()
             }
             sendMessageFunction(multi);
         }
-    }
+        disconnected = true;
 }
 
 void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -127,7 +158,16 @@ bool BaseTimeCoordinator::isDependency(GlobalFederateId ofed) const
 
 bool BaseTimeCoordinator::addDependency(GlobalFederateId fedID)
 {
-    return dependencies.addDependency(fedID);
+    if (dependencies.addDependency(fedID)) {
+        if (fedID == mSourceId) {
+            auto* dep = dependencies.getDependencyInfo(fedID);
+            if (dep != nullptr) {
+                dep->connection = ConnectionType::self;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 bool BaseTimeCoordinator::addDependent(GlobalFederateId fedID)
@@ -137,6 +177,9 @@ bool BaseTimeCoordinator::addDependent(GlobalFederateId fedID)
 
 void BaseTimeCoordinator::setAsChild(GlobalFederateId fedID)
 {
+    if (fedID == mSourceId) {
+        return;
+    }
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::child;
@@ -145,11 +188,24 @@ void BaseTimeCoordinator::setAsChild(GlobalFederateId fedID)
 
 void BaseTimeCoordinator::setAsParent(GlobalFederateId fedID)
 {
+    if (fedID == mSourceId) {
+        return;
+    }
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
         dep->connection = ConnectionType::parent;
         noParent = false;
     }
+}
+
+GlobalFederateId BaseTimeCoordinator::getParent() const
+{
+    for (const auto& dep : dependencies) {
+        if (dep.connection == ConnectionType::parent) {
+            return dep.fedID;
+        }
+    }
+    return {};
 }
 
 void BaseTimeCoordinator::removeDependency(GlobalFederateId fedID)
@@ -314,9 +370,10 @@ bool BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 
 void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)
 {
+    bool added{false};
     switch (cmd.action()) {
         case CMD_ADD_DEPENDENCY:
-            addDependency(cmd.source_id);
+            added=addDependency(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENCY:
             removeDependency(cmd.source_id);
@@ -328,7 +385,7 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
             removeDependent(cmd.source_id);
             break;
         case CMD_ADD_INTERDEPENDENCY:
-            addDependency(cmd.source_id);
+            added=addDependency(cmd.source_id);
             addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_INTERDEPENDENCY:
@@ -338,11 +395,13 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
         default:
             break;
     }
-    if (checkActionFlag(cmd, child_flag)) {
-        setAsChild(cmd.source_id);
-    }
-    if (checkActionFlag(cmd, parent_flag)) {
-        setAsParent(cmd.source_id);
+    if (added) {
+        if (checkActionFlag(cmd, child_flag)) {
+            setAsChild(cmd.source_id);
+        }
+        if (checkActionFlag(cmd, parent_flag)) {
+            setAsParent(cmd.source_id);
+        }
     }
 }
 

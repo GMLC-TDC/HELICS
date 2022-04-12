@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-void ForwardingTimeCoordinator::updateTimeFactors()
+bool ForwardingTimeCoordinator::updateTimeFactors()
 {
     auto mTimeUpstream = generateMinTimeUpstream(
         dependencies, restrictive_time_policy, mSourceId, NoIgnoredFederates, sequenceCounter);
@@ -77,6 +77,7 @@ void ForwardingTimeCoordinator::updateTimeFactors()
             }
         }
     }
+    return (updateUpstream || updateDownstream);
 }
 
 void ForwardingTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -100,7 +101,7 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
                        static_cast<double>(downstream.minDe));
 }
 
-MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry()
+MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
 

@@ -54,14 +54,14 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
     return {triggered, me};
 }
 
-void GlobalTimeCoordinator::updateTimeFactors()
+bool GlobalTimeCoordinator::updateTimeFactors()
 {
     auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
     if (timeStream.mTimeState == TimeState::time_granted) {
         currentTimeState = TimeState::time_granted;
         currentMinTime = timeStream.next;
         nextEvent = timeStream.next;
-        return;
+        return false;
     }
     if (timeStream.mTimeState == TimeState::time_requested) {
         if (currentTimeState == TimeState::time_granted) {
@@ -78,7 +78,7 @@ void GlobalTimeCoordinator::updateTimeFactors()
                     sendMessageFunction(updateTime);
                 }
             }
-            return;
+            return true;
         }
         if (currentTimeState == TimeState::time_requested) {
             if (dependencies.verifySequenceCounter(nextEvent, sequenceCounter)) {
@@ -95,7 +95,7 @@ void GlobalTimeCoordinator::updateTimeFactors()
                             sendMessageFunction(updateTime);
                         }
                     }
-                    return;
+                    return true;
                 }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
                 updateTime.actionTime = nextEvent + Time::epsilon();
@@ -115,6 +115,7 @@ void GlobalTimeCoordinator::updateTimeFactors()
             }
         }
     }
+    return true;
 }
 
 void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -131,7 +132,7 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
                        static_cast<double>(nextEvent));
 }
 
-MessageProcessingResult GlobalTimeCoordinator::checkExecEntry()
+MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
 

@@ -158,7 +158,7 @@ class TimeDependencies {
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
-    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const;
+    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime, bool waiting) const;
 
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
