@@ -52,7 +52,7 @@ class tcoptions {
 the time coordinator manages dependencies and computes whether time can advance or enter execution
 mode
 */
-class TimeCoordinator:public BaseTimeCoordinator {
+class TimeCoordinator: public BaseTimeCoordinator {
   protected:
     /// the variables for time coordination
     TimeData upstream;
@@ -218,7 +218,8 @@ class TimeCoordinator:public BaseTimeCoordinator {
     void removeDependent(GlobalFederateId fedID);
 
     /** check if entry to the executing state can be granted*/
-    virtual MessageProcessingResult checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) override;
+    virtual MessageProcessingResult
+        checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) override;
 
     /** send updated exec request to target or everyone if target is invalid*/
     void sendUpdatedExecRequest(GlobalFederateId target = GlobalFederateId{},

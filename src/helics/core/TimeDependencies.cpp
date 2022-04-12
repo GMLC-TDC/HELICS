@@ -411,20 +411,20 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
                 if (!dep.dependency) {
                     continue;
                 }
-                    if (dep.connection == ConnectionType::self) {
-                        continue;
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.mTimeState == TimeState::initialized) {
+                    if (dep.grantedIteration == 0) {
+                        return false;
                     }
-                    if (dep.mTimeState == TimeState::initialized) {
-                        if (dep.grantedIteration == 0) {
-                            return false;
-                        }
+                }
+                if (dep.mTimeState == TimeState::exec_requested_iterative ||
+                    dep.mTimeState == TimeState::exec_requested_require_iteration) {
+                    if (dep.sequenceCounter < dep.grantedIteration) {
+                        return false;
                     }
-                    if (dep.mTimeState == TimeState::exec_requested_iterative ||
-                        dep.mTimeState == TimeState::exec_requested_require_iteration) {
-                        if (dep.sequenceCounter < dep.grantedIteration) {
-                            return false;
-                        }
-                    }
+                }
             }
             return true;
         }
@@ -446,38 +446,35 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
     });
 }
 
-
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                                                 Time desiredGrantTime,
                                                 bool waiting) const
 {
     if (iterating) {
-        
-            for (const auto& dep : dependencies) {
-                if (!dep.dependency) {
-                    continue;
-                }
-                if (dep.connection == ConnectionType::self) {
-                    continue;
-                }
-                if (dep.next < desiredGrantTime) {
-                    return false;
-                }
-                if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
-                    return false;
-                }
-                if (waiting) {
-                    if (dep.mTimeState == TimeState::time_requested_iterative ||
-                        dep.mTimeState == TimeState::time_requested_require_iteration) {
-                        if (dep.sequenceCounter < dep.grantedIteration) {
-                            return false;
-                        }
+        for (const auto& dep : dependencies) {
+            if (!dep.dependency) {
+                continue;
+            }
+            if (dep.connection == ConnectionType::self) {
+                continue;
+            }
+            if (dep.next < desiredGrantTime) {
+                return false;
+            }
+            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
+                return false;
+            }
+            if (waiting) {
+                if (dep.mTimeState == TimeState::time_requested_iterative ||
+                    dep.mTimeState == TimeState::time_requested_require_iteration) {
+                    if (dep.sequenceCounter < dep.grantedIteration) {
+                        return false;
                     }
                 }
             }
-            return true;
-       
-        
+        }
+        return true;
+
     } else {
         for (const auto& dep : dependencies) {
             if (!dep.dependency) {
@@ -498,7 +495,6 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
     }
     return true;
 }
-
 
 bool TimeDependencies::hasActiveTimeDependencies() const
 {

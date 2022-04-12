@@ -541,114 +541,117 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
     bool sendAll{needSendAll};
     needSendAll = false;
     switch (iterating) {
-
-    case IterationRequest::NO_ITERATIONS:
-        if (time_allow > time_exec) {
-            iteration = 0;
-            updateTimeGrant();
-            return MessageProcessingResult::NEXT_STEP;
-        }
-        if (time_allow == time_exec) {
-            if (!info.wait_for_current_time_updates) {
-                if (time_requested <= time_exec) {
-                    // this is the non interrupted case
-                    iteration = 0;
-                    updateTimeGrant();
-                    return MessageProcessingResult::NEXT_STEP;
-                }
-                if (dependencies.checkIfReadyForTimeGrant(false, time_exec,info.wait_for_current_time_updates)) {
-                    iteration = 0;
-                    updateTimeGrant();
-                    return MessageProcessingResult::NEXT_STEP;
-                }
-            }
-            // if the wait_for_current_time_updates flag is set then time_allow must be greater
-            // than time_exec
-        }
-        break;
-    case IterationRequest::ITERATE_IF_NEEDED:
-    case IterationRequest::FORCE_ITERATION:
-        if (time_allow > time_exec) {
-            if (time_exec<=time_granted) {
-                ++iteration;
-                updateTimeGrant();
-                return MessageProcessingResult::ITERATING;
-            } else {
+        case IterationRequest::NO_ITERATIONS:
+            if (time_allow > time_exec) {
                 iteration = 0;
                 updateTimeGrant();
-                return (iterating == IterationRequest::FORCE_ITERATION) ?
-                    MessageProcessingResult::ITERATING :
-                    MessageProcessingResult::NEXT_STEP;
+                return MessageProcessingResult::NEXT_STEP;
             }
-        }
-        if (time_allow == time_exec)  // time_allow==time_exec==time_granted
-        {
-            if (dependencies.checkIfReadyForTimeGrant(true, time_exec,info.wait_for_current_time_updates)) {
-                bool allowed{!info.wait_for_current_time_updates};
-                bool restricted{info.restrictive_time_policy};
-                bool restrictionAdvance{restricted};
-                int restrictionLevel{50};
-                if (allowed) {
-                    for (const auto& dep : dependencies) {
-                        if (!dep.dependency) {
-                            continue;
-                        }
-                        if (dep.next > time_exec) {
-                            continue;
-                        }
-                       
-                        if (dep.minFed != source_id) {
-                            allowed = false;
-                        }
-                        if (dep.responseSequenceCounter == sequenceCounter) {
-                            if (restricted) {
-                                restrictionLevel =
-                                    (std::min)(restrictionLevel,
-                                               static_cast<int>(dep.restrictionLevel));
-                            }
-
-                        } else {
-                            restrictionAdvance = false;
-                            allowed = false;
-                            break;
-                        }
+            if (time_allow == time_exec) {
+                if (!info.wait_for_current_time_updates) {
+                    if (time_requested <= time_exec) {
+                        // this is the non interrupted case
+                        iteration = 0;
+                        updateTimeGrant();
+                        return MessageProcessingResult::NEXT_STEP;
+                    }
+                    if (dependencies.checkIfReadyForTimeGrant(false,
+                                                              time_exec,
+                                                              info.wait_for_current_time_updates)) {
+                        iteration = 0;
+                        updateTimeGrant();
+                        return MessageProcessingResult::NEXT_STEP;
                     }
                 }
-                if (allowed) {
-                    if (restricted) {
-                        if (restrictionLevel >= 1) {
+                // if the wait_for_current_time_updates flag is set then time_allow must be greater
+                // than time_exec
+            }
+            break;
+        case IterationRequest::ITERATE_IF_NEEDED:
+        case IterationRequest::FORCE_ITERATION:
+            if (time_allow > time_exec) {
+                if (time_exec <= time_granted) {
+                    ++iteration;
+                    updateTimeGrant();
+                    return MessageProcessingResult::ITERATING;
+                } else {
+                    iteration = 0;
+                    updateTimeGrant();
+                    return (iterating == IterationRequest::FORCE_ITERATION) ?
+                        MessageProcessingResult::ITERATING :
+                        MessageProcessingResult::NEXT_STEP;
+                }
+            }
+            if (time_allow == time_exec)  // time_allow==time_exec==time_granted
+            {
+                if (dependencies.checkIfReadyForTimeGrant(true,
+                                                          time_exec,
+                                                          info.wait_for_current_time_updates)) {
+                    bool allowed{!info.wait_for_current_time_updates};
+                    bool restricted{info.restrictive_time_policy};
+                    bool restrictionAdvance{restricted};
+                    int restrictionLevel{50};
+                    if (allowed) {
+                        for (const auto& dep : dependencies) {
+                            if (!dep.dependency) {
+                                continue;
+                            }
+                            if (dep.next > time_exec) {
+                                continue;
+                            }
+
+                            if (dep.minFed != source_id) {
+                                allowed = false;
+                            }
+                            if (dep.responseSequenceCounter == sequenceCounter) {
+                                if (restricted) {
+                                    restrictionLevel =
+                                        (std::min)(restrictionLevel,
+                                                   static_cast<int>(dep.restrictionLevel));
+                                }
+
+                            } else {
+                                restrictionAdvance = false;
+                                allowed = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (allowed) {
+                        if (restricted) {
+                            if (restrictionLevel >= 1) {
+                                ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                                    MessageProcessingResult::ITERATING :
+                                    MessageProcessingResult::NEXT_STEP;
+                            } else {
+                                if (currentRestrictionLevel != restrictionLevel + 1) {
+                                    currentRestrictionLevel = restrictionLevel + 1;
+                                    sendAll = true;
+                                    ++sequenceCounter;
+                                }
+
+                                ret = MessageProcessingResult::CONTINUE_PROCESSING;
+                            }
+                        } else {
                             ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                                 MessageProcessingResult::ITERATING :
                                 MessageProcessingResult::NEXT_STEP;
-                        } else {
-                            if (currentRestrictionLevel != restrictionLevel + 1) {
-                                currentRestrictionLevel = restrictionLevel + 1;
-                                sendAll = true;
-                                ++sequenceCounter;
-                            }
-
-                            ret = MessageProcessingResult::CONTINUE_PROCESSING;
                         }
-                    } else {
-                        ret = (iterating == IterationRequest::FORCE_ITERATION) ?
-                            MessageProcessingResult::ITERATING :
-                            MessageProcessingResult::NEXT_STEP;
-                    }
 
-                } else {
-                    if (restrictionAdvance) {
-                        currentRestrictionLevel = restrictionLevel + 1;
-                        sendAll = true;
-                        ++sequenceCounter;
+                    } else {
+                        if (restrictionAdvance) {
+                            currentRestrictionLevel = restrictionLevel + 1;
+                            sendAll = true;
+                            ++sequenceCounter;
+                        }
+                        ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     }
-                    ret = MessageProcessingResult::CONTINUE_PROCESSING;
                 }
             }
-            }
-    
-        break;
+
+            break;
     }
-    
+
     if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
         iterating != IterationRequest::NO_ITERATIONS) {
         if (sendAll) {
@@ -1285,7 +1288,6 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
     time_block = ltime;
     return message_process_result::no_effect;
 }
-
 
 /** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)

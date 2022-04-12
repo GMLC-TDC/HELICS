@@ -41,13 +41,14 @@ class BaseTimeCoordinator {
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
     bool disconnected{false};
+
   public:
     BaseTimeCoordinator();
     explicit BaseTimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction);
     virtual ~BaseTimeCoordinator() = default;
     /** set the callback function used for the sending messages*/
     void setMessageSender(std::function<void(const ActionMessage&)> userSendMessageFunction);
-    
+
     void setRestrictivePolicy(bool policy) { restrictive_time_policy = policy; }
     /** get a list of actual dependencies*/
     std::vector<GlobalFederateId> getDependencies() const;

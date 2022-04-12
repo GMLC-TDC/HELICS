@@ -26,9 +26,7 @@ static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
 
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 
-BaseTimeCoordinator::BaseTimeCoordinator():sendMessageFunction(nullMessageFunction) {
-
-}
+BaseTimeCoordinator::BaseTimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
 BaseTimeCoordinator::BaseTimeCoordinator(
     std::function<void(const ActionMessage&)> userSendMessageFunction):
     sendMessageFunction(std::move(userSendMessageFunction))
@@ -87,37 +85,37 @@ void BaseTimeCoordinator::disconnect()
         return;
     }
 
-        if (dependencies.empty()) {
-            return;
+    if (dependencies.empty()) {
+        return;
+    }
+    ActionMessage bye(CMD_DISCONNECT);
+    bye.source_id = mSourceId;
+    if (dependencies.size() == 1) {
+        auto& dep = *dependencies.begin();
+        if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
+            bye.dest_id = dep.fedID;
+            if (bye.dest_id == mSourceId) {
+                processTimeMessage(bye);
+            } else {
+                sendMessageFunction(bye);
+            }
         }
-        ActionMessage bye(CMD_DISCONNECT);
-        bye.source_id = mSourceId;
-        if (dependencies.size() == 1) {
-            auto& dep = *dependencies.begin();
+
+    } else {
+        ActionMessage multi(CMD_MULTI_MESSAGE);
+        for (const auto& dep : dependencies) {
             if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                 bye.dest_id = dep.fedID;
-                if (bye.dest_id == mSourceId) {
+                if (dep.fedID == mSourceId) {
                     processTimeMessage(bye);
                 } else {
-                    sendMessageFunction(bye);
+                    appendMessage(multi, bye);
                 }
             }
-
-        } else {
-            ActionMessage multi(CMD_MULTI_MESSAGE);
-            for (const auto& dep : dependencies) {
-                if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
-                    bye.dest_id = dep.fedID;
-                    if (dep.fedID == mSourceId) {
-                        processTimeMessage(bye);
-                    } else {
-                        appendMessage(multi, bye);
-                    }
-                }
-            }
-            sendMessageFunction(multi);
         }
-        disconnected = true;
+        sendMessageFunction(multi);
+    }
+    disconnected = true;
 }
 
 void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
@@ -373,7 +371,7 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
     bool added{false};
     switch (cmd.action()) {
         case CMD_ADD_DEPENDENCY:
-            added=addDependency(cmd.source_id);
+            added = addDependency(cmd.source_id);
             break;
         case CMD_REMOVE_DEPENDENCY:
             removeDependency(cmd.source_id);
@@ -385,7 +383,7 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
             removeDependent(cmd.source_id);
             break;
         case CMD_ADD_INTERDEPENDENCY:
-            added=addDependency(cmd.source_id);
+            added = addDependency(cmd.source_id);
             addDependent(cmd.source_id);
             break;
         case CMD_REMOVE_INTERDEPENDENCY:
