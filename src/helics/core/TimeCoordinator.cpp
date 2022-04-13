@@ -629,7 +629,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                             if (!dep.dependency) {
                                 continue;
                             }
-                            if (dep.next > time_exec || dep.connection==ConnectionType::self) {
+                            if (dep.next > time_exec || dep.connection == ConnectionType::self) {
                                 continue;
                             }
 
