@@ -85,8 +85,6 @@ class TimeCoordinator: public BaseTimeCoordinator {
     std::uint8_t currentRestrictionLevel{0};
 
   public:
-    /// the identifier for inserting into the source id field of any generated messages;
-    GlobalFederateId source_id{0};
     /// indicator that the coordinator should be iteratingif need be
     IterationRequest iterating{IterationRequest::NO_ITERATIONS};
 

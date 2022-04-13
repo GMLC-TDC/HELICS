@@ -1435,7 +1435,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
                 global_id = cmd.dest_id;
                 interfaceInformation.setGlobalId(cmd.dest_id);
-                timeCoord->source_id = global_id;
+                timeCoord->setSourceId(global_id);
                 return MessageProcessingResult::NEXT_STEP;
             }
             break;
