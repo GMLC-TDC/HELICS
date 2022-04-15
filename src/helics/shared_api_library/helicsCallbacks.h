@@ -106,10 +106,10 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
  *
  * @param fed The federate to set the callback for.
  * @param queryAnswer A callback with signature const char *(const char *query, int querySize, HelicsQueryBuffer buffer, void *userdata);
- *                 The function arguments are the query string requesting an answer along with its size, the string is not guaranteed to be
- * null terminated HelicsQueryBuffer is the buffer intended to filled out by the userCallback. The buffer can be empty if the query is not
+ *                 The function arguments include the query string requesting an answer along with its size; the string is not guaranteed to be
+ * null terminated. HelicsQueryBuffer is the buffer intended to filled out by the userCallback. The buffer can be empty if the query is not
  recognized and HELICS will generate the appropriate response.  The buffer is used to ensure memory ownership separation between user code
- and HELICS code
+ and HELICS code.
  *  The HelicsQueryBufferFill method can be used to load a string into the buffer.
  @param userdata A pointer to user data that is passed to the function when executing.
  *
@@ -127,11 +127,11 @@ HELICS_EXPORT void
  * Set callback for the time request.
  *
  * @details This callback will be executed when a valid time request is made. It is intended for the possibility of embedded data grabbers
- in a callback to simplify user code
+ in a callback to simplify user code.
  *
  * @param fed The federate to set the callback for.
  * @param requestTime A callback with signature void(HelicsTime currentTime, HelicsTime requestTime, bool iterating, void *userdata);
- *                 The function arguments are the new time value, a bool indicating that the time is iterating, and pointer to the userdata.
+ *                 The function arguments are the current time value, the requested time value, a bool indicating that the time is iterating, and pointer to the userdata.
  * @param userdata A pointer to user data that is passed to the function when executing.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -190,7 +190,7 @@ HELICS_EXPORT void
  *
  * @details This callback will be executed after all other callbacks for a time request return.  This callback will be the last thing
  executed before returning control to the user program.
- * the difference between this and the TimeUpdate callback is the order of execution.  The timeUpdate callback is executed prior to
+ * The difference between this and the TimeUpdate callback is the order of execution.  The timeUpdate callback is executed prior to
  individual interface callbacks, this callback is executed after all others.
  * @param fed The federate to set the callback for.
  * @param requestTimeReturn A callback with signature void(HelicsTime newTime, bool iterating, void *userdata);
