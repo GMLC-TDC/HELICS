@@ -106,7 +106,8 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
  *
  * @param fed The federate to set the callback for.
  * @param queryAnswer A callback with signature const char *(const char *query, int querySize, HelicsQueryBuffer buffer, void *userdata);
- *                 The function arguments include the query string requesting an answer along with its size; the string is not guaranteed to be
+ *                 The function arguments include the query string requesting an answer along with its size; the string is not guaranteed to
+ be
  * null terminated. HelicsQueryBuffer is the buffer intended to filled out by the userCallback. The buffer can be empty if the query is not
  recognized and HELICS will generate the appropriate response.  The buffer is used to ensure memory ownership separation between user code
  and HELICS code.
@@ -131,7 +132,8 @@ HELICS_EXPORT void
  *
  * @param fed The federate to set the callback for.
  * @param requestTime A callback with signature void(HelicsTime currentTime, HelicsTime requestTime, bool iterating, void *userdata);
- *                 The function arguments are the current time value, the requested time value, a bool indicating that the time is iterating, and pointer to the userdata.
+ *                 The function arguments are the current time value, the requested time value, a bool indicating that the time is
+ iterating, and pointer to the userdata.
  * @param userdata A pointer to user data that is passed to the function when executing.
  *
  * @param[in,out] err A pointer to an error object for catching errors.

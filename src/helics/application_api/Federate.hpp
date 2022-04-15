@@ -331,8 +331,8 @@ class HELICS_CXX_EXPORT Federate {
     @details this callback is executed prior to any blocking operation on any valid timeRequest
     method it will execute in the calling thread
     @param callback the function to call; the function signature is void(Time, Time, bool) where the
-    first Time value is the current time and the second is the requested time.  The boolean is set to
-    true if the request is possibly iterating
+    first Time value is the current time and the second is the requested time.  The boolean is set
+    to true if the request is possibly iterating
     */
     void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
 
