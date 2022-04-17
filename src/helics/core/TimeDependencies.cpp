@@ -473,22 +473,34 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                 }
             }
         }
-        return true;
-
     } else {
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next < desiredGrantTime) {
-                return false;
-            }
-            if (dep.next == desiredGrantTime) {
-                if (dep.mTimeState == TimeState::time_granted) {
+        if (waiting) {
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency) {
+                    continue;
+                }
+                if (dep.connection==ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next <= desiredGrantTime) {
                     return false;
                 }
-                if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+            }
+        } else {
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
                     return false;
+                }
+                if (dep.next == desiredGrantTime) {
+                    if (dep.mTimeState == TimeState::time_granted) {
+                        return false;
+                    }
+                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                        return false;
+                    }
                 }
             }
         }
@@ -643,6 +655,10 @@ static void generateMinTimeImplementation(TimeData& mTime,
             // therefore it can't be used to determine a time grant
             mTime.minDe = -1;
         }
+    } else if (dep.responseSequenceCounter == sequenceCode && dep.dependent) {
+        if (dep.minDe >= dep.next && dep.minDe < mTime.minDe) {
+            mTime.minDe = dep.minDe;
+        }
     } else {
         if (dep.next < mTime.minDe) {
             mTime.minDe = dep.next;
@@ -657,7 +673,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.mTimeState = dep.mTimeState;
         }
     }
-    if (dep.connection != ConnectionType::self) {
+   // if (dep.connection != ConnectionType::self) {
         if (dep.Te < mTime.Te) {
             mTime.TeAlt = mTime.Te;
             mTime.Te = dep.Te;
@@ -673,7 +689,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.minFed = GlobalFederateId{};
             mTime.TeAlt = mTime.Te;
         }
-    }
+   // }
 }
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,

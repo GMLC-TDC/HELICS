@@ -22,11 +22,12 @@ const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter
     return std::string(parameter.param);
 };
 
-struct iteration_tests: public FederateTestFixture, public ::testing::Test {};
+struct iteration: public FederateTestFixture, public ::testing::Test {
+};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-TEST_F(iteration_tests, execution_iteration)
+TEST_F(iteration, execution_iteration)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -53,7 +54,7 @@ TEST_F(iteration_tests, execution_iteration)
     EXPECT_EQ(val2, val);
 }
 
-TEST_F(iteration_tests, execution_iteration_endpoint)
+TEST_F(iteration, execution_iteration_endpoint)
 {
     SetupTest<helics::MessageFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -137,11 +138,11 @@ std::vector<std::pair<double, int>>
     return results;
 }
 
-class iteration_tests_type:
+class iteration_type:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
 
-TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
+TEST_P(iteration_type, execution_iteration_round_robin_ci_skip)
 {
     try {
         SetupTest<helics::ValueFederate>(GetParam(), 3);
@@ -175,12 +176,12 @@ TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(iteration_tests,
-                         iteration_tests_type,
+INSTANTIATE_TEST_SUITE_P(iteration,
+                         iteration_type,
                          ::testing::ValuesIn(CoreTypes_all),
                          testNamer);
 
-TEST_F(iteration_tests, execution_iteration_loop3)
+TEST_F(iteration, execution_iteration_loop3)
 {
     int N = 5;
     SetupTest<helics::ValueFederate>("test", N);
@@ -197,7 +198,7 @@ TEST_F(iteration_tests, execution_iteration_loop3)
     }
 }
 
-TEST_F(iteration_tests, execution_iteration_2fed)
+TEST_F(iteration, execution_iteration_2fed)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -229,7 +230,7 @@ TEST_F(iteration_tests, execution_iteration_2fed)
     vFed1->finalize();
 }
 
-TEST_F(iteration_tests, execution_iteration_2fed_endpoint)
+TEST_F(iteration, execution_iteration_2fed_endpoint)
 {
     SetupTest<helics::MessageFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -260,7 +261,7 @@ TEST_F(iteration_tests, execution_iteration_2fed_endpoint)
     vFed1->finalize();
 }
 
-TEST_F(iteration_tests, execution_iteration_2fed_targeted_endpoint)
+TEST_F(iteration, execution_iteration_2fed_targeted_endpoint)
 {
     SetupTest<helics::MessageFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -294,7 +295,7 @@ TEST_F(iteration_tests, execution_iteration_2fed_targeted_endpoint)
 }
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-TEST_F(iteration_tests, time_iteration_test)
+TEST_F(iteration, time_iteration)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -323,7 +324,7 @@ TEST_F(iteration_tests, time_iteration_test)
     EXPECT_EQ(val2, val);
 }
 
-TEST_F(iteration_tests, time_iteration_test_2fed)
+TEST_F(iteration, time_iteration_2fed)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -359,7 +360,7 @@ TEST_F(iteration_tests, time_iteration_test_2fed)
     EXPECT_EQ(val2, val);
 }
 
-TEST_F(iteration_tests, time_iteration_test_message)
+TEST_F(iteration, time_iteration_message)
 {
     SetupTest<helics::MessageFederate>("test", 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -385,7 +386,7 @@ TEST_F(iteration_tests, time_iteration_test_message)
     EXPECT_FALSE(mFed1->hasMessage());
 }
 
-TEST_F(iteration_tests, time_iteration_test_2fed_message)
+TEST_F(iteration, time_iteration_2fed_message)
 {
     SetupTest<helics::MessageFederate>("test", 2, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -420,7 +421,7 @@ TEST_F(iteration_tests, time_iteration_test_2fed_message)
     mFed1->requestTimeComplete();
 }
 
-TEST_F(iteration_tests, test2fed_withSubPub)
+TEST_F(iteration, two_fed_withSubPub)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -463,7 +464,7 @@ TEST_F(iteration_tests, test2fed_withSubPub)
     EXPECT_EQ(val2, val);
 }
 
-TEST_F(iteration_tests, iteration_counter)
+TEST_F(iteration, iteration_counter)
 {
     SetupTest<helics::ValueFederate>("test", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -558,7 +559,7 @@ TEST_F(iteration_tests, iteration_counter)
     deadlock.join();
 }
 
-TEST_F(iteration_tests, wait_for_current_time_iterative)
+TEST_F(iteration, wait_for_current_time_iterative)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -654,7 +655,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative)
     vFed1->finalize();
 }
 
-TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec)
+TEST_F(iteration, wait_for_current_time_iterative_enter_exec)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -713,7 +714,7 @@ TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec)
     vFed1->finalize();
 }
 
-TEST_F(iteration_tests, wait_for_current_time_iterative_enter_exec_endpoint)
+TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
