@@ -20,8 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class vfed_dual_transfer_ci_skip:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 /** test case checking that the transfer between two federates works as expected
  */

@@ -444,15 +444,27 @@ class ValueFederate: public virtual Federate {
         return Input(helicsFederateGetInputByIndex(fed, index, hThrowOnError()));
     }
     /** get the number of inputs in this federate*/
-    int getInputCount() const { return helicsFederateGetInputCount(fed); }
+    int getInputCount() const
+    {
+        return helicsFederateGetInputCount(fed);
+    }
     /** get the number of publications in this federate*/
-    int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
+    int getPublicationCount() const
+    {
+        return helicsFederateGetPublicationCount(fed);
+    }
     // TODO(PT): use c api to implement this method... callbacks too?
     /** Get a list of all subscriptions with updates since the last call **/
-    std::vector<HelicsInput> queryUpdates() { return std::vector<HelicsInput>(); }
+    std::vector<HelicsInput> queryUpdates()
+    {
+        return std::vector<HelicsInput>();
+    }
 
     /** clear all the update flags from all federate inputs*/
-    void clearUpdates() { helicsFederateClearUpdates(fed); }
+    void clearUpdates()
+    {
+        helicsFederateClearUpdates(fed);
+    }
     /** publish data contained in a JSON file*/
     void publishJSON(const std::string& json)
     {

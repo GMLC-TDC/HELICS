@@ -37,9 +37,15 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Tracer::Tracer(std::vector<std::string> args): App("tracer", std::move(args)) { processArgs(); }
+    Tracer::Tracer(std::vector<std::string> args): App("tracer", std::move(args))
+    {
+        processArgs();
+    }
 
-    Tracer::Tracer(int argc, char* argv[]): App("tracer", argc, argv) { processArgs(); }
+    Tracer::Tracer(int argc, char* argv[]): App("tracer", argc, argv)
+    {
+        processArgs();
+    }
 
     void Tracer::processArgs()
     {

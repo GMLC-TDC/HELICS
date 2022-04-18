@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct bad_input_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct bad_input_tests: public FederateTestFixture, public ::testing::Test {};
 
 /** test simple creation and destruction*/
 TEST_F(bad_input_tests, test_bad_fed)
@@ -111,8 +110,7 @@ TEST(error_tests, unavailable_CoreType)
     helicsBrokerDestroy(brk);
 }
 
-struct function_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct function_tests: public FederateTestFixture, public ::testing::Test {};
 
 TEST_F(function_tests, execution_iteration_test)
 {

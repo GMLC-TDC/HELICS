@@ -194,8 +194,7 @@ static constexpr const char* simple_files[] = {"example1.player",
                                                "example5.json",
                                                "example5.player"};
 
-class player_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class player_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_file_tests, test_files)
 {
@@ -643,8 +642,7 @@ static constexpr const char* simple_message_files[] = {"example_message1.player"
                                                        "example_message2.player",
                                                        "example_message3.json"};
 
-class player_message_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class player_message_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_message_file_tests, message_test_files)
 {

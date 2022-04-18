@@ -15,13 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value converters and some of the other functions
  */
 
-struct cfed_tests: public FederateTestFixture_cpp, public ::testing::Test {
-};
+struct cfed_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 class cfed_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture_cpp {
-};
+    public FederateTestFixture_cpp {};
 
 // const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 

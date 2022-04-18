@@ -21,8 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-struct command_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct command_tests: public FederateTestFixture, public ::testing::Test {};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 

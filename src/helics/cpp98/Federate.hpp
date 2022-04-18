@@ -72,7 +72,10 @@ class FederateInfo {
     }
 #endif
     /** destructor*/
-    ~FederateInfo() { helicsFederateInfoFree(fi); }
+    ~FederateInfo()
+    {
+        helicsFederateInfoFree(fi);
+    }
     void loadFromArgs(const std::string& argString)
     {
         helicsFederateInfoLoadFromString(fi, argString.c_str(), HELICS_NULL_POINTER);
@@ -84,7 +87,10 @@ class FederateInfo {
         helicsFederateInfoSetCoreName(fi, corename.c_str(), HELICS_NULL_POINTER);
     }
     /// Set the separator character
-    void setSeparator(char sep) { helicsFederateInfoSetSeparator(fi, sep, HELICS_NULL_POINTER); }
+    void setSeparator(char sep)
+    {
+        helicsFederateInfoSetSeparator(fi, sep, HELICS_NULL_POINTER);
+    }
     /** set the core init string to use in the federateInfo
     @param coreInit the core name to use*/
     void setCoreInit(const std::string& coreInit)
@@ -159,14 +165,20 @@ class FederateInfo {
         helicsFederateSendCommand(fi, target.c_str(), cmd.c_str(), HELICS_IGNORE_ERROR);
     }
 
-    const char* getCommand() { return helicsFederateGetCommand(fi, HELICS_IGNORE_ERROR); }
+    const char* getCommand()
+    {
+        return helicsFederateGetCommand(fi, HELICS_IGNORE_ERROR);
+    }
 
     const char* getCommandSource()
     {
         return helicsFederateGetCommandSource(fi, HELICS_IGNORE_ERROR);
     }
     /** get the underlying HelicsFederateInfo object*/
-    HelicsFederateInfo getInfo() { return fi; }
+    HelicsFederateInfo getInfo()
+    {
+        return fi;
+    }
 
   private:
     HelicsFederateInfo fi;  //!< handle for the underlying federate_info object
@@ -267,9 +279,15 @@ class Federate {
 #endif
     }
     /** cast operator to get the underlying HelicsFederate object*/
-    operator HelicsFederate() const { return fed; }
+    operator HelicsFederate() const
+    {
+        return fed;
+    }
     /** get the underlying HelicsFederate object*/
-    HelicsFederate baseObject() const { return fed; }
+    HelicsFederate baseObject() const
+    {
+        return fed;
+    }
     /** set a flag for the federate
    @param flag an index into the flag /ref flag-definitions.h
    @param flagValue the value of the flag defaults to true
@@ -326,7 +344,10 @@ class Federate {
     and should be called before any local interfaces are created otherwise it may not be possible to
     retrieve them without using the full name.  recommended possibilities are ('.','/', ':','-','_')
      */
-    void setSeparator(char sep) { helicsFederateSetSeparator(fed, sep, HELICS_NULL_POINTER); }
+    void setSeparator(char sep)
+    {
+        helicsFederateSetSeparator(fed, sep, HELICS_NULL_POINTER);
+    }
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
     @param configString  the location of the file or config String to load to generate the
@@ -344,7 +365,10 @@ class Federate {
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will block until all federates have entered initialization mode
     */
-    void enterInitializingMode() { helicsFederateEnterInitializingMode(fed, hThrowOnError()); }
+    void enterInitializingMode()
+    {
+        helicsFederateEnterInitializingMode(fed, hThrowOnError());
+    }
     /** enter the initialization mode after all interfaces have been defined
    @details  the call will not block but a call to \ref enterInitializingModeComplete should be made
    to complete the call sequence
@@ -418,14 +442,26 @@ class Federate {
     /** terminate the simulation
    @details call is will block until the finalize has been acknowledged, no commands that interact
    with the core may be called after this function function */
-    void finalize() { helicsFederateFinalize(fed, hThrowOnError()); }
+    void finalize()
+    {
+        helicsFederateFinalize(fed, hThrowOnError());
+    }
     /** terminate the simulation in a non-blocking call
     @details finalizeComplete must be called after this call to complete the finalize procedure*/
-    void finalizeAsync() { helicsFederateFinalizeAsync(fed, hThrowOnError()); }
+    void finalizeAsync()
+    {
+        helicsFederateFinalizeAsync(fed, hThrowOnError());
+    }
     /** complete the asynchronous terminate pair*/
-    void finalizeComplete() { helicsFederateFinalizeComplete(fed, hThrowOnError()); }
+    void finalizeComplete()
+    {
+        helicsFederateFinalizeComplete(fed, hThrowOnError());
+    }
     /** get the current time from a federate */
-    HelicsTime getCurrentTime() { return helicsFederateGetCurrentTime(fed, hThrowOnError()); }
+    HelicsTime getCurrentTime()
+    {
+        return helicsFederateGetCurrentTime(fed, hThrowOnError());
+    }
     /** request a time advancement
    @param time the next requested time step
    @return the granted time step*/
@@ -435,7 +471,10 @@ class Federate {
     }
     /** request a time advancement to the next allowed time
     @return the granted time step*/
-    HelicsTime requestNextStep() { return helicsFederateRequestNextStep(fed, hThrowOnError()); }
+    HelicsTime requestNextStep()
+    {
+        return helicsFederateRequestNextStep(fed, hThrowOnError());
+    }
 
     /** request a time advancement to the next allowed time
     @param timeDelta the amount of time requested to advance
@@ -498,7 +537,10 @@ class Federate {
         helicsFederateProcessCommunications(fed, period, HELICS_IGNORE_ERROR);
     }
     /** get the federate name*/
-    const char* getName() const { return helicsFederateGetName(fed); }
+    const char* getName() const
+    {
+        return helicsFederateGetName(fed);
+    }
 
     /** make a query of the federate
     @details this call is blocking until the value is returned which make take some time depending
@@ -657,7 +699,10 @@ class Federate {
                                                                        hThrowOnError()));
     }
     /** get a count of the number of filters registered in a federate*/
-    int getFilterCount() const { return helicsFederateGetFilterCount(fed); }
+    int getFilterCount() const
+    {
+        return helicsFederateGetFilterCount(fed);
+    }
     /** get the id of a source filter from the name of the endpoint
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
@@ -756,9 +801,15 @@ class Federate {
         helicsFederateLogLevelMessage(fed, level, message.c_str(), hThrowOnError());
     }
     /** get a Core Object*/
-    HelicsCore getCore() { return helicsFederateGetCore(fed, hThrowOnError()); }
+    HelicsCore getCore()
+    {
+        return helicsFederateGetCore(fed, hThrowOnError());
+    }
     /** get the C object for use in the C library*/
-    HelicsFederate getObject() const { return fed; }
+    HelicsFederate getObject() const
+    {
+        return fed;
+    }
 
   protected:
     HelicsFederate fed;  //!< underlying HelicsFederate object

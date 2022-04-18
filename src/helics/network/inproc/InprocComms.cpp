@@ -24,7 +24,10 @@ namespace inproc {
     InprocComms::InprocComms(): CommsInterface(CommsInterface::thread_generation::single) {}
 
     /** destructor*/
-    InprocComms::~InprocComms() { disconnect(); }
+    InprocComms::~InprocComms()
+    {
+        disconnect();
+    }
 
     void InprocComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
@@ -229,7 +232,10 @@ namespace inproc {
         setTxStatus(connection_status::terminated);
     }
 
-    std::string InprocComms::getAddress() const { return localTargetAddress; }
+    std::string InprocComms::getAddress() const
+    {
+        return localTargetAddress;
+    }
 
 }  // namespace inproc
 

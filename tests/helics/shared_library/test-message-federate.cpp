@@ -15,14 +15,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class mfed_simple_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class mfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class mfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
-class mfed_tests: public FederateTestFixture, public ::testing::Test {
-};
+class mfed_tests: public FederateTestFixture, public ::testing::Test {};
 /** test simple creation and destruction*/
 TEST_P(mfed_simple_type_tests, initialize_tests)
 {

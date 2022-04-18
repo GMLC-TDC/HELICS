@@ -16,16 +16,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class filter_simple_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 /*
 class filter_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
 };
 */
 
-class filter_tests: public FederateTestFixture, public ::testing::Test {
-};
+class filter_tests: public FederateTestFixture, public ::testing::Test {};
 
 /** test registration of filters*/
 

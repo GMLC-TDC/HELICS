@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <iostream>
 
-struct iteration_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct iteration_tests: public FederateTestFixture, public ::testing::Test {};
 
 // run a simple iteration on a single federate to test out iterative calls
 TEST_F(iteration_tests, execution_iteration_test)
@@ -106,8 +105,7 @@ std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<Helics
 
 class iteration_tests_type:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
 {

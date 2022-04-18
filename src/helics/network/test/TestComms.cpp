@@ -25,7 +25,10 @@ namespace testcore {
     TestComms::TestComms(): CommsInterface(CommsInterface::thread_generation::single) {}
 
     /** destructor*/
-    TestComms::~TestComms() { disconnect(); }
+    TestComms::~TestComms()
+    {
+        disconnect();
+    }
 
     void TestComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
@@ -293,7 +296,10 @@ namespace testcore {
         }
     }
 
-    std::string TestComms::getAddress() const { return localTargetAddress; }
+    std::string TestComms::getAddress() const
+    {
+        return localTargetAddress;
+    }
 
 }  // namespace testcore
 

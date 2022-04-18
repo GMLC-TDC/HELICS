@@ -1188,8 +1188,7 @@ static constexpr const char* simple_global_files[] = {"example_globals1.json",
                                                       "example_globals1.toml",
                                                       "example_globals2.json"};
 
-class federate_global_files: public ::testing::TestWithParam<const char*> {
-};
+class federate_global_files: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(federate_global_files, global_file_ci_skip)
 {

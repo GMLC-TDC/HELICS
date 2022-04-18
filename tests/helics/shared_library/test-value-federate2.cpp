@@ -14,14 +14,11 @@ Energy, LLC.  See the top-level NOTICE for additional details.
  */
 class vfed2_simple_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class vfed2_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class vfed2_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
-class vfed2_tests: public FederateTestFixture, public ::testing::Test {
-};
+class vfed2_tests: public FederateTestFixture, public ::testing::Test {};
 // const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 
 /** test block send and receive*/
