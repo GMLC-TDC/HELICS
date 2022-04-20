@@ -34,7 +34,7 @@ constexpr Time timeEpsilon = Time::epsilon();
 /** definition of the smallest negative increment of time*/
 constexpr Time negEpsilon = -Time::epsilon();
 /** definition of large time representing simulation end*/
-constexpr Time cBigTime = Time{static_cast<int64_t>(HELICS_BIG_NUMBER*1000000)};
+constexpr Time cBigTime = Time{static_cast<int64_t>(HELICS_BIG_NUMBER * 1000000)};
 
 /** common definition of currentTime in initialization mode*/
 constexpr Time initializationTime = negEpsilon;

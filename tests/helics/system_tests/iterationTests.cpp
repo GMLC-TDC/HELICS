@@ -138,9 +138,8 @@ std::vector<std::pair<double, int>>
     return results;
 }
 
-class iteration_type:
-    public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {};
+class iteration_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
+};
 
 TEST_P(iteration_type, execution_iteration_round_robin_ci_skip)
 {
@@ -176,10 +175,7 @@ TEST_P(iteration_type, execution_iteration_round_robin_ci_skip)
     }
 }
 
-INSTANTIATE_TEST_SUITE_P(iteration,
-                         iteration_type,
-                         ::testing::ValuesIn(CoreTypes_all),
-                         testNamer);
+INSTANTIATE_TEST_SUITE_P(iteration, iteration_type, ::testing::ValuesIn(CoreTypes_all), testNamer);
 
 TEST_F(iteration, execution_iteration_loop3)
 {
