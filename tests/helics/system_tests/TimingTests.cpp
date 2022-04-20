@@ -19,8 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics/helics.hpp"
 
-struct timing: public FederateTestFixture, public ::testing::Test {
-};
+struct timing: public FederateTestFixture, public ::testing::Test {};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 TEST_F(timing, simple_timing)

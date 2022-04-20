@@ -28,8 +28,9 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
     return std::string(parameter.param);
 };
 
-class filter_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class filter_type_tests:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {};
 
 TEST_P(filter_type_tests, message_reroute_filter_object1)
 {

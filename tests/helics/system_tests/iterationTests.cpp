@@ -22,8 +22,7 @@ const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter
     return std::string(parameter.param);
 };
 
-struct iteration: public FederateTestFixture, public ::testing::Test {
-};
+struct iteration: public FederateTestFixture, public ::testing::Test {};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 
@@ -138,8 +137,7 @@ std::vector<std::pair<double, int>>
     return results;
 }
 
-class iteration_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class iteration_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 TEST_P(iteration_type, execution_iteration_round_robin_ci_skip)
 {

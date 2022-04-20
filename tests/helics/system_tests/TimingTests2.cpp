@@ -16,8 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-struct timing2: public FederateTestFixture, public ::testing::Test {
-};
+struct timing2: public FederateTestFixture, public ::testing::Test {};
 /** just a check that in the simple case we do actually get the time back we requested*/
 
 TEST_F(timing2, small_time)

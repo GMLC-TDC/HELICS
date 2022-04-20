@@ -552,10 +552,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 }
                 break;
             case HELICS_EXECUTING:
-                mCoord.timeRequest(cBigTime,
-                                   IterationRequest::NO_ITERATIONS,
-                                   cBigTime,
-                                   cBigTime);
+                mCoord.timeRequest(cBigTime, IterationRequest::NO_ITERATIONS, cBigTime, cBigTime);
                 break;
             case HELICS_FINISHED:
                 break;
