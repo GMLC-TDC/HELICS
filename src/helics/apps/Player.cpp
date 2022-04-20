@@ -55,9 +55,15 @@ namespace apps {
         return (m1.sendTime < m2.sendTime);
     }
 
-    Player::Player(std::vector<std::string> args): App("player", std::move(args)) { processArgs(); }
+    Player::Player(std::vector<std::string> args): App("player", std::move(args))
+    {
+        processArgs();
+    }
 
-    Player::Player(int argc, char* argv[]): App("player", argc, argv) { processArgs(); }
+    Player::Player(int argc, char* argv[]): App("player", argc, argv)
+    {
+        processArgs();
+    }
 
     void Player::processArgs()
     {

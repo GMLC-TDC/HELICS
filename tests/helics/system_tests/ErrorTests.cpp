@@ -16,8 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
-struct error_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct error_tests: public FederateTestFixture, public ::testing::Test {};
 
 TEST_F(error_tests, duplicate_federate_names)
 {
@@ -500,8 +499,7 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
-class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(error_tests_type, test_duplicate_broker_name)
@@ -523,8 +521,7 @@ constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 // duplication
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(network_error_tests, test_duplicate_default_brokers)

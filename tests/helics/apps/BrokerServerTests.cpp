@@ -18,8 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 
-class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, CoreType>> {
-};
+class BrokerServerTests: public ::testing::TestWithParam<std::pair<const char*, CoreType>> {};
 
 TEST_P(BrokerServerTests, startup_tests)
 {

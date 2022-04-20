@@ -29,16 +29,13 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class valuefed_single_type:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class valuefed_all_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class valuefed_tests: public ::testing::Test, public FederateTestFixture {
-};
+class valuefed_tests: public ::testing::Test, public FederateTestFixture {};
 
 TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 {
@@ -323,8 +320,7 @@ static constexpr const char* config_files[] = {"bes_config.json",
 
 class valuefed_flagfile_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(valuefed_flagfile_tests, configure_test)
 {
@@ -409,8 +405,9 @@ static constexpr const char* simple_connection_files[] = {"example_connections1.
                                                           "example_connections3.toml",
                                                           "example_connections4.toml"};
 
-class valuefed_link_file: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class valuefed_link_file:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {};
 
 TEST_P(valuefed_link_file, dual_transfer_broker_link_file)
 {

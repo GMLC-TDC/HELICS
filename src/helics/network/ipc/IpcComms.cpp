@@ -34,7 +34,10 @@ namespace ipc {
         maxMessageCount = 256;
     }
     /** destructor*/
-    IpcComms::~IpcComms() { disconnect(); }
+    IpcComms::~IpcComms()
+    {
+        disconnect();
+    }
 
     void IpcComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     {
@@ -286,7 +289,10 @@ namespace ipc {
         }
     }
 
-    std::string IpcComms::getAddress() const { return localTargetAddress; }
+    std::string IpcComms::getAddress() const
+    {
+        return localTargetAddress;
+    }
 
 }  // namespace ipc
 }  // namespace helics

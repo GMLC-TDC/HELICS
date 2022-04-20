@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 /** tests for the different flag options and considerations*/
 
-struct update_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct update_tests: public FederateTestFixture, public ::testing::Test {};
 
 /** test simple creation and destruction*/
 TEST_F(update_tests, test_single_update)

@@ -22,8 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** @file these test cases test out the real time mode for HELICS
  */
 
-struct federate_realtime_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct federate_realtime_tests: public FederateTestFixture, public ::testing::Test {};
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
 TEST_F(federate_realtime_tests, federate_delay_tests_ci_skip)

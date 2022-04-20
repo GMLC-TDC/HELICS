@@ -69,6 +69,9 @@ namespace mpi {
         return comms->connect();
     }
 
-    std::string MpiBroker::generateLocalAddressString() const { return comms->getAddress(); }
+    std::string MpiBroker::generateLocalAddressString() const
+    {
+        return comms->getAddress();
+    }
 }  // namespace mpi
 }  // namespace helics

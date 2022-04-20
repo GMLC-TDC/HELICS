@@ -54,7 +54,10 @@ class Broker {
     }
 #ifdef HELICS_HAS_RVALUE_REFS
     /** move constructor*/
-    Broker(Broker&& brk) HELICS_NOTHROW: broker(brk.broker) { brk.broker = HELICS_NULL_POINTER; }
+    Broker(Broker&& brk) HELICS_NOTHROW: broker(brk.broker)
+    {
+        brk.broker = HELICS_NULL_POINTER;
+    }
     /** move assignment*/
     Broker& operator=(Broker&& brk) HELICS_NOTHROW
     {
@@ -71,12 +74,21 @@ class Broker {
         }
     }
     /** cast to the underlying broker*/
-    operator HelicsBroker() { return broker; }
+    operator HelicsBroker()
+    {
+        return broker;
+    }
     /** get the underlying HelicsBroker object
     @return a HelicsBroker object*/
-    HelicsBroker baseObject() const { return broker; }
+    HelicsBroker baseObject() const
+    {
+        return broker;
+    }
     /** check if the broker is connected*/
-    bool isConnected() const { return (helicsBrokerIsConnected(broker) != HELICS_FALSE); }
+    bool isConnected() const
+    {
+        return (helicsBrokerIsConnected(broker) != HELICS_FALSE);
+    }
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect (-1) implies no timeout
     @return true if the disconnect was successful false if it timed out
@@ -87,11 +99,20 @@ class Broker {
     }
     /** disconnect the broker from any other brokers and communications
      */
-    void disconnect() { helicsBrokerDisconnect(broker, hThrowOnError()); }
+    void disconnect()
+    {
+        helicsBrokerDisconnect(broker, hThrowOnError());
+    }
     /** get the local identification for the broker*/
-    const char* getIdentifier() const { return helicsBrokerGetIdentifier(broker); }
+    const char* getIdentifier() const
+    {
+        return helicsBrokerGetIdentifier(broker);
+    }
     /** get the connection address for the broker*/
-    const char* getAddress() const { return helicsBrokerGetAddress(broker); }
+    const char* getAddress() const
+    {
+        return helicsBrokerGetAddress(broker);
+    }
 
     /** set a federation global value
     @details this overwrites any previous value for this name
@@ -176,7 +197,10 @@ class Broker {
         helicsBrokerSetTimeBarrier(broker, barrierTime, HELICS_IGNORE_ERROR);
     }
 
-    void clearTimeBarrier() { helicsBrokerClearTimeBarrier(broker); }
+    void clearTimeBarrier()
+    {
+        helicsBrokerClearTimeBarrier(broker);
+    }
 
     void globalError(int errorCode, const std::string& errorString)
     {

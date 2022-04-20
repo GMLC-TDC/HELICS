@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct config_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct config_tests: public FederateTestFixture, public ::testing::Test {};
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 /** test simple creation and destruction*/

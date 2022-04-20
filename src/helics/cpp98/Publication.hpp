@@ -118,13 +118,25 @@ class Publication {
         helicsPublicationPublishBoolean(pub, val ? HELICS_TRUE : HELICS_FALSE, HELICS_IGNORE_ERROR);
     }
     /** get the name of the publication*/
-    const char* getName() const { return helicsPublicationGetName(pub); }
+    const char* getName() const
+    {
+        return helicsPublicationGetName(pub);
+    }
     /** get the units of the publication*/
-    const char* getUnits() const { return helicsPublicationGetUnits(pub); }
+    const char* getUnits() const
+    {
+        return helicsPublicationGetUnits(pub);
+    }
     /** get the type for the publication*/
-    const char* getType() const { return helicsPublicationGetType(pub); }
+    const char* getType() const
+    {
+        return helicsPublicationGetType(pub);
+    }
     /** get the interface information field of the publication*/
-    const char* getInfo() const { return helicsPublicationGetInfo(pub); }
+    const char* getInfo() const
+    {
+        return helicsPublicationGetInfo(pub);
+    }
 
     /** set the interface information field of the publication*/
     void setInfo(const std::string& info)
@@ -145,7 +157,10 @@ class Publication {
     {
         helicsPublicationSetOption(pub, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option) { return helicsPublicationGetOption(pub, option); }
+    int32_t getOption(int32_t option)
+    {
+        return helicsPublicationGetOption(pub, option);
+    }
 
   private:
     HelicsPublication pub;  //!< the reference to the underlying publication

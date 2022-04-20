@@ -27,24 +27,19 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class mfed_single_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class mfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class mfed_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 class mfed_all_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class mfed_add_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class mfed_tests: public ::testing::Test, public FederateTestFixture {
-};
+class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 
 TEST_P(mfed_single_type_tests, send_receive)
@@ -558,8 +553,7 @@ static constexpr const char* simple_connection_files[] = {"example_connections5.
                                                           "example_connections5.toml",
                                                           "example_connections6.toml"};
 
-class mfed_link_file: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class mfed_link_file: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 TEST_P(mfed_link_file, dual_transfer_message_broker_link_file)
 {

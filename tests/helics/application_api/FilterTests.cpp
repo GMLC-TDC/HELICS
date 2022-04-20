@@ -27,8 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class filter_single_type_test:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 /*
 class filter_all_type_test:
@@ -37,8 +36,7 @@ class filter_all_type_test:
 };
 */
 
-class filter_tests: public ::testing::Test, public FederateTestFixture {
-};
+class filter_tests: public ::testing::Test, public FederateTestFixture {};
 
 /** test registration of filters*/
 TEST_P(filter_single_type_test, message_filter_registration)
@@ -2075,8 +2073,7 @@ TEST_P(filter_single_type_test, message_filter_function2_rem_target)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-class filter_test: public ::testing::Test, public FederateTestFixture {
-};
+class filter_test: public ::testing::Test, public FederateTestFixture {};
 
 TEST_F(filter_test, message_clone_test)
 {

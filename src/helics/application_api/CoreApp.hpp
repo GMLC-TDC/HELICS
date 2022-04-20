@@ -164,13 +164,25 @@ class HELICS_CXX_EXPORT CoreApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so core functions can be called if needed
      */
-    auto* operator->() const { return core.operator->(); }
+    auto* operator->() const
+    {
+        return core.operator->();
+    }
 #else
-    CoreApp* operator->() { return this; }
-    const CoreApp* operator->() const { return this; }
+    CoreApp* operator->()
+    {
+        return this;
+    }
+    const CoreApp* operator->() const
+    {
+        return this;
+    }
 #endif
     /** get a copy of the core pointer*/
-    std::shared_ptr<Core> getCopyofCorePointer() const { return core; }
+    std::shared_ptr<Core> getCopyofCorePointer() const
+    {
+        return core;
+    }
 
     /** reset the app to default state*/
     void reset();

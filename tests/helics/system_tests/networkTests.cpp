@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** tests for some network options*/
 
-struct network_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct network_tests: public FederateTestFixture, public ::testing::Test {};
 
 #ifdef HELICS_ENABLE_TCP_CORE
 /** test simple creation and destruction*/

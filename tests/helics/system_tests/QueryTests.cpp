@@ -20,12 +20,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gtest/gtest.h"
 #include <thread>
 
-struct query: public FederateTestFixture, public ::testing::Test {
-};
+struct query: public FederateTestFixture, public ::testing::Test {};
 
 using gmlc::utilities::stringOps::removeQuotes;
-class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class query_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 /** test simple creation and destruction*/
 TEST_P(query_type, publication_queries)
 {

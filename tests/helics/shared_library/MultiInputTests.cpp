@@ -15,8 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value federates
  */
 
-class multiInput: public ::testing::Test, public FederateTestFixture_cpp {
-};
+class multiInput: public ::testing::Test, public FederateTestFixture_cpp {};
 using namespace helicscpp;
 TEST_F(multiInput, order)
 {

@@ -37,8 +37,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #    include "MessageTimer.hpp"
 #else
 namespace helics {
-class MessageTimer {
-};
+class MessageTimer {};
 }  // namespace helics
 #endif
 
