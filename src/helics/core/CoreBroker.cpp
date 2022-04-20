@@ -540,9 +540,11 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         }
         if (globalTime) {
             setActionFlag(fedReply, indicator_flag);
-            timeCoord->addDependency(global_fedid);
-            timeCoord->addDependent(global_fedid);
-            timeCoord->setAsChild(global_fedid);
+            if (!checkActionFlag(command, non_counting_flag)) {
+                timeCoord->addDependency(global_fedid);
+                timeCoord->addDependent(global_fedid);
+                timeCoord->setAsChild(global_fedid);
+            }
         }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,

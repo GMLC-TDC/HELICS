@@ -518,7 +518,7 @@ void FilterFederate::clearTimeReturn(int32_t id)
     } else {
     }
     if (recheckTime) {
-        minReturnTime = Time::maxVal();
+        minReturnTime = cBigTime;
         for (const auto& tBP : timeBlockProcesses) {
             if (tBP.second < minReturnTime) {
                 minReturnTime = tBP.second;
@@ -552,10 +552,10 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 }
                 break;
             case HELICS_EXECUTING:
-                mCoord.timeRequest(Time::maxVal(),
+                mCoord.timeRequest(cBigTime,
                                    IterationRequest::NO_ITERATIONS,
-                                   Time::maxVal(),
-                                   Time::maxVal());
+                                   cBigTime,
+                                   cBigTime);
                 break;
             case HELICS_FINISHED:
                 break;

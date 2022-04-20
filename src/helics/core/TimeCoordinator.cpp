@@ -790,6 +790,9 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         setIterationFlags(upd, iterating);
     }
     upd.counter = sequenceCounter;
+    if (triggered) {
+        setActionFlag(upd, destination_target);
+    }
     auto check = checkAndSendTimeRequest(upd, upstream.minFed);
     if (check.first) {
         if (check.second) {

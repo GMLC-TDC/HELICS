@@ -74,8 +74,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
             ++sequenceCounter;
             updateTime.counter = sequenceCounter;
+            auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
             for (const auto& dep : dependencies) {
-                if (dep.next <= nextEvent && dep.next < cBigTime) {
+                if (dep.next <= trigTime  && dep.next < cBigTime) {
                     updateTime.dest_id = dep.fedID;
                     updateTime.setExtraDestData(dep.sequenceCounter);
                     sendMessageFunction(updateTime);
@@ -84,15 +85,23 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             return true;
         }
         if (currentTimeState == TimeState::time_requested) {
-            if (dependencies.verifySequenceCounter(nextEvent, sequenceCounter)) {
-                auto trig = checkForTriggered(dependencies, nextEvent);
+            auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+            if (dependencies.verifySequenceCounter(trigTime, sequenceCounter)) {
+                auto trig = checkForTriggered(dependencies, trigTime);
+                bool verified{trig.second <= nextEvent};
                 nextEvent = trig.second;
-                if (trig.first) {
+                trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+                if (!verified) {
+                    verified = dependencies.verifySequenceCounter(trigTime, sequenceCounter);
+                }
+               
+                if (trig.first||!verified) {
                     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
                     ++sequenceCounter;
                     updateTime.counter = sequenceCounter;
+                    
                     for (const auto& dep : dependencies) {
-                        if (dep.next <= nextEvent) {
+                        if (dep.next <= trigTime) {
                             updateTime.dest_id = dep.fedID;
                             updateTime.setExtraDestData(dep.sequenceCounter);
                             sendMessageFunction(updateTime);
@@ -101,18 +110,14 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     return true;
                 }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
-                if (nextEvent < cBigTime) {
-                    updateTime.actionTime = nextEvent + Time::epsilon();
-                    updateTime.Te = nextEvent + Time::epsilon();
-                    updateTime.Tdemin = nextEvent + Time::epsilon();
-                } else {
-                    updateTime.actionTime = nextEvent;
-                    updateTime.Te = nextEvent;
-                    updateTime.Tdemin = nextEvent;
-                }
+                    updateTime.actionTime = trigTime;
+                    updateTime.Te = trigTime;
+                    updateTime.Tdemin = trigTime;
+       
+                ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
-                    if (dep.next <= nextEvent && dep.next < cBigTime) {
+                    if (dep.next <= trigTime && dep.next < cBigTime) {
                         updateTime.dest_id = dep.fedID;
                         updateTime.setExtraDestData(dep.sequenceCounter);
                         sendMessageFunction(updateTime);
