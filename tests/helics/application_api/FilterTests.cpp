@@ -650,7 +650,7 @@ static const std::string rerouteType("test");
 
 TEST_F(filter_tests, reroute_separate)
 {
-    extraBrokerArgs = " --globaltime ";
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
@@ -862,6 +862,7 @@ TEST_F(filter_tests, many_filters_multi)
 
 TEST_F(filter_tests, reroute_cascade)
 {
+    extraBrokerArgs = "--globaltime";
     auto broker = AddBroker("test", 10);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
@@ -990,7 +991,7 @@ class rfcheck {
 /** this test case fails as of yet with no good path to resolving it yet*/
 TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 {
-    extraBrokerArgs = " --globaltime ";
+    extraBrokerArgs = " --global_time ";
     auto broker = AddBroker("test", 18);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test_2", 9, broker, 1.0, "receiver");
@@ -1070,6 +1071,7 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 
 TEST_F(filter_tests, reroute_separate2)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
@@ -1139,6 +1141,7 @@ TEST_F(filter_tests, reroute_separate2)
 
 TEST_F(filter_tests, reroute_separate3)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
@@ -1393,6 +1396,7 @@ TEST_F(filter_tests, separate_slow_dest_filter_ci_skip)
 
 TEST_F(filter_tests, reroute_separate2_5message)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");
@@ -1509,6 +1513,7 @@ TEST_F(filter_tests, reroute_separate2_5message)
 
 TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");
@@ -1627,6 +1632,7 @@ TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
 
 TEST_F(filter_tests, reroute_separate2_5message_b)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "send");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, helics::timeZero, "rec");

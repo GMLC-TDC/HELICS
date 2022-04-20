@@ -490,6 +490,11 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
         }
     }
     if (time_block <= time_exec && time_block < Time::maxVal()) {
+        if (triggerFed.isValid()) {
+                if (triggerFed != mSourceId) {
+                    sendTimeRequest(triggerFed);
+                }
+        }
         return MessageProcessingResult::CONTINUE_PROCESSING;
     }
     if ((nonGranting && time_exec < time_requested)) {
@@ -1255,21 +1260,21 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         switch (dep->mTimeState) {
             case TimeState::time_requested:
                 if (dep->next > time_exec) {
-                    return message_process_result::delay_processing;
+               //     return message_process_result::delay_processing;
                 }
                 break;
             case TimeState::time_requested_iterative:
                 if (dep->next > time_exec) {
-                    return message_process_result::delay_processing;
+           //         return message_process_result::delay_processing;
                 }
                 if ((iterating != IterationRequest::NO_ITERATIONS) && (time_exec == dep->next)) {
-                    return message_process_result::delay_processing;
+             //       return message_process_result::delay_processing;
                 }
                 break;
             case TimeState::exec_requested_iterative:
                 if ((iterating != IterationRequest::NO_ITERATIONS) && (checkingExec) &&
                     (dep->hasData)) {
-                    return message_process_result::delay_processing;
+          //          return message_process_result::delay_processing;
                 }
                 break;
             default:

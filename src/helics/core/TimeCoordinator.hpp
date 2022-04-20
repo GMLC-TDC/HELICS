@@ -96,12 +96,11 @@ class TimeCoordinator: public BaseTimeCoordinator {
     /// request
     bool needSendAll{false};
     /// indicator the federate was triggered recently
-    bool triggered{false};
+    mutable bool triggered{false};
     /// true if using a global time manager parent
     bool globalTime{false};
 
   protected:
-    bool disconnected{false};
     /// specify that the timeCoordinator should not grant times and instead operate in a continuous
     /// manner until completion
     bool nonGranting{false};

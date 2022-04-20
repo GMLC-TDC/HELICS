@@ -39,15 +39,18 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
     bool triggered{false};
     for (auto& dep : deps) {
         if (dep.next > nextEvent) {
-            continue;
-        }
-        if (!dep.nonGranting) {
             if (dep.Te < me) {
                 me = dep.Te;
             }
-        } else {
+            continue;
+        }
+        if (dep.nonGranting) {
             if (dep.triggered) {
                 triggered = true;
+            }
+        } else {
+            if (dep.Te < me) {
+                me = dep.Te;
             }
         }
     }
@@ -72,7 +75,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             ++sequenceCounter;
             updateTime.counter = sequenceCounter;
             for (const auto& dep : dependencies) {
-                if (dep.next <= nextEvent && dep.next < Time::maxVal()) {
+                if (dep.next <= nextEvent && dep.next < cBigTime) {
                     updateTime.dest_id = dep.fedID;
                     updateTime.setExtraDestData(dep.sequenceCounter);
                     sendMessageFunction(updateTime);
@@ -89,7 +92,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     ++sequenceCounter;
                     updateTime.counter = sequenceCounter;
                     for (const auto& dep : dependencies) {
-                        if (dep.next <= nextEvent && dep.next < Time::maxVal()) {
+                        if (dep.next <= nextEvent) {
                             updateTime.dest_id = dep.fedID;
                             updateTime.setExtraDestData(dep.sequenceCounter);
                             sendMessageFunction(updateTime);
@@ -98,12 +101,18 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     return true;
                 }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
-                updateTime.actionTime = nextEvent + Time::epsilon();
-                updateTime.Te = nextEvent + Time::epsilon();
-                updateTime.Tdemin = nextEvent + Time::epsilon();
+                if (nextEvent<cBigTime) {
+                    updateTime.actionTime = nextEvent + Time::epsilon();
+                    updateTime.Te = nextEvent + Time::epsilon();
+                    updateTime.Tdemin = nextEvent + Time::epsilon();
+                } else {
+                    updateTime.actionTime = nextEvent;
+                    updateTime.Te = nextEvent;
+                    updateTime.Tdemin = nextEvent;
+                }
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
-                    if (dep.next <= nextEvent) {
+                    if (dep.next <= nextEvent && dep.next<cBigTime) {
                         updateTime.dest_id = dep.fedID;
                         updateTime.setExtraDestData(dep.sequenceCounter);
                         sendMessageFunction(updateTime);

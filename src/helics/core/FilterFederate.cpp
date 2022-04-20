@@ -455,6 +455,7 @@ void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* fcoor
                                                   const BasicHandleInfo* handle,
                                                   const ActionMessage& command) const
 {
+    mCoord.triggered = true;
     // now go to the cloning filters
     for (auto* clFilter : fcoord->cloningDestFilters) {
         if (checkActionFlag(*clFilter, disconnected_flag)) {

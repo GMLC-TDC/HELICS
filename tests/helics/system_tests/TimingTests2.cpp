@@ -87,6 +87,12 @@ TEST_F(timing2, small_time)
     vFed2->finalize();
 }
 
+TEST_F(timing2, numbers)
+{
+    EXPECT_EQ(helics::cBigTime, helics::Time{cHelicsBigNumber});
+    EXPECT_EQ(helics::cBigTime, helics::Time::maxVal());
+}
+
 /** based on bug found by Manoj Kumar Cebol Sundarrajan
 where a very small period could cause the time to be negative
 */
