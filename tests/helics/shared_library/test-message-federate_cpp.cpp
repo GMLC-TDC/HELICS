@@ -18,7 +18,6 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
     return std::string(parameter.param);
 };
 
-
 struct mfed_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 class mfed_type_tests:
