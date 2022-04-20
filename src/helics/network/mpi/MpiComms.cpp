@@ -26,7 +26,10 @@ namespace mpi {
     }
 
     /** destructor*/
-    MpiComms::~MpiComms() { disconnect(); }
+    MpiComms::~MpiComms()
+    {
+        disconnect();
+    }
 
     void MpiComms::setBrokerAddress(const std::string& address)
     {

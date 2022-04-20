@@ -145,8 +145,7 @@ static constexpr const char* simple_files[] = {"example1.recorder",
                                                "exampleCapture.txt",
                                                "exampleCapture.json"};
 
-class tracer_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class tracer_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(tracer_file_tests, simple_tracer_test_files)
 {
@@ -207,8 +206,7 @@ static constexpr const char* simple_message_files[] = {"example4.recorder",
                                                        "example5.record",
                                                        "example6rec.json"};
 
-class tracer_message_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class tracer_message_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(tracer_message_file_tests, test_message_files)
 {
@@ -577,8 +575,7 @@ static constexpr const char* simple_clone_test_files[] = {"clone_example1.txt",
                                                           "clone_example7.json",
                                                           "clone_example8.JSON"};
 
-class tracer_clone_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class tracer_clone_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(tracer_clone_file_tests, simple_clone_test_file)
 {

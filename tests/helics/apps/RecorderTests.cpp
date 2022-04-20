@@ -134,8 +134,7 @@ TEST(recorder_tests, recorder_test_message)
     EXPECT_EQ(m->data.to_string(), "this is a test message");
 }
 
-class recorder_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class recorder_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(recorder_file_tests, test_files)
 {
@@ -210,8 +209,7 @@ static constexpr const char* simple_message_files[] = {"example4.recorder",
                                                        "example5.record",
                                                        "example6rec.json"};
 
-class recorder_message_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class recorder_message_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(recorder_message_file_tests, test_message_files)
 {
@@ -519,8 +517,7 @@ TEST(recorder_tests, recorder_test_endpoint_clone)
     }
 }
 
-class recorder_clone_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class recorder_clone_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(recorder_clone_file_tests, simple_clone_test_file)
 {

@@ -22,21 +22,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class valuefed_add_single_type_tests_ci_skip:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class valuefed_add_all_type_tests_ci_skip:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class valuefed_add_type_tests_ci_skip:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class valuefed_add_tests_ci_skip: public ::testing::Test, public FederateTestFixture {
-};
+class valuefed_add_tests_ci_skip: public ::testing::Test, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(valuefed_add_single_type_tests_ci_skip, initialize)
@@ -57,8 +53,7 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, initialize)
 
 class valuefed_add_ztype_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(valuefed_add_ztype_tests, publication_registration)
 {
@@ -581,8 +576,7 @@ static constexpr const char* config_files[] = {"example_value_fed.json", "exampl
 
 class valuefed_add_configfile_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(valuefed_add_configfile_tests, file_load)
 {

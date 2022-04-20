@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct query_tests: public FederateTestFixture_cpp, public ::testing::Test {
-};
+struct query_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 TEST_F(query_tests, exists)
 {

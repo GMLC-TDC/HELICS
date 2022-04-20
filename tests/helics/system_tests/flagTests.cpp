@@ -12,11 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 /** tests for the different flag options and considerations*/
 
-struct flag_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct flag_tests: public FederateTestFixture, public ::testing::Test {};
 
-class flag_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class flag_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(flag_type_tests, optional_pub)

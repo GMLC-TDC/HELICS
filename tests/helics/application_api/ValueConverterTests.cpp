@@ -143,8 +143,7 @@ TEST(valueConverter_tests, errors)
     EXPECT_EQ(vb1.size(), 16U);
 }
 
-class new_converter_tests_double: public ::testing::TestWithParam<double> {
-};
+class new_converter_tests_double: public ::testing::TestWithParam<double> {};
 
 TEST_P(new_converter_tests_double, double_tests)
 {
@@ -173,8 +172,7 @@ INSTANTIATE_TEST_SUITE_P(double_testing,
                                            -std::numeric_limits<double>::infinity(),
                                            std::numeric_limits<double>::quiet_NaN()));
 
-class new_converter_tests_int: public ::testing::TestWithParam<std::int64_t> {
-};
+class new_converter_tests_int: public ::testing::TestWithParam<std::int64_t> {};
 
 TEST_P(new_converter_tests_int, int_tests)
 {
@@ -199,8 +197,7 @@ INSTANTIATE_TEST_SUITE_P(int_testing,
                                            std::numeric_limits<std::int64_t>::min(),
                                            0));
 
-class new_converter_tests_complex: public ::testing::TestWithParam<std::complex<double>> {
-};
+class new_converter_tests_complex: public ::testing::TestWithParam<std::complex<double>> {};
 
 TEST_P(new_converter_tests_complex, complex_tests)
 {
@@ -238,8 +235,7 @@ INSTANTIATE_TEST_SUITE_P(complex_testing,
                                            compd(std::numeric_limits<double>::quiet_NaN(),
                                                  std::numeric_limits<double>::quiet_NaN())));
 
-class new_converter_tests_string: public ::testing::TestWithParam<std::string> {
-};
+class new_converter_tests_string: public ::testing::TestWithParam<std::string> {};
 
 TEST_P(new_converter_tests_string, string_tests)
 {
@@ -281,8 +277,7 @@ INSTANTIATE_TEST_SUITE_P(string_testing,
                                            std::string(621365, 'a'),
                                            std::string{}));
 
-class new_converter_tests_np: public ::testing::TestWithParam<helics::NamedPoint> {
-};
+class new_converter_tests_np: public ::testing::TestWithParam<helics::NamedPoint> {};
 
 TEST_P(new_converter_tests_np, np_tests)
 {
@@ -317,8 +312,7 @@ INSTANTIATE_TEST_SUITE_P(
                       helics::NamedPoint{std::string(621365, 'a'), 55.21},
                       helics::NamedPoint{std::string{}, 0.0}));
 
-class new_converter_tests_vector: public ::testing::TestWithParam<std::vector<double>> {
-};
+class new_converter_tests_vector: public ::testing::TestWithParam<std::vector<double>> {};
 
 TEST_P(new_converter_tests_vector, vector_tests)
 {
@@ -391,8 +385,7 @@ INSTANTIATE_TEST_SUITE_P(
                                           -std::numeric_limits<double>::max()}));
 
 class new_converter_tests_cvector:
-    public ::testing::TestWithParam<std::vector<std::complex<double>>> {
-};
+    public ::testing::TestWithParam<std::vector<std::complex<double>>> {};
 
 TEST_P(new_converter_tests_cvector, cvector_tests)
 {

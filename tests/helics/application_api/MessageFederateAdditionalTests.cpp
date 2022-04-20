@@ -25,21 +25,17 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class mfed_add_single_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class mfed_add_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class mfed_add_all_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class mfed_tests: public ::testing::Test, public FederateTestFixture {
-};
+class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 
 TEST_P(mfed_add_single_type_tests, initialize_tests)
 {
@@ -489,8 +485,7 @@ static constexpr const char* config_files[] = {"example_message_fed.json",
 
 class mfed_file_config_files:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(mfed_file_config_files, test_file_load)
 {
@@ -515,8 +510,7 @@ static constexpr const char* filter_config_files[] = {"example_filters.json",
 
 class mfed_file_filter_config_files:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 {

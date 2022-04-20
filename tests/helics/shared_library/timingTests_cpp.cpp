@@ -13,8 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <thread>
 
-struct timing_tests: public FederateTestFixture_cpp, public ::testing::Test {
-};
+struct timing_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 TEST_F(timing_tests, barrier1)
 {

@@ -56,9 +56,15 @@ namespace zeromq {
         return true;
     }
 
-    bool ZmqRequestSets::waiting() const { return (!active_routes.empty()); }
+    bool ZmqRequestSets::waiting() const
+    {
+        return (!active_routes.empty());
+    }
 
-    bool ZmqRequestSets::hasMessages() const { return (!Responses.empty()); }
+    bool ZmqRequestSets::hasMessages() const
+    {
+        return (!Responses.empty());
+    }
 
     int ZmqRequestSets::checkForMessages()
     {

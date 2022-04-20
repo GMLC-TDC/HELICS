@@ -20,13 +20,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class combofed_single_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class combofed_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 // const std::string CoreTypes[] = {"udp" };
 /** test simple creation and destruction*/
@@ -291,8 +289,7 @@ static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
 
 class combofed_file_load_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(combofed_file_load_tests, test_file_load)
 {

@@ -11,8 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 #include "ctestFixtures.hpp"
 
-struct timing_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct timing_tests: public FederateTestFixture, public ::testing::Test {};
 /** just a check that in the simple case we do actually get the time back we requested*/
 TEST_F(timing_tests, simple_timing_test)
 {

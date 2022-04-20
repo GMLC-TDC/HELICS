@@ -16,13 +16,11 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
     return std::string(parameter.param);
 };
 
-struct vfed_tests: public FederateTestFixture_cpp, public ::testing::Test {
-};
+struct vfed_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 class vfed_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture_cpp {
-};
+    public FederateTestFixture_cpp {};
 
 // const std::string CoreTypes[] = { "test", "ipc", "zmq", "test_2", "ipc_2", "zmq_2" };
 

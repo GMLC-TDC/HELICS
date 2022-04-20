@@ -66,7 +66,10 @@ namespace mpi {
         return comms->connect();
     }
 
-    std::string MpiCore::generateLocalAddressString() const { return comms->getAddress(); }
+    std::string MpiCore::generateLocalAddressString() const
+    {
+        return comms->getAddress();
+    }
 
 }  // namespace mpi
 }  // namespace helics
