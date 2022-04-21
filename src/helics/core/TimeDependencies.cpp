@@ -516,21 +516,21 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
 bool TimeDependencies::hasActiveTimeDependencies() const
 {
     return std::any_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal()));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
     });
 }
 
 bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
 {
     return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
-        return ((!dep.dependency) || dep.timingVersion == 0 || dep.next > tmin ||
+        return ((!dep.dependency) || dep.timingVersion == 0 || dep.next > tmin || dep.next>=cBigTime ||
                 dep.responseSequenceCounter == sq);
     });
 }
 int TimeDependencies::activeDependencyCount() const
 {
     return std::count_if(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal()));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
     });
 }
 /** get a count of the active dependencies*/
@@ -539,7 +539,7 @@ GlobalFederateId TimeDependencies::getMinDependency() const
     GlobalFederateId minID;
     Time minTime(Time::maxVal());
     for (const auto& dep : dependencies) {
-        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal())) {
+        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime)) {
             if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;

@@ -3755,6 +3755,7 @@ void CommonCore::connectFilterTiming()
         ad.setAction(CMD_ADD_DEPENDENCY);
         filterFed->handleMessage(ad);
         clearActionFlag(ad, parent_flag);
+        setActionFlag(ad, child_flag);
         ad.swapSourceDest();
         transmit(parent_route_id, ad);
         ad.setAction(CMD_ADD_DEPENDENT);

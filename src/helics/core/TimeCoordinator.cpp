@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static const Time bigTime(HELICS_BIG_NUMBER);
-
 static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
 
 void TimeCoordinator::enteringExecMode(IterationRequest mode)
@@ -443,6 +441,7 @@ bool TimeCoordinator::updateTimeFactors()
                                        sequenceCounter);
     if (globalTime && dependencies.size() == 1) {
         upstream = total;
+        upstream.minFed = GlobalFederateId{};
     }
 
     maxTime = Time::maxVal() - info.outputDelay - (std::max)(info.period, info.timeDelta);
@@ -463,7 +462,7 @@ bool TimeCoordinator::updateTimeFactors()
     if (upstream.minDe < maxTime && upstream.minDe > total.minDe) {
         upstream.minDe = generateAllowedTime(upstream.minDe) + info.outputDelay;
     }
-    if (info.event_triggered || time_requested >= bigTime) {
+    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
         if (upstream.Te < maxTime) {
             upstream.Te = generateAllowedTime(upstream.minDe);
         }
@@ -768,12 +767,12 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         setActionFlag(upd, delayed_timing_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
-    if (info.event_triggered || time_requested >= bigTime) {
+    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
-    if (info.event_triggered || time_requested >= bigTime) {
+    if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
 
         if (upd.Tdemin < upd.actionTime) {
@@ -800,7 +799,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
                 upd.dest_id = upstream.minFed;
                 upd.setExtraData(GlobalFederateId{}.baseValue());
                 upd.setExtraDestData(upstream.responseSequenceCounter);
-                if (info.event_triggered || time_requested >= bigTime) {
+                if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
                     upd.Te = checkAdd(time_exec, info.outputDelay);
                     upd.Te = std::min(upd.Te, checkAdd(upstream.TeAlt, info.outputDelay));
                 }

@@ -1073,7 +1073,8 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
 */
 TEST_F(filter_tests, reroute_separate2)
 {
-    extraBrokerArgs = " --globaltime";
+    extraBrokerArgs = " --globaltime --debugging";
+    extraCoreArgs = " --debugging ";
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker);

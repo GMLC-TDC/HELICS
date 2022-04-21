@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static const Time bigTime(HELICS_BIG_NUMBER);
-
 static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
 
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};

@@ -1429,6 +1429,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     usingGlobalTime = true;
                     addDependent(gRootBrokerID);
                     addDependency(gRootBrokerID);
+                    timeCoord->setAsParent(gRootBrokerID);
                     timeCoord->globalTime = true;
                 }
                 global_id = cmd.dest_id;
