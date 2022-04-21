@@ -637,6 +637,15 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 filthandle->used = true;
             }
         } break;
+        case CMD_DISCONNECT:
+            if (!usingGlobalTime && !mCoord.hasActiveTimeDependencies()) {
+                mCoord.disconnect();
+                ActionMessage disconnect(CMD_DISCONNECT);
+                disconnect.source_id = mFedID;
+                disconnect.dest_id = parent_broker_id;
+                mQueueMessage(disconnect);
+            }
+            break;
         case CMD_REG_FILTER:
             processFilterInfo(command);
             break;

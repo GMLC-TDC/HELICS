@@ -490,8 +490,12 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
         correct = false;
     }
     helics::cleanupHelicsLibrary();
-    EXPECT_TRUE(!filterCore->isConnected());
     EXPECT_TRUE(!mCore->isConnected());
+    if (filterCore->isConnected()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    }
+    EXPECT_TRUE(!filterCore->isConnected());
+    
     return correct;
 }
 /** test a filter operator
