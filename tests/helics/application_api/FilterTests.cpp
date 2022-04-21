@@ -495,7 +495,7 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
         std::this_thread::sleep_for(std::chrono::milliseconds(300));
     }
     EXPECT_TRUE(!filterCore->isConnected());
-    
+
     return correct;
 }
 /** test a filter operator
