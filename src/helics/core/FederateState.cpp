@@ -406,9 +406,7 @@ std::optional<ActionMessage>
     std::optional<ActionMessage> optAct;
     switch (action.action()) {
         case CMD_REQUEST_CURRENT_TIME:
-            optAct->setAction(CMD_DISCONNECT);
-            optAct->dest_id = action.source_id;
-            optAct->source_id = global_id.load();
+            optAct = ActionMessage(CMD_DISCONNECT, global_id.load(), action.source_id);
             break;
         default:
             break;
