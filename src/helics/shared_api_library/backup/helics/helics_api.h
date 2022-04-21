@@ -619,13 +619,18 @@ void helicsFederateSetLoggingCallback(HelicsFederate fed,
                                       void* userdata,
                                       HelicsError* err);
 void helicsFilterSetCustomCallback(HelicsFilter filter,
-                                   void (*filtCall)(HelicsMessage message, void* userData),
+                                   HelicsMessage (*filtCall)(HelicsMessage message, void* userData),
                                    void* userdata,
                                    HelicsError* err);
 void helicsFederateSetQueryCallback(HelicsFederate fed,
                                     void (*queryAnswer)(const char* query, int querySize, HelicsQueryBuffer buffer, void* userdata),
                                     void* userdata,
                                     HelicsError* err);
+void helicsFederateSetTimeRequestEntryCallback(
+    HelicsFederate fed,
+    void (*requestTime)(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userdata),
+    void* userdata,
+    HelicsError* err);
 void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
                                          void (*timeUpdate)(HelicsTime newTime, HelicsBool iterating, void* userdata),
                                          void* userdata,
@@ -634,4 +639,8 @@ void helicsFederateSetStateChangeCallback(HelicsFederate fed,
                                           void (*stateChange)(HelicsFederateState newState, HelicsFederateState oldState, void* userdata),
                                           void* userdata,
                                           HelicsError* err);
+void helicsFederateSetTimeRequestReturnCallback(HelicsFederate fed,
+                                                void (*requestTimeReturn)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                                void* userdata,
+                                                HelicsError* err);
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
