@@ -523,8 +523,8 @@ bool TimeDependencies::hasActiveTimeDependencies() const
 bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
 {
     return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
-        return ((!dep.dependency) || dep.timingVersion == 0 || dep.next > tmin || dep.next>=cBigTime ||
-                dep.responseSequenceCounter == sq);
+        return ((!dep.dependency) || dep.timingVersion == 0 || dep.next > tmin ||
+                dep.next >= cBigTime || dep.responseSequenceCounter == sq);
     });
 }
 int TimeDependencies::activeDependencyCount() const
