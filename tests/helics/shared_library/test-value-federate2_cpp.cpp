@@ -12,8 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <iostream>
 
-/** these test cases test out the value converters and some of the other functions
- */
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
 
 struct vfed_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
@@ -133,7 +134,7 @@ TEST_P(vfed_type_tests, test_async_calls)
     vFed2->finalize();
 }
 //
-INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes), testNamer);
 
 //
 TEST_F(vfed_tests, test_file_load)

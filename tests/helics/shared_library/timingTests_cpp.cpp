@@ -85,4 +85,47 @@ TEST_F(timing_tests, timeUpdateCallback)
     vFed2->finalize();
 }
 
+// Tests out all the callback sequencing in cpp98
+TEST_F(timing_tests, callbackSequence)
+{
+    int sequence{1};
+    std::vector<int> seqVal(4, 0);
+
+    SetupTest<helicscpp::ValueFederate>("test_2", 1);
+    auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);
+
+    auto timeRequestEntry = [&](auto /*v1*/, auto /*v2*/, auto /*v2*/) { seqVal[0] = sequence++; };
+    auto stateUpdate = [&](auto /*v1*/, auto /*v2*/) { seqVal[1] = sequence++; };
+    auto timeUpdate = [&](auto /*v1*/, auto /*v2*/) { seqVal[2] = sequence++; };
+    auto timeRequestReturn = [&](auto /*v1*/, auto /*v2*/) { seqVal[3] = sequence++; };
+
+    vFed1->setTimeUpdateCallback(timeUpdate);
+    vFed1->setStateChangeCallback(stateUpdate);
+    vFed1->setTimeRequestEntryCallback(timeRequestEntry);
+    vFed1->setTimeRequestReturnCallback(timeRequestReturn);
+
+    vFed1->enterExecutingMode();
+    // state change callback would have been called twice
+    EXPECT_EQ(seqVal[0], 0);  // should not have been called
+    EXPECT_EQ(seqVal[1], 2);
+    EXPECT_EQ(seqVal[2], 3);
+    EXPECT_EQ(seqVal[3], 4);
+
+    // reset the sequence counter
+    sequence = 1;
+    seqVal[0] = 99;
+    seqVal[1] = 99;
+    seqVal[2] = 99;
+    seqVal[3] = 99;
+    vFed1->requestTime(4.0);
+
+    EXPECT_EQ(seqVal[0], 1);
+    EXPECT_EQ(seqVal[1], 99);
+    EXPECT_EQ(seqVal[2], 2);
+    EXPECT_EQ(seqVal[3], 3);
+
+    vFed1->finalize();
+    EXPECT_EQ(seqVal[1], 4);
+}
+
 #endif

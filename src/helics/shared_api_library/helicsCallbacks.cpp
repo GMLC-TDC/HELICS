@@ -167,7 +167,7 @@ void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* string, int str
         bufferStr->clear();
         bufferStr->push_back('>');
     }
-    bufferStr->reserve(stringSize + 1);
+    bufferStr->reserve(static_cast<std::size_t>(stringSize) + 1);
     bufferStr->assign(string, string + stringSize);
     bufferStr->push_back('>');
 }
