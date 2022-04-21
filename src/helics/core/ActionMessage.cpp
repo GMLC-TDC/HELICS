@@ -764,7 +764,8 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
         {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
         {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
-        {action_message_def::action_t::cmd_send_for_dest_filter_return, "send_for_dest_filter_return"},
+        {action_message_def::action_t::cmd_send_for_dest_filter_return,
+         "send_for_dest_filter_return"},
         {action_message_def::action_t::cmd_null_message, "null message"},
         {action_message_def::action_t::cmd_null_dest_message, "null  destination message"},
 
