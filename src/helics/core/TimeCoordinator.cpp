@@ -497,6 +497,11 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
         return MessageProcessingResult::CONTINUE_PROCESSING;
     }
     if ((nonGranting && time_exec < time_requested)) {
+        if (triggerFed.isValid()) {
+            if (triggerFed != mSourceId) {
+                sendTimeRequest(triggerFed);
+            }
+        }
         return MessageProcessingResult::CONTINUE_PROCESSING;
     }
     // if ((iterating == IterationRequest::NO_ITERATIONS) ||
