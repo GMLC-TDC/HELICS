@@ -101,7 +101,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     updateTime.counter = sequenceCounter;
 
                     for (const auto& dep : dependencies) {
-                        if (dep.next <= trigTime) {
+                        if (dep.next <= trigTime && dep.next < cBigTime) {
                             updateTime.dest_id = dep.fedID;
                             updateTime.setExtraDestData(dep.sequenceCounter);
                             sendMessageFunction(updateTime);
@@ -135,7 +135,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
 void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {
     base["type"] = "global";
-
+    base["nextEvent"] = static_cast<double>(nextEvent);
+    addTimeState(base, currentTimeState);
+    base["minTime"] = static_cast<double>(currentMinTime);
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 

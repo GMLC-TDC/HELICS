@@ -224,6 +224,11 @@ static std::string_view timeStateString(TimeState state)
     }
 }
 
+void addTimeState(Json::Value& output, const TimeState state) {
+    auto sstring = timeStateString(state);
+    output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
+}
+
 void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool includeAggregates)
 {
     output["next"] = static_cast<double>(dep.next);
@@ -231,10 +236,10 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["minde"] = static_cast<double>(dep.minDe);
     output["minfed"] = dep.minFed.baseValue();
     output["responseSequence"] = dep.responseSequenceCounter;
-    auto sstring = timeStateString(dep.mTimeState);
-    output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
+    addTimeState(output, dep.mTimeState);
     output["iteration"] = dep.sequenceCounter;
     output["granted_iteration"] = dep.grantedIteration;
+    output["sequenceCounter"] = dep.sequenceCounter;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();

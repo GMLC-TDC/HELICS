@@ -926,6 +926,7 @@ TEST_F(filter, clone_test_broker_dest_connections)
 
 TEST_F(filter, multi_clone_test)
 {
+    extraBrokerArgs = " --globaltime";
     HelicsBroker broker = AddBroker("test", 4);
     AddFederates(helicsCreateMessageFederate, "test", 2, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");

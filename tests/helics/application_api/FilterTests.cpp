@@ -721,6 +721,7 @@ TEST_F(filter, reroute_separate)
 
 TEST_F(filter, many_filters)
 {
+    extraBrokerArgs = "--globaltime";
     auto broker = AddBroker("test", 20);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "receiver");
@@ -2162,6 +2163,7 @@ TEST_F(filter_test, message_clone_test)
 
 TEST_F(filter_test, message_multi_clone_test)
 {
+    extraBrokerArgs = " --globaltime";
     auto broker = AddBroker("test", 4);
     AddFederates<helics::MessageFederate>("test", 2, broker, 1.0, "source");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "dest");

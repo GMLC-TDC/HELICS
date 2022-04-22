@@ -120,6 +120,8 @@ void BaseTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
 {
     base["dependencies"] = Json::arrayValue;
     base["federatesonly"] = federatesOnly;
+    base["sequenceCounter"] = sequenceCounter;
+    base["id"] = mSourceId.baseValue();
     for (const auto& dep : dependencies) {
         if (dep.dependency) {
             Json::Value depblock;
