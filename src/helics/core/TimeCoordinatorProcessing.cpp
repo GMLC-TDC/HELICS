@@ -152,6 +152,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             }
             break;
         case CMD_REQUEST_CURRENT_TIME:
+        case CMD_TIMING_INFO:
             timeCoord->processTimeMessage(cmd);
             break;
         case CMD_DISCONNECT_FED:

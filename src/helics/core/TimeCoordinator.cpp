@@ -21,8 +21,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
-
 void TimeCoordinator::enteringExecMode(IterationRequest mode)
 {
     if (executionMode) {
@@ -39,6 +37,7 @@ void TimeCoordinator::enteringExecMode(IterationRequest mode)
         sendMessageFunction(ge);
         return;
     }
+    sendTimingInfo();
     checkingExec = true;
     ActionMessage execreq(CMD_EXEC_REQUEST);
 

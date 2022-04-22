@@ -30,7 +30,6 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     Time currentMinTime{Time::minVal()};
     TimeState currentTimeState{TimeState::initialized};
     Time nextEvent{Time::maxVal()};
-    std::int32_t sequenceCounter{0};
 
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
@@ -59,6 +58,6 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
 
     /** get the current next time*/
-    Time getNextTime() const { return currentMinTime; }
+    virtual Time getNextTime() const override{ return currentMinTime; }
 };
 }  // namespace helics

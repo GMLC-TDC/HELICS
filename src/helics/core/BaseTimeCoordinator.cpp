@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
-
 static auto nullMessageFunction = [](const ActionMessage& /*unused*/) {};
 
 BaseTimeCoordinator::BaseTimeCoordinator(): sendMessageFunction(nullMessageFunction) {}
@@ -75,6 +73,7 @@ void BaseTimeCoordinator::enteringExecMode()
         }
     }
     federatesOnly = fedOnly;
+    sendTimingInfo();
 }
 
 void BaseTimeCoordinator::disconnect()
@@ -196,6 +195,14 @@ void BaseTimeCoordinator::setAsParent(GlobalFederateId fedID)
     }
 }
 
+void BaseTimeCoordinator::setVersion(GlobalFederateId fedID,std::int8_t version)
+{
+    auto* dep = dependencies.getDependencyInfo(fedID);
+    if (dep != nullptr) {
+        dep->timingVersion = version;
+    }
+}
+
 GlobalFederateId BaseTimeCoordinator::getParent() const
 {
     for (const auto& dep : dependencies) {
@@ -256,6 +263,26 @@ int BaseTimeCoordinator::dependencyCount() const
 GlobalFederateId BaseTimeCoordinator::getMinDependency() const
 {
     return dependencies.getMinDependency();
+}
+
+void BaseTimeCoordinator::sendTimingInfo() {
+    ActionMessage tinfo(CMD_TIMING_INFO);
+    tinfo.source_id = mSourceId;
+    if (nonGranting) {
+        setActionFlag(tinfo, non_granting_flag);
+    }
+    if (delayedTiming) {
+        setActionFlag(tinfo, delayed_timing_flag);
+    }
+    tinfo.setExtraData(TIME_COORDINATOR_VERSION);
+    
+    for (const auto &dep:dependencies) {
+        if (dep.dependent) {
+            tinfo.dest_id = dep.fedID;
+            sendMessageFunction(tinfo);
+        }
+    }
+    
 }
 
 ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep,
@@ -390,6 +417,9 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
             removeDependency(cmd.source_id);
             removeDependent(cmd.source_id);
             break;
+        case CMD_TIMING_INFO:
+            dependencies.updateTime(cmd);
+            break;
         default:
             break;
     }
@@ -399,6 +429,9 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
         }
         if (checkActionFlag(cmd, parent_flag)) {
             setAsParent(cmd.source_id);
+        }
+        if (cmd.counter>0) {
+            setVersion(cmd.source_id, cmd.counter);
         }
     }
 }

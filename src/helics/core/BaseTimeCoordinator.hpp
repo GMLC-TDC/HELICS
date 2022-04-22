@@ -40,9 +40,14 @@ class BaseTimeCoordinator {
     bool executionMode{false};  //!< flag that the coordinator has entered the execution Mode
     /// flag indicating that a restrictive time policy should be used
     bool restrictive_time_policy{false};
+    /// specify that the timeCoordinator should not grant times and instead operate in a continuous
+    /// manner until completion
+    bool nonGranting{false};
+    bool delayedTiming{false};
     bool disconnected{false};
 
   public:
+    static constexpr std::int32_t TIME_COORDINATOR_VERSION{1};
     BaseTimeCoordinator();
     explicit BaseTimeCoordinator(std::function<void(const ActionMessage&)> userSendMessageFunction);
     virtual ~BaseTimeCoordinator() = default;
@@ -74,7 +79,8 @@ class BaseTimeCoordinator {
   protected:
     /** generate a timeRequest message based on the dependency info data*/
     ActionMessage generateTimeRequest(const DependencyInfo& dep, GlobalFederateId fed) const;
-
+    /** send the timing info to dependents*/
+    void sendTimingInfo();
   public:
     /** process a message related to time
     @return a message_process_result if it did anything
@@ -100,6 +106,7 @@ class BaseTimeCoordinator {
 
     void setAsChild(GlobalFederateId fedID);
     void setAsParent(GlobalFederateId fedID);
+    void setVersion(GlobalFederateId fedID, std::int8_t version);
     GlobalFederateId getParent() const;
 
     /** disconnect*/
@@ -110,7 +117,7 @@ class BaseTimeCoordinator {
 
     /** function to enter the exec Mode
      */
-    void enteringExecMode();
+    virtual void enteringExecMode();
 
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const = 0;

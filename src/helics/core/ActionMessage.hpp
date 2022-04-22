@@ -251,6 +251,7 @@ inline bool isTimingCommand(const ActionMessage& command) noexcept
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
+        case CMD_TIMING_INFO:
             return true;
         default:
             return false;

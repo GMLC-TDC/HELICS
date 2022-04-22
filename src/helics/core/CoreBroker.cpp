@@ -1347,6 +1347,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_REMOVE_DEPENDENT:
         case CMD_ADD_INTERDEPENDENCY:
         case CMD_REMOVE_INTERDEPENDENCY:
+        case CMD_TIMING_INFO:
             if (command.dest_id != global_broker_id_local) {
                 routeMessage(command);
             } else {

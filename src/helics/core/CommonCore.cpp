@@ -3297,6 +3297,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_REMOVE_DEPENDENT:
         case CMD_ADD_INTERDEPENDENCY:
         case CMD_REMOVE_INTERDEPENDENCY:
+        case CMD_TIMING_INFO:
             routeMessage(command);
             break;
         case CMD_SEND_FOR_FILTER:

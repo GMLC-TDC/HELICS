@@ -58,7 +58,6 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 dep.responseSequenceCounter = 0;
                 dep.restrictionLevel = 0;
             }
-            dep.timingVersion = static_cast<std::int8_t>(m.getExtraDestData());
             dep.hasData = false;
             break;
         case CMD_TIME_REQUEST:
@@ -102,9 +101,6 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.timeoutCount = 0;
             dep.sequenceCounter = m.counter;
             dep.hasData = false;
-            if (dep.timingVersion < 0) {
-                dep.timingVersion = static_cast<std::int8_t>(m.getExtraDestData());
-            }
             break;
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -120,6 +116,12 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
             dep.hasData = false;
+            break;
+        case CMD_TIMING_INFO:
+            dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
+            dep.timingVersion = static_cast<std::uint8_t>(m.getExtraData());
+            res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:

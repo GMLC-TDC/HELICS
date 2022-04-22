@@ -101,9 +101,7 @@ class TimeCoordinator: public BaseTimeCoordinator {
     bool globalTime{false};
 
   protected:
-    /// specify that the timeCoordinator should not grant times and instead operate in a continuous
-    /// manner until completion
-    bool nonGranting{false};
+
     /// if set to true the time coordinator is joining an ongoing co-simulation
     bool dynamicJoining{false};
 
@@ -202,17 +200,17 @@ class TimeCoordinator: public BaseTimeCoordinator {
     /** add a federate dependency
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependency(GlobalFederateId fedID);
+    virtual bool addDependency(GlobalFederateId fedID) override;
     /** add a dependent federate
     @return true if it was actually added, false if the federate was already present
     */
-    bool addDependent(GlobalFederateId fedID);
+    virtual bool addDependent(GlobalFederateId fedID) override;
     /** remove a dependency
     @param fedID the identifier of the federate to remove*/
-    void removeDependency(GlobalFederateId fedID);
+    virtual void removeDependency(GlobalFederateId fedID) override;
     /** remove a dependent
     @param fedID the identifier of the federate to remove*/
-    void removeDependent(GlobalFederateId fedID);
+    virtual void removeDependent(GlobalFederateId fedID) override;
 
     /** check if entry to the executing state can be granted*/
     virtual MessageProcessingResult
