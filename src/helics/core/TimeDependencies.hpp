@@ -215,7 +215,5 @@ void generateJsonOutputTimeData(Json::Value& output,
 
 void addTimeState(Json::Value& output, const TimeState state);
 
-void generateJsonOutputDependency(
-    Json::Value& output,
-    const DependencyInfo& dep);
+void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
 }  // namespace helics

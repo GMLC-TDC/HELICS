@@ -224,7 +224,8 @@ static std::string_view timeStateString(TimeState state)
     }
 }
 
-void addTimeState(Json::Value& output, const TimeState state) {
+void addTimeState(Json::Value& output, const TimeState state)
+{
     auto sstring = timeStateString(state);
     output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
 }

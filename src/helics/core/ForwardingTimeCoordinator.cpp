@@ -179,7 +179,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
                 continue;
             }
             if (dep.dependency) {
-                if (dep.next > msg.actionTime && dep.next<cBigTime) {
+                if (dep.next > msg.actionTime && dep.next < cBigTime) {
                     continue;
                 }
             }
