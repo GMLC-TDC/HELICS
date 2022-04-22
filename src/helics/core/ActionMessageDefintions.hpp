@@ -77,7 +77,7 @@ across different compilers*/
         cmd_exec_grant = 22,  //!< grant entry to exec mode or iterate
         cmd_exec_check = 24,  //!< command to run a check on execution entry
         cmd_ack = 254,  //!< acknowledge command to for various purposes
-        cmd_timing_info = 310, //!< send some information to dependents on timing
+        cmd_timing_info = 310,  //!< send some information to dependents on timing
 
         cmd_stop = 30,  //!< halt execution
         cmd_terminate_immediately = 31,  //!< immediate halt no-disconnect;

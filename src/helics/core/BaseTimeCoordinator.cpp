@@ -195,7 +195,7 @@ void BaseTimeCoordinator::setAsParent(GlobalFederateId fedID)
     }
 }
 
-void BaseTimeCoordinator::setVersion(GlobalFederateId fedID,std::int8_t version)
+void BaseTimeCoordinator::setVersion(GlobalFederateId fedID, std::int8_t version)
 {
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
@@ -265,7 +265,8 @@ GlobalFederateId BaseTimeCoordinator::getMinDependency() const
     return dependencies.getMinDependency();
 }
 
-void BaseTimeCoordinator::sendTimingInfo() {
+void BaseTimeCoordinator::sendTimingInfo()
+{
     ActionMessage tinfo(CMD_TIMING_INFO);
     tinfo.source_id = mSourceId;
     if (nonGranting) {
@@ -275,14 +276,13 @@ void BaseTimeCoordinator::sendTimingInfo() {
         setActionFlag(tinfo, delayed_timing_flag);
     }
     tinfo.setExtraData(TIME_COORDINATOR_VERSION);
-    
-    for (const auto &dep:dependencies) {
+
+    for (const auto& dep : dependencies) {
         if (dep.dependent) {
             tinfo.dest_id = dep.fedID;
             sendMessageFunction(tinfo);
         }
     }
-    
 }
 
 ActionMessage BaseTimeCoordinator::generateTimeRequest(const DependencyInfo& dep,
@@ -430,7 +430,7 @@ void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cm
         if (checkActionFlag(cmd, parent_flag)) {
             setAsParent(cmd.source_id);
         }
-        if (cmd.counter>0) {
+        if (cmd.counter > 0) {
             setVersion(cmd.source_id, cmd.counter);
         }
     }

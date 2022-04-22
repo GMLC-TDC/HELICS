@@ -101,7 +101,6 @@ class TimeCoordinator: public BaseTimeCoordinator {
     bool globalTime{false};
 
   protected:
-
     /// if set to true the time coordinator is joining an ongoing co-simulation
     bool dynamicJoining{false};
 

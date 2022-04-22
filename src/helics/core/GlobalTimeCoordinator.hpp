@@ -58,6 +58,6 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
 
     /** get the current next time*/
-    virtual Time getNextTime() const override{ return currentMinTime; }
+    virtual Time getNextTime() const override { return currentMinTime; }
 };
 }  // namespace helics

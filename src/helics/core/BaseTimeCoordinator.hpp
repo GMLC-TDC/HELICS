@@ -81,6 +81,7 @@ class BaseTimeCoordinator {
     ActionMessage generateTimeRequest(const DependencyInfo& dep, GlobalFederateId fed) const;
     /** send the timing info to dependents*/
     void sendTimingInfo();
+
   public:
     /** process a message related to time
     @return a message_process_result if it did anything
