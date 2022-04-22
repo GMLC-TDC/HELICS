@@ -172,7 +172,6 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         return;
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
-        
         for (const auto& dep : dependencies) {
             if (dep.connection != ConnectionType::child) {
                 continue;

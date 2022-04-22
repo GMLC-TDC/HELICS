@@ -1133,9 +1133,7 @@ TEST_F(filter, callbacks)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(filter,
-                         filter_simple_type_tests,
-                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(filter, filter_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 /*
 INSTANTIATE_TEST_SUITE_P(filter, filter_type_tests, ::testing::ValuesIn(CoreTypes));
 */
