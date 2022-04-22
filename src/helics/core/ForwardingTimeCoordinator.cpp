@@ -145,7 +145,11 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
     if (!sendMessageFunction) {
         return;
     }
-
+    if (msg.action() == CMD_TIME_REQUEST) {
+        if (msg.actionTime < timeZero) {
+            std::cerr << "time request with  time < 0" << std::endl;
+        }
+    }
     for (const auto& dep : dependencies) {
         if (dep.connection == ConnectionType::child) {
             continue;
@@ -168,6 +172,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
         return;
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
+        
         for (const auto& dep : dependencies) {
             if (dep.connection != ConnectionType::child) {
                 continue;

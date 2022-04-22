@@ -39,7 +39,7 @@ class filter_all_type_test:
 };
 */
 
-class filter_tests: public ::testing::Test, public FederateTestFixture {};
+class filter: public ::testing::Test, public FederateTestFixture {};
 
 /** test registration of filters*/
 TEST_P(filter_single_type_test, message_filter_registration)
@@ -616,7 +616,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_broker_filter_
     EXPECT_TRUE(res);
 }
 
-TEST_F(filter_tests, message_filter_function_two_stage_brokerApp_filter_link)
+TEST_F(filter, message_filter_function_two_stage_brokerApp_filter_link)
 {
     auto broker = AddBroker("test", 3);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
@@ -652,7 +652,7 @@ static const std::string rerouteType("zmq");
 static const std::string rerouteType("test");
 #endif
 
-TEST_F(filter_tests, reroute_separate)
+TEST_F(filter, reroute_separate)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -719,7 +719,7 @@ TEST_F(filter_tests, reroute_separate)
     filt->finalize();
 }
 
-TEST_F(filter_tests, many_filters)
+TEST_F(filter, many_filters)
 {
     auto broker = AddBroker("test", 20);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
@@ -790,7 +790,7 @@ TEST_F(filter_tests, many_filters)
     }
 }
 
-TEST_F(filter_tests, many_filters_multi)
+TEST_F(filter, many_filters_multi)
 {
     auto broker = AddBroker("test", 10);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "sender");
@@ -864,7 +864,7 @@ TEST_F(filter_tests, many_filters_multi)
     }
 }
 
-TEST_F(filter_tests, reroute_cascade)
+TEST_F(filter, reroute_cascade)
 {
     extraBrokerArgs = "--globaltime";
     auto broker = AddBroker("test", 10);
@@ -994,7 +994,7 @@ class rfcheck {
 
 /** this test case fails as of yet with no good path to resolving it yet*/
 /*
-TEST_F(filter_tests, reroute_cascade_2_ci_skip)
+TEST_F(filter, reroute_cascade_2_ci_skip)
 {
     extraBrokerArgs = " --global_time --logfile=logs.txt";
     auto broker = AddBroker("test", 18);
@@ -1075,7 +1075,7 @@ TEST_F(filter_tests, reroute_cascade_2_ci_skip)
     }
 }
 */
-TEST_F(filter_tests, reroute_separate2)
+TEST_F(filter, reroute_separate2)
 {
     extraBrokerArgs = " --globaltime --debugging";
     extraCoreArgs = " --debugging ";
@@ -1146,7 +1146,7 @@ TEST_F(filter_tests, reroute_separate2)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter_tests, reroute_separate3)
+TEST_F(filter, reroute_separate3)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1204,7 +1204,7 @@ TEST_F(filter_tests, reroute_separate3)
     filt->finalize();
 }
 
-TEST_F(filter_tests, reroute_separate_dest_target)
+TEST_F(filter, reroute_separate_dest_target)
 {
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
@@ -1267,7 +1267,7 @@ TEST_F(filter_tests, reroute_separate_dest_target)
     filt->finalize();
 }
 
-TEST_F(filter_tests, separate_slow_filter_ci_skip)
+TEST_F(filter, separate_slow_filter_ci_skip)
 {
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
@@ -1334,7 +1334,7 @@ TEST_F(filter_tests, separate_slow_filter_ci_skip)
     filt->finalize();
 }
 
-TEST_F(filter_tests, separate_slow_dest_filter_ci_skip)
+TEST_F(filter, separate_slow_dest_filter_ci_skip)
 {
     auto broker = AddBroker(rerouteType, 3);
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
@@ -1401,7 +1401,7 @@ TEST_F(filter_tests, separate_slow_dest_filter_ci_skip)
     filt->finalize();
 }
 
-TEST_F(filter_tests, reroute_separate2_5message)
+TEST_F(filter, reroute_separate2_5message)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1518,7 +1518,7 @@ TEST_F(filter_tests, reroute_separate2_5message)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
+TEST_F(filter, reroute_separate2_5000message_ci_skip)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1637,7 +1637,7 @@ TEST_F(filter_tests, reroute_separate2_5000message_ci_skip)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter_tests, reroute_separate2_5message_b)
+TEST_F(filter, reroute_separate2_5message_b)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1762,7 +1762,7 @@ TEST_F(filter_tests, reroute_separate2_5message_b)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter_tests, message_filter_function_two_stage_coreApp_filter_link)
+TEST_F(filter, message_filter_function_two_stage_coreApp_filter_link)
 {
     auto broker = AddBroker("test", 3);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
@@ -2327,10 +2327,10 @@ TEST_P(filter_single_type_test, test_filter_core_termination)
     EXPECT_TRUE(fFed->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(filter_tests,
+INSTANTIATE_TEST_SUITE_P(filter,
                          filter_single_type_test,
                          ::testing::ValuesIn(CoreTypes_simple),
                          testNamer);
 /*
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
+INSTANTIATE_TEST_SUITE_P(filter, filter_all_type_test, ::testing::ValuesIn(CoreTypes_all));
 */

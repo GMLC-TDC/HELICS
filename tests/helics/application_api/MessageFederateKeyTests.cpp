@@ -544,6 +544,7 @@ TEST_P(mfed_all_type_tests, dual_transfer_message_broker_link_direct)
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->linkEndpoints("ept1", "ept2");
+    broker->query("root","global_flush");
     bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }

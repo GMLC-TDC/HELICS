@@ -1031,7 +1031,7 @@ TEST_F(function_tests, messageFed_message_object)
 }
 
 // test error paths for filters
-TEST_F(function_tests, filter_tests)
+TEST_F(function_tests, filter)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 

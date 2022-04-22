@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace helics {
 
@@ -138,7 +139,7 @@ void TimeCoordinator::timeRequest(Time nextTime,
     dependencies.resetDependentEvents(time_granted);
     ++sequenceCounter;
     updateTimeFactors();
-
+   
     if (!dependencies.empty()) {
         sendTimeRequest(GlobalFederateId{});
     }
@@ -769,12 +770,17 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     upd.Te = checkAdd(time_exec, info.outputDelay);
     if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
         upd.Te = std::min(upd.Te, checkAdd(upstream.Te, info.outputDelay));
+        if (upd.Te<timeZero) {
+            upd.Te = timeZero;
+        }
         upd.actionTime = std::min(upd.actionTime, upd.Te);
     }
     upd.Tdemin = std::min(checkAdd(upstream.Te, info.outputDelay), upd.Te);
     if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
         upd.Tdemin = std::min(upd.Tdemin, checkAdd(upstream.minDe, info.outputDelay));
-
+        if (upd.Tdemin<timeZero) {
+            upd.Tdemin = timeZero;
+        }
         if (upd.Tdemin < upd.actionTime) {
             upd.actionTime = upd.Tdemin;
         }
@@ -904,6 +910,7 @@ std::vector<GlobalFederateId> TimeCoordinator::getDependencies() const
 
 bool TimeCoordinator::transmitTimingMessages(ActionMessage& msg, GlobalFederateId skipFed) const
 {
+    
     bool skipped{false};
     for (const auto& dep : dependencies) {
         if (dep.dependent) {

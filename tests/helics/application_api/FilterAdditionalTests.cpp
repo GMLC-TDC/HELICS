@@ -614,7 +614,7 @@ TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
     mFed->finalizeComplete();
 }
 
-INSTANTIATE_TEST_SUITE_P(filter_tests,
+INSTANTIATE_TEST_SUITE_P(filter,
                          filter_type_tests,
                          ::testing::ValuesIn(CoreTypes),
                          testNamer);
