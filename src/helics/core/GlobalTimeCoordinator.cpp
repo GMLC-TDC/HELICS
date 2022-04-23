@@ -57,7 +57,8 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
     return {triggered, me};
 }
 
-void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime) {
+void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime)
+{
     ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
     updateTime.counter = sequenceCounter;
     for (auto& dep : dependencies) {
@@ -102,7 +103,6 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 }
 
                 if (trig.first || !verified) {
-
                     ++sequenceCounter;
                     sendTimeUpdateRequest(trigTime);
                     return true;
@@ -130,20 +130,18 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                         continue;
                     }
                     if (dep.next <= trigTime && dep.next < cBigTime) {
-                        if (!checkSequenceCounter(dep,trigTime,sequenceCounter)) {
-
+                        if (!checkSequenceCounter(dep, trigTime, sequenceCounter)) {
                             std::cerr << "sequence check but no request" << std::endl;
-                              /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,
-                                                         mSourceId,
-                                                         mSourceId);
-                                updateTime.counter = sequenceCounter;
+                            /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,
+                                                       mSourceId,
+                                                       mSourceId);
+                              updateTime.counter = sequenceCounter;
 
-                                updateTime.dest_id = dep.fedID;
-                                updateTime.setExtraDestData(dep.sequenceCounter);
-                                dep.updateRequested = true;
-                                sendMessageFunction(updateTime);
-                                */
-                            
+                              updateTime.dest_id = dep.fedID;
+                              updateTime.setExtraDestData(dep.sequenceCounter);
+                              dep.updateRequested = true;
+                              sendMessageFunction(updateTime);
+                              */
                         }
                     }
                 }

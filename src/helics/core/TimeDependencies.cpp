@@ -74,7 +74,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.next = m.actionTime;
             dep.Te = m.Te;
             dep.minDe = m.Tdemin;
-          
+
             if (dep.Te < dep.minDe) {
                 dep.minDe = dep.Te;
             }
@@ -91,7 +91,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
                 m.getExtraDestData() :
                 dep.sequenceCounter;
-            if (dep.responseSequenceCounter==dep.grantedIteration) {
+            if (dep.responseSequenceCounter == dep.grantedIteration) {
                 dep.updateRequested = false;
             }
             break;
@@ -538,7 +538,7 @@ bool TimeDependencies::hasActiveTimeDependencies() const
 bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
 {
     return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
-        return checkSequenceCounter(dep,tmin,sq);
+        return checkSequenceCounter(dep, tmin, sq);
     });
 }
 int TimeDependencies::activeDependencyCount() const
