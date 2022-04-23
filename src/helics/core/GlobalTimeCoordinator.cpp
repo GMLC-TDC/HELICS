@@ -57,6 +57,20 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
     return {triggered, me};
 }
 
+void GlobalTimeCoordinator::sendTimeUpdateRequest(Time triggerTime) {
+    ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
+    updateTime.counter = sequenceCounter;
+    for (auto& dep : dependencies) {
+        if (dep.next <= triggerTime && dep.next < cBigTime) {
+            updateTime.dest_id = dep.fedID;
+            updateTime.setExtraDestData(dep.sequenceCounter);
+            dep.updateRequested = true;
+            dep.grantedIteration = sequenceCounter;
+            sendMessageFunction(updateTime);
+        }
+    }
+}
+
 bool GlobalTimeCoordinator::updateTimeFactors()
 {
     auto timeStream = generateMinTimeUpstream(dependencies, true, mSourceId, NoIgnoredFederates, 0);
@@ -71,17 +85,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             currentTimeState = TimeState::time_requested;
             currentMinTime = timeStream.next;
             nextEvent = findNextTriggerEvent(dependencies);
-            ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
             ++sequenceCounter;
-            updateTime.counter = sequenceCounter;
             auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
-            for (const auto& dep : dependencies) {
-                if (dep.next <= trigTime && dep.next < cBigTime) {
-                    updateTime.dest_id = dep.fedID;
-                    updateTime.setExtraDestData(dep.sequenceCounter);
-                    sendMessageFunction(updateTime);
-                }
-            }
+            sendTimeUpdateRequest(trigTime);
             return true;
         }
         if (currentTimeState == TimeState::time_requested) {
@@ -96,17 +102,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 }
 
                 if (trig.first || !verified) {
-                    ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME, mSourceId, mSourceId);
-                    ++sequenceCounter;
-                    updateTime.counter = sequenceCounter;
 
-                    for (const auto& dep : dependencies) {
-                        if (dep.next <= trigTime && dep.next < cBigTime) {
-                            updateTime.dest_id = dep.fedID;
-                            updateTime.setExtraDestData(dep.sequenceCounter);
-                            sendMessageFunction(updateTime);
-                        }
-                    }
+                    ++sequenceCounter;
+                    sendTimeUpdateRequest(trigTime);
                     return true;
                 }
                 ActionMessage updateTime(CMD_TIME_REQUEST, mSourceId, mSourceId);
@@ -126,6 +124,29 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 currentTimeState = TimeState::time_granted;
                 currentMinTime = timeStream.Te;
                 nextEvent = timeStream.Te;
+            } else {
+                for (auto& dep : dependencies) {
+                    if (dep.updateRequested) {
+                        continue;
+                    }
+                    if (dep.next <= trigTime && dep.next < cBigTime) {
+                        if (!checkSequenceCounter(dep,trigTime,sequenceCounter)) {
+
+                            std::cerr << "sequence check but no request" << std::endl;
+                              /* ActionMessage updateTime(CMD_REQUEST_CURRENT_TIME,
+                                                         mSourceId,
+                                                         mSourceId);
+                                updateTime.counter = sequenceCounter;
+
+                                updateTime.dest_id = dep.fedID;
+                                updateTime.setExtraDestData(dep.sequenceCounter);
+                                dep.updateRequested = true;
+                                sendMessageFunction(updateTime);
+                                */
+                            
+                        }
+                    }
+                }
             }
         }
     }

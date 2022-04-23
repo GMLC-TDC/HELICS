@@ -88,6 +88,7 @@ class DependencyInfo: public TimeData {
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
     bool nonGranting{false};  //!< indicator that the dependency is a non granting time coordinator
     bool triggered{false};  //!< indicator that the dependency has been triggered in some way
+    bool updateRequested{false}; //!< indicator that an update request is in process
     // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
@@ -184,6 +185,11 @@ class TimeDependencies {
     bool hasDelayedDependency() const { return mDelayedDependency.isValid(); }
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
+
+inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int32_t sq) {
+    return (!dep.dependency || !dep.dependent || dep.timingVersion <= 0 || dep.next > tmin ||
+            dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+}
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
                                               GlobalFederateId self,

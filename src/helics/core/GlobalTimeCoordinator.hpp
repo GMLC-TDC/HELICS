@@ -47,6 +47,8 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     void transmitTimingMessagesDownstream(ActionMessage& msg,
                                           GlobalFederateId skipFed = GlobalFederateId{}) const;
 
+    void sendTimeUpdateRequest(Time triggerTime);
+
   public:
     /** check if entry to the executing state can be granted*/
     virtual MessageProcessingResult

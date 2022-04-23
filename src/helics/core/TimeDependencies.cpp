@@ -39,6 +39,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             if (dep.connection == ConnectionType::self) {
                 dep.responseSequenceCounter = dep.sequenceCounter;
             }
+            if (dep.responseSequenceCounter == dep.grantedIteration) {
+                dep.updateRequested = false;
+            }
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
@@ -71,7 +74,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.next = m.actionTime;
             dep.Te = m.Te;
             dep.minDe = m.Tdemin;
-
+          
             if (dep.Te < dep.minDe) {
                 dep.minDe = dep.Te;
             }
@@ -88,6 +91,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
                 m.getExtraDestData() :
                 dep.sequenceCounter;
+            if (dep.responseSequenceCounter==dep.grantedIteration) {
+                dep.updateRequested = false;
+            }
             break;
         case CMD_TIME_GRANT:
             dep.mTimeState = TimeState::time_granted;
@@ -116,6 +122,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
             dep.hasData = false;
+            dep.updateRequested = false;
             break;
         case CMD_TIMING_INFO:
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
@@ -531,8 +538,7 @@ bool TimeDependencies::hasActiveTimeDependencies() const
 bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
 {
     return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
-        return ((!dep.dependency) || dep.timingVersion == 0 || dep.next > tmin ||
-                dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+        return checkSequenceCounter(dep,tmin,sq);
     });
 }
 int TimeDependencies::activeDependencyCount() const
