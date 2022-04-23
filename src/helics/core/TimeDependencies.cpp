@@ -148,6 +148,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
         case CMD_PUB:
             dep.hasData = true;
             break;
+        case CMD_REQUEST_CURRENT_TIME:
+            dep.sequenceCounter = m.counter;
+            break;
         default:
             res = DependencyProcessingResult::NOT_PROCESSED;
             break;

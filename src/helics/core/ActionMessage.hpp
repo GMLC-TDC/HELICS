@@ -326,6 +326,7 @@ inline bool isIgnoreableCommand(const ActionMessage& command) noexcept
         case CMD_LOG:
         case CMD_WARNING:
         case CMD_REMOTE_LOG:
+        case CMD_TIME_REQUEST:
         case CMD_REQUEST_CURRENT_TIME:
             return true;
         default:

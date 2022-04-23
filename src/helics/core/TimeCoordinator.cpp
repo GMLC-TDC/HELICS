@@ -1237,7 +1237,9 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                     }
                 }
                 sendMessageFunction(resp);
+                dependencies.updateTime(cmd);
             }
+
             return message_process_result::processed;
         default:
             break;
