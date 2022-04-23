@@ -286,7 +286,8 @@ void BaseTimeCoordinator::sendTimingInfo()
 }
 
 ActionMessage BaseTimeCoordinator::generateTimeRequest(const TimeData& dep,
-                                                       GlobalFederateId fed,std::int32_t responseCode) const
+                                                       GlobalFederateId fed,
+                                                       std::int32_t responseCode) const
 {
     ActionMessage nTime(CMD_TIME_REQUEST);
     nTime.source_id = mSourceId;

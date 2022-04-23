@@ -1224,7 +1224,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
         case CMD_REQUEST_CURRENT_TIME:
-            if (disconnected || lastSend.mTimeState==TimeState::error) {
+            if (disconnected || lastSend.mTimeState == TimeState::error) {
                 ActionMessage treq(CMD_DISCONNECT, mSourceId, cmd.source_id);
                 treq.setExtraDestData(cmd.counter);
                 sendMessageFunction(treq);
