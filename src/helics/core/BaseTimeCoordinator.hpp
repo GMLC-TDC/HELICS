@@ -78,7 +78,9 @@ class BaseTimeCoordinator {
 
   protected:
     /** generate a timeRequest message based on the dependency info data*/
-    ActionMessage generateTimeRequest(const TimeData& dep, GlobalFederateId fed,std::int32_t responseCode) const;
+    ActionMessage generateTimeRequest(const TimeData& dep,
+                                      GlobalFederateId fed,
+                                      std::int32_t responseCode) const;
     /** send the timing info to dependents*/
     void sendTimingInfo();
 
