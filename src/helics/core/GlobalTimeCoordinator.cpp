@@ -111,7 +111,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.actionTime = trigTime;
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
-
+                if (trigTime<=timeZero) {
+                    std::cerr << "negative trigger time" << std::endl;
+                }
                 ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {

@@ -80,13 +80,17 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             }
 
             dep.minFed = GlobalFederateId(m.getExtraData());
-            dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            if (checkActionFlag(m, non_granting_flag)) {
+                dep.nonGranting = true;
+            }
             delayed = checkActionFlag(m, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
+            if (delayed) {
+                dep.delayedTiming = delayed;
+            }
             dep.triggered = checkActionFlag(m, destination_target);
-            dep.delayedTiming = delayed;
             dep.sequenceCounter = m.counter;
             dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
                 m.getExtraDestData() :

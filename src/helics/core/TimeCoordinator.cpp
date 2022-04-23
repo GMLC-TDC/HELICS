@@ -1224,36 +1224,19 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
             removeDependent(GlobalFederateId(cmd.source_id));
             break;
         case CMD_REQUEST_CURRENT_TIME:
-            if (disconnected) {
+            if (disconnected || lastSend.mTimeState==TimeState::error) {
                 ActionMessage treq(CMD_DISCONNECT, mSourceId, cmd.source_id);
                 treq.setExtraDestData(cmd.counter);
                 sendMessageFunction(treq);
-            } else if (lastSend.mTimeState == TimeState::time_granted) {
-                ActionMessage treq(CMD_TIME_GRANT, mSourceId, cmd.source_id);
-                treq.actionTime = lastSend.next;
-                treq.setExtraDestData(cmd.counter);
-                sendMessageFunction(treq);
             } else {
-                ActionMessage treq(CMD_TIME_REQUEST, mSourceId, cmd.source_id);
-                treq.actionTime = lastSend.next;
-                treq.Tdemin = lastSend.minDe;
-                treq.Te = lastSend.Te;
-                treq.counter = sequenceCounter;
-                treq.setExtraData(lastSend.minFed.baseValue());
-                treq.setExtraDestData(cmd.counter);
-                if (nonGranting) {
-                    setActionFlag(treq, non_granting_flag);
-                }
-                if (info.wait_for_current_time_updates) {
-                    setActionFlag(treq, delayed_timing_flag);
-                }
+                auto resp = generateTimeRequest(lastSend, cmd.source_id, cmd.counter);
                 if (triggered) {
-                    setActionFlag(treq, destination_target);
+                    setActionFlag(resp, destination_target);
                     if (cmd.source_id == gRootBrokerID) {
                         triggered = false;
                     }
                 }
-                sendMessageFunction(treq);
+                sendMessageFunction(resp);
             }
             return message_process_result::processed;
         default:
