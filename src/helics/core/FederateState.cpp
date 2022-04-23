@@ -1222,6 +1222,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     prettyPrintString(cmd),
                                     cmd.actionTime,
                                     time_granted));
+                    auto qres = processQueryActual("global_time_debugging");
+                    qres.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(qres);
                 }
                 if (state <= HELICS_EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
