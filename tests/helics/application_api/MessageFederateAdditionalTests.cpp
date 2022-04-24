@@ -37,6 +37,10 @@ class mfed_add_all_type_tests:
 
 class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 TEST_P(mfed_add_single_type_tests, initialize_tests)
 {
     SetupTest<helics::MessageFederate>(GetParam(), 1);
@@ -474,11 +478,16 @@ TEST_P(mfed_add_type_tests, threefedPingPong)
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_single_type_tests,
-                         ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(CoreTypes));
+                         ::testing::ValuesIn(CoreTypes_single),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
+                         mfed_add_type_tests,
+                         ::testing::ValuesIn(CoreTypes),
+                         testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,
-                         ::testing::ValuesIn(CoreTypes_all));
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
                                                "example_message_fed.toml"};

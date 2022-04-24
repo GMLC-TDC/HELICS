@@ -430,12 +430,12 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
 bool TimeCoordinator::updateTimeFactors()
 {
     total = generateMinTimeTotal(dependencies,
-                                 info.restrictive_time_policy,
+                                 info.restrictive_time_policy||globalTime,
                                  GlobalFederateId{},
                                  NoIgnoredFederates,
                                  sequenceCounter);
     upstream = generateMinTimeUpstream(dependencies,
-                                       info.restrictive_time_policy,
+                                       info.restrictive_time_policy||globalTime,
                                        GlobalFederateId{},
                                        NoIgnoredFederates,
                                        sequenceCounter);
@@ -1007,7 +1007,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             } else {
                 // on wait for current time flag all other federates must have entered exec mode
                 total = generateMinTimeTotal(dependencies,
-                                             info.restrictive_time_policy,
+                                             info.restrictive_time_policy || globalTime,
                                              mSourceId,
                                              mSourceId,
                                              sequenceCounter);
