@@ -430,12 +430,12 @@ void TimeCoordinator::updateMessageTime(Time messageUpdateTime, bool allowReques
 bool TimeCoordinator::updateTimeFactors()
 {
     total = generateMinTimeTotal(dependencies,
-                                 info.restrictive_time_policy||globalTime,
+                                 info.restrictive_time_policy || globalTime,
                                  GlobalFederateId{},
                                  NoIgnoredFederates,
                                  sequenceCounter);
     upstream = generateMinTimeUpstream(dependencies,
-                                       info.restrictive_time_policy||globalTime,
+                                       info.restrictive_time_policy || globalTime,
                                        GlobalFederateId{},
                                        NoIgnoredFederates,
                                        sequenceCounter);
