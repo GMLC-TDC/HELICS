@@ -15,7 +15,6 @@ set(sequencing_test_sources
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
     ../coreTypeLists.hpp
-
 )
 
 add_executable(sequencing-tests ${sequencing_test_sources})

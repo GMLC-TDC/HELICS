@@ -14,7 +14,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/Core.hpp"
 #include "sequencingHelpers.hpp"
-#include <gtest/gtest.h>
 
 #include <future>
 #include <gtest/gtest.h>
@@ -38,8 +37,8 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     epid.setDefaultDestination("ep2");
 
-    auto delay=helics::delayMessages(mFed1.get(), GetParam(), 500);
-    
+    auto delay = helics::delayMessages(mFed1.get(), GetParam(), 500);
+
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
@@ -86,8 +85,7 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          ::testing::ValuesIn({5, 6, 7, 8, 9}),
                          testNamer);
 
-class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {
-};
+class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 TEST_P(sequencing2, time_interruptions)
 {
@@ -100,7 +98,7 @@ TEST_P(sequencing2, time_interruptions)
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 0.5);
 
-     auto delay = helics::delayMessages(brokers[1].get(), GetParam(), 500);
+    auto delay = helics::delayMessages(brokers[1].get(), GetParam(), 500);
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
@@ -150,7 +148,4 @@ TEST_P(sequencing2, time_interruptions)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(sequencing_tests,
-                         sequencing2,
-                         ::testing::Range(12,25),
-                         testNamer);
+INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(12, 25), testNamer);

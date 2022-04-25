@@ -160,7 +160,7 @@ namespace testcore {
                 rid = pr.first;
                 cmd = std::move(pr.second);
                 buffer.pop();
-                if (allowedSend>0) {
+                if (allowedSend > 0) {
                     --allowedSend;
                 }
             } else {
