@@ -5,30 +5,25 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
+#include "../application_api/testFixtures.hpp"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Endpoints.hpp"
 #include "helics/application_api/MessageFederate.hpp"
-#include "helics/core/Core.hpp"
-#include "helics/network/test/TestComms.h"
 #include "helics/core/CommonCore.hpp"
+#include "helics/core/Core.hpp"
 #include "helics/network/CommsBroker.hpp"
-#include <gtest/gtest.h>
-
-#include "../application_api/testFixtures.hpp"
-
+#include "helics/network/test/TestComms.h"
 
 #include <future>
+#include <gtest/gtest.h>
 #include <iostream>
 #include <thread>
 /** these test cases test out the message federates
  */
 
-
 class sequencing: public ::testing::TestWithParam<int>, public FederateTestFixture {};
-
-
 
 TEST_P(sequencing, send_receive_2fed_multisend)
 {
@@ -43,10 +38,10 @@ TEST_P(sequencing, send_receive_2fed_multisend)
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     epid.setDefaultDestination("ep2");
 
-    auto tcore = std::dynamic_pointer_cast <
+    auto tcore = std::dynamic_pointer_cast<
         helics::CommsBroker<helics::testcore::TestComms, helics::CommonCore>>(
-                     mFed1->getCorePointer());
-    auto *tcomms=tcore->getCommsObjectPointer();
+        mFed1->getCorePointer());
+    auto* tcomms = tcore->getCommsObjectPointer();
     tcomms->allowMessages(GetParam());
     auto tcommAllow = std::async(std::launch::async, [tcomms]() {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -80,7 +75,7 @@ TEST_P(sequencing, send_receive_2fed_multisend)
     ASSERT_EQ(M1->data.size(), data1.size());
 
     EXPECT_EQ(M1->data[245], data1[245]);
-    
+
     EXPECT_EQ(M1->time, 0.0);
     mFed1->finalizeAsync();
     mFed2->finalize();
@@ -95,5 +90,5 @@ static const auto testNamer = [](const ::testing::TestParamInfo<int>& parameter)
 
 INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          sequencing,
-                         ::testing::ValuesIn({5,6, 7, 8,9}),
+                         ::testing::ValuesIn({5, 6, 7, 8, 9}),
                          testNamer);
