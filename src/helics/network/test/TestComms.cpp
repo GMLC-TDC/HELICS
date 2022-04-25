@@ -221,7 +221,7 @@ namespace testcore {
                             allowedSend = 0;
                             continue;
                         case ALLOW_MESSAGES:
-                            if (cmd.getExtraData()>=0) {
+                            if (cmd.getExtraData() >= 0) {
                                 bufferData = true;
                                 allowedSend += cmd.getExtraData();
                             } else {
