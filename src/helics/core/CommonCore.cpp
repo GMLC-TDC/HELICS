@@ -3131,7 +3131,24 @@ void CommonCore::processCommand(ActionMessage&& command)
             if (isReasonForTick(command.messageID, TickForwardingReasons::QUERY_TIMEOUT)) {
                 checkQueryTimeouts();
             }
-
+            if (isReasonForTick(command.messageID,TickForwardingReasons::DISCONNECT_TIMEOUT)) {
+                auto now=std::chrono::steady_clock::now();
+                if (now - disconnectTime > (3*tickTimer).to_ms())
+                {
+                    LOG_WARNING(global_broker_id_local,
+                                getIdentifier(),
+                                " disconnect Timer expired forcing disconnect");
+                    ActionMessage bye(CMD_DISCONNECT_FED_ACK);
+                    bye.source_id = parent_broker_id;
+                    for (auto fed : loopFederates) {
+                        if (fed->getState() != FederateStates::HELICS_FINISHED) {
+                            bye.dest_id = fed->global_id.load();
+                            fed->addAction(bye);
+                        }
+                    }
+                    addActionMessage(CMD_STOP);
+                }
+            }
             break;
         case CMD_PING:
         case CMD_BROKER_PING:  // broker ping for core is the same as core
@@ -4736,6 +4753,8 @@ bool CommonCore::checkAndProcessDisconnect()
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
         transmit(parent_route_id, dis);
+        setTickForwarding(TickForwardingReasons::DISCONNECT_TIMEOUT, true);
+        disconnectTime = std::chrono::steady_clock::now();
         return true;
     }
     if (hasFilters) {

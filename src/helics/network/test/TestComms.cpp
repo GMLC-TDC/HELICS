@@ -160,7 +160,9 @@ namespace testcore {
                 rid = pr.first;
                 cmd = std::move(pr.second);
                 buffer.pop();
-                --allowedSend;
+                if (allowedSend>0) {
+                    --allowedSend;
+                }
             } else {
                 std::tie(rid, cmd) = txQueue.pop();
             }

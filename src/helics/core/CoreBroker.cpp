@@ -908,6 +908,7 @@ void CoreBroker::processTimeMonitorMessage(ActionMessage& m)
     }
 }
 
+
 void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
 {
     ActionMessage bye(disconnectType);
@@ -917,10 +918,20 @@ void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
                 brk.state = connection_state::disconnected;
+                brk._sent_disconnect_ack = true;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
                 timeCoord->removeDependent(brk.global_id);
+            }
+        } else if (brk.state==connection_state::disconnected) {
+            if (brk._sent_disconnect_ack == false) {
+                ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
+                                                 CMD_DISCONNECT_BROKER_ACK);
+                dis.source_id = global_broker_id_local;
+                dis.dest_id = brk.global_id;
+                transmit(brk.route, dis);
+                brk._sent_disconnect_ack = true;
             }
         }
     });
@@ -1167,7 +1178,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     m.source_id = global_broker_id_local;
                     transmit(parent_route_id, m);
                 }
-            }
+            } 
             activeQueries.fulfillAllPromises("#disconnected");
             break;
         case CMD_BROADCAST_DISCONNECT: {

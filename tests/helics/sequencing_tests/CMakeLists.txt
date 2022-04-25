@@ -10,6 +10,8 @@
 set(sequencing_test_sources
     Sequencing1.cpp
     sequencing-tests.cpp
+    sequencingHelpers.hpp
+    sequencingHelpers.cpp
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
     ../coreTypeLists.hpp

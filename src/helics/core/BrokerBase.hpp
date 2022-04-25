@@ -122,7 +122,8 @@ class BrokerBase {
         NO_COMMS = 0x01,
         PING_RESPONSE = 0x02,
         QUERY_TIMEOUT = 0x04,
-        GRANT_TIMEOUT = 0x08
+        GRANT_TIMEOUT = 0x08,
+        DISCONNECT_TIMEOUT = 0x10
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
@@ -138,6 +139,8 @@ class BrokerBase {
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
+    /// time when the disconnect started
+    decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
