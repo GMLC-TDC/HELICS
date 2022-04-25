@@ -657,6 +657,9 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.responseSequenceCounter = dep.sequenceCounter;
             }
         }
+        mTime.next = initializationTime;
+        mTime.Te = timeZero;
+        mTime.minDe = timeZero;
         return;
     }
 

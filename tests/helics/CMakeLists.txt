@@ -21,6 +21,7 @@ add_subdirectory(core)
 add_subdirectory(network)
 add_subdirectory(common)
 add_subdirectory(system_tests)
+add_subdirectory(sequencing_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
