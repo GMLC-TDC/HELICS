@@ -73,6 +73,7 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
     mFed1->finalizeComplete();
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    delay.wait();
 }
 
 static const auto testNamer = [](const ::testing::TestParamInfo<int>& parameter) {
@@ -206,6 +207,7 @@ TEST_P(sequencing2, message_filter_function_two_stage)
     auto delay = helics::delayMessages(fFed2.get(), GetParam(), 500);
     bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
     EXPECT_TRUE(res);
+    delay.wait();
 }
 
 INSTANTIATE_TEST_SUITE_P(sequencing_tests,
