@@ -209,8 +209,8 @@ TEST(ftc_tests, timing_test1)
     auto modified = ftc.processTimeMessage(timeUpdate);
     EXPECT_TRUE(modified);
     ftc.updateTimeFactors();
-    // there should still be the exec request
-    EXPECT_TRUE(lastMessage.action() == CMD_EXEC_REQUEST);
+    // there should still be the invalid as all federates are not updated past exec
+    EXPECT_TRUE(lastMessage.action() == CMD_INVALID);
 
     timeUpdate.source_id = fed3;
     timeUpdate.actionTime = 0.5;

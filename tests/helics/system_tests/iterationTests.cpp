@@ -555,9 +555,7 @@ TEST_F(iteration, iteration_counter)
 
 TEST_F(iteration, wait_for_current_time_iterative)
 {
-    extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
-    extraCoreArgs = "--debugging";
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
 
@@ -651,9 +649,7 @@ TEST_F(iteration, wait_for_current_time_iterative)
 
 TEST_F(iteration, wait_for_current_time_iterative_enter_exec)
 {
-    extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
-    extraCoreArgs = "--debugging";
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
 
