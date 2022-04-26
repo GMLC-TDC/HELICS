@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "helics/helics-config.h"
+
 #include <future>
 
 namespace helics {
@@ -16,4 +17,4 @@ class Broker;
 std::future<void> delayMessages(Federate* fed, int preDelayMessageCount, int msecDelay);
 
 std::future<void> delayMessages(Broker* brk, int preDelayMessageCount, int msecDelay);
-}
+}  // namespace helics

@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/Core.hpp"
 #include "sequencingHelpers.hpp"
-#include <gtest/gtest.h>
 
 #include <future>
 #include <gtest/gtest.h>
@@ -37,8 +36,8 @@ TEST_P(sequencing1, send_receive_2fed_multisend)
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     epid.setDefaultDestination("ep2");
 
-    auto delay=helics::delayMessages(mFed1.get(), GetParam(), 500);
-    
+    auto delay = helics::delayMessages(mFed1.get(), GetParam(), 500);
+
     auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
     mFed2->enterExecutingMode();
     f1finish.wait();
@@ -85,8 +84,7 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          ::testing::ValuesIn({5, 6, 7, 8, 9}),
                          testNamer);
 
-class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {
-};
+class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 
 static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed,
