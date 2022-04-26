@@ -229,11 +229,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         grantTimeout,
         "time to wait for a time request to be granted before triggering diagnostic actions; default is in ms (can also be entered as a time "
         "like '10s' or '45ms')");
-    timeout_group->add_option(
-        "--maxcosimduration",
-        maxCoSimDuration,
-        "the maximum time a broker/core should be active, the co-simulation will self terminate if it is still active after this duration, the time resolution is the tick timer (can also be entered as a time "
-        "like '10s' or '45ms')");
+    timeout_group
+        ->add_option(
+            "--maxcosimduration",
+            maxCoSimDuration,
+            "the maximum time a broker/core should be active, the co-simulation will self terminate if it is still active after this duration, the time resolution is the tick timer (can also be entered as a time "
+            "like '10s' or '45ms')")
+        ->multi_option_policy(CLI::MultiOptionPolicy::TakeLast);
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,

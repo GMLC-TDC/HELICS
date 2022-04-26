@@ -1029,7 +1029,9 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["id"] = mFedID.baseValue();
         base["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
-        mCoord.generateDebuggingTimeInfo(base);
+        if (mCoord.hasActiveTimeDependencies()) {
+            mCoord.generateDebuggingTimeInfo(base);
+        }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {

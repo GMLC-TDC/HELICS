@@ -2171,7 +2171,9 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value base;
         addHeader(base);
         base["state"] = fedStateString(state.load());
-        timeCoord->generateDebuggingTimeInfo(base);
+        if (timeCoord->hasActiveTimeDependencies()) {
+            timeCoord->generateDebuggingTimeInfo(base);
+        }
         return fileops::generateJsonString(base);
     }
     if (query == "timeconfig") {
