@@ -84,6 +84,17 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
                 transmitTimingMessagesDownstream(upd);
             }
         }
+    } else if (dependencies.hasDelayedDependency() &&
+               mTimeDownstream.minFed == dependencies.delayedDependency() && executionMode) {
+        auto td = generateMinTimeUpstream(
+            dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed, 0);
+        DependencyInfo di;
+        di.update(td);
+        auto upd_delayed =
+            generateTimeRequest(di, mTimeDownstream.minFed, di.responseSequenceCounter);
+        if (sendMessageFunction) {
+            sendMessageFunction(upd_delayed);
+        }
     }
     return (updateUpStream || updateDownStream);
 }
