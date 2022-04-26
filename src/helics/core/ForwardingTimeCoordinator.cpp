@@ -33,13 +33,12 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
 
     bool updateUpStream{false};
     bool updateDownStream{false};
-    if (mTimeUpstream.mTimeState>TimeState::exec_requested || !executionMode) {
+    if (mTimeUpstream.mTimeState > TimeState::exec_requested || !executionMode) {
         updateUpStream = upstream.update(mTimeUpstream);
     }
     if (mTimeDownstream.mTimeState > TimeState::exec_requested || !executionMode) {
         updateDownStream = downstream.update(mTimeDownstream);
     }
-
 
     if (upstream.mTimeState == TimeState::time_requested) {
         if (upstream.minDe < downstream.minDe) {
@@ -54,41 +53,37 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             //     downstream.next = downstream.minminDe;
         }
     }
-    
+
     sequenceCounter = upstream.sequenceCounter;
     if (updateUpStream) {
-        
-            auto upd =
-                generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
-            if (upd.action() != CMD_IGNORE) {
-                transmitTimingMessagesUpstream(upd);
-            }
-        
+        auto upd =
+            generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
+        if (upd.action() != CMD_IGNORE) {
+            transmitTimingMessagesUpstream(upd);
+        }
     }
     if (updateDownStream) {
-        
-            if (dependencies.hasDelayedDependency() &&
-                downstream.minFed == dependencies.delayedDependency()) {
-                auto upd = generateTimeRequest(downstream, GlobalFederateId{}, 0);
-                if (upd.action() != CMD_IGNORE) {
-                    transmitTimingMessagesDownstream(upd, downstream.minFed);
-                }
-                auto td = generateMinTimeUpstream(
-                    dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
-                DependencyInfo di;
-                di.update(td);
-                auto upd_delayed =
-                    generateTimeRequest(di, downstream.minFed, di.responseSequenceCounter);
-                if (sendMessageFunction) {
-                    sendMessageFunction(upd_delayed);
-                }
-            } else {
-                auto upd = generateTimeRequest(downstream, GlobalFederateId{}, 0);
-                if (upd.action() != CMD_IGNORE) {
-                    transmitTimingMessagesDownstream(upd);
-                }
+        if (dependencies.hasDelayedDependency() &&
+            downstream.minFed == dependencies.delayedDependency()) {
+            auto upd = generateTimeRequest(downstream, GlobalFederateId{}, 0);
+            if (upd.action() != CMD_IGNORE) {
+                transmitTimingMessagesDownstream(upd, downstream.minFed);
             }
-        
+            auto td = generateMinTimeUpstream(
+                dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
+            DependencyInfo di;
+            di.update(td);
+            auto upd_delayed =
+                generateTimeRequest(di, downstream.minFed, di.responseSequenceCounter);
+            if (sendMessageFunction) {
+                sendMessageFunction(upd_delayed);
+            }
+        } else {
+            auto upd = generateTimeRequest(downstream, GlobalFederateId{}, 0);
+            if (upd.action() != CMD_IGNORE) {
+                transmitTimingMessagesDownstream(upd);
+            }
+        }
     }
     return (updateUpStream || updateDownStream);
 }
