@@ -1146,7 +1146,7 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
         }
     }
     if (triggerFed.isValid() && ret == MessageProcessingResult::CONTINUE_PROCESSING &&
-        iterating != IterationRequest::NO_ITERATIONS ) {
+        iterating != IterationRequest::NO_ITERATIONS) {
         // if we are just continuing
         const auto& mfed = getExecEntryMinFederate(dependencies, mSourceId);
         if (sendAll) {
@@ -1156,14 +1156,12 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                 if (triggerFed == mfed.fedID && mfed.dependent) {
                     sendUpdatedExecRequest(triggerFed, mfed.fedID, mfed.sequenceCounter);
                 } else {
-                    
                     const auto* tfed = dependencies.getDependencyInfo(triggerFed);
                     if (tfed->dependent) {
                         sendUpdatedExecRequest(triggerFed, mfed.fedID, tfed->sequenceCounter);
                     }
                 }
             }
-            
         }
     }
     return ret;

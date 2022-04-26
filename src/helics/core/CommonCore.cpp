@@ -4181,8 +4181,8 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
         case CMD_ERROR:
         case CMD_LOCAL_ERROR:
             if (cmd.dest_id == global_broker_id_local) {
-                if (cmd.source_id == higher_broker_id ||
-                    cmd.source_id == parent_broker_id || cmd.source_id == gRootBrokerID) {
+                if (cmd.source_id == higher_broker_id || cmd.source_id == parent_broker_id ||
+                    cmd.source_id == gRootBrokerID) {
                     sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
                     setErrorState(cmd.messageID, cmd.payload.to_string());
 
@@ -4245,8 +4245,7 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
             setErrorState(cmd.messageID, cmd.payload.to_string());
             if (isConnected()) {
                 sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                if (!(cmd.source_id == higher_broker_id ||
-                      cmd.source_id == gRootBrokerID)) {
+                if (!(cmd.source_id == higher_broker_id || cmd.source_id == gRootBrokerID)) {
                     transmit(parent_route_id, std::move(cmd));
                 }
             }
@@ -4254,7 +4253,6 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
         default:
             break;
     }
-    
 }
 void CommonCore::processDisconnectCommand(ActionMessage& cmd)
 {
