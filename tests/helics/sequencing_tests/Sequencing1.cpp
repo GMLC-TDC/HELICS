@@ -6,10 +6,10 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../application_api/testFixtures.hpp"
+#include "helics/application_api.hpp"
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/CoreApp.hpp"
-#include "helics/application_api.hpp"
 #include "helics/core/CommonCore.hpp"
 #include "helics/core/Core.hpp"
 #include "sequencingHelpers.hpp"
@@ -86,7 +86,6 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
 
 class sequencing2: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-
 static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed,
                                   std::shared_ptr<helics::MessageFederate>& fFed1,
                                   std::shared_ptr<helics::MessageFederate>& fFed2,
@@ -102,7 +101,6 @@ static bool two_stage_filter_test(std::shared_ptr<helics::MessageFederate>& mFed
     fFed1->setFilterOperator(f1, timeOperator);
     fFed2->setFilterOperator(f2, timeOperator);
 
-    
     fFed1->enterExecutingModeAsync();
     fFed2->enterExecutingModeAsync();
     mFed->enterExecutingMode();
@@ -208,7 +206,4 @@ TEST_P(sequencing2, message_filter_function_two_stage)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(sequencing_tests,
-                         sequencing2,
-                         ::testing::Range(5,15),
-                         testNamer);
+INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(5, 15), testNamer);
