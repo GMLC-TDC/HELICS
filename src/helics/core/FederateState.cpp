@@ -1226,7 +1226,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     qres.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(qres);
                 }
-                
+
                 if (state <= HELICS_EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
                 }
