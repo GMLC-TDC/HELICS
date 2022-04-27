@@ -799,6 +799,7 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
             setActionFlag(treq, indicator_flag);
             addActionMessage(treq);
             auto ret = fed->requestTime(next, IterationRequest::NO_ITERATIONS, false);
+           
             switch (ret.state) {
                 case IterationResult::ERROR_RESULT:
                     throw(FunctionExecutionFailure(fed->lastErrorString()));

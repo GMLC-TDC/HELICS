@@ -212,7 +212,7 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(5, 15),
 
 class sequencing3: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-constexpr char* rerouteType = "test";
+static constexpr char* rerouteType = "test";
 
 TEST_P(sequencing3, reroute_separate2)
 {
@@ -236,13 +236,15 @@ TEST_P(sequencing3, reroute_separate2)
 
     f1.addSourceTarget("send");
     f1.setString("newdestination", "reroute");
-    auto delay = helics::delayMessages(filt.get(), GetParam(), 400);
-    auto act1 = [&p1, &send]() {
+    auto delay = helics::delayMessages(filt.get(), GetParam(), 900);
+    std::vector<helics::Time> tm;
+    auto act1 = [&p1, &send,&tm]() {
         send->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
             p1.send("this is a message");
             tr = send->requestTimeAdvance(1.0);
+            tm.emplace_back(tr);
         }
         send->finalize();
     };
