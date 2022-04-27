@@ -210,8 +210,7 @@ TEST_P(sequencing2, message_filter_function_two_stage)
 
 INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(5, 15), testNamer);
 
-class sequencing3: public ::testing::TestWithParam<int>, public FederateTestFixture {
-};
+class sequencing3: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 constexpr char* rerouteType = "test";
 
@@ -259,7 +258,7 @@ TEST_P(sequencing3, reroute_separate2)
 
     int cnt{0};
     std::vector<std::pair<helics::Time, int>> res;
-    auto act3 = [&filt, &cnt,&res,&p3]() {
+    auto act3 = [&filt, &cnt, &res, &p3]() {
         filt->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 20.0) {
