@@ -1226,19 +1226,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     qres.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(qres);
                 }
-                if (cmd.actionTime == time_granted &&
-                    timeCoord->getRequestedTime() > cmd.actionTime && !iterating &&
-                    time_granted > timeZero) {
-                    LOG_WARNING(fmt::format(
-                        "received message {} at time({}) at interrupted grant Time ({}) request={}",
-                        prettyPrintString(cmd),
-                        cmd.actionTime,
-                        time_granted,
-                        timeCoord->getRequestedTime()));
-                    auto qres = processQueryActual("global_time_debugging");
-                    qres.insert(0, "TIME DEBUGGING::");
-                    LOG_WARNING(qres);
-                }
+                
                 if (state <= HELICS_EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
                 }
@@ -2184,7 +2172,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value base;
         addHeader(base);
         base["state"] = fedStateString(state.load());
-        if (timeCoord->hasActiveTimeDependencies() || usingGlobalTime) {
+        if (!timeCoord->empty()) {
             timeCoord->generateDebuggingTimeInfo(base);
         }
         return fileops::generateJsonString(base);

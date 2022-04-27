@@ -706,9 +706,7 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec)
 
 TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
 {
-    extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
-    extraCoreArgs = "--debugging";
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
 
