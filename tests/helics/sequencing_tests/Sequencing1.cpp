@@ -209,3 +209,83 @@ TEST_P(sequencing2, message_filter_function_two_stage)
 }
 
 INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(5, 15), testNamer);
+
+class sequencing3: public ::testing::TestWithParam<int>, public FederateTestFixture {
+};
+
+constexpr char* rerouteType = "test";
+
+TEST_P(sequencing3, reroute_separate2)
+{
+    extraBrokerArgs = " --globaltime --debugging";
+    extraCoreArgs = " --debugging ";
+    auto broker = AddBroker(rerouteType, 3);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker);
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
+
+    f1.addSourceTarget("send");
+    f1.setString("newdestination", "reroute");
+    auto delay = helics::delayMessages(filt.get(), GetParam(), 400);
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+
+    auto act2 = [&rec]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+        }
+        rec->finalize();
+    };
+
+    int cnt{0};
+    std::vector<std::pair<helics::Time, int>> res;
+    auto act3 = [&filt, &cnt,&res,&p3]() {
+        filt->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 20.0) {
+            tr = filt->requestTime(helics::Time::maxVal());
+            ++cnt;
+            res.emplace_back(tr, p3.pendingMessageCount());
+        }
+    };
+
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    auto t3 = std::thread(act3);
+
+    t1.join();
+    t2.join();
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    // auto res = broker->query("root", "global_time_debugging");
+    t3.join();
+    filt->finalize();
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(cnt, 11);
+    // auto res2 = broker->query("root", "global_time_debugging");
+    broker->waitForDisconnect();
+}
+
+INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing3, ::testing::Range(26, 28), testNamer);

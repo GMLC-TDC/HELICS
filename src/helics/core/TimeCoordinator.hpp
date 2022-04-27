@@ -134,6 +134,8 @@ class TimeCoordinator: public BaseTimeCoordinator {
     /** get the current granted time*/
     Time getGrantedTime() const { return time_granted; }
     /** get the current granted time*/
+    Time getRequestedTime() const { return time_requested; }
+    /** get the current granted time*/
     Time allowedSendTime() const { return time_granted + info.outputDelay; }
     /** get a list of actual dependencies*/
     std::vector<GlobalFederateId> getDependencies() const;
