@@ -716,9 +716,9 @@ Time Federate::requestTime(Time nextInternalTimeStep)
                     timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
                 }
                 auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
-                
+
                 updateSimulationTime(newTime, currentTime, false);
-                
+
                 if (timeRequestReturnCallback) {
                     timeRequestReturnCallback(newTime, false);
                 }

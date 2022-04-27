@@ -90,6 +90,5 @@ static const auto testNamer = [](const ::testing::TestParamInfo<int>& parameter)
 
 INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          sequencing_interruptions,
-                         ::testing::Range(25,80),
+                         ::testing::Range(25, 80),
                          testNamer);
-

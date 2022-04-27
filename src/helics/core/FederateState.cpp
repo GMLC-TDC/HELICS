@@ -446,7 +446,7 @@ IterationResult FederateState::waitSetup()
         unlock();
         return static_cast<IterationResult>(ret);
     }
-    //this function can fail try_lock gracefully
+    // this function can fail try_lock gracefully
 
     std::lock_guard<FederateState> fedlock(*this);
     IterationResult ret;
@@ -479,7 +479,7 @@ IterationResult FederateState::enterInitializingMode()
         }
         return static_cast<IterationResult>(ret);
     }
-   //this function can handle try_lock fail gracefully
+    // this function can handle try_lock fail gracefully
     sleeplock();
     IterationResult ret;
     switch (getState()) {
@@ -560,7 +560,8 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
         return static_cast<IterationResult>(ret);
     }
 
-    //if this is not true then try again the core may have been handing something short so try again
+    // if this is not true then try again the core may have been handing something short so try
+    // again
     if (!queueProcessing.load()) {
         std::this_thread::yield();
         if (!queueProcessing.load()) {
@@ -679,7 +680,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
             allowed_send_time = timeCoord->allowedSendTime();
             iterating = (ret == MessageProcessingResult::ITERATING);
         }
-        
+
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
         // now fill the event vector so external systems know what has been updated
         switch (iterate) {

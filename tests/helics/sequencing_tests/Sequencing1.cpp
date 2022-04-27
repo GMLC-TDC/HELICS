@@ -238,7 +238,7 @@ TEST_P(sequencing3, reroute_separate2)
     f1.setString("newdestination", "reroute");
     auto delay = helics::delayMessages(filt.get(), GetParam(), 900);
     std::vector<helics::Time> tm;
-    auto act1 = [&p1, &send,&tm]() {
+    auto act1 = [&p1, &send, &tm]() {
         send->enterExecutingMode();
         helics::Time tr = helics::timeZero;
         while (tr < 10.0) {
