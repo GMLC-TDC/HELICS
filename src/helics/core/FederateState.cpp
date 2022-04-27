@@ -679,9 +679,6 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
             allowed_send_time = timeCoord->allowedSendTime();
             iterating = (ret == MessageProcessingResult::ITERATING);
         }
-        if (lastTime == time_granted) {
-            std::cerr << "equivalent Times new and old " << lastTime << time_granted << std::endl;
-        }
         
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
         // now fill the event vector so external systems know what has been updated
