@@ -400,7 +400,7 @@ class CommonCore: public Core, public BrokerBase {
     void processDisconnectCommand(ActionMessage& cmd);
     /** handle the processing for a query command*/
     void processQueryCommand(ActionMessage& cmd);
-    /** handle Logging and error related command*/
+    /** handle logging and error related commands*/
     void processLogAndErrorCommand(ActionMessage& cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
