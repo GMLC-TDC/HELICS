@@ -56,7 +56,9 @@ class TimeData {
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false};  //!< indicator that data was sent in the current interval
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
+    std::int8_t timingVersion{-2};  //!< version indicator
     std::uint8_t restrictionLevel{0};  //!< timing restriction level
+
     std::int32_t timeoutCount{0};  //!< counter for timeout checking
     std::int32_t sequenceCounter{0};  //!< the sequence Counter of the request
     std::int32_t responseSequenceCounter{0};  //!< the iteration count of the min federate
@@ -85,6 +87,8 @@ class DependencyInfo: public TimeData {
     bool dependency{false};  //!< indicator that the dependency is an actual dependency
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
     bool nonGranting{false};  //!< indicator that the dependency is a non granting time coordinator
+    bool triggered{false};  //!< indicator that the dependency has been triggered in some way
+    bool updateRequested{false};  //!< indicator that an update request is in process
     // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
@@ -155,7 +159,7 @@ class TimeDependencies {
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
-    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const;
+    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime, bool waiting) const;
 
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
@@ -166,6 +170,8 @@ class TimeDependencies {
     void resetDependentEvents(Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
+    /** verify that all the sequence Counters match*/
+    bool verifySequenceCounter(Time tmin, std::int32_t sq);
     /** get a count of the active dependencies*/
     int activeDependencyCount() const;
     /** get a count of the active dependencies*/
@@ -180,29 +186,41 @@ class TimeDependencies {
     GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
 
+inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int32_t sq)
+{
+    return (!dep.dependency || !dep.dependent || dep.timingVersion <= 0 || dep.next > tmin ||
+            dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+}
+
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
                                               GlobalFederateId self,
                                               ConnectionType ignoreType = ConnectionType::none,
                                               GlobalFederateId ignore = GlobalFederateId{});
+static constexpr GlobalFederateId NoIgnoredFederates{};
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
                                  GlobalFederateId self,
-                                 GlobalFederateId ignore = GlobalFederateId{});
+                                 GlobalFederateId ignore,
+                                 std::int32_t responseCode);
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
                                    GlobalFederateId self,
-                                   GlobalFederateId ignore = GlobalFederateId{});
+                                   GlobalFederateId ignore,
+                                   std::int32_t responseCode);
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
                               GlobalFederateId self,
-                              GlobalFederateId ignore = GlobalFederateId{});
+                              GlobalFederateId ignore,
+                              std::int32_t responseCode);
 
 void generateJsonOutputTimeData(Json::Value& output,
                                 const TimeData& dep,
                                 bool includeAggregates = true);
+
+void addTimeState(Json::Value& output, const TimeState state);
 
 void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
 }  // namespace helics

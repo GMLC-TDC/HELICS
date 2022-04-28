@@ -19,10 +19,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 #include "helics/helics.hpp"
 
-struct timing_tests: public FederateTestFixture, public ::testing::Test {};
+struct timing: public FederateTestFixture, public ::testing::Test {};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
-TEST_F(timing_tests, simple_timing_test)
+TEST_F(timing, simple_timing)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -48,7 +48,7 @@ TEST_F(timing_tests, simple_timing_test)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, simple_timing_test2)
+TEST_F(timing, simple_timing2)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -79,7 +79,7 @@ TEST_F(timing_tests, simple_timing_test2)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, simple_timing_test_message)
+TEST_F(timing, simple_timing_message)
 {
     SetupTest<helics::MessageFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -113,7 +113,42 @@ TEST_F(timing_tests, simple_timing_test_message)
                         // it will time out.
 }
 
-TEST_F(timing_tests, test_uninteruptible_flag)
+TEST_F(timing, simple_global_timing_message)
+{
+    extraBrokerArgs = " --globaltime ";
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.6);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.45);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    auto& ept1 = vFed1->registerGlobalEndpoint("e1");
+    vFed2->registerGlobalEndpoint("e2");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->requestTimeAsync(3.5);
+    auto res = vFed1->requestTime(0.32);
+    // check that the request is only granted at the appropriate period
+    EXPECT_EQ(res, 0.6);
+    ept1.sendTo("test1", "e2");
+    vFed1->requestTimeAsync(1.85);
+    res = vFed2->requestTimeComplete();
+    EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync(2.0);
+    res = vFed2->requestTimeComplete();
+    EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
+    vFed2->requestTimeAsync(3.0);
+    res = vFed1->requestTimeComplete();
+    EXPECT_EQ(res, 2.4);
+    vFed1->finalize();
+    vFed2->finalize();  // this will also test finalizing while a time request is ongoing otherwise
+                        // it will time out.
+}
+
+TEST_F(timing, test_uninteruptible_flag)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -158,7 +193,7 @@ TEST_F(timing_tests, test_uninteruptible_flag)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, test_uninteruptible_flag_option)
+TEST_F(timing, uninteruptible_flag_option)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -210,7 +245,7 @@ TEST_F(timing_tests, test_uninteruptible_flag_option)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
+TEST_F(timing, uninterruptible_flag_two_way_comm)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -282,7 +317,7 @@ TEST_F(timing_tests, test_uninterruptible_flag_two_way_comm)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, test_uninterruptible_iterations)
+TEST_F(timing, uninterruptible_iterations)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -373,7 +408,7 @@ TEST_F(timing_tests, test_uninterruptible_iterations)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, timing_with_input_delay)
+TEST_F(timing, timing_with_input_delay)
 {
     SetupTest<helics::MessageFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -407,7 +442,7 @@ TEST_F(timing_tests, timing_with_input_delay)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, timing_with_minDelta_change)
+TEST_F(timing, timing_with_minDelta_change)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -429,7 +464,7 @@ TEST_F(timing_tests, timing_with_minDelta_change)
     vFed1->finalize();
 }
 
-TEST_F(timing_tests, timing_with_period_change)
+TEST_F(timing, timing_with_period_change)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -451,7 +486,7 @@ TEST_F(timing_tests, timing_with_period_change)
     vFed1->finalize();
 }
 
-TEST_F(timing_tests, sender_finalize_timing_result)
+TEST_F(timing, sender_finalize_timing_result)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -516,7 +551,7 @@ TEST_F(timing_tests, sender_finalize_timing_result)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, sender_finalize_timing_result2)
+TEST_F(timing, sender_finalize_timing_result2)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -587,7 +622,7 @@ TEST_F(timing_tests, sender_finalize_timing_result2)
 }
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
-TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
+TEST_F(timing, fast_sender_tests_ci_skip)  // ci_skip
 {
     SetupTest<helics::ValueFederate>("zmq_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -620,7 +655,7 @@ TEST_F(timing_tests, fast_sender_tests_ci_skip)  // ci_skip
     vFed2->finalize();
 }
 
-TEST_F(timing_tests, dual_fast_sender_tests_ci_skip)  // ci_skip
+TEST_F(timing, dual_fast_sender_tests_ci_skip)  // ci_skip
 {
     SetupTest<helics::ValueFederate>("zmq_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);

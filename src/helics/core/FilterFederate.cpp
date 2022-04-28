@@ -28,9 +28,8 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
     mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
-    mCoord.source_id = fedID;
+    mCoord.setSourceId(fedID);
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
-    mCoord.specifyNonGranting(true);
     mCoord.specifyNonGranting(true);
 }
 
@@ -76,6 +75,7 @@ void FilterFederate::processMessageFilter(ActionMessage& cmd)
         // deal with local source filters
         auto* FiltI = getFilterInfo(cmd.getDest());
         if (FiltI != nullptr) {
+            mCoord.triggered = true;
             if ((!checkActionFlag(*FiltI, disconnected_flag)) && (FiltI->filterOp)) {
                 if (FiltI->cloning) {
                     auto new_messages =
@@ -326,6 +326,7 @@ void FilterFederate::processDestFilterReturn(ActionMessage& command)
 std::pair<ActionMessage&, bool> FilterFederate::executeFilter(ActionMessage& command,
                                                               FilterInfo* filt)
 {
+    mCoord.triggered = true;
     if (filt->core_id == mFedID) {
         if (filt->cloning) {
             // cloning filter returns a vector
@@ -454,6 +455,7 @@ void FilterFederate::runCloningDestinationFilters(const FilterCoordinator* fcoor
                                                   const BasicHandleInfo* handle,
                                                   const ActionMessage& command) const
 {
+    mCoord.triggered = true;
     // now go to the cloning filters
     for (auto* clFilter : fcoord->cloningDestFilters) {
         if (checkActionFlag(*clFilter, disconnected_flag)) {
@@ -516,7 +518,7 @@ void FilterFederate::clearTimeReturn(int32_t id)
     } else {
     }
     if (recheckTime) {
-        minReturnTime = Time::maxVal();
+        minReturnTime = cBigTime;
         for (const auto& tBP : timeBlockProcesses) {
             if (tBP.second < minReturnTime) {
                 minReturnTime = tBP.second;
@@ -550,10 +552,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 }
                 break;
             case HELICS_EXECUTING:
-                mCoord.timeRequest(Time::maxVal(),
-                                   IterationRequest::NO_ITERATIONS,
-                                   Time::maxVal(),
-                                   Time::maxVal());
+                mCoord.timeRequest(cBigTime, IterationRequest::NO_ITERATIONS, cBigTime, cBigTime);
                 break;
             case HELICS_FINISHED:
                 break;
@@ -629,13 +628,24 @@ void FilterFederate::handleMessage(ActionMessage& command)
             auto* filtI = getFilterInfo(mFedID, command.dest_handle);
             if (filtI != nullptr) {
                 filtI->sourceTargets.emplace_back(command.source_id, command.source_handle);
-                mCoord.addDependency(command.source_id);
+                if (!usingGlobalTime) {
+                    mCoord.addDependency(command.source_id);
+                }
             }
             auto* filthandle = mHandles->getFilter(command.dest_handle);
             if (filthandle != nullptr) {
                 filthandle->used = true;
             }
         } break;
+        case CMD_DISCONNECT:
+            if (!usingGlobalTime && !mCoord.hasActiveTimeDependencies()) {
+                mCoord.disconnect();
+                ActionMessage disconnect(CMD_DISCONNECT);
+                disconnect.source_id = mFedID;
+                disconnect.dest_id = parent_broker_id;
+                mQueueMessage(disconnect);
+            }
+            break;
         case CMD_REG_FILTER:
             processFilterInfo(command);
             break;
@@ -648,7 +658,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
                     filtI->sourceTargets.emplace_back(command.getSource());
                 }
                 if (!checkActionFlag(command, error_flag)) {
-                    mCoord.addDependency(command.source_id);
+                    if (!usingGlobalTime) {
+                        mCoord.addDependency(command.source_id);
+                    }
                 }
             }
 
@@ -1017,7 +1029,9 @@ std::string FilterFederate::query(const std::string& queryStr) const
         base["id"] = mFedID.baseValue();
         base["parent"] = mCoreID.baseValue();
         base["state"] = fedStateString(current_state);
-        mCoord.generateDebuggingTimeInfo(base);
+        if (!mCoord.empty()) {
+            mCoord.generateDebuggingTimeInfo(base);
+        }
         return fileops::generateJsonString(base);
     }
     if (queryStr == "timeconfig") {

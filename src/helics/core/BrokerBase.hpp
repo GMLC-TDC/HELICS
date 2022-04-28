@@ -27,7 +27,7 @@ namespace spdlog {
 class logger;
 }
 namespace helics {
-class ForwardingTimeCoordinator;
+class BaseTimeCoordinator;
 class helicsCLI11App;
 class ProfilerBuffer;
 class LogBuffer;
@@ -81,6 +81,8 @@ class BrokerBase {
     bool debugging{false};
     /// flag indicating that the broker is an observer only
     bool observer{false};
+    /// flag indicating that the broker should use a global time coordinator
+    bool globalTime{false};
 
   private:
     /// flag indicating that the main processing loop is running
@@ -96,7 +98,7 @@ class BrokerBase {
     std::atomic<std::size_t> messageCounter{0};
 
   protected:
-    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<BaseTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
@@ -120,7 +122,8 @@ class BrokerBase {
         NO_COMMS = 0x01,
         PING_RESPONSE = 0x02,
         QUERY_TIMEOUT = 0x04,
-        GRANT_TIMEOUT = 0x08
+        GRANT_TIMEOUT = 0x08,
+        DISCONNECT_TIMEOUT = 0x10
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
@@ -136,6 +139,8 @@ class BrokerBase {
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
+    /// time when the disconnect started
+    decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:

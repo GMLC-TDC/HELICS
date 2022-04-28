@@ -57,7 +57,6 @@ bool NetworkCore<COMMS, baseline>::brokerConnect()
     CommsBroker<COMMS, CommonCore>::comms->setName(CommonCore::getIdentifier());
     CommsBroker<COMMS, CommonCore>::comms->loadNetworkInfo(netInfo);
     CommsBroker<COMMS, CommonCore>::comms->setTimeout(BrokerBase::networkTimeout.to_ms());
-    // comms->setMessageSize(maxMessageSize, maxMessageCount);
     auto res = CommsBroker<COMMS, CommonCore>::comms->connect();
     if (res) {
         if (netInfo.portNumber < 0) {

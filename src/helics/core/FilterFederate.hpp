@@ -61,6 +61,8 @@ class FilterFederate {
     /** counter for the number of messages that have been sent, nothing magical about 54 just a
      * number bigger than 1 to prevent confusion */
     std::atomic<int32_t> messageCounter{54};
+    /// indicator to use a globalTimeCoordinator
+    bool usingGlobalTime{false};
     /// storage for all the filters
     gmlc::containers::MappedPointerVector<FilterInfo, GlobalHandle> filters;
     // bool hasTiming{false};
@@ -125,6 +127,12 @@ class FilterFederate {
     std::string query(const std::string& queryStr) const;
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
+
+    void useGlobalTimeCoordinator(bool value)
+    {
+        usingGlobalTime = value;
+        mCoord.globalTime = value;
+    }
 
   private:
     void routeMessage(const ActionMessage& msg);

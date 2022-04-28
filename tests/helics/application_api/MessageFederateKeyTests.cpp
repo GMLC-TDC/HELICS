@@ -42,6 +42,10 @@ class mfed_add_type_tests:
 class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 TEST_P(mfed_single_type_tests, send_receive)
 {
     SetupTest<helics::MessageFederate>(GetParam(), 1);
@@ -544,6 +548,7 @@ TEST_P(mfed_all_type_tests, dual_transfer_message_broker_link_direct)
     auto& ept2 = vFed2->registerGlobalEndpoint("ept2");
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     broker->linkEndpoints("ept1", "ept2");
+    broker->query("root", "global_flush");
     bool res = dual_transfer_test_message(vFed1, vFed2, ept1, ept2);
     EXPECT_TRUE(res);
 }
@@ -726,6 +731,12 @@ TEST_F(mfed_tests, dual_transfer_message_core_link_json_string)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_single_type_tests, ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_all_type_tests, ::testing::ValuesIn(CoreTypes_all));
+INSTANTIATE_TEST_SUITE_P(mfed_tests,
+                         mfed_single_type_tests,
+                         ::testing::ValuesIn(CoreTypes_single),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes), testNamer);
+INSTANTIATE_TEST_SUITE_P(mfed_tests,
+                         mfed_all_type_tests,
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);

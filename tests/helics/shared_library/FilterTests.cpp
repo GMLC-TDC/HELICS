@@ -23,7 +23,7 @@ class filter_type_tests: public ::testing::TestWithParam<const char*>, public Fe
 };
 */
 
-class filter_tests: public FederateTestFixture, public ::testing::Test {};
+class filter: public FederateTestFixture, public ::testing::Test {};
 
 /** test registration of filters*/
 
@@ -131,7 +131,7 @@ TEST_P(filter_simple_type_tests, info_tests)
     CE(helicsFederateFinalizeComplete(mFed, &err));
 }
 
-TEST_F(filter_tests, core_filter_reg)
+TEST_F(filter, core_filter_reg)
 {
     CE(auto core1 = helicsCreateCore("test", "core1", "--autobroker", &err));
 
@@ -517,7 +517,7 @@ TEST_P(filter_simple_type_tests, message_filter_function3)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, clone_test)
+TEST_F(filter, clone_test)
 {
     HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -590,7 +590,7 @@ TEST_F(filter_tests, clone_test)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, clone_test_connections)
+TEST_F(filter, clone_test_connections)
 {
     HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -676,7 +676,7 @@ TEST_F(filter_tests, clone_test_connections)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, clone_test_broker_connections)
+TEST_F(filter, clone_test_broker_connections)
 {
     HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -753,7 +753,7 @@ TEST_F(filter_tests, clone_test_broker_connections)
 }
 
 // this tests using a remote core to connect an endpoint to a cloning destination filter
-TEST_F(filter_tests, clone_test_dest_connections)
+TEST_F(filter, clone_test_dest_connections)
 {
     HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -841,7 +841,7 @@ TEST_F(filter_tests, clone_test_dest_connections)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, clone_test_broker_dest_connections)
+TEST_F(filter, clone_test_broker_dest_connections)
 {
     HelicsBroker broker = AddBroker("test", 3);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "source");
@@ -924,8 +924,9 @@ TEST_F(filter_tests, clone_test_broker_dest_connections)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, multi_clone_test)
+TEST_F(filter, multi_clone_test)
 {
+    extraBrokerArgs = " --globaltime";
     HelicsBroker broker = AddBroker("test", 4);
     AddFederates(helicsCreateMessageFederate, "test", 2, broker, 1.0, "source");
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "dest");
@@ -1034,7 +1035,7 @@ TEST_F(filter_tests, multi_clone_test)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-TEST_F(filter_tests, file_load)
+TEST_F(filter, file_load)
 {
     std::string filename = std::string(TEST_DIR) + "/example_filters.json";
     auto mFed = helicsCreateMessageFederateFromConfig(filename.c_str(), &err);
@@ -1064,7 +1065,7 @@ static HelicsMessage filterFunc1(HelicsMessage mess, void* /*unused*/)
     return mess;
 }
 
-TEST_F(filter_tests, callback_test)
+TEST_F(filter, callbacks)
 {
     HelicsBroker broker = AddBroker("test", 2);
     AddFederates(helicsCreateMessageFederate, "test", 1, broker, 1.0, "filter");
@@ -1133,9 +1134,7 @@ TEST_F(filter_tests, callback_test)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(filter_tests,
-                         filter_simple_type_tests,
-                         ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(filter, filter_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 /*
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(filter, filter_type_tests, ::testing::ValuesIn(CoreTypes));
 */

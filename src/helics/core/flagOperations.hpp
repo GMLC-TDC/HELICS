@@ -53,10 +53,8 @@ constexpr uint16_t non_counting_flag = empty_flag;
 
 /// overload of extra_flag2 indicating an endpoint is targeted
 constexpr uint16_t targeted_flag = extra_flag2;
-
-constexpr uint16_t filter_processing_required_flag =
-    extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for
-                  // filters yet
+/// overload of extra_flag1 indicating that the message requires processing for filters yet
+constexpr uint16_t filter_processing_required_flag = extra_flag1;
 
 /// overload of extra_flag1 to indicate the request is from a non-granting federate
 constexpr uint16_t non_granting_flag = extra_flag1;

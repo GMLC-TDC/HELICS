@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "BrokerFactory.hpp"
-#include "ForwardingTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
@@ -254,6 +254,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             if (no_ping) {
                 setActionFlag(brokerReply, slow_responding_flag);
             }
+            if (globalTime) {
+                setActionFlag(brokerReply, indicator_flag);
+            }
             transmit(brk->route, brokerReply);
             return;
         }
@@ -428,6 +431,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         if (no_ping) {
             setActionFlag(brokerReply, slow_responding_flag);
         }
+        if (globalTime) {
+            setActionFlag(brokerReply, indicator_flag);
+        }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -532,6 +538,14 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
+        if (globalTime) {
+            setActionFlag(fedReply, indicator_flag);
+            if (!checkActionFlag(command, non_counting_flag)) {
+                timeCoord->addDependency(global_fedid);
+                timeCoord->addDependent(global_fedid);
+                timeCoord->setAsChild(global_fedid);
+            }
+        }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -571,7 +585,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_BROKER_SETUP: {
             global_broker_id_local = global_id.load();
             isRootc = _isRoot.load();
-            timeCoord->source_id = global_broker_id_local;
+            timeCoord->setSourceId(global_broker_id_local);
             connectionEstablished = true;
             if (!earlyMessages.empty()) {
                 for (auto& M : earlyMessages) {
@@ -634,7 +648,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 global_broker_id_local = command.dest_id;
                 global_id.store(global_broker_id_local);
                 higher_broker_id = command.source_id;
-                timeCoord->source_id = global_broker_id_local;
+                timeCoord->setSourceId(global_broker_id_local);
                 transmitDelayedMessages();
                 mBrokers.apply([localid = global_broker_id_local](auto& brk) {
                     if (!brk._nonLocal) {
@@ -903,10 +917,20 @@ void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
                 brk.state = connection_state::disconnected;
+                brk._sent_disconnect_ack = true;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
                 timeCoord->removeDependent(brk.global_id);
+            }
+        } else if (brk.state == connection_state::disconnected) {
+            if (brk._sent_disconnect_ack == false) {
+                ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
+                                                CMD_DISCONNECT_BROKER_ACK);
+                dis.source_id = global_broker_id_local;
+                dis.dest_id = brk.global_id;
+                transmit(brk.route, dis);
+                brk._sent_disconnect_ack = true;
             }
         }
     });
@@ -1174,9 +1198,14 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto& dep : timeCoord->getDependents()) {
-                    routeMessage(command, dep);
+                if (command.dest_id.isValid()) {
+                    transmit(getRoute(command.dest_id), command);
+                } else {
+                    for (auto& dep : timeCoord->getDependents()) {
+                        routeMessage(command, dep);
+                    }
                 }
+
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
@@ -1328,6 +1357,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_REMOVE_DEPENDENT:
         case CMD_ADD_INTERDEPENDENCY:
         case CMD_REMOVE_INTERDEPENDENCY:
+        case CMD_TIMING_INFO:
             if (command.dest_id != global_broker_id_local) {
                 routeMessage(command);
             } else {
@@ -1875,7 +1905,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
-        if (!hasTimeDependency) {
+        if (!hasTimeDependency && !globalTime) {
             if (timeCoord->addDependency(higher_broker_id)) {
                 hasTimeDependency = true;
                 ActionMessage add(CMD_ADD_INTERDEPENDENCY,
@@ -1916,11 +1946,13 @@ void CoreBroker::addFilter(ActionMessage& m)
         transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
-            if (timeCoord->addDependent(higher_broker_id)) {
-                hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
-                setActionFlag(add, child_flag);
-                transmit(parent_route_id, add);
+            if (!globalTime) {
+                if (timeCoord->addDependent(higher_broker_id)) {
+                    hasTimeDependency = true;
+                    ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
+                    setActionFlag(add, child_flag);
+                    transmit(parent_route_id, add);
+                }
             }
         }
     } else {

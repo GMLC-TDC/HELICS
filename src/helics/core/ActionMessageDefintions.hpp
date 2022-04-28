@@ -77,6 +77,7 @@ across different compilers*/
         cmd_exec_grant = 22,  //!< grant entry to exec mode or iterate
         cmd_exec_check = 24,  //!< command to run a check on execution entry
         cmd_ack = 254,  //!< acknowledge command to for various purposes
+        cmd_timing_info = 310,  //!< send some information to dependents on timing
 
         cmd_stop = 30,  //!< halt execution
         cmd_terminate_immediately = 31,  //!< immediate halt no-disconnect;
@@ -236,6 +237,7 @@ across different compilers*/
 #define CMD_INIT action_message_def::action_t::cmd_init
 #define CMD_INIT_NOT_READY action_message_def::action_t::cmd_init_not_ready
 #define CMD_INIT_GRANT action_message_def::action_t::cmd_init_grant
+#define CMD_TIMING_INFO action_message_def::action_t::cmd_timing_info
 #define CMD_EXEC_REQUEST action_message_def::action_t::cmd_exec_request
 #define CMD_EXEC_GRANT action_message_def::action_t::cmd_exec_grant
 #define CMD_EXEC_CHECK action_message_def::action_t::cmd_exec_check

@@ -198,7 +198,7 @@ TEST(ftc_tests, timing_test1)
 
     ftc.addDependent(GlobalFederateId(5));
     ActionMessage lastMessage(CMD_INVALID);
-    ftc.source_id = GlobalFederateId(1);
+    ftc.setSourceId(GlobalFederateId(1));
     ftc.setMessageSender([&lastMessage](const helics::ActionMessage& mess) { lastMessage = mess; });
 
     ActionMessage timeUpdate(CMD_TIME_REQUEST, fed2, GlobalFederateId(1));
@@ -209,8 +209,8 @@ TEST(ftc_tests, timing_test1)
     auto modified = ftc.processTimeMessage(timeUpdate);
     EXPECT_TRUE(modified);
     ftc.updateTimeFactors();
-    // there should still be the exec request
-    EXPECT_TRUE(lastMessage.action() == CMD_EXEC_REQUEST);
+    // there should still be the invalid as all federates are not updated past exec
+    EXPECT_TRUE(lastMessage.action() == CMD_INVALID);
 
     timeUpdate.source_id = fed3;
     timeUpdate.actionTime = 0.5;

@@ -36,6 +36,12 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.sequenceCounter = m.counter;
             dep.minFed = GlobalFederateId(m.getExtraData());
             dep.responseSequenceCounter = m.getExtraDestData();
+            if (dep.connection == ConnectionType::self) {
+                dep.responseSequenceCounter = dep.sequenceCounter;
+            }
+            if (dep.responseSequenceCounter == dep.grantedIteration) {
+                dep.updateRequested = false;
+            }
             break;
         case CMD_EXEC_GRANT:
             if (!checkActionFlag(m, iteration_requested_flag)) {
@@ -74,14 +80,24 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             }
 
             dep.minFed = GlobalFederateId(m.getExtraData());
-            dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            if (checkActionFlag(m, non_granting_flag)) {
+                dep.nonGranting = true;
+            }
             delayed = checkActionFlag(m, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             }
-            dep.delayedTiming = delayed;
+            if (delayed) {
+                dep.delayedTiming = delayed;
+            }
+            dep.triggered = checkActionFlag(m, destination_target);
             dep.sequenceCounter = m.counter;
-            dep.responseSequenceCounter = m.getExtraDestData();
+            dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
+                m.getExtraDestData() :
+                dep.sequenceCounter;
+            if (dep.responseSequenceCounter == dep.grantedIteration) {
+                dep.updateRequested = false;
+            }
             break;
         case CMD_TIME_GRANT:
             dep.mTimeState = TimeState::time_granted;
@@ -110,6 +126,13 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
             dep.hasData = false;
+            dep.updateRequested = false;
+            break;
+        case CMD_TIMING_INFO:
+            dep.nonGranting = checkActionFlag(m, non_granting_flag);
+            dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
+            dep.timingVersion = static_cast<std::uint8_t>(m.getExtraData());
+            res = DependencyProcessingResult::PROCESSED_AND_CHECK;
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -124,6 +147,9 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
         case CMD_SEND_MESSAGE:
         case CMD_PUB:
             dep.hasData = true;
+            break;
+        case CMD_REQUEST_CURRENT_TIME:
+            dep.sequenceCounter = m.counter;
             break;
         default:
             res = DependencyProcessingResult::NOT_PROCESSED;
@@ -214,6 +240,12 @@ static std::string_view timeStateString(TimeState state)
     }
 }
 
+void addTimeState(Json::Value& output, const TimeState state)
+{
+    auto sstring = timeStateString(state);
+    output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
+}
+
 void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool includeAggregates)
 {
     output["next"] = static_cast<double>(dep.next);
@@ -221,10 +253,10 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["minde"] = static_cast<double>(dep.minDe);
     output["minfed"] = dep.minFed.baseValue();
     output["responseSequence"] = dep.responseSequenceCounter;
-    auto sstring = timeStateString(dep.mTimeState);
-    output["state"] = Json::Value(sstring.data(), sstring.data() + sstring.size());
+    addTimeState(output, dep.mTimeState);
     output["iteration"] = dep.sequenceCounter;
     output["granted_iteration"] = dep.grantedIteration;
+    output["sequenceCounter"] = dep.sequenceCounter;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
@@ -398,20 +430,21 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
     if (iterating) {
         if (waiting) {
             for (const auto& dep : dependencies) {
-                if (dep.dependency) {
-                    if (dep.connection == ConnectionType::self) {
-                        continue;
+                if (!dep.dependency) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.mTimeState == TimeState::initialized) {
+                    if (dep.grantedIteration == 0) {
+                        return false;
                     }
-                    if (dep.mTimeState == TimeState::initialized) {
-                        if (dep.grantedIteration == 0) {
-                            return false;
-                        }
-                    }
-                    if (dep.mTimeState == TimeState::exec_requested_iterative ||
-                        dep.mTimeState == TimeState::exec_requested_require_iteration) {
-                        if (dep.sequenceCounter < dep.grantedIteration) {
-                            return false;
-                        }
+                }
+                if (dep.mTimeState == TimeState::exec_requested_iterative ||
+                    dep.mTimeState == TimeState::exec_requested_require_iteration) {
+                    if (dep.sequenceCounter < dep.grantedIteration) {
+                        return false;
                     }
                 }
             }
@@ -435,17 +468,90 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
     });
 }
 
+bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
+                                                Time desiredGrantTime,
+                                                bool waiting) const
+{
+    if (iterating) {
+        for (const auto& dep : dependencies) {
+            if (!dep.dependency || dep.next >= cBigTime) {
+                continue;
+            }
+            if (dep.connection == ConnectionType::self) {
+                continue;
+            }
+            if (dep.next < desiredGrantTime) {
+                return false;
+            }
+            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
+                return false;
+            }
+            if (waiting) {
+                if (dep.mTimeState == TimeState::time_requested_iterative ||
+                    dep.mTimeState == TimeState::time_requested_require_iteration) {
+                    if (dep.sequenceCounter < dep.grantedIteration) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+
+    } else {
+        if (!waiting) {
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
+                    return false;
+                }
+                if (dep.next == desiredGrantTime) {
+                    if (dep.mTimeState == TimeState::time_granted) {
+                        return false;
+                    }
+                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next <= desiredGrantTime) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 bool TimeDependencies::hasActiveTimeDependencies() const
 {
     return std::any_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal()));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
     });
 }
 
+bool TimeDependencies::verifySequenceCounter(Time tmin, std::int32_t sq)
+{
+    return std::all_of(dependencies.begin(), dependencies.end(), [tmin, sq](const auto& dep) {
+        return checkSequenceCounter(dep, tmin, sq);
+    });
+}
 int TimeDependencies::activeDependencyCount() const
 {
     return std::count_if(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal()));
+        return (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime));
     });
 }
 /** get a count of the active dependencies*/
@@ -454,7 +560,7 @@ GlobalFederateId TimeDependencies::getMinDependency() const
     GlobalFederateId minID;
     Time minTime(Time::maxVal());
     for (const auto& dep : dependencies) {
-        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < Time::maxVal())) {
+        if (dep.dependency && (dep.fedID.isFederate()) && (dep.next < cBigTime)) {
             if (dep.next < minTime) {
                 minTime = dep.next;
                 minID = dep.fedID;
@@ -476,41 +582,6 @@ void TimeDependencies::resetIteratingExecRequests()
             dep.minFed = GlobalFederateId();
         }
     }
-}
-
-bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const
-{
-    if (iterating) {
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next < desiredGrantTime) {
-                return false;
-            }
-            if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
-                return false;
-            }
-        }
-    } else {
-        for (const auto& dep : dependencies) {
-            if (!dep.dependency) {
-                continue;
-            }
-            if (dep.next < desiredGrantTime) {
-                return false;
-            }
-            if (dep.next == desiredGrantTime) {
-                if (dep.mTimeState == TimeState::time_granted) {
-                    return false;
-                }
-                if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
-                    return false;
-                }
-            }
-        }
-    }
-    return true;
 }
 
 void TimeDependencies::resetIteratingTimeRequests(helics::Time requestTime)
@@ -558,7 +629,8 @@ std::pair<int, std::string> TimeDependencies::checkForIssues(bool waiting) const
 
 static void generateMinTimeImplementation(TimeData& mTime,
                                           const DependencyInfo& dep,
-                                          GlobalFederateId ignore)
+                                          GlobalFederateId ignore,
+                                          std::int32_t sequenceCode)
 {
     if (dep.mTimeState < TimeState::time_granted) {
         if (dep.fedID == ignore) {
@@ -570,7 +642,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.delayedTiming = dep.delayedTiming;
             mTime.restrictionLevel = dep.restrictionLevel;
             mTime.sequenceCounter = dep.sequenceCounter;
-            mTime.responseSequenceCounter = dep.sequenceCounter;
+            mTime.responseSequenceCounter = dep.responseSequenceCounter;
         } else if (dep.mTimeState == mTime.mTimeState) {
             if (dep.restrictionLevel < mTime.restrictionLevel) {
                 mTime.minFed = dep.fedID;
@@ -585,6 +657,9 @@ static void generateMinTimeImplementation(TimeData& mTime,
                 mTime.responseSequenceCounter = dep.sequenceCounter;
             }
         }
+        mTime.next = initializationTime;
+        mTime.Te = timeZero;
+        mTime.minDe = timeZero;
         return;
     }
 
@@ -598,7 +673,9 @@ static void generateMinTimeImplementation(TimeData& mTime,
         return;
     }
 
-    if (dep.connection != ConnectionType::self) {
+    if (dep.connection != ConnectionType::self &&
+        (sequenceCode == 0 || dep.responseSequenceCounter == sequenceCode ||
+         dep.timingVersion == 0 || !dep.dependent)) {
         if (dep.minDe >= dep.next) {
             if (dep.minDe < mTime.minDe) {
                 mTime.minDe = dep.minDe;
@@ -607,6 +684,14 @@ static void generateMinTimeImplementation(TimeData& mTime,
             // this minimum dependent event time received was invalid and can't be trusted
             // therefore it can't be used to determine a time grant
             mTime.minDe = -1;
+        }
+    } else if (dep.responseSequenceCounter == sequenceCode && dep.dependent) {
+        if (dep.minDe >= dep.next && dep.minDe < mTime.minDe) {
+            mTime.minDe = dep.minDe;
+        }
+    } else {
+        if (dep.next < mTime.minDe) {
+            mTime.minDe = dep.next;
         }
     }
     if (dep.next < mTime.next) {
@@ -618,21 +703,23 @@ static void generateMinTimeImplementation(TimeData& mTime,
             mTime.mTimeState = dep.mTimeState;
         }
     }
-    if (dep.connection != ConnectionType::self) {
-        if (dep.Te < mTime.Te) {
-            mTime.TeAlt = mTime.Te;
-            mTime.Te = dep.Te;
+    // if (dep.connection != ConnectionType::self) {
+    if (dep.Te < mTime.Te) {
+        mTime.TeAlt = mTime.Te;
+        mTime.Te = dep.Te;
+        mTime.minFed = dep.fedID;
+        mTime.sequenceCounter = dep.sequenceCounter;
+        mTime.responseSequenceCounter = dep.sequenceCounter;
+        if (dep.minFed.isValid()) {
+            mTime.minFedActual = dep.minFed;
+        } else {
             mTime.minFed = dep.fedID;
-            if (dep.minFed.isValid()) {
-                mTime.minFedActual = dep.minFed;
-            } else {
-                mTime.minFed = dep.fedID;
-            }
-        } else if (dep.Te == mTime.Te) {
-            mTime.minFed = GlobalFederateId{};
-            mTime.TeAlt = mTime.Te;
         }
+    } else if (dep.Te == mTime.Te) {
+        mTime.minFed = GlobalFederateId{};
+        mTime.TeAlt = mTime.Te;
     }
+    // }
 }
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
@@ -677,7 +764,8 @@ const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependenci
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
                                  GlobalFederateId self,
-                                 GlobalFederateId ignore)
+                                 GlobalFederateId ignore,
+                                 std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     std::int32_t iterationCount{0};
@@ -692,7 +780,7 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
             continue;
         }
         iterationCount += dep.sequenceCounter;
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -715,7 +803,8 @@ TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
                                    GlobalFederateId self,
-                                   GlobalFederateId ignore)
+                                   GlobalFederateId ignore,
+                                   std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
@@ -728,7 +817,7 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
     if (mTime.Te < mTime.minDe) {
         mTime.minDe = mTime.Te;
@@ -756,7 +845,8 @@ TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
                               GlobalFederateId self,
-                              GlobalFederateId ignore)
+                              GlobalFederateId ignore,
+                              std::int32_t responseCode)
 {
     TimeData mTime(Time::maxVal(), TimeState::error);
     for (const auto& dep : dependencies) {
@@ -767,7 +857,7 @@ TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
         if (self.isValid() && dep.minFedActual == self) {
             continue;
         }
-        generateMinTimeImplementation(mTime, dep, ignore);
+        generateMinTimeImplementation(mTime, dep, ignore, responseCode);
     }
 
     if (mTime.Te < mTime.minDe) {

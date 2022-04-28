@@ -24,18 +24,18 @@ namespace helics {
 the time coordinator manages dependencies and computes whether time can advance or enter execution
 mode
 */
-class ForwardingTimeCoordinator: public BaseTimeCoordinator {
+class GlobalTimeCoordinator: public BaseTimeCoordinator {
   private:
     // the variables for time coordination
-    DependencyInfo upstream;
-    DependencyInfo downstream;
+    Time currentMinTime{Time::minVal()};
+    TimeState currentTimeState{TimeState::initialized};
+    Time nextEvent{Time::maxVal()};
 
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
-    bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
 
   public:
-    ForwardingTimeCoordinator() = default;
+    GlobalTimeCoordinator() = default;
 
     /** compute updates to time values
     and send an update if needed
@@ -46,6 +46,8 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
     void transmitTimingMessagesUpstream(ActionMessage& msg) const;
     void transmitTimingMessagesDownstream(ActionMessage& msg,
                                           GlobalFederateId skipFed = GlobalFederateId{}) const;
+
+    void sendTimeUpdateRequest(Time triggerTime);
 
   public:
     /** check if entry to the executing state can be granted*/
@@ -58,6 +60,6 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
     virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
 
     /** get the current next time*/
-    virtual Time getNextTime() const override { return downstream.next; }
+    virtual Time getNextTime() const override { return currentMinTime; }
 };
 }  // namespace helics

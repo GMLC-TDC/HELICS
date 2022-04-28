@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-struct timing_tests2: public FederateTestFixture, public ::testing::Test {};
+struct timing2: public FederateTestFixture, public ::testing::Test {};
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-TEST_F(timing_tests2, small_time_test)
+TEST_F(timing2, small_time)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -86,10 +86,16 @@ TEST_F(timing_tests2, small_time_test)
     vFed2->finalize();
 }
 
+TEST_F(timing2, numbers)
+{
+    EXPECT_EQ(helics::cBigTime, helics::Time{cHelicsBigNumber});
+    EXPECT_EQ(helics::cBigTime, helics::Time::maxVal());
+}
+
 /** based on bug found by Manoj Kumar Cebol Sundarrajan
 where a very small period could cause the time to be negative
 */
-TEST_F(timing_tests2, small_period_test)
+TEST_F(timing2, small_period)
 {
     SetupTest<helics::MessageFederate>("test", 3);
     auto rx = GetFederateAs<helics::MessageFederate>(0);
@@ -166,7 +172,7 @@ TEST_F(timing_tests2, small_period_test)
 }
 
 // Tests out the restrictive time policy
-TEST_F(timing_tests2, ring_test3)
+TEST_F(timing2, ring3)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -248,7 +254,7 @@ TEST_F(timing_tests2, ring_test3)
     vFed1->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_exec_extry)
+TEST_F(timing2, wait_for_current_time_exec_extry)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -295,7 +301,7 @@ TEST_F(timing_tests2, wait_for_current_time_exec_extry)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag)
+TEST_F(timing2, wait_for_current_time_flag)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -377,7 +383,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag2)
+TEST_F(timing2, wait_for_current_time_flag2)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -444,7 +450,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag2_error)
+TEST_F(timing2, wait_for_current_time_flag2_error)
 {
     extraBrokerArgs = "--debugging --consoleloglevel=no_print";
     auto broker = AddBroker("test", 2);
@@ -479,7 +485,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag2_error)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_self)
+TEST_F(timing2, wait_for_current_time_flag_self)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -549,7 +555,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_self)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
+TEST_F(timing2, wait_for_current_time_flag_endpoint_error)
 {
     extraBrokerArgs = "--debugging --loglevel=no_print";
     auto broker = AddBroker("test", 2);
@@ -581,7 +587,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
     broker.reset();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
+TEST_F(timing2, wait_for_current_time_flag_endpoint)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -646,7 +652,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     broker.reset();
 }
 
-TEST_F(timing_tests2, offset_timing)
+TEST_F(timing2, offset_timing)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -685,7 +691,7 @@ TEST_F(timing_tests2, offset_timing)
 }
 
 // Tests out the time barrier
-TEST_F(timing_tests2, time_barrier1)
+TEST_F(timing2, time_barrier1)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -707,7 +713,7 @@ TEST_F(timing_tests2, time_barrier1)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, time_barrier_update)
+TEST_F(timing2, time_barrier_update)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -730,7 +736,7 @@ TEST_F(timing_tests2, time_barrier_update)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, time_barrier_clear)
+TEST_F(timing2, time_barrier_clear)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -778,7 +784,7 @@ TEST_F(timing_tests2, time_barrier_clear)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, time_barrier_clear2)
+TEST_F(timing2, time_barrier_clear2)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -835,7 +841,7 @@ TEST_F(timing_tests2, time_barrier_clear2)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, value_to_endpoint_timing)
+TEST_F(timing2, value_to_endpoint_timing)
 {
     SetupTest<helics::CombinationFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);

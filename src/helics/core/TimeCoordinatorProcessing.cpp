@@ -152,6 +152,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             }
             break;
         case CMD_REQUEST_CURRENT_TIME:
+        case CMD_TIMING_INFO:
             timeCoord->processTimeMessage(cmd);
             break;
         case CMD_DISCONNECT_FED:
@@ -247,7 +248,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 break;
             }
             if (!timeGranted_mode) {
-                proc = timeCoord->checkTimeGrant();
+                proc = timeCoord->checkTimeGrant(
+                    cmd.action() == CMD_TIME_REQUEST ? cmd.source_id : GlobalFederateId{});
                 if (returnableResult(proc)) {
                     newMode = true;
                 }

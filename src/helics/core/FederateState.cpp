@@ -406,9 +406,7 @@ std::optional<ActionMessage>
     std::optional<ActionMessage> optAct;
     switch (action.action()) {
         case CMD_REQUEST_CURRENT_TIME:
-            optAct->setAction(CMD_DISCONNECT);
-            optAct->dest_id = action.source_id;
-            optAct->source_id = global_id.load();
+            optAct = ActionMessage(CMD_DISCONNECT, global_id.load(), action.source_id);
             break;
         default:
             break;
@@ -1224,7 +1222,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     prettyPrintString(cmd),
                                     cmd.actionTime,
                                     time_granted));
+                    auto qres = processQueryActual("global_time_debugging");
+                    qres.insert(0, "TIME DEBUGGING::");
+                    LOG_WARNING(qres);
                 }
+
                 if (state <= HELICS_EXECUTING) {
                     timeCoord->processTimeMessage(cmd);
                 }
@@ -1350,7 +1352,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     std::string(cmd.name()),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                    addDependency(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependency(cmd.source_id);
+                    }
                 }
             } else {
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
@@ -1358,7 +1362,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     eptI->addSourceTarget(cmd.getSource(),
                                           std::string(cmd.name()),
                                           cmd.getString(typeStringLoc));
-                    addDependency(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependency(cmd.source_id);
+                    }
                 }
             }
         } break;
@@ -1366,7 +1372,9 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 if (pubI->addSubscriber(cmd.getSource())) {
-                    addDependent(cmd.source_id);
+                    if (!usingGlobalTime) {
+                        addDependent(cmd.source_id);
+                    }
                 }
             }
         } break;
@@ -1421,9 +1429,16 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     errorString = commandErrorString(cmd.messageID);
                     return MessageProcessingResult::ERROR_RESULT;
                 }
+                if (checkActionFlag(cmd, indicator_flag)) {
+                    usingGlobalTime = true;
+                    addDependent(gRootBrokerID);
+                    addDependency(gRootBrokerID);
+                    timeCoord->setAsParent(gRootBrokerID);
+                    timeCoord->globalTime = true;
+                }
                 global_id = cmd.dest_id;
                 interfaceInformation.setGlobalId(cmd.dest_id);
-                timeCoord->source_id = global_id;
+                timeCoord->setSourceId(global_id);
                 return MessageProcessingResult::NEXT_STEP;
             }
             break;
@@ -2157,7 +2172,9 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value base;
         addHeader(base);
         base["state"] = fedStateString(state.load());
-        timeCoord->generateDebuggingTimeInfo(base);
+        if (!timeCoord->empty()) {
+            timeCoord->generateDebuggingTimeInfo(base);
+        }
         return fileops::generateJsonString(base);
     }
     if (query == "timeconfig") {

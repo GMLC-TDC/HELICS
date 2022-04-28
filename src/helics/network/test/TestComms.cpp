@@ -160,11 +160,15 @@ namespace testcore {
                 rid = pr.first;
                 cmd = std::move(pr.second);
                 buffer.pop();
-                --allowedSend;
+                if (allowedSend > 0) {
+                    --allowedSend;
+                }
             } else {
                 std::tie(rid, cmd) = txQueue.pop();
             }
-
+            if (preProcCallback) {
+                preProcCallback(cmd);
+            }
             bool processed = false;
             if (isProtocolCommand(cmd)) {
                 if (rid == control_route) {
@@ -217,7 +221,12 @@ namespace testcore {
                             allowedSend = 0;
                             continue;
                         case ALLOW_MESSAGES:
-                            allowedSend += cmd.getExtraData();
+                            if (cmd.getExtraData() >= 0) {
+                                bufferData = true;
+                                allowedSend += cmd.getExtraData();
+                            } else {
+                                bufferData = false;
+                            }
                             continue;
                     }
                 }
@@ -291,6 +300,7 @@ namespace testcore {
     {
         if (getTxStatus() == connection_status::connected) {
             ActionMessage cmd(CMD_PROTOCOL);
+            cmd.messageID = ALLOW_MESSAGES;
             cmd.setExtraData(count);
             transmit(control_route, cmd);
         }

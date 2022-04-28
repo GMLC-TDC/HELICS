@@ -21,7 +21,9 @@ set(SRC_FILES
     ActionMessage.cpp
     CoreBroker.cpp
     TimeCoordinator.cpp
+    BaseTimeCoordinator.cpp
     ForwardingTimeCoordinator.cpp
+    GlobalTimeCoordinator.cpp
     TimeDependencies.cpp
     HandleManager.cpp
     FilterCoordinator.cpp
@@ -62,7 +64,9 @@ set(INCLUDE_FILES
     BrokerBase.hpp
     TimeDependencies.hpp
     TimeCoordinator.hpp
+    BaseTimeCoordinator.hpp
     ForwardingTimeCoordinator.hpp
+    GlobalTimeCoordinator.hpp
     loggingHelper.hpp
     GlobalFederateId.hpp
     basic_CoreTypes.hpp

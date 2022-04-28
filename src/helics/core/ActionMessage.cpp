@@ -697,7 +697,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // Map to translate the action to a description
-static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 93>
+static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 96>
     actionStrings = {
         // priority commands
         {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
@@ -742,6 +742,7 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_time_check, "time_check"},
         {action_message_def::action_t::cmd_time_block, "time_block"},
         {action_message_def::action_t::cmd_time_unblock, "time_unblock"},
+        {action_message_def::action_t::cmd_request_current_time, "request current time"},
         {action_message_def::action_t::cmd_pub, "pub"},
         {action_message_def::action_t::cmd_bye, "bye"},
         {action_message_def::action_t::cmd_log, "log"},
@@ -763,7 +764,10 @@ static constexpr frozen::unordered_map<action_message_def::action_t, frozen::str
         {action_message_def::action_t::cmd_send_for_filter, "send_for_filter"},
         {action_message_def::action_t::cmd_filter_result, "result from running a filter"},
         {action_message_def::action_t::cmd_send_for_filter_return, "send_for_filter_return"},
+        {action_message_def::action_t::cmd_send_for_dest_filter_return,
+         "send_for_dest_filter_return"},
         {action_message_def::action_t::cmd_null_message, "null message"},
+        {action_message_def::action_t::cmd_null_dest_message, "null destination message"},
 
         {action_message_def::action_t::cmd_reg_pub, "reg_pub"},
         {action_message_def::action_t::cmd_add_publisher, "add publisher"},
