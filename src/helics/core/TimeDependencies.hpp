@@ -45,18 +45,15 @@ enum class DependencyProcessingResult : std::uint8_t {
 };
 
 /** enumeration of delay modes which affect whether a time is granted or not*/
-enum class GrantDelayMode : std::uint8_t {
-    NONE = 0,
-    INTERRUPTED=1,
-    WAITING=2
-};
+enum class GrantDelayMode : std::uint8_t { NONE = 0, INTERRUPTED = 1, WAITING = 2 };
 
-inline GrantDelayMode getDelayMode(bool waiting, bool interrupted) {
+inline GrantDelayMode getDelayMode(bool waiting, bool interrupted)
+{
     return waiting ? GrantDelayMode::WAITING :
                      (interrupted ? GrantDelayMode::INTERRUPTED : GrantDelayMode::NONE);
 }
 
-    // helper class containing the basic timeData
+// helper class containing the basic timeData
 class TimeData {
   public:
     Time next{negEpsilon};  //!< next possible message or value
@@ -171,7 +168,9 @@ class TimeDependencies {
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
-    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime, GrantDelayMode delayMode) const;
+    bool checkIfReadyForTimeGrant(bool iterating,
+                                  Time desiredGrantTime,
+                                  GrantDelayMode delayMode) const;
 
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();

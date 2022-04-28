@@ -605,7 +605,9 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
-                        if (dependencies.checkIfReadyForTimeGrant(false, time_exec, GrantDelayMode::NONE)) {
+                        if (dependencies.checkIfReadyForTimeGrant(false,
+                                                                  time_exec,
+                                                                  GrantDelayMode::NONE)) {
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
@@ -613,9 +615,8 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     break;
                 }
-                if (dependencies.checkIfReadyForTimeGrant(true,
-                                                          time_exec,
-                                                          getDelayMode(info.wait_for_current_time_updates,false))) {
+                if (dependencies.checkIfReadyForTimeGrant(
+                        true, time_exec, getDelayMode(info.wait_for_current_time_updates, false))) {
                     if (hasIterationData) {
                         ret = MessageProcessingResult::ITERATING;
                         break;

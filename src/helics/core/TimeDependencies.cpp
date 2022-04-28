@@ -486,7 +486,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
                 return false;
             }
-            if (delayMode==GrantDelayMode::WAITING) {
+            if (delayMode == GrantDelayMode::WAITING) {
                 if (dep.mTimeState == TimeState::time_requested_iterative ||
                     dep.mTimeState == TimeState::time_requested_require_iteration) {
                     if (dep.sequenceCounter < dep.grantedIteration) {
@@ -501,40 +501,40 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
         switch (delayMode) {
             case GrantDelayMode::NONE:
             case GrantDelayMode::INTERRUPTED:
-            for (const auto& dep : dependencies) {
-                if (!dep.dependency || dep.next >= cBigTime) {
-                    continue;
-                }
-                if (dep.connection == ConnectionType::self) {
-                    continue;
-                }
-                if (dep.next < desiredGrantTime) {
-                    return false;
-                }
-                if (dep.next == desiredGrantTime) {
-                    if (dep.mTimeState == TimeState::time_granted) {
+                for (const auto& dep : dependencies) {
+                    if (!dep.dependency || dep.next >= cBigTime) {
+                        continue;
+                    }
+                    if (dep.connection == ConnectionType::self) {
+                        continue;
+                    }
+                    if (dep.next < desiredGrantTime) {
                         return false;
                     }
-                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
-                        return false;
+                    if (dep.next == desiredGrantTime) {
+                        if (dep.mTimeState == TimeState::time_granted) {
+                            return false;
+                        }
+                        if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                            return false;
+                        }
                     }
                 }
-            }
-            break;
-            
+                break;
+
             case GrantDelayMode::WAITING:
-            for (const auto& dep : dependencies) {
-                if (!dep.dependency || dep.next >= cBigTime) {
-                    continue;
+                for (const auto& dep : dependencies) {
+                    if (!dep.dependency || dep.next >= cBigTime) {
+                        continue;
+                    }
+                    if (dep.connection == ConnectionType::self) {
+                        continue;
+                    }
+                    if (dep.next <= desiredGrantTime) {
+                        return false;
+                    }
                 }
-                if (dep.connection == ConnectionType::self) {
-                    continue;
-                }
-                if (dep.next <= desiredGrantTime) {
-                    return false;
-                }
-            }
-            break;
+                break;
         }
     }
     return true;

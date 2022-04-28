@@ -1472,7 +1472,6 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                 } else {
                     transmit(parent_route_id, cmd);
                 }
-                
             }
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
             if (brk != nullptr) {

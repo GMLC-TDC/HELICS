@@ -94,8 +94,7 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          ::testing::Range(25, 80),
                          testNamer);
 
-class sequencing_reroute: public ::testing::TestWithParam<int>, public FederateTestFixture {
-};
+class sequencing_reroute: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
 TEST_P(sequencing_reroute, separate_dest)
 {
@@ -103,7 +102,7 @@ TEST_P(sequencing_reroute, separate_dest)
     extraBrokerArgs = " --debugging ";
     auto broker = AddBroker(rerouteType, 3);
     extraCoreArgs = " --debugging ";
-    
+
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
     AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
@@ -151,17 +150,17 @@ TEST_P(sequencing_reroute, separate_dest)
     int cnt{0};
     filt->enterExecutingMode();
     helics::Time tr = helics::timeZero;
-    std::vector<std::pair<helics::Time,int>> tv;
+    std::vector<std::pair<helics::Time, int>> tv;
     tv.reserve(12);
     while (tr < 20.0) {
         tr = filt->requestTime(21.0);
-        if (tr==10.0) {
+        if (tr == 10.0) {
             ++cnt;
         } else {
             ++cnt;
         }
-        
-        tv.emplace_back(tr,p3.pendingMessageCount());
+
+        tv.emplace_back(tr, p3.pendingMessageCount());
     }
     t1.join();
     t2.join();
@@ -169,15 +168,11 @@ TEST_P(sequencing_reroute, separate_dest)
     EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 11);
     EXPECT_EQ(cntb, 0);
-    if (cnt!=11) {
+    if (cnt != 11) {
         EXPECT_EQ(cnt, 11);
     }
     filt->finalize();
     delay.get();
 }
 
-
-INSTANTIATE_TEST_SUITE_P(sequencing_test,
-                         sequencing_reroute,
-                         ::testing::Range(15, 40),
-                         testNamer);
+INSTANTIATE_TEST_SUITE_P(sequencing_test, sequencing_reroute, ::testing::Range(15, 40), testNamer);
