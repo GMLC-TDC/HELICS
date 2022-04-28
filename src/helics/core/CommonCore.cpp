@@ -505,16 +505,8 @@ bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
     auto afed = (minFederateState() == OperatingState::DISCONNECTED);
-    if ((hasTimeDependency) || (hasFilters)) {
-        if (afed) {
-            if (!timeCoord->hasActiveTimeDependencies()) {
-                return true;
-            }
-            if (timeCoord->dependencyCount() == 1 && timeCoord->getMinDependency() == filterFedID) {
-                return !filterFed->hasActiveTimeDependencies();
-            }
-        }
-        return false;
+    if (afed && filterFed) {
+      return !filterFed->hasActiveTimeDependencies();
     }
     return (afed);
 }
@@ -4969,23 +4961,19 @@ bool CommonCore::checkAndProcessDisconnect()
         if (enable_profiling) {
             writeProfilingData();
         }
-
+        
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
+        dis.dest_id = parent_broker_id;
         transmit(parent_route_id, dis);
         setTickForwarding(TickForwardingReasons::DISCONNECT_TIMEOUT, true);
         disconnectTime = std::chrono::steady_clock::now();
-        return true;
-    }
-    if (hasFilters) {
-        if (!filterFed->hasActiveTimeDependencies()) {
-            ActionMessage dis(CMD_DISCONNECT);
-            dis.source_id = global_broker_id_local;
-            transmit(parent_route_id, dis);
+        if (filterFed) {
             dis.source_id = filterFedID;
             filterFed->handleMessage(dis);
-            return true;
         }
+       
+        return true;
     }
     if (translatorFed != nullptr) {
         if (!translatorFed->hasActiveTimeDependencies()) {

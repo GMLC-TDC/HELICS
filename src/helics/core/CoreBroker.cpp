@@ -451,8 +451,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         earlyMessages.push_back(std::move(command));
         return;
     }
-    if (!checkActionFlag(command, non_counting_flag) &&
-        getCountableFederates() >= maxFederateCount) {
+    bool countable = !checkActionFlag(command, non_counting_flag);
+    if (countable && getCountableFederates() >= maxFederateCount) {
         ActionMessage badInit(CMD_FED_ACK);
         setActionFlag(badInit, error_flag);
         badInit.source_id = global_broker_id_local;
@@ -462,13 +462,13 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     if (getBrokerState() < BrokerState::operating) {
-        if (allInitReady()) {
+        if (countable && allInitReady()) {
             ActionMessage noInit(CMD_INIT_NOT_READY);
             noInit.source_id = global_broker_id_local;
             transmit(parent_route_id, noInit);
         }
     } else if (getBrokerState() == BrokerState::operating) {
-        if (!checkActionFlag(command, observer_flag)) {
+        if (!checkActionFlag(command, observer_flag) && countable) {
             // we are initialized already
             ActionMessage badInit(CMD_FED_ACK);
             setActionFlag(badInit, error_flag);
@@ -479,7 +479,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             return;
         }
     } else {
-        // we are initialized already
+        // we are in an error state and terminating
         ActionMessage badInit(CMD_FED_ACK);
         setActionFlag(badInit, error_flag);
         badInit.source_id = global_broker_id_local;
@@ -1464,7 +1464,15 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
         } break;
         case CMD_INIT_NOT_READY: {
             if (allInitReady()) {
-                transmit(parent_route_id, cmd);
+                if (isRootc) {
+                    LOG_WARNING(global_broker_id_local,
+                                getIdentifier(),
+                                "received init not ready but already init");
+                    break;
+                } else {
+                    transmit(parent_route_id, cmd);
+                }
+                
             }
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
             if (brk != nullptr) {

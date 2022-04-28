@@ -470,7 +470,7 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
 
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                                                 Time desiredGrantTime,
-                                                bool waiting) const
+                                                GrantDelayMode delayMode) const
 {
     if (iterating) {
         for (const auto& dep : dependencies) {
@@ -486,7 +486,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
                 return false;
             }
-            if (waiting) {
+            if (delayMode==GrantDelayMode::WAITING) {
                 if (dep.mTimeState == TimeState::time_requested_iterative ||
                     dep.mTimeState == TimeState::time_requested_require_iteration) {
                     if (dep.sequenceCounter < dep.grantedIteration) {
@@ -498,7 +498,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
         return true;
 
     } else {
-        if (!waiting) {
+        switch (delayMode) {
+            case GrantDelayMode::NONE:
+            case GrantDelayMode::INTERRUPTED:
             for (const auto& dep : dependencies) {
                 if (!dep.dependency || dep.next >= cBigTime) {
                     continue;
@@ -518,7 +520,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                     }
                 }
             }
-        } else {
+            break;
+            
+            case GrantDelayMode::WAITING:
             for (const auto& dep : dependencies) {
                 if (!dep.dependency || dep.next >= cBigTime) {
                     continue;
@@ -530,6 +534,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                     return false;
                 }
             }
+            break;
         }
     }
     return true;

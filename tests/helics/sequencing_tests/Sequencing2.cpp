@@ -82,6 +82,7 @@ TEST_P(sequencing_interruptions, time_interruptions)
     mFed1->finalizeComplete();
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    delay.get();
 }
 
 static const auto testNamer = [](const ::testing::TestParamInfo<int>& parameter) {
@@ -91,4 +92,92 @@ static const auto testNamer = [](const ::testing::TestParamInfo<int>& parameter)
 INSTANTIATE_TEST_SUITE_P(sequencing_tests,
                          sequencing_interruptions,
                          ::testing::Range(25, 80),
+                         testNamer);
+
+class sequencing_reroute: public ::testing::TestWithParam<int>, public FederateTestFixture {
+};
+
+TEST_P(sequencing_reroute, separate_dest)
+{
+    static constexpr char* rerouteType = "test_3";
+    extraBrokerArgs = " --debugging ";
+    auto broker = AddBroker(rerouteType, 3);
+    extraCoreArgs = " --debugging ";
+    
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "sender");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "receiver");
+    AddFederates<helics::MessageFederate>(rerouteType, 1, broker, 1.0, "filter");
+
+    auto send = GetFederateAs<helics::MessageFederate>(0);
+    auto rec = GetFederateAs<helics::MessageFederate>(1);
+    auto filt = GetFederateAs<helics::MessageFederate>(2);
+    send->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    rec->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    filt->setProperty(HELICS_PROPERTY_TIME_GRANT_TIMEOUT, 1.0);
+    auto& p1 = send->registerGlobalEndpoint("send");
+    auto& p2 = rec->registerGlobalEndpoint("rec");
+    p1.setDefaultDestination("rec");
+    auto& p3 = filt->registerGlobalEndpoint("reroute");
+
+    auto& f1 = helics::make_filter(helics::FilterTypes::REROUTE, filt.get(), "rrfilt");
+
+    f1.addDestinationTarget("rec");
+    f1.setString("newdestination", "reroute");
+
+    auto act1 = [&p1, &send]() {
+        send->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            p1.send("this is a message");
+            tr = send->requestTimeAdvance(1.0);
+        }
+        send->finalize();
+    };
+    int cntb{0};
+    auto act2 = [&rec, &cntb]() {
+        rec->enterExecutingMode();
+        helics::Time tr = helics::timeZero;
+        while (tr < 10.0) {
+            tr = rec->requestTimeAdvance(1.0);
+            if (rec->hasMessage()) {
+                ++cntb;
+            }
+        }
+        rec->finalize();
+    };
+    auto delay = helics::delayMessages(send.get(), GetParam(), 500);
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+    int cnt{0};
+    filt->enterExecutingMode();
+    helics::Time tr = helics::timeZero;
+    std::vector<std::pair<helics::Time,int>> tv;
+    tv.reserve(12);
+    while (tr < 20.0) {
+        tr = filt->requestTime(21.0);
+        if (tr==10.0) {
+            ++cnt;
+        } else {
+            ++cnt;
+        }
+        
+        tv.emplace_back(tr,p3.pendingMessageCount());
+    }
+    t1.join();
+    t2.join();
+    EXPECT_EQ(p2.pendingMessageCount(), 0U);
+    EXPECT_EQ(p3.pendingMessageCount(), 10U);
+    EXPECT_EQ(cnt, 11);
+    EXPECT_EQ(cntb, 0);
+    if (cnt!=11) {
+        EXPECT_EQ(cnt, 11);
+    }
+    filt->finalize();
+    delay.get();
+}
+
+
+INSTANTIATE_TEST_SUITE_P(sequencing_test,
+                         sequencing_reroute,
+                         ::testing::Range(15, 40),
                          testNamer);

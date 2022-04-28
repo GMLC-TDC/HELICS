@@ -565,9 +565,12 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                         return MessageProcessingResult::NEXT_STEP;
                     }
                 }
-                if (dependencies.checkIfReadyForTimeGrant(false,
-                                                          time_exec,
-                                                          info.wait_for_current_time_updates)) {
+
+                if (dependencies.checkIfReadyForTimeGrant(
+                        false,
+                        time_exec,
+                        getDelayMode(info.wait_for_current_time_updates,
+                                     (time_requested > time_exec)))) {
                     iteration = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
@@ -602,7 +605,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
-                        if (dependencies.checkIfReadyForTimeGrant(false, time_exec, false)) {
+                        if (dependencies.checkIfReadyForTimeGrant(false, time_exec, GrantDelayMode::NONE)) {
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
@@ -612,7 +615,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                 }
                 if (dependencies.checkIfReadyForTimeGrant(true,
                                                           time_exec,
-                                                          info.wait_for_current_time_updates)) {
+                                                          getDelayMode(info.wait_for_current_time_updates,false))) {
                     if (hasIterationData) {
                         ret = MessageProcessingResult::ITERATING;
                         break;
