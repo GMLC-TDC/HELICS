@@ -159,9 +159,10 @@ HELICS_EXPORT void helicsTranslatorSetString(HelicsTranslator trans, const char*
 /**
  * Add an input to send a translator output.
  *
- * @details All messages going to a destination are copied to the delivery address(es).
+ * @details All messages sent to a translator endpoint get translated and published to the translators target inputs.
+ * This method adds an input to a translators which will receive translated messages. 
  * @param trans The given translator to add a destination target to.
- * @param dst The name of the endpoint to add as a destination target.
+ * @param input The name of the input which will be receiving translated messages
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -171,10 +172,11 @@ HELICS_EXPORT void helicsTranslatorAddInputTarget(HelicsTranslator trans, const 
 /**
  * Add a source publication target to a translator.
  *
- * @details All messages coming from a source are copied to the delivery address(es).
+ * @details when a publication publishes data the translator will receive it and convert it to a message sent to a translators destination endpoints.
+ * this method adds a publication which publishes data the translator receives and sends to its destination endpoints
  *
  * @param trans The given translator.
- * @param source The name of the endpoint to add as a source target.
+ * @param pub The name of the publication to subscribe.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -184,10 +186,10 @@ HELICS_EXPORT void helicsTranslatorAddPublicationTarget(HelicsTranslator trans, 
 /**
  * Add a source endpoint target to a translator.
  *
- * @details All messages coming from a source are copied to the delivery address(es).
+ * @details the translator will "translate" all message sent to it.  This method adds an endpoint which can send the translator data.
  *
  * @param trans The given translator.
- * @param source The name of the endpoint to add as a source target.
+ * @param ept The name of the endpoint which will send the endpoint data
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -197,10 +199,10 @@ HELICS_EXPORT void helicsTranslatorAddSourceEndpoint(HelicsTranslator trans, con
 /**
  * Add a destination target endpoint to a translator.
  *
- * @details All messages coming from a source are copied to the delivery address(es).
+ * @details the translator will "translate" all message sent to it.  This method adds an endpoint which will receive data published to the translator
  *
  * @param trans The given translator.
- * @param source The name of the endpoint to add as a source target.
+ * @param ept The name of the endpoint the translator sends data to.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -214,10 +216,10 @@ HELICS_EXPORT void helicsTranslatorAddDestinationEndpoint(HelicsTranslator trans
  */
 
 /**
- * Remove a destination target from a translator.
+ * Remove a target from a translator.
  *
  * @param trans The given translator.
- * @param target The named endpoint to remove as a target.
+ * @param target the name of the interface to remove as a target
  *
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -294,4 +296,4 @@ HELICS_EXPORT int helicsTranslatorGetOption(HelicsTranslator trans, int option);
 } /* end of extern "C" { */
 #endif
 
-#endif /* HELICS_APISHARED_MESSAGE_FILTER_FEDERATE_FUNCTIONS_H_*/
+#endif /* HELICS_APISHARED_MESSAGE_TRANSLATOR_FUNCTIONS_H_*/
