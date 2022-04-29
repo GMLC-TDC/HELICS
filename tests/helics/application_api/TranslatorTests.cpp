@@ -30,8 +30,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out translator operations
  */
 
-class translator: public ::testing::Test, public FederateTestFixture {
-};
+class translator: public ::testing::Test, public FederateTestFixture {};
 
 /** test registration of translators*/
 TEST_F(translator, translator_registration)

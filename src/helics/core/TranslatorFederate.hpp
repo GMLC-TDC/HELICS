@@ -106,6 +106,7 @@ class TranslatorFederate {
         usingGlobalTime = value;
         mCoord.globalTime = value;
     }
+
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/
