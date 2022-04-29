@@ -4528,7 +4528,8 @@ HELICS_EXPORT void helicsTranslatorAddInputTarget(HelicsTranslator trans, const 
 /**
  * Add a source publication target to a translator.
  *
- * @details when a publication publishes data the translator will receive it and convert it to a message sent to a translators destination endpoints.
+ * @details when a publication publishes data the translator will receive it and convert it to a message sent to a translators destination
+ endpoints.
  * this method adds a publication which publishes data the translator receives and sends to its destination endpoints
  *
  * @param trans The given translator.
@@ -4555,7 +4556,8 @@ HELICS_EXPORT void helicsTranslatorAddSourceEndpoint(HelicsTranslator trans, con
 /**
  * Add a destination target endpoint to a translator.
  *
- * @details the translator will "translate" all message sent to it.  This method adds an endpoint which will receive data published to the translator
+ * @details the translator will "translate" all message sent to it.  This method adds an endpoint which will receive data published to the
+ translator
  *
  * @param trans The given translator.
  * @param ept The name of the endpoint the translator sends data to.
