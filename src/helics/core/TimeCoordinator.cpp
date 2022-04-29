@@ -588,13 +588,12 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     hasIterationData = false;
                     updateTimeGrant();
                     return MessageProcessingResult::ITERATING;
-                } else {
+                }
                     iteration = 0;
                     updateTimeGrant();
                     return (iterating == IterationRequest::FORCE_ITERATION) ?
                         MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;
-                }
             }
 
             if (time_allow == time_exec) {
@@ -823,7 +822,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         }
     } else if (triggerFed.isValid()) {
         upd.dest_id = triggerFed;
-        auto* dep = dependencies.getDependencyInfo(triggerFed);
+        const auto* dep = dependencies.getDependencyInfo(triggerFed);
         if (dep->dependent) {
             upd.setExtraDestData(dep->sequenceCounter);
             sendMessageFunction(upd);

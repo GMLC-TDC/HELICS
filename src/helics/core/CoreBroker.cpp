@@ -1469,9 +1469,8 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                                 getIdentifier(),
                                 "received init not ready but already init");
                     break;
-                } else {
-                    transmit(parent_route_id, cmd);
                 }
+                transmit(parent_route_id, cmd);
             }
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
             if (brk != nullptr) {

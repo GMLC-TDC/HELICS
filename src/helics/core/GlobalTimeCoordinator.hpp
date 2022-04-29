@@ -20,9 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-/** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
-the time coordinator manages dependencies and computes whether time can advance or enter execution
-mode
+/** class implementing a global time coordination in a non distributed fashion
 */
 class GlobalTimeCoordinator: public BaseTimeCoordinator {
   private:

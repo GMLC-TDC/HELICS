@@ -505,7 +505,7 @@ bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
     auto afed = (minFederateState() == OperatingState::DISCONNECTED);
-    if (afed && filterFed) {
+    if (afed && filterFed!=nullptr) {
         return !filterFed->hasActiveTimeDependencies();
     }
     return (afed);
@@ -4968,7 +4968,7 @@ bool CommonCore::checkAndProcessDisconnect()
         transmit(parent_route_id, dis);
         setTickForwarding(TickForwardingReasons::DISCONNECT_TIMEOUT, true);
         disconnectTime = std::chrono::steady_clock::now();
-        if (filterFed) {
+        if (filterFed!=nullptr) {
             dis.source_id = filterFedID;
             filterFed->handleMessage(dis);
         }

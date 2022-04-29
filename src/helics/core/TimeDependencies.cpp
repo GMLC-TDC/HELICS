@@ -497,7 +497,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
         }
         return true;
 
-    } else {
+    }
         switch (delayMode) {
             case GrantDelayMode::NONE:
             case GrantDelayMode::INTERRUPTED:
@@ -536,7 +536,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                 }
                 break;
         }
-    }
+    
     return true;
 }
 
