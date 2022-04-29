@@ -53,7 +53,7 @@ class TranslatorFederate {
 
     Time minReturnTime{Time::maxVal()};
 
-    /// storage for all the filters
+    /// storage for all the translators
     gmlc::containers::MappedPointerVector<TranslatorInfo, GlobalHandle> translators;
     // bool hasTiming{false};
 
@@ -109,8 +109,8 @@ class TranslatorFederate {
 
   private:
     void routeMessage(const ActionMessage& msg);
-    /** get a filtering function object*/
 
+    /** get a translator function object*/
     TranslatorInfo* getTranslatorInfo(GlobalHandle id);
     TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle);
     const TranslatorInfo* getTranslatorInfo(GlobalFederateId fed, InterfaceHandle handle) const;

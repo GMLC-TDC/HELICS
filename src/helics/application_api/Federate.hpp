@@ -551,7 +551,7 @@ received
     /** define a translator interface
     @details a translator acts as a bridge between value and message interfaces
     @param translatorType a code defining a known type of translator (0 for custom)
-    @param translatorName the name of the globally visible translator can be empty for
+    @param translatorName the name of the  translator; can be an empty string
     @param endpointType the type associated with the translator endpoint
     @param units the units associated with the translator value interfaces
     */
@@ -574,7 +574,7 @@ received
 
     /** define a translator interface
     @details a translator acts as a bridge between value and message interfaces
-    @param translatorName the name of the globally visible translator
+    @param translatorName the name of the translator
     @param endpointType the type associated with the translator endpoint
     @param units the units associated with the translator value interfaces
     */
@@ -636,7 +636,7 @@ received
 
     /** get a translator from its index
     @param index the index of a translator
-    @return a reference to a translator object which will be invalid if translatorName is not
+    @return a reference to a translator object which will be invalid if index is not
     valid*/
     const Translator& getTranslator(int index) const;
 
@@ -648,14 +648,14 @@ received
 
     /** get a translator from its index
     @param index the index of a translator
-    @return a reference to a translator object which will be invalid if translatorName is not
+    @return a reference to a translator object which will be invalid if index is not
     valid*/
     Translator& getTranslator(int index);
 
-    /** @brief register a operator for the specified translator
+    /** @brief register an operator for the specified translator
     @details
-    The TranslatorOperator gets called when there is a message or value to translate, There is no
-    order or state to this messages can come in any order.
+    The TranslatorOperator gets called when there is a message or value to translate, there is no
+    order or state to this as messages can come in any order.
     @param trans the translator object to set the operation on
     @param op a shared_ptr to a \ref TranslatorOperator
     */
@@ -686,7 +686,7 @@ received
     interfaces
     */
     virtual void registerInterfaces(const std::string& configString);
-    /** register filter/translator interfaces defined in  file or string
+    /** register filter/translator interfaces defined in a file or string
     @details call is only valid in startup mode
     @param configString  the location of the file or config String to load to generate the
     interfaces

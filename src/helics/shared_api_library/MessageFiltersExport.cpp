@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static constexpr char invalidFilterString[] = "The given filter object is not valid";
 
-/** this is a random identifier put in place for valditing filters*/
+/** this is a random identifier put in place for validating filters*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
 /** this is a random identifier for validating translators*/

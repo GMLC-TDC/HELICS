@@ -55,7 +55,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     Translator(const Translator& trans) = default;
     Translator& operator=(Translator&& trans) = default;
     /** copy the translator, a copied translator will point to the same object as the original*/
-    Translator& operator=(const Translator& filt) = default;
+    Translator& operator=(const Translator& trans) = default;
 
     /** set a message operator to process the message*/
     void setOperator(std::shared_ptr<TranslatorOperator> mo);

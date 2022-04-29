@@ -141,7 +141,7 @@ int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data)
     }
 }
 
-/** convert a bool to serialized bytes*/
+/** convert a char to serialized bytes*/
 int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
@@ -157,7 +157,7 @@ int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
     }
 }
 
-/** convert a bool to serialized bytes*/
+/** convert a HelicsTime to serialized bytes*/
 int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);

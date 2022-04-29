@@ -28,7 +28,7 @@ struct TransInformation {
     }
 };
 
-/** data class defining the information about a filter*/
+/** data class defining the information about a translator*/
 class TranslatorInfo {
   public:
     /** constructor from all fields*/
@@ -46,7 +46,7 @@ class TranslatorInfo {
     const std::string key;  //!< the identifier of the translator
     uint16_t flags = 0;  //!< flags for the translator
     // there is a 4 byte gap here
-    std::shared_ptr<TranslatorOperator> tranOp;  //!< the callback operation of the filter
+    std::shared_ptr<TranslatorOperator> tranOp;  //!< the callback operation of the translator
 
   private:
     PublicationInfo pub;  //!< translator publication interface

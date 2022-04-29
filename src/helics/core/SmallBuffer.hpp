@@ -125,7 +125,7 @@ class SmallBuffer {
         sb.bufferSize = 0;
         sb.usingAllocatedBuffer = false;
         sb.locked = false;
-        locked = false;
+       
         return *this;
     }
     template<typename U,

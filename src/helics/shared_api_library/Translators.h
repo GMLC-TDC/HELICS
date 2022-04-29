@@ -24,7 +24,7 @@ extern "C" {
  * Create a source Translator on the specified federate.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
- *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior
+ *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
  *
  * @param fed The federate to register through.
  * @param type The type of translator to create /ref HelicsTranslatorTypes.
@@ -43,7 +43,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate f
  * Create a global source translator through a federate.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
- *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+ *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
  *
  * @param fed The federate to register through.
  * @param type The type of translator to create /ref HelicsTranslatorTypes.
@@ -63,7 +63,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFede
  * Create a source Translator on the specified core.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
- *          a few extra features of name matching to function on the federate interface but otherwise equivalent behavior.
+ *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
  *
  * @param core The core to register through.
  * @param type The type of translator to create /ref HelicsTranslatorTypes.
@@ -105,7 +105,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, c
  * Get a translator by its index, typically already created via registerInterfaces file or something of that nature.
  *
  * @param fed The federate object in which to create a publication.
- * @param index The index of the publication to get.
+ * @param index The index of the translator to get.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -172,7 +172,7 @@ HELICS_EXPORT void helicsTranslatorAddInputTarget(HelicsTranslator trans, const 
 /**
  * Add a source publication target to a translator.
  *
- * @details when a publication publishes data the translator will receive it and convert it to a message sent to a translators destination
+ * @details When a publication publishes data the translator will receive it and convert it to a message sent to a translators destination
  endpoints.
  * this method adds a publication which publishes data the translator receives and sends to its destination endpoints
  *
@@ -187,7 +187,7 @@ HELICS_EXPORT void helicsTranslatorAddPublicationTarget(HelicsTranslator trans, 
 /**
  * Add a source endpoint target to a translator.
  *
- * @details the translator will "translate" all message sent to it.  This method adds an endpoint which can send the translator data.
+ * @details The translator will "translate" all message sent to it.  This method adds an endpoint which can send the translator data.
  *
  * @param trans The given translator.
  * @param ept The name of the endpoint which will send the endpoint data
@@ -200,8 +200,8 @@ HELICS_EXPORT void helicsTranslatorAddSourceEndpoint(HelicsTranslator trans, con
 /**
  * Add a destination target endpoint to a translator.
  *
- * @details the translator will "translate" all message sent to it.  This method adds an endpoint which will receive data published to the
- translator
+ * @details The translator will "translate" all message sent to it.  This method adds an endpoint which will receive data published to the
+ translator.
  *
  * @param trans The given translator.
  * @param ept The name of the endpoint the translator sends data to.
@@ -221,7 +221,7 @@ HELICS_EXPORT void helicsTranslatorAddDestinationEndpoint(HelicsTranslator trans
  * Remove a target from a translator.
  *
  * @param trans The given translator.
- * @param target the name of the interface to remove as a target
+ * @param target The name of the interface to remove as a target.
  *
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -262,7 +262,7 @@ HELICS_EXPORT const char* helicsTranslatorGetTag(HelicsTranslator trans, const c
  *
  * @param trans The translator object to set the tag for.
  * @param tagname The string to set.
- * @param tagvalue the string value to associate with a tag.
+ * @param tagvalue The string value to associate with a tag.
  *
  * @param[in,out] err An error object to fill out in case of an error.
 
@@ -274,7 +274,7 @@ HELICS_EXPORT void helicsTranslatorSetTag(HelicsTranslator trans, const char* ta
  *
  * @param trans The given translator.
  * @param option The option to set /ref helics_handle_options.
- * @param value The value of the option commonly 0 for false 1 for true.
+ * @param value The value of the option, commonly 0 for false or 1 for true.
  *
  * @param[in,out] err An error object to fill out in case of an error.
 
