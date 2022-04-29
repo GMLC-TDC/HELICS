@@ -38,6 +38,8 @@ class TranslatorFederate {
     TimeCoordinator mCoord;
     HandleManager* mHandles{nullptr};
     FederateStates current_state{HELICS_CREATED};
+    /// indicator to use a globalTimeCoordinator
+    bool usingGlobalTime{false};
 
     std::function<void(const ActionMessage&)> mQueueMessage;
     std::function<void(ActionMessage&&)> mQueueMessageMove;
@@ -99,6 +101,11 @@ class TranslatorFederate {
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
 
+    void useGlobalTimeCoordinator(bool value)
+    {
+        usingGlobalTime = value;
+        mCoord.globalTime = value;
+    }
   private:
     void routeMessage(const ActionMessage& msg);
     /** get a filtering function object*/

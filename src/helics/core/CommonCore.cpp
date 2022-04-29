@@ -3811,6 +3811,9 @@ void CommonCore::generateTranslatorFederate()
     newFed.setExtraData(fid.baseValue());
     newFed.name(getIdentifier() + "_translators");
     transmit(getRoute(higher_broker_id), newFed);
+    if (globalTime) {
+        translatorFed->useGlobalTimeCoordinator(true);
+    }
 }
 
 void CommonCore::generateFilterFederate()
@@ -4380,7 +4383,7 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
                                  cmd.payload.to_string());
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed != loopFederates.end()) {
-                        fed->state = operation_state::error;
+                        fed->state = OperatingState::ERROR_STATE;
                     } else if (cmd.source_id == filterFedID) {
                         filterFed->handleMessage(cmd);
                         // filterFed->
@@ -4417,7 +4420,7 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
                     if (cmd.source_id.isValid()) {
                         auto fed = loopFederates.find(cmd.source_id);
                         if (fed != loopFederates.end()) {
-                            fed->state = operation_state::error;
+                            fed->state = OperatingState::ERROR_STATE;
                         }
                     }
                 }
@@ -4695,96 +4698,6 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
             LOG_WARNING(global_broker_id_local,
                         identifier,
                         "unrecognized configure option passed to core ");
-            break;
-    }
-}
-void CommonCore::processErrorCommand(ActionMessage& cmd)
-{
-    switch (cmd.action()) {
-        case CMD_WARNING:
-            if (cmd.dest_id == global_broker_id_local) {
-                sendToLogger(cmd.source_id,
-                             LogLevels::WARNING,
-                             cmd.getString(0),
-                             cmd.payload.to_string());
-            } else {
-                routeMessage(cmd);
-            }
-            break;
-        case CMD_ERROR:
-        case CMD_LOCAL_ERROR:
-            if (cmd.dest_id == global_broker_id_local) {
-                if (cmd.source_id == higher_broker_id || cmd.source_id == parent_broker_id ||
-                    cmd.source_id == gRootBrokerID) {
-                    sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                    setErrorState(cmd.messageID, cmd.payload.to_string());
-
-                } else {
-                    sendToLogger(parent_broker_id,
-                                 LogLevels::ERROR_LEVEL,
-                                 getFederateNameNoThrow(cmd.source_id),
-                                 cmd.payload.to_string());
-                    auto fed = loopFederates.find(cmd.source_id);
-                    if (fed != loopFederates.end()) {
-                        fed->state = OperatingState::ERROR_STATE;
-                    } else if (cmd.source_id == filterFedID) {
-                        filterFed->handleMessage(cmd);
-                    } else if (cmd.source_id == translatorFedID) {
-                        translatorFed->handleMessage(cmd);
-                    }
-
-                    if (hasTimeDependency) {
-                        timeCoord->processTimeMessage(cmd);
-                    }
-                }
-                if (terminate_on_error) {
-                    if (getBrokerState() != BrokerState::errored &&
-                        getBrokerState() != BrokerState::connected_error) {
-                        sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                        setBrokerState(BrokerState::errored);
-                    }
-                    cmd.setAction(CMD_GLOBAL_ERROR);
-                    cmd.source_id = global_broker_id_local;
-                    cmd.dest_id = gRootBrokerID;
-                    transmit(parent_route_id, std::move(cmd));
-                }
-            } else {
-                if (cmd.dest_id == parent_broker_id) {
-                    if (terminate_on_error) {
-                        if (getBrokerState() != BrokerState::errored) {
-                            sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                            setBrokerState(BrokerState::errored);
-                        }
-                        cmd.setAction(CMD_GLOBAL_ERROR);
-                        cmd.source_id = global_broker_id_local;
-                        cmd.dest_id = gRootBrokerID;
-                        transmit(parent_route_id, std::move(cmd));
-                        break;
-                    }
-                    if (cmd.source_id.isValid()) {
-                        auto fed = loopFederates.find(cmd.source_id);
-                        if (fed != loopFederates.end()) {
-                            fed->state = OperatingState::ERROR_STATE;
-                        }
-                    }
-                }
-                routeMessage(cmd);
-            }
-            break;
-        case CMD_GLOBAL_ERROR:
-
-            if (getBrokerState() == BrokerState::connecting) {
-                processDisconnect();
-            }
-            setErrorState(cmd.messageID, cmd.payload.to_string());
-            if (isConnected()) {
-                sendErrorToFederates(cmd.messageID, cmd.payload.to_string());
-                if (!(cmd.source_id == higher_broker_id || cmd.source_id == gRootBrokerID)) {
-                    transmit(parent_route_id, std::move(cmd));
-                }
-            }
-            break;
-        default:
             break;
     }
 }

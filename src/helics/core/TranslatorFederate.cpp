@@ -28,7 +28,7 @@ TranslatorFederate::TranslatorFederate(GlobalFederateId fedID,
     mCoreID(coreID), mName(std::move(name)), /*mCore(core),*/
     mCoord([this](const ActionMessage& msg) { routeMessage(msg); })
 {
-    mCoord.source_id = fedID;
+    mCoord.setSourceId(fedID);
     mCoord.setOptionFlag(helics::defs::Flags::EVENT_TRIGGERED, true);
     mCoord.specifyNonGranting(true);
     mCoord.setProperty(HELICS_PROPERTY_TIME_OUTPUT_DELAY, Time::epsilon());
