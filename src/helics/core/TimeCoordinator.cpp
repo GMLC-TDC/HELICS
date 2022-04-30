@@ -566,11 +566,13 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     }
                 }
 
+                auto delayMode=getDelayMode(info.wait_for_current_time_updates,
+                                     (time_requested > time_exec));
                 if (dependencies.checkIfReadyForTimeGrant(
                         false,
                         time_exec,
-                        getDelayMode(info.wait_for_current_time_updates,
-                                     (time_requested > time_exec)))) {
+                        delayMode)) {
+                    
                     iteration = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
@@ -773,6 +775,9 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     }
     if (info.wait_for_current_time_updates) {
         setActionFlag(upd, delayed_timing_flag);
+    }
+    else if (time_requested>time_next) {
+        setActionFlag(upd, interrupted_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
     if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {

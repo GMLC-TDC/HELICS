@@ -154,22 +154,18 @@ TEST_P(sequencing_reroute, separate_dest)
     tv.reserve(12);
     while (tr < 20.0) {
         tr = filt->requestTime(21.0);
-        if (tr == 10.0) {
+        
             ++cnt;
-        } else {
-            ++cnt;
-        }
-
         tv.emplace_back(tr, p3.pendingMessageCount());
     }
     t1.join();
     t2.join();
     EXPECT_EQ(p2.pendingMessageCount(), 0U);
     EXPECT_EQ(p3.pendingMessageCount(), 10U);
-    EXPECT_EQ(cnt, 11);
+    EXPECT_EQ(cnt, 10);
     EXPECT_EQ(cntb, 0);
-    if (cnt != 11) {
-        EXPECT_EQ(cnt, 11);
+    if (cnt != 10) {
+        EXPECT_EQ(cnt, 10);
     }
     filt->finalize();
     delay.get();
