@@ -743,6 +743,9 @@ std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& up
     if (lastSend.sequenceCounter != sequenceCounter) {
         changed = true;
     }
+    if (lastSend.interrupted != checkActionFlag(upd,interrupted_flag)) {
+        changed = true;
+    }
     if (changed) {
         lastSend.next = upd.actionTime;
         lastSend.minDe = upd.Tdemin;
@@ -750,6 +753,7 @@ std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& up
         lastSend.sequenceCounter = sequenceCounter;
         lastSend.minFed = GlobalFederateId(upd.getExtraData());
         lastSend.mTimeState = TimeState::time_requested;
+        lastSend.interrupted = checkActionFlag(upd, interrupted_flag);
         return {true, transmitTimingMessages(upd, skipFed)};
     }
     return {false, false};
