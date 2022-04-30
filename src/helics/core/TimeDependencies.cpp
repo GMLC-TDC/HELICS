@@ -199,7 +199,7 @@ bool TimeData::update(const TimeData& update)
         sequenceCounter = update.sequenceCounter;
     }
 
-    if (update.interrupted!=interrupted) {
+    if (update.interrupted != interrupted) {
         interrupted = update.interrupted;
         updated = true;
     }
@@ -509,71 +509,70 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             }
         }
         return true;
-
     }
-        switch (delayMode) {
-            case GrantDelayMode::NONE:
-                for (const auto& dep : dependencies) {
-                    if (!dep.dependency || dep.next >= cBigTime) {
-                        continue;
-                    }
-                    if (dep.connection == ConnectionType::self) {
-                        continue;
-                    }
-                    if (dep.next < desiredGrantTime) {
-                        return false;
-                    }
-                    if (dep.next == desiredGrantTime) {
-                        if (dep.mTimeState == TimeState::time_granted) {
-                            return false;
-                        }
-                        if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
-                            return false;
-                        }
-                    }
+    switch (delayMode) {
+        case GrantDelayMode::NONE:
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
                 }
-                break;
-            case GrantDelayMode::INTERRUPTED:
-                for (const auto& dep : dependencies) {
-                    if (!dep.dependency || dep.next >= cBigTime) {
-                        continue;
-                    }
-                    if (dep.connection == ConnectionType::self) {
-                        continue;
-                    }
-                    if (dep.next < desiredGrantTime) {
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
+                    return false;
+                }
+                if (dep.next == desiredGrantTime) {
+                    if (dep.mTimeState == TimeState::time_granted) {
                         return false;
                     }
-                    if (dep.next == desiredGrantTime) {
-                        if (dep.mTimeState == TimeState::time_granted) {
-                            return false;
-                        }
-                        if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
-                            return false;
-                        }
-                        
-                        if (dep.interrupted || dep.delayedTiming) {
-                            continue;
-                        }
+                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
                         return false;
                     }
                 }
-                break;
-            case GrantDelayMode::WAITING:
-                for (const auto& dep : dependencies) {
-                    if (!dep.dependency || dep.next >= cBigTime) {
-                        continue;
-                    }
-                    if (dep.connection == ConnectionType::self) {
-                        continue;
-                    }
-                    if (dep.next <= desiredGrantTime) {
+            }
+            break;
+        case GrantDelayMode::INTERRUPTED:
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
+                    return false;
+                }
+                if (dep.next == desiredGrantTime) {
+                    if (dep.mTimeState == TimeState::time_granted) {
                         return false;
                     }
+                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                        return false;
+                    }
+
+                    if (dep.interrupted || dep.delayedTiming) {
+                        continue;
+                    }
+                    return false;
                 }
-                break;
-        }
-    
+            }
+            break;
+        case GrantDelayMode::WAITING:
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next <= desiredGrantTime) {
+                    return false;
+                }
+            }
+            break;
+    }
+
     return true;
 }
 
@@ -759,7 +758,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
         mTime.minFed = dep.fedID;
         mTime.sequenceCounter = dep.sequenceCounter;
         mTime.responseSequenceCounter = dep.sequenceCounter;
-        
+
         if (dep.minFed.isValid()) {
             mTime.minFedActual = dep.minFed;
         } else {

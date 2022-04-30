@@ -154,8 +154,8 @@ TEST_P(sequencing_reroute, separate_dest)
     tv.reserve(12);
     while (tr < 20.0) {
         tr = filt->requestTime(21.0);
-        
-            ++cnt;
+
+        ++cnt;
         tv.emplace_back(tr, p3.pendingMessageCount());
     }
     t1.join();

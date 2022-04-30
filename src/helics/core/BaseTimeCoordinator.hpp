@@ -19,8 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-/** a virtual class defining a time coordinator.  The base class implements some common data and operations that are common to all the time coordinators
-*/
+/** a virtual class defining a time coordinator.  The base class implements some common data and
+ * operations that are common to all the time coordinators
+ */
 class BaseTimeCoordinator {
   protected:
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on

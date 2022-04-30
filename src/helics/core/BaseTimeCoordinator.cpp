@@ -293,10 +293,9 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const TimeData& dep,
     nTime.source_id = mSourceId;
     nTime.dest_id = fed;
     nTime.actionTime = dep.next;
-    if (dep.interrupted)
-        {
+    if (dep.interrupted) {
         setActionFlag(nTime, interrupted_flag);
-        }
+    }
     switch (dep.mTimeState) {
         case TimeState::time_granted:
             nTime.setAction(CMD_TIME_GRANT);

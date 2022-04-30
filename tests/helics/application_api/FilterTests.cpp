@@ -1267,7 +1267,7 @@ TEST_F(filter, reroute_separate_dest_target)
     EXPECT_EQ(p2.pendingMessageCount(), 0U);
     EXPECT_EQ(p3.pendingMessageCount(), 10U);
     EXPECT_EQ(cnt, 10);
-    if (cnt==11) {
+    if (cnt == 11) {
         EXPECT_EQ(cnt, 10);
     }
     EXPECT_EQ(cntb, 0);
@@ -2321,9 +2321,9 @@ TEST_P(filter_single_type_test, filter_core_termination)
     EXPECT_EQ(m2->data.size(), data.size());
     EXPECT_EQ(m2->time, 2.5);
 
-    auto tr=mFed->requestTime(4.0);
+    auto tr = mFed->requestTime(4.0);
     EXPECT_TRUE(!mFed->hasMessage(p2));
-    tr=mFed->requestTime(6.0);
+    tr = mFed->requestTime(6.0);
     EXPECT_TRUE(mFed->hasMessage(p2));
     mFed->finalize();
     fFed->finalizeComplete();

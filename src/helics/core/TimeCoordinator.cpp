@@ -566,13 +566,9 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     }
                 }
 
-                auto delayMode=getDelayMode(info.wait_for_current_time_updates,
-                                     (time_requested > time_exec));
-                if (dependencies.checkIfReadyForTimeGrant(
-                        false,
-                        time_exec,
-                        delayMode)) {
-                    
+                auto delayMode =
+                    getDelayMode(info.wait_for_current_time_updates, (time_requested > time_exec));
+                if (dependencies.checkIfReadyForTimeGrant(false, time_exec, delayMode)) {
                     iteration = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
@@ -591,11 +587,11 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     updateTimeGrant();
                     return MessageProcessingResult::ITERATING;
                 }
-                    iteration = 0;
-                    updateTimeGrant();
-                    return (iterating == IterationRequest::FORCE_ITERATION) ?
-                        MessageProcessingResult::ITERATING :
-                        MessageProcessingResult::NEXT_STEP;
+                iteration = 0;
+                updateTimeGrant();
+                return (iterating == IterationRequest::FORCE_ITERATION) ?
+                    MessageProcessingResult::ITERATING :
+                    MessageProcessingResult::NEXT_STEP;
             }
 
             if (time_allow == time_exec) {
@@ -775,8 +771,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     }
     if (info.wait_for_current_time_updates) {
         setActionFlag(upd, delayed_timing_flag);
-    }
-    else if (time_requested>time_next) {
+    } else if (time_requested > time_next) {
         setActionFlag(upd, interrupted_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);

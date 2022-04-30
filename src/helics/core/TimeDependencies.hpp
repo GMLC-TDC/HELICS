@@ -64,7 +64,7 @@ class TimeData {
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false};  //!< indicator that data was sent in the current interval
-    bool interrupted{false}; //!< indicator that the federates next event is a timing interruption
+    bool interrupted{false};  //!< indicator that the federates next event is a timing interruption
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
     std::int8_t timingVersion{-2};  //!< version indicator
     std::uint8_t restrictionLevel{0};  //!< timing restriction level

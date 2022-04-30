@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 /** class implementing a global time coordination in a non distributed fashion
-*/
+ */
 class GlobalTimeCoordinator: public BaseTimeCoordinator {
   private:
     // the variables for time coordination
