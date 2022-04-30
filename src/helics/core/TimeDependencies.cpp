@@ -227,7 +227,7 @@ static std::string_view timeStateString(TimeState state)
     static constexpr std::string_view timeReq{"time requested"};
     static constexpr std::string_view timeReqIterative{"time requested iterative"};
     static constexpr std::string_view timeReqMustIt{"time requested required iteration"};
-    static constexpr std::string_view disconnected{"disconnected"};
+   // static constexpr std::string_view disconnected{"disconnected"};
     static constexpr std::string_view other{"other"};
     switch (state) {
         case TimeState::initialized:
@@ -270,6 +270,7 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["iteration"] = dep.sequenceCounter;
     output["granted_iteration"] = dep.grantedIteration;
     output["sequenceCounter"] = dep.sequenceCounter;
+    output["interrupted"] = dep.interrupted;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
