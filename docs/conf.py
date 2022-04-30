@@ -176,8 +176,9 @@ redoc = [
     {
         "name": "HELICS REST API",
         "page": "references/api-reference/rest_queries_api",
-        "spec": "swagger/reference/queries.yaml",
-        "embed": True,
+        "spec-root": "swagger/",
+        "spec": "reference/queries.yaml",
+        "embed": False,
     }
 ]
 
