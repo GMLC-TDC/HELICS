@@ -743,7 +743,7 @@ std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& up
     if (lastSend.sequenceCounter != sequenceCounter) {
         changed = true;
     }
-    if (lastSend.interrupted != checkActionFlag(upd,interrupted_flag)) {
+    if (lastSend.interrupted != checkActionFlag(upd, interrupted_flag)) {
         changed = true;
     }
     if (changed) {
