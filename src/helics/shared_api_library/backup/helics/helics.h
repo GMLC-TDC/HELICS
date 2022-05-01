@@ -4378,7 +4378,7 @@ HELICS_EXPORT int helicsFilterGetOption(HelicsFilter filt, int option);
  */
 
 /**
- * Create a source Translator on the specified federate.
+ * Create a Translator on the specified federate.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
@@ -4397,7 +4397,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate f
                                                                 const char* name,
                                                                 HelicsError* err);
 /**
- * Create a global source translator through a federate.
+ * Create a global translator through a federate.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
@@ -4417,7 +4417,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFede
                                                                       HelicsError* err);
 
 /**
- * Create a source Translator on the specified core.
+ * Create a Translator on the specified core.
  *
  * @details Translators can be created through a federate or a core. Linking through a federate allows
  *          a few extra features of name matching to function on the federate interface but otherwise have equivalent behavior.
@@ -4531,7 +4531,7 @@ HELICS_EXPORT void helicsTranslatorAddInputTarget(HelicsTranslator trans, const 
  *
  * @details When a publication publishes data the translator will receive it and convert it to a message sent to a translators destination
  endpoints.
- * this method adds a publication which publishes data the translator receives and sends to its destination endpoints
+ * This method adds a publication which publishes data the translator receives and sends to its destination endpoints.
  *
  * @param trans The given translator.
  * @param pub The name of the publication to subscribe.

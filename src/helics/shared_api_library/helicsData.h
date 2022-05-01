@@ -16,9 +16,6 @@ extern "C" {
 
 #include "helics_export.h"
 
-#ifdef __cplusplus
-} /* end of extern "C" { */
-#endif
 /** create a helics managed data buffer with initial capacity*/
 HELICS_EXPORT HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity);
 
@@ -75,5 +72,9 @@ HELICS_EXPORT double helicsDataBufferToDouble(HelicsDataBuffer data);
 
 /** convert a data buffer to a boolean*/
 HELICS_EXPORT HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
+
+#ifdef __cplusplus
+} /* end of extern "C" { */
+#endif
 
 #endif /*HELICS_APISHAREDDATA_FUNCTIONS_H_ */
