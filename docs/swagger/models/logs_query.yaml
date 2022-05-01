@@ -1,0 +1,34 @@
+title: logs_query
+type: object
+description: return the logs stored in the log buffer
+properties:
+  logs:
+    type: array
+    items:
+      type: object
+      properties:
+        level:
+          type: integer
+          description: logging level
+        header:
+          type: string
+          description: "header information for the message(time, source,etc)"
+        message:
+          type: string
+          description: actual log message
+      required:
+        - level
+        - header
+        - message
+  object:
+    $ref: ./base_response.yaml
+examples:
+  - logs:
+      - level: 0
+        header: string
+        message: string
+    object:
+      name: string
+      uuid: string
+      id: 0
+      parent: 0

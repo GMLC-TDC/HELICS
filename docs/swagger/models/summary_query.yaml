@@ -1,0 +1,40 @@
+title: summary_query
+type: object
+examples:
+  - id: string
+properties:
+  object:
+    $ref: ./base_response.yaml
+  summary:
+    type: object
+    properties:
+      federates:
+        type: string
+      allowed_federates:
+        type: array
+        minItems: 2
+        maxItems: 2
+        items:
+          type: integer
+      countable_federates:
+        type: integer
+      brokers:
+        type: integer
+      cores:
+        type: integer
+      allowed_brokers:
+        type: array
+        minItems: 2
+        maxItems: 2
+        items:
+          type: integer
+      publications:
+        type: integer
+      filters:
+        type: integer
+      translators:
+        type: integer
+      inputs:
+        type: integer
+      endpoints:
+        type: integer

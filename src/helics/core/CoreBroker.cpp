@@ -3035,7 +3035,13 @@ void CoreBroker::sendCommand(const std::string& target,
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
     cmdcmd.setString(sourceStringLoc, getIdentifier());
-    transmitToParent(std::move(cmdcmd));
+
+    if (target == "broker" || target == getIdentifier() || target.empty() ||
+        (target == "root" && _isRoot) || (target == "federation" && _isRoot)) {
+        addActionMessage(std::move(cmdcmd));
+    } else {
+        transmitToParent(std::move(cmdcmd));
+    }
 }
 
 static const std::set<std::string> querySet{"isinit",
@@ -3156,6 +3162,20 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "summary") {
         return generateFederationSummary();
+    }
+    if (request == "config") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
+        base["id"] = global_broker_id_local.baseValue();
+        base["log_level"] = logLevelToString(static_cast<LogLevels>(maxLogLevel.load()));
+        base["root"] = isRoot();
+        return fileops::generateJsonString(base);
     }
     if (request == "monitor") {
         return std::string{"\""} + mTimeMonitorFederate + '"';

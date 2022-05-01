@@ -1,0 +1,28 @@
+description: Common information shared across many responses
+type: object
+x-examples:
+  example-1:
+    name: string
+    id: 1
+    parent: 0
+properties:
+  name:
+    type: string
+    minLength: 1
+  uuid:
+    type: string
+    minLength: 1
+    description: If the object is defined as uuid like it will contain the uuid as a field
+  id:
+    type: number
+  parent:
+    type: number
+    description: All objects except root broker will have a parent
+required:
+  - name
+  - id
+examples:
+  - name: string
+    uuid: string
+    id: 0
+    parent: 0

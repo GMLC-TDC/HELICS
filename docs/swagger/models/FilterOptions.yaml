@@ -1,0 +1,14 @@
+title: FilterOptions
+description: Configuration options for a filter
+anyOf:
+  - type: object
+    properties:
+      flags:
+        type:
+          - string
+          - array
+        items:
+          type: string
+      "":
+        type: string
+  - $ref: ./interfaceOptions.yaml

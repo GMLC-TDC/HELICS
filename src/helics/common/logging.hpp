@@ -38,4 +38,7 @@ enum LogLevels : int {
 extern const std::unordered_map<std::string, int> gLogLevelMap;
 
 LogLevels logLevelFromString(std::string_view level);
+
+std::string logLevelToString(LogLevels level);
+
 }  // namespace helics

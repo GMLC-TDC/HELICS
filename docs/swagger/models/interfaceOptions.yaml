@@ -1,0 +1,49 @@
+title: interfaceOptions
+type: object
+description: general options for all interface objects in HELICS
+properties:
+  bufferdata:
+    type: boolean
+  connectionsoptional:
+    type: boolean
+  connectoionsrequired:
+    type: boolean
+  required:
+    type: boolean
+  uninterruptible:
+    type: boolean
+  multipleconnectionsallowed:
+    type: boolean
+  singleconnectiononly:
+    type: boolean
+  onlytransmitonchange:
+    type: boolean
+  onlyupdateonchange:
+    type: boolean
+  ignoreunitmismatch:
+    type: boolean
+  strictinputtypechecking:
+    type: boolean
+  connections:
+    type: integer
+  multiinputhandlingmethod:
+    type:
+      - integer
+      - string
+    pattern: (and|or|none|no_op|sum|max|min|average|mean|vectorize|diff)
+  inputprioritylocation:
+    type: integer
+  tags:
+    oneOf:
+      - type: array
+        items:
+          $ref: ./tag.yaml
+      - $ref: ./tag.yaml
+  info:
+    type: string
+  flags:
+    type:
+      - string
+      - array
+    items:
+      type: string

@@ -1,0 +1,32 @@
+title: timeData
+type: object
+properties:
+  next:
+    type: number
+  te:
+    type: number
+  minde:
+    type: number
+  minfed:
+    type: integer
+  state:
+    type: string
+    enum:
+      - initialized
+      - granted
+      - error
+      - exec requested
+      - time requested
+      - time requested iterative
+      - disconnected
+      - other
+  minde_alt:
+    type: number
+  minfedActual:
+    type: integer
+required:
+  - next
+  - te
+  - minde
+  - minfed
+  - state

@@ -1,0 +1,13 @@
+title: version_all_query
+type: object
+description: Get extended version information for an objects library
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brokers:
+    $ref: ./version_all_query.yaml
+  cores:
+    $ref: ./version_all_query.yaml
+  version:
+    type: string
+    example: '"3.1.2-translators-g18975c681 (2022-02-08)"'

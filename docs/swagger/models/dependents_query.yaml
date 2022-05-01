@@ -1,0 +1,5 @@
+title: dependents_query
+type: array
+description: get a list of the object ids who depend on a target
+items:
+  type: number

@@ -1,0 +1,15 @@
+title: global_state_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brokers:
+    $ref: ./global_state_query.yaml
+  cores:
+    $ref: ./global_state_query.yaml
+  federates:
+    $ref: ./global_state_query.yaml
+  state:
+    type: string
+  status:
+    type: boolean

@@ -1,0 +1,25 @@
+type: object
+description: current status of the object
+properties:
+  object:
+    allOf: []
+  status:
+    type: boolean
+  state:
+    type: string
+    enum:
+      - created
+      - configuring
+      - configured
+      - connected
+      - connecting
+      - initializing
+      - operating
+      - terminating
+      - terminated
+      - error
+      - other
+examples:
+  - object: null
+    status: true
+    state: created
