@@ -724,6 +724,7 @@ std::string CoreBroker::generateFederationSummary() const
     int epts = 0;
     int ipts = 0;
     int filt = 0;
+    int translators = 0;
     for (const auto& hand : handles) {
         switch (hand.handleType) {
             case InterfaceType::PUBLICATION:
@@ -735,6 +736,9 @@ std::string CoreBroker::generateFederationSummary() const
             case InterfaceType::ENDPOINT:
                 ++epts;
                 break;
+            case InterfaceType::TRANSLATOR:
+                ++translators;
+                break;
             default:
                 ++filt;
                 break;
@@ -743,7 +747,9 @@ std::string CoreBroker::generateFederationSummary() const
     Json::Value summary;
     Json::Value block;
     block["federates"] = static_cast<int>(mFederates.size());
-    block["min_federates"] = minFederateCount;
+    block["allowed_federates"][0] = minFederateCount;
+    block["allowed_federates"][1] = maxFederateCount;
+    block["countable_federates"] = getCountableFederates();
     block["brokers"] =
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return !static_cast<bool>(brk._core);
@@ -752,13 +758,15 @@ std::string CoreBroker::generateFederationSummary() const
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return static_cast<bool>(brk._core);
         }));
-    block["min_brokers"] = minBrokerCount;
+    block["allowed_brokers"][0] = minBrokerCount;
+    block["allowed_brokers"][1] = maxBrokerCount;
     block["publications"] = pubs;
     block["inputs"] = ipts;
     block["filters"] = filt;
     block["endpoints"] = epts;
+    block["translators"] = translators;
     summary["summary"] = block;
-
+    addBaseInformation(summary, isRootc);
     return fileops::generateJsonString(summary);
 }
 
@@ -1344,6 +1352,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             addFilter(command);
             break;
+        case CMD_REG_TRANSLATOR:
+            if ((!isRootc) && (command.dest_id != parent_broker_id)) {
+                routeMessage(command);
+                // break;
+            }
+            addTranslator(command);
+            break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
@@ -1924,7 +1939,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 }
 void CoreBroker::addFilter(ActionMessage& m)
 {
-    // detect duplicate endpoints
+    // detect duplicate filters
     if (handles.getFilter(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
@@ -1944,6 +1959,34 @@ void CoreBroker::addFilter(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
+    } else {
+        FindandNotifyFilterTargets(filt);
+    }
+}
+
+void CoreBroker::addTranslator(ActionMessage& m)
+{
+    // detect duplicate endpoints/pubs/inputs
+    if (handles.getEndpoint(m.name()) != nullptr || handles.getInput(m.name()) != nullptr ||
+        handles.getPublication(m.name()) != nullptr) {
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+        eret.dest_handle = m.source_handle;
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate names for translator({})", m.name());
+        propagateError(std::move(eret));
+        return;
+    }
+
+    auto& trans = handles.addHandle(m.source_id,
+                                    m.source_handle,
+                                    InterfaceType::TRANSLATOR,
+                                    std::string(m.name()),
+                                    m.getString(typeStringLoc),
+                                    m.getString(typeOutStringLoc));
+    addLocalInfo(trans, m);
+
+    if (!isRootc) {
+        transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
             if (!globalTime) {
@@ -1956,7 +1999,9 @@ void CoreBroker::addFilter(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyFilterTargets(filt);
+        FindandNotifyInputTargets(trans);
+        FindandNotifyPublicationTargets(trans);
+        FindandNotifyEndpointTargets(trans);
     }
 }
 
@@ -2556,7 +2601,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), m);
 
         const auto* iface = handles.findHandle(target.first);
-        if (iface->handleType == InterfaceType::ENDPOINT) {
+        if (iface->handleType != InterfaceType::FILTER) {
             // notify the endpoint about its endpoint
             m.setAction(CMD_ADD_ENDPOINT);
             m.name(iface->key);
@@ -2570,7 +2615,6 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         }
 
         m.swapSourceDest();
-        m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(handleInfo.key);
@@ -2934,11 +2978,7 @@ std::string CoreBroker::query(const std::string& target,
             }
             if (queryStr == "logs") {
                 Json::Value base;
-                base["name"] = getIdentifier();
-                if (uuid_like) {
-                    base["uuid"] = getIdentifier();
-                }
-                base["id"] = global_id.load().baseValue();
+                addBaseInformation(base, !isRoot());
                 bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
@@ -3123,10 +3163,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     }
     if (request == "status") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         return fileops::generateJsonString(base);
@@ -3136,16 +3173,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
-    auto addHeader = [this](Json::Value& base) {
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
-    };
+    auto addHeader = [this](Json::Value& base) { addBaseInformation(base, !isRootc); };
 
     auto res = quickBrokerQueries(request);
     if (!res.empty()) {
@@ -3157,7 +3185,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         base["brokers"] = static_cast<int>(mBrokers.size());
         base["federates"] = static_cast<int>(mFederates.size());
         base["countable_federates"] = getCountableFederates();
-        base["handles"] = static_cast<int>(handles.size());
+        base["interfaces"] = static_cast<int>(handles.size());
         return fileops::generateJsonString(base);
     }
     if (request == "summary") {
@@ -3182,7 +3210,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "logs") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base, !isRootc);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
@@ -3192,17 +3220,27 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "brokers") {
         return generateStringVector(mBrokers, [](auto& brk) { return brk.name; });
     }
+    if (request == "subbrokers") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return !brk._core; });
+    }
+    if (request == "cores") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return brk._core; });
+    }
     if (request == "current_state") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
         for (const auto& fed : mFederates) {
             Json::Value fedstate;
-            fedstate["name"] = fed.name;
+            fedstate["attributes"] = Json::objectValue;
+            fedstate["attributes"]["name"] = fed.name;
             fedstate["state"] = state_string(fed.state);
-            fedstate["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["parent"] = fed.parent.baseValue();
             base["federates"].append(std::move(fedstate));
         }
         base["cores"] = Json::arrayValue;
@@ -3210,8 +3248,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         for (const auto& brk : mBrokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
-            brkstate["name"] = brk.name;
-            brkstate["id"] = brk.global_id.baseValue();
+            brkstate["attributes"] = Json::objectValue;
+            brkstate["attributes"]["name"] = brk.name;
+            brkstate["attributes"]["id"] = brk.global_id.baseValue();
+            brkstate["attributes"]["parent"] = brk.parent.baseValue();
             if (brk._core) {
                 base["cores"].append(std::move(brkstate));
             } else {
@@ -3237,6 +3277,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "global_status") {
         if (!isConnected()) {
             Json::Value gs;
+            addBaseInformation(gs, !isRootc);
             gs["status"] = "disconnected";
             gs["timestep"] = -1;
             return fileops::generateJsonString(gs);
@@ -3289,7 +3330,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "dependencies") {
         Json::Value base;
-        addHeader(base);
+        addBaseInformation(base, !isRootc);
         base["dependents"] = Json::arrayValue;
         for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
@@ -3388,14 +3429,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
-    base["name"] = getIdentifier();
-    if (uuid_like) {
-        base["uuid"] = getIdentifier();
-    }
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
+    addBaseInformation(base, !isRootc);
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
     if (index == GLOBAL_FLUSH) {
@@ -3438,8 +3472,10 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                     if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
-                        brkstate["name"] = broker.name;
-                        brkstate["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"] = Json::objectValue;
+                        brkstate["attributes"]["name"] = broker.name;
+                        brkstate["attributes"]["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"]["parent"] = broker.parent.baseValue();
                         if (broker._core) {
                             if (!hasCores) {
                                 base["cores"] = Json::arrayValue;

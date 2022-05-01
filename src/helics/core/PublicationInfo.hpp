@@ -18,9 +18,9 @@ class PublicationInfo {
   public:
     /** constructor from the basic information*/
     PublicationInfo(GlobalHandle pid,
-                    const std::string& pkey,
-                    const std::string& ptype,
-                    const std::string& punits):
+                    std::string_view pkey,
+                    std::string_view ptype,
+                    std::string_view punits):
         id(pid),
         key(pkey), type(ptype), units(punits)
     {

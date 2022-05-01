@@ -171,17 +171,30 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
 }
 
 /** add a named filter to an endpoint for all messages coming from the endpoint*/
-void Endpoint::addSourceFilter(const std::string& filterName)
+void Endpoint::addSourceFilter(std::string_view filterName)
 {
     if (cr != nullptr) {
         cr->addSourceTarget(handle, filterName, InterfaceType::FILTER);
     }
 }
 /** add a named filter to an endpoint for all messages going to the endpoint*/
-void Endpoint::addDestinationFilter(const std::string& filterName)
+void Endpoint::addDestinationFilter(std::string_view filterName)
 {
     if (cr != nullptr) {
         cr->addDestinationTarget(handle, filterName, InterfaceType::FILTER);
+    }
+}
+
+void Endpoint::addSourceEndpoint(std::string_view endpointName)
+{
+    if (cr != nullptr) {
+        cr->addSourceTarget(handle, endpointName, InterfaceType::ENDPOINT);
+    }
+}
+void Endpoint::addDestinationEndpoint(std::string_view endpointName)
+{
+    if (cr != nullptr) {
+        cr->addDestinationTarget(handle, endpointName, InterfaceType::ENDPOINT);
     }
 }
 }  // namespace helics

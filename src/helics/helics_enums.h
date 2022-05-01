@@ -362,6 +362,17 @@ typedef enum {
     HELICS_FILTER_TYPE_FIREWALL = 6
 } HelicsFilterTypes;
 
+/** enumeration of the predefined translator types*/
+typedef enum {
+    /** a custom filter type that executes a user defined callback*/
+    HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
+    /** a translator type that converts to and from JSON*/
+    HELICS_TRANSLATOR_TYPE_JSON = 11,
+    /** a translator type that just encodes the message again in binary*/
+    HELICS_TRANSLATOR_TYPE_BINARY = 12
+
+} HelicsTranslatorTypes;
+
 /** enumeration of sequencing modes for queries and commands
 fast is the default, meaning the query travels along priority channels and takes precedence of over
 existing messages; ordered means it follows normal priority patterns and will be ordered along with

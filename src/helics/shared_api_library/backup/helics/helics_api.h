@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2021,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -174,6 +174,12 @@ typedef enum {
 } HelicsFilterTypes;
 
 typedef enum {
+    HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
+    HELICS_TRANSLATOR_TYPE_JSON = 11,
+    HELICS_TRANSLATOR_TYPE_BINARY = 12
+} HelicsTranslatorTypes;
+
+typedef enum {
     HELICS_SEQUENCING_MODE_FAST = 0,
     HELICS_SEQUENCING_MODE_ORDERED = 1,
     HELICS_SEQUENCING_MODE_DEFAULT = 2
@@ -189,6 +195,8 @@ typedef void* HelicsEndpoint;
 
 typedef void* HelicsFilter;
 
+typedef void* HelicsTranslator;
+
 typedef void* HelicsCore;
 
 typedef void* HelicsBroker;
@@ -198,6 +206,8 @@ typedef void* HelicsFederate;
 typedef void* HelicsFederateInfo;
 
 typedef void* HelicsQuery;
+
+typedef void* HelicsDataBuffer;
 
 typedef void* HelicsQueryBuffer;
 
@@ -247,11 +257,31 @@ typedef struct HelicsComplex {
     double real;
     double imag;
 } HelicsComplex;
+
 typedef struct HelicsError {
     int32_t error_code;
     const char* message;
 } HelicsError;
 
+HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity);
+HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity);
+void helicsDataBufferFree(HelicsDataBuffer data);
+int32_t helicsDataBufferSize(HelicsDataBuffer data);
+int32_t helicsDataBufferCapacity(HelicsDataBuffer data);
+void* helicsDataBufferData(HelicsDataBuffer data);
+HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
+int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data);
+int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
+int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
+int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);
+int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
+int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data);
+int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
+int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+int helicsDataBufferType(HelicsDataBuffer data);
+int64_t helicsDataBufferToInt(HelicsDataBuffer data);
+double helicsDataBufferToDouble(HelicsDataBuffer data);
+HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
 const char* helicsGetVersion(void);
 const char* helicsGetBuildFlags(void);
 const char* helicsGetCompilerVersion(void);
@@ -605,6 +635,28 @@ const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname);
 void helicsFilterSetTag(HelicsFilter filt, const char* tagname, const char* tagvalue, HelicsError* err);
 void helicsFilterSetOption(HelicsFilter filt, int option, int value, HelicsError* err);
 int helicsFilterGetOption(HelicsFilter filt, int option);
+
+HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate fed, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFederate fed, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+HelicsTranslator helicsCoreRegisterTranslator(HelicsCore core, HelicsTranslatorTypes type, const char* name, HelicsError* err);
+int helicsFederateGetTranslatorCount(HelicsFederate fed);
+HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* name, HelicsError* err);
+HelicsTranslator helicsFederateGetTranslatorByIndex(HelicsFederate fed, int index, HelicsError* err);
+HelicsBool helicsTranslatorIsValid(HelicsTranslator trans);
+const char* helicsTranslatorGetName(HelicsTranslator trans);
+void helicsTranslatorSet(HelicsTranslator trans, const char* prop, double val, HelicsError* err);
+void helicsTranslatorSetString(HelicsTranslator trans, const char* prop, const char* val, HelicsError* err);
+void helicsTranslatorAddInputTarget(HelicsTranslator trans, const char* input, HelicsError* err);
+void helicsTranslatorAddPublicationTarget(HelicsTranslator trans, const char* pub, HelicsError* err);
+void helicsTranslatorAddSourceEndpoint(HelicsTranslator trans, const char* ept, HelicsError* err);
+void helicsTranslatorAddDestinationEndpoint(HelicsTranslator trans, const char* ept, HelicsError* err);
+void helicsTranslatorRemoveTarget(HelicsTranslator trans, const char* target, HelicsError* err);
+const char* helicsTranslatorGetInfo(HelicsTranslator trans);
+void helicsTranslatorSetInfo(HelicsTranslator trans, const char* info, HelicsError* err);
+const char* helicsTranslatorGetTag(HelicsTranslator trans, const char* tagname);
+void helicsTranslatorSetTag(HelicsTranslator trans, const char* tagname, const char* tagvalue, HelicsError* err);
+void helicsTranslatorSetOption(HelicsTranslator trans, int option, int value, HelicsError* err);
+int helicsTranslatorGetOption(HelicsTranslator trans, int option);
 
 void helicsBrokerSetLoggingCallback(HelicsBroker broker,
                                     void (*logger)(int loglevel, const char* identifier, const char* message, void* userData),

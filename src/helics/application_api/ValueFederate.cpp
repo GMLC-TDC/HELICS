@@ -135,12 +135,12 @@ Input& ValueFederate::registerSubscription(const std::string& target, const std:
     return inp;
 }
 
-void ValueFederate::addTarget(const Publication& pub, const std::string& target)
+void ValueFederate::addTarget(const Publication& pub, std::string_view target)
 {
     vfManager->addTarget(pub, target);
 }
 
-void ValueFederate::addTarget(const Input& inp, const std::string& target)
+void ValueFederate::addTarget(const Input& inp, std::string_view target)
 {
     vfManager->addTarget(inp, target);
 }
@@ -149,12 +149,12 @@ void ValueFederate::addAlias(const Input& inp, const std::string& shortcutName)
 {
     vfManager->addAlias(inp, shortcutName);
 }
-void ValueFederate::removeTarget(const Publication& pub, const std::string& target)
+void ValueFederate::removeTarget(const Publication& pub, std::string_view target)
 {
     vfManager->removeTarget(pub, target);
 }
 
-void ValueFederate::removeTarget(const Input& inp, const std::string& target)
+void ValueFederate::removeTarget(const Input& inp, std::string_view target)
 {
     vfManager->removeTarget(inp, target);
 }

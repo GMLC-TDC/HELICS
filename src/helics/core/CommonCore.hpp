@@ -46,19 +46,20 @@ class BasicHandleInfo;
 class FilterCoordinator;
 class FilterInfo;
 class FilterFederate;
+class TranslatorFederate;
 class TimeoutMonitor;
 enum class InterfaceType : char;
 /** enumeration of possible operating conditions for a federate*/
-enum class operation_state : std::uint8_t { operating = 0, error = 5, disconnected = 10 };
+enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
 /** function to print string for the state*/
-const std::string& state_string(operation_state state);
+const std::string& state_string(OperatingState state);
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
   public:
     FederateState* fed = nullptr;
-    operation_state state{operation_state::operating};
+    OperatingState state{OperatingState::OPERATING};
 
     constexpr FedInfo() = default;
     constexpr explicit FedInfo(FederateState* newfed) noexcept: fed(newfed) {}
@@ -187,7 +188,11 @@ class CommonCore: public Core, public BrokerBase {
     virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
                                                   const std::string& type_in,
                                                   const std::string& type_out) override final;
+    virtual InterfaceHandle registerTranslator(std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units) override final;
     virtual InterfaceHandle getFilter(const std::string& name) const override final;
+    virtual InterfaceHandle getTranslator(const std::string& name) const override final;
     virtual void addDependency(LocalFederateId federateID,
                                const std::string& federateName) override final;
     virtual void linkEndpoints(const std::string& source, const std::string& dest) override final;
@@ -224,7 +229,9 @@ class CommonCore: public Core, public BrokerBase {
                             const std::string& messageToLog) override final;
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) override final;
-
+    virtual void
+        setTranslatorOperator(InterfaceHandle translator,
+                              std::shared_ptr<TranslatorOperator> callbacks) override final;
     /** set the local identification for the core*/
     void setIdentifier(const std::string& name);
     /** get the local identifier for the core*/
@@ -336,7 +343,7 @@ class CommonCore: public Core, public BrokerBase {
     /** check if all connections are disconnected (feds and time dependencies)*/
     bool allDisconnected() const;
     /** get the minimum operating state of the connected federates*/
-    operation_state minFederateState() const;
+    OperatingState minFederateState() const;
 
     virtual double getSimulationTime() const override;
 
@@ -451,7 +458,9 @@ class CommonCore: public Core, public BrokerBase {
                                 //!< thread protection
     /// sets of ongoing time blocks from filtering
     std::vector<std::pair<GlobalFederateId, int32_t>> timeBlocks;
-
+    TranslatorFederate* translatorFed{nullptr};
+    std::atomic<std::thread::id> translatorThread{std::thread::id{}};
+    std::atomic<GlobalFederateId> translatorFedID;
     std::map<int32_t, std::vector<ActionMessage>>
         delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
 
@@ -469,12 +478,14 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<std::thread::id> filterThread{std::thread::id{}};
     std::atomic<GlobalFederateId> filterFedID;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<gmlc::containers::AirLock<std::any>, 4>
-        dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    /// airlocks for updating filter operators and other functions
+    std::array<gmlc::containers::AirLock<std::any>, 4> dataAirlocks;
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
   private:
     // generate a filter Federate
     void generateFilterFederate();
+    // generate a translator Federate
+    void generateTranslatorFederate();
     // generate a timing connection between the core and filter Federate
     void connectFilterTiming();
     /** check if a given federate has a timeblock*/
@@ -494,9 +505,9 @@ class CommonCore: public Core, public BrokerBase {
     const BasicHandleInfo& createBasicHandle(GlobalFederateId global_federateId,
                                              LocalFederateId local_federateId,
                                              InterfaceType HandleType,
-                                             const std::string& key,
-                                             const std::string& type,
-                                             const std::string& units,
+                                             std::string_view key,
+                                             std::string_view type,
+                                             std::string_view units,
                                              uint16_t flags = 0);
 
     /** check if a global id represents a local federate

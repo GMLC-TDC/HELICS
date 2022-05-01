@@ -23,7 +23,7 @@ struct EndpointInformation {
     std::string key;
     std::string type;
     EndpointInformation() = default;
-    EndpointInformation(GlobalHandle gid, const std::string& key_, const std::string& type_):
+    EndpointInformation(GlobalHandle gid, std::string_view key_, std::string_view type_):
         id(gid), key(key_), type(type_)
     {
     }
@@ -32,7 +32,7 @@ struct EndpointInformation {
 class EndpointInfo {
   public:
     /** constructor from all data*/
-    EndpointInfo(GlobalHandle handle, const std::string& key_, const std::string& type_):
+    EndpointInfo(GlobalHandle handle, std::string_view key_, std::string_view type_):
         id(handle), key(key_), type(type_)
     {
     }
@@ -41,8 +41,8 @@ class EndpointInfo {
     const std::string key;  //!< name of the endpoint
     const std::string type;  //!< type of the endpoint
   private:
-    shared_guarded<std::deque<std::unique_ptr<Message>>>
-        message_queue;  //!< storage for the messages
+    /// storage for the messages
+    shared_guarded<std::deque<std::unique_ptr<Message>>> message_queue;
     std::atomic<int32_t> mAvailableMessages{0};  //!< indicator of how many message are available
 
     std::vector<EndpointInformation> sourceInformation;
@@ -85,14 +85,10 @@ class EndpointInfo {
     Time firstMessageTime() const;
     /** clear all the message queues*/
     void clearQueue();
-    /** add a target target*/
-    void addDestinationTarget(GlobalHandle dest,
-                              const std::string& destName,
-                              const std::string& destType);
-    /** add a source to an endpoint*/
-    void addSourceTarget(GlobalHandle dest,
-                         const std::string& sourceName,
-                         const std::string& sourceType);
+    /** add a target to send messages*/
+    void addDestination(GlobalHandle dest, std::string_view destName, std::string_view destType);
+    /** add an endpoint to receive information from*/
+    void addSource(GlobalHandle source, std::string_view sourceName, std::string_view sourceType);
     /** remove a target from connection*/
     void removeTarget(GlobalHandle targetId);
     /** get the vector of endpoint targets*/

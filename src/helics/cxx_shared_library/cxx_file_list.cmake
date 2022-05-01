@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2019, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -15,6 +15,7 @@ set(helics_shared_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Subscriptions.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Endpoints.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Filters.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Translator.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Federate.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/helicsTypes.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/data_view.hpp
@@ -37,7 +38,8 @@ set(helics_shared_private_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ValueFederateManager.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/AsyncFedCallInfo.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/FilterOperations.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/FilterFederateManager.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/TranslatorOperations.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/ConnectorFederateManager.hpp
 )
 
 set(conv_headers

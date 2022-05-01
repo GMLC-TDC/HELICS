@@ -13,6 +13,7 @@ set(application_api_headers
     Subscriptions.hpp
     Endpoints.hpp
     Filters.hpp
+    Translator.hpp
     Federate.hpp
     helicsTypes.hpp
     data_view.hpp
@@ -31,8 +32,12 @@ set(application_api_headers
 set(conv_headers ../application_api.hpp ../ValueFederates.hpp ../MessageFederates.hpp)
 
 set(private_application_api_headers
-    MessageFederateManager.hpp ValueFederateManager.hpp AsyncFedCallInfo.hpp FilterOperations.hpp
-    FilterFederateManager.hpp
+    MessageFederateManager.hpp
+    ValueFederateManager.hpp
+    AsyncFedCallInfo.hpp
+    FilterOperations.hpp
+    ConnectorFederateManager.hpp
+    TranslatorOperations.hpp
 )
 
 set(application_api_sources
@@ -48,7 +53,9 @@ set(application_api_sources
     Publications.cpp
     Filters.cpp
     FilterOperations.cpp
-    FilterFederateManager.cpp
+    ConnectorFederateManager.cpp
+    Translator.cpp
+    TranslatorOperations.cpp
     Endpoints.cpp
     helicsTypes.cpp
     queryFunctions.cpp

@@ -29,12 +29,13 @@ class HandleManager {
     otherwise we would need two classes that do basically the same thing just with different
     container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
-    std::unordered_map<std::string_view, InterfaceHandle>
-        publications;  //!< map of all local publications
-    std::unordered_map<std::string_view, InterfaceHandle>
-        endpoints;  //!< map of all local endpoints
+    /// map of all local publications
+    std::unordered_map<std::string_view, InterfaceHandle> publications;
+    /// map of all local endpoints
+    std::unordered_map<std::string_view, InterfaceHandle> endpoints;
     std::unordered_map<std::string_view, InterfaceHandle> inputs;  //!< map of all local endpoints
     std::unordered_map<std::string_view, InterfaceHandle> filters;  //!< map of all local endpoints
+    std::unordered_map<std::string_view, InterfaceHandle> translators;  //!< map of all translators
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
   public:
     /** default constructor*/
@@ -87,10 +88,17 @@ class HandleManager {
     /** get a const filter by name*/
     const BasicHandleInfo* getFilter(std::string_view name) const;
     BasicHandleInfo* getFilter(std::string_view name);
-    // auto getFilters (const std::string &name) const { return filters.equal_range (name); }
     /** get a filter by index
     @return nullptr if the index doesn't point to a valid filter*/
     BasicHandleInfo* getFilter(InterfaceHandle handle);
+
+    const BasicHandleInfo* getTranslator(std::string_view name) const;
+    BasicHandleInfo* getTranslator(std::string_view name);
+    /** get a translator by index
+    @return nullptr if the index doesn't point to a valid translator*/
+    BasicHandleInfo* getTranslator(InterfaceHandle handle);
+
+    /** get a publication by name*/
     BasicHandleInfo* getPublication(std::string_view name);
     const BasicHandleInfo* getPublication(std::string_view name) const;
     /** get a publication by index

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -43,19 +44,16 @@ class InputInfo {
         std::string type;
         std::string units;
         sourceInformation() = default;
-        sourceInformation(const std::string& key_,
-                          const std::string& type_,
-                          const std::string& units_):
-            key(key_),
-            type(type_), units(units_)
+        sourceInformation(std::string_view key_, std::string_view type_, std::string_view units_):
+            key(key_), type(type_), units(units_)
         {
         }
     };
     /** constructor with all the information*/
     InputInfo(GlobalHandle handle,
-              const std::string& key_,
-              const std::string& type_,
-              const std::string& units_):
+              std::string_view key_,
+              std::string_view type_,
+              std::string_view units_):
         id(handle),
         key(key_), type(type_), units(units_)
     {
@@ -123,13 +121,13 @@ class InputInfo {
     @return true if the source was added false if duplicate
     */
     bool addSource(GlobalHandle newSource,
-                   const std::string& sourceName,
-                   const std::string& stype,
-                   const std::string& sunits);
+                   std::string_view sourceName,
+                   std::string_view stype,
+                   std::string_view sunits);
     /** remove a source */
     void removeSource(GlobalHandle sourceToRemove, Time minTime);
     /** remove a source */
-    void removeSource(const std::string& sourceName, Time minTime);
+    void removeSource(std::string_view sourceName, Time minTime);
     /** clear all non-current data*/
     void clearFutureData();
 
@@ -146,7 +144,7 @@ class InputInfo {
     mutable std::string sourceTargets;
 };
 
-bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match);
+bool checkTypeMatch(std::string_view type1, std::string_view type2, bool strict_match);
 
 bool checkUnitMatch(const std::string& unit1, const std::string& unit2, bool strict_match);
 }  // namespace helics

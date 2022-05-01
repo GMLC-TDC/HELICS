@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/GuardedTypes.hpp"
 #include "Filters.hpp"
+#include "Translator.hpp"
 #include "gmlc/containers/MappedVector.hpp"
 
 #include <memory>
@@ -16,17 +17,17 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class Core;
 class Federate;
-/** class handling the implementation details of a value Federate
-@details the functions will parallel those in message Federate and contain the actual implementation
-details
+/** class handling the implementation details for managing connectors(Filters and Translators)
+@details the functions match those in Federate.hpp dealing with filters and Translators and contain
+the actual implementation details
 */
-class FilterFederateManager {
+class ConnectorFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    FilterFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id);
+    ConnectorFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id);
     /** destructor */
-    ~FilterFederateManager();
+    ~ConnectorFederateManager();
 
     /** register a Filter
     @details call is only valid in startup mode
@@ -50,8 +51,8 @@ class FilterFederateManager {
 
     /** register a Filter
     @details call is only valid in startup mode
-    @param name the name of the endpoint
-    @param type the defined type of the interface for endpoint checking if requested
+    @param type the defined type of the filter
+    @param name the name of the filter
     */
     Filter& registerFilter(FilterTypes type, const std::string& name);
 
@@ -70,18 +71,40 @@ class FilterFederateManager {
     Filter& getFilter(int index);
     const Filter& getFilter(int index) const;
 
+    /** register a Translator
+    @details call is only valid in startup mode
+    @param name the name of the translator
+    @param type_in the type the translator is expecting on the value interface
+    @param type_out the type the translator for the endpoint
+    */
+    Translator& registerTranslator(std::string_view name,
+                                   std::string_view type_in,
+                                   std::string_view type_out);
+
+    /** get a registered Translator
+    @param name the translator name
+    @return invalid translator object if name is not recognized otherwise returns the translator*/
+    Translator& getTranslator(const std::string& name);
+    const Translator& getTranslator(const std::string& name) const;
+    Translator& getTranslator(int index);
+    const Translator& getTranslator(int index) const;
+
     /** get the number of registered filters in the federate*/
     int getFilterCount() const;
+    /** get the number of registered filters in the federate*/
+    int getTranslatorCount() const;
     /** close all filters*/
-    void closeAllFilters();
+    void closeAllConnectors();
     /** close all filters*/
-    void disconnectAllFilters();
+    void disconnectAllConnectors();
     /** disconnect from the coreObject*/
     void disconnect();
 
   private:
     Core* coreObject{nullptr};
     shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
+    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Translator>, std::string>>
+        translators;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
 };

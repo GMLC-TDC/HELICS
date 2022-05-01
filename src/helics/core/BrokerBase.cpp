@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/string_viewConversion.h"
+#include "helics/common/JsonGeneration.hpp"
 #include "helics/common/LogBuffer.hpp"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
@@ -482,6 +483,22 @@ std::pair<bool, std::vector<std::string_view>>
         return {false, res};
     }
     return {true, res};
+}
+
+void BrokerBase::addBaseInformation(Json::Value& base, bool hasParent) const
+{
+    Json::Value object;
+    object["name"] = identifier;
+    if (uuid_like) {
+        object["uuid"] = identifier;
+    }
+    object["id"] = global_id.load().baseValue();
+    if (hasParent) {
+        object["parent"] = higher_broker_id.baseValue();
+    } else {
+        object["parent"] = 0;
+    }
+    base["attributes"] = object;
 }
 
 void BrokerBase::setLoggerFunction(

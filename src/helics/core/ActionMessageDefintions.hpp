@@ -167,10 +167,12 @@ across different compilers*/
             41,  //!< the result of a destination filter going back to its originator
         cmd_reg_pub = cmd_info_basis + 50,  //!< register a publication
         cmd_add_publisher = 50,  //!< notify of a publication
-        cmd_reg_filter = cmd_info_basis + 60,  //!< register a destination filter
+        cmd_reg_filter = cmd_info_basis + 60,  //!< register a filter
         cmd_add_filter = 62,  //!< notify of a destination filter
         cmd_reg_input = cmd_info_basis + 70,  //!< register an input interface
         cmd_add_subscriber = 70,  //!< notify of a subscription
+        cmd_reg_translator = cmd_info_basis + 80,  //!< register a translator
+
         cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
         cmd_add_endpoint = 90,  //!< notify of a source endpoint
 
@@ -178,6 +180,7 @@ across different compilers*/
         cmd_add_named_filter = 105,  //!< command to add named filter as a target
         cmd_add_named_publication = 106,  //!< command to add a named publication as a target
         cmd_add_named_endpoint = 107,  //!< command to add a named endpoint as a target
+
         cmd_remove_named_input = 124,  //!< cmd to remove a target from connection by name
         cmd_remove_named_filter = 125,  //!< cmd to remove a filter from connection by name
         cmd_remove_named_publication =
@@ -285,6 +288,8 @@ across different compilers*/
 #define CMD_ADD_PUBLISHER action_message_def::action_t::cmd_add_publisher
 #define CMD_REG_INPUT action_message_def::action_t::cmd_reg_input
 #define CMD_ADD_SUBSCRIBER action_message_def::action_t::cmd_add_subscriber
+
+#define CMD_REG_TRANSLATOR action_message_def::action_t::cmd_reg_translator
 
 #define CMD_ADD_NAMED_ENDPOINT action_message_def::action_t::cmd_add_named_endpoint
 #define CMD_ADD_NAMED_FILTER action_message_def::action_t::cmd_add_named_filter
@@ -395,6 +400,7 @@ across different compilers*/
 
 // definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
+#define UPDATE_TRANSLATOR_OPERATOR 574
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 #define UPDATE_LOGGING_FILE 594

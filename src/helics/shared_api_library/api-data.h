@@ -43,6 +43,11 @@ typedef void* HelicsEndpoint;
 typedef void* HelicsFilter;
 
 /**
+ * opaque object representing a translator
+ */
+typedef void* HelicsTranslator;
+
+/**
  * opaque object representing a core
  */
 // typedef void* helics_core;
@@ -70,6 +75,11 @@ typedef void* HelicsFederateInfo;
  */
 // typedef void* helics_query;
 typedef void* HelicsQuery;
+
+/**
+ * opaque object representing a data buffer in HELICS
+ */
+typedef void* HelicsDataBuffer;
 
 /**
  * opaque object representing a string buffer for a query
@@ -148,8 +158,6 @@ typedef struct HelicsComplex {
     double real;
     double imag;
 } HelicsComplex;
-
-// typedef HelicsComplex helics_complex;
 
 /**
  * helics error object
