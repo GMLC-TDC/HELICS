@@ -9,6 +9,7 @@
 
 set(sequencing_test_sources
     Sequencing1.cpp
+    Sequencing2.cpp
     sequencing-tests.cpp
     sequencingHelpers.hpp
     sequencingHelpers.cpp

@@ -565,9 +565,10 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                         return MessageProcessingResult::NEXT_STEP;
                     }
                 }
-                if (dependencies.checkIfReadyForTimeGrant(false,
-                                                          time_exec,
-                                                          info.wait_for_current_time_updates)) {
+
+                auto delayMode =
+                    getDelayMode(info.wait_for_current_time_updates, (time_requested > time_exec));
+                if (dependencies.checkIfReadyForTimeGrant(false, time_exec, delayMode)) {
                     iteration = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
@@ -585,13 +586,12 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     hasIterationData = false;
                     updateTimeGrant();
                     return MessageProcessingResult::ITERATING;
-                } else {
-                    iteration = 0;
-                    updateTimeGrant();
-                    return (iterating == IterationRequest::FORCE_ITERATION) ?
-                        MessageProcessingResult::ITERATING :
-                        MessageProcessingResult::NEXT_STEP;
                 }
+                iteration = 0;
+                updateTimeGrant();
+                return (iterating == IterationRequest::FORCE_ITERATION) ?
+                    MessageProcessingResult::ITERATING :
+                    MessageProcessingResult::NEXT_STEP;
             }
 
             if (time_allow == time_exec) {
@@ -602,7 +602,9 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
-                        if (dependencies.checkIfReadyForTimeGrant(false, time_exec, false)) {
+                        if (dependencies.checkIfReadyForTimeGrant(false,
+                                                                  time_exec,
+                                                                  GrantDelayMode::NONE)) {
                             ret = MessageProcessingResult::NEXT_STEP;
                             break;
                         }
@@ -610,9 +612,8 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     ret = MessageProcessingResult::CONTINUE_PROCESSING;
                     break;
                 }
-                if (dependencies.checkIfReadyForTimeGrant(true,
-                                                          time_exec,
-                                                          info.wait_for_current_time_updates)) {
+                if (dependencies.checkIfReadyForTimeGrant(
+                        true, time_exec, getDelayMode(info.wait_for_current_time_updates, false))) {
                     if (hasIterationData) {
                         ret = MessageProcessingResult::ITERATING;
                         break;
@@ -742,6 +743,9 @@ std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& up
     if (lastSend.sequenceCounter != sequenceCounter) {
         changed = true;
     }
+    if (lastSend.interrupted != checkActionFlag(upd, interrupted_flag)) {
+        changed = true;
+    }
     if (changed) {
         lastSend.next = upd.actionTime;
         lastSend.minDe = upd.Tdemin;
@@ -749,6 +753,7 @@ std::pair<bool, bool> TimeCoordinator::checkAndSendTimeRequest(ActionMessage& up
         lastSend.sequenceCounter = sequenceCounter;
         lastSend.minFed = GlobalFederateId(upd.getExtraData());
         lastSend.mTimeState = TimeState::time_requested;
+        lastSend.interrupted = checkActionFlag(upd, interrupted_flag);
         return {true, transmitTimingMessages(upd, skipFed)};
     }
     return {false, false};
@@ -770,6 +775,8 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
     }
     if (info.wait_for_current_time_updates) {
         setActionFlag(upd, delayed_timing_flag);
+    } else if (time_requested > time_next) {
+        setActionFlag(upd, interrupted_flag);
     }
     upd.Te = checkAdd(time_exec, info.outputDelay);
     if (!globalTime && (info.event_triggered || time_requested >= cBigTime)) {
@@ -819,7 +826,7 @@ void TimeCoordinator::sendTimeRequest(GlobalFederateId triggerFed) const
         }
     } else if (triggerFed.isValid()) {
         upd.dest_id = triggerFed;
-        auto* dep = dependencies.getDependencyInfo(triggerFed);
+        const auto* dep = dependencies.getDependencyInfo(triggerFed);
         if (dep->dependent) {
             upd.setExtraDestData(dep->sequenceCounter);
             sendMessageFunction(upd);

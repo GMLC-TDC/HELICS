@@ -505,16 +505,8 @@ bool CommonCore::allDisconnected() const
 {
     // all federates must have hit finished state
     auto afed = (minFederateState() == OperatingState::DISCONNECTED);
-    if ((hasTimeDependency) || (hasFilters)) {
-        if (afed) {
-            if (!timeCoord->hasActiveTimeDependencies()) {
-                return true;
-            }
-            if (timeCoord->dependencyCount() == 1 && timeCoord->getMinDependency() == filterFedID) {
-                return !filterFed->hasActiveTimeDependencies();
-            }
-        }
-        return false;
+    if (afed && filterFed != nullptr) {
+        return !filterFed->hasActiveTimeDependencies();
     }
     return (afed);
 }
@@ -799,6 +791,7 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
             setActionFlag(treq, indicator_flag);
             addActionMessage(treq);
             auto ret = fed->requestTime(next, IterationRequest::NO_ITERATIONS, false);
+
             switch (ret.state) {
                 case IterationResult::ERROR_RESULT:
                     throw(FunctionExecutionFailure(fed->lastErrorString()));
@@ -1833,10 +1826,7 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
                     return true;
                 }
                 res = hand.getInput(translatorName);
-                if (res != nullptr) {
-                    return true;
-                }
-                return false;
+                return (res != nullptr);
             })) {
             throw(RegistrationFailure("there already exists an interface with this name"));
         }
@@ -2202,7 +2192,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             if (fed != nullptr) {
                 fed->addAction(std::move(message));
             } else if (localP->getFederateId() == translatorFedID) {
-                if (translatorFed) {
+                if (translatorFed != nullptr) {
                     translatorFed->handleMessage(message);
                 }
             }
@@ -4971,20 +4961,16 @@ bool CommonCore::checkAndProcessDisconnect()
 
         ActionMessage dis(CMD_DISCONNECT);
         dis.source_id = global_broker_id_local;
+        dis.dest_id = parent_broker_id;
         transmit(parent_route_id, dis);
         setTickForwarding(TickForwardingReasons::DISCONNECT_TIMEOUT, true);
         disconnectTime = std::chrono::steady_clock::now();
-        return true;
-    }
-    if (hasFilters) {
-        if (!filterFed->hasActiveTimeDependencies()) {
-            ActionMessage dis(CMD_DISCONNECT);
-            dis.source_id = global_broker_id_local;
-            transmit(parent_route_id, dis);
+        if (filterFed != nullptr) {
             dis.source_id = filterFedID;
             filterFed->handleMessage(dis);
-            return true;
         }
+
+        return true;
     }
     if (translatorFed != nullptr) {
         if (!translatorFed->hasActiveTimeDependencies()) {

@@ -135,7 +135,7 @@ class FederateState {
     std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
-
+    std::atomic<bool> queueProcessing{false};
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/

@@ -19,14 +19,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-/** class managing the coordination of time in HELICS for forwarding object (cores, brokers)
-the time coordinator manages dependencies and computes whether time can advance or enter execution
-mode
-*/
+/** a virtual class defining a time coordinator.  The base class implements some common data and
+ * operations that are common to all the time coordinators
+ */
 class BaseTimeCoordinator {
   protected:
-    // Core::local_federate_id parent = invalid_fed_id;  //!< the id for the parent object which
-    // should also be a ForwardingTimeCoordinator
     TimeDependencies dependencies;  //!< federates which this Federate is temporally dependent on
     /// callback used to send the messages
     std::function<void(const ActionMessage&)> sendMessageFunction;

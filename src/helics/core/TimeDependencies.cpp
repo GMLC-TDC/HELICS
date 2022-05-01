@@ -80,9 +80,13 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             }
 
             dep.minFed = GlobalFederateId(m.getExtraData());
+            dep.interrupted = checkActionFlag(m, interrupted_flag);
+
+            // NEXT version this gets moved out of here
             if (checkActionFlag(m, non_granting_flag)) {
                 dep.nonGranting = true;
             }
+
             delayed = checkActionFlag(m, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
                 res = DependencyProcessingResult::PROCESSED_AND_CHECK;
@@ -90,6 +94,8 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             if (delayed) {
                 dep.delayedTiming = delayed;
             }
+            // END remove block
+
             dep.triggered = checkActionFlag(m, destination_target);
             dep.sequenceCounter = m.counter;
             dep.responseSequenceCounter = (dep.connection != ConnectionType::self) ?
@@ -109,6 +115,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.minDe = dep.next;
             dep.minFed = GlobalFederateId{};
             dep.timeoutCount = 0;
+            dep.interrupted = false;
             dep.sequenceCounter = m.counter;
             dep.hasData = false;
             break;
@@ -191,6 +198,12 @@ bool TimeData::update(const TimeData& update)
     if (update.sequenceCounter != sequenceCounter) {
         sequenceCounter = update.sequenceCounter;
     }
+
+    if (update.interrupted != interrupted) {
+        interrupted = update.interrupted;
+        updated = true;
+    }
+
     if (update.responseSequenceCounter != responseSequenceCounter) {
         responseSequenceCounter = update.responseSequenceCounter;
         updated = true;
@@ -214,7 +227,7 @@ static std::string_view timeStateString(TimeState state)
     static constexpr std::string_view timeReq{"time requested"};
     static constexpr std::string_view timeReqIterative{"time requested iterative"};
     static constexpr std::string_view timeReqMustIt{"time requested required iteration"};
-    static constexpr std::string_view disconnected{"disconnected"};
+    // static constexpr std::string_view disconnected{"disconnected"};
     static constexpr std::string_view other{"other"};
     switch (state) {
         case TimeState::initialized:
@@ -257,6 +270,7 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["iteration"] = dep.sequenceCounter;
     output["granted_iteration"] = dep.grantedIteration;
     output["sequenceCounter"] = dep.sequenceCounter;
+    output["interrupted"] = dep.interrupted;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
@@ -470,7 +484,7 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
 
 bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                                                 Time desiredGrantTime,
-                                                bool waiting) const
+                                                GrantDelayMode delayMode) const
 {
     if (iterating) {
         for (const auto& dep : dependencies) {
@@ -486,7 +500,7 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             if ((dep.next == desiredGrantTime) && (dep.mTimeState == TimeState::time_granted)) {
                 return false;
             }
-            if (waiting) {
+            if (delayMode == GrantDelayMode::WAITING) {
                 if (dep.mTimeState == TimeState::time_requested_iterative ||
                     dep.mTimeState == TimeState::time_requested_require_iteration) {
                     if (dep.sequenceCounter < dep.grantedIteration) {
@@ -496,9 +510,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
             }
         }
         return true;
-
-    } else {
-        if (!waiting) {
+    }
+    switch (delayMode) {
+        case GrantDelayMode::NONE:
             for (const auto& dep : dependencies) {
                 if (!dep.dependency || dep.next >= cBigTime) {
                     continue;
@@ -518,7 +532,34 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                     }
                 }
             }
-        } else {
+            break;
+        case GrantDelayMode::INTERRUPTED:
+            for (const auto& dep : dependencies) {
+                if (!dep.dependency || dep.next >= cBigTime) {
+                    continue;
+                }
+                if (dep.connection == ConnectionType::self) {
+                    continue;
+                }
+                if (dep.next < desiredGrantTime) {
+                    return false;
+                }
+                if (dep.next == desiredGrantTime) {
+                    if (dep.mTimeState == TimeState::time_granted) {
+                        return false;
+                    }
+                    if (dep.mTimeState == TimeState::time_requested && dep.nonGranting) {
+                        return false;
+                    }
+
+                    if (dep.interrupted || dep.delayedTiming) {
+                        continue;
+                    }
+                    return false;
+                }
+            }
+            break;
+        case GrantDelayMode::WAITING:
             for (const auto& dep : dependencies) {
                 if (!dep.dependency || dep.next >= cBigTime) {
                     continue;
@@ -530,8 +571,9 @@ bool TimeDependencies::checkIfReadyForTimeGrant(bool iterating,
                     return false;
                 }
             }
-        }
+            break;
     }
+
     return true;
 }
 
@@ -697,10 +739,17 @@ static void generateMinTimeImplementation(TimeData& mTime,
     if (dep.next < mTime.next) {
         mTime.next = dep.next;
         mTime.mTimeState = dep.mTimeState;
-
+        if (dep.responseSequenceCounter == sequenceCode && dep.dependent) {
+            mTime.interrupted = dep.interrupted;
+        } else {
+            mTime.interrupted = false;
+        }
     } else if (dep.next == mTime.next) {
         if (dep.mTimeState == TimeState::time_granted) {
             mTime.mTimeState = dep.mTimeState;
+            mTime.interrupted = false;
+        } else if (!dep.interrupted) {
+            mTime.interrupted = false;
         }
     }
     // if (dep.connection != ConnectionType::self) {
@@ -710,6 +759,7 @@ static void generateMinTimeImplementation(TimeData& mTime,
         mTime.minFed = dep.fedID;
         mTime.sequenceCounter = dep.sequenceCounter;
         mTime.responseSequenceCounter = dep.sequenceCounter;
+
         if (dep.minFed.isValid()) {
             mTime.minFedActual = dep.minFed;
         } else {

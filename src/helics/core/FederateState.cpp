@@ -446,6 +446,7 @@ IterationResult FederateState::waitSetup()
         unlock();
         return static_cast<IterationResult>(ret);
     }
+    // this function can fail try_lock gracefully
 
     std::lock_guard<FederateState> fedlock(*this);
     IterationResult ret;
@@ -478,7 +479,7 @@ IterationResult FederateState::enterInitializingMode()
         }
         return static_cast<IterationResult>(ret);
     }
-
+    // this function can handle try_lock fail gracefully
     sleeplock();
     IterationResult ret;
     switch (getState()) {
@@ -558,6 +559,16 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
 #endif
         return static_cast<IterationResult>(ret);
     }
+
+    // if this is not true then try again the core may have been handing something short so try
+    // again
+    if (!queueProcessing.load()) {
+        std::this_thread::yield();
+        if (!queueProcessing.load()) {
+            return enterExecutingMode(iterate, sendRequest);
+        }
+    }
+
     // the following code is for a situation in which this method has been called multiple times
     // from different threads, which really shouldn't be done but it isn't really an error so we
     // need to deal with it.
@@ -605,7 +616,7 @@ std::vector<std::pair<GlobalHandle, std::string_view>>
 iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
-        Time lastTime = timeCoord->getGrantedTime();
+        const Time lastTime = timeCoord->getGrantedTime();
         events.clear();  // clear the event queue
         LOG_TRACE(timeCoord->printTimeStatus());
         // timeCoord->timeRequest (nextTime, iterate, nextValueTime (), nextMessageTime ());
@@ -724,6 +735,16 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
         return retTime;
     }
+
+    // if this is not true then try again the core may have been handling something short so try
+    // again
+    if (!queueProcessing.load()) {
+        std::this_thread::yield();
+        if (!queueProcessing.load()) {
+            return requestTime(nextTime, iterate, sendRequest);
+        }
+    }
+    LOG_WARNING("duplicate locking attempted");
     // this would not be good practice to get into this part of the function
     // but the area must protect itself against the possibility and should return something sensible
     std::lock_guard<FederateState> fedlock(*this);
@@ -801,7 +822,14 @@ MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyR
         unlock();
         return ret;
     }
-
+    // if this is not true then try again the core may have been handling something short so try
+    // again
+    if (!queueProcessing.load()) {
+        std::this_thread::yield();
+        if (!queueProcessing.load()) {
+            return genericUnspecifiedQueueProcess(busyReturn);
+        }
+    }
     if (busyReturn) {
         return MessageProcessingResult::BUSY;
     }
@@ -1010,6 +1038,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     auto initError = (state == HELICS_ERROR);
     bool error_cmd{false};
     bool profilerActive{mProfilerActive};
+    queueProcessing.store(true);
     if (profilerActive) {
         generateProfilingMessage(true);
     }
@@ -1052,6 +1081,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     if (initError) {
         ret_code = MessageProcessingResult::ERROR_RESULT;
     }
+    queueProcessing.store(false);
     if (profilerActive) {
         generateProfilingMessage(false);
     }

@@ -13,7 +13,7 @@ operations and helper functions for handling flags in helics
 
 namespace helics {
 /** flag definitions for the action Message Flag field*/
-enum operation_flags : uint16_t {
+enum OperationFlags : uint16_t {
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
     destination_target = 1,  //!< indicator that the target is a destination target
     required_flag = 2,  //!< flag indicating that an action or match is required
@@ -65,6 +65,9 @@ constexpr uint16_t delayed_timing_flag = extra_flag2;
 
 /// overload of flag to indicate an interface is nameless
 constexpr uint16_t nameless_interface_flag = empty_flag;
+
+/// overload of optional_flag to mark an interrupted event
+constexpr uint16_t interrupted_flag = optional_flag;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field

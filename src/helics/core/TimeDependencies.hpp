@@ -44,6 +44,15 @@ enum class DependencyProcessingResult : std::uint8_t {
     PROCESSED_AND_CHECK = 2
 };
 
+/** enumeration of delay modes which affect whether a time is granted or not*/
+enum class GrantDelayMode : std::uint8_t { NONE = 0, INTERRUPTED = 1, WAITING = 2 };
+
+inline GrantDelayMode getDelayMode(bool waiting, bool interrupted)
+{
+    return waiting ? GrantDelayMode::WAITING :
+                     (interrupted ? GrantDelayMode::INTERRUPTED : GrantDelayMode::NONE);
+}
+
 // helper class containing the basic timeData
 class TimeData {
   public:
@@ -55,6 +64,7 @@ class TimeData {
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
     bool hasData{false};  //!< indicator that data was sent in the current interval
+    bool interrupted{false};  //!< indicator that the federates next event is a timing interruption
     bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
     std::int8_t timingVersion{-2};  //!< version indicator
     std::uint8_t restrictionLevel{0};  //!< timing restriction level
@@ -159,7 +169,9 @@ class TimeDependencies {
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
-    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime, bool waiting) const;
+    bool checkIfReadyForTimeGrant(bool iterating,
+                                  Time desiredGrantTime,
+                                  GrantDelayMode delayMode) const;
 
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
