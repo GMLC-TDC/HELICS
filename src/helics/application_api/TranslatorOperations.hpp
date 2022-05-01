@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 /** @file
-file defines some common filter operations
+file defines some common translator operations
 */
 
 #include "../common/GuardedTypes.hpp"
@@ -25,29 +25,24 @@ file defines some common filter operations
 namespace helics {
 class Core;
 
-/** class defining a message operator that can operate on any part of a message*/
+/** class defining translator operations that converts values to a json string and vice versa*/
 class JsonTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     JsonTranslatorOperator() = default;
-    /** set the function to modify the data of the message*/
+    
   private:
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
-
-    /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
 };
 
-/** class defining a message operator that can operate on any part of a message*/
+/** class defining translator operations that simply move the binary value data into a message and vice versa*/
 class BinaryTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     BinaryTranslatorOperator() = default;
-    /** set the function to modify the data of the message*/
   private:
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
-
-    /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
 };
 
@@ -56,14 +51,14 @@ class CustomTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     CustomTranslatorOperator() = default;
-    /** set the function to modify the data of the message*/
+    
   private:
+    /** the custom operation to convert a message to a value*/
     std::function<SmallBuffer(std::unique_ptr<Message> message)> toValueFunction;
+    /** the custom operation to convert a value into a message*/
     std::function<std::unique_ptr<Message>(const SmallBuffer& value)> toMessageFunction;
 
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
-
-    /** convert a value to a message*/
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
 };
 

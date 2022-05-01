@@ -17,8 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 class Core;
 class Federate;
-/** class handling the implementation details of a value Federate
-@details the functions will parallel those in message Federate and contain the actual implementation
+/** class handling the implementation details for managing connectors(Filters and Translators)
+@details the functions match those in Federate.hpp dealing with filters and Translators and contain the actual implementation
 details
 */
 class ConnectorFederateManager {
@@ -81,12 +81,6 @@ class ConnectorFederateManager {
                                    std::string_view type_in,
                                    std::string_view type_out);
 
-    /** register a Translator
-    @details call is only valid in startup mode
-    @param type the defined type of the translator
-    @param name the name of the translator
-    */
-    Translator& registerTranslator(TranslatorTypes type, std::string_view name);
 
     /** get a registered Translator
     @param name the translator name

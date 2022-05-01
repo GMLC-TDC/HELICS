@@ -176,16 +176,16 @@ void EndpointInfo::addDestination(GlobalHandle dest,
 }
 
 /** add a source to an endpoint*/
-void EndpointInfo::addSource(GlobalHandle dest,
+void EndpointInfo::addSource(GlobalHandle source,
                              std::string_view sourceName,
                              std::string_view sourceType)
 {
     for (const auto& si : sourceInformation) {
-        if (si.id == dest) {
+        if (si.id == source) {
             return;
         }
     }
-    sourceInformation.emplace_back(dest, sourceName, sourceType);
+    sourceInformation.emplace_back(source, sourceName, sourceType);
 }
 
 /** remove a target from connection*/

@@ -88,7 +88,7 @@ class EndpointInfo {
     /** add a target to send messages*/
     void addDestination(GlobalHandle dest, std::string_view destName, std::string_view destType);
     /** add an endpoint to receive information from*/
-    void addSource(GlobalHandle dest, std::string_view sourceName, std::string_view sourceType);
+    void addSource(GlobalHandle source, std::string_view sourceName, std::string_view sourceType);
     /** remove a target from connection*/
     void removeTarget(GlobalHandle targetId);
     /** get the vector of endpoint targets*/

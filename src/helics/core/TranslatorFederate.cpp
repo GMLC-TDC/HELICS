@@ -193,6 +193,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_CLOSE_INTERFACE: {
             auto* tran = translators.find(command.getSource());
             if (tran != nullptr) {
+                //TODO(PT) actually close the interface
             }
         } break;
 
