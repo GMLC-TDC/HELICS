@@ -18,8 +18,8 @@ namespace helics {
 class Core;
 class Federate;
 /** class handling the implementation details for managing connectors(Filters and Translators)
-@details the functions match those in Federate.hpp dealing with filters and Translators and contain the actual implementation
-details
+@details the functions match those in Federate.hpp dealing with filters and Translators and contain
+the actual implementation details
 */
 class ConnectorFederateManager {
   public:
@@ -80,7 +80,6 @@ class ConnectorFederateManager {
     Translator& registerTranslator(std::string_view name,
                                    std::string_view type_in,
                                    std::string_view type_out);
-
 
     /** get a registered Translator
     @param name the translator name

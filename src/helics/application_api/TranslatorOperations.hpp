@@ -30,17 +30,19 @@ class JsonTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     JsonTranslatorOperator() = default;
-    
+
   private:
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
 };
 
-/** class defining translator operations that simply move the binary value data into a message and vice versa*/
+/** class defining translator operations that simply move the binary value data into a message and
+ * vice versa*/
 class BinaryTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     BinaryTranslatorOperator() = default;
+
   private:
     virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) override;
     virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) override;
@@ -51,7 +53,7 @@ class CustomTranslatorOperator: public TranslatorOperator {
   public:
     /** default constructor*/
     CustomTranslatorOperator() = default;
-    
+
   private:
     /** the custom operation to convert a message to a value*/
     std::function<SmallBuffer(std::unique_ptr<Message> message)> toValueFunction;
