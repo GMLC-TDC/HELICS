@@ -736,7 +736,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         return retTime;
     }
 
-    // if this is not true then try again the core may have been handing something short so try
+    // if this is not true then try again the core may have been handling something short so try
     // again
     if (!queueProcessing.load()) {
         std::this_thread::yield();
@@ -822,7 +822,7 @@ MessageProcessingResult FederateState::genericUnspecifiedQueueProcess(bool busyR
         unlock();
         return ret;
     }
-    // if this is not true then try again the core may have been handing something short so try
+    // if this is not true then try again the core may have been handling something short so try
     // again
     if (!queueProcessing.load()) {
         std::this_thread::yield();
