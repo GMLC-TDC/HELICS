@@ -1826,10 +1826,7 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
                     return true;
                 }
                 res = hand.getInput(translatorName);
-                if (res != nullptr) {
-                    return true;
-                }
-                return false;
+                return (res != nullptr);
             })) {
             throw(RegistrationFailure("there already exists an interface with this name"));
         }
@@ -2195,7 +2192,7 @@ void CommonCore::deliverMessage(ActionMessage& message)
             if (fed != nullptr) {
                 fed->addAction(std::move(message));
             } else if (localP->getFederateId() == translatorFedID) {
-                if (translatorFed) {
+                if (translatorFed!=nullptr) {
                     translatorFed->handleMessage(message);
                 }
             }
