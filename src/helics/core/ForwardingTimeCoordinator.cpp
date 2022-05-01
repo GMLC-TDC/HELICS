@@ -55,7 +55,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
     }
 
     sequenceCounter = upstream.sequenceCounter;
-    if (updateUpStream||updateDownStream) {
+    if (updateUpStream || updateDownStream) {
         auto upd =
             generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
         if (upd.action() != CMD_IGNORE) {
