@@ -212,7 +212,7 @@ INSTANTIATE_TEST_SUITE_P(sequencing_tests, sequencing2, ::testing::Range(5, 15),
 
 class sequencing3: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-static constexpr char* rerouteType = "test";
+static constexpr auto rerouteType = "test";
 
 TEST_P(sequencing3, reroute_separate2)
 {

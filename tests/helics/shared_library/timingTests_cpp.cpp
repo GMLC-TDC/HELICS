@@ -100,6 +100,7 @@ TEST_F(timing_tests, callbackSequence)
     auto timeUpdate = [&](auto /*v1*/, auto /*v2*/) { seqVal[2] = sequence++; };
     auto timeRequestReturn = [&](auto /*v1*/, auto /*v2*/) { seqVal[3] = sequence++; };
 
+    ASSERT_TRUE(vFed1);
     vFed1->setTimeUpdateCallback(timeUpdate);
     vFed1->setStateChangeCallback(stateUpdate);
     vFed1->setTimeRequestEntryCallback(timeRequestEntry);

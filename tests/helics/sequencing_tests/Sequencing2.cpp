@@ -98,7 +98,7 @@ class sequencing_reroute: public ::testing::TestWithParam<int>, public FederateT
 
 TEST_P(sequencing_reroute, separate_dest)
 {
-    static constexpr char* rerouteType = "test_3";
+    static constexpr const char* rerouteType = "test_3";
     extraBrokerArgs = " --debugging ";
     auto broker = AddBroker(rerouteType, 3);
     extraCoreArgs = " --debugging ";
