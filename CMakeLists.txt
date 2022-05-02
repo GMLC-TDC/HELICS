@@ -511,16 +511,17 @@ if(MSYS OR CYGWIN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
+    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
-    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
+    
 endif()
 
 if(CYGWIN)
     target_compile_definitions(
-        helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601
+        helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS
     )
 endif()
 

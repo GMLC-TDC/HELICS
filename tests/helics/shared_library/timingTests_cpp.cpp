@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 #include <thread>
+#include <array>
 
 struct timing_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
@@ -89,7 +90,7 @@ TEST_F(timing_tests, timeUpdateCallback)
 TEST_F(timing_tests, callbackSequence)
 {
     int sequence{1};
-    std::vector<int> seqVal(4, 0);
+    std::array<int, 4> seqVal{0, 0, 0, 0};
 
     SetupTest<helicscpp::ValueFederate>("test_2", 1);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);

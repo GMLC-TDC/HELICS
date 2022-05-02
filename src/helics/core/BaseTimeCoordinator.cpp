@@ -41,7 +41,7 @@ void BaseTimeCoordinator::setMessageSender(
     }
 }
 
-void BaseTimeCoordinator::enteringExecMode()
+void BaseTimeCoordinator::enteringExecMode(IterationRequest /*Mode*/)
 {
     if (executionMode) {
         return;

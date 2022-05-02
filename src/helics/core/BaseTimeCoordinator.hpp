@@ -117,7 +117,7 @@ class BaseTimeCoordinator {
 
     /** function to enter the exec Mode
      */
-    virtual void enteringExecMode();
+    virtual void enteringExecMode(IterationRequest Mode=IterationRequest::NO_ITERATIONS);
 
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const = 0;

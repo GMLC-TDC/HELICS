@@ -122,6 +122,8 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
         }
 
         break;
+        default:
+            break;
     }
     return;
 }

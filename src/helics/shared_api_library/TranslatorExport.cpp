@@ -113,7 +113,7 @@ HelicsTranslator helicsCoreRegisterTranslator(HelicsCore cr, HelicsTranslatorTyp
         trans->mTrans->setTranslatorType(type);
         trans->transPtr = trans->mTrans.get();
         trans->corePtr = std::move(core);
-        trans->custom = (type == HELICS_FILTER_TYPE_CUSTOM);
+        trans->custom = (type == HELICS_TRANSLATOR_TYPE_CUSTOM);
         return coreAddTranslator(cr, std::move(trans));
     }
     catch (...) {
@@ -430,9 +430,9 @@ int helicsTranslatorGetOption(HelicsTranslator trans, int option)
 }
 
 void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
-                                        void (*toValueCall)(HelicsMessage message, HelicsDataBuffer out, void* userData),
-                                        void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage out, void* userData),
-                                        void* userdata,
+                                        void (* /*toValueCall*/)(HelicsMessage message, HelicsDataBuffer out, void* userData),
+                                        void (* /*toMessageCall*/)(HelicsDataBuffer value, HelicsMessage out, void* userData),
+                                        void* /*userdata*/,
                                         HelicsError* err)
 {
     auto* fObj = getTranslatorObj(trans, err);
