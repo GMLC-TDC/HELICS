@@ -516,13 +516,11 @@ endif()
 
 if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
-    
+
 endif()
 
 if(CYGWIN)
-    target_compile_definitions(
-        helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS
-    )
+    target_compile_definitions(helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS)
 endif()
 
 option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" OFF)
