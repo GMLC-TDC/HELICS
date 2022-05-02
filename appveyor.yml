@@ -4,9 +4,8 @@ branches:
   only:
     - main
     - develop
-    - helics2
 
-version: 3.1.2.{build}
+version: 3.2.0.{build}
 
 image: Visual Studio 2019
 
