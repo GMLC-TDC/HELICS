@@ -90,7 +90,7 @@ TEST_F(timing_tests, timeUpdateCallback)
 TEST_F(timing_tests, callbackSequence)
 {
     int sequence{1};
-    std::array<int, 4> seqVal{0, 0, 0, 0};
+    std::array<int, 4> seqVal{{0, 0, 0, 0}};
 
     SetupTest<helicscpp::ValueFederate>("test_2", 1);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);

@@ -702,6 +702,7 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
                 case defs::Properties::FILE_LOG_LEVEL:
                 case defs::Properties::CONSOLE_LOG_LEVEL:
                     setIntegerProperty(gLocalCoreId, prop.first, static_cast<int16_t>(prop.second));
+                    break;
                 default:
                     break;
             }

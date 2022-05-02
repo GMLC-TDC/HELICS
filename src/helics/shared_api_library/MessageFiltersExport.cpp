@@ -20,9 +20,6 @@ static constexpr char invalidFilterString[] = "The given filter object is not va
 /** this is a random identifier put in place for validating filters*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
-/** this is a random identifier for validating translators*/
-static const int translatorValidationIdentifier = 0xB37C'352E;
-
 static helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
@@ -45,16 +42,6 @@ static inline HelicsFilter federateAddFilter(HelicsFederate fed, std::unique_ptr
     filt->valid = filterValidationIdentifier;
     HelicsFilter ret = filt.get();
     fedObj->filters.push_back(std::move(filt));
-    return ret;
-}
-
-// fed is assumed to be valid here
-static inline HelicsTranslator federateAddTranslator(HelicsFederate fed, std::unique_ptr<helics::TranslatorObject> trans)
-{
-    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    trans->valid = translatorValidationIdentifier;
-    HelicsTranslator ret = trans.get();
-    fedObj->translators.push_back(std::move(trans));
     return ret;
 }
 
