@@ -348,7 +348,7 @@ TEST(ActionMessage, message_message_conversion_test)
     EXPECT_EQ(cmd.getString(sourceStringLoc), msg->source);
     EXPECT_EQ(cmd.getString(origSourceStringLoc), msg->original_source);
     EXPECT_EQ(cmd.getString(targetStringLoc), msg->dest);
-    EXPECT_EQ(cmd.payload, msg->data.to_string());
+    EXPECT_EQ(cmd.payload.to_string(), msg->data.to_string());
 
     ActionMessage cmd2;
     cmd2 = std::move(msg);

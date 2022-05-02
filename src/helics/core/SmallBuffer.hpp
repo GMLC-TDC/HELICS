@@ -51,7 +51,7 @@ class SmallBuffer {
 
     template<typename U,
              typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
-    SmallBuffer(U&& u): heap(buffer.data())
+    /*implicit*/ SmallBuffer(U&& u): heap(buffer.data())
     {
         std::string_view val(std::forward<U>(u));
         resize(val.size());
