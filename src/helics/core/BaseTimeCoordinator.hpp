@@ -116,8 +116,9 @@ class BaseTimeCoordinator {
         checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) = 0;
 
     /** function to enter the exec Mode
+     * @param mode the mode of iteration_request (NO_ITERATIONS, FORCE_ITERATION, ITERATE_IF_NEEDED)
      */
-    virtual void enteringExecMode();
+    virtual void enteringExecMode(IterationRequest Mode = IterationRequest::NO_ITERATIONS);
 
     /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const = 0;

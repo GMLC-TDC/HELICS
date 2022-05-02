@@ -1161,7 +1161,7 @@ TEST_F(query, queries_disconnected)
     vFed1->finalize();
 }
 
-// the pupose is to make it doesn't block
+// the pupose is to make sure it doesn't block when federates disconnect
 TEST_F(query, queries_disconnected_global)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
@@ -1175,13 +1175,41 @@ TEST_F(query, queries_disconnected_global)
     vFed3->enterExecutingModeComplete();
 
     auto res = brokers[0]->query("root", "global_time");
+    try {
+        auto v = loadJsonStr(res);
+        (void)(v);
+    }
+    catch (...) {
+        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
+    }
     vFed2->finalize();
     vFed1->requestTime(3.0);
     res = brokers[0]->query("root", "global_time");
+    try {
+        auto v = loadJsonStr(res);
+        (void)(v);
+    }
+    catch (...) {
+        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
+    }
     vFed2->finalize();
     res = brokers[0]->query("root", "global_time");
+    try {
+        auto v = loadJsonStr(res);
+        (void)(v);
+    }
+    catch (...) {
+        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
+    }
     vFed3->finalize();
     res = brokers[0]->query("root", "global_time");
+    try {
+        auto v = loadJsonStr(res);
+        (void)(v);
+    }
+    catch (...) {
+        EXPECT_TRUE(false) << "Unable to load JSON string " << res;
+    }
 }
 
 TEST_F(query, queries_timeout_ci_skip)

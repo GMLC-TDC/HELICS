@@ -1867,7 +1867,7 @@ void CoreBroker::addPublication(ActionMessage& m)
     auto& pub = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::PUBLICATION,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(0),
                                   m.getString(1));
 
@@ -1892,7 +1892,7 @@ void CoreBroker::addInput(ActionMessage& m)
     auto& inp = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::INPUT,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(0),
                                   m.getString(1));
 
@@ -1918,7 +1918,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
     auto& ept = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::ENDPOINT,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(typeStringLoc),
                                   m.getString(unitStringLoc));
 
@@ -1958,7 +1958,7 @@ void CoreBroker::addFilter(ActionMessage& m)
     auto& filt = handles.addHandle(m.source_id,
                                    m.source_handle,
                                    InterfaceType::FILTER,
-                                   std::string(m.name()),
+                                   m.name(),
                                    m.getString(typeStringLoc),
                                    m.getString(typeOutStringLoc));
     addLocalInfo(filt, m);
@@ -1986,7 +1986,7 @@ void CoreBroker::addTranslator(ActionMessage& m)
     auto& trans = handles.addHandle(m.source_id,
                                     m.source_handle,
                                     InterfaceType::TRANSLATOR,
-                                    std::string(m.name()),
+                                    m.name(),
                                     m.getString(typeStringLoc),
                                     m.getString(typeOutStringLoc));
     addLocalInfo(trans, m);

@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../src/helics/cpp98/ValueFederate.hpp"
 #include "cpptestFixtures.hpp"
 
+#include <array>
 #include <gtest/gtest.h>
 #include <thread>
 
@@ -89,7 +90,7 @@ TEST_F(timing_tests, timeUpdateCallback)
 TEST_F(timing_tests, callbackSequence)
 {
     int sequence{1};
-    std::vector<int> seqVal(4, 0);
+    std::array<int, 4> seqVal{{0, 0, 0, 0}};
 
     SetupTest<helicscpp::ValueFederate>("test_2", 1);
     auto vFed1 = GetFederateAs<helicscpp::ValueFederate>(0);
@@ -99,6 +100,7 @@ TEST_F(timing_tests, callbackSequence)
     auto timeUpdate = [&](auto /*v1*/, auto /*v2*/) { seqVal[2] = sequence++; };
     auto timeRequestReturn = [&](auto /*v1*/, auto /*v2*/) { seqVal[3] = sequence++; };
 
+    ASSERT_TRUE(vFed1);
     vFed1->setTimeUpdateCallback(timeUpdate);
     vFed1->setStateChangeCallback(stateUpdate);
     vFed1->setTimeRequestEntryCallback(timeRequestEntry);

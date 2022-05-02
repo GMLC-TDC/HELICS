@@ -526,7 +526,7 @@ class Core {
    @param translatorName the name of the translator (may be left blank and one will be automatically
    assigned)
    @param units the specified units for the value side of the translator
-   @param message_type a specified value type for the units
+   @param endpointType a user specified name of the type data on the endpoint
    @return the handle for the new translator
    */
     virtual InterfaceHandle registerTranslator(std::string_view translatorName,

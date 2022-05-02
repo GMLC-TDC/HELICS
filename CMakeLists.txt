@@ -511,17 +511,16 @@ if(MSYS OR CYGWIN)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         set(ENABLE_IPC_CORE FALSE)
     endif()
+    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
 endif()
 
 if(MINGW AND NOT UNIX_LIKE)
     target_link_libraries(helics_base INTERFACE wsock32 ws2_32 iphlpapi)
-    target_compile_definitions(helics_base INTERFACE -D_WIN32_WINNT=0x0601)
+
 endif()
 
 if(CYGWIN)
-    target_compile_definitions(
-        helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS -D_WIN32_WINNT=0x0601
-    )
+    target_compile_definitions(helics_base INTERFACE -D_XOPEN_SOURCE=500 -D__USE_W32_SOCKETS)
 endif()
 
 option(HELICS_ENABLE_ENCRYPTION "enable encryption support in HELICS" OFF)
@@ -710,7 +709,7 @@ endif()
 set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
 set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
 set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
-set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO})
+set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
 
 if(HELICS_ENABLE_ENCRYPTION)
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
@@ -726,6 +725,8 @@ hide_variable(GMLC_NETWORKING_WITH_CMAKE_PACKAGE)
 hide_variable(GMLC_NETWORKING_OBJECT_LIB)
 hide_variable(GMLC_NETWORKING_STATIC_LIB)
 hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
+hide_variable(GMLC_NETWORKING_ENABLE_SUBMODULE_UPDATE)
+hide_variable(GMLC_NETWORKING_USE_EXTERNAL_JSON)
 
 set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
 

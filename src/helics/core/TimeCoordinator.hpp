@@ -231,10 +231,8 @@ class TimeCoordinator: public BaseTimeCoordinator {
                      IterationRequest iterate,
                      Time newValueTime,
                      Time newMessageTime);
-    /** function to enter the exec Mode
-    @param mode the mode of iteration_request (no_iteration, FORCE_ITERATION, ITERATE_IF_NEEDED)
-    */
-    void enteringExecMode(IterationRequest mode);
+
+    virtual void enteringExecMode(IterationRequest mode) override;
     /** check if it is valid to grant a time*/
     MessageProcessingResult checkTimeGrant(GlobalFederateId triggerFed = GlobalFederateId{});
     /** generate a local Error*/
