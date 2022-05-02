@@ -11,13 +11,13 @@ Everything within a major version number should be code compatible (with the exc
 ## [3.2.0][] - 2022-05-03
 
 Major new features include beta release for Translators, global time coordinator and Data API and the addition of Support for encrypted communication through the TCP and TCP SS core types.
-Numerous bug fixes were included related to timing in unusual edge cases.  
+Numerous bug fixes were included related to timing in unusual edge cases.
 
 ### Fixed
 
 - Fix some undefined behavior warnings with duplicate named federates.
 - Fix a discrepancy in the way subscriptions were processed for config files to better match how they are handled for inputs.
-- Fix some accidently disabled test cases testing different network configurations.
+- Fix some accidentally disabled test cases testing different network configurations.
 - Fix missing dependency generation when subscribing to publications from Endpoints.
 - Fixed a few sporadic failures in the test cases.
 - Fixed some issues with iterations particularly in initialization mode.
@@ -39,8 +39,8 @@ Numerous bug fixes were included related to timing in unusual edge cases.
 
 - Added support for openSSL based encryption on the tcp tcpss cores and some tests using that capability.
 - Added a callback option which triggers when a federate changes mode.
-- Added [Translators]() as a beta API, this is not version locked and likely has a few bugs.  The API is subject to minor revisions based on user feedback.
-- Added Data API to the C interface as a beta.  API is subject to further revisions based on user feedback in  upcoming releases until 3.3.
+- Added [Translators]() as a beta API, this is not version locked and likely has a few bugs. The API is subject to minor revisions based on user feedback.
+- Added Data API to the C interface as a beta. API is subject to further revisions based on user feedback in upcoming releases until 3.3.
 - Added support for command operations through the REST API on the webserver.
 - Added swagger documentation for the REST API and queries.
 - Added a global time coordinator(in Beta) for handling some unusual cases.
@@ -50,8 +50,7 @@ Numerous bug fixes were included related to timing in unusual edge cases.
 
 ### Deprecated
 
-- CI tests for visual studio 2017 were deprecated.  HELICS still compiles fine on Visual studio 2017.  But this is the last release that is specified for.  Future releases will not be tested on Visual Studio 2017.  HELICS 3.3 will actively change the minimum required to Visual Studio 2019 along with other related minimum compiler updates and requirements
-
+- CI tests for visual studio 2017 were deprecated. HELICS still compiles fine on Visual studio 2017. But this is the last release that is specified for. Future releases will not be tested on Visual Studio 2017. HELICS 3.3 will actively change the minimum required to Visual Studio 2019 along with other related minimum compiler updates and requirements
 
 ## [3.1.2][] - 2022-01-25
 

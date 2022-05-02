@@ -29,7 +29,7 @@ The public API includes the following
   - CoreApp.hpp
   - timeOperations.hpp
   - typeOperations.hpp
-  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.3 release.  Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries. The data returned via queries is subject to change, in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers. We hope to fully document the queries structure in 3.3 at which point they will be stable for at least minor releases and changes will be noted.
+  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.3 release. Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries. The data returned via queries is subject to change, in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers. We hope to fully document the queries structure in 3.3 at which point they will be stable for at least minor releases and changes will be noted.
 
 - Core library headers
 
