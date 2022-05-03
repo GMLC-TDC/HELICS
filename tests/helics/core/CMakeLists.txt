@@ -1,79 +1,49 @@
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# National Security, LLC; Alliance for Sustainable Energy, LLC.
+# See the top-level NOTICE for additional details.
+# All rights reserved.
 #
-# Copyright © 2017-2018, Battelle Memorial Institute; Lawrence Livermore National
-# Security, LLC; Alliance for Sustainable Energy, LLC All rights reserved. See LICENSE
-# file and DISCLAIMER for more details.
-#
+# SPDX-License-Identifier: BSD-3-Clause
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# -----------------------------------------------------------------------------
-# Core tests using Boost
-# -----------------------------------------------------------------------------
+set(core_test_headers)
 
-set(core_test_headers testFixtures.h)
-
-set(
-  core_test_sources
-  core-tests.cpp
-  InfoClass-tests.cpp
-  FederateState-tests.cpp
-  ActionMessage-tests.cpp
-  # CoreBroker-tests.cpp
-  CoreFactory-tests.cpp 
-  MessageTimerTests.cpp
-  # CommonCore-tests.cpp
-  TestCore-tests.cpp
-  testFixtures.cpp
-  IPCcore_tests.cpp
-  IpcQueueTests.cpp
-  IpcQueueImplTests.cpp
-  data-block-tests.cpp
-  UdpCore-tests.cpp
-  ForwardingTimeCoordinatorTests.cpp
-  TimeCoordinatorTests.cpp
-  networkInfoTests.cpp
+set(core_test_sources
+    core-tests.cpp
+    InfoClass-tests.cpp
+    FederateState-tests.cpp
+    ActionMessage-tests.cpp
+    BrokerClassTests.cpp
+    CoreFactory-tests.cpp
+    ForwardingTimeCoordinatorTests.cpp
+    TimeCoordinatorTests.cpp
+    CoreConfigureTests.cpp
+    FilterFederateTests.cpp
+    TimeDependenciesTests.cpp
+    CoreOperationsTests.cpp
 )
 
-if(HELICS_HAVE_ZEROMQ)
-  list(APPEND core_test_sources ZeromqCore-tests.cpp)
-endif(HELICS_HAVE_ZEROMQ)
-
-if(NOT DISABLE_TCP_CORE)
-  list(APPEND core_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
-endif()
-
-if(MPI_ENABLE)
-  list(APPEND core_test_sources MpiCore-tests.cpp)
+if(NOT HELICS_DISABLE_ASIO)
+    list(APPEND core_test_sources MessageTimerTests.cpp)
 endif()
 
 add_executable(core-tests ${core_test_sources} ${core_test_headers})
-target_link_libraries(core-tests helics-static helics_test_base)
+target_link_libraries(core-tests helics_network helics_test_base)
 
 target_include_directories(core-tests PRIVATE ${PROJECT_SOURCE_DIR}/src)
+target_compile_definitions(core-tests PRIVATE BOOST_DATE_TIME_NO_LIB)
+
+target_compile_definitions(
+    core-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
+)
+
 set_target_properties(core-tests PROPERTIES FOLDER tests)
 
-add_test(NAME core-tests COMMAND core-tests --log_level=test_suite --report_level=short)
+add_test(NAME core-tests COMMAND core-tests)
 set_property(TEST core-tests PROPERTY LABELS Core Coverage Daily)
 
 # Tests for Continuous Integration builds
-add_test(
-  NAME core-ci-tests
-  COMMAND
-    core-tests
-    --run_test=@ci
-    --log_level=test_suite
-    --report_level=short
-)
-set_property(TEST core-ci-tests PROPERTY LABELS Continuous)
-#set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
-foreach(keyfile IN LISTS KEY_LIBRARY_FILES)
-  add_custom_command(
-    TARGET
-    core-tests
-    POST_BUILD # Adds a post-build event to core tests
-    COMMAND
-      ${CMAKE_COMMAND}
-      -E
-      copy_if_different # which executes "cmake - E copy_if_different..."
-      "${keyfile}" # <--this is in-file
-      "$<TARGET_FILE_DIR:core-tests>/"
-  ) # <--this is out- file path
-endforeach(keyfile)
+add_test(NAME core-ci-tests COMMAND core-tests --gtest_filter=-*ci_skip*)
+set_property(TEST core-ci-tests PROPERTY LABELS CoreCI Continuous)
+# set_property(TEST core-ci-tests PROPERTY LABELS DebugTest)
