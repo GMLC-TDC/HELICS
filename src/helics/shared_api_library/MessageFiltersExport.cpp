@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static constexpr char invalidFilterString[] = "The given filter object is not valid";
 
-/** this is a random identifier put in place when the federate or core or broker gets created*/
+/** this is a random identifier put in place for validating filters*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
 static helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
@@ -78,7 +78,6 @@ HelicsFilter helicsFederateRegisterFilter(HelicsFederate fed, HelicsFilterTypes 
 
 HelicsFilter helicsFederateRegisterGlobalFilter(HelicsFederate fed, HelicsFilterTypes type, const char* name, HelicsError* err)
 {
-    // now generate a generic subscription
     auto fedObj = getFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -505,7 +504,7 @@ int helicsFilterGetOption(HelicsFilter filt, int option)
 }
 
 void helicsFilterSetCustomCallback(HelicsFilter filt,
-                                   void (*filtCall)(HelicsMessage message, void* userData),
+                                   HelicsMessage (*filtCall)(HelicsMessage message, void* userData),
                                    void* userdata,
                                    HelicsError* err)
 {
@@ -521,9 +520,12 @@ void helicsFilterSetCustomCallback(HelicsFilter filt,
     }
     auto op = std::make_shared<helics::CustomMessageOperator>();
     op->setMessageFunction([filtCall, userdata](std::unique_ptr<helics::Message> message) {
-        auto* ms = createAPIMessage(message);
+        HelicsMessage ms = createAPIMessage(message);
         if (filtCall != nullptr) {
-            filtCall(ms, userdata);
+            ms = filtCall(ms, userdata);
+        }
+        if (ms != nullptr && reinterpret_cast<helics::Message*>(ms) != message.get()) {
+            return getMessageUniquePtr(ms, nullptr);
         }
         return message;
     });

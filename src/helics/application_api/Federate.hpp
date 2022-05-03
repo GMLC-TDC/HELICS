@@ -37,8 +37,9 @@ class Core;
 class CoreApp;
 class AsyncFedCallInfo;
 class MessageOperator;
-class FilterFederateManager;
+class ConnectorFederateManager;
 class Filter;
+class Translator;
 class CloningFilter;
 class Federate;
 
@@ -91,9 +92,12 @@ class HELICS_CXX_EXPORT Federate {
   private:
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
         asyncCallInfo;  //!< pointer to a class defining the async call information
-    std::unique_ptr<FilterFederateManager> fManager;  //!< class for managing filter operations
+    std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
+    std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
+    std::function<void(Modes, Modes)> modeUpdateCallback;
+    std::function<void(Time, bool)> timeRequestReturnCallback;
 
   public:
     /**constructor taking a federate information structure
@@ -324,6 +328,15 @@ class HELICS_CXX_EXPORT Federate {
     void setLoggingCallback(
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
+    /** register a callback function to call when a timeRequest function is called
+    @details this callback is executed prior to any blocking operation on any valid timeRequest
+    method it will execute in the calling thread
+    @param callback the function to call; the function signature is void(Time, Time, bool) where the
+    first Time value is the current time and the second is the requested time.  The boolean is set
+    to true if the request is possibly iterating
+    */
+    void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
+
     /** register a callback function to call when the time gets updated and before other value
     callbacks are executed
     @details this callback is executed before other callbacks updating values, no values will have
@@ -333,6 +346,25 @@ class HELICS_CXX_EXPORT Federate {
     value is the new time and bool is true if this is an iteration
     */
     void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
+
+    /** register a callback function to call when the federate mode is changed from one state to
+    another
+    @details this callback is executed before other callbacks updating values and times, no values
+    will have been updated when this callback is executed. It will execute before timeUpdateCallback
+    in situations where both would be called.
+    @param callback the function to call; the function signature is void(Modes, Modes) the first
+    argument is the new Mode and the second is the old Mode
+    */
+    void setModeUpdateCallback(std::function<void(Modes, Modes)> callback);
+
+    /** register a callback function to call when a timeRequest function returns
+  @details this callback is executed after all other callbacks and is the last thing executed before
+  returning
+  @param callback the function to call; the function signature is void(Time, bool) where the
+  Time value is the new time and the boolean is set to
+  true if the request is an iteration
+  */
+    void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -505,6 +537,57 @@ received
         return registerGlobalFilter(std::string(), std::string(), std::string());
     }
 
+    /** define a named global translator interface
+    @param translatorType a code defining a known type of translator (0 for custom)
+    @param translatorName the name of the globally visible translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerGlobalTranslator(std::int32_t translatorType,
+                                         std::string_view translatorName,
+                                         std::string_view endpointType = std::string_view{},
+                                         std::string_view units = std::string_view());
+
+    /** define a translator interface
+    @details a translator acts as a bridge between value and message interfaces
+    @param translatorType a code defining a known type of translator (0 for custom)
+    @param translatorName the name of the  translator; can be an empty string
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerTranslator(std::int32_t translatorType,
+                                   std::string_view translatorName,
+                                   std::string_view endpointType = std::string_view{},
+                                   std::string_view units = std::string_view{});
+
+    /** define a named global translator interface
+    @param translatorName the name of the globally visible translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerGlobalTranslator(std::string_view translatorName,
+                                         std::string_view endpointType = std::string_view{},
+                                         std::string_view units = std::string_view())
+    {
+        return registerGlobalTranslator(0, translatorName, endpointType, units);
+    }
+
+    /** define a translator interface
+    @details a translator acts as a bridge between value and message interfaces
+    @param translatorName the name of the translator
+    @param endpointType the type associated with the translator endpoint
+    @param units the units associated with the translator value interfaces
+    */
+    Translator& registerTranslator(std::string_view translatorName,
+                                   std::string_view endpointType = std::string_view{},
+                                   std::string_view units = std::string_view{})
+    {
+        return registerTranslator(0, translatorName, endpointType, units);
+    }
+
+    /** define a nameless translator interface
+     */
+    Translator& registerTranslator() { return registerGlobalTranslator(""); }
     /** define a nameless cloning filter interface on a source
      */
     CloningFilter& registerCloningFilter()
@@ -544,6 +627,43 @@ received
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
 
+    // translator retrieval
+    /** get a translator from its name
+    @param translatorName the name of the translator
+    @return a reference to a translator object which will be invalid if translatorName is not
+    valid*/
+    const Translator& getTranslator(const std::string& translatorName) const;
+
+    /** get a translator from its index
+    @param index the index of a translator
+    @return a reference to a translator object which will be invalid if index is not
+    valid*/
+    const Translator& getTranslator(int index) const;
+
+    /** get a translator from its name
+      @param translatorName the name of the translator
+      @return a reference to a translator object which will be invalid if translatorName is not
+      valid*/
+    Translator& getTranslator(const std::string& translatorName);
+
+    /** get a translator from its index
+    @param index the index of a translator
+    @return a reference to a translator object which will be invalid if index is not
+    valid*/
+    Translator& getTranslator(int index);
+
+    /** @brief register an operator for the specified translator
+    @details
+    The TranslatorOperator gets called when there is a message or value to translate, there is no
+    order or state to this as messages can come in any order.
+    @param trans the translator object to set the operation on
+    @param op a shared_ptr to a \ref TranslatorOperator
+    */
+    void setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op);
+
+    /** get the number of translators registered through this federate*/
+    int getTranslatorCount() const;
+
   protected:
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
@@ -566,7 +686,7 @@ received
     interfaces
     */
     virtual void registerInterfaces(const std::string& configString);
-    /** register filter interfaces defined in  file or string
+    /** register filter/translator interfaces defined in a file or string
     @details call is only valid in startup mode
     @param configString  the location of the file or config String to load to generate the
     interfaces
@@ -584,9 +704,7 @@ received
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/
     const std::shared_ptr<Core>& getCorePointer() { return coreObject; }
-    // interface for filter objects
-    /** get a count of the number of filter objects stored in the federate*/
-    int filterCount() const;
+
     /** log a message to the federate Logger
    @param level the logging level of the message
    @param message the message to log
@@ -625,18 +743,20 @@ received
     void completeOperation();
 
   private:
+    /** function to deal with any operations that occur on a mode switch*/
+    void updateFederateMode(Modes newMode);
     /** function to deal with any operations that need to occur on a time update*/
     void updateSimulationTime(Time newTime, Time oldTime, bool iterating);
-    /** register filter interfaces defined in  file or string
+    /** register connector(filters,translators) interfaces defined in  file or string
   @details call is only valid in startup mode
   @param jsonString  the location of the file or config String to load to generate the interfaces
   */
-    void registerFilterInterfacesJson(const std::string& jsonString);
-    /** register filter interfaces defined in  file or string
+    void registerConnectorInterfacesJson(const std::string& jsonString);
+    /** register connector(filters,translators) interfaces defined in  file or string
     @details call is only valid in startup mode
     @param tomlString  the location of the file or config String to load to generate the interfaces
     */
-    void registerFilterInterfacesToml(const std::string& tomlString);
+    void registerConnectorInterfacesToml(const std::string& tomlString);
 };
 
 /** base class for the interface objects*/
@@ -672,11 +792,12 @@ class HELICS_CXX_EXPORT Interface {
     const std::string& getName() const;
     /** get an associated target*/
     const std::string& getTarget() const;
-    /** subscribe to a named publication*/
-    void addSourceTarget(std::string_view newTarget);
-    /** subscribe to a named publication*/
-    void addDestinationTarget(std::string_view newTarget);
-    /** remove a named publication from being a target*/
+    /** add a source of information to an interface*/
+    void addSourceTarget(std::string_view newTarget, InterfaceType hint = InterfaceType::UNKNOWN);
+    /** add destination for data sent via the interface*/
+    void addDestinationTarget(std::string_view newTarget,
+                              InterfaceType hint = InterfaceType::UNKNOWN);
+    /** remove a named interface from the target lists*/
     void removeTarget(std::string_view targetToRemove);
 
     /** get the interface information field of the input*/

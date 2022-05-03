@@ -10,12 +10,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "ForwardingTimeCoordinator.hpp"
+#include "GlobalTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "ProfilerBuffer.hpp"
 #include "flagOperations.hpp"
 #include "gmlc/libguarded/guarded.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/string_viewConversion.h"
+#include "helics/common/JsonGeneration.hpp"
 #include "helics/common/LogBuffer.hpp"
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
@@ -145,6 +147,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--debugging",
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
+    hApp->add_flag(
+        "--globaltime",
+        globalTime,
+        "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
     hApp->add_flag("--observer",
                    observer,
                    "specify that the broker/core should be added as an observer only");
@@ -224,11 +230,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         grantTimeout,
         "time to wait for a time request to be granted before triggering diagnostic actions; default is in ms (can also be entered as a time "
         "like '10s' or '45ms')");
-    timeout_group->add_option(
-        "--maxcosimduration",
-        maxCoSimDuration,
-        "the maximum time a broker/core should be active, the co-simulation will self terminate if it is still active after this duration, the time resolution is the tick timer (can also be entered as a time "
-        "like '10s' or '45ms')");
+    timeout_group
+        ->add_option(
+            "--maxcosimduration",
+            maxCoSimDuration,
+            "the maximum time a broker/core should be active, the co-simulation will self terminate if it is still active after this duration, the time resolution is the tick timer (can also be entered as a time "
+            "like '10s' or '45ms')")
+        ->multi_option_policy(CLI::MultiOptionPolicy::TakeLast);
     timeout_group
         ->add_option("--errordelay,--errortimeout",
                      errorDelay,
@@ -288,9 +296,15 @@ void BrokerBase::configureBase()
             uuid_like = true;
         }
     }
-    timeCoord = std::make_unique<ForwardingTimeCoordinator>();
+    if (globalTime) {
+        timeCoord = std::make_unique<GlobalTimeCoordinator>();
+        hasTimeDependency = true;
+    } else {
+        timeCoord = std::make_unique<ForwardingTimeCoordinator>();
+    }
+
     timeCoord->setMessageSender([this](const ActionMessage& msg) { addActionMessage(msg); });
-    timeCoord->restrictive_time_policy = restrictive_time_policy;
+    timeCoord->setRestrictivePolicy(restrictive_time_policy);
 
     mLogManager->setTransmitCallback([this](ActionMessage&& m) {
         if (getBrokerState() < BrokerState::terminating) {
@@ -329,7 +343,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
         }
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }
-    return mLogManager->sendToLogger(logLevel, name, message, fromRemote);
+    return mLogManager->sendToLogger(logLevel, header, message, fromRemote);
 }
 
 void BrokerBase::generateNewIdentifier()
@@ -360,10 +374,15 @@ void BrokerBase::writeProfilingData()
 
 void BrokerBase::setErrorState(int eCode, std::string_view estring)
 {
-    lastErrorString = std::string(estring);
+    lastErrorString.assign(estring.data(), estring.size());
     lastErrorCode.store(eCode);
-    if (brokerState.load() != BrokerState::errored) {
-        brokerState.store(BrokerState::errored);
+    auto cBrokerState = brokerState.load();
+    if (cBrokerState != BrokerState::errored && cBrokerState != BrokerState::connected_error) {
+        if (cBrokerState > BrokerState::configured && cBrokerState < BrokerState::terminating) {
+            brokerState.store(BrokerState::connected_error);
+        } else {
+            brokerState.store(BrokerState::errored);
+        }
         if (errorDelay <= timeZero) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
@@ -464,6 +483,22 @@ std::pair<bool, std::vector<std::string_view>>
         return {false, res};
     }
     return {true, res};
+}
+
+void BrokerBase::addBaseInformation(Json::Value& base, bool hasParent) const
+{
+    Json::Value object;
+    object["name"] = identifier;
+    if (uuid_like) {
+        object["uuid"] = identifier;
+    }
+    object["id"] = global_id.load().baseValue();
+    if (hasParent) {
+        object["parent"] = higher_broker_id.baseValue();
+    } else {
+        object["parent"] = 0;
+    }
+    base["attributes"] = object;
 }
 
 void BrokerBase::setLoggerFunction(
@@ -670,7 +705,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -725,7 +760,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == BrokerState::errored) {
+                if (brokerState.load() == BrokerState::connected_error) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td > errorDelay.to_ms()) {
@@ -810,9 +845,36 @@ void BrokerBase::setTickForwarding(TickForwardingReasons reason, bool value)
 
 bool BrokerBase::setBrokerState(BrokerState newState)
 {
-    if (brokerState.load() == BrokerState::errored) {
-        return false;
+    auto currentState = brokerState.load();
+    switch (currentState) {
+        case BrokerState::errored:
+            return (newState == BrokerState::errored);
+        case BrokerState::connected_error:
+            if (newState == BrokerState::terminating) {
+                newState = BrokerState::terminating_error;
+            } else if (newState == BrokerState::terminated || newState == BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::connected_error);
+            }
+            break;
+        case BrokerState::terminating_error:
+            if (newState == BrokerState::terminated || newState == BrokerState::errored) {
+                newState = BrokerState::errored;
+            } else {
+                return (newState == BrokerState::terminating_error);
+            }
+            break;
+        default:
+            if (newState == BrokerState::errored) {
+                if (currentState > BrokerState::connecting &&
+                    currentState < BrokerState::terminating) {
+                    newState = BrokerState::connected_error;
+                }
+            }
+            break;
     }
+
     brokerState.store(newState);
     return true;
 }
@@ -888,8 +950,10 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
     static const std::string initializingString = "initializing";
     static const std::string operatingString = "operating";
     static const std::string terminatingString = "terminating";
+    static const std::string terminatingErrorString = "terminating_error";
     static const std::string terminatedString = "terminated";
     static const std::string erroredString = "error";
+    static const std::string connectedErrorString = "connected_error";
     static const std::string otherString = "other";
     switch (state) {
         case BrokerBase::BrokerState::created:
@@ -908,10 +972,14 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
             return operatingString;
         case BrokerBase::BrokerState::terminating:
             return terminatingString;
+        case BrokerBase::BrokerState::terminating_error:
+            return terminatingErrorString;
         case BrokerBase::BrokerState::terminated:
             return terminatedString;
         case BrokerBase::BrokerState::errored:
             return erroredString;
+        case BrokerBase::BrokerState::connected_error:
+            return connectedErrorString;
         default:
             return otherString;
     }

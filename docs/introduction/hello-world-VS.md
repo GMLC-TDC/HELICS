@@ -49,7 +49,7 @@ Next > I agree > Choose to add system variables if you would like > Next > Choos
 
 **2. Pull the HELICS example folder down from github**
 
-```cmd
+```shell-session
 git clone https://github.com/GMLC-TDC/HELICS-Examples.git
 ```
 
@@ -93,7 +93,7 @@ f. Once both projects have been created, we will add their respective source fil
 
 i. In Solution Explorer,
 
-```txt
+```text
 Right click hello_world_sender > Add > Existing item ...
 ```
 

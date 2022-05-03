@@ -5,7 +5,7 @@ Its purpose is to provide a common executable for running any of the other as
 
 typical syntax is as follows
 
-```cmd
+```shell-session
 helics-app.exe <app> <app arguments ...>
 ```
 

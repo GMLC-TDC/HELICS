@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/coreTypeOperations.hpp"
 #include "../helics.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
+#include "helicsCallbacks.h"
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
@@ -1064,6 +1065,79 @@ HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
     // LCOV_EXCL_STOP
 }
 
+void helicsFederateSetTimeRequestEntryCallback(
+    HelicsFederate fed,
+    void (*requestTimeEntry)(HelicsTime currentTime, HelicsTime requestTime, HelicsBool iterating, void* userdata),
+    void* userdata,
+    HelicsError* err)
+{
+    auto* fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (requestTimeEntry == nullptr) {
+            fedptr->setTimeRequestEntryCallback({});
+        } else {
+            fedptr->setTimeRequestEntryCallback(
+                [requestTimeEntry, userdata](helics::Time currentTime, helics::Time requestTime, bool iterating) {
+                    requestTimeEntry(currentTime, requestTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
+                });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
+
+void helicsFederateSetStateChangeCallback(HelicsFederate fed,
+                                          void (*stateChange)(HelicsFederateState newState, HelicsFederateState oldState, void* userdata),
+                                          void* userdata,
+                                          HelicsError* err)
+{
+    auto* fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (stateChange == nullptr) {
+            fedptr->setModeUpdateCallback({});
+        } else {
+            fedptr->setModeUpdateCallback([stateChange, userdata](helics::Federate::Modes newMode, helics::Federate::Modes oldMode) {
+                stateChange(modeEnumConversions.at(newMode), modeEnumConversions.at(oldMode), userdata);
+            });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
+
+void helicsFederateSetTimeRequestReturnCallback(HelicsFederate fed,
+                                                void (*requestTimeReturn)(HelicsTime newTime, HelicsBool iterating, void* userdata),
+                                                void* userdata,
+                                                HelicsError* err)
+{
+    auto* fedptr = getFed(fed, err);
+    if (fedptr == nullptr) {
+        return;
+    }
+
+    try {
+        if (requestTimeReturn == nullptr) {
+            fedptr->setTimeRequestReturnCallback({});
+        } else {
+            fedptr->setTimeRequestReturnCallback([requestTimeReturn, userdata](helics::Time newTime, bool iterating) {
+                requestTimeReturn(newTime, (iterating) ? HELICS_TRUE : HELICS_FALSE, userdata);
+            });
+        }
+    }
+    catch (...) {  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
+    }
+}
 const char* helicsFederateGetName(HelicsFederate fed)
 {
     auto* fedObj = getFed(fed, nullptr);

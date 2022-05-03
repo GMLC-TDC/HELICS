@@ -1,0 +1,5 @@
+title: dependson_query
+type: array
+description: get a list of the other object the target depends on
+items:
+  type: integer

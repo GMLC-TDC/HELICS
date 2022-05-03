@@ -9,10 +9,12 @@
 
 set(helicsShared_headers
     helicsCore.h
+    helicsData.h
     api-data.h
     ValueFederate.h
     MessageFederate.h
     MessageFilters.h
+    Translators.h
     helicsCallbacks.h
 )
 
@@ -22,7 +24,9 @@ set(helicsShared_sources
     ValueFederateExport.cpp
     MessageFederateExport.cpp
     MessageFiltersExport.cpp
+    TranslatorExport.cpp
     helicsCallbacks.cpp
+    helicsData.cpp
     internal/api_objects.h
 )
 
@@ -39,6 +43,7 @@ if(PYTHON_EXECUTABLE)
                 MessageFederate.h
                 ValueFederate.h
                 MessageFilters.h
+                Translators.h
                 api-data.h
                 ../helics_enums.h
     )

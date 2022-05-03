@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/core-exceptions.hpp"
 #include "ValueFederate.hpp"
-#include "units/units/units.hpp"
+#include "units/units.hpp"
 
 #include <memory>
 #include <string>
@@ -318,27 +318,6 @@ void Publication::publish(double val, const units::precise_unit& units)
     }
 }
 
-SmallBuffer typeConvert(DataType type, const defV& val)
-{
-    switch (val.index()) {
-        case double_loc:  // double
-            return typeConvert(type, std::get<double>(val));
-        case int_loc:  // int64_t
-            return typeConvert(type, std::get<int64_t>(val));
-        case string_loc:  // string
-        default:
-            return typeConvert(type, std::string_view(std::get<std::string>(val)));
-        case complex_loc:  // complex
-            return typeConvert(type, std::get<std::complex<double>>(val));
-        case vector_loc:  // vector
-            return typeConvert(type, std::get<std::vector<double>>(val));
-        case complex_vector_loc:  // complex
-            return typeConvert(type, std::get<std::vector<std::complex<double>>>(val));
-        case named_point_loc:
-            return typeConvert(type, std::get<NamedPoint>(val));
-    }
-}
-
 void Publication::publishDefV(const defV& val)
 {
     bool doPublish = true;
@@ -350,7 +329,7 @@ void Publication::publishDefV(const defV& val)
         }
     }
     if (doPublish) {
-        auto db = typeConvert(pubType, val);
+        auto db = typeConvertDefV(pubType, val);
         fed->publishBytes(*this, db);
     }
 }

@@ -35,6 +35,18 @@ TcpCommsSS::~TcpCommsSS()
     disconnect();
 }
 
+/** load network information into the comms object*/
+void TcpCommsSS::loadNetworkInfo(const NetworkBrokerData& netInfo)
+{
+    NetworkCommsInterface::loadNetworkInfo(netInfo);
+    if (!propertyLock()) {
+        return;
+    }
+    reuse_address = netInfo.reuse_address;
+    encryption_config = netInfo.encryptionConfig;
+    propertyUnLock();
+}
+
 int TcpCommsSS::getDefaultBrokerPort() const
 {
     return getDefaultPort(HELICS_CORE_TYPE_TCP_SS);
@@ -71,6 +83,11 @@ void TcpCommsSS::setFlag(const std::string& flag, bool val)
     } else if (flag == "allow_outgoing") {
         if (propertyLock()) {
             outgoingConnectionsAllowed = val;
+            propertyUnLock();
+        }
+    } else if (flag == "encrypted") {
+        if (propertyLock()) {
+            encrypted = val;
             propertyUnLock();
         }
     } else {
@@ -134,6 +151,8 @@ void TcpCommsSS::queue_tx_function()
     }
     gmlc::networking::TcpServer::pointer server;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                          gmlc::networking::SocketFactory();
     auto contextLoop = ioctx->startContextLoop();
     auto dataCall =
         [this](const TcpConnection::pointer& connection, const char* data, size_t datasize) {
@@ -145,7 +164,8 @@ void TcpCommsSS::queue_tx_function()
     };
 
     if (serverMode) {
-        server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+        server = gmlc::networking::TcpServer::create(sf,
+                                                     ioctx->getBaseContext(),
                                                      localTargetAddress,
                                                      static_cast<uint16_t>(PortNumber.load()),
                                                      true,
@@ -177,15 +197,22 @@ void TcpCommsSS::queue_tx_function()
     std::map<std::string, route_id> established_routes;
     if (outgoingConnectionsAllowed) {
         for (const auto& conn : connections) {
-            auto new_connect = gmlc::networking::establishConnection(ioctx->getBaseContext(), conn);
+            try {
+                auto new_connect =
+                    gmlc::networking::establishConnection(sf, ioctx->getBaseContext(), conn);
 
-            if (new_connect) {
-                new_connect->setDataCall(dataCall);
-                new_connect->setErrorCall(errorCall);
-                new_connect->send(cstring);
-                new_connect->startReceive();
+                if (new_connect) {
+                    new_connect->setDataCall(dataCall);
+                    new_connect->setErrorCall(errorCall);
+                    new_connect->send(cstring);
+                    new_connect->startReceive();
 
-                made_connections.emplace_back(conn, std::move(new_connect));
+                    made_connections.emplace_back(conn, std::move(new_connect));
+                }
+            }
+            catch (const std::exception& e) {
+                logWarning(std::string("unable to establish connection with ") + conn +
+                           "::" + e.what());
             }
         }
     }
@@ -204,7 +231,8 @@ void TcpCommsSS::queue_tx_function()
         }
         if (outgoingConnectionsAllowed) {
             try {
-                brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
+                brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                         ioctx->getBaseContext(),
                                                                          brokerTargetAddress,
                                                                          std::to_string(brokerPort),
                                                                          std::chrono::milliseconds(
@@ -227,7 +255,8 @@ void TcpCommsSS::queue_tx_function()
                 brokerConnection->startReceive();
             }
             catch (std::exception& e) {
-                logError(e.what());
+                logError(std::string("unable to establish connection with ") + brokerTargetAddress +
+                         "::" + e.what());
                 setTxStatus(connection_status::error);
                 setRxStatus(connection_status::error);
                 return;
@@ -299,20 +328,29 @@ void TcpCommsSS::queue_tx_function()
 
                         if (!established) {
                             if (outgoingConnectionsAllowed) {
-                                auto new_connect = gmlc::networking::establishConnection(
-                                    ioctx->getBaseContext(), std::string(cmd.payload.to_string()));
-                                if (new_connect) {
-                                    new_connect->setDataCall(dataCall);
-                                    new_connect->setErrorCall(errorCall);
-                                    new_connect->send(cstring);
-                                    new_connect->startReceive();
-                                    routes.emplace(route_id{cmd.getExtraData()},
-                                                   std::move(new_connect));
-                                    established_routes[std::string(cmd.payload.to_string())] =
-                                        route_id{cmd.getExtraData()};
+                                try {
+                                    auto new_connect = gmlc::networking::establishConnection(
+                                        sf,
+                                        ioctx->getBaseContext(),
+                                        std::string(cmd.payload.to_string()));
+                                    if (new_connect) {
+                                        new_connect->setDataCall(dataCall);
+                                        new_connect->setErrorCall(errorCall);
+                                        new_connect->send(cstring);
+                                        new_connect->startReceive();
+                                        routes.emplace(route_id{cmd.getExtraData()},
+                                                       std::move(new_connect));
+                                        established_routes[std::string(cmd.payload.to_string())] =
+                                            route_id{cmd.getExtraData()};
+                                    }
+                                }
+                                catch (const std::exception& e) {
+                                    logWarning(std::string("unable to establish connection with ") +
+                                               std::string(cmd.payload.to_string()) +
+                                               "::" + e.what());
                                 }
                             } else {
-                                logWarning(std::string("unable to make connection ") +
+                                logWarning(std::string("outgoing connections not allowed ") +
                                            std::string(cmd.payload.to_string()));
                             }
                         }

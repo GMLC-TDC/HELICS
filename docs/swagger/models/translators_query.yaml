@@ -1,0 +1,8 @@
+title: translators_query
+type: object
+properties:
+  id:
+    type: array
+    items:
+      type: string
+description: return a list of available queries

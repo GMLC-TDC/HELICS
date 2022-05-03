@@ -16,27 +16,31 @@ set(SRC_FILES
     PublicationInfo.cpp
     InputInfo.cpp
     InterfaceInfo.cpp
-    FilterInfo.cpp
     EndpointInfo.cpp
     ActionMessage.cpp
     CoreBroker.cpp
     TimeCoordinator.cpp
+    BaseTimeCoordinator.cpp
     ForwardingTimeCoordinator.cpp
+    GlobalTimeCoordinator.cpp
     TimeDependencies.cpp
     HandleManager.cpp
+    FilterInfo.cpp
     FilterCoordinator.cpp
+    FilterFederate.cpp
     UnknownHandleManager.cpp
     LocalFederateId.cpp
     TimeoutMonitor.cpp
     coreTypeOperations.cpp
     helicsCLI11JsonConfig.cpp
-    FilterFederate.cpp
+    TranslatorFederate.cpp
     TimeCoordinatorProcessing.cpp
     BasicHandleInfo.cpp
     queryHelpers.cpp
     ProfilerBuffer.cpp
     EmptyCore.cpp
     helicsVersion.cpp
+    TranslatorInfo.cpp
     LogManager.cpp
 )
 
@@ -62,7 +66,9 @@ set(INCLUDE_FILES
     BrokerBase.hpp
     TimeDependencies.hpp
     TimeCoordinator.hpp
+    BaseTimeCoordinator.hpp
     ForwardingTimeCoordinator.hpp
+    GlobalTimeCoordinator.hpp
     loggingHelper.hpp
     GlobalFederateId.hpp
     basic_CoreTypes.hpp
@@ -77,17 +83,19 @@ set(INCLUDE_FILES
     PublicationInfo.hpp
     InputInfo.hpp
     EndpointInfo.hpp
+    TranslatorInfo.hpp
     flagOperations.hpp
     BasicHandleInfo.hpp
     FederateIdExtra.hpp
     FilterInfo.hpp
     FilterCoordinator.hpp
+    FilterFederate.hpp
+    TranslatorFederate.hpp
     HandleManager.hpp
     UnknownHandleManager.hpp
     queryHelpers.hpp
     fileConnections.hpp
     helicsCLI11JsonConfig.hpp
-    FilterFederate.hpp
     TimeCoordinatorProcessing.hpp
     ProfilerBuffer.hpp
     LogManager.hpp

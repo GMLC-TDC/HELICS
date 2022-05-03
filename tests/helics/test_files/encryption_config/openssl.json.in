@@ -1,0 +1,8 @@
+{
+    "encrypted": true,
+    "verify_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/ca.pem",
+    "certificate_chain_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
+    "private_key_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
+    "tmp_dh_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/dh4096.pem",
+    "password": "test"
+}

@@ -39,6 +39,7 @@ void TcpComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
         return;
     }
     reuse_address = netInfo.reuse_address;
+    encryption_config = netInfo.encryptionConfig;
     propertyUnLock();
 }
 
@@ -47,6 +48,11 @@ void TcpComms::setFlag(const std::string& flag, bool val)
     if (flag == "reuse_address") {
         if (propertyLock()) {
             reuse_address = val;
+            propertyUnLock();
+        }
+    } else if (flag == "encrypted") {
+        if (propertyLock()) {
+            encrypted = val;
             propertyUnLock();
         }
     } else {
@@ -134,7 +140,10 @@ void TcpComms::queue_rx_function()
         return;
     }
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
-    auto server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                          gmlc::networking::SocketFactory();
+    auto server = gmlc::networking::TcpServer::create(sf,
+                                                      ioctx->getBaseContext(),
                                                       localTargetAddress,
                                                       static_cast<uint16_t>(PortNumber.load()),
                                                       reuse_address,
@@ -144,7 +153,8 @@ void TcpComms::queue_rx_function()
                                                 // assigned port number, just try a different port
             server->close();
             ++PortNumber;
-            server = gmlc::networking::TcpServer::create(ioctx->getBaseContext(),
+            server = gmlc::networking::TcpServer::create(sf,
+                                                         ioctx->getBaseContext(),
                                                          localTargetAddress,
                                                          static_cast<uint16_t>(PortNumber),
                                                          reuse_address,
@@ -222,10 +232,19 @@ bool TcpComms::establishBrokerConnection(
         brokerPort = getDefaultBrokerPort();
     }
     try {
-        brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                                 brokerTargetAddress,
-                                                                 std::to_string(brokerPort),
-                                                                 connectionTimeout);
+        auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                              gmlc::networking::SocketFactory();
+        try {
+            brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                     ioctx->getBaseContext(),
+                                                                     brokerTargetAddress,
+                                                                     std::to_string(brokerPort),
+                                                                     connectionTimeout);
+        }
+        catch (std::system_error& e) {
+            logWarning(std::string("network error (retrying):: ") + e.what());
+            brokerConnection = nullptr;
+        }
         int retries = 0;
         while (!brokerConnection) {
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
@@ -249,10 +268,18 @@ bool TcpComms::establishBrokerConnection(
             if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
             }
-            brokerConnection = gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                                     brokerTargetAddress,
-                                                                     std::to_string(brokerPort),
-                                                                     connectionTimeout);
+            try {
+                brokerConnection = gmlc::networking::establishConnection(sf,
+                                                                         ioctx->getBaseContext(),
+                                                                         brokerTargetAddress,
+                                                                         std::to_string(brokerPort),
+                                                                         connectionTimeout);
+            }
+            catch (std::system_error& e) {
+                logWarning(std::string("network error (retry #") + std::to_string(retries) +
+                           "):: " + e.what());
+                brokerConnection = nullptr;
+            }
         }
         if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
             return terminate(connection_status::terminated);
@@ -318,11 +345,20 @@ bool TcpComms::establishBrokerConnection(
                         if (brkprt.first != "?") {
                             brokerTargetAddress = brkprt.first;
                         }
-                        brokerConnection =
-                            gmlc::networking::establishConnection(ioctx->getBaseContext(),
-                                                                  brokerTargetAddress,
-                                                                  std::to_string(brokerPort),
-                                                                  connectionTimeout);
+                        try {
+                            brokerConnection =
+                                gmlc::networking::establishConnection(sf,
+                                                                      ioctx->getBaseContext(),
+                                                                      brokerTargetAddress,
+                                                                      std::to_string(brokerPort),
+                                                                      connectionTimeout);
+                        }
+                        catch (const std::exception& e) {
+                            brokerConnection = nullptr;
+                            logError(std::string(" unable to create broker connection to ") +
+                                     brokerTargetAddress + "::" + e.what());
+                            return terminate(connection_status::error);
+                        }
                         continue;
                     }
                     if (mess->second.messageID == DELAY_CONNECTION) {
@@ -354,6 +390,8 @@ void TcpComms::queue_tx_function()
 {
     // std::vector<char> buffer;
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
+    auto sf = encrypted ? gmlc::networking::SocketFactory(encryption_config) :
+                          gmlc::networking::SocketFactory();
     auto contextLoop = ioctx->startContextLoop();
     TcpConnection::pointer brokerConnection;
 
@@ -399,12 +437,13 @@ void TcpComms::queue_tx_function()
                             std::tie(interface, port) =
                                 gmlc::networking::extractInterfaceAndPortString(newroute);
                             auto new_connect =
-                                TcpConnection::create(ioctx->getBaseContext(), interface, port);
+                                TcpConnection::create(sf, ioctx->getBaseContext(), interface, port);
 
                             routes.emplace(route_id{cmd.getExtraData()}, std::move(new_connect));
                         }
-                        catch (std::exception&) {
-                            // TODO(PT):: do something???
+                        catch (std::exception& e) {
+                            logWarning(std::string("unable to create route ") + newroute +
+                                       "::" + e.what());
                         }
                         processed = true;
                     } break;

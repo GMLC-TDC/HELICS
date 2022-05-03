@@ -29,8 +29,8 @@ void TimeoutMonitor::tick(CommonCore* core)
                                core->getIdentifier(),
                                message);
             core->sendErrorToFederates(-5, message);
-            core->processDisconnect();
             core->brokerState = BrokerBase::BrokerState::errored;
+            core->sendDisconnect();
             core->addActionMessage(CMD_STOP);
         } else {  // ping again
             ActionMessage png(CMD_PING_PRIORITY);
@@ -101,7 +101,7 @@ void TimeoutMonitor::tick(CoreBroker* brk)
                               brk->getIdentifier(),
                               "broker lost connection with parent");
             brk->sendErrorToImmediateBrokers(-5);
-            brk->processDisconnect();
+            brk->sendDisconnect(CMD_GLOBAL_DISCONNECT);
             brk->brokerState = BrokerBase::BrokerState::errored;
             brk->addActionMessage(CMD_STOP);
         } else {  // ping again

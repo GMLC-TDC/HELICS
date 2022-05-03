@@ -177,8 +177,10 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     const std::string& getType() const { return getExtractionType(); }
     /** get the units of the publication*/
     const std::string& getUnits() const { return pubUnits; }
-
+    /** add an input object to target*/
     void addTarget(std::string_view target) { addDestinationTarget(target); }
+    /** add an input object to send the information*/
+    void addInputTarget(std::string_view target) { addDestinationTarget(target); }
     /** close a input during an active simulation
     @details it is not necessary to call this function unless you are continuing the simulation
     after the close*/

@@ -1,0 +1,36 @@
+description: return counts of the objects and interfaces under an object
+type: object
+x-examples:
+  example-1:
+    name: object_name
+    parent: 1
+    brokers: 3
+    federates: 4
+    countable_federates: 3
+    interfaces: 34
+examples:
+  - name: string
+    id: 1
+    parent: 0
+    brokers: 0
+    federates: 0
+    countable_federates: 0
+    interfaces: 0
+title: ""
+properties:
+  brokers:
+    type: number
+  federates:
+    type: number
+  countable_federates:
+    type: number
+  interfaces:
+    type: number
+  object:
+    $ref: ./base_response.yaml
+required:
+  - brokers
+  - federates
+  - countable_federates
+  - interfaces
+  - object

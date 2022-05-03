@@ -125,7 +125,6 @@ The first task is to register and configure the federates with HELICS within eac
 fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 federate_name = h.helicsFederateGetName(fed)
 logger.info(f"Created federate {federate_name}")
-print(f"Created federate {federate_name}")
 ```
 
 Since we are configuring with external JSON files, this is done in one line!

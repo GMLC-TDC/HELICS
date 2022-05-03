@@ -25,7 +25,6 @@ SPDX-License-Identifier: BSD-3-Clause
  * separate threads in order to function correctly.
  *
  *
- * Implementations should be thread safe.
  *
  * Note: Methods should all be pure virtual.
  */
@@ -507,7 +506,7 @@ class Core {
                                                   const std::string& type_out) = 0;
 
     /**
-     * Register source filter.
+     * Register filter.
      *
      * May only be invoked in the Initialization state.
      @param filterName the name of the filter (may be left blank and one will be automatically
@@ -520,8 +519,23 @@ class Core {
     virtual InterfaceHandle registerFilter(const std::string& filterName,
                                            const std::string& type_in,
                                            const std::string& type_out) = 0;
+
     /**
-    * add a destination target,  the handle can be for a filter or a publication
+   * Register translator.
+   *
+   @param translatorName the name of the translator (may be left blank and one will be automatically
+   assigned)
+   @param units the specified units for the value side of the translator
+   @param endpointType a user specified name of the type data on the endpoint
+   @return the handle for the new translator
+   */
+    virtual InterfaceHandle registerTranslator(std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units) = 0;
+
+    /**
+    * adds a destination for interface data, the handle can be a publication, endpoint, filter,
+    or translators
     @details a filter will create an additional processing step for messages before they get to a
     destination endpoint, for publications this will establish a linkage from the publication to the
     named input
@@ -534,7 +548,8 @@ class Core {
                                       std::string_view dest,
                                       InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
-    /** add a source target,  the handle can be a subscription, input, filter or endpoint
+    /** adds a source of data to an interface, the handle can be an input, filter, translator, or
+    endpoint
     @details for subscriptions and inputs this establishes a link from a publication, for endpoints
     this creates a linkage to a particular publication, for filters it add a source endpoint to
     filter
@@ -547,12 +562,12 @@ class Core {
                                  InterfaceType hint = InterfaceType::UNKNOWN) = 0;
 
     /**
-    * get the destination targets for an interface
+    * get the destinations for an interface
     @param handle an interface get the destination targets for
     */
     virtual const std::string& getDestinationTargets(InterfaceHandle handle) const = 0;
 
-    /** get the source targets for an interface
+    /** get the sources of data for an interface
     @param handle the identifier of the interface
     */
     virtual const std::string& getSourceTargets(InterfaceHandle handle) const = 0;
@@ -562,6 +577,12 @@ class Core {
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
     virtual InterfaceHandle getFilter(const std::string& name) const = 0;
+
+    /** get a translator handle from its name or target (this may not be unique so it will
+    only find the first one)
+    @param name the name of the translator or its target
+    @return a handle to identify the translator*/
+    virtual InterfaceHandle getTranslator(const std::string& name) const = 0;
 
     /**
     * add a time dependency between federates
@@ -720,6 +741,13 @@ class Core {
     */
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) = 0;
+
+    /** set the translator callback operators
+    @param translator  the handle of the translator
+    @param callback pointer to the operator class executing the translator
+    */
+    virtual void setTranslatorOperator(InterfaceHandle translator,
+                                       std::shared_ptr<TranslatorOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

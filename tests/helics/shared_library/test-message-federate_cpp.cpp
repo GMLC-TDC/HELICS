@@ -14,16 +14,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 // these test cases test out the message federates
 
-struct mfed_tests: public FederateTestFixture_cpp, public ::testing::Test {
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
 };
+
+struct mfed_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 class mfed_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture_cpp {
-};
+    public FederateTestFixture_cpp {};
 
 /** test simple creation and destruction*/
-TEST_P(mfed_type_tests, message_federate_initialize_tests)
+TEST_P(mfed_type_tests, message_federate_initialize)
 {
     SetupTest<helicscpp::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
@@ -101,7 +103,10 @@ TEST_P(mfed_type_tests, message_federate_send_receive)
     EXPECT_TRUE(mFed1State == HelicsFederateState::HELICS_STATE_FINALIZE);
 }
 
-INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes_simple));
+INSTANTIATE_TEST_SUITE_P(mfed_tests,
+                         mfed_type_tests,
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
 
 TEST_F(mfed_tests, Message)
 {

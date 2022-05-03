@@ -1,0 +1,13 @@
+title: dependencies_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  dependents:
+    type: array
+    items:
+      type: integer
+  dependencies:
+    type: array
+    items:
+      type: integer

@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    BrokerApp(CoreType ctype, const std::string& argString = std::string{});
+    explicit BrokerApp(CoreType ctype, const std::string& argString = std::string{});
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker
@@ -146,13 +146,25 @@ class HELICS_CXX_EXPORT BrokerApp {
 #ifdef HELICS_CXX_STATIC_DEFINE
     /** overload the -> operator so all broker functions can be called if needed
      */
-    auto* operator->() const { return broker.operator->(); }
+    auto* operator->() const
+    {
+        return broker.operator->();
+    }
 #else
-    BrokerApp* operator->() { return this; }
-    const BrokerApp* operator->() const { return this; }
+    BrokerApp* operator->()
+    {
+        return this;
+    }
+    const BrokerApp* operator->() const
+    {
+        return this;
+    }
 #endif
     /** get a copy of the core pointer*/
-    std::shared_ptr<Broker> getCopyofBrokerPointer() const { return broker; }
+    std::shared_ptr<Broker> getCopyofBrokerPointer() const
+    {
+        return broker;
+    }
 
     /** set a global time Barrier*/
     void setTimeBarrier(Time barrierTime);

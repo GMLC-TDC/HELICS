@@ -1,0 +1,17 @@
+title: data_flow_graph_query
+type: object
+properties:
+  object:
+    $ref: ./base_response.yaml
+  brokers:
+    type: array
+    items:
+      $ref: ./data_flow_graph_query.yaml
+  cores:
+    type: array
+    items:
+      $ref: ./data_flow_graph_query.yaml
+  federates:
+    type: array
+    items:
+      $ref: ./data_flow_graph_query.yaml

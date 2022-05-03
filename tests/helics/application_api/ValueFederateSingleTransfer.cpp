@@ -20,8 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class valuefed_single_transfer:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(valuefed_single_transfer, types1)
 {

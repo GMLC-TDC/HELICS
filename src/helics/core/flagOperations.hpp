@@ -11,8 +11,9 @@ operations and helper functions for handling flags in helics
 */
 #include <cstdint>
 
+namespace helics {
 /** flag definitions for the action Message Flag field*/
-enum operation_flags : uint16_t {
+enum OperationFlags : uint16_t {
     iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
     destination_target = 1,  //!< indicator that the target is a destination target
     required_flag = 2,  //!< flag indicating that an action or match is required
@@ -53,10 +54,8 @@ constexpr uint16_t non_counting_flag = empty_flag;
 
 /// overload of extra_flag2 indicating an endpoint is targeted
 constexpr uint16_t targeted_flag = extra_flag2;
-
-constexpr uint16_t filter_processing_required_flag =
-    extra_flag1;  // overload of extra_flag1 indicating that the message requires processing for
-                  // filters yet
+/// overload of extra_flag1 indicating that the message requires processing for filters yet
+constexpr uint16_t filter_processing_required_flag = extra_flag1;
 
 /// overload of extra_flag1 to indicate the request is from a non-granting federate
 constexpr uint16_t non_granting_flag = extra_flag1;
@@ -66,6 +65,9 @@ constexpr uint16_t delayed_timing_flag = extra_flag2;
 
 /// overload of flag to indicate an interface is nameless
 constexpr uint16_t nameless_interface_flag = empty_flag;
+
+/// overload of optional_flag to mark an interrupted event
+constexpr uint16_t interrupted_flag = optional_flag;
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
@@ -130,3 +132,5 @@ inline constexpr uint16_t make_flags(unsigned int flag1, unsigned int flag2, uns
 {
     return make_flags(flag1, flag2) | make_flags(flag3);
 }
+
+}  // namespace helics

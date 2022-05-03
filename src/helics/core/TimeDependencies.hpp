@@ -9,29 +9,50 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_CoreTypes.hpp"
 
 #include "json/forwards.h"
+#include <string>
+#include <utility>
 #include <vector>
 
 namespace helics {
 class ActionMessage;
 
 /**enumeration of possible states for a federate to be in regards to time request*/
-enum class time_state_t : uint8_t {
+enum class TimeState : std::uint8_t {
     initialized = 0,
-    exec_requested_iterative = 1,
-    exec_requested = 2,
-    time_granted = 3,
-    time_requested_iterative = 4,
-    time_requested = 5,
-    error = 7
+    exec_requested_require_iteration = 1,
+    exec_requested_iterative = 2,
+    exec_requested = 3,
+    time_granted = 5,
+    time_requested_require_iteration = 6,
+    time_requested_iterative = 7,
+    time_requested = 8,
+    error = 10
 };
 
-enum class ConnectionType : uint8_t {
+enum class ConnectionType : std::uint8_t {
     independent = 0,
     parent = 1,
     child = 2,
     self = 3,
     none = 4,
 };
+
+/** enumeration of the possible message processing results*/
+enum class DependencyProcessingResult : std::uint8_t {
+    NOT_PROCESSED = 0,
+    PROCESSED = 1,
+    PROCESSED_AND_CHECK = 2
+};
+
+/** enumeration of delay modes which affect whether a time is granted or not*/
+enum class GrantDelayMode : std::uint8_t { NONE = 0, INTERRUPTED = 1, WAITING = 2 };
+
+inline GrantDelayMode getDelayMode(bool waiting, bool interrupted)
+{
+    return waiting ? GrantDelayMode::WAITING :
+                     (interrupted ? GrantDelayMode::INTERRUPTED : GrantDelayMode::NONE);
+}
+
 // helper class containing the basic timeData
 class TimeData {
   public:
@@ -41,10 +62,25 @@ class TimeData {
     Time TeAlt{timeZero};  //!< the second min event
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
-    time_state_t time_state{time_state_t::initialized};
-    std::int32_t timeoutCount{0};  // counter for timeout checking
+    TimeState mTimeState{TimeState::initialized};
+    bool hasData{false};  //!< indicator that data was sent in the current interval
+    bool interrupted{false};  //!< indicator that the federates next event is a timing interruption
+    bool delayedTiming{false};  //!< indicator that the dependency is using delayed timing
+    std::int8_t timingVersion{-2};  //!< version indicator
+    std::uint8_t restrictionLevel{0};  //!< timing restriction level
+
+    std::int32_t timeoutCount{0};  //!< counter for timeout checking
+    std::int32_t sequenceCounter{0};  //!< the sequence Counter of the request
+    std::int32_t responseSequenceCounter{0};  //!< the iteration count of the min federate
+    /// the iteration of the dependency when the local iteration was granted
+    std::int32_t grantedIteration{0};
     TimeData() = default;
-    explicit TimeData(Time start): next{start}, Te{start}, minDe{start}, TeAlt{start} {};
+    explicit TimeData(Time start,
+                      TimeState startState = TimeState::initialized,
+                      std::uint8_t resLevel = 0U):
+        next{start},
+        Te{start}, minDe{start}, TeAlt{start}, mTimeState{startState}, restrictionLevel{
+                                                                           resLevel} {};
     /** check if there is an update to the current dependency info and assign*/
     bool update(const TimeData& update);
 };
@@ -61,20 +97,26 @@ class DependencyInfo: public TimeData {
     bool dependency{false};  //!< indicator that the dependency is an actual dependency
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
     bool nonGranting{false};  //!< indicator that the dependency is a non granting time coordinator
-    bool delayedTiming{false};  //!< indicator that the dependency uses delayed timing
+    bool triggered{false};  //!< indicator that the dependency has been triggered in some way
+    bool updateRequested{false};  //!< indicator that an update request is in process
     // Time forwardEvent{Time::maxVal()};  //!< a predicted event
     /** default constructor*/
     DependencyInfo() = default;
     /** construct from a federate id*/
     explicit DependencyInfo(GlobalFederateId id): fedID(id), forwarding{id.isBroker()} {}
 
-    explicit DependencyInfo(Time start): TimeData(start) {}
+    template<class... Args>
+    explicit DependencyInfo(Args&&... args): TimeData(std::forward<Args>(args)...)
+    {
+    }
 };
 
 /** class for managing a set of dependencies*/
 class TimeDependencies {
   private:
     std::vector<DependencyInfo> dependencies;  //!< container
+    mutable GlobalFederateId mDelayedDependency{};
+
   public:
     /** default constructor*/
     TimeDependencies() = default;
@@ -95,7 +137,7 @@ class TimeDependencies {
     /** remove an interdependency from consideration*/
     void removeInterdependence(GlobalFederateId id);
     /** update the info about a dependency based on a message*/
-    bool updateTime(const ActionMessage& m);
+    DependencyProcessingResult updateTime(const ActionMessage& m);
     /** get the number of dependencies*/
     auto size() const { return dependencies.size(); }
     /** iterator to first dependency*/
@@ -120,14 +162,16 @@ class TimeDependencies {
     DependencyInfo* getDependencyInfo(GlobalFederateId id);
 
     /** check if the dependencies would allow entry to exec mode*/
-    bool checkIfReadyForExecEntry(bool iterating) const;
+    bool checkIfReadyForExecEntry(bool iterating, bool waiting) const;
 
     /** check if the dependencies would allow a grant of the time
     @param iterating true if the object is iterating
     @param desiredGrantTime  the time to check for granting
     @return true if the object is ready
     */
-    bool checkIfReadyForTimeGrant(bool iterating, Time desiredGrantTime) const;
+    bool checkIfReadyForTimeGrant(bool iterating,
+                                  Time desiredGrantTime,
+                                  GrantDelayMode delayMode) const;
 
     /** reset the iterative exec requests to prepare for the next iteration*/
     void resetIteratingExecRequests();
@@ -138,32 +182,57 @@ class TimeDependencies {
     void resetDependentEvents(Time grantTime);
     /** check if there are active dependencies*/
     bool hasActiveTimeDependencies() const;
+    /** verify that all the sequence Counters match*/
+    bool verifySequenceCounter(Time tmin, std::int32_t sq);
     /** get a count of the active dependencies*/
     int activeDependencyCount() const;
     /** get a count of the active dependencies*/
     GlobalFederateId getMinDependency() const;
 
     void setDependencyVector(const std::vector<DependencyInfo>& deps) { dependencies = deps; }
+    /** check the dependency set for any issues
+    @return an error code and string containing an error description */
+    std::pair<int, std::string> checkForIssues(bool waiting) const;
+
+    bool hasDelayedDependency() const { return mDelayedDependency.isValid(); }
+    GlobalFederateId delayedDependency() const { return mDelayedDependency; }
 };
+
+inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int32_t sq)
+{
+    return (!dep.dependency || !dep.dependent || dep.timingVersion <= 0 || dep.next > tmin ||
+            dep.next >= cBigTime || dep.responseSequenceCounter == sq);
+}
+
+const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
+                                              GlobalFederateId self,
+                                              ConnectionType ignoreType = ConnectionType::none,
+                                              GlobalFederateId ignore = GlobalFederateId{});
+static constexpr GlobalFederateId NoIgnoredFederates{};
 
 TimeData generateMinTimeUpstream(const TimeDependencies& dependencies,
                                  bool restricted,
                                  GlobalFederateId self,
-                                 GlobalFederateId ignore = GlobalFederateId{});
+                                 GlobalFederateId ignore,
+                                 std::int32_t responseCode);
 
 TimeData generateMinTimeDownstream(const TimeDependencies& dependencies,
                                    bool restricted,
                                    GlobalFederateId self,
-                                   GlobalFederateId ignore = GlobalFederateId{});
+                                   GlobalFederateId ignore,
+                                   std::int32_t responseCode);
 
 TimeData generateMinTimeTotal(const TimeDependencies& dependencies,
                               bool restricted,
                               GlobalFederateId self,
-                              GlobalFederateId ignore = GlobalFederateId{});
+                              GlobalFederateId ignore,
+                              std::int32_t responseCode);
 
 void generateJsonOutputTimeData(Json::Value& output,
                                 const TimeData& dep,
                                 bool includeAggregates = true);
+
+void addTimeState(Json::Value& output, const TimeState state);
 
 void generateJsonOutputDependency(Json::Value& output, const DependencyInfo& dep);
 }  // namespace helics

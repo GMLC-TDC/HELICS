@@ -335,4 +335,6 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
 
 HELICS_CXX_EXPORT void valueConvert(defV& val, DataType newType);
 
+HELICS_CXX_EXPORT SmallBuffer typeConvertDefV(DataType type, const defV& val);
+HELICS_CXX_EXPORT SmallBuffer typeConvertDefV(const defV& val);
 }  // namespace helics

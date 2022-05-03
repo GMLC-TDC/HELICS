@@ -4,6 +4,10 @@ inputs:
   script:
     description: 'Bash script to run in the container'
     required: true
+  cpack_gen:
+    description: 'CPack Generator(s) to use'
+    required: false
+    default: 'TGZ'
 runs:
   using: 'docker'
   image: 'Dockerfile'

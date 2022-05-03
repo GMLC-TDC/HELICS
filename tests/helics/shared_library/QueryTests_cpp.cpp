@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct query_tests: public FederateTestFixture_cpp, public ::testing::Test {
-};
+struct query_tests: public FederateTestFixture_cpp, public ::testing::Test {};
 
 TEST_F(query_tests, exists)
 {
@@ -86,4 +85,36 @@ TEST_F(query_tests, exists)
     mFed2->finalize();
 
     core1.waitForDisconnect();
+}
+
+TEST_F(query_tests, callback)
+{
+    SetupTest<helicscpp::MessageFederate>("test_2", 2, 1.0);
+    auto mFed1 = GetFederateAs<helicscpp::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helicscpp::MessageFederate>(1);
+
+    mFed1->registerEndpoint("ept1");
+    mFed2->registerEndpoint("ept2");
+
+    mFed1->setQueryCallback([](const std::string& query) -> std::string {
+        if (query == "string1") {
+            return "abcd";
+        }
+        if (query == "string2") {
+            return "dcba";
+        }
+        return std::string{};
+    });
+
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    auto res = mFed2->query(mFed1->getName(), "string1");
+    EXPECT_EQ(res, "abcd");
+    res = mFed2->query(mFed1->getName(), "string2");
+    EXPECT_EQ(res, "dcba");
+
+    mFed1->finalize();
+    mFed2->finalize();
 }

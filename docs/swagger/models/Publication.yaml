@@ -1,0 +1,6 @@
+title: Publication
+type: object
+properties:
+  id:
+    type: string
+description: Configuration for a HELICS publication

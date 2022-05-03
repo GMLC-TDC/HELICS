@@ -49,7 +49,10 @@ class GlobalBrokerId {
     {
         return (gid != invalid_global_broker_id && gid != detail::gInvalidInterfaceHandle);
     }
-    BaseType localIndex() const { return gid - gGlobalBrokerIdShift; }
+    BaseType localIndex() const
+    {
+        return (gid >= gGlobalBrokerIdShift) ? (gid - gGlobalBrokerIdShift) : gid;
+    }
 
   private:
     BaseType gid = invalid_global_broker_id;  //!< the underlying index value
@@ -109,7 +112,10 @@ class GlobalFederateId {
     }
     /** generate a local offset index
         @details the global_id is shifted by a certain amount*/
-    constexpr BaseType localIndex() const { return gid - gGlobalFederateIdShift; }
+    constexpr BaseType localIndex() const
+    {
+        return (gid >= gGlobalFederateIdShift) ? (gid - gGlobalFederateIdShift) : gid;
+    }
 
     /** get a pointer to the index value type for copying from memory*/
     BaseType* getBaseTypePointer() { return &gid; }
@@ -125,9 +131,10 @@ constexpr GlobalFederateId gDirectCoreId{-235262};
 constexpr GlobalFederateId getSpecialFederateId(GlobalBrokerId broker,
                                                 GlobalBrokerId::BaseType index)
 {
+    // allow 3 special federates per subbroker/core + 3 special ones for the root broker
     return (broker != gRootBrokerID) ?
         (GlobalFederateId(gGlobalBrokerIdShift -
-                          2 * (broker.baseValue() - gGlobalBrokerIdShift + 2) + index)) :
+                          3 * (broker.baseValue() - gGlobalBrokerIdShift + 2) + index)) :
         GlobalFederateId(gGlobalBrokerIdShift - index - 1);
 }
 /** stream operator for a federate_id*/

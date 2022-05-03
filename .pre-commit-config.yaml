@@ -3,26 +3,26 @@ ci:
   autoupdate_branch: "develop"
 repos:
   - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-    rev: v1.1.1
+    rev: v1.1.2
     hooks:
       - id: dockerfile_lint
         args: [--rulefile, ./config/Docker/docker_rules.yml, --dockerfile]
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
         args: ["--line-length=100"]
   - repo: https://github.com/asottile/blacken-docs
-    rev: v1.12.0
+    rev: v1.12.1
     hooks:
       - id: blacken-docs
         additional_dependencies: [black==21.10b0]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.10
+    rev: v1.1.13
     hooks:
       - id: remove-tabs
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.2.0
     hooks:
       - id: check-added-large-files
       - id: mixed-line-ending
@@ -35,19 +35,19 @@ repos:
       - id: end-of-file-fixer
       - id: check-shebang-scripts-are-executable
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.5.1
+    rev: v2.6.2
     hooks:
       - id: prettier
         exclude: ^(docs/user-guide/examples/user_guide_examples)
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.5
+    rev: 2.1.6
     hooks:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
         exclude: "mac.md"
       - id: script-must-have-extension
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.8.0.3
+    rev: v0.8.0.4
     hooks:
       - id: shellcheck
         args: [-x]
@@ -68,7 +68,7 @@ repos:
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v13.0.0
+    rev: v14.0.1
     hooks:
       - id: clang-format
         types:

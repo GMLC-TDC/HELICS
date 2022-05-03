@@ -109,7 +109,7 @@ inputs=[
 
 **JSON**
 
-```JSON
+```json
 "inputs": [
     {
       "key": "ipt2",
@@ -118,7 +118,7 @@ inputs=[
       "multi_input_handling_method":"average",
       "targets": ["pub1","pub2"]
     }
-  ]
+ ]
 ```
 
 The priority of the inputs in most cases determined by the order of adding the publications as a target. This is not strictly guaranteed to occur but is a general rule and only applies in the default case, and possibly the diff operation.

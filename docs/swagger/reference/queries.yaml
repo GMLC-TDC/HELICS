@@ -1,0 +1,760 @@
+openapi: 3.0.0
+info:
+  title: queries
+  version: "3.2"
+  contact:
+    name: Philip Top
+    url: helics.org
+    email: helicsteam@helics.org
+  license:
+    name: BSD-3
+    url: "https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE"
+  description: |-
+    Summary of the query paths used in HELICS
+    Note: Individual Federates may also define additional queries
+    See https://docs.helics.org/en/latest/user-guide/advanced_topics/queries.html
+    For additional Information
+servers:
+  - url: "http://localhost:3000"
+paths:
+  "/{broker_id}/{target_id}/version":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_query.yaml
+              examples: {}
+        "404":
+          description: query or target not found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/error_response.yaml
+      operationId: get-version
+      description: run the version query on the specified broker/target
+  "/{broker_id}/{target_id}/version_all":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-version_all
+      description: data structure with the version string of all contained objects
+  "/{broker_id}/{target_id}/name":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-name
+      description: the identifier of the object
+  "/{broker_id}/{target_id}/exists":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-exists
+      description: true if the object exists
+  "/{broker_id}/{target_id}/is_init":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-is_init
+      description: boolean if the result is initialized
+  "/{broker_id}/{target_id}/state":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-state
+      description: current state of the object
+  "/{broker_id}/{target_id}/global_state":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/global_state_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-global_state
+      description: The state of all the components from the components
+  "/{broker_id}/{target_id}/publications":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/Publication.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-publications
+      description: current publications defined on an object
+  "/{broker_id}/{target_id}/subscriptions":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/inputs_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-subscriptions
+      description: current subscriptions of a federate
+  "/{broker_id}/{target_id}/inputs":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/inputs_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-inputs
+      description: current inputs defined by an object
+  "/{broker_id}/{target_id}/endpoints":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/endpoints_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-endpoints
+      description: current endpoints defined by an object
+  "/{broker_id}/{target_id}/translators":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-translators
+      description: current translators defined by an object
+  "/{broker_id}/{target_id}/filters":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/Filter.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-filters
+      description: current filters of the object
+  "/{broker_id}/{target_id}/dependencies":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/dependencies_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-dependencies
+      description: structure containing dependency information
+  "/{broker_id}/{target_id}/dependents":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/dependents_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-dependents
+      description: list of dependent objects
+  "/{broker_id}/{target_id}/current_time":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/current_time_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-current_Time
+      description: if a time is computed locally that time sequence is returned
+  "/{broker_id}/{target_id}/endpoint_filters":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/endpoints_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-endpoint_filters
+      description: data structure containing the filters on endpoints for the core
+  "/{broker_id}/{target_id}/dependency_graph":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/dependencies_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-dependency_graph
+      description: a representation of the dependencies in the core and its federates
+  "/{broker_id}/{target_id}/data_flow_graph":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/data_flow_graph_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-data_flow_graph
+      description: a representation of the data connections from all interfaces in an object
+  "/{broker_id}/{target_id}/queries":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/queries_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-queries
+      description: list of dependent objects
+  "/{broker_id}/{target_id}/tags":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/tag.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-tags
+      description: a JSON structure with the tags and values
+  "/{broker_id}/{target_id}/logs":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/logs_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-logs
+      description: any log messages stored in the log buffer
+  "/{broker_id}/{target_id}/tag/{tag_id}":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: tag_id
+        in: path
+        required: true
+        description: the specific name of a tag
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/version_all_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-tag-tag_id
+      description: the value associated with a specific tag
+  "/{broker_id}/{target_id}/federate_map":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/federate_map_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-federate_map
+      description: a Hierarchical map of the federates contained in a core
+  "/{broker_id}/{target_id}/global_time_debugging":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/global_time_debugging_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-global_time_debugging
+      description: return detailed time debugging state
+  "/{broker_id}/{target_id}/global_flush":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/global_flush_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-global_flush
+      description: a query that just flushes the current system and returns the id’s
+  "/{broker_id}/{target_id}/dependson":
+    parameters:
+      - schema:
+          type: string
+        name: broker_id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: target_id
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        "200":
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: ../models/dependson_query.yaml
+              examples: {}
+        "404":
+          description: target not found
+      operationId: get-dependson
+      description: list of the objects this core depends
+components:
+  schemas: {}

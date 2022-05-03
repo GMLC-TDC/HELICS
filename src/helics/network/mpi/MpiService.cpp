@@ -23,9 +23,15 @@ namespace mpi {
         return instance;
     }
 
-    void MpiService::setMpiCommunicator(MPI_Comm communicator) { mpiCommunicator = communicator; }
+    void MpiService::setMpiCommunicator(MPI_Comm communicator)
+    {
+        mpiCommunicator = communicator;
+    }
 
-    void MpiService::setStartServiceThread(bool start) { startServiceThread = start; }
+    void MpiService::setStartServiceThread(bool start)
+    {
+        startServiceThread = start;
+    }
 
     MpiService::~MpiService()
     {

@@ -43,9 +43,6 @@ Below is a sample JSON configuration file with some of the more common options. 
       "name": "sample_federate/ep1",
       "destination": "other_federate/ep1",
       "global": true
-    },
-    {
-    ...
     }
   ],
   "publications":[
@@ -60,9 +57,6 @@ Below is a sample JSON configuration file with some of the more common options. 
         "period": 0.5,
         "description": "a test publication"
       }
-    },
-    {
-    ...
     }
   ],
   "subscriptions":[
@@ -73,9 +67,6 @@ Below is a sample JSON configuration file with some of the more common options. 
       "global": true,
       "only_update_on_change": true,
       "tolerance": 0.2
-    },
-    {
-    ...
     }
   ]
 }
@@ -87,7 +78,6 @@ Below is a sample JSON configuration file with some of the more common options. 
 - **`loglevel`** - The level of detail exported to the [log files](./logging.md) during run time ranges from "none" to "trace".
 - **`coreType`** - There are a number of technologies or message buses that can be used to send HELICS messages among federates, detailed in [Core Types](../advanced_topics/CoreTypes.md). Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used, but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on high-performance computing clusters where MPI is installed).
 - **`period`** and **`offset`** - The federate needs instruction for how to step forward in time in order to synchronize calculations. This is the simplest way to synchronize simulators to the same time step; this forces the federate to time step intervals of `n*period + offset`. The default units are in seconds. Timing configuration is explained in greater detail in the [Timing](./timing_configuration.md) page, with additional configuration options in the [Configuration Options Reference](../../references/configuration_options_reference.md#timing-options).
-  configuration_options_reference.md#timing-options).
 - **`uninterruptible`** - Setting `uninterruptible` to `false` allows the federate to be interrupted if there is a signal available for it to receive. This is a [timing configuration](./timing_configuration.md) option.
 - **`terminate_on_error`** - By default, HELICS will not terminate execution of every participating federate if an error occurs in one. However, in most cases, if such an error occurs, the cosimulation is no longer valid. Setting `terminate_on_error` frees the federate from the broker if there is an error in execution, which simplifies debugging. This will prevent your federate from hanging in the event that another federate fails.
 - **`wait_for_current_time_update`** - There are times when HELICS will grant the same simulated time to a number of federates simultaneously. There is a possibility of this leading to unexpected co-simulation results if federates are unexpectedly operating on old data. Using this flag, HELICS uses this option to provide the ability for one federate to always be granted this time last, after all other federates that have been granted this time have requested a later time. This ensures that the federate with this flag set will have all the latest information from all other federates before it begins execution at the granted time.
@@ -130,8 +120,8 @@ def create_combo_federate(fedinitstring, name, period):
     # "coreType": "zmq",
     h.helicsFederateInfoSetCoreTypeFromString(fedinfo, "zmq")
     h.helicsFederateInfoSetCoreInitString(fedinfo, fedinitstring)
-    # "loglevel": 1,
-    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 7)
+    # "loglevel": 11,
+    h.helicsFederateInfoSetIntegerProperty(fedinfo, h.helics_property_int_log_level, 11)
     # "period": 60,
     h.helicsFederateInfoSetTimeProperty(fedinfo, h.helics_property_time_period, period)
     # "uninterruptible": false,

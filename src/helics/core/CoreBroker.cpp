@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
+#include "BaseTimeCoordinator.hpp"
 #include "BrokerFactory.hpp"
-#include "ForwardingTimeCoordinator.hpp"
 #include "LogManager.hpp"
 #include "TimeoutMonitor.h"
 #include "fileConnections.hpp"
@@ -27,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <limits>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -253,6 +254,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             if (no_ping) {
                 setActionFlag(brokerReply, slow_responding_flag);
             }
+            if (globalTime) {
+                setActionFlag(brokerReply, indicator_flag);
+            }
             transmit(brk->route, brokerReply);
             return;
         }
@@ -427,6 +431,9 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         if (no_ping) {
             setActionFlag(brokerReply, slow_responding_flag);
         }
+        if (globalTime) {
+            setActionFlag(brokerReply, indicator_flag);
+        }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -444,8 +451,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         earlyMessages.push_back(std::move(command));
         return;
     }
-    if (!checkActionFlag(command, non_counting_flag) &&
-        getCountableFederates() >= maxFederateCount) {
+    bool countable = !checkActionFlag(command, non_counting_flag);
+    if (countable && getCountableFederates() >= maxFederateCount) {
         ActionMessage badInit(CMD_FED_ACK);
         setActionFlag(badInit, error_flag);
         badInit.source_id = global_broker_id_local;
@@ -455,13 +462,13 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     if (getBrokerState() < BrokerState::operating) {
-        if (allInitReady()) {
+        if (countable && allInitReady()) {
             ActionMessage noInit(CMD_INIT_NOT_READY);
             noInit.source_id = global_broker_id_local;
             transmit(parent_route_id, noInit);
         }
     } else if (getBrokerState() == BrokerState::operating) {
-        if (!checkActionFlag(command, observer_flag)) {
+        if (!checkActionFlag(command, observer_flag) && countable) {
             // we are initialized already
             ActionMessage badInit(CMD_FED_ACK);
             setActionFlag(badInit, error_flag);
@@ -472,7 +479,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             return;
         }
     } else {
-        // we are initialized already
+        // we are in an error state and terminating
         ActionMessage badInit(CMD_FED_ACK);
         setActionFlag(badInit, error_flag);
         badInit.source_id = global_broker_id_local;
@@ -531,6 +538,14 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
+        if (globalTime) {
+            setActionFlag(fedReply, indicator_flag);
+            if (!checkActionFlag(command, non_counting_flag)) {
+                timeCoord->addDependency(global_fedid);
+                timeCoord->addDependent(global_fedid);
+                timeCoord->setAsChild(global_fedid);
+            }
+        }
         transmit(route_id, fedReply);
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
@@ -570,7 +585,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_BROKER_SETUP: {
             global_broker_id_local = global_id.load();
             isRootc = _isRoot.load();
-            timeCoord->source_id = global_broker_id_local;
+            timeCoord->setSourceId(global_broker_id_local);
             connectionEstablished = true;
             if (!earlyMessages.empty()) {
                 for (auto& M : earlyMessages) {
@@ -633,7 +648,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 global_broker_id_local = command.dest_id;
                 global_id.store(global_broker_id_local);
                 higher_broker_id = command.source_id;
-                timeCoord->source_id = global_broker_id_local;
+                timeCoord->setSourceId(global_broker_id_local);
                 transmitDelayedMessages();
                 mBrokers.apply([localid = global_broker_id_local](auto& brk) {
                     if (!brk._nonLocal) {
@@ -709,6 +724,7 @@ std::string CoreBroker::generateFederationSummary() const
     int epts = 0;
     int ipts = 0;
     int filt = 0;
+    int translators = 0;
     for (const auto& hand : handles) {
         switch (hand.handleType) {
             case InterfaceType::PUBLICATION:
@@ -720,6 +736,9 @@ std::string CoreBroker::generateFederationSummary() const
             case InterfaceType::ENDPOINT:
                 ++epts;
                 break;
+            case InterfaceType::TRANSLATOR:
+                ++translators;
+                break;
             default:
                 ++filt;
                 break;
@@ -728,7 +747,9 @@ std::string CoreBroker::generateFederationSummary() const
     Json::Value summary;
     Json::Value block;
     block["federates"] = static_cast<int>(mFederates.size());
-    block["min_federates"] = minFederateCount;
+    block["allowed_federates"][0] = minFederateCount;
+    block["allowed_federates"][1] = maxFederateCount;
+    block["countable_federates"] = getCountableFederates();
     block["brokers"] =
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return !static_cast<bool>(brk._core);
@@ -737,13 +758,15 @@ std::string CoreBroker::generateFederationSummary() const
         static_cast<int>(std::count_if(mBrokers.begin(), mBrokers.end(), [](auto& brk) {
             return static_cast<bool>(brk._core);
         }));
-    block["min_brokers"] = minBrokerCount;
+    block["allowed_brokers"][0] = minBrokerCount;
+    block["allowed_brokers"][1] = maxBrokerCount;
     block["publications"] = pubs;
     block["inputs"] = ipts;
     block["filters"] = filt;
     block["endpoints"] = epts;
+    block["translators"] = translators;
     summary["summary"] = block;
-
+    addBaseInformation(summary, isRootc);
     return fileops::generateJsonString(summary);
 }
 
@@ -902,10 +925,20 @@ void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
                 brk.state = connection_state::disconnected;
+                brk._sent_disconnect_ack = true;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
                 timeCoord->removeDependent(brk.global_id);
+            }
+        } else if (brk.state == connection_state::disconnected) {
+            if (brk._sent_disconnect_ack == false) {
+                ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
+                                                CMD_DISCONNECT_BROKER_ACK);
+                dis.source_id = global_broker_id_local;
+                dis.dest_id = brk.global_id;
+                transmit(brk.route, dis);
+                brk._sent_disconnect_ack = true;
             }
         }
     });
@@ -1009,7 +1042,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     command.setAction(CMD_DISCONNECT);
                     command.dest_id = parent_broker_id;
                     setActionFlag(command, error_flag);
-                    processDisconnect(command);
+                    processDisconnectCommand(command);
                 } else {
                     if (isRootc) {
                         std::string lcom =
@@ -1072,7 +1105,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT:
         case CMD_DISCONNECT_CORE:
         case CMD_DISCONNECT_BROKER:
-            processDisconnect(command);
+            processDisconnectCommand(command);
             break;
         case CMD_DISCONNECT_BROKER_ACK:
             if ((command.dest_id == global_broker_id_local) &&
@@ -1112,7 +1145,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     } else {
                         LOG_ERROR(global_broker_id_local,
                                   getIdentifier(),
-                                  "receoved timeout disconnect");
+                                  "received timeout disconnect");
                     }
 
                     if (getBrokerState() <
@@ -1168,12 +1201,19 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
                         LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
+                    } else {
+                        timeCoord->updateTimeFactors();
                     }
                 }
             } else if (command.source_id == global_broker_id_local) {
-                for (auto& dep : timeCoord->getDependents()) {
-                    routeMessage(command, dep);
+                if (command.dest_id.isValid()) {
+                    transmit(getRoute(command.dest_id), command);
+                } else {
+                    for (auto& dep : timeCoord->getDependents()) {
+                        routeMessage(command, dep);
+                    }
                 }
+
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
@@ -1312,6 +1352,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             addFilter(command);
             break;
+        case CMD_REG_TRANSLATOR:
+            if ((!isRootc) && (command.dest_id != parent_broker_id)) {
+                routeMessage(command);
+                // break;
+            }
+            addTranslator(command);
+            break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
@@ -1325,6 +1372,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_REMOVE_DEPENDENT:
         case CMD_ADD_INTERDEPENDENCY:
         case CMD_REMOVE_INTERDEPENDENCY:
+        case CMD_TIMING_INFO:
             if (command.dest_id != global_broker_id_local) {
                 routeMessage(command);
             } else {
@@ -1416,6 +1464,12 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
         } break;
         case CMD_INIT_NOT_READY: {
             if (allInitReady()) {
+                if (isRootc) {
+                    LOG_WARNING(global_broker_id_local,
+                                getIdentifier(),
+                                "received init not ready but already init");
+                    break;
+                }
                 transmit(parent_route_id, cmd);
             }
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
@@ -1789,7 +1843,10 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
             cmd.setAction(CMD_GLOBAL_ERROR);
             setErrorState(cmd.messageID, cmd.payload.to_string());
             broadcast(cmd);
-            transmitToParent(std::move(cmd));
+            if (!isRoot()) {
+                transmitToParent(std::move(cmd));
+            } else {
+            }
             return;
         }
     }
@@ -1810,7 +1867,7 @@ void CoreBroker::addPublication(ActionMessage& m)
     auto& pub = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::PUBLICATION,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(0),
                                   m.getString(1));
 
@@ -1835,7 +1892,7 @@ void CoreBroker::addInput(ActionMessage& m)
     auto& inp = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::INPUT,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(0),
                                   m.getString(1));
 
@@ -1861,7 +1918,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
     auto& ept = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::ENDPOINT,
-                                  std::string(m.name()),
+                                  m.name(),
                                   m.getString(typeStringLoc),
                                   m.getString(unitStringLoc));
 
@@ -1869,7 +1926,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
-        if (!hasTimeDependency) {
+        if (!hasTimeDependency && !globalTime) {
             if (timeCoord->addDependency(higher_broker_id)) {
                 hasTimeDependency = true;
                 ActionMessage add(CMD_ADD_INTERDEPENDENCY,
@@ -1888,7 +1945,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 }
 void CoreBroker::addFilter(ActionMessage& m)
 {
-    // detect duplicate endpoints
+    // detect duplicate filters
     if (handles.getFilter(m.name()) != nullptr) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
@@ -1901,24 +1958,56 @@ void CoreBroker::addFilter(ActionMessage& m)
     auto& filt = handles.addHandle(m.source_id,
                                    m.source_handle,
                                    InterfaceType::FILTER,
-                                   std::string(m.name()),
+                                   m.name(),
                                    m.getString(typeStringLoc),
                                    m.getString(typeOutStringLoc));
     addLocalInfo(filt, m);
 
     if (!isRootc) {
         transmit(parent_route_id, m);
+    } else {
+        FindandNotifyFilterTargets(filt);
+    }
+}
+
+void CoreBroker::addTranslator(ActionMessage& m)
+{
+    // detect duplicate endpoints/pubs/inputs
+    if (handles.getEndpoint(m.name()) != nullptr || handles.getInput(m.name()) != nullptr ||
+        handles.getPublication(m.name()) != nullptr) {
+        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+        eret.dest_handle = m.source_handle;
+        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+        eret.payload = fmt::format("Duplicate names for translator({})", m.name());
+        propagateError(std::move(eret));
+        return;
+    }
+
+    auto& trans = handles.addHandle(m.source_id,
+                                    m.source_handle,
+                                    InterfaceType::TRANSLATOR,
+                                    m.name(),
+                                    m.getString(typeStringLoc),
+                                    m.getString(typeOutStringLoc));
+    addLocalInfo(trans, m);
+
+    if (!isRootc) {
+        transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
-            if (timeCoord->addDependent(higher_broker_id)) {
-                hasTimeDependency = true;
-                ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
-                setActionFlag(add, child_flag);
-                transmit(parent_route_id, add);
+            if (!globalTime) {
+                if (timeCoord->addDependent(higher_broker_id)) {
+                    hasTimeDependency = true;
+                    ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);
+                    setActionFlag(add, child_flag);
+                    transmit(parent_route_id, add);
+                }
             }
         }
     } else {
-        FindandNotifyFilterTargets(filt);
+        FindandNotifyInputTargets(trans);
+        FindandNotifyPublicationTargets(trans);
+        FindandNotifyEndpointTargets(trans);
     }
 }
 
@@ -2174,7 +2263,7 @@ void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
 bool CoreBroker::isConnected() const
 {
     auto state = getBrokerState();
-    return ((state == BrokerState::operating) || (state == BrokerState::connected));
+    return ((state >= BrokerState::connected) && (state < BrokerState::terminating));
 }
 
 bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
@@ -2189,7 +2278,7 @@ bool CoreBroker::waitForDisconnect(std::chrono::milliseconds msToWait) const
 void CoreBroker::processDisconnect(bool skipUnregister)
 {
     auto cBrokerState = getBrokerState();
-    if ((cBrokerState == BrokerState::terminating) || (cBrokerState == BrokerState::terminated)) {
+    if (cBrokerState >= BrokerState::terminating) {
         return;
     }
     if (cBrokerState > BrokerState::configured) {
@@ -2518,7 +2607,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), m);
 
         const auto* iface = handles.findHandle(target.first);
-        if (iface->handleType == InterfaceType::ENDPOINT) {
+        if (iface->handleType != InterfaceType::FILTER) {
             // notify the endpoint about its endpoint
             m.setAction(CMD_ADD_ENDPOINT);
             m.name(iface->key);
@@ -2532,7 +2621,6 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         }
 
         m.swapSourceDest();
-        m.flags = target.second;
         transmit(getRoute(m.dest_id), m);
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(handleInfo.key);
@@ -2673,7 +2761,7 @@ void CoreBroker::processError(ActionMessage& command)
     }
 }
 
-void CoreBroker::processDisconnect(ActionMessage& command)
+void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
     auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
     switch (command.action()) {
@@ -2896,11 +2984,7 @@ std::string CoreBroker::query(const std::string& target,
             }
             if (queryStr == "logs") {
                 Json::Value base;
-                base["name"] = getIdentifier();
-                if (uuid_like) {
-                    base["uuid"] = getIdentifier();
-                }
-                base["id"] = global_id.load().baseValue();
+                addBaseInformation(base, !isRoot());
                 bufferToJson(mLogManager->getLogBuffer(), base);
                 return fileops::generateJsonString(base);
             }
@@ -2987,14 +3071,63 @@ void CoreBroker::sendCommand(const std::string& target,
                              const std::string& commandStr,
                              HelicsSequencingModes mode)
 {
+    if (commandStr == "flush") {
+        query(target, "global_flush", HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
+        return;
+    }
     ActionMessage cmdcmd(mode == HELICS_SEQUENCING_MODE_ORDERED ? CMD_SEND_COMMAND_ORDERED :
                                                                   CMD_SEND_COMMAND);
     cmdcmd.source_id = global_id.load();
     cmdcmd.payload = commandStr;
     cmdcmd.setString(targetStringLoc, target);
     cmdcmd.setString(sourceStringLoc, getIdentifier());
-    transmitToParent(std::move(cmdcmd));
+
+    if (target == "broker" || target == getIdentifier() || target.empty() ||
+        (target == "root" && _isRoot) || (target == "federation" && _isRoot)) {
+        addActionMessage(std::move(cmdcmd));
+    } else {
+        transmitToParent(std::move(cmdcmd));
+    }
 }
+
+static const std::set<std::string> querySet{"isinit",
+                                            "isconnected",
+                                            "exists",
+                                            "name",
+                                            "identifier",
+                                            "address",
+                                            "queries",
+                                            "address",
+                                            "counts",
+                                            "summary",
+                                            "federates",
+                                            "brokers",
+                                            "inputs",
+                                            "input_details",
+                                            "endpoints",
+                                            "endpoint_details",
+                                            "publications",
+                                            "publication_details",
+                                            "filters",
+                                            "filter_details",
+                                            "interface_details",
+                                            "version",
+                                            "version_all",
+                                            "federate_map",
+                                            "dependency_graph",
+                                            "data_flow_graph",
+                                            "dependencies",
+                                            "dependson",
+                                            "logs",
+                                            "monitor",
+                                            "dependents",
+                                            "status",
+                                            "current_time",
+                                            "global_time",
+                                            "global_state",
+                                            "global_flush",
+                                            "current_state",
+                                            "logs"};
 
 static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
@@ -3023,10 +3156,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
         return "true";
     }
     if ((request == "queries") || (request == "available_queries")) {
-        return "[\"isinit\",\"isconnected\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"counts\",\"summary\",\"federates\",\"brokers\",\"inputs\",\"endpoints\","
-               "\"publications\",\"filters\",\"federate_map\",\"dependency_graph\",\"data_flow_graph\",\"dependencies\",\"dependson\",\"dependents\","
-               "\"monitor\",\"logs\","
-               "\"current_time\",\"current_state\",\"global_state\",\"status\",\"global_time\",\"global_status\",\"version\",\"version_all\",\"exists\",\"global_flush\"]";
+        return generateStringVector(querySet, [](const std::string& data) { return data; });
     }
     if (request == "address") {
         return std::string{"\""} + getAddress() + '"';
@@ -3039,10 +3169,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     }
     if (request == "status") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         return fileops::generateJsonString(base);
@@ -3052,39 +3179,44 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
 
 std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
 {
+    auto addHeader = [this](Json::Value& base) { addBaseInformation(base, !isRootc); };
+
     auto res = quickBrokerQueries(request);
     if (!res.empty()) {
         return res;
     }
     if (request == "counts") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addHeader(base);
         base["brokers"] = static_cast<int>(mBrokers.size());
         base["federates"] = static_cast<int>(mFederates.size());
         base["countable_federates"] = getCountableFederates();
-        base["handles"] = static_cast<int>(handles.size());
+        base["interfaces"] = static_cast<int>(handles.size());
         return fileops::generateJsonString(base);
     }
     if (request == "summary") {
         return generateFederationSummary();
+    }
+    if (request == "config") {
+        Json::Value base;
+        base["name"] = getIdentifier();
+        if (uuid_like) {
+            base["uuid"] = getIdentifier();
+        }
+        if (!isRootc) {
+            base["parent"] = higher_broker_id.baseValue();
+        }
+        base["id"] = global_broker_id_local.baseValue();
+        base["log_level"] = logLevelToString(static_cast<LogLevels>(maxLogLevel.load()));
+        base["root"] = isRoot();
+        return fileops::generateJsonString(base);
     }
     if (request == "monitor") {
         return std::string{"\""} + mTimeMonitorFederate + '"';
     }
     if (request == "logs") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
+        addBaseInformation(base, !isRootc);
         bufferToJson(mLogManager->getLogBuffer(), base);
         return fileops::generateJsonString(base);
     }
@@ -3094,24 +3226,27 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "brokers") {
         return generateStringVector(mBrokers, [](auto& brk) { return brk.name; });
     }
+    if (request == "subbrokers") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return !brk._core; });
+    }
+    if (request == "cores") {
+        return generateStringVector_if(
+            mBrokers, [](auto& brk) { return brk.name; }, [](auto& brk) { return brk._core; });
+    }
     if (request == "current_state") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addBaseInformation(base, !isRootc);
         base["state"] = brokerStateName(getBrokerState());
         base["status"] = isConnected();
         base["federates"] = Json::arrayValue;
         for (const auto& fed : mFederates) {
             Json::Value fedstate;
-            fedstate["name"] = fed.name;
+            fedstate["attributes"] = Json::objectValue;
+            fedstate["attributes"]["name"] = fed.name;
             fedstate["state"] = state_string(fed.state);
-            fedstate["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["id"] = fed.global_id.baseValue();
+            fedstate["attributes"]["parent"] = fed.parent.baseValue();
             base["federates"].append(std::move(fedstate));
         }
         base["cores"] = Json::arrayValue;
@@ -3119,8 +3254,10 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         for (const auto& brk : mBrokers) {
             Json::Value brkstate;
             brkstate["state"] = state_string(brk.state);
-            brkstate["name"] = brk.name;
-            brkstate["id"] = brk.global_id.baseValue();
+            brkstate["attributes"] = Json::objectValue;
+            brkstate["attributes"]["name"] = brk.name;
+            brkstate["attributes"]["id"] = brk.global_id.baseValue();
+            brkstate["attributes"]["parent"] = brk.parent.baseValue();
             if (brk._core) {
                 base["cores"].append(std::move(brkstate));
             } else {
@@ -3146,6 +3283,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     if (request == "global_status") {
         if (!isConnected()) {
             Json::Value gs;
+            addBaseInformation(gs, !isRootc);
             gs["status"] = "disconnected";
             gs["timestep"] = -1;
             return fileops::generateJsonString(gs);
@@ -3181,32 +3319,11 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
         }
         return "#wait";
     }
-
-    if (request == "inputs") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::INPUT); });
+    auto interfaceQueryResult =
+        generateInterfaceQueryResults(request, handles, GlobalFederateId{}, addHeader);
+    if (!interfaceQueryResult.empty()) {
+        return interfaceQueryResult;
     }
-    if (request == "publications") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::PUBLICATION); });
-    }
-    if (request == "filters") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::FILTER); });
-    }
-    if (request == "endpoints") {
-        return generateStringVector_if(
-            handles,
-            [](auto& handle) { return handle.key; },
-            [](auto& handle) { return (handle.handleType == InterfaceType::ENDPOINT); });
-    }
-
     if (request == "dependson") {
         return generateStringVector(timeCoord->getDependencies(), [](const auto& dep) {
             return std::to_string(dep.baseValue());
@@ -3219,14 +3336,7 @@ std::string CoreBroker::generateQueryAnswer(const std::string& request, bool for
     }
     if (request == "dependencies") {
         Json::Value base;
-        base["name"] = getIdentifier();
-        if (uuid_like) {
-            base["uuid"] = getIdentifier();
-        }
-        base["id"] = global_broker_id_local.baseValue();
-        if (!isRootc) {
-            base["parent"] = higher_broker_id.baseValue();
-        }
+        addBaseInformation(base, !isRootc);
         base["dependents"] = Json::arrayValue;
         for (const auto& dep : timeCoord->getDependents()) {
             base["dependents"].append(dep.baseValue());
@@ -3325,14 +3435,7 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
-    base["name"] = getIdentifier();
-    if (uuid_like) {
-        base["uuid"] = getIdentifier();
-    }
-    base["id"] = global_broker_id_local.baseValue();
-    if (!isRootc) {
-        base["parent"] = higher_broker_id.baseValue();
-    }
+    addBaseInformation(base, !isRootc);
     base["brokers"] = Json::arrayValue;
     ActionMessage queryReq(force_ordering ? CMD_BROKER_QUERY_ORDERED : CMD_BROKER_QUERY);
     if (index == GLOBAL_FLUSH) {
@@ -3375,8 +3478,10 @@ void CoreBroker::initializeMapBuilder(const std::string& request,
                     if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
-                        brkstate["name"] = broker.name;
-                        brkstate["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"] = Json::objectValue;
+                        brkstate["attributes"]["name"] = broker.name;
+                        brkstate["attributes"]["id"] = broker.global_id.baseValue();
+                        brkstate["attributes"]["parent"] = broker.parent.baseValue();
                         if (broker._core) {
                             if (!hasCores) {
                                 base["cores"] = Json::arrayValue;
@@ -3785,7 +3890,6 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
-
     } else {
         auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
         LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);

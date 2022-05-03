@@ -121,7 +121,9 @@ threads without external protection, that will result in undefined behavior
         /** generate the command line parser*/
         std::unique_ptr<helicsCLI11App> generateParser();
         /** process the command line arguments */
-        void processArgs(std::unique_ptr<helicsCLI11App>& app, const std::string& defaultAppName);
+        void processArgs(std::unique_ptr<helicsCLI11App>& app,
+                         FederateInfo& fi,
+                         const std::string& defaultAppName);
 
       protected:
         std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player

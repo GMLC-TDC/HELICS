@@ -13,6 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
+namespace CLI {
+class App;
+}
+
 namespace helics {
 class helicsCLI11App;
 /** data class defining federate properties and information
@@ -33,10 +37,12 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     bool forceNewCore{false};  //!< indicator that the federate should not use an existing core
     /** indicate that the federate should use json serialization for all data transfers*/
     bool useJsonSerialization{false};
+    /** specify that the core should use encryption*/
+    bool encrypted{false};
     /** specify that the federate and associated core should enable profiling to the specified
      * file*/
     std::string profilerFileName;
-
+    std::string encryptionConfig;  //!< encryption configuration string or file
     std::string defName;  //!< a default name to use for a federate
     std::string coreName;  //!< the name of the core
     std::string coreInitString;  //!< an initialization string for the core API object
@@ -108,6 +114,9 @@ class HELICS_CXX_EXPORT FederateInfo: public CoreFederateInfo {
     Time checkTimeProperty(int propId, Time defVal) const;
     bool checkFlagProperty(int propId, bool defVal) const;
     int checkIntProperty(int propId, int defVal) const;
+
+    /** inject the federateInfo parser into another CLI11 App*/
+    void injectParser(CLI::App* app);
 
   private:
     std::unique_ptr<helicsCLI11App> makeCLIApp();

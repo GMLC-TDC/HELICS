@@ -233,7 +233,7 @@ TEST_F(httpTest, single_info)
     EXPECT_EQ(val["brokers"].size(), 0U);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["federates"].size(), 0U);
-    EXPECT_STREQ(val["name"].asCString(), "brk1");
+    EXPECT_STREQ(val["attributes"]["name"].asCString(), "brk1");
     EXPECT_STREQ(val["state"].asCString(), "connected");
 }
 
@@ -291,14 +291,14 @@ TEST_F(httpTest, core)
         val = loadJson(result);
     }
     ASSERT_EQ(val["cores"].size(), 1U);
-    EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
+    EXPECT_STREQ(val["cores"][0]["attributes"]["name"].asCString(), "cr1");
 
     auto result2 = sendCommand(http::verb::search, "/search/brk2", "query=current_state");
     EXPECT_EQ(result, result2);
 
     result = sendGet("brk2/cr1");
     val = loadJson(result);
-    EXPECT_STREQ(val["name"].asCString(), "cr1");
+    EXPECT_STREQ(val["attributes"]["name"].asCString(), "cr1");
 
     result2 = sendGet("brk2/cr1/current_state");
     EXPECT_EQ(result, result2);
@@ -446,7 +446,7 @@ TEST_F(httpTest, deleteJson)
 
 TEST_F(httpTest, timeBlock)
 {
-    sendCommand(http::verb::post, "brk_timer", "type=ZMQ");
+    sendCommand(http::verb::post, "brk_timer", "type=ZMQ&log_level=timing");
     auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timer");
     EXPECT_TRUE(cr->connect());
 
@@ -470,8 +470,24 @@ TEST_F(httpTest, timeBlock)
     rtime = vFed.requestTimeComplete();
     EXPECT_EQ(rtime, 6.0);
 
+    auto brk = helics::BrokerFactory::findBroker("brk_timer");
+    EXPECT_TRUE(brk);
+
+    auto res = brk->query("brk_timer", "config");
+
+    EXPECT_TRUE(res.find("\"timing\"") != std::string::npos);
+    brk.reset();
+
     vFed.finalize();
     Json::Value v1;
     v1["broker"] = "brk_timer";
     sendCommand(http::verb::post, "delete", generateJsonString(v1));
+}
+
+TEST_F(httpTest, healthcheck)
+{
+    auto result = sendGet("healthcheck");
+    EXPECT_FALSE(result.empty());
+    auto val = loadJson(result);
+    EXPECT_TRUE(val["success"].asBool());
 }

@@ -84,11 +84,11 @@ Run the co-simulation:
 
 Since this is only a change to the configuration method of the federation, the results are identical to those in the [Advanced Default example.](./advanced_default.md)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_charging_power.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_charging_power.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_estimated_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_estimated_SOCs.png)
 
-![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_query_battery_SOCs.png)
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_default_battery_SOCs.png)
 
 The dynamic configuration can also been seen by looking at the log file for the Battery federate (`Battery.log`). The pre-configure data flow graph only showed five subscriptions, all made by the Charger federate of the Battery federates current
 

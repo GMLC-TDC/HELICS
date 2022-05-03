@@ -24,8 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** these test cases test out the value federates
  */
 
-class multiInput: public ::testing::Test, public FederateTestFixture {
-};
+class multiInput: public ::testing::Test, public FederateTestFixture {};
 
 TEST_F(multiInput, order)
 {

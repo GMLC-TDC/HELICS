@@ -8,7 +8,7 @@
 
 This is the documentation for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
-power system. Although, HELICS was designed to support very-large-scale (100,000+
+power system. Although HELICS was designed to support very-large-scale (100,000+
 federates) co-simulations with off-the-shelf power-system,
 communication, market, and end-use tools; it has been built to provide a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform (Linux, Windows, and Mac OS X) and supports both event driven and time
 series simulation. It provides users a high-performance way for multiple individual simulation model "federates" from various domains to interact during execution--exchanging data as time advances--and create a larger co-simulation "federation" able to capture rich interactions. Written in modern C++ (C++14), HELICS provides a rich set of APIs for other languages including Python, C, Java, and MATLAB, and has native support within a growing number of energy simulation tools.

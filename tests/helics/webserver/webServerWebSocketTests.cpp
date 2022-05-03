@@ -213,7 +213,7 @@ TEST_F(webTest, single_info)
     EXPECT_EQ(val["brokers"].size(), 0U);
     EXPECT_EQ(val["cores"].size(), 0U);
     EXPECT_EQ(val["federates"].size(), 0U);
-    EXPECT_STREQ(val["name"].asCString(), "brk1");
+    EXPECT_STREQ(val["attributes"]["name"].asCString(), "brk1");
     EXPECT_STREQ(val["state"].asCString(), "connected");
 }
 
@@ -257,12 +257,12 @@ TEST_F(webTest, core)
         val = loadJson(result);
     }
     ASSERT_EQ(val["cores"].size(), 1U);
-    EXPECT_STREQ(val["cores"][0]["name"].asCString(), "cr1");
+    EXPECT_STREQ(val["cores"][0]["attributes"]["name"].asCString(), "cr1");
 
     query["target"] = "cr1";
     result = sendText(generateJsonString(query));
     val = loadJson(result);
-    EXPECT_STREQ(val["name"].asCString(), "cr1");
+    EXPECT_STREQ(val["attributes"]["name"].asCString(), "cr1");
     query["query"] = "current_state";
 
     auto result2 = sendText(generateJsonString(query));

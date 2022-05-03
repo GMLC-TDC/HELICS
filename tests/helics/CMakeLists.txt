@@ -21,6 +21,7 @@ add_subdirectory(core)
 add_subdirectory(network)
 add_subdirectory(common)
 add_subdirectory(system_tests)
+add_subdirectory(sequencing_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
@@ -36,6 +37,17 @@ add_subdirectory(application_api)
 
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_library)
+endif()
+
+# Configure files for encryption tests
+if(HELICS_ENABLE_ENCRYPTION)
+    configure_file(
+        "test_files/encryption_config/openssl.json.in" "test_files/encryption_config/openssl.json"
+    )
+    configure_file(
+        "test_files/encryption_config/multiBroker_encrypted_bridge.json.in"
+        "test_files/encryption_config/multiBroker_encrypted_bridge.json"
+    )
 endif()
 
 if(HELICS_INSTALL_PACKAGE_TESTS)

@@ -1,0 +1,18 @@
+title: tag
+description: tag data for an interface
+oneOf:
+  - properties:
+      name:
+        type: string
+      value:
+        type:
+          - string
+          - number
+  - properties:
+      key:
+        type: string
+      value:
+        type:
+          - string
+          - number
+type: object

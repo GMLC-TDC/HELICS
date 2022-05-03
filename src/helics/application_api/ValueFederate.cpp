@@ -135,12 +135,12 @@ Input& ValueFederate::registerSubscription(const std::string& target, const std:
     return inp;
 }
 
-void ValueFederate::addTarget(const Publication& pub, const std::string& target)
+void ValueFederate::addTarget(const Publication& pub, std::string_view target)
 {
     vfManager->addTarget(pub, target);
 }
 
-void ValueFederate::addTarget(const Input& inp, const std::string& target)
+void ValueFederate::addTarget(const Input& inp, std::string_view target)
 {
     vfManager->addTarget(inp, target);
 }
@@ -149,12 +149,12 @@ void ValueFederate::addAlias(const Input& inp, const std::string& shortcutName)
 {
     vfManager->addAlias(inp, shortcutName);
 }
-void ValueFederate::removeTarget(const Publication& pub, const std::string& target)
+void ValueFederate::removeTarget(const Publication& pub, std::string_view target)
 {
     vfManager->removeTarget(pub, target);
 }
 
-void ValueFederate::removeTarget(const Input& inp, const std::string& target)
+void ValueFederate::removeTarget(const Input& inp, std::string_view target)
 {
     vfManager->removeTarget(inp, target);
 }
@@ -264,14 +264,22 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
     if (doc.isMember("subscriptions")) {
         auto subs = doc["subscriptions"];
         for (const auto& sub : subs) {
+            bool skipNameTarget{false};
             auto name = fileops::getName(sub);
+            if (name.empty()) {
+                fileops::replaceIfMember(sub, "target", name);
+                skipNameTarget = true;
+            }
             auto* subAct = &vfManager->getSubscription(name);
             if (!subAct->isValid()) {
                 auto type = fileops::getOrDefault(sub, "type", emptyStr);
                 auto units = fileops::getOrDefault(sub, "unit", emptyStr);
                 fileops::replaceIfMember(sub, "units", units);
                 subAct = &registerInput(emptyStr, type, units);
-                subAct->addTarget(name);
+                if (!skipNameTarget) {
+                    // this check is to prevent some warnings since targets get added later
+                    subAct->addTarget(name);
+                }
             }
             loadOptions(this, sub, *subAct);
         }
@@ -350,6 +358,11 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         auto& subArray = subs.as_array();
         for (const auto& sub : subArray) {
             auto name = fileops::getName(sub);
+            bool skipNameTarget{false};
+            if (name.empty()) {
+                fileops::replaceIfMember(sub, "target", name);
+                skipNameTarget = true;
+            }
             Input* id = &vfManager->getSubscription(name);
             if (!id->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
@@ -357,7 +370,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 replaceIfMember(sub, "units", units);
 
                 id = &registerInput(emptyStr, type, units);
-                id->addTarget(name);
+                if (!skipNameTarget) {
+                    // this check is to prevent some warnings since targets get added later
+                    id->addTarget(name);
+                }
             }
 
             loadOptions(this, sub, *id);

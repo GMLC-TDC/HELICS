@@ -1,0 +1,13 @@
+title: base_status_info
+type: object
+properties:
+  id:
+    type: integer
+  "":
+    type: string
+  state:
+    type: string
+required:
+  - id
+  - ""
+  - state

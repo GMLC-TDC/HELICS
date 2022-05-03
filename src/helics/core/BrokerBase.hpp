@@ -26,8 +26,13 @@ and some common methods used cores and brokers
 namespace spdlog {
 class logger;
 }
+/** forward declare Json::Value*/
+namespace Json {
+class Value;
+}
+
 namespace helics {
-class ForwardingTimeCoordinator;
+class BaseTimeCoordinator;
 class helicsCLI11App;
 class ProfilerBuffer;
 class LogBuffer;
@@ -59,7 +64,7 @@ class BrokerBase {
     Time networkTimeout{-1.0};  //!< timeout to establish a socket connection before giving up
     Time queryTimeout{15.0};  //!< timeout for queries, if the query isn't answered within this time
                               //!< period respond with timeout error
-    Time errorDelay{10.0};  //!< time to delay before terminating after error state
+    Time errorDelay{0.0};  //!< time to delay before terminating after error state
     Time grantTimeout{-1.0};  //!< timeout for triggering diagnostic action waiting for a time grant
     Time maxCoSimDuration{-1.0};  //!< the maximum lifetime (wall clock time) of the co-simulation
     std::string identifier;  //!< an identifier for the broker
@@ -81,6 +86,8 @@ class BrokerBase {
     bool debugging{false};
     /// flag indicating that the broker is an observer only
     bool observer{false};
+    /// flag indicating that the broker should use a global time coordinator
+    bool globalTime{false};
 
   private:
     /// flag indicating that the main processing loop is running
@@ -96,20 +103,22 @@ class BrokerBase {
     std::atomic<std::size_t> messageCounter{0};
 
   protected:
-    std::unique_ptr<ForwardingTimeCoordinator> timeCoord;  //!< object managing the time control
+    std::unique_ptr<BaseTimeCoordinator> timeCoord;  //!< object managing the time control
     gmlc::containers::BlockingPriorityQueue<ActionMessage> actionQueue;  //!< primary routing queue
     std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
-        created = -6,  //!< the broker has been created
-        configuring = -5,  //!< the broker is in the processing of configuring
-        configured = -4,  //!< the broker itself has been configured and is ready to connect
-        connecting = -3,  //!< the connection process has started
-        connected = -2,  //!< the connection process has completed
+        created = -10,  //!< the broker has been created
+        configuring = -7,  //!< the broker is in the processing of configuring
+        configured = -6,  //!< the broker itself has been configured and is ready to connect
+        connecting = -4,  //!< the connection process has started
+        connected = -3,  //!< the connection process has completed
         initializing = -1,  //!< the enter initialization process has started
         operating = 0,  //!< normal operating conditions
-        terminating = 1,  //!< the termination process has started
-        terminated = 3,  //!< the termination process has started
+        connected_error = 3,  //!< error state but still connected
+        terminating = 4,  //!< the termination process has started
+        terminating_error = 5,  //!< the termination process has started while in an error state
+        terminated = 6,  //!< the termination process has started
         errored = 7,  //!< an error was encountered
     };
 
@@ -118,7 +127,8 @@ class BrokerBase {
         NO_COMMS = 0x01,
         PING_RESPONSE = 0x02,
         QUERY_TIMEOUT = 0x04,
-        GRANT_TIMEOUT = 0x08
+        GRANT_TIMEOUT = 0x08,
+        DISCONNECT_TIMEOUT = 0x10
     };
     bool noAutomaticID{false};  //!< the broker should not automatically generate an ID
     bool hasTimeDependency{false};  //!< set to true if the broker has Time dependencies
@@ -134,6 +144,8 @@ class BrokerBase {
     bool enable_profiling{false};  //!< indicator that profiling is enabled
     /// time when the error condition started; related to the errorDelay
     decltype(std::chrono::steady_clock::now()) errorTimeStart;
+    /// time when the disconnect started
+    decltype(std::chrono::steady_clock::now()) disconnectTime;
     std::atomic<int> lastErrorCode{0};  //!< storage for last error code
     std::string lastErrorString;  //!< storage for last error string
   private:
@@ -239,12 +251,13 @@ class BrokerBase {
 
     /** send a Message to the logging system
     @return true if the message was actually logged
+    @param fromRemote set to true if the message to be logged came from a different object
     */
     bool sendToLogger(GlobalFederateId federateID,
                       int logLevel,
                       std::string_view name,
                       std::string_view message,
-                      bool disableRemote = false) const;
+                      bool fromRemote = false) const;
     /** save a profiling message*/
     void saveProfilingData(std::string_view message);
     /** write profiler data to file*/
@@ -265,6 +278,8 @@ class BrokerBase {
     virtual double getSimulationTime() const { return mInvalidSimulationTime; }
     /** process some common commands that can be processed by the broker base */
     std::pair<bool, std::vector<std::string_view>> processBaseCommands(ActionMessage& command);
+    /** add some base information to a json structure */
+    void addBaseInformation(Json::Value& base, bool hasParent) const;
 
   public:
     /** generate a callback function for the logging purposes*/

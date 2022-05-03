@@ -1,0 +1,5 @@
+title: publications_query
+type: array
+items:
+  type: string
+description: list of the available publications

@@ -49,7 +49,6 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 ```json
 {
-    ...
     "name":"generic_federate",
     "coreType": "zmq"
     "publications" : [
@@ -80,7 +79,6 @@ Let's look at a generic JSON configuration file as an example with the more comm
             "info" : ""
         }
      ]
-    ...
 }
 ```
 

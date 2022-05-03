@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InputInfo.hpp"
 
 #include "../common/JsonGeneration.hpp"
-#include "units/units/units.hpp"
+#include "units/units.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -112,9 +112,9 @@ void InputInfo::addData(GlobalHandle source_id,
 }
 
 bool InputInfo::addSource(GlobalHandle newSource,
-                          const std::string& sourceName,
-                          const std::string& stype,
-                          const std::string& sunits)
+                          std::string_view sourceName,
+                          std::string_view stype,
+                          std::string_view sunits)
 {
     for (const auto& is : input_sources) {
         if (is == newSource) {
@@ -152,7 +152,7 @@ void InputInfo::removeSource(GlobalHandle sourceToRemove, Time minTime)
     }
 }
 
-void InputInfo::removeSource(const std::string& sourceName, Time minTime)
+void InputInfo::removeSource(std::string_view sourceName, Time minTime)
 {
     inputUnits.clear();
     inputType.clear();
@@ -402,24 +402,26 @@ Time InputInfo::nextValueTime() const
     return nvtime;
 }
 
-static const std::set<std::string> convertible_set{"double_vector",
-                                                   "complex_vector",
-                                                   "vector",
-                                                   "double",
-                                                   "float",
-                                                   "bool",
-                                                   "char",
-                                                   "uchar",
-                                                   "int32",
-                                                   "int64",
-                                                   "uint32",
-                                                   "uint64",
-                                                   "int16",
-                                                   "string",
-                                                   "complex",
-                                                   "complex_f",
-                                                   "named_point"};
-bool checkTypeMatch(const std::string& type1, const std::string& type2, bool strict_match)
+static const std::set<std::string_view> convertible_set{"double_vector",
+                                                        "complex_vector",
+                                                        "vector",
+                                                        "double",
+                                                        "float",
+                                                        "bool",
+                                                        "time",
+                                                        "char",
+                                                        "uchar",
+                                                        "json"
+                                                        "int32",
+                                                        "int64",
+                                                        "uint32",
+                                                        "uint64",
+                                                        "int16",
+                                                        "string",
+                                                        "complex",
+                                                        "complex_f",
+                                                        "named_point"};
+bool checkTypeMatch(std::string_view type1, std::string_view type2, bool strict_match)
 {
     if ((type1.empty()) || (type1 == type2) || (type1 == "def") || (type1 == "any") ||
         (type1 == "raw") || (type1 == "json")) {

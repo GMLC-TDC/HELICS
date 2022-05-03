@@ -29,16 +29,13 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class valuefed_single_type:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class valuefed_all_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class valuefed_tests: public ::testing::Test, public FederateTestFixture {
-};
+class valuefed_tests: public ::testing::Test, public FederateTestFixture {};
 
 TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 {
@@ -323,8 +320,7 @@ static constexpr const char* config_files[] = {"bes_config.json",
 
 class valuefed_flagfile_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(valuefed_flagfile_tests, configure_test)
 {
@@ -409,8 +405,9 @@ static constexpr const char* simple_connection_files[] = {"example_connections1.
                                                           "example_connections3.toml",
                                                           "example_connections4.toml"};
 
-class valuefed_link_file: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class valuefed_link_file:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {};
 
 TEST_P(valuefed_link_file, dual_transfer_broker_link_file)
 {
@@ -768,6 +765,28 @@ TEST_F(valuefed_tests, time_update_callback)
     EXPECT_EQ(lastTime, 3.0);
 
     vFed1->finalize();
+}
+
+TEST_F(valuefed_tests, mode_update_callback)
+{
+    using Modes = helics::Federate::Modes;
+    SetupTest<helics::ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    helics::Federate::Modes cmode{Modes::STARTUP};
+
+    vFed1->setModeUpdateCallback([&](Modes mNew, Modes /*mOld*/) { cmode = mNew; });
+    vFed1->enterInitializingMode();
+    EXPECT_EQ(cmode, Modes::INITIALIZING);
+    vFed1->enterExecutingMode();
+    EXPECT_EQ(cmode, Modes::EXECUTING);
+    cmode = Modes::ERROR_STATE;
+    vFed1->requestTime(1.0);
+    EXPECT_EQ(cmode, Modes::ERROR_STATE);
+    vFed1->requestTime(helics::Time::maxVal());
+    EXPECT_EQ(cmode, Modes::FINISHED);
+    vFed1->finalize();
+    EXPECT_EQ(cmode, Modes::FINALIZE);
 }
 
 TEST_P(valuefed_single_type, transfer_close)

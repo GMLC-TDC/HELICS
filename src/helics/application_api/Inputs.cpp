@@ -10,7 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/core-exceptions.hpp"
 #include "ValueFederate.hpp"
-#include "units/units/units.hpp"
+#include "units/units.hpp"
 
 #include <algorithm>
 #include <limits>
@@ -619,7 +619,7 @@ size_t Input::getByteCount()
     return dv.size();
 }
 
-void Input::addTarget(const std::string& target)
+void Input::addPublication(std::string_view target)
 {
     if (givenTarget.empty()) {
         givenTarget = target;

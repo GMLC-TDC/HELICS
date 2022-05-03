@@ -1083,6 +1083,18 @@ SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1ERROR_1OTHER_1get
 }
 
 
+SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1USER_1EXCEPTION_1get(JNIEnv *jenv, jclass jcls) {
+  jint jresult = 0 ;
+  HelicsErrorTypes result;
+  
+  (void)jenv;
+  (void)jcls;
+  result = (HelicsErrorTypes)HELICS_USER_EXCEPTION;
+  jresult = (jint)result; 
+  return jresult;
+}
+
+
 SWIGEXPORT jint JNICALL Java_com_java_helics_helicsJNI_HELICS_1ERROR_1USER_1ABORT_1get(JNIEnv *jenv, jclass jcls) {
   jint jresult = 0 ;
   HelicsErrorTypes result;
@@ -2283,6 +2295,18 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsClearSignalHandler(
   (void)jenv;
   (void)jcls;
   helicsClearSignalHandler();
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsLoadSignalHandlerCallbackNoExit(JNIEnv *jenv, jclass jcls, jlong jarg1, jint jarg2) {
+  HelicsBool (*arg1)(int) = (HelicsBool (*)(int)) 0 ;
+  HelicsBool arg2 ;
+  
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(HelicsBool (**)(int))&jarg1; 
+  arg2 = (HelicsBool)jarg2; 
+  helicsLoadSignalHandlerCallbackNoExit(arg1,arg2);
 }
 
 
@@ -10899,6 +10923,33 @@ SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateSetTimeUpda
   arg2 = *(void (**)(HelicsTime,HelicsBool,void *))&jarg2; 
   arg3 = *(void **)&jarg3; 
   helicsFederateSetTimeUpdateCallback(arg1,arg2,arg3,arg4);
+  {
+    if (arg4->error_code!=HELICS_OK)
+    {
+      jclass clazz = (*jenv)->FindClass(jenv, "java/lang/Exception");
+      (*jenv)->ThrowNew(jenv, clazz, arg4->message);
+    }
+  }
+}
+
+
+SWIGEXPORT void JNICALL Java_com_java_helics_helicsJNI_helicsFederateSetStateChangeCallback(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
+  HelicsFederate arg1 = (HelicsFederate) 0 ;
+  void (*arg2)(HelicsFederateState,HelicsFederateState,void *) = (void (*)(HelicsFederateState,HelicsFederateState,void *)) 0 ;
+  void *arg3 = (void *) 0 ;
+  HelicsError *arg4 = (HelicsError *) 0 ;
+  HelicsError etemp4 ;
+  
+  (void)jenv;
+  (void)jcls;
+  {
+    etemp4=helicsErrorInitialize();
+    arg4=&etemp4;
+  }
+  arg1 = *(HelicsFederate *)&jarg1; 
+  arg2 = *(void (**)(HelicsFederateState,HelicsFederateState,void *))&jarg2; 
+  arg3 = *(void **)&jarg3; 
+  helicsFederateSetStateChangeCallback(arg1,arg2,arg3,arg4);
   {
     if (arg4->error_code!=HELICS_OK)
     {

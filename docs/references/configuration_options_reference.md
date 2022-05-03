@@ -6,14 +6,14 @@
     :maxdepth: 2
 ```
 
-Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSON files for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things). As such
+Many of the HELICS entities have significant configuration options. Rather than comprehensively list these options while explaining the features themselves, we've created this section of the User Guide to serve as a reference as to what they are, what they do, and how to use them. This reference is oriented-around the use of JSON files for configuration and is an attempt to be comprehensive in listing and explaining those options. As will be explained below, many of these options are accessible via direct API calls though some of these calls are general in nature (such as [helicsFederateInfoSetIntegrerProperty](api-reference/C_API.md#federateinfo) to set the logging level, among other things).
 
 ## Configuration methods
 
 Generally, there are three ways in which a co-simulation can be configured and all the various options can be defined:
 
 1. Using direct API calls in the federate source code.
-2. Using command-line switches/flags which beginning execution of the federate
+2. Using command-line switches/flags while beginning execution of the federate
 3. Using a JSON configuration file (and calling helicsCreateValueFederateFromConfig, helicsCreateMessageFederateFromConfig, or helicsCreateComboFederateFromConfig)
 
 Not all configuration options are available in all three forms but often they are. For example, it is not possible (nor convenient) to configure a publication for a federate from the command line but it is possible to do so with the JSON config file and with API calls.
@@ -22,7 +22,7 @@ Not all configuration options are available in all three forms but often they ar
 
 Which method you use to configure your federate and co-simulation significantly depends on the circumstances of the co-simulation and details of any existing code-base being used. Here is some guidance, though, to help in guiding you're decision in how to do this:
 
-- **If possible, use a JSON configuration file** - Using a JSON configuration file allows creates separation between the code base of the federation and its use in a particular co-simulation. This allows for a modularity between the functionality the federate provides and the particular co-simulation in which it is applied. For example, a power system federate can easily be reconfigured to work on one model vs another through the use of a JSON configuration file. The particular publications and subscriptions may change but the main functionality of the federate (solving the power flow) does not.
+- **If possible, use a JSON configuration file** - Using a JSON configuration file creates separation between the code base of the federation and its use in a particular co-simulation. This allows for a modularity between the functionality the federate provides and the particular co-simulation in which it is applied. For example, a power system federate can easily be reconfigured to work on one model vs another through the use of a JSON configuration file. The particular publications and subscriptions may change but the main functionality of the federate (solving the power flow) does not.
   To use the JSON file for configuration, one of three specific APIs needs to be called: in the file:
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
@@ -52,11 +52,9 @@ Default values are shown in "[]" following the name(s) of the option.
 
 When an API exists, its name is shown along with links to the specific API documentation for a few (but, sadly, not all) of the supported languages. Many of the options are set with generic functions (_e.g._ `helicsFederateInfoSetFlagOption`) and in those cases the option being set is specified by an enumerated value. In C, these values (_e.g._ `helics_flag_uninterruptible`) are set to integer value (_e.g._ `1`); in this document that integer value follows the enumeration string in brackets. If using the C interface, the integer value must be used. The C++ interface supports the use of the enumerated value directly as do the Python and Julia interfaces with slight syntactical variations (Python: `helics.HELICS_FLAG_INTERRUPTIBLE` and Julia: `HELICS.HELICS_FLAG_INTERRUPTIBLE`).
 
-x
-
 ## Sample Configurations
 
-The JSON configuration file below shows all the configuration options in a single file along with their default values and shows what section of the file they should be placed in. Most JSON configuration files will require far fewer options than shown here; items marked with "\*\*" are required. Many items have alternative names that are
+The JSON configuration file below shows all the configuration options in a single file along with their default values and shows what section of the file they should be placed in. Most JSON configuration files will require far fewer options than shown here; items marked with "\*\*" are required.
 
 Many of the configuration parameters have alternate names that provide the same functionality. Only one of the names is shown in this configuration file but the alternative names are listed in the reference below. Generally, the supported names are the same string in nocase, camelCase, and snake_case.
 
@@ -64,7 +62,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
 
 (Note that the JSON standard does not support comments and thus the block below is not valid JSON. The JSON parser HELICS uses does support comments)
 
-```json
+```text
 {
   // General
   **"name": "arbitrary federate name",**
@@ -131,6 +129,8 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "brokerport": 22608,
   "localport": 8080,
   "portstart": 22608,
+  "encrypted": false,
+  "encryption_config":"encryption_config.json",
 
 
   "publications" | "subscriptions" | "inputs": [
@@ -461,7 +461,7 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER` [276]
 
-When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user_guide/advanced_topics/queries.md). Also see discussion in [Logging](../user_guide/fundamental_topics/logging.md#log_buffer).
+When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user-guide/advanced_topics/queries.md). Also see discussion in [Logging](../user-guide/fundamental_topics/logging.md#log-buffer).
 
 ## Timing Options
 
@@ -1087,11 +1087,11 @@ Name of the filter; must be unique to a federate.
 
 ### `source_targets`, `sourcetargets`, `sourceTargets` []
 
-_API:_ ``
-[C++]()
-| [C]()
+_API:_ `helicsFilterAddSourceTarget`
+[C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#a40d2017f51dca63c1b034df70c35c655)
+| [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
 | [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddSourceTarget)
-| [Julia]()
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
 
@@ -1099,11 +1099,11 @@ Acts on previously registered filter and associated with a specific endpoint of 
 
 ### `destination_targets`, `destinationtargets`, `destinationtargets` []
 
-_API:_ ``
-[C++]()
-| [C]()
+_API:_ `helicsFilterAddDestinationTarget`
+[C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#aa197abc9f9c07f9d8fbe39aef588965f)
+| [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
 | [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddDestinationTarget)
-| [Julia]()
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddDestinationTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
 
@@ -1137,7 +1137,6 @@ This filter reroutes a message to a new destination. it also has an optional fil
 Example `property` object:
 
 ```json
-...
    "operation": "reroute",
     "properties": [
         {
@@ -1149,7 +1148,6 @@ Example `property` object:
             "value": "regular expression string"
         }
     ]
-...
 ```
 
 #### `delay`
@@ -1159,13 +1157,11 @@ This filter will delay a message by a certain amount fo time.
 Example `property` object:
 
 ```json
-...
    "operation": "delay",
     "properties": {
         "name": "delay",
         "value": "76 ms",
     },
-...
 ```
 
 #### `random_delay` | `randomdelay` | `randomDelay`
@@ -1218,23 +1214,21 @@ some distributions only take one parameter in which case the second is ignored. 
   - param1="n"
 
 ```json
-...
-   "operation": "randomdelay",
-    "properties": [
-        {
-            "name": "distribution",
-            "value": normal
-        },
-        {
-            "name": "mean",
-            "value": 0
-        },
-        {
-            "name": "stdev",
-            "value": 1
-        }
-    ],
-...
+  "operation": "randomdelay",
+  "properties": [
+    {
+      "name": "distribution",
+      "value": "normal"
+    },
+    {
+      "name": "mean",
+      "value": 0
+    },
+    {
+      "name": "stdev",
+      "value": 1
+    }
+  ]
 ```
 
 #### `random_drop` | `randomdrop` | `randomDrop`
@@ -1242,13 +1236,11 @@ some distributions only take one parameter in which case the second is ignored. 
 This filter will randomly drop a message, the drop probability is specified, and is modeled as a uniform distribution between zero and one.
 
 ```json
-...
    "operation": "random_drop",
     "properties": {
         "name": "prob",
         "value": 0.5,
     },
-...
 ```
 
 #### `clone`
@@ -1256,13 +1248,11 @@ This filter will randomly drop a message, the drop probability is specified, and
 This filter will copy a message and send it to the original destination plus a new one.
 
 ```json
-...
    "operation": "clone",
     "properties": {
         "name": "add delivery",
         "value": "endpoint name",
     },
-...
 ```
 
 ## Profiling
@@ -1364,6 +1354,20 @@ Maximum number of network retry attempts.
 
 ---
 
+### `encrypted` [false]
+
+_API:_ (none)
+set to true to enable encryption on network types that support encryption
+
+---
+
+### `encryption_config`
+
+_API:_ (none)
+specify json or a file containing the configuration options for defining the encrypted interface
+
+---
+
 ### `use_os_port` | `useosport` | `useOsPort` [false]
 
 _API:_ (none)
@@ -1381,14 +1385,15 @@ specify that the network connection should be a server or client. By default nei
 ### `local_interface` | `localinterface` | `localInterface` [local address]
 
 _API:_ (none)
-the local interface to use for the receive ports.
+Specifies the IP address (and optionally port) the rest of the federation should use when contacting this federate.
 
 ---
 
-### `port` | `-p` []
+### `broker_address` | `brokeraddress` | `brokerAddress` []
 
 _API:_ (none)
-Port number to use.
+
+Specifies the IP address (and optionally port) a federate or sub-broker should use when contacting its parent broker
 
 ---
 
@@ -1396,7 +1401,7 @@ Port number to use.
 
 _API:_ (none)
 
-The port to use to connect to the broker.
+Specifies the port a federate or sub-broker should use when contacting its parent broker
 
 ---
 
@@ -1409,7 +1414,7 @@ _API:_ (none)
 ### `local_port` | `localport` | `localPort` []
 
 _API:_ (none)
-port number for the local receive port.
+Specifies the port the rest of the federation should use when contacting this federate.
 
 ---
 

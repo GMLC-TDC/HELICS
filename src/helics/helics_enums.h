@@ -211,11 +211,14 @@ typedef enum {
     HELICS_ERROR_EXTERNAL_TYPE = -203,
     /** the function produced a helics error of some other type */
     HELICS_ERROR_OTHER = -101,
+    /** user code generated exception */
+    HELICS_USER_EXCEPTION = -29,
     /** user system abort*/
     HELICS_ERROR_USER_ABORT = -27,
     /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
-    HELICS_ERROR_EXECUTION_FAILURE = -14, /*!< the function execution has failed */
+    /** the function execution has failed */
+    HELICS_ERROR_EXECUTION_FAILURE = -14,
     /** the call made was invalid in the present state of the calling object */
     HELICS_ERROR_INVALID_FUNCTION_CALL = -10,
     /** error issued when an invalid state transition occurred */
@@ -275,7 +278,7 @@ typedef enum {
        HelicsLogLevels*/
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
     /** integer property controlling the size of the log buffer*/
-    HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+    HELICS_PROPERTY_INT_LOG_BUFFER = 276
 } HelicsProperties;
 
 /** result returned for requesting the value of an invalid/unknown property */
@@ -358,6 +361,17 @@ typedef enum {
        firewall like rules*/
     HELICS_FILTER_TYPE_FIREWALL = 6
 } HelicsFilterTypes;
+
+/** enumeration of the predefined translator types*/
+typedef enum {
+    /** a custom filter type that executes a user defined callback*/
+    HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
+    /** a translator type that converts to and from JSON*/
+    HELICS_TRANSLATOR_TYPE_JSON = 11,
+    /** a translator type that just encodes the message again in binary*/
+    HELICS_TRANSLATOR_TYPE_BINARY = 12
+
+} HelicsTranslatorTypes;
 
 /** enumeration of sequencing modes for queries and commands
 fast is the default, meaning the query travels along priority channels and takes precedence of over

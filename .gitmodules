@@ -30,3 +30,4 @@
 [submodule "ThirdParty/networking"]
 	path = ThirdParty/networking
 	url = ../../GMLC-TDC/networking.git
+	branch = main

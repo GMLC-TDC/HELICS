@@ -194,8 +194,7 @@ static constexpr const char* simple_files[] = {"example1.player",
                                                "example5.json",
                                                "example5.player"};
 
-class player_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class player_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_file_tests, test_files)
 {
@@ -270,12 +269,13 @@ TEST(player_tests, bigfile)
     // helics::Time maxTime = 60.0 * 60.0 * 24.0 * 7.0;
     helics::Time period = 60.0;
     auto retTime = vfed.requestTime(60.0);
-    double val1{0.0};
-    double val2{0.0};
-    double val3{0.0};
-    double val4{0.0};
-    double val5{0.0};
+
     while (retTime <= 200.0) {
+        double val1{0.0};
+        double val2{0.0};
+        double val3{0.0};
+        double val4{0.0};
+        double val5{0.0};
         EXPECT_NO_THROW(val1 = sub1.getValue<double>());
         EXPECT_NO_THROW(val2 = sub2.getValue<double>());
         EXPECT_NO_THROW(val3 = sub3.getValue<double>());
@@ -642,8 +642,7 @@ static constexpr const char* simple_message_files[] = {"example_message1.player"
                                                        "example_message2.player",
                                                        "example_message3.json"};
 
-class player_message_file_tests: public ::testing::TestWithParam<const char*> {
-};
+class player_message_file_tests: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(player_message_file_tests, message_test_files)
 {

@@ -22,4 +22,7 @@ TEST(networkData_tests, basic_test)
     EXPECT_EQ(bdata.brokerName, "tom");
     EXPECT_EQ(bdata.brokerPort, 20755);
     EXPECT_EQ(bdata.portNumber, 45);
+    parser->helics_parse("--encrypted --encryption_config=openssl.json");
+    EXPECT_EQ(bdata.encrypted, true);
+    EXPECT_EQ(bdata.encryptionConfig, "openssl.json");
 }

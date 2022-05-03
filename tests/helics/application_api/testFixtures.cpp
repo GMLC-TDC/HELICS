@@ -117,7 +117,7 @@ std::shared_ptr<helics::Broker>
                                 std::string("--maxcosimduration=180000 ") + initialization_string +
                                     " " + extraBrokerArgs);
     }
-    broker->setLoggingLevel(HELICS_LOG_LEVEL_ERROR);
+    broker->setLoggingLevel(HELICS_LOG_LEVEL_WARNING);
     brokers.push_back(broker);
     return broker;
 }

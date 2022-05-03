@@ -123,6 +123,45 @@ class NullFilterOperator final: public FilterOperator {
     }
 };
 
+/**
+ * TranslatorOperator abstract class
+ @details TranslatorOperators will perform the conversion from a value to message and vice versa
+ *
+ */
+class TranslatorOperator {
+  public:
+    /** default constructor*/
+    TranslatorOperator() = default;
+    /**virtual destructor*/
+    virtual ~TranslatorOperator() = default;
+    /** convert a message to a value*/
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> message) = 0;
+
+    /** convert a value to a message*/
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& value) = 0;
+
+    /** generate a new time for the message based on the value time */
+    virtual Time computeNewMessageTime(Time valueTime) { return valueTime + minDelay; }
+    /** generate a new time for the value based on the message time */
+    virtual Time computeNewValueTime(Time messageTime) { return messageTime + minDelay; }
+    Time minDelay{Time::epsilon()};
+};
+
+/** special translator operator defining no operation the original message is simply discarded
+ */
+class NullTranslatorOperator final: public TranslatorOperator {
+  public:
+    /**default constructor*/
+    NullTranslatorOperator() = default;
+    virtual SmallBuffer convertToValue(std::unique_ptr<Message> /*message*/) override { return {}; }
+
+    /** convert a value to a message*/
+    virtual std::unique_ptr<Message> convertToMessage(const SmallBuffer& /*value*/) override
+    {
+        return nullptr;
+    }
+};
+
 /** helper template to check whether an index is actually valid for a particular vector
 @tparam SizedDataType a vector like data type that must have a size function
 @param testSize an index to test

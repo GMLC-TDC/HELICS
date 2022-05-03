@@ -1,5 +1,14 @@
 # Quick links
 
+```{eval-rst}
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    404
+
+```
+
 - [Configuration Option Reference](./references/configuration_options_reference.md)
 - [Queries](./user-guide/advanced_topics/queries.md)
 - [Environment Variables](./user-guide/advanced_topics/environment_variables.md)

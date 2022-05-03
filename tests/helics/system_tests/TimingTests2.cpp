@@ -16,11 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 #include <thread>
 
-struct timing_tests2: public FederateTestFixture, public ::testing::Test {
-};
+struct timing2: public FederateTestFixture, public ::testing::Test {};
 /** just a check that in the simple case we do actually get the time back we requested*/
 
-TEST_F(timing_tests2, small_time_test)
+TEST_F(timing2, small_time)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -87,10 +86,16 @@ TEST_F(timing_tests2, small_time_test)
     vFed2->finalize();
 }
 
+TEST_F(timing2, numbers)
+{
+    EXPECT_EQ(helics::cBigTime, helics::Time{cHelicsBigNumber});
+    EXPECT_EQ(helics::cBigTime, helics::Time::maxVal());
+}
+
 /** based on bug found by Manoj Kumar Cebol Sundarrajan
 where a very small period could cause the time to be negative
 */
-TEST_F(timing_tests2, small_period_test)
+TEST_F(timing2, small_period)
 {
     SetupTest<helics::MessageFederate>("test", 3);
     auto rx = GetFederateAs<helics::MessageFederate>(0);
@@ -167,7 +172,7 @@ TEST_F(timing_tests2, small_period_test)
 }
 
 // Tests out the restrictive time policy
-TEST_F(timing_tests2, ring_test3)
+TEST_F(timing2, ring3)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -249,7 +254,7 @@ TEST_F(timing_tests2, ring_test3)
     vFed1->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_exec_extry)
+TEST_F(timing2, wait_for_current_time_exec_extry)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -296,7 +301,7 @@ TEST_F(timing_tests2, wait_for_current_time_exec_extry)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag)
+TEST_F(timing2, wait_for_current_time_flag)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -378,7 +383,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag)
     vFed3->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag2)
+TEST_F(timing2, wait_for_current_time_flag2)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -445,7 +450,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag2)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag2_error)
+TEST_F(timing2, wait_for_current_time_flag2_error)
 {
     extraBrokerArgs = "--debugging --consoleloglevel=no_print";
     auto broker = AddBroker("test", 2);
@@ -480,7 +485,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag2_error)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_self)
+TEST_F(timing2, wait_for_current_time_flag_self)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -550,7 +555,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_self)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
+TEST_F(timing2, wait_for_current_time_flag_endpoint_error)
 {
     extraBrokerArgs = "--debugging --loglevel=no_print";
     auto broker = AddBroker("test", 2);
@@ -582,7 +587,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint_error)
     broker.reset();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
+TEST_F(timing2, wait_for_current_time_flag_endpoint)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);
@@ -647,7 +652,7 @@ TEST_F(timing_tests2, wait_for_current_time_flag_endpoint)
     broker.reset();
 }
 
-TEST_F(timing_tests2, offset_timing)
+TEST_F(timing2, offset_timing)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -685,104 +690,8 @@ TEST_F(timing_tests2, offset_timing)
     vFed2->disconnect();
 }
 
-TEST_F(timing_tests2, wait_for_current_time_iterative)
-{
-    extraBrokerArgs = "--debugging";
-    auto broker = AddBroker("test", 2);
-    extraCoreArgs = "--debugging";
-    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
-    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
-
-    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
-    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
-
-    auto& pub1_1 = vFed1->registerGlobalPublication<double>("pub1_1");
-    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
-
-    auto& pub2_1 = vFed2->registerGlobalPublication<double>("pub2_1");
-
-    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
-    sub2_1.setDefault(9.9);
-    sub1_1.setDefault(10.22);
-
-    vFed2->enterExecutingModeAsync();
-    vFed1->enterExecutingMode();
-
-    pub1_1.publish(3.5);
-
-    vFed1->requestTimeAsync(1.0);
-
-    vFed2->enterExecutingModeComplete();
-    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
-
-    vFed2->requestTimeAsync(1.0);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-
-    auto retTime = vFed1->requestTimeComplete();
-    EXPECT_EQ(retTime, 1.0);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-
-    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-    retTime = vFed2->requestTimeComplete();
-    EXPECT_EQ(retTime, 1.0);
-
-    EXPECT_EQ(sub2_1.getValue<double>(), 3.5);
-
-    pub2_1.publish(3.1);
-
-    vFed2->requestTimeIterativeAsync(7.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-
-    auto itTime = vFed1->requestTimeIterativeComplete();
-    EXPECT_EQ(itTime.grantedTime, 1.0);
-    EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
-    EXPECT_EQ(sub1_1.getValue<double>(), 3.1);
-
-    pub1_1.publish(5.4);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-
-    // iteration 3
-
-    itTime = vFed2->requestTimeIterativeComplete();
-    EXPECT_EQ(itTime.grantedTime, 1.0);
-    EXPECT_EQ(sub2_1.getValue<double>(), 5.4);
-    pub2_1.publish(8.7);
-    vFed2->requestTimeIterativeAsync(7.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-
-    // iteration 4
-    itTime = vFed1->requestTimeIterativeComplete();
-    EXPECT_EQ(itTime.grantedTime, 1.0);
-    EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
-    EXPECT_EQ(sub1_1.getValue<double>(), 8.7);
-
-    pub1_1.publish(7.3);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
-    vFed1->requestTimeIterativeAsync(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
-    // iteration 5
-
-    itTime = vFed2->requestTimeIterativeComplete();
-    EXPECT_EQ(itTime.grantedTime, 1.0);
-    EXPECT_EQ(sub2_1.getValue<double>(), 7.3);
-
-    vFed2->finalize();
-
-    itTime = vFed1->requestTimeIterativeComplete();
-    EXPECT_EQ(itTime.grantedTime, 3.0);
-    EXPECT_EQ(itTime.state, helics::IterationResult::NEXT_STEP);
-
-    broker.reset();
-    vFed1->finalize();
-}
-
 // Tests out the time barrier
-TEST_F(timing_tests2, time_barrier1)
+TEST_F(timing2, time_barrier1)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -804,8 +713,7 @@ TEST_F(timing_tests2, time_barrier1)
     vFed2->finalize();
 }
 
-// Tests out the restrictive time policy
-TEST_F(timing_tests2, time_barrier_update)
+TEST_F(timing2, time_barrier_update)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -828,7 +736,7 @@ TEST_F(timing_tests2, time_barrier_update)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, time_barrier_clear)
+TEST_F(timing2, time_barrier_clear)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -876,7 +784,7 @@ TEST_F(timing_tests2, time_barrier_clear)
     vFed2->finalize();
 }
 
-TEST_F(timing_tests2, time_barrier_clear2)
+TEST_F(timing2, time_barrier_clear2)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -929,6 +837,36 @@ TEST_F(timing_tests2, time_barrier_clear2)
     rtime = vFed2->requestTimeComplete();
     EXPECT_EQ(rtime, 3.0);
 
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(timing2, value_to_endpoint_timing)
+{
+    SetupTest<helics::CombinationFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto vFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    /** establish dependencies between the federates*/
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+
+    auto& ept2 = vFed2->registerEndpoint("ept1");
+
+    ept2.subscribe("pub1");
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->requestTimeAsync(3.0);
+    pub1.publish(3.7);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+    auto tm = vFed1->requestTime(2.0);
+    EXPECT_EQ(tm, 2.0);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    auto tm2 = vFed2->requestTimeComplete();
+    EXPECT_LT(tm2, 2.0);
+    EXPECT_TRUE(ept2.hasMessage());
     vFed1->finalize();
     vFed2->finalize();
 }

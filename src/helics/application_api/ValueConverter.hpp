@@ -25,10 +25,22 @@ algorithms
 namespace helics {
 
 namespace detail {
-    constexpr size_t getBinaryLength(double /*val*/) { return 16; }
-    constexpr size_t getBinaryLength(std::int64_t /*val*/) { return 16; }
-    constexpr size_t getBinaryLength(std::complex<double> /*val*/) { return 24; }
-    inline size_t getBinaryLength(std::string_view val) { return val.size() + 8; }
+    constexpr size_t getBinaryLength(double /*val*/)
+    {
+        return 16;
+    }
+    constexpr size_t getBinaryLength(std::int64_t /*val*/)
+    {
+        return 16;
+    }
+    constexpr size_t getBinaryLength(std::complex<double> /*val*/)
+    {
+        return 24;
+    }
+    inline size_t getBinaryLength(std::string_view val)
+    {
+        return val.size() + 8;
+    }
     inline size_t getBinaryLength(const std::vector<double>& val)
     {
         return val.size() * sizeof(double) + 8;
@@ -38,7 +50,10 @@ namespace detail {
         return size * sizeof(double) + 8;
     }
 
-    inline size_t getBinaryLength(const NamedPoint& np) { return np.name.size() + 16; }
+    inline size_t getBinaryLength(const NamedPoint& np)
+    {
+        return np.name.size() + 16;
+    }
 
     inline size_t getBinaryLength(const std::vector<std::complex<double>>& cv)
     {

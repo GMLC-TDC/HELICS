@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <gtest/gtest.h>
 #include <iostream>
 
-struct iteration_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct iteration_tests: public FederateTestFixture, public ::testing::Test {};
 
 // run a simple iteration on a single federate to test out iterative calls
 TEST_F(iteration_tests, execution_iteration_test)
@@ -53,7 +52,7 @@ TEST_F(iteration_tests, execution_iteration_test)
 std::pair<double, int> runInitIterations(HelicsFederate vfed, int index, int total)
 {
     auto pub = helicsFederateRegisterPublication(vfed, "pub", HELICS_DATA_TYPE_DOUBLE, "", nullptr);
-    helicsPublicationSetMinimumChange(pub, 0.01, nullptr);
+    helicsPublicationSetMinimumChange(pub, 0.001, nullptr);
     std::string low_target = "fed";
     low_target += std::to_string((index == 0) ? total - 1 : index - 1);
     low_target += "/pub";
@@ -106,8 +105,7 @@ std::vector<std::pair<double, int>> run_iteration_round_robin(std::vector<Helics
 
 class iteration_tests_type:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(iteration_tests_type, execution_iteration_round_robin_ci_skip)
 {
@@ -137,6 +135,10 @@ TEST_F(iteration_tests, execution_iteration_loop3)
     std::vector<HelicsFederate> vfeds(N);
     for (int ii = 0; ii < N; ++ii) {
         vfeds[ii] = GetFederateAt(ii);
+        helicsFederateSetFlagOption(vfeds[ii],
+                                    HELICS_FLAG_RESTRICTIVE_TIME_POLICY,
+                                    HELICS_TRUE,
+                                    nullptr);
     }
     auto results = run_iteration_round_robin(vfeds);
     for (int ii = 1; ii < N; ++ii) {

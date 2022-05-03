@@ -51,7 +51,7 @@ class SmallBuffer {
 
     template<typename U,
              typename T = std::enable_if_t<std::is_constructible_v<std::string_view, U>>>
-    SmallBuffer(U&& u): heap(buffer.data())
+    /*implicit*/ SmallBuffer(U&& u): heap(buffer.data())
     {
         std::string_view val(std::forward<U>(u));
         resize(val.size());
@@ -64,7 +64,7 @@ class SmallBuffer {
         std::memcpy(heap, data, size);
     }
     /** create a buffer with a specific size*/
-    SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
+    explicit SmallBuffer(std::size_t size): heap(buffer.data()) { resize(size); }
 
     /** create a buffer with a specific size and contents*/
     SmallBuffer(std::size_t size, std::byte val): heap(buffer.data()) { resize(size, val); }
@@ -118,11 +118,14 @@ class SmallBuffer {
             heap = buffer.data();
             bufferCapacity = 64;
         }
+        locked = sb.locked;
         bufferSize = sb.bufferSize;
         sb.heap = sb.buffer.data();
         sb.bufferCapacity = 64;
         sb.bufferSize = 0;
         sb.usingAllocatedBuffer = false;
+        sb.locked = false;
+
         return *this;
     }
     template<typename U,
@@ -250,6 +253,7 @@ class SmallBuffer {
         bufferSize = size;
         nonOwning = false;
         usingAllocatedBuffer = true;
+        locked = false;
     }
     /** use other managed memory */
     void spanAssign(void* data, std::size_t size, std::size_t capacity)
@@ -265,6 +269,7 @@ class SmallBuffer {
             }
             delete[] heap;
         }
+        locked = false;
         heap = newHeap;
         bufferCapacity = capacity;
         bufferSize = size;
@@ -288,7 +293,7 @@ class SmallBuffer {
     {
         static constexpr size_t bigSize{sizeof(size_t) == 8 ? 0x010'0000'0000U : 0xFFFF'0000U};
         if (size > bufferCapacity) {
-            if (size > bigSize) {
+            if (size > bigSize || locked) {
                 throw(std::bad_alloc());
             }
             auto* ndata = new std::byte[size + 8];
@@ -302,6 +307,9 @@ class SmallBuffer {
             bufferCapacity = size + 8;
         }
     }
+    void lock(bool lockStatus = true) { locked = lockStatus; }
+
+    bool isLocked() const { return locked; }
     /** check if the buffer is empty*/
     bool empty() const { return (bufferSize == 0); }
     /** get the current size of the buffer*/
@@ -358,6 +366,7 @@ class SmallBuffer {
         heap = buffer.data();
         usingAllocatedBuffer = false;
         nonOwning = false;
+        locked = false;
         bufferCapacity = 64;
         bufferSize = 0;
         return released;
@@ -369,7 +378,12 @@ class SmallBuffer {
     std::size_t bufferCapacity{64};
     std::byte* heap;
     bool nonOwning{false};
+    bool locked{false};
     bool usingAllocatedBuffer{false};
+
+  public:
+    std::uint32_t userKey{0};  // 32 bits of user data for whatever purpose is desired has no impact
+                               // on state or operations
 };
 
 /** operator to check if small buffers are equal to each other*/

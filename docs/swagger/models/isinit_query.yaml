@@ -1,0 +1,8 @@
+title: isinit_query
+type: boolean
+x-tags:
+  - query response
+examples:
+  - true
+  - true
+description: response for "isinit" query

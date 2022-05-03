@@ -1,0 +1,5 @@
+title: endpoints_query
+type: array
+description: query a list of available endpoints
+items:
+  type: string

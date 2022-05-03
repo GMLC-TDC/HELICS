@@ -33,8 +33,11 @@ class Input;
 class Publication;
 class Endpoint;
 class Filter;
+class Translator;
 
 class FilterObject;
+class TranslatorObject;
+class SmallBuffer;
 
 /** type code embedded in the objects so the library knows how to cast them appropriately*/
 enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, INVALID };
@@ -54,6 +57,7 @@ class CoreObject {
   public:
     std::shared_ptr<Core> coreptr;
     std::vector<std::unique_ptr<FilterObject>> filters;  //!< list of filters created directly through the core
+    std::vector<std::unique_ptr<TranslatorObject>> translators;  //!< list of filters created directly through the core
     int index{0};
     int valid{-2};
     CoreObject() = default;
@@ -91,6 +95,7 @@ class FedObject {
     std::vector<std::unique_ptr<PublicationObject>> pubs;
     std::vector<std::unique_ptr<EndpointObject>> epts;
     std::vector<std::unique_ptr<FilterObject>> filters;
+    std::vector<std::unique_ptr<TranslatorObject>> translators;
     std::pair<std::string, std::string> commandBuffer;
     FedObject() = default;
     ~FedObject();
@@ -123,7 +128,7 @@ class EndpointObject {
     int valid{0};
 };
 
-/** object wrapping a source filter*/
+/** object wrapping a filter*/
 class FilterObject {
   public:
     bool cloning{false};  //!< indicator that the filter is a cloning filter
@@ -131,6 +136,17 @@ class FilterObject {
     int valid{0};
     Filter* filtPtr{nullptr};
     std::unique_ptr<Filter> uFilter;
+    std::shared_ptr<Federate> fedptr;
+    std::shared_ptr<Core> corePtr;
+};
+
+/** object wrapping a translator*/
+class TranslatorObject {
+  public:
+    bool custom{false};  //!< indicator that the translator is a custom translator and requires callbacks
+    int valid{0};
+    Translator* transPtr{nullptr};
+    std::unique_ptr<Translator> mTrans;
     std::shared_ptr<Federate> fedptr;
     std::shared_ptr<Core> corePtr;
 };
@@ -187,6 +203,7 @@ helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
+std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
 

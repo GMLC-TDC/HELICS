@@ -13,6 +13,7 @@ The public API includes the following
   - Subscriptions.hpp
   - Endpoints.hpp
   - Filters.hpp
+  - Translators.hpp
   - Federate.hpp
   - helicsTypes.hpp
   - data_view.hpp
@@ -28,7 +29,7 @@ The public API includes the following
   - CoreApp.hpp
   - timeOperations.hpp
   - typeOperations.hpp
-  - Exceptions: Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries. The data returned via queries is subject to change, in general queries will not be removed, but if a need arises the data structure may change at minor revision numbers. We hope to fully document the queries structure in 3.2 at which point they will be stable for at least minor releases and changes will be noted. The new log features in 3.1.2 will be stabilized in 3.2 and considered experimental in 3.1.2.
+  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.3 release. Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure in HELICS v3.3 at which point they will be stable for at least minor releases and changes will be noted.
 
 - Core library headers
 
@@ -46,6 +47,7 @@ The public API includes the following
 
   - All C library operations are merged into a single header `helics.h`
   - A `helics_api.h` header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
+  - Translator and helicsData API's and methods are in Beta and subject to revision until the HELICS 3.3 release comments or bugs are welcome
 
 - App Library
 

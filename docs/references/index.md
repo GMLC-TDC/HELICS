@@ -3,7 +3,7 @@
 ```{eval-rst}
 .. toctree::
    :hidden:
-   :maxdepth: 2
+   :maxdepth: 1
 
    Tools_using_HELICS
    apps/index

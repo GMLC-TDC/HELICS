@@ -1,5 +1,15 @@
 # Timing Configuration
 
+```{eval-rst}
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    timing_exercise
+    timing_exercise_answers
+
+```
+
 The two fundamental roles of a co-simulation platform are to provide a means of data exchange between members of the co-simulation (federates) and a means of keeping the federation synchronized in simulated time.
 
 In HELICS, time synchronization across the federates is managed by each federate requesting a time (via a HELICS API call). When granted a time, the federate generally does the following:
@@ -11,7 +21,7 @@ In HELICS, time synchronization across the federates is managed by each federate
 
 Sometimes this timing configuration is determined by the construction of the simulator (for example, if it has a fixed simulation time step size) and sometimes the simulator will have nothing to do until it receives a new input (for example, with a controller).
 
-In most federates there will be a line of code that look like this (at least if their [using the C API](../../references/api-reference/index.md)):
+In most federates there will be a line of code that look like this (at least if they are [using the Python API](../../references/api-reference/index.md)):
 
 ```python
 t = h.helicsFederateRequestTime(fed, time_requested)
@@ -41,15 +51,12 @@ Below is an example of how the most common of these are implemented in a federat
 
 ```json
 {
-  "name":"generic_federate",
-  ...
-
-  "period":  1.0,
+  "name": "generic_federate",
+  "period": 1.0,
   "offset": 1.0,
   "time_delta": 10.0,
-  "uninterruptible":false,
-  "wait_for_current_time_update": true,
-  ...
+  "uninterruptible": false,
+  "wait_for_current_time_update": true
 }
 ```
 

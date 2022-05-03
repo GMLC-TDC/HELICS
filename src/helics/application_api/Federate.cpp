@@ -18,9 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helics_definitions.hpp"
 #include "../network/loadCores.hpp"
 #include "AsyncFedCallInfo.hpp"
+#include "ConnectorFederateManager.hpp"
 #include "CoreApp.hpp"
-#include "FilterFederateManager.hpp"
 #include "Filters.hpp"
+#include "Translator.hpp"
 #include "gmlc/utilities/stringOps.h"
 #include "helics/helics-config.h"
 
@@ -112,7 +113,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     observerMode = fi.observer;
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
 Federate::Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi):
@@ -151,7 +152,7 @@ Federate::Federate(const std::string& fedName,
     strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
     currentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    fManager = std::make_unique<FilterFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
 Federate::Federate(const std::string& fedName, const std::string& configString):
@@ -183,7 +184,7 @@ Federate::Federate(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     observerMode = fed.observerMode;
     asyncCallInfo = std::move(fed.asyncCallInfo);
-    fManager = std::move(fed.fManager);
+    cManager = std::move(fed.cManager);
     mName = std::move(fed.mName);
 }
 
@@ -200,7 +201,7 @@ Federate& Federate::operator=(Federate&& fed) noexcept
     strictConfigChecking = fed.strictConfigChecking;
     asyncCallInfo = std::move(fed.asyncCallInfo);
     observerMode = fed.observerMode;
-    fManager = std::move(fed.fManager);
+    cManager = std::move(fed.cManager);
     mName = std::move(fed.mName);
     return *this;
 }
@@ -226,12 +227,12 @@ void Federate::enterInitializingMode()
         case Modes::STARTUP:
             try {
                 coreObject->enterInitializingMode(fedID);
-                currentMode = Modes::INITIALIZING;
+                updateFederateMode(Modes::INITIALIZING);
                 currentTime = coreObject->getCurrentTime(fedID);
                 startupToInitializeStateTransition();
             }
             catch (const HelicsException&) {
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
             break;
@@ -294,10 +295,10 @@ void Federate::enterInitializingModeComplete()
                 asyncInfo->initFuture.get();
             }
             catch (const std::exception&) {
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
-            currentMode = Modes::INITIALIZING;
+            updateFederateMode(Modes::INITIALIZING);
             currentTime = coreObject->getCurrentTime(fedID);
             startupToInitializeStateTransition();
         } break;
@@ -325,7 +326,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             res = coreObject->enterExecutingMode(fedID, iterate);
             switch (res) {
                 case IterationResult::NEXT_STEP:
-                    currentMode = Modes::EXECUTING;
+                    updateFederateMode(Modes::EXECUTING);
                     if (observerMode) {
                         currentTime = coreObject->getCurrentTime(fedID);
                     } else {
@@ -335,17 +336,20 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
                         timeUpdateCallback(currentTime, false);
                     }
                     initializeToExecuteStateTransition(res);
+                    if (timeRequestReturnCallback) {
+                        timeRequestReturnCallback(currentTime, false);
+                    }
                     break;
                 case IterationResult::ITERATING:
-                    currentMode = Modes::INITIALIZING;
+                    updateFederateMode(Modes::INITIALIZING);
                     currentTime = initializationTime;
                     initializeToExecuteStateTransition(res);
                     break;
                 case IterationResult::ERROR_RESULT:
-                    currentMode = Modes::ERROR_STATE;
+                    updateFederateMode(Modes::ERROR_STATE);
                     break;
                 case IterationResult::HALTED:
-                    currentMode = Modes::FINISHED;
+                    updateFederateMode(Modes::FINISHED);
                     break;
             }
             break;
@@ -381,7 +385,7 @@ void Federate::enterExecutingModeAsync(IterationRequest iterate)
                 return coreObject->enterExecutingMode(fedID, iterate);
             };
             auto asyncInfo = asyncCallInfo->lock();
-            currentMode = Modes::PENDING_EXEC;
+            updateFederateMode(Modes::PENDING_EXEC);
             asyncInfo->execFuture = std::async(std::launch::async, eExecFunc);
         } break;
         case Modes::PENDING_INIT:
@@ -392,7 +396,7 @@ void Federate::enterExecutingModeAsync(IterationRequest iterate)
                 return coreObject->enterExecutingMode(fedID, iterate);
             };
             auto asyncInfo = asyncCallInfo->lock();
-            currentMode = Modes::PENDING_EXEC;
+            updateFederateMode(Modes::PENDING_EXEC);
             asyncInfo->execFuture = std::async(std::launch::async, eExecFunc);
         } break;
         case Modes::PENDING_EXEC:
@@ -416,7 +420,7 @@ IterationResult Federate::enterExecutingModeComplete()
                 auto res = asyncInfo->execFuture.get();
                 switch (res) {
                     case IterationResult::NEXT_STEP:
-                        currentMode = Modes::EXECUTING;
+                        updateFederateMode(Modes::EXECUTING);
                         if (observerMode) {
                             currentTime = coreObject->getCurrentTime(fedID);
                         } else {
@@ -426,26 +430,29 @@ IterationResult Federate::enterExecutingModeComplete()
                             timeUpdateCallback(currentTime, false);
                         }
                         initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
+                        if (timeRequestReturnCallback) {
+                            timeRequestReturnCallback(currentTime, false);
+                        }
                         break;
                     case IterationResult::ITERATING:
-                        currentMode = Modes::INITIALIZING;
+                        updateFederateMode(Modes::INITIALIZING);
                         currentTime = initializationTime;
                         initializeToExecuteStateTransition(IterationResult::ITERATING);
                         break;
                     case IterationResult::ERROR_RESULT:
                         // LCOV_EXCL_START
-                        currentMode = Modes::ERROR_STATE;
+                        updateFederateMode(Modes::ERROR_STATE);
                         break;
                         // LCOV_EXCL_STOP
                     case IterationResult::HALTED:
-                        currentMode = Modes::FINISHED;
+                        updateFederateMode(Modes::FINISHED);
                         break;
                 }
 
                 return res;
             }
             catch (const std::exception&) {
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
         }
@@ -495,13 +502,42 @@ void Federate::setLoggingCallback(
     coreObject->setLoggingCallback(fedID, logFunction);
 }
 
+void Federate::setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback)
+{
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
+        throw(InvalidFunctionCall(
+            "cannot update time request callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    timeRequestEntryCallback = std::move(callback);
+}
+
 void Federate::setTimeUpdateCallback(std::function<void(Time, bool)> callback)
 {
     if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
         throw(InvalidFunctionCall(
-            "cannot update time callback during an async operation"));  // LCOV_EXCL_LINE
+            "cannot update time update callback during an async operation"));  // LCOV_EXCL_LINE
     }
     timeUpdateCallback = std::move(callback);
+}
+
+void Federate::setModeUpdateCallback(std::function<void(Modes, Modes)> callback)
+{
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME ||
+        currentMode == Modes::PENDING_EXEC || currentMode == Modes::PENDING_INIT ||
+        currentMode == Modes::PENDING_FINALIZE) {
+        throw(InvalidFunctionCall(
+            "cannot update mode update callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    modeUpdateCallback = std::move(callback);
+}
+
+void Federate::setTimeRequestReturnCallback(std::function<void(Time, bool)> callback)
+{
+    if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
+        throw(InvalidFunctionCall(
+            "cannot update time request return callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    timeRequestReturnCallback = std::move(callback);
 }
 
 void Federate::setFlagOption(int flag, bool flagValue)
@@ -533,7 +569,7 @@ void Federate::finalize()
                 asyncInfo->initFuture.get();
             }
             catch (const std::exception&) {
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
         } break;
@@ -561,10 +597,10 @@ void Federate::finalize()
         coreObject->finalize(fedID);
     }
 
-    if (fManager) {
-        fManager->closeAllFilters();
+    if (cManager) {
+        cManager->closeAllConnectors();
     }
-    currentMode.store(Modes::FINALIZE);
+    updateFederateMode(Modes::FINALIZE);
 }
 
 void Federate::finalizeAsync()
@@ -592,7 +628,7 @@ void Federate::finalizeAsync()
     }
     auto finalizeFunc = [this]() { return coreObject->finalize(fedID); };
     auto asyncInfo = asyncCallInfo->lock();
-    currentMode = Modes::PENDING_FINALIZE;
+    updateFederateMode(Modes::PENDING_FINALIZE);
     asyncInfo->finalizeFuture = std::async(std::launch::async, finalizeFunc);
 }
 
@@ -602,7 +638,7 @@ void Federate::finalizeComplete()
     if (currentMode == Modes::PENDING_FINALIZE) {
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->finalizeFuture.get();
-        currentMode = Modes::FINALIZE;
+        updateFederateMode(Modes::FINALIZE);
     } else {
         finalize();
     }
@@ -616,8 +652,8 @@ void Federate::processCommunication(std::chrono::milliseconds period)
 void Federate::disconnect()
 {
     finalize();
-    if (fManager) {
-        fManager->disconnect();
+    if (cManager) {
+        cManager->disconnect();
     }
     coreObject = CoreFactory::getEmptyCore();
 }
@@ -660,14 +696,14 @@ void Federate::globalError(int errorcode)
 void Federate::localError(int errorcode, const std::string& message)
 {
     completeOperation();
-    currentMode = Modes::ERROR_STATE;
+    updateFederateMode(Modes::ERROR_STATE);
     coreObject->localError(fedID, errorcode, message);
 }
 
 void Federate::globalError(int errorcode, const std::string& message)
 {
     completeOperation();
-    currentMode = Modes::ERROR_STATE;
+    updateFederateMode(Modes::ERROR_STATE);
     coreObject->globalError(fedID, errorcode, message);
 }
 
@@ -676,15 +712,20 @@ Time Federate::requestTime(Time nextInternalTimeStep)
     switch (currentMode) {
         case Modes::EXECUTING:
             try {
+                if (timeRequestEntryCallback) {
+                    timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
+                }
                 auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+
                 updateSimulationTime(newTime, currentTime, false);
-                if (newTime == Time::maxVal()) {
-                    currentMode = Modes::FINISHED;
+
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(newTime, false);
                 }
                 return newTime;
             }
             catch (const FunctionExecutionFailure&) {
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
             break;
@@ -701,21 +742,32 @@ Time Federate::requestTime(Time nextInternalTimeStep)
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
 {
     if (currentMode == Modes::EXECUTING) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime,
+                                     nextInternalTimeStep,
+                                     iterate != IterationRequest::NO_ITERATIONS);
+        }
         auto iterativeTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterate);
         switch (iterativeTime.state) {
             case IterationResult::NEXT_STEP:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, false);
+                }
                 break;
             case IterationResult::ITERATING:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, true);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, true);
+                }
                 break;
             case IterationResult::HALTED:
+                updateFederateMode(Modes::FINISHED);
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
-                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 break;
                 // LCOV_EXCL_STOP
         }
@@ -731,6 +783,9 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_TIME)) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
+        }
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep]() {
@@ -745,6 +800,11 @@ void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationReq
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_ITERATIVE_TIME)) {
+        if (timeRequestEntryCallback) {
+            timeRequestEntryCallback(currentTime,
+                                     nextInternalTimeStep,
+                                     iterate != IterationRequest::NO_ITERATIONS);
+        }
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestIterativeFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep, iterate]() {
@@ -763,6 +823,9 @@ Time Federate::requestTimeComplete()
         auto newTime = asyncInfo->timeRequestFuture.get();
         asyncInfo.unlock();  // remove the lock;
         updateSimulationTime(newTime, currentTime, false);
+        if (timeRequestReturnCallback) {
+            timeRequestReturnCallback(newTime, false);
+        }
         return newTime;
     }
     throw(InvalidFunctionCall(
@@ -780,17 +843,23 @@ iteration_time Federate::requestTimeIterativeComplete()
         switch (iterativeTime.state) {
             case IterationResult::NEXT_STEP:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, false);
+                }
                 break;
             case IterationResult::ITERATING:
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, true);
+                if (timeRequestReturnCallback) {
+                    timeRequestReturnCallback(iterativeTime.grantedTime, true);
+                }
                 break;
             case IterationResult::HALTED:
+                updateFederateMode(Modes::FINISHED);
                 updateSimulationTime(iterativeTime.grantedTime, currentTime, false);
-                currentMode = Modes::FINISHED;
                 break;
             case IterationResult::ERROR_RESULT:
                 // LCOV_EXCL_START
-                currentMode = Modes::ERROR_STATE;
+                updateFederateMode(Modes::ERROR_STATE);
                 break;
                 // LCOV_EXCL_STOP
         }
@@ -800,6 +869,46 @@ iteration_time Federate::requestTimeIterativeComplete()
         "cannot call requestTimeIterativeComplete without first calling requestTimeIterativeAsync function"));
 }
 
+void Federate::updateFederateMode(Modes newMode)
+{
+    Modes oldMode = currentMode.load();
+    currentMode.store(newMode);
+    if (modeUpdateCallback && newMode != oldMode) {
+        if (newMode == Modes::PENDING_EXEC || newMode == Modes::PENDING_INIT ||
+            newMode == Modes::PENDING_ITERATIVE_TIME || newMode == Modes::PENDING_TIME ||
+            newMode == Modes::PENDING_FINALIZE) {
+            return;
+        }
+        switch (oldMode) {
+            case Modes::PENDING_INIT:
+                modeUpdateCallback(newMode, Modes::STARTUP);
+                break;
+            case Modes::PENDING_EXEC:
+                if (newMode != Modes::INITIALIZING) {
+                    modeUpdateCallback(newMode, Modes::INITIALIZING);
+                }
+                break;
+            case Modes::PENDING_ITERATIVE_TIME:
+            case Modes::PENDING_TIME:
+                if (newMode != Modes::EXECUTING) {
+                    modeUpdateCallback(newMode, Modes::EXECUTING);
+                }
+                break;
+            case Modes::PENDING_FINALIZE:
+                modeUpdateCallback(newMode, Modes::EXECUTING);
+                break;
+            case Modes::FINALIZE:
+            case Modes::INITIALIZING:
+            case Modes::EXECUTING:
+            case Modes::FINISHED:
+            case Modes::ERROR_STATE:
+            case Modes::STARTUP:
+                modeUpdateCallback(newMode, oldMode);
+                break;
+        }
+    }
+}
+
 void Federate::updateSimulationTime(Time newTime, Time oldTime, bool iterating)
 {
     currentTime = newTime;
@@ -807,6 +916,9 @@ void Federate::updateSimulationTime(Time newTime, Time oldTime, bool iterating)
         timeUpdateCallback(newTime, iterating);
     }
     updateTime(newTime, oldTime);
+    if (newTime == Time::maxVal()) {
+        updateFederateMode(Modes::FINISHED);
+    }
 }
 
 void Federate::updateTime(Time /*newTime*/, Time /*oldTime*/)
@@ -825,8 +937,8 @@ void Federate::initializeToExecuteStateTransition(IterationResult /*unused*/)
 
 void Federate::disconnectTransition()
 {
-    if (fManager) {
-        fManager->closeAllFilters();
+    if (cManager) {
+        cManager->closeAllConnectors();
     }
 }
 
@@ -838,10 +950,10 @@ void Federate::registerInterfaces(const std::string& configString)
 void Federate::registerFilterInterfaces(const std::string& configString)
 {
     if (fileops::hasTomlExtension(configString)) {
-        registerFilterInterfacesToml(configString);
+        registerConnectorInterfacesToml(configString);
     } else {
         try {
-            registerFilterInterfacesJson(configString);
+            registerConnectorInterfacesJson(configString);
         }
         catch (const std::invalid_argument& e) {
             throw(helics::InvalidParameter(e.what()));
@@ -911,7 +1023,7 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     addTargets(data, "destination_targets", adest);
 }
 
-void Federate::registerFilterInterfacesJson(const std::string& jsonString)
+void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     using fileops::getOrDefault;
     auto doc = fileops::loadJson(jsonString);
@@ -1023,7 +1135,7 @@ void Federate::registerFilterInterfacesJson(const std::string& jsonString)
     });
 }
 
-void Federate::registerFilterInterfacesToml(const std::string& tomlString)
+void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
     using fileops::isMember;
@@ -1160,17 +1272,22 @@ void Federate::registerFilterInterfacesToml(const std::string& tomlString)
 
 Filter& Federate::getFilter(int index)
 {
-    return fManager->getFilter(index);
+    return cManager->getFilter(index);
 }
 
 const Filter& Federate::getFilter(int index) const
 {
-    return fManager->getFilter(index);
+    return cManager->getFilter(index);
 }
 
-int Federate::filterCount() const
+Translator& Federate::getTranslator(int index)
 {
-    return fManager->getFilterCount();
+    return cManager->getTranslator(index);
+}
+
+const Translator& Federate::getTranslator(int index) const
+{
+    return cManager->getTranslator(index);
 }
 
 std::string Federate::localQuery(const std::string& /*queryStr*/) const
@@ -1290,7 +1407,7 @@ Filter& Federate::registerFilter(const std::string& filterName,
                                  const std::string& inputType,
                                  const std::string& outputType)
 {
-    return fManager->registerFilter((!filterName.empty()) ?
+    return cManager->registerFilter((!filterName.empty()) ?
                                         (getName() + nameSegmentSeparator + filterName) :
                                         filterName,
                                     inputType,
@@ -1301,7 +1418,7 @@ CloningFilter& Federate::registerCloningFilter(const std::string& filterName,
                                                const std::string& inputType,
                                                const std::string& outputType)
 {
-    return fManager->registerCloningFilter((!filterName.empty()) ?
+    return cManager->registerCloningFilter((!filterName.empty()) ?
                                                (getName() + nameSegmentSeparator + filterName) :
                                                filterName,
                                            inputType,
@@ -1312,42 +1429,95 @@ Filter& Federate::registerGlobalFilter(const std::string& filterName,
                                        const std::string& inputType,
                                        const std::string& outputType)
 {
-    return fManager->registerFilter(filterName, inputType, outputType);
+    return cManager->registerFilter(filterName, inputType, outputType);
 }
 
 CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterName,
                                                      const std::string& inputType,
                                                      const std::string& outputType)
 {
-    return fManager->registerCloningFilter(filterName, inputType, outputType);
+    return cManager->registerCloningFilter(filterName, inputType, outputType);
+}
+
+Translator& Federate::registerGlobalTranslator(std::int32_t translatorType,
+                                               std::string_view translatorName,
+                                               std::string_view endpointType,
+                                               std::string_view units)
+{
+    Translator& trans = cManager->registerTranslator(translatorName, endpointType, units);
+    trans.setTranslatorType(translatorType);
+    return trans;
+}
+
+Translator& Federate::registerTranslator(std::int32_t translatorType,
+                                         std::string_view translatorName,
+                                         std::string_view endpointType,
+                                         std::string_view units)
+{
+    std::string globalName = [this, translatorName]() {
+        if (!translatorName.empty()) {
+            std::string name = getName();
+            name.push_back(nameSegmentSeparator);
+            name.append(translatorName);
+            return name;
+        }
+        return std::string{};
+    }();
+
+    Translator& trans = cManager->registerTranslator(globalName, endpointType, units);
+    trans.setTranslatorType(translatorType);
+    return trans;
 }
 
 const Filter& Federate::getFilter(const std::string& filterName) const
 {
-    const Filter& filt = fManager->getFilter(filterName);
+    const Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return fManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
     }
     return filt;
 }
 
 Filter& Federate::getFilter(const std::string& filterName)
 {
-    Filter& filt = fManager->getFilter(filterName);
+    Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return fManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
     }
     return filt;
 }
 
 int Federate::getFilterCount() const
 {
-    return fManager->getFilterCount();
+    return cManager->getFilterCount();
 }
 
 void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op)
 {
     coreObject->setFilterOperator(filt.getHandle(), std::move(op));
+}
+
+const Translator& Federate::getTranslator(const std::string& translatorName) const
+{
+    const Translator& trans = cManager->getTranslator(translatorName);
+    if (!trans.isValid()) {
+        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+    }
+    return trans;
+}
+
+Translator& Federate::getTranslator(const std::string& translatorName)
+{
+    Translator& trans = cManager->getTranslator(translatorName);
+    if (!trans.isValid()) {
+        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+    }
+    return trans;
+}
+
+int Federate::getTranslatorCount() const
+{
+    return cManager->getTranslatorCount();
 }
 
 void Federate::logMessage(int level, const std::string& message) const
@@ -1382,20 +1552,20 @@ const std::string& Interface::getTarget() const
     return (cr != nullptr) ? cr->getSourceTargets(handle) : emptyStr;
 }
 
-void Interface::addSourceTarget(std::string_view newTarget)
+void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
     if (cr != nullptr) {
-        cr->addSourceTarget(handle, newTarget);
+        cr->addSourceTarget(handle, newTarget, hint);
     } else {
         throw(InvalidFunctionCall(
             "add source target cannot be called on uninitialized federate or after finalize call"));
     }
 }
 
-void Interface::addDestinationTarget(std::string_view newTarget)
+void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
 {
     if (cr != nullptr) {
-        cr->addDestinationTarget(handle, newTarget);
+        cr->addDestinationTarget(handle, newTarget, hint);
     } else {
         throw(InvalidFunctionCall(
             "add destination target cannot be called on a closed or uninitialized interface"));

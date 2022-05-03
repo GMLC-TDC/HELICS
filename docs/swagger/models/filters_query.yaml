@@ -1,0 +1,5 @@
+title: filters_query
+type: array
+description: return a list of filters contained in an object
+items:
+  type: string

@@ -111,6 +111,7 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
+    bool usingGlobalTime{false};  // indicator that the federation is using global time
     /** counter for the number of times time or execution mode has been granted */
     std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */
@@ -134,7 +135,7 @@ class FederateState {
     std::function<std::string(std::string_view)> queryCallback;
 
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
-
+    std::atomic<bool> queueProcessing{false};
     /** find the next Value Event*/
     Time nextValueTime() const;
     /** find the next Message Event*/
@@ -201,11 +202,11 @@ class FederateState {
     void setProperties(const ActionMessage& cmd);
     /** set a property on a specific interface*/
     void setInterfaceProperty(const ActionMessage& cmd);
-    /** set a timeProperty for a the coordinator*/
+    /** set a timeProperty on the federate*/
     void setProperty(int timeProperty, Time propertyVal);
-    /** set a timeProperty for a the coordinator*/
+    /** set an integral property on the federate*/
     void setProperty(int intProperty, int propertyVal);
-    /** set an option Flag for a the coordinator*/
+    /** set an option Flag on the federate*/
     void setOptionFlag(int optionFlag, bool value);
     /** get a time Property*/
     Time getTimeProperty(int timeProperty) const;
@@ -440,7 +441,8 @@ class FederateState {
                          InterfaceHandle handle,
                          const std::string& key,
                          const std::string& type,
-                         const std::string& units);
+                         const std::string& units,
+                         uint16_t flags);
     /** close an interface*/
     void closeInterface(InterfaceHandle handle, InterfaceType type);
     /** send a command to a federate*/

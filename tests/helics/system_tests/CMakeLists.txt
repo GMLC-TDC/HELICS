@@ -23,6 +23,8 @@ set(system_test_sources
     dynamicFederationTests.cpp
     ../application_api/testFixtures.cpp
     ../application_api/testFixtures.hpp
+    ../apps/exeTestHelper.cpp
+    ../apps/exeTestHelper.h
 )
 
 if(NOT HELICS_DISABLE_ASIO)
@@ -39,6 +41,9 @@ target_compile_definitions(
     system-tests PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\""
 )
 target_compile_definitions(system-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}\"")
+target_compile_definitions(
+    system-tests PRIVATE "-DTEST_BIN_DIR=\"${CMAKE_CURRENT_BINARY_DIR}/../test_files/\""
+)
 
 add_test(NAME system-tests COMMAND system-tests)
 set_property(TEST system-tests PROPERTY LABELS System Coverage Daily TSAN)

@@ -1,0 +1,19 @@
+title: webQueryInfo
+type: object
+description: "basic information contained in a web query body, all parts are optional and may also be contained in the query parameters"
+properties:
+  broker:
+    type: string
+    description: The name of the broker
+  target:
+    type: string
+    description: the target object contained in the broker
+  query:
+    type: string
+    description: the actual query string
+  broker_uuid:
+    type: string
+    description: same as broker
+  uuid:
+    type: string
+    description: same as broker_uuid

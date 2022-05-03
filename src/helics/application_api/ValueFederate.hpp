@@ -371,22 +371,22 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param pub the publication object to add a target to
     @param target the name of the input to send the data to
     */
-    void addTarget(const Publication& pub, const std::string& target);
+    void addTarget(const Publication& pub, std::string_view target);
     /** add a source target to an input/subscription
     @param inp the input object to add a named publication
     @param target the name of the publication to get data from
     */
-    void addTarget(const Input& inp, const std::string& target);
+    void addTarget(const Input& inp, std::string_view target);
     /** remove a destination target from a publication
     @param pub the publication object to add a target to
     @param target the name of the input to remove
     */
-    void removeTarget(const Publication& pub, const std::string& target);
+    void removeTarget(const Publication& pub, std::string_view target);
     /** remove a publication from an input/subscription
     @param inp the input object to add a named publication
     @param target the name of the publication to remove
     */
-    void removeTarget(const Input& inp, const std::string& target);
+    void removeTarget(const Input& inp, std::string_view target);
 
     /** add a 1-d Indexed target to an interface
    @details call is only valid in startup mode, register an optional subscription for a 1D array of

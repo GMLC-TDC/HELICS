@@ -25,20 +25,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 class mfed_add_single_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class mfed_add_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 class mfed_add_all_type_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
-class mfed_tests: public ::testing::Test, public FederateTestFixture {
+class mfed_tests: public ::testing::Test, public FederateTestFixture {};
+
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
 };
 
 TEST_P(mfed_add_single_type_tests, initialize_tests)
@@ -478,19 +478,23 @@ TEST_P(mfed_add_type_tests, threefedPingPong)
 
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_single_type_tests,
-                         ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(mfed_add_tests, mfed_add_type_tests, ::testing::ValuesIn(CoreTypes));
+                         ::testing::ValuesIn(CoreTypes_single),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
+                         mfed_add_type_tests,
+                         ::testing::ValuesIn(CoreTypes),
+                         testNamer);
 INSTANTIATE_TEST_SUITE_P(mfed_add_tests,
                          mfed_add_all_type_tests,
-                         ::testing::ValuesIn(CoreTypes_all));
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);
 
 static constexpr const char* config_files[] = {"example_message_fed.json",
                                                "example_message_fed.toml"};
 
 class mfed_file_config_files:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(mfed_file_config_files, test_file_load)
 {
@@ -515,8 +519,7 @@ static constexpr const char* filter_config_files[] = {"example_filters.json",
 
 class mfed_file_filter_config_files:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 TEST_P(mfed_file_filter_config_files, test_file_load_filter)
 {
@@ -528,7 +531,7 @@ TEST_P(mfed_file_filter_config_files, test_file_load_filter)
     auto id = mFed.getEndpoint("ept1");
     EXPECT_EQ(id.getExtractionType(), "genmessage");
 
-    EXPECT_EQ(mFed.filterCount(), 3);
+    EXPECT_EQ(mFed.getFilterCount(), 3);
 
     auto filt = &mFed.getFilter(2);
 
@@ -723,7 +726,7 @@ TEST_F(mfed_tests, message_warnings_ignore)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(warnings.load(), 1);
-    setActionFlag(mess1, optional_flag);
+    setActionFlag(mess1, helics::optional_flag);
     // it should cause the unknown destination to be ignored
     ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -758,7 +761,7 @@ TEST_F(mfed_tests, message_error)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     mFed1->requestTime(2.0);
     EXPECT_EQ(errors.load(), 0);
-    setActionFlag(mess1, required_flag);
+    setActionFlag(mess1, helics::required_flag);
     // it should cause the unknown destination to be to generate an error
     ep1.send(mess1);
     std::this_thread::sleep_for(std::chrono::milliseconds(100));

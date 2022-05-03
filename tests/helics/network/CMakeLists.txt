@@ -11,23 +11,23 @@ set(betwork_test_headers)
 
 set(network_test_sources network-tests.cpp networkInfoTests.cpp TestCore-tests.cpp)
 
-if(ENABLE_ZMQ_CORE)
+if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND network_test_sources ZeromqCore-tests.cpp ZeromqSSCore-tests.cpp)
 endif()
 
-if(ENABLE_TCP_CORE)
+if(HELICS_ENABLE_TCP_CORE)
     list(APPEND network_test_sources TcpCore-tests.cpp TcpSSCore-tests.cpp)
 endif()
 
-if(ENABLE_UDP_CORE)
+if(HELICS_ENABLE_UDP_CORE)
     list(APPEND network_test_sources UdpCore-tests.cpp)
 endif()
 
-if(ENABLE_IPC_CORE)
+if(HELICS_ENABLE_IPC_CORE)
     list(APPEND network_test_sources IPCcore_tests.cpp)
 endif()
 
-if(ENABLE_MPI_CORE)
+if(HELICS_ENABLE_MPI_CORE)
     list(APPEND network_test_sources MpiCore-tests.cpp)
 endif()
 

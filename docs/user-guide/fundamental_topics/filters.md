@@ -29,7 +29,6 @@ To demonstrate the effects of filters, let's take the same model we were working
 [The JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/EV_Controller/Control.json) adds a new `filter` section that implements the filtering:
 
 ```json
-...
 "filters":
     [
         {
@@ -52,7 +51,6 @@ To demonstrate the effects of filters, let's take the same model we were working
             "value":600
             }
         },
-        ...
     ]
 ```
 

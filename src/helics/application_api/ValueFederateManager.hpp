@@ -94,23 +94,23 @@ class ValueFederateManager {
    @param pub the identifier of the input
    @param target the name of the input to send the data to
    */
-    void addTarget(const Publication& pub, const std::string& target);
+    void addTarget(const Publication& pub, std::string_view target);
     /** add a source target to an input/subscription
     @param inp the identifier of the publication
     @param target the name of the input to send the data to
     */
-    void addTarget(const Input& inp, const std::string& target);
+    void addTarget(const Input& inp, std::string_view target);
 
     /** remove a destination target from a publication
     @param pub the identifier of the input
     @param target the name of the input to remove
     */
-    void removeTarget(const Publication& pub, const std::string& target);
+    void removeTarget(const Publication& pub, std::string_view target);
     /** remove a source target from an input/subscription
     @param inp the identifier of the publication
     @param target the name of the publication to remove
     */
-    void removeTarget(const Input& inp, const std::string& target);
+    void removeTarget(const Input& inp, std::string_view target);
 
     /** set the default value for a subscription
     @details this is the value returned prior to any publications

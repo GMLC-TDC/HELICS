@@ -235,12 +235,12 @@ TEST(federate_tests, timeout_abort_zmq)
 
 #endif
 
-#ifdef ENABLE_TCP_CORE
+#ifdef HELICS_ENABLE_TCP_CORE
 TEST(federate_tests, timeout_abort_tcp)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::core_type::TCP);
+        helics::FederateInfo fi(helics::CoreType::TCP);
         fi.coreInitString = "";
         auto fed = std::make_shared<helics::Federate>("test1", fi);
         return fed;
@@ -252,7 +252,7 @@ TEST(federate_tests, timeout_abort_tcp)
     while (helics::CoreFactory::getCoreCount() == 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    helics::CoreFactory::abortAllCores(HELICS_ERROR_USER_ABORT, "aborting55");
     try {
         cret.get();
         EXPECT_TRUE(false);
@@ -266,7 +266,7 @@ TEST(federate_tests, timeout_abort_tcpss)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::core_type::TCP_SS);
+        helics::FederateInfo fi(helics::CoreType::TCP_SS);
         fi.coreInitString = "";
         auto fed = std::make_shared<helics::Federate>("test1", fi);
         return fed;
@@ -278,7 +278,7 @@ TEST(federate_tests, timeout_abort_tcpss)
     while (helics::CoreFactory::getCoreCount() == 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    helics::CoreFactory::abortAllCores(HELICS_ERROR_USER_ABORT, "aborting55");
     try {
         cret.get();
         EXPECT_TRUE(false);
@@ -289,12 +289,12 @@ TEST(federate_tests, timeout_abort_tcpss)
 }
 #endif
 
-#ifdef ENABLE_UDP_CORE
+#ifdef HELICS_ENABLE_UDP_CORE
 TEST(federate_tests, timeout_abort_udp)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
-        helics::FederateInfo fi(helics::core_type::UDP);
+        helics::FederateInfo fi(helics::CoreType::UDP);
         fi.coreInitString = "";
         auto fed = std::make_shared<helics::Federate>("test1", fi);
         return fed;
@@ -305,7 +305,7 @@ TEST(federate_tests, timeout_abort_udp)
     while (helics::CoreFactory::getCoreCount() == 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    helics::CoreFactory::abortAllCores(helics_error_user_abort, "aborting55");
+    helics::CoreFactory::abortAllCores(HELICS_ERROR_USER_ABORT, "aborting55");
     try {
         cret.get();
         EXPECT_TRUE(false);
@@ -1188,8 +1188,7 @@ static constexpr const char* simple_global_files[] = {"example_globals1.json",
                                                       "example_globals1.toml",
                                                       "example_globals2.json"};
 
-class federate_global_files: public ::testing::TestWithParam<const char*> {
-};
+class federate_global_files: public ::testing::TestWithParam<const char*> {};
 
 TEST_P(federate_global_files, global_file_ci_skip)
 {

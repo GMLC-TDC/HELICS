@@ -1,1 +1,0 @@
-# C++ API Reference (Doxygen)

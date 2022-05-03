@@ -112,7 +112,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         target_link_libraries(helics_broker PUBLIC HELICS::apps)
         target_link_libraries(helics_broker PRIVATE compile_flags_target)
         set_target_properties(helics_broker PROPERTIES FOLDER apps)
-        set(HELICS_BROKER_LOC ${CMAKE_CURRENT_BINARY_DIR}
+        set(HELICS_BROKER_LOC ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             CACHE INTERNAL "build folder location of the broker"
         )
 
@@ -124,7 +124,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         target_link_libraries(helics_broker_server PUBLIC HELICS::apps)
         target_link_libraries(helics_broker_server PRIVATE compile_flags_target)
         set_target_properties(helics_broker_server PROPERTIES FOLDER apps)
-        set(HELICS_BROKER_SERVER_LOC ${CMAKE_CURRENT_BINARY_DIR}
+        set(HELICS_BROKER_SERVER_LOC ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
             CACHE INTERNAL "build folder location of the broker server"
         )
         install(TARGETS helics_broker helics_broker_server ${HELICS_EXPORT_COMMAND}

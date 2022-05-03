@@ -77,9 +77,23 @@ static void signalHandler(int /*signum*/)
     exit(HELICS_ERROR_USER_ABORT);
 }
 
+static void signalHandlerNoExit(int /*signum*/)
+{
+    helicsAbort(HELICS_ERROR_USER_ABORT, "user abort");
+    // add a sleep to give the abort a chance to propagate to other federates
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::cout << std::endl;
+}
+
 static void signalHandlerThreaded(int signum)
 {
     std::thread sigthread(signalHandler, signum);
+    sigthread.detach();
+}
+
+static void signalHandlerThreadedNoExit(int signum)
+{
+    std::thread sigthread(signalHandlerNoExit, signum);
     sigthread.detach();
 }
 
@@ -111,6 +125,17 @@ static void signalHandlerCallback(int signum)
     }
 }
 
+static void signalHandlerCallbackNoExit(int signum)
+{
+    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
+    if (keyHandler != nullptr) {
+        runDefaultSignalHandler = keyHandler(signum);
+    }
+    if (runDefaultSignalHandler != HELICS_FALSE) {
+        signalHandlerNoExit(signum);
+    }
+}
+
 static void signalHandlerThreadedCallback(int signum)
 {
     HelicsBool runDefaultSignalHandler{HELICS_TRUE};
@@ -119,6 +144,17 @@ static void signalHandlerThreadedCallback(int signum)
     }
     if (runDefaultSignalHandler != HELICS_FALSE) {
         signalHandlerThreaded(signum);
+    }
+}
+
+static void signalHandlerThreadedCallbackNoExit(int signum)
+{
+    HelicsBool runDefaultSignalHandler{HELICS_TRUE};
+    if (keyHandler != nullptr) {
+        runDefaultSignalHandler = keyHandler(signum);
+    }
+    if (runDefaultSignalHandler != HELICS_FALSE) {
+        signalHandlerThreadedNoExit(signum);
     }
 }
 
@@ -137,6 +173,25 @@ void helicsLoadSignalHandlerCallback(HelicsBool (*handler)(int), HelicsBool useS
             helicsLoadThreadedSignalHandler();
         } else {
             helicsLoadSignalHandler();
+        }
+    }
+}
+
+void helicsLoadSignalHandlerCallbackNoExit(HelicsBool (*handler)(int), HelicsBool useSeparateThread)
+{
+    keyHandler = handler;
+    if (handler != nullptr) {
+        if (useSeparateThread != HELICS_FALSE) {
+            signal(SIGINT, signalHandlerThreadedCallbackNoExit);
+        } else {
+            signal(SIGINT, signalHandlerCallbackNoExit);
+        }
+
+    } else {
+        if (useSeparateThread != HELICS_FALSE) {
+            signal(SIGINT, signalHandlerThreadedNoExit);
+        } else {
+            signal(SIGINT, signalHandlerNoExit);
         }
     }
 }
@@ -1252,7 +1307,7 @@ void MasterObjectHolder::abortAll(int code, const std::string& error)
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, fed->fedptr->getName() + " sending->" + error);
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + error + "'");
             }
         }
     }

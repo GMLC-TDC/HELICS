@@ -46,9 +46,15 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Clone::Clone(std::vector<std::string> args): App("Clone", std::move(args)) { processArgs(); }
+    Clone::Clone(std::vector<std::string> args): App("Clone", std::move(args))
+    {
+        processArgs();
+    }
 
-    Clone::Clone(int argc, char* argv[]): App("Clone", argc, argv) { processArgs(); }
+    Clone::Clone(int argc, char* argv[]): App("Clone", argc, argv)
+    {
+        processArgs();
+    }
 
     void Clone::processArgs()
     {

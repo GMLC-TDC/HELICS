@@ -22,9 +22,15 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    Echo::Echo(std::vector<std::string> args): App("echo", std::move(args)) { processArgs(); }
+    Echo::Echo(std::vector<std::string> args): App("echo", std::move(args))
+    {
+        processArgs();
+    }
 
-    Echo::Echo(int argc, char* argv[]): App("echo", argc, argv) { processArgs(); }
+    Echo::Echo(int argc, char* argv[]): App("echo", argc, argv)
+    {
+        processArgs();
+    }
 
     void Echo::processArgs()
     {

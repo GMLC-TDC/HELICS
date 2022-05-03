@@ -116,6 +116,17 @@ set(ENABLE_CPACK
     OFF
     CACHE INTERNAL ""
 )
+if (${PROJECT_NAME}_ENABLE_ENCRYPTION AND NOT ${PROJECT_NAME}_DISABLE_ZMQ_ENCRYPTION)
+    set(WITH_LIBSODIUM
+        ON
+        CACHE INTERNAL ""
+)
+else()
+ set(WITH_LIBSODIUM
+        OFF
+        CACHE INTERNAL ""
+)
+endif()
 
 set(ZMQ_OUTPUT_BASENAME
     zmq
@@ -158,7 +169,6 @@ endif()
 # hide a bunch of local variables and options
 
 hide_variable(LIBZMQ_WERROR)
-hide_variable(WITH_LIBSODIUM)
 hide_variable(WITH_MILITANT)
 hide_variable(WITH_OPENPGM)
 hide_variable(WITH_VMCI)

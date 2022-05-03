@@ -79,6 +79,10 @@ class EmptyCore: public Core {
     virtual InterfaceHandle getInput(LocalFederateId federateID,
                                      const std::string& key) const override;
 
+    virtual InterfaceHandle registerTranslator(std::string_view translatorName,
+                                               std::string_view message_type,
+                                               std::string_view units) override;
+
     virtual const std::string& getHandleName(InterfaceHandle handle) const override;
 
     virtual void
@@ -122,6 +126,7 @@ class EmptyCore: public Core {
                                                   const std::string& type_in,
                                                   const std::string& type_out) override;
     virtual InterfaceHandle getFilter(const std::string& name) const override;
+    virtual InterfaceHandle getTranslator(const std::string& name) const override;
     virtual void addDependency(LocalFederateId federateID,
                                const std::string& federateName) override;
     virtual void linkEndpoints(const std::string& source, const std::string& dest) override;
@@ -155,7 +160,8 @@ class EmptyCore: public Core {
                             const std::string& messageToLog) override;
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) override;
-
+    virtual void setTranslatorOperator(InterfaceHandle translator,
+                                       std::shared_ptr<TranslatorOperator> callback) override;
     /** get the local identifier for the core*/
     virtual const std::string& getIdentifier() const override;
     virtual const std::string& getAddress() const override;

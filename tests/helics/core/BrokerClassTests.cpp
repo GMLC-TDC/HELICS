@@ -37,7 +37,7 @@ TEST(broker_tests, subbroker_min_test)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
                                              "gbroker2",
-                                             "--subbrokers=2 -f 2 --root");
+                                             "--sub_brokers 2 -f 2 --root");
 
     auto brk2 = helics::BrokerFactory::create(helics::CoreType::TEST, "gb2", "--broker=gbroker2");
 

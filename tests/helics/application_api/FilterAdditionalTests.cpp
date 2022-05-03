@@ -24,8 +24,13 @@ This test case sets reroute filter on a source endpoint. This means message
 sent from this endpoint will be rerouted to a new destination endpoint.
 */
 
-class filter_type_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
 };
+
+class filter_type_tests:
+    public ::testing::TestWithParam<const char*>,
+    public FederateTestFixture {};
 
 TEST_P(filter_type_tests, message_reroute_filter_object1)
 {
@@ -609,4 +614,4 @@ TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
     mFed->finalizeComplete();
 }
 
-INSTANTIATE_TEST_SUITE_P(filter_tests, filter_type_tests, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(filter, filter_type_tests, ::testing::ValuesIn(CoreTypes), testNamer);

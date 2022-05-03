@@ -10,11 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-class query_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class query_tests: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
-class query_test_single: public ::testing::Test, public FederateTestFixture {
-};
+class query_test_single: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 TEST_P(query_tests, publication_queries)
 {

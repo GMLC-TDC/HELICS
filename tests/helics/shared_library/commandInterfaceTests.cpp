@@ -9,8 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-class command_tests: public ::testing::Test, public FederateTestFixture {
-};
+class command_tests: public ::testing::Test, public FederateTestFixture {};
 
 /** just a check that in the simple case we do actually get the time back we requested*/
 

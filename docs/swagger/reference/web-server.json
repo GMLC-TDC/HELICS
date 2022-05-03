@@ -1,0 +1,890 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "web server",
+    "version": "1.0",
+    "summary": "HELICS web server API",
+    "description": "Description of the services from a Helics web server for broker management",
+    "contact": {
+      "name": "Philip Top"
+    },
+    "license": {
+      "name": "BSD-3",
+      "url": "https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Get Index page",
+        "operationId": "index",
+        "description": "Get the index page no properties",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{broker_id}": {
+      "post": {
+        "summary": "Create New User",
+        "operationId": "post-broker",
+        "responses": {
+          "200": {
+            "description": "User Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "broker_uuid": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Missing Required Information"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/BrokerCreation.yaml"
+              },
+              "examples": {}
+            }
+          },
+          "description": "Post the necessary fields for the API to create a new user."
+        },
+        "description": "Create a new broker"
+      },
+      "get": {
+        "summary": "run a query on a broker",
+        "operationId": "get-broker",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "../models/base_status_info.yaml"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "description": "Get basic information on a broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "target",
+            "description": "query target"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "description": "name of the query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/webQueryInfo.yaml"
+              }
+            }
+          },
+          "description": "additional information including targets and query string for the target"
+        }
+      },
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the broker"
+        }
+      ],
+      "delete": {
+        "summary": "",
+        "operationId": "delete-broker_id",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "remove a broker"
+      }
+    },
+    "/{broker_id}/{target_id}/{query}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the broker"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "target_id",
+          "in": "path",
+          "required": true,
+          "description": "name of the query target"
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "query",
+          "in": "path",
+          "required": true,
+          "description": "query to run"
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "run_query",
+        "description": "Run a query on the specified target through the specified broker"
+      }
+    },
+    "/brokers": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "brokers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "name of the broker"
+                          },
+                          "address": {
+                            "type": "string",
+                            "description": "network address of the broker"
+                          },
+                          "isConnected": {
+                            "type": "boolean",
+                            "description": "true if the broker is connected on the network"
+                          },
+                          "isOpen": {
+                            "type": "boolean",
+                            "description": "true if the broker is accepting new objects"
+                          },
+                          "isRoot": {
+                            "type": "boolean",
+                            "description": "true if the broker is a root broker"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "address",
+                          "isConnected",
+                          "isOpen",
+                          "isRoot"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-brokers",
+        "description": "Get a summary of all the registered brokers"
+      }
+    },
+    "/{param1}/{param2}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "param1",
+          "in": "path",
+          "required": true
+        },
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "param2",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "operationId": "get-broker_id-query",
+        "description": "make a query on a specific broker or target on the default broker  equivalent to broker/target, target/query",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/webQueryInfo.yaml"
+              }
+            }
+          },
+          "description": "This is supplying 2 parameters in the address,  the parameters can also be supplied as a qeury parameter or in the body"
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "name of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "uuid of the broker "
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "query",
+            "description": "the query to run on the target"
+          }
+        ]
+      }
+    },
+    "/search/{target_id}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "target_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-search-target_id",
+        "description": "search for a specific object or broker and get its information",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/webQueryInfo.yaml"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/{broker_id}/barrier": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "post-broker_id-barrier",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "create or update a time barrier on a specific broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "time",
+            "description": "the time to set/update the barrier, if left off barrier is cleared"
+          }
+        ]
+      },
+      "delete": {
+        "summary": "",
+        "operationId": "delete-broker_id-barrier",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "clear a time barrier on a specific broker"
+      }
+    },
+    "/{broker_id}/clearbarrier": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string"
+          },
+          "name": "broker_id",
+          "in": "path",
+          "required": true
+        }
+      ],
+      "post": {
+        "summary": "",
+        "operationId": "post-broker_id-clearbarrier",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "clear a time barrier on a specific broker"
+      }
+    },
+    "/create": {
+      "post": {
+        "summary": "",
+        "operationId": "broker-create",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "x-examples": {
+                    "example-1": {
+                      "broker_uuid": "broker_name"
+                    }
+                  },
+                  "properties": {
+                    "broker_uuid": {
+                      "type": "string",
+                      "description": "if the name is empty this returns the uuid name of the broker"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "number"
+                    },
+                    "error": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": ["status", "error"],
+                  "x-examples": {
+                    "example-1": {
+                      "status": 400,
+                      "error": "unable to generate broker"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "create a new broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "args",
+            "description": "other command line arguments for the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "type",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "CoreType",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "core_type",
+            "description": "core type to use"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "num_feds",
+            "description": "the number of federates in the federation"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "num_brokers",
+            "description": "the number of brokers in the federation"
+          },
+          {
+            "schema": {
+              "type": "integer"
+            },
+            "in": "query",
+            "name": "port",
+            "description": "the network port number to use for the broker "
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "debug",
+                "trace",
+                "info",
+                "error",
+                "warning",
+                "none",
+                "data",
+                "connections"
+              ]
+            },
+            "in": "query",
+            "name": "log_level",
+            "description": "the logging level for the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "host",
+            "description": "the interface address to use for networking"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "the name of the broker to create"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "the expected uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "the expected uuid of the broker(same as broker_uuid)"
+          }
+        ]
+      }
+    },
+    "/delete": {
+      "post": {
+        "summary": "",
+        "operationId": "post-delete",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "the broker is \"Not Found\" and could not be deleted",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "the name of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "uuid of the broker "
+          }
+        ],
+        "description": "terminate a broker and remove it from the server"
+      }
+    },
+    "/remove": {
+      "post": {
+        "summary": "remove a broker",
+        "operationId": "post-remove",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "description": "remove a broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "Name of the broker to remove"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "uuid of the broker"
+          }
+        ]
+      }
+    },
+    "/query": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": ""
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-query",
+        "description": "run a query on a broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "the name of the broker on which to execute the query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "target",
+            "description": "the target object of the query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "example": "dependencies"
+            },
+            "in": "query",
+            "name": "query",
+            "description": "the actual query"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "uuid of the broker"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../models/webQueryInfo.yaml"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": ""
+              }
+            }
+          },
+          "description": ""
+        }
+      }
+    },
+    "/healthcheck": {
+      "get": {
+        "summary": "Your GET endpoint",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "",
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": ["success"],
+                  "x-examples": {
+                    "example-1": {
+                      "success": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-healthcheck",
+        "description": "general health check for the broker server",
+        "parameters": []
+      }
+    },
+    "/command": {
+      "post": {
+        "summary": "send a command to the specified target",
+        "operationId": "post-command",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "command_str",
+            "description": "the command to send to the target"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker",
+            "description": "the broker through which to send the command"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "target",
+            "description": "the specific target object to send the command"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "broker_uuid",
+            "description": "uuid of the broker"
+          },
+          {
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "name": "uuid",
+            "description": "uuid of the broker"
+          }
+        ],
+        "description": "send a command to a specified object"
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {},
+    "requestBodies": {}
+  }
+}

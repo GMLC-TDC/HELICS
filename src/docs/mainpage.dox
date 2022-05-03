@@ -18,7 +18,7 @@ Welcome to the C++ API reference docs for HELICS, for applications using the hel
 HELICS provides a general-purpose, modular, highly-scalable co-simulation framework that runs cross-platform and has bindings for multiple languages. It is a library that enables multiple existing simulation tools (and/or instances of the same tool), known as "federates", to exchange data during runtime and stay synchronized in time such that together they act as one large simulation, or "federation". This enables bringing together simulation tools from multiple domains to form a complex software simulation without having to change the individual tools.
 
 \section related Informational Pages
-- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/README.md">GitHub README</a>
-- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE">LICENSE</a>
-- <a href="https://github.com/GMLC-TDC/HELICS/blob/master/NOTICE">NOTICE</a>
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/main/README.md">GitHub README</a>
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/main/LICENSE">LICENSE</a>
+- <a href="https://github.com/GMLC-TDC/HELICS/blob/main/NOTICE">NOTICE</a>
  */

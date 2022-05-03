@@ -4,7 +4,7 @@
 # 2. run git submodule update --init after a normal git clone
 # 3. download and extract a tar file from a HELICS release that includes submodules
 
-FROM helics/buildenv:tumbleweed-builder as builder
+FROM helics/buildenv:gcc11-builder as builder
 
 # Copies the current directory from the host to use as the source code for building HELICS
 COPY . /root/HELICS
@@ -35,10 +35,10 @@ RUN cd build && make -j${MAKE_PARALLEL:-2} install
 ##############################################################################
 
 # Create final image with the HELICS apps
-FROM opensuse/tumbleweed:latest
+FROM ubuntu:21.10
 
 # Install the runtime libraries needed for ZeroMQ without development files
-RUN zypper mr -d openSUSE-Tumbleweed-Update && zypper install -y libzmq5 && zypper clean -a
+RUN apt-get update && apt-get install -y libzmq5 openssl && apt-get clean
 
 ARG GIT_COMMIT=unspecified
 
@@ -48,7 +48,7 @@ LABEL name="helics.apps"
 LABEL org.helics.description="HELICS applications"
 LABEL org.helics.vcs-ref=$GIT_COMMIT
 LABEL org.helics.vcs-url="https://github.com/GMLC-TDC/helics"
-LABEL version="2.5.1"
+LABEL version="3.2.0"
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr

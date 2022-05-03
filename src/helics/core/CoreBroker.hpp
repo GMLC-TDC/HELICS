@@ -333,7 +333,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void FindandNotifyFilterTargets(BasicHandleInfo& handleInfo);
     void FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo);
     /** process a disconnect message*/
-    void processDisconnect(ActionMessage& command);
+    void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/
     void processError(ActionMessage& command);
     /** disconnect a broker/core*/
@@ -382,6 +382,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void addInput(ActionMessage& m);
     void addEndpoint(ActionMessage& m);
     void addFilter(ActionMessage& m);
+    void addTranslator(ActionMessage& m);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
     // Helper function for linking interfaces
@@ -397,7 +398,6 @@ class CoreBroker: public Broker, public BrokerBase {
                               bool force_ordering);
 
     std::string generateGlobalStatus(fileops::JsonMapBuilder& builder);
-
     /** send an error code to all direct cores*/
     void sendErrorToImmediateBrokers(int errorCode);
     /** send a disconnect message to time dependencies and child brokers*/

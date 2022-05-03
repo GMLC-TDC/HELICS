@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using namespace helics;
 using namespace helics::fileops;
-class jsonStringGen_tests: public ::testing::TestWithParam<const char*> {
-};
+class jsonStringGen_tests: public ::testing::TestWithParam<const char*> {};
 
 static constexpr const char* test_strings[] = {"test1",
                                                "test 2",

@@ -16,8 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CORE_TYPE_TO_TEST helics::CoreType::TEST
 
-struct error_tests: public FederateTestFixture, public ::testing::Test {
-};
+struct error_tests: public FederateTestFixture, public ::testing::Test {};
 
 TEST_F(error_tests, duplicate_federate_names)
 {
@@ -191,7 +190,7 @@ TEST_F(error_tests, duplicate_publication_names2)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    auto broker = AddBroker("test", "-f 2");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -228,7 +227,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0");
+    auto broker = AddBroker("test", "-f 2");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -270,7 +269,7 @@ TEST_F(error_tests, duplicate_publication_names_auto_terminate_core)
 
 TEST_F(error_tests, duplicate_publication_names_auto_terminate_broker)
 {
-    auto broker = AddBroker("test", "-f 2 --error_timeout=0 --terminate_on_error");
+    auto broker = AddBroker("test", "-f 2 --terminate_on_error");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
 
@@ -411,7 +410,7 @@ TEST_F(error_tests, missing_required_pub)
 
     fed1->registerGlobalPublication("t1", "");
     auto& i2 = fed2->registerSubscription("abcd", "");
-    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED, true);
+    i2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
 
     fed1->enterInitializingModeAsync();
     EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
@@ -473,8 +472,8 @@ TEST_F(error_tests, mismatched_units)
 
 TEST_F(error_tests, mismatched_units_terminate_on_error)
 {
-    auto broker = AddBroker("test", "-f 3 --error_timeout=0");
-
+    auto broker = AddBroker("test", "-f 3 ");
+    extraCoreArgs = "--error_timeout=0";
     AddFederates<helics::ValueFederate>("test", 3, broker, 1.0, "fed");
 
     auto fed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -500,8 +499,7 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
-class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {
-};
+class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(error_tests_type, test_duplicate_broker_name)
@@ -515,7 +513,7 @@ TEST_P(error_tests_type, test_duplicate_broker_name)
 
 INSTANTIATE_TEST_SUITE_P(error_tests, error_tests_type, ::testing::ValuesIn(CoreTypes_simple));
 
-#if defined(ENABLE_ZMQ_CORE) || defined(ENABLE_UDP_CORE)
+#if defined(HELICS_ENABLE_ZMQ_CORE) || defined(HELICS_ENABLE_UDP_CORE)
 
 constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 
@@ -523,8 +521,7 @@ constexpr const char* networkCores[] = {ZMQTEST UDPTEST};
 // duplication
 class network_error_tests:
     public ::testing::TestWithParam<const char*>,
-    public FederateTestFixture {
-};
+    public FederateTestFixture {};
 
 /** test simple creation and destruction*/
 TEST_P(network_error_tests, test_duplicate_default_brokers)
