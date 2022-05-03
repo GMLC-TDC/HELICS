@@ -10,10 +10,11 @@ Mainly includes any relevant bug fixes and other minor tweaks for compatibility,
 
 ## \[3.2.1\] ~ 2022-05-28
 
-Mostly refinement of the 3.2 release and additional testing a bug fixes
+Mostly refinement of the 3.2 release, additional testing, and bug fixes
 
-- Additional refinement on Translators and their interface
+- Additional refinement on Translators and their interfaces
 - Additional refinement and development of the data API in the C based interface
+- Further use of string_view in the C++ interfaces
 - Separate out Matlab HELICS interface in Matlab oriented way vs current swig build
 - additional testing of the global time coordinator
 

@@ -1161,7 +1161,7 @@ TEST_F(query, queries_disconnected)
     vFed1->finalize();
 }
 
-// the pupose is to make sure it doesn't block when federates disconnect
+// the purpose of this test is to make sure the calls don't block when a federate disconnects
 TEST_F(query, queries_disconnected_global)
 {
     SetupTest<helics::ValueFederate>("test_2", 3);
