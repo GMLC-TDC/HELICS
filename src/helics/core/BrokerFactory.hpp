@@ -24,7 +24,7 @@ namespace BrokerFactory {
     class BrokerBuilder {
       public:
         /** build a new broker of the builder type*/
-        virtual std::shared_ptr<Broker> build(const std::string& name) = 0;
+        virtual std::shared_ptr<Broker> build(std::string_view name) = 0;
     };
 
     /** template for making a Broker builder*/
@@ -35,18 +35,18 @@ namespace BrokerFactory {
                       "Type does not inherit from helics::Core");
 
         using broker_build_type = BrokerTYPE;
-        virtual std::shared_ptr<Broker> build(const std::string& name) override
+        virtual std::shared_ptr<Broker> build(std::string_view name) override
         {
             return std::make_shared<BrokerTYPE>(name);
         }
     };
 
     /** define a new Broker Builder from the builder give a name and build code*/
-    void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code);
+    void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code);
 
     /** template function to create a builder and link it into the library*/
     template<class BrokerTYPE>
-    std::shared_ptr<BrokerBuilder> addBrokerType(const std::string& brokerTypeName, int code)
+    std::shared_ptr<BrokerBuilder> addBrokerType(std::string_view brokerTypeName, int code)
     {
         auto bld = std::make_shared<BrokerTypeBuilder<BrokerTYPE>>();
         std::shared_ptr<BrokerBuilder> bbld = std::static_pointer_cast<BrokerBuilder>(bld);
@@ -58,26 +58,26 @@ namespace BrokerFactory {
      *
      * Invokes initialize() on the instantiated Core object.
      */
-    std::shared_ptr<Broker> create(CoreType type, const std::string& configureString);
+    std::shared_ptr<Broker> create(CoreType type, std::string_view configureString);
     /** Create a broker from command line arguments*/
     std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[]);
     /** Create a broker from command line arguments in a vector*/
     std::shared_ptr<Broker> create(CoreType type, std::vector<std::string> args);
 
     std::shared_ptr<Broker>
-        create(CoreType type, const std::string& brokerName, const std::string& configureString);
+        create(CoreType type, std::string_view brokerName, std::string_view configureString);
 
     std::shared_ptr<Broker>
-        create(CoreType type, const std::string& brokerName, int argc, char* argv[]);
+        create(CoreType type, std::string_view brokerName, int argc, char* argv[]);
 
     /** Create a broker from command line arguments in a vector*/
     std::shared_ptr<Broker>
-        create(CoreType type, const std::string& brokerName, std::vector<std::string> args);
+        create(CoreType type, std::string_view brokerName, std::vector<std::string> args);
 
     /** locate a coreBroker by name
 @param brokerName the name of the broker
 @return a shared_ptr to the Broker*/
-    std::shared_ptr<Broker> findBroker(const std::string& brokerName);
+    std::shared_ptr<Broker> findBroker(std::string_view brokerName);
     /** get the first available Connected broker
 @return a shared_ptr to the Broker*/
     std::shared_ptr<Broker> getConnectedBroker();
@@ -105,10 +105,10 @@ controlled by calling cleanUpBrokers earlier if desired
     /** remove a broker from the registry
 @param name the name of the broker to unregister
 */
-    void unregisterBroker(const std::string& name);
+    void unregisterBroker(std::string_view name);
 
     /** add a type associated with a broker*/
-    void addAssociatedBrokerType(const std::string& name, CoreType type);
+    void addAssociatedBrokerType(std::string_view name, CoreType type);
 
     /** clean up unused brokers
 @details when brokers are unregistered they get put in a holding area that gets cleaned up when a
@@ -130,7 +130,7 @@ issues
     /** make a copy of the broker pointer to allow access to the new name
 @return true if successful
  */
-    bool copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName);
+    bool copyBrokerIdentifier(std::string_view copyFromName, std::string_view copyToName);
 
     /** display the help listing for a particular CoreType*/
     void displayHelp(CoreType type = CoreType::UNRECOGNIZED);
@@ -138,6 +138,6 @@ issues
     /** terminate all running Brokers*/
     void terminateAllBrokers();
     /** abort all brokers */
-    void abortAllBrokers(int errorCode, const std::string& errorString);
+    void abortAllBrokers(int errorCode, std::string_view errorString);
 }  // namespace BrokerFactory
 }  // namespace helics

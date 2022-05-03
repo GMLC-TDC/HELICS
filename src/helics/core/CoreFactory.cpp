@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/shared_guarded.hpp"
 #include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
+#include "helics/common/fmt_format.h"
 
 #include <cassert>
 #include <cstring>
@@ -37,7 +38,7 @@ class MasterCoreBuilder {
   public:
     using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
 
-    static void addBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
+    static void addBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)
     {
         instance()->builders.emplace_back(code, name, std::move(cb));
     }
@@ -84,7 +85,7 @@ class MasterCoreBuilder {
     std::vector<BuildT> builders;  //!< container for the different builders
 };
 
-void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, const std::string& name, int code)
+void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)
 {
     MasterCoreBuilder::addBuilder(std::move(cb), name, code);
 }
@@ -101,7 +102,7 @@ std::vector<std::string> getAvailableCoreTypes()
 
 static std::shared_ptr<Core> emptyCore = std::make_shared<EmptyCore>();
 
-std::shared_ptr<Core> makeCore(CoreType type, const std::string& name)
+std::shared_ptr<Core> makeCore(CoreType type, std::string_view name)
 {
     if (type == CoreType::NULLCORE) {
         throw(HelicsException("nullcore is explicitly not available nor will ever be"));
@@ -120,23 +121,23 @@ std::shared_ptr<Core> getEmptyCore()
     return emptyCore;
 }
 
-std::shared_ptr<Core> create(const std::string& initializationString)
+std::shared_ptr<Core> create(std::string_view initializationString)
 {
     helicsCLI11App tparser;
     tparser.remove_helics_specifics();
     tparser.addTypeOption();
     tparser.allow_extras();
-    tparser.parse(initializationString);
+    tparser.parse(std::string(initializationString));
     return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
 }
 
-std::shared_ptr<Core> create(CoreType type, const std::string& configureString)
+std::shared_ptr<Core> create(CoreType type, std::string_view configureString)
 {
     return create(type, gEmptyString, configureString);
 }
 
 std::shared_ptr<Core>
-    create(CoreType type, const std::string& coreName, const std::string& configureString)
+    create(CoreType type, std::string_view coreName, std::string_view configureString)
 {
     auto core = makeCore(type, coreName);
     if (!core) {
@@ -144,8 +145,7 @@ std::shared_ptr<Core>
     }
     core->configure(configureString);
     if (!registerCore(core, type)) {
-        throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
-                                          " failed to register properly"));
+        throw(helics::RegistrationFailure(fmt::format("core {} failed to register properly",core->getIdentifier())));
     }
 
     return core;
@@ -168,13 +168,13 @@ std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
 }
 
 std::shared_ptr<Core>
-    create(CoreType type, const std::string& coreName, std::vector<std::string> args)
+    create(CoreType type, std::string_view coreName, std::vector<std::string> args)
 {
     auto core = makeCore(type, coreName);
     core->configureFromVector(std::move(args));
     if (!registerCore(core, type)) {
-        throw(helics::RegistrationFailure(std::string("core ") + core->getIdentifier() +
-                                          " failed to register properly"));
+        throw(helics::RegistrationFailure(
+            fmt::format("core {} failed to register properly", core->getIdentifier())));
     }
 
     return core;
@@ -196,7 +196,7 @@ std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
     return create(type, gEmptyString, argc, argv);
 }
 
-std::shared_ptr<Core> create(CoreType type, const std::string& coreName, int argc, char* argv[])
+std::shared_ptr<Core> create(CoreType type, std::string_view coreName, int argc, char* argv[])
 {
     auto core = makeCore(type, coreName);
     core->configureFromArgs(argc, argv);
@@ -209,7 +209,7 @@ std::shared_ptr<Core> create(CoreType type, const std::string& coreName, int arg
 }
 
 std::shared_ptr<Core>
-    FindOrCreate(CoreType type, const std::string& coreName, std::vector<std::string> args)
+    FindOrCreate(CoreType type, std::string_view coreName, std::vector<std::string> args)
 {
     std::shared_ptr<Core> core = findCore(coreName);
     if (core) {
@@ -230,7 +230,7 @@ std::shared_ptr<Core>
 }
 
 std::shared_ptr<Core>
-    FindOrCreate(CoreType type, const std::string& coreName, const std::string& configureString)
+    FindOrCreate(CoreType type, std::string_view coreName, std::string_view configureString)
 {
     std::shared_ptr<Core> core = findCore(coreName);
     if (core) {
@@ -250,8 +250,7 @@ std::shared_ptr<Core>
     return core;
 }
 
-std::shared_ptr<Core>
-    FindOrCreate(CoreType type, const std::string& coreName, int argc, char* argv[])
+std::shared_ptr<Core> FindOrCreate(CoreType type, std::string_view coreName, int argc, char* argv[])
 {
     std::shared_ptr<Core> core = findCore(coreName);
     if (core) {
@@ -295,9 +294,9 @@ static gmlc::concurrency::SearchableObjectHolder<Core, CoreType>
 // this will trip the line when it is destroyed at global destruction time
 static gmlc::concurrency::TripWireTrigger tripTrigger;
 
-std::shared_ptr<Core> findCore(const std::string& name)
+std::shared_ptr<Core> findCore(std::string_view name)
 {
-    return searchableCores.findObject(name);
+    return searchableCores.findObject(std::string{name});
 }
 
 std::shared_ptr<Core> findJoinableCoreOfType(CoreType type)
@@ -359,13 +358,16 @@ void terminateAllCores()
     cleanUpCores(std::chrono::milliseconds(250));
 }
 
-void abortAllCores(int errorCode, const std::string& errorString)
+void abortAllCores(int errorCode, std::string_view errorString)
 {
     auto cores = searchableCores.getObjects();
     for (auto& cr : cores) {
         cr->globalError(gLocalCoreId,
                         errorCode,
-                        cr->getIdentifier() + " sent abort message: '" + errorString + "'");
+                        fmt::format("{} sent abort message: '{}'",
+                                    cr->getIdentifier(),
+                                    errorString));
+                        
         cr->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));
@@ -375,22 +377,22 @@ size_t getCoreCount()
 {
     return searchableCores.getObjects().size();
 }
-bool copyCoreIdentifier(const std::string& copyFromName, const std::string& copyToName)
+bool copyCoreIdentifier(std::string_view copyFromName, std::string_view copyToName)
 {
-    return searchableCores.copyObject(copyFromName, copyToName);
+    return searchableCores.copyObject(std::string{copyFromName}, std::string{copyToName});
 }
 
-void unregisterCore(const std::string& name)
+void unregisterCore(std::string_view name)
 {
-    if (!searchableCores.removeObject(name)) {
+    if (!searchableCores.removeObject(std::string{name})) {
         searchableCores.removeObject([&name](auto& obj) { return (obj->getIdentifier() == name); });
     }
 }
 
-void addAssociatedCoreType(const std::string& name, CoreType type)
+void addAssociatedCoreType(std::string_view name, CoreType type)
 {
-    searchableCores.addType(name, type);
-    addExtraTypes(name, type);
+    searchableCores.addType(std::string{name}, type);
+    addExtraTypes(std::string{name}, type);
 }
 
 static const std::string helpStr{"--help"};

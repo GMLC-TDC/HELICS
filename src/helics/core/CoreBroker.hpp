@@ -56,7 +56,7 @@ class BasicFedInfo {
     GlobalBrokerId parent;  //!< the id of the parent broker/core
     connection_state state{connection_state::connected};
     bool nonCounting{false};  // indicator the federate shouldn't count toward limits or total
-    explicit BasicFedInfo(const std::string& fedname): name(fedname) {}
+    explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 
 /** class defining the common information about a broker federate*/
@@ -229,7 +229,7 @@ class CoreBroker: public Broker, public BrokerBase {
 
     virtual void clearTimeBarrier() override final;
 
-    virtual void globalError(int32_t errorCode, const std::string& errorString) override final;
+    virtual void globalError(int32_t errorCode, std::string_view errorString) override final;
 
   private:
     /** implementation details of the connection process
@@ -263,7 +263,7 @@ class CoreBroker: public Broker, public BrokerBase {
     be added to, in most cases this should be zero since there is only one interface
     @param routeInfo a string containing the information necessary to connect
     */
-    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) = 0;
+    virtual void addRoute(route_id rid, int interfaceId, std::string_view routeInfo) = 0;
     /** remove or disconnect a route from use
     @param rid the identification of the route
     */
@@ -274,11 +274,11 @@ class CoreBroker: public Broker, public BrokerBase {
     @param setAsRootBroker  set to true to indicate this object is a root broker*/
     explicit CoreBroker(bool setAsRootBroker = false) noexcept;
     /** constructor to set the name of the broker*/
-    explicit CoreBroker(const std::string& broker_name);
+    explicit CoreBroker(std::string_view broker_name);
     /** destructor*/
     virtual ~CoreBroker();
     /** start up the broker with an initialization string containing commands and parameters*/
-    virtual void configure(const std::string& configureString) override final;
+    virtual void configure(std::string_view configureString) override final;
     /** initialize from command line arguments
      */
     virtual void configureFromArgs(int argc, char* argv[]) override final;
@@ -293,29 +293,29 @@ class CoreBroker: public Broker, public BrokerBase {
     connection_state getAllConnectionState() const;
 
     /** set the local identification string for the broker*/
-    void setIdentifier(const std::string& name);
+    void setIdentifier(std::string_view name);
     /** get the local identification for the broker*/
     virtual const std::string& getIdentifier() const override final { return identifier; }
     virtual const std::string& getAddress() const override final;
     virtual void setLoggingLevel(int logLevel) override final;
-    virtual void setLogFile(const std::string& lfile) override final;
+    virtual void setLogFile(std::string_view lfile) override final;
     virtual std::string
-        query(const std::string& target,
-              const std::string& queryStr,
+        query(std::string_view target,
+              std::string_view queryStr,
               HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) override final;
-    virtual void setGlobal(const std::string& valueName, const std::string& value) override final;
-    virtual void sendCommand(const std::string& target,
-                             const std::string& commandStr,
+    virtual void setGlobal(std::string_view valueName, std::string_view value) override final;
+    virtual void sendCommand(std::string_view target,
+                             std::string_view commandStr,
                              HelicsSequencingModes mode) override final;
-    virtual void makeConnections(const std::string& file) override final;
-    virtual void linkEndpoints(const std::string& source, const std::string& target) override final;
-    virtual void dataLink(const std::string& publication, const std::string& input) override final;
+    virtual void makeConnections(const std::string &file) override final;
+    virtual void linkEndpoints(std::string_view source, std::string_view target) override final;
+    virtual void dataLink(std::string_view publication, std::string_view input) override final;
 
-    virtual void addSourceFilterToEndpoint(const std::string& filter,
-                                           const std::string& endpoint) override final;
+    virtual void addSourceFilterToEndpoint(std::string_view filter,
+                                           std::string_view endpoint) override final;
 
-    virtual void addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& endpoint) override final;
+    virtual void addDestinationFilterToEndpoint(std::string_view filter,
+                                                std::string_view endpoint) override final;
 
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
@@ -359,15 +359,15 @@ class CoreBroker: public Broker, public BrokerBase {
     /** generate an answer to a local query*/
     void processLocalQuery(const ActionMessage& m);
     /** generate an actual response string to a query*/
-    std::string generateQueryAnswer(const std::string& request, bool force_ordering);
+    std::string generateQueryAnswer(std::string_view request, bool force_ordering);
     /** run queries that are not dependent on the main loop to be running*/
-    std::string quickBrokerQueries(const std::string& request) const;
+    std::string quickBrokerQueries(std::string_view request) const;
     /** process a command instruction message*/
     void processCommandInstruction(ActionMessage& m);
     /** process a command instruction targeted at this broker*/
     void processLocalCommandInstruction(ActionMessage& m);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
-    std::string getNameList(std::string gidString) const;
+    std::string getNameList(std::string_view gidString) const;
     /** locate the route to take to a particular federate*/
     route_id getRoute(GlobalFederateId fedid) const;
     /** locate the route to take to a particular federate*/
@@ -392,7 +392,7 @@ class CoreBroker: public Broker, public BrokerBase {
 
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
-    void initializeMapBuilder(const std::string& request,
+    void initializeMapBuilder(std::string_view request,
                               std::uint16_t index,
                               bool reset,
                               bool force_ordering);

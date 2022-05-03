@@ -65,12 +65,12 @@ CoreBroker::~CoreBroker()
     // make sure everything is synchronized
 }
 
-void CoreBroker::setIdentifier(const std::string& name)
+void CoreBroker::setIdentifier(std::string_view name)
 {
     if (getBrokerState() <= BrokerState::connecting)  // can't be changed after initialization
     {
         std::lock_guard<std::mutex> lock(name_mutex_);
-        identifier = name;
+        identifier.assign(name);
     }
 }
 
@@ -174,7 +174,7 @@ void CoreBroker::makeConnections(const std::string& file)
     }
 }
 
-void CoreBroker::linkEndpoints(const std::string& source, const std::string& target)
+void CoreBroker::linkEndpoints(std::string_view source, std::string_view target)
 {
     ActionMessage M(CMD_ENDPOINT_LINK);
     M.name(source);
@@ -182,7 +182,7 @@ void CoreBroker::linkEndpoints(const std::string& source, const std::string& tar
     addActionMessage(std::move(M));
 }
 
-void CoreBroker::dataLink(const std::string& publication, const std::string& input)
+void CoreBroker::dataLink(std::string_view publication, std::string_view input)
 {
     ActionMessage M(CMD_DATA_LINK);
     M.name(publication);
@@ -190,7 +190,7 @@ void CoreBroker::dataLink(const std::string& publication, const std::string& inp
     addActionMessage(std::move(M));
 }
 
-void CoreBroker::addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint)
+void CoreBroker::addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     ActionMessage M(CMD_FILTER_LINK);
     M.name(filter);
@@ -198,8 +198,7 @@ void CoreBroker::addSourceFilterToEndpoint(const std::string& filter, const std:
     addActionMessage(std::move(M));
 }
 
-void CoreBroker::addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& endpoint)
+void CoreBroker::addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     ActionMessage M(CMD_FILTER_LINK);
     M.name(filter);
@@ -2105,12 +2104,12 @@ CoreBroker::CoreBroker(bool setAsRootBroker) noexcept:
 {
 }
 
-CoreBroker::CoreBroker(const std::string& broker_name):
+CoreBroker::CoreBroker(std::string_view broker_name):
     BrokerBase(broker_name), timeoutMon(new TimeoutMonitor)
 {
 }
 
-void CoreBroker::configure(const std::string& configureString)
+void CoreBroker::configure(std::string_view configureString)
 {
     if (transitionBrokerState(BrokerState::created, BrokerState::configuring)) {
         auto result = parseArgs(configureString);
@@ -2251,7 +2250,7 @@ void CoreBroker::clearTimeBarrier()
     addActionMessage(tbarrier);
 }
 
-void CoreBroker::globalError(int32_t errorCode, const std::string& errorString)
+void CoreBroker::globalError(int32_t errorCode, std::string_view errorString)
 {
     ActionMessage m(CMD_GLOBAL_ERROR);
     m.source_id = getGlobalId();
@@ -2961,7 +2960,7 @@ void CoreBroker::setLoggingLevel(int logLevel)
     addActionMessage(cmd);
 }
 
-void CoreBroker::setLogFile(const std::string& lfile)
+void CoreBroker::setLogFile(std::string_view lfile)
 {
     ActionMessage cmd(CMD_BROKER_CONFIGURE);
     cmd.dest_id = global_id.load();
@@ -2971,8 +2970,8 @@ void CoreBroker::setLogFile(const std::string& lfile)
 }
 
 // public query function
-std::string CoreBroker::query(const std::string& target,
-                              const std::string& queryStr,
+std::string CoreBroker::query(std::string_view target,
+                              std::string_view queryStr,
                               HelicsSequencingModes mode)
 {
     if (getBrokerState() >= BrokerState::terminating) {
@@ -3058,7 +3057,7 @@ std::string CoreBroker::query(const std::string& target,
     return ret;
 }
 
-void CoreBroker::setGlobal(const std::string& valueName, const std::string& value)
+void CoreBroker::setGlobal(std::string_view valueName, std::string_view value)
 {
     ActionMessage querycmd(CMD_SET_GLOBAL);
     querycmd.source_id = global_id.load();
@@ -3067,8 +3066,8 @@ void CoreBroker::setGlobal(const std::string& valueName, const std::string& valu
     transmitToParent(std::move(querycmd));
 }
 
-void CoreBroker::sendCommand(const std::string& target,
-                             const std::string& commandStr,
+void CoreBroker::sendCommand(std::string_view target,
+                             std::string_view commandStr,
                              HelicsSequencingModes mode)
 {
     if (commandStr == "flush") {
@@ -3129,7 +3128,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "current_state",
                                             "logs"};
 
-static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
+static const std::map<std::string_view, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
     {"federate_map", {FEDERATE_MAP, false}},
     {"dependency_graph", {DEPENDENCY_GRAPH, false}},
@@ -3140,7 +3139,7 @@ static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_status", {GLOBAL_STATUS, true}},
     {"global_flush", {GLOBAL_FLUSH, true}}};
 
-std::string CoreBroker::quickBrokerQueries(const std::string& request) const
+std::string CoreBroker::quickBrokerQueries(std::string_view request) const
 {
     if (request == "isinit") {
         return (getBrokerState() >= BrokerState::operating) ? std::string("true") :
@@ -3177,7 +3176,7 @@ std::string CoreBroker::quickBrokerQueries(const std::string& request) const
     return {};
 }
 
-std::string CoreBroker::generateQueryAnswer(const std::string& request, bool force_ordering)
+std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force_ordering)
 {
     auto addHeader = [this](Json::Value& base) { addBaseInformation(base, !isRootc); };
 
@@ -3394,36 +3393,36 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
     return fileops::generateJsonString(v);
 }
 
-std::string CoreBroker::getNameList(std::string gidString) const
+std::string CoreBroker::getNameList(std::string_view gidString) const
 {
     if (gidString.back() == ']') {
-        gidString.pop_back();
+        gidString.remove_suffix(1);
     }
     if (gidString.front() == '[') {
-        gidString = gidString.substr(1);
+        gidString.remove_prefix(1);
     }
     auto val = gmlc::utilities::str2vector<int>(gidString, -23, ",:;");
-    gidString.clear();
-    gidString.push_back('[');
+    std::string nameString;
+    nameString.push_back('[');
     size_t index = 0;
     while (index + 1 < val.size()) {
         const auto* info = handles.findHandle(
             GlobalHandle(GlobalFederateId(val[index]), InterfaceHandle(val[index + 1])));
         if (info != nullptr) {
-            gidString.append(generateJsonQuotedString(info->key));
-            gidString.push_back(',');
+            nameString.append(generateJsonQuotedString(info->key));
+            nameString.push_back(',');
         }
 
         index += 2;
     }
-    if (gidString.back() == ',') {
-        gidString.pop_back();
+    if (nameString.back() == ',') {
+        nameString.pop_back();
     }
-    gidString.push_back(']');
-    return gidString;
+    nameString.push_back(']');
+    return nameString;
 }
 
-void CoreBroker::initializeMapBuilder(const std::string& request,
+void CoreBroker::initializeMapBuilder(std::string_view request,
                                       std::uint16_t index,
                                       bool reset,
                                       bool force_ordering)

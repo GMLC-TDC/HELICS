@@ -39,7 +39,7 @@ BrokerApp::BrokerApp(std::vector<std::string> args):
 {
 }
 
-BrokerApp::BrokerApp(CoreType ctype, const std::string& brokerName, int argc, char* argv[]):
+BrokerApp::BrokerApp(CoreType ctype, std::string_view brokerName, int argc, char* argv[]):
     name(brokerName)
 {
     auto app = generateParser(ctype == CoreType::MULTI);
@@ -60,25 +60,25 @@ BrokerApp::BrokerApp(int argc, char* argv[]):
 {
 }
 
-BrokerApp::BrokerApp(CoreType ctype, const std::string& brokerName, const std::string& argString):
+BrokerApp::BrokerApp(CoreType ctype, std::string_view brokerName, std::string_view argString):
     name(brokerName)
 {
     auto app = generateParser(ctype == CoreType::MULTI);
     app->setDefaultCoreType(ctype);
     app->passConfig = true;
-    if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string(argString)) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
 }
 
-BrokerApp::BrokerApp(CoreType ctype, const std::string& argString):
+BrokerApp::BrokerApp(CoreType ctype, std::string_view argString):
     BrokerApp(ctype, std::string{}, argString)
 {
 }
 
-BrokerApp::BrokerApp(const std::string& argString)
+BrokerApp::BrokerApp(std::string_view argString)
 {
-    if (argString.find_first_of('-') == std::string::npos) {
+    if (argString.find_first_of('-') == std::string_view::npos) {
         broker = BrokerFactory::findBroker(argString);
         if (broker) {
             name = broker->getIdentifier();
@@ -86,7 +86,7 @@ BrokerApp::BrokerApp(const std::string& argString)
         }
     }
     auto app = generateParser();
-    if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string(argString)) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
 }
@@ -170,29 +170,28 @@ void BrokerApp::forceTerminate()
     }
 }
 
-void BrokerApp::linkEndpoints(const std::string& source, const std::string& target)
+void BrokerApp::linkEndpoints(std::string_view source, std::string_view target)
 {
     if (broker) {
         broker->linkEndpoints(source, target);
     }
 }
 
-void BrokerApp::dataLink(const std::string& source, const std::string& target)
+void BrokerApp::dataLink(std::string_view source, std::string_view target)
 {
     if (broker) {
         broker->dataLink(source, target);
     }
 }
 /** add a source Filter to an endpoint*/
-void BrokerApp::addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint)
+void BrokerApp::addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     if (broker) {
         broker->addSourceFilterToEndpoint(filter, endpoint);
     }
 }
 /** add a destination Filter to an endpoint*/
-void BrokerApp::addDestinationFilterToEndpoint(const std::string& filter,
-                                               const std::string& endpoint)
+void BrokerApp::addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     if (broker) {
         broker->addDestinationFilterToEndpoint(filter, endpoint);
@@ -219,22 +218,21 @@ const std::string& BrokerApp::getAddress() const
     return (broker) ? broker->getAddress() : estring;
 }
 /** make a query at the broker*/
-std::string BrokerApp::query(const std::string& target,
-                             const std::string& queryStr,
+std::string BrokerApp::query(std::string_view target, std::string_view queryStr,
                              HelicsSequencingModes mode)
 {
     return (broker) ? broker->query(target, queryStr, mode) : std::string("#error");
 }
 
-void BrokerApp::setGlobal(const std::string& valueName, const std::string& value)
+void BrokerApp::setGlobal(std::string_view valueName, std::string_view value)
 {
     if (broker) {
         broker->setGlobal(valueName, value);
     }
 }
 
-void BrokerApp::sendCommand(const std::string& target,
-                            const std::string& commandStr,
+void BrokerApp::sendCommand(std::string_view target,
+                            std::string_view commandStr,
                             HelicsSequencingModes mode)
 {
     if (broker) {
@@ -263,7 +261,7 @@ void BrokerApp::clearTimeBarrier()
     }
 }
 
-void BrokerApp::globalError(int32_t errorCode, const std::string& errorString)
+void BrokerApp::globalError(int32_t errorCode, std::string_view errorString)
 {
     if (broker) {
         broker->globalError(errorCode, errorString);
@@ -271,7 +269,7 @@ void BrokerApp::globalError(int32_t errorCode, const std::string& errorString)
 }
 
 /** set the log file to use for the broker*/
-void BrokerApp::setLogFile(const std::string& logFile)
+void BrokerApp::setLogFile(std::string_view logFile)
 {
     if (broker) {
         broker->setLogFile(logFile);

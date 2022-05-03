@@ -31,7 +31,7 @@ class TcpComms final: public NetworkCommsInterface {
     /** load network information into the comms object*/
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;
 
-    virtual void setFlag(const std::string& flag, bool val) override;
+    virtual void setFlag(std::string_view flag, bool val) override;
 
   private:
     bool reuse_address{false};

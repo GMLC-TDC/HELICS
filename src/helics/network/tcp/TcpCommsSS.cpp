@@ -52,7 +52,7 @@ int TcpCommsSS::getDefaultBrokerPort() const
     return getDefaultPort(HELICS_CORE_TYPE_TCP_SS);
 }
 
-void TcpCommsSS::addConnection(const std::string& newConn)
+void TcpCommsSS::addConnection(std::string_view newConn)
 {
     if (propertyLock()) {
         connections.emplace_back(newConn);
@@ -73,7 +73,7 @@ void TcpCommsSS::addConnections(const std::vector<std::string>& newConnections)
     }
 }
 
-void TcpCommsSS::setFlag(const std::string& flag, bool val)
+void TcpCommsSS::setFlag(std::string_view flag, bool val)
 {
     if (flag == "reuse_address") {
         if (propertyLock()) {

@@ -21,7 +21,7 @@ namespace mpi {
       public:
         /** default constructor*/
         MpiCore() noexcept;
-        explicit MpiCore(const std::string& core_name);
+        explicit MpiCore(std::string_view core_name);
         ~MpiCore();
 
       protected:

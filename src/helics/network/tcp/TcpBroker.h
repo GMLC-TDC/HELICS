@@ -30,7 +30,7 @@ namespace tcp {
       public:
         /** default constructor*/
         explicit TcpBrokerSS(bool rootBroker = false) noexcept;
-        explicit TcpBrokerSS(const std::string& broker_name);
+        explicit TcpBrokerSS(std::string_view broker_name);
 
       protected:
         virtual std::shared_ptr<helicsCLI11App> generateCLI() override;

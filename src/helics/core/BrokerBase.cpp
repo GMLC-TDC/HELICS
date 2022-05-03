@@ -80,10 +80,10 @@ BrokerBase::~BrokerBase()
         }
     }
 }
-std::function<void(int, const std::string&, const std::string&)>
+std::function<void(int, std::string_view, std::string_view)>
     BrokerBase::getLoggingCallback() const
 {
-    return [this](int level, const std::string& name, const std::string& message) {
+    return [this](int level, std::string_view name, std::string_view message) {
         sendToLogger(global_id.load(), level, name, message);
     };
 }
@@ -270,7 +270,7 @@ int BrokerBase::parseArgs(std::string_view initializationString)
     auto app = generateBaseCLI();
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
-    auto res = app->helics_parse(initializationString);
+    auto res = app->helics_parse(std::string(initializationString));
     return static_cast<int>(res);
 }
 

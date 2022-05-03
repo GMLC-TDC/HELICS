@@ -16,6 +16,8 @@ them using the toml library
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wshadow"
 #endif
+#include <string_view>
+#define TOML11_USING_STRING_VIEW 1
 #include "toml.hpp"
 #ifdef __GNUC__
 #    pragma GCC diagnostic pop

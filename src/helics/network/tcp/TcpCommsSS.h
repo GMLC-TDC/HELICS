@@ -29,11 +29,11 @@ namespace tcp {
         ~TcpCommsSS();
 
         /** add a connection to the connection list*/
-        void addConnection(const std::string& newConn);
+        void addConnection(std::string_view newConn);
         /** add a vector of connections to the connection list*/
         void addConnections(const std::vector<std::string>& newConnections);
         /** allow outgoing connections*/
-        virtual void setFlag(const std::string& flag, bool val) override;
+        virtual void setFlag(std::string_view flag, bool val) override;
 
         /** load network information into the comms object*/
         virtual void loadNetworkInfo(const NetworkBrokerData& netInfo) override;

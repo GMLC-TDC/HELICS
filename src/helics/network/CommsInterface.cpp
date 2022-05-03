@@ -27,7 +27,7 @@ namespace CommFactory {
       public:
         using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
-        static void addBuilder(std::shared_ptr<CommBuilder> cb, const std::string& name, int code)
+        static void addBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(cb));
         }
@@ -41,7 +41,7 @@ namespace CommFactory {
             throw(HelicsException("comm type is not available"));
         }
 
-        static const std::shared_ptr<CommBuilder>& getBuilder(const std::string& type)
+        static const std::shared_ptr<CommBuilder>& getBuilder(std::string_view type)
         {
             for (auto& bb : instance()->builders) {
                 if (std::get<1>(bb) == type) {
@@ -71,7 +71,7 @@ namespace CommFactory {
         std::vector<BuildT> builders;  //!< container for the different builders
     };
 
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, const std::string& name, int code)
+    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
     {
         MasterCommBuilder::addBuilder(std::move(cb), name, code);
     }
@@ -82,7 +82,7 @@ namespace CommFactory {
         return builder->build();
     }
 
-    std::unique_ptr<CommsInterface> create(const std::string& type)
+    std::unique_ptr<CommsInterface> create(std::string_view type)
     {
         const auto& builder = MasterCommBuilder::getBuilder(type);
         return builder->build();
@@ -138,8 +138,9 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     }
 }
 
-void CommsInterface::loadTargetInfo(const std::string& localTarget,
-                                    const std::string& brokerTarget,
+void CommsInterface::loadTargetInfo(std::string_view
+                                    localTarget,
+                                    std::string_view brokerTarget,
                                     gmlc::networking::InterfaceNetworks targetNetwork)
 {
     if (propertyLock()) {
@@ -185,7 +186,7 @@ void CommsInterface::transmit(route_id rid, ActionMessage&& cmd)
     }
 }
 
-void CommsInterface::addRoute(route_id rid, const std::string& routeInfo)
+void CommsInterface::addRoute(route_id rid, std::string_view routeInfo)
 {
     ActionMessage rt(CMD_PROTOCOL_PRIORITY);
     rt.payload = routeInfo;
@@ -507,7 +508,7 @@ void CommsInterface::setCallback(std::function<void(ActionMessage&&)> callback)
 }
 
 void CommsInterface::setLoggingCallback(
-    std::function<void(int level, const std::string& name, const std::string& message)> callback)
+    std::function<void(int level, std::string_view name, std::string_view message)> callback)
 {
     if (propertyLock()) {
         loggingCallback = std::move(callback);
@@ -528,12 +529,14 @@ void CommsInterface::setMessageSize(int maxMsgSize, int maxCount)
     }
 }
 
-void CommsInterface::setFlag(const std::string& flag, bool val)
+void CommsInterface::setFlag(std::string_view flag, bool val)
 {
     if (flag == "server_mode") {
         setServerMode(val);
     } else {
-        logWarning(std::string("unrecognized flag :") + flag);
+        std::string message("unrecognized flag :");
+        message.append(flag);
+        logWarning(message);
     }
 }
 
@@ -559,7 +562,7 @@ bool CommsInterface::isConnected() const
             (rx_status == connection_status::connected));
 }
 
-void CommsInterface::logMessage(const std::string& message) const
+void CommsInterface::logMessage(std::string_view message) const
 {
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_INTERFACES, "commMessage||" + name, message);
@@ -568,7 +571,7 @@ void CommsInterface::logMessage(const std::string& message) const
     }
 }
 
-void CommsInterface::logWarning(const std::string& message) const
+void CommsInterface::logWarning(std::string_view message) const
 {
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_WARNING, "commWarning||" + name, message);
@@ -577,7 +580,7 @@ void CommsInterface::logWarning(const std::string& message) const
     }
 }
 
-void CommsInterface::logError(const std::string& message) const
+void CommsInterface::logError(std::string_view message) const
 {
     if (loggingCallback) {
         loggingCallback(HELICS_LOG_LEVEL_ERROR, "commERROR||" + name, message);

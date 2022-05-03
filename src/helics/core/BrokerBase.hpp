@@ -283,7 +283,7 @@ class BrokerBase {
 
   public:
     /** generate a callback function for the logging purposes*/
-    std::function<void(int, const std::string&, const std::string&)> getLoggingCallback() const;
+    std::function<void(int, std::string_view, std::string_view)> getLoggingCallback() const;
     /** close all the threads*/
     void joinAllThreads();
     /** get the number of messages that have been processed internally*/

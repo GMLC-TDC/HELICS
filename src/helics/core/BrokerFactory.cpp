@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
 #include "helics/helics-config.h"
+#include "helics/common/fmt_format.h"
 
 #include <cassert>
 #include <tuple>
@@ -30,7 +31,7 @@ class MasterBrokerBuilder {
   public:
     using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
 
-    static void addBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
+    static void addBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)
     {
         instance()->builders.emplace_back(code, name, std::move(cb));
     }
@@ -79,12 +80,12 @@ class MasterBrokerBuilder {
     std::vector<BuildT> builders;  //!< container for the builders
 };
 
-void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, const std::string& name, int code)
+void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)
 {
     MasterBrokerBuilder::addBuilder(std::move(cb), name, code);
 }
 
-std::shared_ptr<Broker> makeBroker(CoreType type, const std::string& name)
+std::shared_ptr<Broker> makeBroker(CoreType type, std::string_view name)
 {
     if (type == CoreType::NULLCORE) {
         throw(HelicsException("nullcore is explicitly not available nor will ever be"));
@@ -95,14 +96,14 @@ std::shared_ptr<Broker> makeBroker(CoreType type, const std::string& name)
     return MasterBrokerBuilder::getBuilder(static_cast<int>(type))->build(name);
 }
 
-std::shared_ptr<Broker> create(CoreType type, const std::string& configureString)
+std::shared_ptr<Broker> create(CoreType type, std::string_view configureString)
 {
-    static const std::string emptyString;
+    static constexpr std::string_view emptyString{nullptr,0};
     return create(type, emptyString, configureString);
 }
 
 std::shared_ptr<Broker>
-    create(CoreType type, const std::string& brokerName, const std::string& configureString)
+    create(CoreType type, std::string_view brokerName, std::string_view configureString)
 {
     auto broker = makeBroker(type, brokerName);
     if (!broker) {
@@ -123,7 +124,7 @@ std::shared_ptr<Broker> create(CoreType type, int argc, char* argv[])
     return create(type, emptyString, argc, argv);
 }
 
-std::shared_ptr<Broker> create(CoreType type, const std::string& brokerName, int argc, char* argv[])
+std::shared_ptr<Broker> create(CoreType type, std::string_view brokerName, int argc, char* argv[])
 {
     auto broker = makeBroker(type, brokerName);
     broker->configureFromArgs(argc, argv);
@@ -142,7 +143,7 @@ std::shared_ptr<Broker> create(CoreType type, std::vector<std::string> args)
 }
 
 std::shared_ptr<Broker>
-    create(CoreType type, const std::string& brokerName, std::vector<std::string> args)
+    create(CoreType type, std::string_view brokerName, std::vector<std::string> args)
 {
     auto broker = makeBroker(type, brokerName);
     broker->configureFromVector(std::move(args));
@@ -179,9 +180,9 @@ static gmlc::concurrency::SearchableObjectHolder<Broker, CoreType>
 // this will trip the line when it is destroyed at global destruction time
 static gmlc::concurrency::TripWireTrigger tripTrigger;
 
-std::shared_ptr<Broker> findBroker(const std::string& brokerName)
+std::shared_ptr<Broker> findBroker(std::string_view brokerName)
 {
-    auto brk = searchableBrokers.findObject(brokerName);
+    auto brk = searchableBrokers.findObject(std::string(brokerName));
     if (brk) {
         return brk;
     }
@@ -189,13 +190,11 @@ std::shared_ptr<Broker> findBroker(const std::string& brokerName)
         return getConnectedBroker();
     }
     if (brokerName.front() == '#') {
-        try {
-            auto val = std::stoull(brokerName.substr(1));
-            return getBrokerByIndex(val);
-        }
-        catch (...) {
-            return nullptr;
-        }
+
+            char* ept = nullptr;
+            auto val = std::strtoull(brokerName.data() + 1, &ept, 10);
+            return (ept>brokerName.data()+1)?getBrokerByIndex(val):nullptr;
+        
     }
     return nullptr;
 }
@@ -284,33 +283,37 @@ void terminateAllBrokers()
     cleanUpBrokers(std::chrono::milliseconds(250));
 }
 
-void abortAllBrokers(int errorCode, const std::string& errorString)
+void abortAllBrokers(int errorCode, std::string_view errorString)
 {
     auto brokers = getAllBrokers();
     for (auto& brk : brokers) {
         brk->globalError(errorCode,
-                         brk->getIdentifier() + " sent abort message: '" + errorString + "'");
+                         fmt::format("{} sent abort message: '{}'",
+                                     brk->getIdentifier(),
+                                     errorString));
+  
         brk->disconnect();
     }
     cleanUpBrokers(std::chrono::milliseconds(250));
 }
-bool copyBrokerIdentifier(const std::string& copyFromName, const std::string& copyToName)
+bool copyBrokerIdentifier(std::string_view copyFromName, std::string_view copyToName)
 {
-    return searchableBrokers.copyObject(copyFromName, copyToName);
+    return searchableBrokers.copyObject(std::string(copyFromName), std::string(copyToName));
 }
 
-void unregisterBroker(const std::string& name)
+void unregisterBroker(std::string_view name)
 {
-    if (!searchableBrokers.removeObject(name)) {
+    if (!searchableBrokers.removeObject(std::string(name))) {
         searchableBrokers.removeObject(
             [&name](auto& obj) { return (obj->getIdentifier() == name); });
     }
 }
 
-void addAssociatedBrokerType(const std::string& name, CoreType type)
+void addAssociatedBrokerType(std::string_view name, CoreType type)
 {
-    searchableBrokers.addType(name, type);
-    addExtraTypes(name, type);
+    std::string sname{name};
+    searchableBrokers.addType(sname, type);
+    addExtraTypes(sname, type);
 }
 
 static const std::string helpStr{"--help"};

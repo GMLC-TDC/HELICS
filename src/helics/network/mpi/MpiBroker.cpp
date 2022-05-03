@@ -17,7 +17,7 @@ namespace helics {
 namespace mpi {
     MpiBroker::MpiBroker(bool rootBroker) noexcept: CommsBroker(rootBroker) {}
 
-    MpiBroker::MpiBroker(const std::string& broker_name): CommsBroker(broker_name) {}
+    MpiBroker::MpiBroker(std::string_view broker_name): CommsBroker(broker_name) {}
 
     // MpiBroker::~MpiBroker() = default;
     MpiBroker::~MpiBroker()

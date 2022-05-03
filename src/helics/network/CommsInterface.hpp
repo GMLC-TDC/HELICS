@@ -38,8 +38,8 @@ class CommsInterface {
 
     /** load network information into the comms object*/
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo);
-    void loadTargetInfo(const std::string& localTarget,
-                        const std::string& brokerTarget,
+    void loadTargetInfo(std::string_view localTarget,
+                        std::string_view brokerTarget,
                         gmlc::networking::InterfaceNetworks targetNetwork =
                             gmlc::networking::InterfaceNetworks::LOCAL);
     /** transmit a message along a particular route
@@ -50,7 +50,7 @@ class CommsInterface {
     void transmit(route_id rid, ActionMessage&& cmd);
     /** add a new route assigned to the appropriate id
      */
-    void addRoute(route_id rid, const std::string& routeInfo);
+    void addRoute(route_id rid, std::string_view routeInfo);
     /** remove a route from use*/
     void removeRoute(route_id rid);
     /** connect the commsInterface
@@ -77,7 +77,7 @@ class CommsInterface {
     /** set the callback for processing the messages
      */
     void setLoggingCallback(
-        std::function<void(int level, const std::string& name, const std::string& message)>
+        std::function<void(int level, std::string_view name, std::string_view message)>
             callback);
     /** set the max message size and max Queue size
      */
@@ -91,16 +91,16 @@ class CommsInterface {
     */
     void setTimeout(std::chrono::milliseconds timeOut);
     /** set a flag for the comms system*/
-    virtual void setFlag(const std::string& flag, bool val);
+    virtual void setFlag(std::string_view flag, bool val);
     /** enable or disable the server mode for the comms*/
     void setServerMode(bool serverActive);
 
     /** generate a log message as a warning*/
-    void logWarning(const std::string& message) const;
+    void logWarning(std::string_view message) const;
     /** generate a log message as an error*/
-    void logError(const std::string& message) const;
+    void logError(std::string_view message) const;
     /** generate a log message as a level above warning or error*/
-    void logMessage(const std::string& message) const;
+    void logMessage(std::string_view message) const;
 
   protected:
     /// enumeration of the connection status flags for more immediate feedback from the processing
@@ -148,7 +148,7 @@ class CommsInterface {
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
     std::function<void(ActionMessage&&)>
         ActionCallback;  //!< the callback for what to do with a received message
-    std::function<void(int level, const std::string& name, const std::string& message)>
+    std::function<void(int level, std::string_view name, std::string_view message)>
         loggingCallback;  //!< callback for logging
     gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
         txQueue;  //!< set of messages waiting to be transmitted
@@ -210,13 +210,12 @@ namespace CommFactory {
     };
 
     /** define a new Comm Builder from the builder give a name and build code*/
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb,
-                           const std::string& commTypeName,
+    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view commTypeName,
                            int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CommTYPE>
-    std::shared_ptr<CommBuilder> addCommType(const std::string& commTypeName, int code)
+    std::shared_ptr<CommBuilder> addCommType(std::string_view commTypeName, int code)
     {
         auto bld = std::make_shared<CommTypeBuilder<CommTYPE>>();
         std::shared_ptr<CommBuilder> cbld = std::static_pointer_cast<CommBuilder>(bld);
@@ -225,7 +224,7 @@ namespace CommFactory {
     }
 
     std::unique_ptr<CommsInterface> create(CoreType type);
-    std::unique_ptr<CommsInterface> create(const std::string& type);
+    std::unique_ptr<CommsInterface> create(std::string_view type);
 
 }  // namespace CommFactory
 

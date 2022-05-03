@@ -20,7 +20,7 @@ class NetworkCore: public CommsBroker<COMMS, CommonCore> {
   public:
     /** default constructor*/
     NetworkCore() noexcept;
-    explicit NetworkCore(const std::string& broker_name);
+    explicit NetworkCore(std::string_view broker_name);
 
   public:
     virtual std::string generateLocalAddressString() const override;

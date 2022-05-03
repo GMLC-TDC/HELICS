@@ -20,7 +20,7 @@ namespace mpi {
       public:
         /** default constructor*/
         explicit MpiBroker(bool rootBroker = false) noexcept;
-        explicit MpiBroker(const std::string& broker_name);
+        explicit MpiBroker(std::string_view broker_name);
 
       protected:
         virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
