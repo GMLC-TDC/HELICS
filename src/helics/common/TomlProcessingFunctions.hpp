@@ -30,7 +30,7 @@ toml::Value to the root object
 */
 toml::value loadToml(const std::string& tomlString);
 
-bool hasTomlExtension(const std::string& tomlString);
+bool hasTomlExtension(std::string_view tomlString);
 /** load a TOML object in a string
  */
 toml::value loadTomlStr(const std::string& tomlString);

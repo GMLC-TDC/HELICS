@@ -688,9 +688,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
 
 FilterInfo* FilterFederate::createFilter(GlobalBrokerId dest,
                                          InterfaceHandle handle,
-                                         const std::string& key,
-                                         const std::string& type_in,
-                                         const std::string& type_out,
+                                         std::string_view key,
+                                         std::string_view type_in,
+                                         std::string_view type_out,
                                          bool cloning)
 {
     auto filt = std::make_unique<FilterInfo>((dest == parent_broker_id || dest == mCoreID) ?
@@ -972,7 +972,7 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fe
     }
 }
 
-std::string FilterFederate::query(const std::string& queryStr) const
+std::string FilterFederate::query(std::string_view queryStr) const
 {
     if (queryStr == "exists") {
         return "true";

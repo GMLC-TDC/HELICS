@@ -74,12 +74,12 @@ CommonCore::CommonCore() noexcept: timeoutMon(new TimeoutMonitor) {}
 
 CommonCore::CommonCore(bool /*arg*/) noexcept: timeoutMon(new TimeoutMonitor) {}
 
-CommonCore::CommonCore(const std::string& coreName):
+CommonCore::CommonCore(std::string_view coreName):
     BrokerBase(coreName), timeoutMon(new TimeoutMonitor)
 {
 }
 
-void CommonCore::configure(const std::string& configureString)
+void CommonCore::configure(std::string_view configureString)
 {
     if (transitionBrokerState(BrokerState::created, BrokerState::configuring)) {
         // initialize the brokerbase
@@ -294,10 +294,10 @@ FederateState* CommonCore::getFederateAt(LocalFederateId federateID) const
     return (*feds)[federateID.baseValue()];
 }
 
-FederateState* CommonCore::getFederate(const std::string& federateName) const
+FederateState* CommonCore::getFederate(std::string_view federateName) const
 {
     auto feds = federates.lock();
-    return feds->find(federateName);
+    return feds->find(std::string(federateName));
 }
 
 FederateState* CommonCore::getHandleFederate(InterfaceHandle handle)
@@ -317,9 +317,9 @@ FederateState* CommonCore::getFederateCore(GlobalFederateId federateID)
     return (fed != loopFederates.end()) ? (fed->fed) : nullptr;
 }
 
-FederateState* CommonCore::getFederateCore(const std::string& federateName)
+FederateState* CommonCore::getFederateCore(std::string_view federateName)
 {
-    auto fed = loopFederates.find(federateName);
+    auto fed = loopFederates.find(std::string(federateName));
     return (fed != loopFederates.end()) ? (fed->fed) : nullptr;
 }
 
@@ -338,7 +338,7 @@ const BasicHandleInfo* CommonCore::getHandleInfo(InterfaceHandle handle) const
     return handles.read([handle](auto& hand) { return hand.getHandleInfo(handle.baseValue()); });
 }
 
-const BasicHandleInfo* CommonCore::getLocalEndpoint(const std::string& name) const
+const BasicHandleInfo* CommonCore::getLocalEndpoint(std::string_view name) const
 {
     return handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
 }
@@ -373,7 +373,7 @@ bool CommonCore::hasError() const
 }
 void CommonCore::globalError(LocalFederateId federateID,
                              int errorCode,
-                             const std::string& errorString)
+                             std::string_view errorString)
 {
     if (federateID == gLocalCoreId) {
         ActionMessage m(CMD_GLOBAL_ERROR);
@@ -413,7 +413,7 @@ void CommonCore::globalError(LocalFederateId federateID,
 
 void CommonCore::localError(LocalFederateId federateID,
                             int errorCode,
-                            const std::string& errorString)
+                            std::string_view errorString)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -637,7 +637,7 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     return fed->enterExecutingMode(iterate, false);
 }
 
-LocalFederateId CommonCore::registerFederate(const std::string& name, const CoreFederateInfo& info)
+LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFederateInfo& info)
 {
     if (!waitCoreRegistration()) {
         if (getBrokerState() == BrokerState::errored) {
@@ -659,12 +659,12 @@ LocalFederateId CommonCore::registerFederate(const std::string& name, const Core
         if (static_cast<decltype(maxFederateCount)>(feds->size()) >= maxFederateCount) {
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
-        auto id = feds->insert(name, name, info);
+        auto id = feds->insert(std::string(name), std::string(name), info);
         if (id) {
             local_id = LocalFederateId(static_cast<int32_t>(*id));
             fed = (*feds)[*id];
         } else {
-            throw(RegistrationFailure("duplicate names " + name +
+            throw(RegistrationFailure("duplicate names " + std::string(name) +
                                       "detected multiple federates with the same name"));
         }
         if (feds->size() == 1) {
@@ -741,10 +741,10 @@ const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateI
     return (fed == nullptr) ? unknownString : fed->getIdentifier();
 }
 
-LocalFederateId CommonCore::getFederateId(const std::string& name) const
+LocalFederateId CommonCore::getFederateId(std::string_view name) const
 {
     auto feds = federates.lock();
-    auto* fed = feds->find(name);
+    auto* fed = feds->find(std::string(name));
     if (fed != nullptr) {
         return fed->local_id;
     }
@@ -1072,9 +1072,9 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
 static const std::string emptyString;
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
-                                          const std::string& key,
-                                          const std::string& type,
-                                          const std::string& units)
+                                          std::string_view key,
+                                          std::string_view type,
+                                          std::string_view units)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1109,7 +1109,7 @@ InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::getInput(LocalFederateId federateID, const std::string& key) const
+InterfaceHandle CommonCore::getInput(LocalFederateId federateID, std::string_view key) const
 {
     const auto* ci = handles.read([&key](auto& hand) { return hand.getInput(key); });
     if (ci->local_fed_id != federateID) {
@@ -1119,9 +1119,9 @@ InterfaceHandle CommonCore::getInput(LocalFederateId federateID, const std::stri
 }
 
 InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
-                                                const std::string& key,
-                                                const std::string& type,
-                                                const std::string& units)
+                                                std::string_view key,
+                                                std::string_view type,
+                                                std::string_view units)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1156,7 +1156,7 @@ InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, const std::string& key) const
+InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, std::string_view key) const
 {
     const auto* pub = handles.read([&key](auto& hand) { return hand.getPublication(key); });
     if (pub->local_fed_id != federateID) {
@@ -1659,8 +1659,8 @@ const std::vector<InterfaceHandle>& CommonCore::getValueUpdates(LocalFederateId 
 }
 
 InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
-                                             const std::string& name,
-                                             const std::string& type)
+                                             std::string_view name,
+                                             std::string_view type)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1693,8 +1693,8 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
 }
 
 InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
-                                                     const std::string& name,
-                                                     const std::string& type)
+                                                     std::string_view name,
+                                                     std::string_view type)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -1722,7 +1722,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, const std::string& name) const
+InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, std::string_view name) const
 {
     const auto* ept = handles.read([&name](auto& hand) { return hand.getEndpoint(name); });
     if (ept->local_fed_id != federateID) {
@@ -1731,9 +1731,9 @@ InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, const std::s
     return ept->handle.handle;
 }
 
-InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
-                                           const std::string& type_in,
-                                           const std::string& type_out)
+InterfaceHandle CommonCore::registerFilter(std::string_view filterName,
+                                           std::string_view type_in,
+                                           std::string_view type_out)
 {
     // check to make sure the name isn't already used
     if (!filterName.empty()) {
@@ -1768,9 +1768,9 @@ InterfaceHandle CommonCore::registerFilter(const std::string& filterName,
     return id;
 }
 
-InterfaceHandle CommonCore::registerCloningFilter(const std::string& filterName,
-                                                  const std::string& type_in,
-                                                  const std::string& type_out)
+InterfaceHandle CommonCore::registerCloningFilter(std::string_view filterName,
+                                                  std::string_view type_in,
+                                                  std::string_view type_out)
 {
     // check to make sure the name isn't already used
     if (!filterName.empty()) {
@@ -1855,7 +1855,7 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
     return id;
 }
 
-InterfaceHandle CommonCore::getFilter(const std::string& name) const
+InterfaceHandle CommonCore::getFilter(std::string_view name) const
 {
     const auto* filt = handles.read([&name](auto& hand) { return hand.getFilter(name); });
     if ((filt != nullptr) && (filt->handleType == InterfaceType::FILTER)) {
@@ -1864,7 +1864,7 @@ InterfaceHandle CommonCore::getFilter(const std::string& name) const
     return {};
 }
 
-InterfaceHandle CommonCore::getTranslator(const std::string& name) const
+InterfaceHandle CommonCore::getTranslator(std::string_view name) const
 {
     const auto* trans = handles.read([&name](auto& hand) { return hand.getTranslator(name); });
     if ((trans != nullptr) && (trans->handleType == InterfaceType::TRANSLATOR)) {
@@ -1873,7 +1873,7 @@ InterfaceHandle CommonCore::getTranslator(const std::string& name) const
     return {};
 }
 
-void CommonCore::makeConnections(const std::string& file)
+void CommonCore::makeConnections(const std::string &file)
 {
     if (fileops::hasTomlExtension(file)) {
         fileops::makeConnectionsToml(this, file);
@@ -1882,7 +1882,7 @@ void CommonCore::makeConnections(const std::string& file)
     }
 }
 
-void CommonCore::linkEndpoints(const std::string& source, const std::string& dest)
+void CommonCore::linkEndpoints(std::string_view source, std::string_view dest)
 {
     ActionMessage M(CMD_ENDPOINT_LINK);
     M.name(source);
@@ -1890,7 +1890,7 @@ void CommonCore::linkEndpoints(const std::string& source, const std::string& des
     addActionMessage(std::move(M));
 }
 
-void CommonCore::dataLink(const std::string& source, const std::string& target)
+void CommonCore::dataLink(std::string_view source, std::string_view target)
 {
     ActionMessage M(CMD_DATA_LINK);
     M.name(source);
@@ -1898,7 +1898,7 @@ void CommonCore::dataLink(const std::string& source, const std::string& target)
     addActionMessage(std::move(M));
 }
 
-void CommonCore::addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint)
+void CommonCore::addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     ActionMessage M(CMD_FILTER_LINK);
     M.name(filter);
@@ -1906,8 +1906,8 @@ void CommonCore::addSourceFilterToEndpoint(const std::string& filter, const std:
     addActionMessage(std::move(M));
 }
 
-void CommonCore::addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& endpoint)
+void CommonCore::addDestinationFilterToEndpoint(std::string_view filter,
+                                                std::string_view endpoint)
 {
     ActionMessage M(CMD_FILTER_LINK);
     M.name(filter);
@@ -1916,7 +1916,7 @@ void CommonCore::addDestinationFilterToEndpoint(const std::string& filter,
     addActionMessage(std::move(M));
 }
 
-void CommonCore::addDependency(LocalFederateId federateID, const std::string& federateName)
+void CommonCore::addDependency(LocalFederateId federateID, std::string_view federateName)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -2263,7 +2263,7 @@ uint64_t CommonCore::receiveCountAny(LocalFederateId federateID)
 
 void CommonCore::logMessage(LocalFederateId federateID,
                             int logLevel,
-                            const std::string& messageToLog)
+                            std::string_view messageToLog)
 {
     GlobalFederateId gid;
     if (federateID == gLocalCoreId) {
@@ -2292,7 +2292,7 @@ void CommonCore::setLoggingLevel(int logLevel)
     addActionMessage(cmd);
 }
 
-void CommonCore::setLogFile(const std::string& lfile)
+void CommonCore::setLogFile(std::string_view lfile)
 {
     ActionMessage cmd(CMD_CORE_CONFIGURE);
     cmd.dest_id = global_id.load();
@@ -2413,7 +2413,7 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     actionQueue.push(transOpUpdate);
 }
 
-void CommonCore::setIdentifier(const std::string& name)
+void CommonCore::setIdentifier(std::string_view name)
 {
     if (getBrokerState() == BrokerState::created) {
         identifier = name;
@@ -2461,7 +2461,7 @@ std::string CommonCore::filteredEndpointQuery(const FederateState* fed) const
 }
 
 std::string CommonCore::federateQuery(const FederateState* fed,
-                                      const std::string& queryStr,
+                                      std::string_view queryStr,
                                       bool force_ordering) const
 {
     if (fed == nullptr) {
@@ -2545,7 +2545,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "current_state",
                                             "logs"};
 
-std::string CommonCore::quickCoreQueries(const std::string& queryStr) const
+std::string CommonCore::quickCoreQueries(std::string_view queryStr) const
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return generateStringVector(querySet, [](const std::string& data) { return data; });
@@ -2584,7 +2584,7 @@ void CommonCore::loadBasicJsonInfo(
     }
 }
 
-void CommonCore::initializeMapBuilder(const std::string& request,
+void CommonCore::initializeMapBuilder(std::string_view request,
                                       std::uint16_t index,
                                       bool reset,
                                       bool force_ordering) const
@@ -2689,7 +2689,7 @@ void CommonCore::processCommandInstruction(ActionMessage& command)
     }
 }
 
-std::string CommonCore::coreQuery(const std::string& queryStr, bool force_ordering) const
+std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering) const
 {
     auto addHeader = [this](Json::Value& base) { loadBasicJsonInfo(base, nullptr); };
 
@@ -2778,7 +2778,7 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
         });
         return fileops::generateJsonString(base);
     }
-    auto mi = mapIndex.find(queryStr);
+    auto mi = mapIndex.find(std::string(queryStr));
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
@@ -2848,8 +2848,8 @@ std::string CommonCore::coreQuery(const std::string& queryStr, bool force_orderi
     return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized core query");
 }
 
-std::string CommonCore::query(const std::string& target,
-                              const std::string& queryStr,
+std::string CommonCore::query(std::string_view target,
+                              std::string_view queryStr,
                               HelicsSequencingModes mode)
 {
     if (getBrokerState() >= BrokerState::terminating) {
@@ -2939,7 +2939,7 @@ std::string CommonCore::query(const std::string& target,
     return ret;
 }
 
-void CommonCore::setGlobal(const std::string& valueName, const std::string& value)
+void CommonCore::setGlobal(std::string_view valueName, std::string_view value)
 {
     ActionMessage querycmd(CMD_SET_GLOBAL);
     querycmd.dest_id = gRootBrokerID;
@@ -2949,9 +2949,9 @@ void CommonCore::setGlobal(const std::string& valueName, const std::string& valu
     addActionMessage(std::move(querycmd));
 }
 
-void CommonCore::sendCommand(const std::string& target,
-                             const std::string& commandStr,
-                             const std::string& source,
+void CommonCore::sendCommand(std::string_view target,
+                             std::string_view commandStr,
+                             std::string_view source,
                              HelicsSequencingModes mode)
 {
     if (commandStr == "flush") {
@@ -3166,14 +3166,15 @@ void CommonCore::transmitDelayedMessages()
     }
 }
 
-void CommonCore::errorRespondDelayedMessages(const std::string& estring)
+void CommonCore::errorRespondDelayedMessages(std::string_view estring)
 {
     auto msg = delayTransmitQueue.pop();
     while (msg) {
         if ((*msg).action() == CMD_QUERY ||
             (*msg).action() == CMD_BROKER_QUERY) {  // deal with in flight queries that will block
                                                     // unless a response is given
-            activeQueries.setDelayedValue((*msg).messageID, std::string("#error:") + estring);
+            activeQueries.setDelayedValue((*msg).messageID, fmt::format(
+                "#error:{}", estring));
         }
         // else other message which might get into here shouldn't need any action, just drop them
         msg = delayTransmitQueue.pop();
@@ -3745,7 +3746,7 @@ void CommonCore::registerInterface(ActionMessage& command)
                 }
                 filterFed->createFilter(filterFedID.load(),
                                         command.source_handle,
-                                        std::string(command.name()),
+                                        command.name(),
                                         command.getString(typeStringLoc),
                                         command.getString(typeOutStringLoc),
                                         checkActionFlag(command, clone_flag));
@@ -3758,7 +3759,7 @@ void CommonCore::registerInterface(ActionMessage& command)
                 }
                 translatorFed->createTranslator(translatorFedID.load(),
                                                 command.source_handle,
-                                                std::string(command.name()),
+                                                command.name(),
                                                 command.getString(typeStringLoc),
                                                 command.getString(unitStringLoc));
                 // connectFilterTiming();
@@ -3822,7 +3823,7 @@ void CommonCore::generateFilterFederate()
     hasFilters = true;
 
     filterFed->setHandleManager(&loopHandles);
-    filterFed->setLogger([this](int level, const std::string& name, const std::string& message) {
+    filterFed->setLogger([this](int level, std::string_view name, std::string_view message) {
         sendToLogger(global_broker_id_local, level, name, message);
     });
     filterFed->setAirLockFunction([this](int index) { return std::ref(dataAirlocks[index]); });
@@ -5232,7 +5233,7 @@ void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string in
         [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("local_info_", info); });
 }
 
-const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, const std::string& tag) const
+const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, std::string_view tag) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
@@ -5242,8 +5243,8 @@ const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, const std
 }
 
 void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
-                                 const std::string& tag,
-                                 const std::string& value)
+                                 std::string_view tag,
+                                 std::string_view value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {
@@ -5255,7 +5256,7 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
         return;
     }
 
-    const std::string& valueStr{value.empty() ? trueString : value};
+    std::string_view valueStr{value.empty() ? trueString : value};
 
     handles.modify(
         [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag(tag, valueStr); });
@@ -5269,14 +5270,14 @@ void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,
     }
 }
 
-const std::string& CommonCore::getFederateTag(LocalFederateId fid, const std::string& tag) const
+const std::string& CommonCore::getFederateTag(LocalFederateId fid, std::string_view tag) const
 {
     auto* fed = getFederateAt(fid);
     if (fid == gLocalCoreId) {
         static thread_local std::string val;
         val = const_cast<CommonCore*>(this)->query(
             "core",
-            std::string("tag/") + tag,
+            fmt::format("tag/{}",tag),
             HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
         val = gmlc::utilities::stringOps::removeQuotes(val);
         return val;
@@ -5289,8 +5290,8 @@ const std::string& CommonCore::getFederateTag(LocalFederateId fid, const std::st
 }
 
 void CommonCore::setFederateTag(LocalFederateId fid,
-                                const std::string& tag,
-                                const std::string& value)
+                                std::string_view tag,
+                                std::string_view value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {

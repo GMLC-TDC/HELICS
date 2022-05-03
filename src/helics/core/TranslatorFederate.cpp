@@ -288,9 +288,9 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
 
 TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
                                                      InterfaceHandle handle,
-                                                     const std::string& key,
-                                                     const std::string& endpointType,
-                                                     const std::string& units)
+                                                     std::string_view key,
+                                                     std::string_view endpointType,
+                                                     std::string_view units)
 {
     auto tran = std::make_unique<TranslatorInfo>(
         GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest,
@@ -341,7 +341,7 @@ const TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed
     return translators.find(GlobalHandle{fed, handle});
 }
 
-std::string TranslatorFederate::query(const std::string& queryStr) const
+std::string TranslatorFederate::query(std::string_view queryStr) const
 {
     if (queryStr == "exists") {
         return "true";

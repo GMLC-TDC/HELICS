@@ -63,9 +63,9 @@ class TranslatorFederate {
     /** create a translator */
     TranslatorInfo* createTranslator(GlobalBrokerId dest,
                                      InterfaceHandle handle,
-                                     const std::string& key,
-                                     const std::string& endpointType,
-                                     const std::string& units);
+                                     std::string_view key,
+                                     std::string_view endpointType,
+                                     std::string_view units);
 
     void setCallbacks(std::function<void(const ActionMessage&)> queueMessage,
                       std::function<void(ActionMessage&&)> queueMessageMove,
@@ -97,7 +97,7 @@ class TranslatorFederate {
 
     void setHandleManager(HandleManager* handles) { mHandles = handles; }
 
-    std::string query(const std::string& queryStr) const;
+    std::string query(std::string_view queryStr) const;
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
 

@@ -41,21 +41,21 @@ class UnknownHandleManager {
     /** default constructor*/
     UnknownHandleManager() = default;
     /** add a missingPublication*/
-    void addUnknownPublication(const std::string& key, GlobalHandle target, uint16_t flags);
+    void addUnknownPublication(std::string_view key, GlobalHandle target, uint16_t flags);
     /** add a missingPublication*/
-    void addUnknownInput(const std::string& key, GlobalHandle target, uint16_t flags);
+    void addUnknownInput(std::string_view key, GlobalHandle target, uint16_t flags);
     /** add a missing source endpoint*/
-    void addUnknownEndpoint(const std::string& key, GlobalHandle target, uint16_t flags);
+    void addUnknownEndpoint(std::string_view key, GlobalHandle target, uint16_t flags);
 
     /** add a missing source filter*/
-    void addUnknownFilter(const std::string& key, GlobalHandle target, uint16_t flags);
+    void addUnknownFilter(std::string_view key, GlobalHandle target, uint16_t flags);
     /** add a data link where neither side is known*/
-    void addDataLink(const std::string& source, const std::string& target);
+    void addDataLink(std::string_view source, std::string_view target);
     /** add an endpoint link where neither side is known*/
-    void addEndpointLink(const std::string& source, const std::string& target);
+    void addEndpointLink(std::string_view source, std::string_view target);
 
-    void addSourceFilterLink(const std::string& filter, const std::string& endpoint);
-    void addDestinationFilterLink(const std::string& filter, const std::string& endpoint);
+    void addSourceFilterLink(std::string_view filter, std::string_view endpoint);
+    void addDestinationFilterLink(std::string_view filter, std::string_view endpoint);
     /** specify a found input*/
     std::vector<targetInfo> checkForInputs(const std::string& newInput) const;
     /** specify a found input*/

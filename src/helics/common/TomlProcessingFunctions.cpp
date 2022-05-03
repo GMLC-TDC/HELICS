@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::fileops {
 
-bool hasTomlExtension(const std::string& tomlString)
+bool hasTomlExtension(std::string_view tomlString)
 {
     auto ext = tomlString.substr(tomlString.length() - 4);
     return ((ext == "toml") || (ext == "TOML") || (ext == ".ini") || (ext == ".INI"));
@@ -44,7 +44,7 @@ toml::value loadToml(const std::string& tomlString)
     }
 }
 
-toml::value loadTomlStr(const std::string& tomlString)
+toml::value loadTomlStr(const std::string &tomlString)
 {
     try {
         std::istringstream tstring(tomlString);

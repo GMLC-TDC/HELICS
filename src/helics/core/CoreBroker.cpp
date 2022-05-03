@@ -1693,12 +1693,12 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
         if (isRootc) {
             switch (command.action()) {
                 case CMD_ADD_NAMED_PUBLICATION:
-                    unknownHandles.addUnknownPublication(std::string(command.name()),
+                    unknownHandles.addUnknownPublication(command.name(),
                                                          command.getSource(),
                                                          command.flags);
                     break;
                 case CMD_ADD_NAMED_INPUT:
-                    unknownHandles.addUnknownInput(std::string(command.name()),
+                    unknownHandles.addUnknownInput(command.name(),
                                                    command.getSource(),
                                                    command.flags);
                     if (!command.getStringData().empty()) {
@@ -1717,7 +1717,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     }
                     break;
                 case CMD_ADD_NAMED_ENDPOINT:
-                    unknownHandles.addUnknownEndpoint(std::string(command.name()),
+                    unknownHandles.addUnknownEndpoint(command.name(),
                                                       command.getSource(),
                                                       command.flags);
                     if (!command.getStringData().empty()) {
@@ -1727,7 +1727,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                             auto& afilt = handles.addHandle(command.source_id,
                                                             command.source_handle,
                                                             InterfaceType::FILTER,
-                                                            std::string(),
+                                                            "",
                                                             command.getString(typeStringLoc),
                                                             command.getString(typeOutStringLoc));
 
@@ -1736,7 +1736,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                     }
                     break;
                 case CMD_ADD_NAMED_FILTER:
-                    unknownHandles.addUnknownFilter(std::string(command.name()),
+                    unknownHandles.addUnknownFilter(command.name(),
                                                     command.getSource(),
                                                     command.flags);
                     break;
@@ -2025,7 +2025,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 auto* input = handles.getInput(command.getString(targetStringLoc));
                 if (input == nullptr) {
                     if (isRootc) {
-                        unknownHandles.addDataLink(std::string(command.name()),
+                        unknownHandles.addDataLink(command.name(),
                                                    command.getString(targetStringLoc));
                     } else {
                         routeMessage(command);
@@ -2050,7 +2050,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 auto* target = handles.getEndpoint(command.getString(targetStringLoc));
                 if (target == nullptr) {
                     if (isRootc) {
-                        unknownHandles.addEndpointLink(std::string(command.name()),
+                        unknownHandles.addEndpointLink(command.name(),
                                                        command.getString(targetStringLoc));
                     } else {
                         routeMessage(command);
@@ -2078,11 +2078,11 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 if (ept == nullptr) {
                     if (isRootc) {
                         if (checkActionFlag(command, destination_target)) {
-                            unknownHandles.addDestinationFilterLink(std::string(command.name()),
+                            unknownHandles.addDestinationFilterLink(command.name(),
                                                                     command.getString(
                                                                         targetStringLoc));
                         } else {
-                            unknownHandles.addSourceFilterLink(std::string(command.name()),
+                            unknownHandles.addSourceFilterLink(command.name(),
                                                                command.getString(targetStringLoc));
                         }
                     } else {

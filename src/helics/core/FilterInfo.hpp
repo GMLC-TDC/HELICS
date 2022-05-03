@@ -19,7 +19,7 @@ struct EptInformation {
     std::string key;
     std::string type;
     EptInformation() = default;
-    EptInformation(GlobalHandle gid, const std::string& key_, const std::string& type_):
+    EptInformation(GlobalHandle gid, std::string_view key_, std::string_view type_):
         id(gid), key(key_), type(type_)
     {
     }
@@ -31,9 +31,9 @@ class FilterInfo {
     /** constructor from all fields*/
     FilterInfo(GlobalBrokerId core_id_,
                InterfaceHandle handle_,
-               const std::string& key_,
-               const std::string& type_in_,
-               const std::string& type_out_,
+               std::string_view key_,
+               std::string_view type_in_,
+               std::string_view type_out_,
                bool destFilter_):
         core_id(core_id_),
         handle(handle_), key(key_), inputType(type_in_), outputType(type_out_),
@@ -64,12 +64,12 @@ class FilterInfo {
   public:
     /** add a target target*/
     void addDestinationEndpoint(GlobalHandle dest,
-                                const std::string& destName,
-                                const std::string& destType);
+                                std::string_view destName,
+                                std::string_view destType);
     /** add a source to an endpoint*/
     void addSourceEndpoint(GlobalHandle dest,
-                           const std::string& sourceName,
-                           const std::string& sourceType);
+                           std::string_view sourceName,
+                           std::string_view sourceType);
     /** remove a target from connection*/
     void removeTarget(GlobalHandle targetId);
     /** get a string with the names of the source endpoints*/

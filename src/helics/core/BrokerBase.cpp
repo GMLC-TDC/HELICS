@@ -63,7 +63,7 @@ BrokerBase::BrokerBase(bool DisableQueue) noexcept:
 {
 }
 
-BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
+BrokerBase::BrokerBase(std::string_view broker_name, bool DisableQueue):
     identifier(broker_name), queueDisabled(DisableQueue),
     mLogManager(std::make_shared<LogManager>())
 {
@@ -265,7 +265,7 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
     return static_cast<int>(res);
 }
 
-int BrokerBase::parseArgs(const std::string& initializationString)
+int BrokerBase::parseArgs(std::string_view initializationString)
 {
     auto app = generateBaseCLI();
     auto sApp = generateCLI();

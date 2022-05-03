@@ -161,7 +161,7 @@ class BrokerBase {
 
   public:
     explicit BrokerBase(bool DisableQueue = false) noexcept;
-    explicit BrokerBase(const std::string& broker_name, bool DisableQueue = false);
+    explicit BrokerBase(std::string_view broker_name, bool DisableQueue = false);
 
     virtual ~BrokerBase();
     /** parse configuration information from command line arguments
@@ -175,7 +175,7 @@ class BrokerBase {
     /** parse configuration information from a string of command line like arguments
     @return 0 for OK, positive numbers for expected information calls and negative number for error
     */
-    int parseArgs(const std::string& initializationString);
+    int parseArgs(std::string_view initializationString);
     /** configure the base of all brokers and cores
      */
     virtual void configureBase();
