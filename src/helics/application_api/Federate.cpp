@@ -42,7 +42,7 @@ void cleanupHelicsLibrary()
     BrokerFactory::cleanUpBrokers(100ms);
 }
 
-Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fedName)
+Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedName)
 {
     if (mName.empty()) {
         mName = fi.defName;
@@ -54,7 +54,7 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
         }
         if (!coreObject) {
             if (!mName.empty()) {
-                std::string cname = fedName + "_core_" + gmlc::utilities::randomString(6);
+                std::string cname = fmt::format("{}_core_{}",fedName,gmlc::utilities::randomString(6));
 
                 try {
                     coreObject =
@@ -116,12 +116,12 @@ Federate::Federate(const std::string& fedName, const FederateInfo& fi): mName(fe
     cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
-Federate::Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi):
+Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi):
     Federate(fedname, core.getCopyofCorePointer(), fi)
 {
 }
 
-Federate::Federate(const std::string& fedName,
+Federate::Federate(std::string_view fedName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
     coreObject(core),
@@ -155,7 +155,7 @@ Federate::Federate(const std::string& fedName,
     cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
-Federate::Federate(const std::string& fedName, const std::string& configString):
+Federate::Federate(std::string_view fedName, const std::string &configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     if (looksLikeFile(configString)) {
@@ -163,7 +163,7 @@ Federate::Federate(const std::string& fedName, const std::string& configString):
     }
 }
 
-Federate::Federate(const std::string& configString): Federate(std::string{}, configString) {}
+Federate::Federate(const std::string& configString): Federate(std::string_view{}, configString) {}
 
 Federate::Federate() noexcept
 {
