@@ -6,13 +6,12 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <optional>
-
 #include <boost/interprocess/mapped_region.hpp>
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_condition.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <chrono>
+#include <optional>
 #include <utility>
 
 namespace helics {

@@ -6,12 +6,11 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcBlockingPriorityQueue.hpp"
 
-#include <optional>
-
 #include <algorithm>
 #include <atomic>
 #include <condition_variable>
 #include <mutex>
+#include <optional>
 #include <queue>
 #include <string>
 #include <type_traits>

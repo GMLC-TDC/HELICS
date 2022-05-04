@@ -32,10 +32,7 @@ namespace ipc {
         using namespace boost::interprocess;  // NOLINT
 
         /** default constructor*/
-        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* data,
-                                                                   size_t blockSize)
-        {
-        }
+        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* data, size_t blockSize) {}
 
         /** clear the queue*/
         void IpcBlockingPriorityQueueImpl::clear()
