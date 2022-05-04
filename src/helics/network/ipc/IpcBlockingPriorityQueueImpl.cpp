@@ -32,7 +32,7 @@ namespace ipc {
         using namespace boost::interprocess;  // NOLINT
 
         /** default constructor*/
-        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* dataBlock,
+        IpcBlockingPriorityQueueImpl::IpcBlockingPriorityQueueImpl(void* data,
                                                                    size_t blockSize)
         {
         }
@@ -169,7 +169,7 @@ val the value to push on the queue
 @return an optional object with an object of type T if available
 */
         template<typename = std::enable_if<std::is_copy_assignable<T>::value>>
-        stx::optional<T> try_peek() const
+        std::optional<T> try_peek() const
         {
             std::lock_guard<std::mutex> lock(m_pullLock);
             if (!priorityQueue.empty()) {
@@ -187,7 +187,7 @@ val the value to push on the queue
 @return an optional containing the value if successful the optional will be empty if there is no
 element in the queue
 */
-        stx::optional<T> try_pop();
+        std::optional<T> try_pop();
 
         /** blocking call to wait on an object from the stack*/
         T pop()
@@ -228,7 +228,7 @@ element in the queue
         }
 
         /** blocking call to wait on an object from the stack with timeout*/
-        stx::optional<T> pop(std::chrono::milliseconds timeout)
+        std::optional<T> pop(std::chrono::milliseconds timeout)
         {
             auto val = try_pop();
             while (!val) {
