@@ -51,7 +51,7 @@ adding to its interface
 */
 HELICS_CXX_EXPORT bool
     waitForInit(helics::Federate* fed,
-                const std::string& fedName,
+                std::string_view fedName,
                 std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
 
 /** helper function to wait for a particular federate to be created
@@ -63,7 +63,7 @@ HELICS_CXX_EXPORT bool
 */
 HELICS_CXX_EXPORT bool
     waitForFed(helics::Federate* fed,
-               const std::string& fedName,
+               std::string_view fedName,
                std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
 
 /** helper function to get a list of all the publications a federate subscribes to
@@ -72,6 +72,6 @@ HELICS_CXX_EXPORT bool
 @return a string vector of the names of the publication that are subscribed to
 */
 HELICS_CXX_EXPORT std::string queryFederateSubscriptions(helics::Federate* fed,
-                                                         const std::string& fedName);
+                                                         std::string_view fedName);
 
 }  // namespace helics

@@ -824,7 +824,7 @@ class Core {
      * @param handle the identifiers for the interface to set the info data on
      * @param info a string containing the info data
      */
-    virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) = 0;
+    virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) = 0;
 
     /**
      * getter for the interface information

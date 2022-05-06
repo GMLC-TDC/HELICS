@@ -461,12 +461,12 @@ IterationResult Federate::enterExecutingModeComplete()
     }
 }
 
-void Federate::setTag(const std::string& tag, const std::string& value)
+void Federate::setTag(std::string_view tag, std::string_view value)
 {
     coreObject->setFederateTag(fedID, tag, value);
 }
 
-const std::string& Federate::getTag(const std::string& tag) const
+const std::string& Federate::getTag(std::string_view tag) const
 {
     return coreObject->getFederateTag(fedID, tag);
 }
@@ -693,14 +693,14 @@ void Federate::globalError(int errorcode)
     globalError(errorcode, errorString);
 }
 
-void Federate::localError(int errorcode, const std::string& message)
+void Federate::localError(int errorcode, std::string_view message)
 {
     completeOperation();
     updateFederateMode(Modes::ERROR_STATE);
     coreObject->localError(fedID, errorcode, message);
 }
 
-void Federate::globalError(int errorcode, const std::string& message)
+void Federate::globalError(int errorcode, std::string_view message)
 {
     completeOperation();
     updateFederateMode(Modes::ERROR_STATE);
@@ -1223,7 +1223,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                         if (propval.is_floating()) {
                             filter.set(propname, propval.as_floating());
                         } else {
-                            filter.setString(propname, propval.as_string());
+                            filter.setString(propname, static_cast<std::string_view>(propval.as_string()));
                         }
                     }
                 } else {
@@ -1247,7 +1247,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
-                        filter.setString(propname, propval.as_string());
+                        filter.setString(propname, static_cast<std::string_view>(propval.as_string()));
                     }
                 }
             }
@@ -1257,11 +1257,11 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         auto globals = toml::find(doc, "globals");
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
+                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()), static_cast<std::string_view>(val.as_array()[1].as_string()));
             }
         } else {
             for (const auto& val : globals.as_table()) {
-                setGlobal(val.first, val.second.as_string());
+                setGlobal(val.first, static_cast<std::string_view>(val.second.as_string()));
             }
         }
     }
@@ -1290,11 +1290,11 @@ const Translator& Federate::getTranslator(int index) const
     return cManager->getTranslator(index);
 }
 
-std::string Federate::localQuery(const std::string& /*queryStr*/) const
+std::string Federate::localQuery(std::string_view /*queryStr*/) const
 {
     return std::string{};
 }
-std::string Federate::query(const std::string& queryStr, HelicsSequencingModes mode)
+std::string Federate::query(std::string_view queryStr, HelicsSequencingModes mode)
 {
     std::string res;
     if (queryStr == "name") {
@@ -1312,8 +1312,7 @@ std::string Federate::query(const std::string& queryStr, HelicsSequencingModes m
     return res;
 }
 
-std::string Federate::query(const std::string& target,
-                            const std::string& queryStr,
+std::string Federate::query(std::string_view target, std::string_view queryStr,
                             HelicsSequencingModes mode)
 {
     std::string res;
@@ -1325,8 +1324,8 @@ std::string Federate::query(const std::string& target,
     return res;
 }
 
-QueryId Federate::queryAsync(const std::string& target,
-                             const std::string& queryStr,
+QueryId Federate::queryAsync(std::string_view target,
+                             std::string_view queryStr,
                              HelicsSequencingModes mode)
 {
     auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
@@ -1339,7 +1338,7 @@ QueryId Federate::queryAsync(const std::string& target,
     return QueryId(cnt);
 }
 
-QueryId Federate::queryAsync(const std::string& queryStr, HelicsSequencingModes mode)
+QueryId Federate::queryAsync(std::string_view queryStr, HelicsSequencingModes mode)
 {
     auto queryFut =
         std::async(std::launch::async, [this, queryStr, mode]() { return query(queryStr, mode); });
@@ -1376,13 +1375,13 @@ bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
     return false;
 }
 
-void Federate::setGlobal(const std::string& valueName, const std::string& value)
+void Federate::setGlobal(std::string_view valueName, std::string_view value)
 {
     coreObject->setGlobal(valueName, value);
 }
 
-void Federate::sendCommand(const std::string& target,
-                           const std::string& commandStr,
+void Federate::sendCommand(std::string_view target,
+                           std::string_view commandStr,
                            HelicsSequencingModes mode)
 {
     coreObject->sendCommand(target, commandStr, getName(), mode);
@@ -1398,25 +1397,32 @@ std::pair<std::string, std::string> Federate::waitCommand()
     return coreObject->waitCommand(fedID);
 }
 
-void Federate::addDependency(const std::string& fedName)
+void Federate::addDependency(std::string_view fedName)
 {
     coreObject->addDependency(fedID, fedName);
 }
+static std::string nameGenerator(std::string start, char sep, std::string_view addition) {
 
-Filter& Federate::registerFilter(const std::string& filterName,
-                                 const std::string& inputType,
-                                 const std::string& outputType)
+    if (!addition.empty()) {
+        start.push_back(sep);
+        start.append(addition);
+        return start;
+    }
+    return std::string{};
+}
+
+Filter& Federate::registerFilter(std::string_view filterName,
+                                 std::string_view inputType,
+                                 std::string_view outputType)
 {
-    return cManager->registerFilter((!filterName.empty()) ?
-                                        (getName() + nameSegmentSeparator + filterName) :
-                                        filterName,
+    return cManager->registerFilter(nameGenerator(getName(),nameSegmentSeparator,filterName),
                                     inputType,
                                     outputType);
 }
 
-CloningFilter& Federate::registerCloningFilter(const std::string& filterName,
-                                               const std::string& inputType,
-                                               const std::string& outputType)
+CloningFilter& Federate::registerCloningFilter(std::string_view filterName,
+                                               std::string_view inputType,
+                                               std::string_view outputType)
 {
     return cManager->registerCloningFilter((!filterName.empty()) ?
                                                (getName() + nameSegmentSeparator + filterName) :
@@ -1425,16 +1431,16 @@ CloningFilter& Federate::registerCloningFilter(const std::string& filterName,
                                            outputType);
 }
 
-Filter& Federate::registerGlobalFilter(const std::string& filterName,
-                                       const std::string& inputType,
-                                       const std::string& outputType)
+Filter& Federate::registerGlobalFilter(std::string_view filterName,
+                                       std::string_view inputType,
+                                       std::string_view outputType)
 {
     return cManager->registerFilter(filterName, inputType, outputType);
 }
 
-CloningFilter& Federate::registerGlobalCloningFilter(const std::string& filterName,
-                                                     const std::string& inputType,
-                                                     const std::string& outputType)
+CloningFilter& Federate::registerGlobalCloningFilter(std::string_view filterName,
+                                                     std::string_view inputType,
+                                                     std::string_view outputType)
 {
     return cManager->registerCloningFilter(filterName, inputType, outputType);
 }
@@ -1469,7 +1475,7 @@ Translator& Federate::registerTranslator(std::int32_t translatorType,
     return trans;
 }
 
-const Filter& Federate::getFilter(const std::string& filterName) const
+const Filter& Federate::getFilter(std::string_view filterName) const
 {
     const Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
@@ -1478,7 +1484,7 @@ const Filter& Federate::getFilter(const std::string& filterName) const
     return filt;
 }
 
-Filter& Federate::getFilter(const std::string& filterName)
+Filter& Federate::getFilter(std::string_view filterName)
 {
     Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
@@ -1497,7 +1503,7 @@ void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOpera
     coreObject->setFilterOperator(filt.getHandle(), std::move(op));
 }
 
-const Translator& Federate::getTranslator(const std::string& translatorName) const
+const Translator& Federate::getTranslator(std::string_view translatorName) const
 {
     const Translator& trans = cManager->getTranslator(translatorName);
     if (!trans.isValid()) {
@@ -1506,7 +1512,7 @@ const Translator& Federate::getTranslator(const std::string& translatorName) con
     return trans;
 }
 
-Translator& Federate::getTranslator(const std::string& translatorName)
+Translator& Federate::getTranslator(std::string_view translatorName)
 {
     Translator& trans = cManager->getTranslator(translatorName);
     if (!trans.isValid()) {
@@ -1520,7 +1526,7 @@ int Federate::getTranslatorCount() const
     return cManager->getTranslatorCount();
 }
 
-void Federate::logMessage(int level, const std::string& message) const
+void Federate::logMessage(int level, std::string_view message) const
 {
     if (coreObject) {
         coreObject->logMessage(fedID, level, message);
@@ -1587,7 +1593,7 @@ const std::string& Interface::getInfo() const
     return (cr != nullptr) ? cr->getInterfaceInfo(handle) : emptyStr;
 }
 
-void Interface::setInfo(const std::string& info)
+void Interface::setInfo(std::string_view info)
 {
     if (cr != nullptr) {
         cr->setInterfaceInfo(handle, info);
@@ -1597,12 +1603,12 @@ void Interface::setInfo(const std::string& info)
     }
 }
 
-const std::string& Interface::getTag(const std::string& tag) const
+const std::string& Interface::getTag(std::string_view tag) const
 {
     return (cr != nullptr) ? cr->getInterfaceTag(handle, tag) : emptyStr;
 }
 
-void Interface::setTag(const std::string& tag, const std::string& value)
+void Interface::setTag(std::string_view tag, std::string_view value)
 {
     if (cr != nullptr) {
         cr->setInterfaceTag(handle, tag, value);
