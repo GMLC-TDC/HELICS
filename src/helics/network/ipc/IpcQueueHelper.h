@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include <optional>
 #include "helics/core/ActionMessage.hpp"
 
 #include <algorithm>
@@ -16,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cctype>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>

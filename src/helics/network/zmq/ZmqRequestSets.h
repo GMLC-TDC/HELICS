@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/ActionMessage.hpp"
 #include "ZmqContextManager.h"
 #include "cppzmq/zmq.hpp"
-#include <optional>
 
 #include <deque>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>

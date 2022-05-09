@@ -411,9 +411,7 @@ void CommonCore::globalError(LocalFederateId federateID,
     }
 }
 
-void CommonCore::localError(LocalFederateId federateID,
-                            int errorCode,
-                            std::string_view errorString)
+void CommonCore::localError(LocalFederateId federateID, int errorCode, std::string_view errorString)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -664,7 +662,9 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             local_id = LocalFederateId(static_cast<int32_t>(*id));
             fed = (*feds)[*id];
         } else {
-            throw(RegistrationFailure(fmt::format("duplicate names {} detected: multiple federates with the same name",name)));
+            throw(RegistrationFailure(
+                fmt::format("duplicate names {} detected: multiple federates with the same name",
+                            name)));
         }
         if (feds->size() == 1) {
             checkProperties = true;
@@ -1872,7 +1872,7 @@ InterfaceHandle CommonCore::getTranslator(std::string_view name) const
     return {};
 }
 
-void CommonCore::makeConnections(const std::string &file)
+void CommonCore::makeConnections(const std::string& file)
 {
     if (fileops::hasTomlExtension(file)) {
         fileops::makeConnectionsToml(this, file);
@@ -1905,8 +1905,7 @@ void CommonCore::addSourceFilterToEndpoint(std::string_view filter, std::string_
     addActionMessage(std::move(M));
 }
 
-void CommonCore::addDestinationFilterToEndpoint(std::string_view filter,
-                                                std::string_view endpoint)
+void CommonCore::addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     ActionMessage M(CMD_FILTER_LINK);
     M.name(filter);
@@ -2260,9 +2259,7 @@ uint64_t CommonCore::receiveCountAny(LocalFederateId federateID)
     return fed->getQueueSize();
 }
 
-void CommonCore::logMessage(LocalFederateId federateID,
-                            int logLevel,
-                            std::string_view messageToLog)
+void CommonCore::logMessage(LocalFederateId federateID, int logLevel, std::string_view messageToLog)
 {
     GlobalFederateId gid;
     if (federateID == gLocalCoreId) {
@@ -2995,9 +2992,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_REG_FED:
             // this one in the core needs to be the thread-safe version of getFederate
-            loopFederates.insert(command.name(),
-                                 no_search,
-                                 getFederate(command.name()));
+            loopFederates.insert(command.name(), no_search, getFederate(command.name()));
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -3172,8 +3167,7 @@ void CommonCore::errorRespondDelayedMessages(std::string_view estring)
         if ((*msg).action() == CMD_QUERY ||
             (*msg).action() == CMD_BROKER_QUERY) {  // deal with in flight queries that will block
                                                     // unless a response is given
-            activeQueries.setDelayedValue((*msg).messageID, fmt::format(
-                "#error:{}", estring));
+            activeQueries.setDelayedValue((*msg).messageID, fmt::format("#error:{}", estring));
         }
         // else other message which might get into here shouldn't need any action, just drop them
         msg = delayTransmitQueue.pop();
@@ -4731,8 +4725,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.source_id = global_broker_id_local;
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
-                    std::get<1>(
-                        mapBuilders[mapIndex.at(cmd.payload.to_string()).first])
+                    std::get<1>(mapBuilders[mapIndex.at(cmd.payload.to_string()).first])
                         .push_back(queryResp);
                 }
 
@@ -4783,8 +4776,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     repStr = coreQuery(cmd.payload.to_string(), force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
-                    repStr =
-                        federateQuery(fedptr, cmd.payload.to_string(), force_ordered);
+                    repStr = federateQuery(fedptr, cmd.payload.to_string(), force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;
@@ -5276,7 +5268,7 @@ const std::string& CommonCore::getFederateTag(LocalFederateId fid, std::string_v
         static thread_local std::string val;
         val = const_cast<CommonCore*>(this)->query(
             "core",
-            fmt::format("tag/{}",tag),
+            fmt::format("tag/{}", tag),
             HelicsSequencingModes::HELICS_SEQUENCING_MODE_ORDERED);
         val = gmlc::utilities::stringOps::removeQuotes(val);
         return val;
@@ -5288,9 +5280,7 @@ const std::string& CommonCore::getFederateTag(LocalFederateId fid, std::string_v
     return fed->getTag(tag);
 }
 
-void CommonCore::setFederateTag(LocalFederateId fid,
-                                std::string_view tag,
-                                std::string_view value)
+void CommonCore::setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value)
 {
     static const std::string trueString{"true"};
     if (tag.empty()) {

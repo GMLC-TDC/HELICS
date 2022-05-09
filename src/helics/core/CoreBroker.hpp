@@ -100,14 +100,14 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    gmlc::containers::DualStringMappedVector<BasicFedInfo, GlobalFederateId,reference_stability::unstable>
-        mFederates;  //!< container for all federates
+    gmlc::containers::
+        DualStringMappedVector<BasicFedInfo, GlobalFederateId, reference_stability::unstable>
+            mFederates;  //!< container for all federates
     gmlc::containers::
         DualStringMappedVector<BasicBrokerInfo, GlobalBrokerId, reference_stability::unstable>
-        mBrokers;  //!< container for all the broker information
+            mBrokers;  //!< container for all the broker information
     /// the previous identifier in case a rename is required
-    std::string
-        mPreviousLocalBrokerIdentifier;  
+    std::string mPreviousLocalBrokerIdentifier;
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
     UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
@@ -309,7 +309,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void sendCommand(std::string_view target,
                              std::string_view commandStr,
                              HelicsSequencingModes mode) override final;
-    virtual void makeConnections(const std::string &file) override final;
+    virtual void makeConnections(const std::string& file) override final;
     virtual void linkEndpoints(std::string_view source, std::string_view target) override final;
     virtual void dataLink(std::string_view publication, std::string_view input) override final;
 

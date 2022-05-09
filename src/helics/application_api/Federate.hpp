@@ -123,7 +123,7 @@ class HELICS_CXX_EXPORT Federate {
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */
-    explicit Federate(const std::string & configString);
+    explicit Federate(const std::string& configString);
     /**constructor taking a file with the required information and the name of the federate
     @param fedname the name of the federate
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
@@ -680,6 +680,7 @@ received
     virtual std::string localQuery(std::string_view queryStr) const;
     /** generate a string with the local variant of the name*/
     std::string localNameGenerator(std::string_view localName) const;
+
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode

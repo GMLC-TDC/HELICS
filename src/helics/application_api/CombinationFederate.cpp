@@ -38,10 +38,8 @@ CombinationFederate::CombinationFederate(const std::string& configString):
     CombinationFederate::registerInterfaces(configString);
 }
 
-CombinationFederate::CombinationFederate(std::string_view fedName,
-                                         const std::string& configString):
-    Federate(fedName, loadFederateInfo(configString)),
-    ValueFederate(true), MessageFederate(true)
+CombinationFederate::CombinationFederate(std::string_view fedName, const std::string& configString):
+    Federate(fedName, loadFederateInfo(configString)), ValueFederate(true), MessageFederate(true)
 {
     CombinationFederate::registerInterfaces(configString);
 }

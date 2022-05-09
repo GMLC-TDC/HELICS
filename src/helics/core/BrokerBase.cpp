@@ -80,8 +80,7 @@ BrokerBase::~BrokerBase()
         }
     }
 }
-std::function<void(int, std::string_view, std::string_view)>
-    BrokerBase::getLoggingCallback() const
+std::function<void(int, std::string_view, std::string_view)> BrokerBase::getLoggingCallback() const
 {
     return [this](int level, std::string_view name, std::string_view message) {
         sendToLogger(global_id.load(), level, name, message);

@@ -623,9 +623,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 }
             } else {
                 // this means we haven't seen this federate before for some reason
-                mFederates.insert(command.name(),
-                                  command.dest_id,
-                                  command.name());
+                mFederates.insert(command.name(), command.dest_id, command.name());
                 mFederates.back().route = getRoute(command.source_id);
                 mFederates.back().global_id = command.dest_id;
                 routing_table.emplace(fed->global_id, mFederates.back().route);
@@ -677,9 +675,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                                              // change the source_id
                 transmit(route, command);
             } else {
-                mBrokers.insert(command.name(),
-                                GlobalBrokerId(command.dest_id),
-                                command.name());
+                mBrokers.insert(command.name(), GlobalBrokerId(command.dest_id), command.name());
                 mBrokers.back().route = getRoute(command.source_id);
                 mBrokers.back().global_id = GlobalBrokerId(command.dest_id);
                 routing_table.emplace(broker->global_id, mBrokers.back().route);
@@ -3551,8 +3547,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(m.payload.to_string()).first])
-            .push_back(queryRep);
+        std::get<1>(mapBuilders[mapIndex.at(m.payload.to_string()).first]).push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(m.messageID, std::string(queryRep.payload.to_string()));
     } else {

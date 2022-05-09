@@ -113,7 +113,8 @@ namespace fileops {
             for (const auto& filt : filtArray) {
                 if (filt.is_array()) {
                     auto& filtAct = filt.as_array();
-                    brk->addSourceFilterToEndpoint(filtAct[0].as_string().str, filtAct[1].as_string().str);
+                    brk->addSourceFilterToEndpoint(filtAct[0].as_string().str,
+                                                   filtAct[1].as_string().str);
                 } else {
                     std::string fname = getOrDefault(filt, "filter", std::string());
                     if (!fname.empty()) {
@@ -136,7 +137,8 @@ namespace fileops {
         if (!globals.is_uninitialized()) {
             if (globals.is_array()) {
                 for (auto& val : globals.as_array()) {
-                    brk->setGlobal(val.as_array()[0].as_string().str, val.as_array()[1].as_string().str);
+                    brk->setGlobal(val.as_array()[0].as_string().str,
+                                   val.as_array()[1].as_string().str);
                 }
             } else {
                 for (const auto& val : globals.as_table()) {

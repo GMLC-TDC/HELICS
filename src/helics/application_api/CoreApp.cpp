@@ -38,8 +38,7 @@ CoreApp::CoreApp(CoreType ctype, std::vector<std::string> args)
 
 CoreApp::CoreApp(std::vector<std::string> args): CoreApp(CoreType::DEFAULT, std::move(args)) {}
 
-CoreApp::CoreApp(CoreType ctype, std::string_view coreName, int argc, char* argv[]):
-    name(coreName)
+CoreApp::CoreApp(CoreType ctype, std::string_view coreName, int argc, char* argv[]): name(coreName)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
@@ -215,8 +214,7 @@ const std::string& CoreApp::getAddress() const
 
 /** make a query at the core*/
 std::string
-    CoreApp::query(std::string_view target, std::string_view queryStr,
-                           HelicsSequencingModes mode)
+    CoreApp::query(std::string_view target, std::string_view queryStr, HelicsSequencingModes mode)
 {
     return (core) ? core->query(target, queryStr, mode) :
                     generateJsonErrorResponse(JsonErrorCodes::BAD_GATEWAY, "Core not available");

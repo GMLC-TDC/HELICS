@@ -100,8 +100,7 @@ Publication& ValueFederate::registerPublication(std::string_view name,
                                                 std::string_view type,
                                                 std::string_view units)
 {
-    return vfManager->registerPublication(
-        localNameGenerator(name), type, units);
+    return vfManager->registerPublication(localNameGenerator(name), type, units);
 }
 
 Publication& ValueFederate::registerGlobalPublication(std::string_view name,
@@ -115,9 +114,7 @@ Input& ValueFederate::registerInput(std::string_view name,
                                     std::string_view type,
                                     std::string_view units)
 {
-    return vfManager->registerInput(localNameGenerator(name),
-                                    type,
-                                    units);
+    return vfManager->registerInput(localNameGenerator(name), type, units);
 }
 
 Input& ValueFederate::registerGlobalInput(std::string_view name,
@@ -575,7 +572,8 @@ const Input& ValueFederate::getInput(std::string_view name, int index1) const
 
 const Input& ValueFederate::getInput(std::string_view name, int index1, int index2) const
 {
-    return vfManager->getInput(std::string(name) + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+    return vfManager->getInput(std::string(name) + '_' + std::to_string(index1) + '_' +
+                               std::to_string(index2));
 }
 
 const Input& ValueFederate::getSubscription(std::string_view target) const

@@ -138,8 +138,7 @@ void CommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     }
 }
 
-void CommsInterface::loadTargetInfo(std::string_view
-                                    localTarget,
+void CommsInterface::loadTargetInfo(std::string_view localTarget,
                                     std::string_view brokerTarget,
                                     gmlc::networking::InterfaceNetworks targetNetwork)
 {

@@ -105,7 +105,7 @@ class CommonCore: public Core, public BrokerBase {
                            IterationRequest iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) override final;
-    virtual const std::string &getFederateName(LocalFederateId federateID) const override final;
+    virtual const std::string& getFederateName(LocalFederateId federateID) const override final;
     virtual LocalFederateId getFederateId(std::string_view name) const override final;
     virtual int32_t getFederationSize() override final;
     virtual Time timeRequest(LocalFederateId federateID, Time next) override final;
@@ -196,7 +196,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual void addDependency(LocalFederateId federateID,
                                std::string_view federateName) override final;
     virtual void linkEndpoints(std::string_view source, std::string_view dest) override final;
-    virtual void makeConnections(const std::string &file) override final;
+    virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(std::string_view source, std::string_view target) override final;
     virtual void addSourceFilterToEndpoint(std::string_view filter,
                                            std::string_view endpoint) override final;
@@ -280,12 +280,12 @@ class CommonCore: public Core, public BrokerBase {
     /** set the local information field of the interface*/
     virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) override final;
     /** get the local information field of the interface*/
-    virtual const std::string &getInterfaceInfo(InterfaceHandle handle) const override final;
+    virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override final;
 
     virtual void setInterfaceTag(InterfaceHandle handle,
                                  std::string_view tag,
                                  std::string_view value) override final;
-    virtual const std::string &getInterfaceTag(InterfaceHandle handle,
+    virtual const std::string& getInterfaceTag(InterfaceHandle handle,
                                                std::string_view tag) const override final;
 
     virtual void setFederateTag(LocalFederateId fid,

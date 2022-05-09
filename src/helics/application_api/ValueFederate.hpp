@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <functional>
 #include <memory>
 #include <string>
-#include <vector>
 #include <string_view>
+#include <vector>
 
 namespace helics {
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
@@ -50,9 +50,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param core a CoreApp with the core to connect to.
     @param fi  a federate information structure
     */
-    ValueFederate(std::string_view fedName,
-                  CoreApp& core,
-                  const FederateInfo& fi = FederateInfo{});
+    ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string
@@ -148,7 +146,8 @@ class HELICS_CXX_EXPORT ValueFederate:
                                             int index1,
                                             std::string_view units = std::string_view{})
     {
-        return registerGlobalPublication<X>(std::string(name) + '_' + std::to_string(index1), units);
+        return registerGlobalPublication<X>(std::string(name) + '_' + std::to_string(index1),
+                                            units);
     }
     /** register a publication as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
@@ -411,7 +410,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     template<class iType>
     void addIndexedTarget(const iType& iObject, std::string_view target, int index1, int index2)
     {
-        addTarget(iObject, std::string(target) + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+        addTarget(iObject,
+                  std::string(target) + '_' + std::to_string(index1) + '_' +
+                      std::to_string(index2));
     }
 
     /** check if a given subscription has an update
@@ -442,7 +443,7 @@ class HELICS_CXX_EXPORT ValueFederate:
 
     /** get the name of the first target for an input
     @return empty string if an invalid input is passed or it has no target*/
-    const std::string& getTarget(const Input & inp) const;
+    const std::string& getTarget(const Input& inp) const;
     /** get the id of a subscription
     @return an invalid input object if the name is invalid otherwise a reference to the
     corresponding input*/

@@ -53,8 +53,7 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** construct from handle and core*/
     Filter(Core* core, std::string_view filtName, InterfaceHandle ihandle);
     /** construct through a federate*/
-    Filter(InterfaceVisibility locality,
-           Federate* ffed, std::string_view filtName = EMPTY_STRING);
+    Filter(InterfaceVisibility locality, Federate* ffed, std::string_view filtName = EMPTY_STRING);
     /** construct through a core object*/
     explicit Filter(Core* cr, std::string_view filtName = EMPTY_STRING);
     /** virtual destructor*/

@@ -44,7 +44,7 @@ toml::value loadToml(const std::string& tomlString)
     }
 }
 
-toml::value loadTomlStr(const std::string &tomlString)
+toml::value loadTomlStr(const std::string& tomlString)
 {
     try {
         std::istringstream tstring(tomlString);

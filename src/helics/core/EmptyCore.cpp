@@ -365,8 +365,7 @@ void EmptyCore::addDestinationFilterToEndpoint(std::string_view /*filter*/,
 {
 }
 
-void EmptyCore::addDependency(LocalFederateId /*federateID*/, std::string_view /*federateName*/) {
-}
+void EmptyCore::addDependency(LocalFederateId /*federateID*/, std::string_view /*federateName*/) {}
 
 void EmptyCore::sendTo(InterfaceHandle /*sourceHandle*/,
                        const void* /*data*/,

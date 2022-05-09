@@ -44,8 +44,8 @@ namespace CoreFactory {
     };
 
     //** define a new Core Builder from the builder give a name and build code*/
-    void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view coreTypeName,
-                           int code);
+    void
+        defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view coreTypeName, int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CoreTYPE>
@@ -124,7 +124,8 @@ type is used
 
     /** tries to find a named core if it fails it creates a new one
      */
-    std::shared_ptr<Core> FindOrCreate(CoreType type, std::string_view coreName, std::string_view configureString);
+    std::shared_ptr<Core>
+        FindOrCreate(CoreType type, std::string_view coreName, std::string_view configureString);
 
     /** tries to find a named core if it fails it creates a new one
      */

@@ -16,9 +16,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/libguarded/shared_guarded.hpp"
+#include "helics/common/fmt_format.h"
 #include "helics/helics-config.h"
 #include "helicsCLI11.hpp"
-#include "helics/common/fmt_format.h"
 
 #include <cassert>
 #include <cstring>
@@ -145,7 +145,8 @@ std::shared_ptr<Core>
     }
     core->configure(configureString);
     if (!registerCore(core, type)) {
-        throw(helics::RegistrationFailure(fmt::format("core {} failed to register properly",core->getIdentifier())));
+        throw(helics::RegistrationFailure(
+            fmt::format("core {} failed to register properly", core->getIdentifier())));
     }
 
     return core;
@@ -367,7 +368,7 @@ void abortAllCores(int errorCode, std::string_view errorString)
                         fmt::format("{} sent abort message: '{}'",
                                     cr->getIdentifier(),
                                     errorString));
-                        
+
         cr->disconnect();
     }
     cleanUpCores(std::chrono::milliseconds(250));

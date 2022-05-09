@@ -35,8 +35,8 @@ class ConnectorFederateManager {
     @param type_in the type the filter is expecting as an input
     @param type_out the type the filter generates
     */
-    Filter& registerFilter(std::string_view name,
-                           std::string_view type_in, std::string_view type_out);
+    Filter&
+        registerFilter(std::string_view name, std::string_view type_in, std::string_view type_out);
 
     /** register a cloningFilter
     @details call is only valid in startup mode

@@ -34,8 +34,7 @@ struct publication_info {
     int size{-1};  //!< required size of a publication
     bool forward{true};
     publication_info(std::string_view n_name, std::string_view n_type, std::string_view n_units):
-        name(n_name),
-        type(n_type), units(n_units)
+        name(n_name), type(n_type), units(n_units)
     {
     }
 };
@@ -206,12 +205,8 @@ class ValueFederateManager {
     bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
     LocalFederateId fedID;  //!< the federation ID from the core API
-    shared_guarded_m<
-        gmlc::containers::
-            DualStringMappedVector<Input, InterfaceHandle>>
-        inputs;
-    shared_guarded_m<gmlc::containers::DualStringMappedVector<Publication,
-                                                        InterfaceHandle>>
+    shared_guarded_m<gmlc::containers::DualStringMappedVector<Input, InterfaceHandle>> inputs;
+    shared_guarded_m<gmlc::containers::DualStringMappedVector<Publication, InterfaceHandle>>
         publications;
     Time CurrentTime{-1.0};  //!< the current simulation time
     Core* coreObject{nullptr};  //!< the pointer to the actual core

@@ -181,23 +181,21 @@ void ConnectorFederateManager::closeAllConnectors()
         for (int ii = 0; ii < trans->size(); ++ii) {
             coreObject->closeHandle(trans->operator[](ii).getHandle());
             trans->operator[](ii).disconnectFromCore();
-        }  
+        }
     }
 }
 
 void ConnectorFederateManager::disconnectAllConnectors()
 {
-        auto filts = filters.lock();
-        filts->apply([](auto& filt) {
-            filt->disconnectFromCore();
-        });
+    auto filts = filters.lock();
+    filts->apply([](auto& filt) { filt->disconnectFromCore(); });
 
-        //TODO(PT) some missing operations need to be added to the StableBlockVector including `at` and `operate`
-        auto trans = translators.lock();
-        for (int ii=0;ii<trans->size();++ii) {
-            trans->operator[](ii).disconnectFromCore();
-        }
-        
+    // TODO(PT) some missing operations need to be added to the StableBlockVector including `at` and
+    // `operate`
+    auto trans = translators.lock();
+    for (int ii = 0; ii < trans->size(); ++ii) {
+        trans->operator[](ii).disconnectFromCore();
+    }
 }
 
 static EmptyCore eCore;

@@ -54,7 +54,8 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
         }
         if (!coreObject) {
             if (!mName.empty()) {
-                std::string cname = fmt::format("{}_core_{}",fedName,gmlc::utilities::randomString(6));
+                std::string cname =
+                    fmt::format("{}_core_{}", fedName, gmlc::utilities::randomString(6));
 
                 try {
                     coreObject =
@@ -155,7 +156,7 @@ Federate::Federate(std::string_view fedName,
     cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
 }
 
-Federate::Federate(std::string_view fedName, const std::string &configString):
+Federate::Federate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     if (looksLikeFile(configString)) {
@@ -1223,7 +1224,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                         if (propval.is_floating()) {
                             filter.set(propname, propval.as_floating());
                         } else {
-                            filter.setString(propname, static_cast<std::string_view>(propval.as_string()));
+                            filter.setString(propname,
+                                             static_cast<std::string_view>(propval.as_string()));
                         }
                     }
                 } else {
@@ -1247,7 +1249,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     if (propval.is_floating()) {
                         filter.set(propname, propval.as_floating());
                     } else {
-                        filter.setString(propname, static_cast<std::string_view>(propval.as_string()));
+                        filter.setString(propname,
+                                         static_cast<std::string_view>(propval.as_string()));
                     }
                 }
             }
@@ -1257,7 +1260,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         auto globals = toml::find(doc, "globals");
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
-                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()), static_cast<std::string_view>(val.as_array()[1].as_string()));
+                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                          static_cast<std::string_view>(val.as_array()[1].as_string()));
             }
         } else {
             for (const auto& val : globals.as_table()) {
@@ -1312,8 +1316,8 @@ std::string Federate::query(std::string_view queryStr, HelicsSequencingModes mod
     return res;
 }
 
-std::string Federate::query(std::string_view target, std::string_view queryStr,
-                            HelicsSequencingModes mode)
+std::string
+    Federate::query(std::string_view target, std::string_view queryStr, HelicsSequencingModes mode)
 {
     std::string res;
     if ((target.empty()) || (target == "federate") || (target == getName())) {
@@ -1401,10 +1405,10 @@ void Federate::addDependency(std::string_view fedName)
 {
     coreObject->addDependency(fedID, fedName);
 }
-std::string Federate::localNameGenerator(std::string_view addition) const{
-
+std::string Federate::localNameGenerator(std::string_view addition) const
+{
     if (!addition.empty()) {
-        std::string localName = getName(); 
+        std::string localName = getName();
         localName.push_back(nameSegmentSeparator);
         localName.append(addition);
         return localName;
@@ -1416,18 +1420,14 @@ Filter& Federate::registerFilter(std::string_view filterName,
                                  std::string_view inputType,
                                  std::string_view outputType)
 {
-    return cManager->registerFilter(localNameGenerator(filterName),
-                                    inputType,
-                                    outputType);
+    return cManager->registerFilter(localNameGenerator(filterName), inputType, outputType);
 }
 
 CloningFilter& Federate::registerCloningFilter(std::string_view filterName,
                                                std::string_view inputType,
                                                std::string_view outputType)
 {
-    return cManager->registerCloningFilter(localNameGenerator(filterName),
-                                           inputType,
-                                           outputType);
+    return cManager->registerCloningFilter(localNameGenerator(filterName), inputType, outputType);
 }
 
 Filter& Federate::registerGlobalFilter(std::string_view filterName,
@@ -1459,7 +1459,8 @@ Translator& Federate::registerTranslator(std::int32_t translatorType,
                                          std::string_view endpointType,
                                          std::string_view units)
 {
-    Translator& trans = cManager->registerTranslator(localNameGenerator(translatorName), endpointType, units);
+    Translator& trans =
+        cManager->registerTranslator(localNameGenerator(translatorName), endpointType, units);
     trans.setTranslatorType(translatorType);
     return trans;
 }

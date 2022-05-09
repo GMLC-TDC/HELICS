@@ -58,7 +58,7 @@ void NetworkCommsInterface::PortAllocator::addUsedPort(int port)
     usedPort[localHostString].insert(port);
 }
 
-void NetworkCommsInterface::PortAllocator::addUsedPort(const std::string &host, int port)
+void NetworkCommsInterface::PortAllocator::addUsedPort(const std::string& host, int port)
 {
     usedPort[host].insert(port);
 }
@@ -67,7 +67,7 @@ void NetworkCommsInterface::PortAllocator::addUsedPort(const std::string &host, 
     std::map<std::string, std::set<int>> usedPort;
     std::map<std::string, int> nextPorts;
     */
-bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string &host, int port) const
+bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, int port) const
 {
     auto fnd = usedPort.find(host);
     if (fnd == usedPort.end()) {

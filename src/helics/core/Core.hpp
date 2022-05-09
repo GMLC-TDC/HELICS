@@ -119,8 +119,8 @@ class Core {
      * @param errorCode a numerical code associated with the error
      * @param errorString a text message associated with the error
      */
-    virtual void localError(LocalFederateId federateID,
-                            int32_t errorCode, std::string_view errorString) = 0;
+    virtual void
+        localError(LocalFederateId federateID, int32_t errorCode, std::string_view errorString) = 0;
 
     /** get the last error code from a core*/
     virtual int getErrorCode() const = 0;
@@ -604,7 +604,7 @@ class Core {
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
-    virtual void makeConnections(const std::string &file) = 0;
+    virtual void makeConnections(const std::string& file) = 0;
 
     /** create a data connection between a named publication and a named input
     @param source the name of the publication
@@ -804,8 +804,7 @@ class Core {
     return until the query is answered so use with caution
     */
     virtual std::string
-        query(std::string_view target, std::string_view queryStr,
-                              HelicsSequencingModes mode) = 0;
+        query(std::string_view target, std::string_view queryStr, HelicsSequencingModes mode) = 0;
 
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests
@@ -838,7 +837,8 @@ class Core {
      * @param tag a string containing the name of the tag
      * @param value a string containing the value for the tag
      */
-    virtual void setInterfaceTag(InterfaceHandle handle, std::string_view tag, std::string_view value) = 0;
+    virtual void
+        setInterfaceTag(InterfaceHandle handle, std::string_view tag, std::string_view value) = 0;
     /**
      * getter for the interface tags
      * @param handle the identifier for the interface to set the info data on

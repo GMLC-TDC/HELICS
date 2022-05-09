@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 namespace helics {
-void FilterOperations::set(std::string_view  /*property*/, double /*val*/) {}
+void FilterOperations::set(std::string_view /*property*/, double /*val*/) {}
 void FilterOperations::setString(std::string_view /*property*/, std::string_view /*val*/) {}
 
 DelayFilterOperation::DelayFilterOperation(Time delayTime): delay(delayTime)
@@ -265,7 +265,7 @@ void RerouteFilterOperation::setString(std::string_view property, std::string_vi
     } else if (property == "condition") {
         try {
             // this line is to verify that it is a valid regex
-            auto test = std::regex(val.data(),val.size());
+            auto test = std::regex(val.data(), val.size());
             auto cond = conditions.lock();
             cond->emplace(val);
         }
@@ -322,8 +322,7 @@ FirewallFilterOperation::~FirewallFilterOperation() = default;
 
 void FirewallFilterOperation::set(std::string_view /*property*/, double /*val*/) {}
 
-void FirewallFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/) {
-}
+void FirewallFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/) {}
 
 std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
 {
@@ -344,8 +343,8 @@ CloneFilterOperation::~CloneFilterOperation() = default;
 
 void CloneFilterOperation::set(std::string_view property, double /*val*/)
 {
-    throw(
-        helics::InvalidParameter(std::string("property ") + std::string(property) + " is not a known property"));
+    throw(helics::InvalidParameter(std::string("property ") + std::string(property) +
+                                   " is not a known property"));
 }
 
 void CloneFilterOperation::setString(std::string_view property, std::string_view val)
@@ -371,8 +370,8 @@ void CloneFilterOperation::setString(std::string_view property, std::string_view
             handle->erase(fnd);
         }
     } else {
-        throw(helics::InvalidParameter(
-            std::string(std::string("property ") + std::string(property) + " is not a known property")));
+        throw(helics::InvalidParameter(std::string(
+            std::string("property ") + std::string(property) + " is not a known property")));
     }
 }
 

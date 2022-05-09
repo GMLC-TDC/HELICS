@@ -108,14 +108,12 @@ std::string MessageFederate::localQuery(std::string_view queryStr) const
 
 Endpoint& MessageFederate::registerEndpoint(std::string_view eptName, std::string_view type)
 {
-    return mfManager->registerEndpoint(localNameGenerator(eptName),
-                                       type);
+    return mfManager->registerEndpoint(localNameGenerator(eptName), type);
 }
 
 Endpoint& MessageFederate::registerTargetedEndpoint(std::string_view eptName, std::string_view type)
 {
-    return mfManager->registerTargetedEndpoint(localNameGenerator(eptName),
-                                               type);
+    return mfManager->registerTargetedEndpoint(localNameGenerator(eptName), type);
 }
 
 Endpoint& MessageFederate::registerGlobalEndpoint(std::string_view eptName, std::string_view type)

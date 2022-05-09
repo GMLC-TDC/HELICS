@@ -104,8 +104,7 @@ Filter::Filter(InterfaceVisibility locality, Federate* ffed, std::string_view fi
     }
 }
 
-Filter::Filter(Core* core, std::string_view filtName):
-    Interface(core, InterfaceHandle(), filtName)
+Filter::Filter(Core* core, std::string_view filtName): Interface(core, InterfaceHandle(), filtName)
 {
     if (cr != nullptr) {
         handle = cr->registerFilter(filtName, std::string_view{}, std::string_view{});

@@ -20,7 +20,7 @@ class NetworkCommsInterface: public CommsInterface {
     class PortAllocator {
       public:
         /** get an open port for a particular host*/
-        int findOpenPort(int count, const std::string &host = "localhost");
+        int findOpenPort(int count, const std::string& host = "localhost");
         void setStartingPortNumber(int startPort) { startingPort = startPort; }
         int getDefaultStartingPort() const { return startingPort; }
         void addUsedPort(int port);

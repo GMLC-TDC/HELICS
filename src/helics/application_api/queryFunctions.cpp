@@ -98,9 +98,7 @@ std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres)
     return vec;
 }
 
-bool waitForInit(helics::Federate* fed,
-                 std::string_view fedName,
-                 std::chrono::milliseconds timeout)
+bool waitForInit(helics::Federate* fed, std::string_view fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "isinit", HELICS_SEQUENCING_MODE_ORDERED);
     std::chrono::milliseconds waitTime{0};
@@ -119,9 +117,7 @@ bool waitForInit(helics::Federate* fed,
     return true;
 }
 
-bool waitForFed(helics::Federate* fed,
-                std::string_view fedName,
-                std::chrono::milliseconds timeout)
+bool waitForFed(helics::Federate* fed, std::string_view fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "exists");
     std::chrono::milliseconds waitTime{0};

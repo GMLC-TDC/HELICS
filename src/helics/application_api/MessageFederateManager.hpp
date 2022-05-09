@@ -116,9 +116,7 @@ class MessageFederateManager {
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
         atomic_guarded<std::function<void(Endpoint&, Time)>> callback;
     };
-    shared_guarded<
-        gmlc::containers::
-            DualStringMappedVector<Endpoint, InterfaceHandle>>
+    shared_guarded<gmlc::containers::DualStringMappedVector<Endpoint, InterfaceHandle>>
         local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
     Time CurrentTime = Time::minVal();  //!< the current simulation time

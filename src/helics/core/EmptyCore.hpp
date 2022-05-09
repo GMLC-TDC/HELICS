@@ -205,8 +205,8 @@ class EmptyCore: public Core {
     virtual const std::string& getInterfaceTag(InterfaceHandle handle,
                                                std::string_view tag) const override;
 
-    virtual void setFederateTag(LocalFederateId fid,
-                                std::string_view tag, std::string_view value) override;
+    virtual void
+        setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value) override;
     virtual const std::string& getFederateTag(LocalFederateId fid,
                                               std::string_view tag) const override;
 };

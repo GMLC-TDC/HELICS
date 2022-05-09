@@ -21,7 +21,8 @@ void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       std::string_view type,
                                       std::string_view units)
 {
-    publications.lock()->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
+    publications.lock()->insert(
+        std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
 }
 
 void InterfaceInfo::createInput(InterfaceHandle handle,

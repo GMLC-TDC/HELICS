@@ -77,8 +77,7 @@ class CommsInterface {
     /** set the callback for processing the messages
      */
     void setLoggingCallback(
-        std::function<void(int level, std::string_view name, std::string_view message)>
-            callback);
+        std::function<void(int level, std::string_view name, std::string_view message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize(int maxMsgSize, int maxCount);
@@ -210,8 +209,8 @@ namespace CommFactory {
     };
 
     /** define a new Comm Builder from the builder give a name and build code*/
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view commTypeName,
-                           int code);
+    void
+        defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view commTypeName, int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CommTYPE>

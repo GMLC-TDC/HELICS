@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
-#include "helics/helics-config.h"
 #include "helics/common/fmt_format.h"
+#include "helics/helics-config.h"
 
 #include <cassert>
 #include <tuple>
@@ -98,7 +98,7 @@ std::shared_ptr<Broker> makeBroker(CoreType type, std::string_view name)
 
 std::shared_ptr<Broker> create(CoreType type, std::string_view configureString)
 {
-    static constexpr std::string_view emptyString{nullptr,0};
+    static constexpr std::string_view emptyString{nullptr, 0};
     return create(type, emptyString, configureString);
 }
 
@@ -190,11 +190,9 @@ std::shared_ptr<Broker> findBroker(std::string_view brokerName)
         return getConnectedBroker();
     }
     if (brokerName.front() == '#') {
-
-            char* ept = nullptr;
-            auto val = std::strtoull(brokerName.data() + 1, &ept, 10);
-            return (ept>brokerName.data()+1)?getBrokerByIndex(val):nullptr;
-        
+        char* ept = nullptr;
+        auto val = std::strtoull(brokerName.data() + 1, &ept, 10);
+        return (ept > brokerName.data() + 1) ? getBrokerByIndex(val) : nullptr;
     }
     return nullptr;
 }
@@ -291,7 +289,7 @@ void abortAllBrokers(int errorCode, std::string_view errorString)
                          fmt::format("{} sent abort message: '{}'",
                                      brk->getIdentifier(),
                                      errorString));
-  
+
         brk->disconnect();
     }
     cleanUpBrokers(std::chrono::milliseconds(250));
