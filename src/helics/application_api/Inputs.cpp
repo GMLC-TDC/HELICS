@@ -20,13 +20,14 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 Input::Input(ValueFederate* valueFed,
              InterfaceHandle id,
-             const std::string& actName,
-             const std::string& unitsOut):
+             std::string_view actName,
+             std::string_view unitsOut):
     Interface(valueFed, id, actName),
     fed(valueFed)
 {
     if (!unitsOut.empty()) {
-        outputUnits = std::make_shared<units::precise_unit>(units::unit_from_string(unitsOut));
+        outputUnits =
+            std::make_shared<units::precise_unit>(units::unit_from_string(std::string{unitsOut}));
         if (!units::is_valid(*outputUnits)) {
             outputUnits.reset();
         }
@@ -34,9 +35,9 @@ Input::Input(ValueFederate* valueFed,
 }
 
 Input::Input(ValueFederate* valueFed,
-             const std::string& key,
-             const std::string& defaultType,
-             const std::string& units)
+             std::string_view key,
+             std::string_view defaultType,
+             std::string_view units)
 {
     auto& inp = valueFed->getInput(key);
     if (inp.isValid()) {
@@ -48,9 +49,9 @@ Input::Input(ValueFederate* valueFed,
 
 Input::Input(InterfaceVisibility locality,
              ValueFederate* valueFed,
-             const std::string& key,
-             const std::string& defaultType,
-             const std::string& units)
+             std::string_view key,
+             std::string_view defaultType,
+             std::string_view units)
 {
     try {
         if (locality == InterfaceVisibility::GLOBAL) {

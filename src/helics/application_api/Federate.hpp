@@ -495,8 +495,8 @@ received
     @param outputType the outputType of the filter which the filter produces
     */
     Filter& registerGlobalFilter(std::string_view filterName,
-                                 std::string_view inputType = std::string(),
-                                 std::string_view outputType = std::string());
+                                 std::string_view inputType = std::string_view{},
+                                 std::string_view outputType = std::string_view{});
 
     /** define a cloning filter interface on a source
     @details a cloning filter will modify copy of messages coming from or going to target endpoints
@@ -505,8 +505,8 @@ received
     @param outputType the outputType of the filter which the filter produces
     */
     CloningFilter& registerGlobalCloningFilter(std::string_view filterName,
-                                               std::string_view inputType = std::string(),
-                                               std::string_view outputType = std::string());
+                                               std::string_view inputType = std::string_view{},
+                                               std::string_view outputType = std::string_view{});
 
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
@@ -515,8 +515,8 @@ received
     @param outputType the outputType of the filter which the filter produces
     */
     Filter& registerFilter(std::string_view filterName,
-                           std::string_view inputType = std::string(),
-                           std::string_view outputType = std::string());
+                           std::string_view inputType = std::string_view{},
+                           std::string_view outputType = std::string_view{});
 
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
@@ -527,14 +527,14 @@ received
     @param outputType the outputType of the filter which the filter produces
     */
     CloningFilter& registerCloningFilter(std::string_view filterName,
-                                         std::string_view inputType = std::string(),
-                                         std::string_view outputType = std::string());
+                                         std::string_view inputType = std::string_view{},
+                                         std::string_view outputType = std::string_view{});
 
     /** define a nameless filter interface
      */
     Filter& registerFilter()
     {
-        return registerGlobalFilter(std::string(), std::string(), std::string());
+        return registerGlobalFilter(std::string(), std::string_view{}, std::string_view{});
     }
 
     /** define a named global translator interface
@@ -678,7 +678,8 @@ received
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
     virtual std::string localQuery(std::string_view queryStr) const;
-
+    /** generate a string with the local variant of the name*/
+    std::string localNameGenerator(std::string_view localName) const;
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode

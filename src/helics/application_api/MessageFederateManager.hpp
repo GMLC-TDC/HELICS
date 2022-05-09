@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/FederateIdExtra.hpp"
 #include "Endpoints.hpp"
 #include "data_view.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 
 #include <cstdint>
@@ -118,7 +118,7 @@ class MessageFederateManager {
     };
     shared_guarded<
         gmlc::containers::
-            DualMappedVector<Endpoint, std::string, InterfaceHandle, reference_stability::stable>>
+            DualStringMappedVector<Endpoint, InterfaceHandle>>
         local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
     Time CurrentTime = Time::minVal();  //!< the current simulation time

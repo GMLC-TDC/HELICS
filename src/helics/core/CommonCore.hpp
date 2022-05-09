@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
 #include "gmlc/containers/AirLock.hpp"
-#include "gmlc/containers/DualMappedPointerVector.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+//#include "gmlc/containers/DualMappedPointerVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 #include "helics/helics-config.h"
@@ -278,7 +278,7 @@ class CommonCore: public Core, public BrokerBase {
     void checkInFlightQueriesForDisconnect();
 
     /** set the local information field of the interface*/
-    virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override final;
+    virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) override final;
     /** get the local information field of the interface*/
     virtual const std::string &getInterfaceInfo(InterfaceHandle handle) const override final;
 
@@ -448,7 +448,7 @@ class CommonCore: public Core, public BrokerBase {
     /** threadsafe local federate information list for external functions */
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;
     /** federate pointers stored for the core loop */
-    gmlc::containers::DualMappedVector<FedInfo, std::string, GlobalFederateId> loopFederates;
+    gmlc::containers::DualStringMappedVector<FedInfo, GlobalFederateId> loopFederates;
 
     /** counter for the number of messages that have been sent, nothing magical about 54 just a
      * number bigger than 1 to prevent confusion */

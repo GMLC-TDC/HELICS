@@ -9,7 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/GuardedTypes.hpp"
 #include "Filters.hpp"
 #include "Translator.hpp"
-#include "gmlc/containers/MappedVector.hpp"
+#include "gmlc/containers/StringMappedVector.hpp"
 
 #include <memory>
 #include <string>
@@ -101,9 +101,8 @@ class ConnectorFederateManager {
 
   private:
     Core* coreObject{nullptr};
-    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Filter>, std::string>> filters;
-    shared_guarded<gmlc::containers::MappedVector<std::unique_ptr<Translator>, std::string>>
-        translators;
+    shared_guarded<gmlc::containers::StringMappedVector<std::unique_ptr<Filter>>> filters;
+    shared_guarded<gmlc::containers::StringMappedVector<Translator>> translators;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
 };

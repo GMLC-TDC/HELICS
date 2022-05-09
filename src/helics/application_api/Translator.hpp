@@ -11,7 +11,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics_enums.h"
 
 #include <memory>
-#include <string>
 
 namespace helics {
 class TranslatorOperations;
@@ -66,7 +65,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
     */
-    virtual void set(const std::string& property, double val);
+    virtual void set(std::string_view property, double val);
 
     /** set a string property on a translator
     @param property the name of the property of the translator to change

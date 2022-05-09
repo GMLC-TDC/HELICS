@@ -17,6 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <string_view>
 
 namespace helics {
 /** @brief PIMPL design pattern with the implementation details for the ValueFederate*/
@@ -97,7 +98,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     Publication& registerPublication(std::string_view name,
                                      std::string_view type,
-                                     std::string_view units = std::string());
+                                     std::string_view units = std::string_view{});
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param name the name of the publication
@@ -105,7 +106,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @return an identifier for use with this publication
     */
     template<typename X>
-    Publication& registerPublication(std::string_view name, std::string_view units = std::string())
+    Publication& registerPublication(std::string_view name,
+                                     std::string_view units = std::string_view{})
     {
         return registerPublication(name, ValueConverter<X>::type(), units);
     }
@@ -119,7 +121,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     Publication& registerGlobalPublication(std::string_view name,
                                            std::string_view type,
-                                           std::string_view units = std::string());
+                                           std::string_view units = std::string_view{});
     /** register a publication
     @details call is only valid in startup mode by default prepends the name with the federate name
     @param name the name of the publication
@@ -128,7 +130,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     template<typename X>
     Publication& registerGlobalPublication(std::string_view name,
-                                           std::string_view units = std::string())
+                                           std::string_view units = std::string_view{})
     {
         return registerGlobalPublication(name, ValueConverter<X>::type(), units);
     }
@@ -144,9 +146,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     template<typename X>
     Publication& registerIndexedPublication(std::string_view name,
                                             int index1,
-                                            std::string_view units = std::string())
+                                            std::string_view units = std::string_view{})
     {
-        return registerGlobalPublication<X>(name + '_' + std::to_string(index1), units);
+        return registerGlobalPublication<X>(std::string(name) + '_' + std::to_string(index1), units);
     }
     /** register a publication as part of a 2 dimensional indexed structure
     @details call is only valid in startup mode by default prepends the name with the federate name
@@ -161,9 +163,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     Publication& registerIndexedPublication(std::string_view name,
                                             int index1,
                                             int index2,
-                                            std::string_view units = std::string())
+                                            std::string_view units = std::string_view{})
     {
-        return registerGlobalPublication<X>(name + '_' + std::to_string(index1) + '_' +
+        return registerGlobalPublication<X>(std::string(name) + '_' + std::to_string(index1) + '_' +
                                                 std::to_string(index2),
                                             units);
     }
@@ -213,9 +215,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     template<typename X>
     Input& registerIndexedInput(std::string_view name,
                                 int index1,
-                                std::string_view units = std::string())
+                                std::string_view units = std::string_view())
     {
-        return registerGlobalInput<X>(name + '_' + std::to_string(index1), units);
+        return registerGlobalInput<X>(std::string(name) + '_' + std::to_string(index1), units);
     }
 
     /** register a publication as part of a 2 dimensional indexed structure
@@ -231,9 +233,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     Input& registerIndexedInput(std::string_view name,
                                 int index1,
                                 int index2,
-                                std::string_view units = std::string())
+                                std::string_view units = std::string_view())
     {
-        return registerGlobalInput<X>(name + '_' + std::to_string(index1) + '_' +
+        return registerGlobalInput<X>(std::string(name) + '_' + std::to_string(index1) + '_' +
                                           std::to_string(index2),
                                       units);
     }
@@ -267,7 +269,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     Input& registerIndexedSubscription(std::string_view target,
                                        int index1,
                                        int index2,
-                                       std::string_view units = std::string())
+                                       std::string_view units = std::string_view{})
     {
         return registerSubscription(std::string(target) + '_' + std::to_string(index1) + '_' +
                                         std::to_string(index2),
@@ -396,7 +398,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     template<class iType>
     void addIndexedTarget(const iType& iObject, std::string_view target, int index1)
     {
-        addTarget(iObject, target + '_' + std::to_string(index1));
+        addTarget(iObject, std::string(target) + '_' + std::to_string(index1));
     }
 
     /** add an indexed target to an interface
@@ -409,7 +411,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     template<class iType>
     void addIndexedTarget(const iType& iObject, std::string_view target, int index1, int index2)
     {
-        addTarget(iObject, target + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+        addTarget(iObject, std::string(target) + '_' + std::to_string(index1) + '_' + std::to_string(index2));
     }
 
     /** check if a given subscription has an update
@@ -440,7 +442,7 @@ class HELICS_CXX_EXPORT ValueFederate:
 
     /** get the name of the first target for an input
     @return empty string if an invalid input is passed or it has no target*/
-    const std::string& getTarget(std::string_view inp) const;
+    const std::string& getTarget(const Input & inp) const;
     /** get the id of a subscription
     @return an invalid input object if the name is invalid otherwise a reference to the
     corresponding input*/

@@ -389,7 +389,7 @@ class FederateState {
     /** move a message to the queue*/
     void addAction(ActionMessage&& action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
-    opt<ActionMessage> processPostTerminationAction(const ActionMessage& action);
+    std::optional<ActionMessage> processPostTerminationAction(const ActionMessage& action);
 
     /** force processing of a specific message out of order*/
     void forceProcessMessage(ActionMessage& action);

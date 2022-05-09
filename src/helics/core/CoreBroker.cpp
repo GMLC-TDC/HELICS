@@ -3877,14 +3877,13 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 }
                 break;
             case 3:
-                mTimeMonitorPeriod = loadTimeFromString(std::string(res[2]), time_units::sec);
+                mTimeMonitorPeriod = loadTimeFromString(res[2], time_units::sec);
                 loadTimeMonitor(false, res[1]);
                 break;
             case 4:
             default:
                 mTimeMonitorPeriod =
-                    loadTimeFromString(std::string(
-                                           gmlc::utilities::string_viewOps::merge(res[2], res[3])),
+                    loadTimeFromString(gmlc::utilities::string_viewOps::merge(res[2], res[3]),
                                        time_units::sec);
                 loadTimeMonitor(false, res[1]);
                 break;

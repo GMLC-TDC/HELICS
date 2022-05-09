@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Inputs.hpp"
 #include "ValueFederate.hpp"
 #include "data_view.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "helicsTypes.hpp"
 
 #include <map>
@@ -208,12 +208,10 @@ class ValueFederateManager {
     LocalFederateId fedID;  //!< the federation ID from the core API
     shared_guarded_m<
         gmlc::containers::
-            DualMappedVector<Input, std::string, InterfaceHandle, reference_stability::stable>>
+            DualStringMappedVector<Input, InterfaceHandle>>
         inputs;
-    shared_guarded_m<gmlc::containers::DualMappedVector<Publication,
-                                                        std::string,
-                                                        InterfaceHandle,
-                                                        reference_stability::stable>>
+    shared_guarded_m<gmlc::containers::DualStringMappedVector<Publication,
+                                                        InterfaceHandle>>
         publications;
     Time CurrentTime{-1.0};  //!< the current simulation time
     Core* coreObject{nullptr};  //!< the pointer to the actual core

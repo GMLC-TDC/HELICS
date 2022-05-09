@@ -195,7 +195,7 @@ class EmptyCore: public Core {
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override;
 
     /** set the local information field of the interface*/
-    virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override;
+    virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) override;
     /** get the local information field of the interface*/
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override;
 

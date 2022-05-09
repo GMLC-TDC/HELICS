@@ -11,7 +11,7 @@ functions for dealing with query results*/
 #include "helics_cxx_export.h"
 
 #include <chrono>
-#include <string>
+#include <string_view>
 #include <vector>
 
 // forward declare Federate
@@ -21,25 +21,25 @@ class Federate;
 /** function takes a query result and vectorizes it if the query is a vector result, if not the
  * results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string&& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string_view queryres);
 /** function takes a query result and vectorizes it if the query is a vector result, if not the
  * results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string_view queryres);
 
 /** function takes a query result and vectorizes it if the query is a vector result of integer
  * indices, if not the results are an empty vector
  */
-HELICS_CXX_EXPORT std::vector<int> vectorizeIndexQuery(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<int> vectorizeIndexQuery(std::string_view queryres);
 
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not
  * the results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string&& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres);
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not
  * the results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres);
 
 /** helper function to wait for a particular federate has requested initialization mode
 @details this is useful for querying information and being reasonably certain the federate is done

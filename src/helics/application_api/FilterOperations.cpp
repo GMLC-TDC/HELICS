@@ -9,8 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../core/Core.hpp"
 #include "../core/core-exceptions.hpp"
-#include "../utilities/timeStringOps.hpp"
 #include "MessageOperators.hpp"
+#include "gmlc/utilities/timeStringOps.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -21,8 +21,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 namespace helics {
-void FilterOperations::set(const std::string& /*property*/, double /*val*/) {}
-void FilterOperations::setString(const std::string& /*property*/, const std::string& /*val*/) {}
+void FilterOperations::set(std::string_view  /*property*/, double /*val*/) {}
+void FilterOperations::setString(std::string_view /*property*/, std::string_view /*val*/) {}
 
 DelayFilterOperation::DelayFilterOperation(Time delayTime): delay(delayTime)
 {
@@ -33,7 +33,7 @@ DelayFilterOperation::DelayFilterOperation(Time delayTime): delay(delayTime)
         [this](Time messageTime) { return messageTime + delay; });
 }
 
-void DelayFilterOperation::set(const std::string& property, double val)
+void DelayFilterOperation::set(std::string_view property, double val)
 {
     if (property == "delay") {
         if (val >= timeZero) {
@@ -42,14 +42,14 @@ void DelayFilterOperation::set(const std::string& property, double val)
     }
 }
 
-void DelayFilterOperation::setString(const std::string& property, const std::string& val)
+void DelayFilterOperation::setString(std::string_view property, std::string_view val)
 {
     if (property == "delay") {
         try {
-            delay = gmlc::utilities::loadTimeFromString<Time>(val);
+            delay = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
         }
         catch (const std::invalid_argument&) {
-            throw(helics::InvalidParameter(val + " is not a valid time string"));
+            throw(helics::InvalidParameter(std::string(val) + " is not a valid time string"));
         }
     }
 }
@@ -79,7 +79,7 @@ enum class random_dists_t : int {
     student_t
 };
 
-static const std::map<std::string, random_dists_t> distMap{
+static const std::map<std::string_view, random_dists_t> distMap{
     {"constant", random_dists_t::constant},
     {"uniform", random_dists_t::uniform},
     {"bernoulli", random_dists_t::bernoulli},
@@ -99,35 +99,10 @@ static const std::map<std::string, random_dists_t> distMap{
 
 double randDouble(random_dists_t dist, double p1, double p2)
 {
-#ifndef __apple_build_version__
     static thread_local std::mt19937 generator(
         std::random_device{}() +
         static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
-#else
-#    if __clang_major__ >= 8
-    static thread_local std::mt19937 generator(
-        std::random_device{}() +
-        static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
-#    else
-    // this will leak on thread termination,  older apple clang does not have proper thread_local
-    // variables so there really isn't any option
-    //  static __thread std::mt19937 *genPtr =
-    //    new std::mt19937(std::random_device{}() +
-    //        static_cast<unsigned int> (std::hash<std::thread::id>{}(std::this_thread::get_id())));
 
-    static __thread std::mt19937* genPtr = nullptr;
-    if (genPtr == nullptr) {
-        genPtr = new std::mt19937(
-            std::random_device{}() +
-            static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
-    }
-    if (genPtr == nullptr) {
-        throw(helics::FunctionExecutionFailure("unable to allocate random generator"));
-    }
-    auto& generator = *genPtr;
-
-#    endif
-#endif
     switch (dist) {
         case random_dists_t::constant:
         default:
@@ -215,7 +190,7 @@ RandomDelayFilterOperation::RandomDelayFilterOperation():
 }
 RandomDelayFilterOperation::~RandomDelayFilterOperation() = default;
 
-void RandomDelayFilterOperation::set(const std::string& property, double val)
+void RandomDelayFilterOperation::set(std::string_view property, double val)
 {
     if ((property == "param1") || (property == "mean") || (property == "min") ||
         (property == "alpha")) {
@@ -225,7 +200,7 @@ void RandomDelayFilterOperation::set(const std::string& property, double val)
         rdelayGen->param2.store(val);
     }
 }
-void RandomDelayFilterOperation::setString(const std::string& property, const std::string& val)
+void RandomDelayFilterOperation::setString(std::string_view property, std::string_view val)
 {
     if ((property == "dist") || (property == "distribution")) {
         auto res = distMap.find(val);
@@ -234,11 +209,11 @@ void RandomDelayFilterOperation::setString(const std::string& property, const st
         }
     } else if ((property == "param1") || (property == "mean") || (property == "min") ||
                (property == "alpha")) {
-        auto tm = gmlc::utilities::loadTimeFromString<Time>(val);
+        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
         rdelayGen->param1.store(static_cast<double>(tm));
     } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
                (property == "beta")) {
-        auto tm = gmlc::utilities::loadTimeFromString<Time>(val);
+        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
         rdelayGen->param2.store(static_cast<double>(tm));
     }
 }
@@ -256,14 +231,13 @@ RandomDropFilterOperation::RandomDropFilterOperation():
 }
 
 RandomDropFilterOperation::~RandomDropFilterOperation() = default;
-void RandomDropFilterOperation::set(const std::string& property, double val)
+void RandomDropFilterOperation::set(std::string_view property, double val)
 {
     if ((property == "dropprob") || (property == "prob")) {
         dropProb = val;
     }
 }
-void RandomDropFilterOperation::setString(const std::string& /*property*/,
-                                          const std::string& /*val*/)
+void RandomDropFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/)
 {
 }
 
@@ -282,18 +256,18 @@ RerouteFilterOperation::RerouteFilterOperation():
 
 RerouteFilterOperation::~RerouteFilterOperation() = default;
 
-void RerouteFilterOperation::set(const std::string& /*property*/, double /*val*/) {}
+void RerouteFilterOperation::set(std::string_view /*property*/, double /*val*/) {}
 
-void RerouteFilterOperation::setString(const std::string& property, const std::string& val)
+void RerouteFilterOperation::setString(std::string_view property, std::string_view val)
 {
     if (property == "newdestination") {
         newDest = val;
     } else if (property == "condition") {
         try {
             // this line is to verify that it is a valid regex
-            auto test = std::regex(val);
+            auto test = std::regex(val.data(),val.size());
             auto cond = conditions.lock();
-            cond->insert(val);
+            cond->emplace(val);
         }
         catch (const std::regex_error& re) {
             std::cerr << "filter expression is not a valid Regular expression " << re.what()
@@ -309,18 +283,16 @@ std::shared_ptr<FilterOperator> RerouteFilterOperation::getOperator()
     return std::static_pointer_cast<FilterOperator>(op);
 }
 
-std::string
-    newDestGeneration(const std::string& src, const std::string& dest, const std::string& formula)
+std::string newDestGeneration(const std::string& src, const std::string& dest, std::string formula)
 {
     if (formula.find_first_of('$') == std::string::npos) {
         return formula;
     }
-    std::string newDest = formula;
     std::regex srcreg(R"(\$\{source\})");
-    newDest = std::regex_replace(newDest, srcreg, src);
+    formula = std::regex_replace(formula, srcreg, std::string{src});
     std::regex destreg(R"(\$\{dest\})");
-    newDest = std::regex_replace(newDest, destreg, dest);
-    return newDest;
+    formula = std::regex_replace(formula, destreg, std::string{dest});
+    return formula;
 }
 
 std::string RerouteFilterOperation::rerouteOperation(const std::string& src,
@@ -348,10 +320,9 @@ FirewallFilterOperation::FirewallFilterOperation():
 
 FirewallFilterOperation::~FirewallFilterOperation() = default;
 
-void FirewallFilterOperation::set(const std::string& /*property*/, double /*val*/) {}
+void FirewallFilterOperation::set(std::string_view /*property*/, double /*val*/) {}
 
-void FirewallFilterOperation::setString(const std::string& /*property*/, const std::string& /*val*/)
-{
+void FirewallFilterOperation::setString(std::string_view /*property*/, std::string_view /*val*/) {
 }
 
 std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
@@ -371,25 +342,26 @@ CloneFilterOperation::CloneFilterOperation():
 
 CloneFilterOperation::~CloneFilterOperation() = default;
 
-void CloneFilterOperation::set(const std::string& property, double /*val*/)
+void CloneFilterOperation::set(std::string_view property, double /*val*/)
 {
     throw(
-        helics::InvalidParameter(std::string("property " + property + " is not a known property")));
+        helics::InvalidParameter(std::string("property ") + std::string(property) + " is not a known property"));
 }
 
-void CloneFilterOperation::setString(const std::string& property, const std::string& val)
+void CloneFilterOperation::setString(std::string_view property, std::string_view val)
 {
     if (property == "delivery") {
         auto handle = deliveryAddresses.lock();
-        *handle = std::vector<std::string>{val};
+        handle->clear();
+        handle->emplace_back(val);
     } else if (property == "add delivery") {
         auto handle = deliveryAddresses.lock();
         if (handle->empty()) {
-            handle->push_back(val);
+            handle->emplace_back(val);
         } else {
             auto fnd = std::find(handle->cbegin(), handle->cend(), val);
             if (fnd == handle->cend()) {
-                handle->push_back(val);
+                handle->emplace_back(val);
             }
         }
     } else if (property == "remove delivery") {
@@ -400,7 +372,7 @@ void CloneFilterOperation::setString(const std::string& property, const std::str
         }
     } else {
         throw(helics::InvalidParameter(
-            std::string("property " + property + " is not a known property")));
+            std::string(std::string("property ") + std::string(property) + " is not a known property")));
     }
 }
 

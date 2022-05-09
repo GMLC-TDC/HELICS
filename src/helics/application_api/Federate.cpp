@@ -1401,12 +1401,13 @@ void Federate::addDependency(std::string_view fedName)
 {
     coreObject->addDependency(fedID, fedName);
 }
-static std::string nameGenerator(std::string start, char sep, std::string_view addition) {
+std::string Federate::localNameGenerator(std::string_view addition) const{
 
     if (!addition.empty()) {
-        start.push_back(sep);
-        start.append(addition);
-        return start;
+        std::string localName = getName(); 
+        localName.push_back(nameSegmentSeparator);
+        localName.append(addition);
+        return localName;
     }
     return std::string{};
 }
@@ -1415,7 +1416,7 @@ Filter& Federate::registerFilter(std::string_view filterName,
                                  std::string_view inputType,
                                  std::string_view outputType)
 {
-    return cManager->registerFilter(nameGenerator(getName(),nameSegmentSeparator,filterName),
+    return cManager->registerFilter(localNameGenerator(filterName),
                                     inputType,
                                     outputType);
 }
@@ -1424,9 +1425,7 @@ CloningFilter& Federate::registerCloningFilter(std::string_view filterName,
                                                std::string_view inputType,
                                                std::string_view outputType)
 {
-    return cManager->registerCloningFilter((!filterName.empty()) ?
-                                               (getName() + nameSegmentSeparator + filterName) :
-                                               filterName,
+    return cManager->registerCloningFilter(localNameGenerator(filterName),
                                            inputType,
                                            outputType);
 }
@@ -1460,17 +1459,7 @@ Translator& Federate::registerTranslator(std::int32_t translatorType,
                                          std::string_view endpointType,
                                          std::string_view units)
 {
-    std::string globalName = [this, translatorName]() {
-        if (!translatorName.empty()) {
-            std::string name = getName();
-            name.push_back(nameSegmentSeparator);
-            name.append(translatorName);
-            return name;
-        }
-        return std::string{};
-    }();
-
-    Translator& trans = cManager->registerTranslator(globalName, endpointType, units);
+    Translator& trans = cManager->registerTranslator(localNameGenerator(translatorName), endpointType, units);
     trans.setTranslatorType(translatorType);
     return trans;
 }
@@ -1479,7 +1468,7 @@ const Filter& Federate::getFilter(std::string_view filterName) const
 {
     const Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(localNameGenerator(filterName));
     }
     return filt;
 }
@@ -1488,7 +1477,7 @@ Filter& Federate::getFilter(std::string_view filterName)
 {
     Filter& filt = cManager->getFilter(filterName);
     if (!filt.isValid()) {
-        return cManager->getFilter(getName() + nameSegmentSeparator + filterName);
+        return cManager->getFilter(localNameGenerator(filterName));
     }
     return filt;
 }
@@ -1507,7 +1496,7 @@ const Translator& Federate::getTranslator(std::string_view translatorName) const
 {
     const Translator& trans = cManager->getTranslator(translatorName);
     if (!trans.isValid()) {
-        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+        return cManager->getTranslator(localNameGenerator(translatorName));
     }
     return trans;
 }
@@ -1516,7 +1505,7 @@ Translator& Federate::getTranslator(std::string_view translatorName)
 {
     Translator& trans = cManager->getTranslator(translatorName);
     if (!trans.isValid()) {
-        return cManager->getTranslator(getName() + nameSegmentSeparator + translatorName);
+        return cManager->getTranslator(localNameGenerator(translatorName));
     }
     return trans;
 }

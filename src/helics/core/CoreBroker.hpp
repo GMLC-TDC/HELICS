@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
 #include "gmlc/containers/AirLock.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 
 #include <any>
@@ -100,9 +100,9 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    gmlc::containers::DualMappedVector<BasicFedInfo, std::string, GlobalFederateId>
+    gmlc::containers::DualStringMappedVector<BasicFedInfo, GlobalFederateId>
         mFederates;  //!< container for all federates
-    gmlc::containers::DualMappedVector<BasicBrokerInfo, std::string, GlobalBrokerId>
+    gmlc::containers::DualStringMappedVector<BasicBrokerInfo, GlobalBrokerId>
         mBrokers;  //!< container for all the broker information
     std::string
         previous_local_broker_identifier;  //!< the previous identifier in case a rename is required

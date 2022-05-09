@@ -145,14 +145,14 @@ namespace zeromq {
         active_routes.clear();
     }
 
-    stx::optional<ActionMessage> ZmqRequestSets::getMessage()
+    std::optional<ActionMessage> ZmqRequestSets::getMessage()
     {
         if (!Responses.empty()) {
             auto resp = Responses.front();
             Responses.pop_front();
             return resp;
         }
-        return stx::nullopt;
+        return std::nullopt;
     }
 
     /*

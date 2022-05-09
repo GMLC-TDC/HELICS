@@ -114,10 +114,10 @@ namespace ipc {
         }
     }
 
-    stx::optional<ActionMessage> OwnedQueue::getMessage(int timeout)
+    std::optional<ActionMessage> OwnedQueue::getMessage(int timeout)
     {
         if (!connected) {
-            return stx::nullopt;
+            return std::nullopt;
         }
         size_t rx_size = 0;
         unsigned int priority{0};
@@ -128,12 +128,12 @@ namespace ipc {
                 bool res =
                     rqueue->timed_receive(buffer.data(), mxSize, rx_size, priority, abs_time);
                 if (!res) {
-                    return stx::nullopt;
+                    return std::nullopt;
                 }
             } else if (timeout <= 0) {
                 bool res = rqueue->try_receive(buffer.data(), mxSize, rx_size, priority);
                 if (!res) {
-                    return stx::nullopt;
+                    return std::nullopt;
                 }
             }
 

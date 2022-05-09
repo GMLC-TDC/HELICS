@@ -79,12 +79,12 @@ class TranslatorOperations {
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
     */
-    virtual void set(const std::string& property, double val);
+    virtual void set(std::string_view property, double val);
     /** set a string property on a translator
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
     */
-    virtual void setString(const std::string& property, const std::string& val);
+    virtual void setString(std::string_view property, std::string_view val);
     virtual std::shared_ptr<TranslatorOperator> getOperator() = 0;
 };
 

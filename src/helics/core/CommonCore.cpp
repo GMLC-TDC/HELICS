@@ -5227,7 +5227,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
     return emptyStr;
 }
 
-void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string info)
+void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string_view info)
 {
     handles.modify(
         [&](auto& hdls) { hdls.getHandleInfo(handle.baseValue())->setTag("local_info_", info); });

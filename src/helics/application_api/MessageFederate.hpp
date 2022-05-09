@@ -98,16 +98,16 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerEndpoint(std::string_view eptName = std::string(),
-                               std::string_view type = std::string());
+    Endpoint& registerEndpoint(std::string_view eptName = std::string_view(),
+                               std::string_view type = std::string_view());
 
     /** register a targeted endpoint
     @details this type of endpoint can can send messages to predefined targets
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerTargetedEndpoint(std::string_view eptName = std::string(),
-                                       std::string_view type = std::string());
+    Endpoint& registerTargetedEndpoint(std::string_view eptName = std::string_view(),
+                                       std::string_view type = std::string_view());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
@@ -116,7 +116,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @return a Reference to an Endpoint Object
     */
     Endpoint& registerGlobalEndpoint(std::string_view eptName,
-                                     std::string_view type = std::string());
+                                     std::string_view type = std::string_view());
 
     /** register a targeted endpoint directly without prepending the federate name
   @param eptName the name of the endpoint
@@ -124,7 +124,7 @@ class HELICS_CXX_EXPORT MessageFederate:
   @return a Reference to an Endpoint Object
   */
     Endpoint& registerGlobalTargetedEndpoint(std::string_view eptName,
-                                             std::string_view type = std::string());
+                                             std::string_view type = std::string_view());
 
     /** register an indexed Endpoint
     @details register a global endpoint as part of a 1D array of endpoints
@@ -134,9 +134,9 @@ class HELICS_CXX_EXPORT MessageFederate:
     */
     Endpoint& registerIndexedEndpoint(std::string_view eptName,
                                       int index1,
-                                      std::string_view type = std::string())
+                                      std::string_view type = std::string_view())
     {
-        return registerGlobalEndpoint(eptName + '_' + std::to_string(index1), type);
+        return registerGlobalEndpoint(std::string(eptName) + '_' + std::to_string(index1), type);
     }
 
     virtual void registerInterfaces(const std::string& configString) override;

@@ -91,14 +91,14 @@ void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> t
 
 static const std::string emptyStr;
 
-void Translator::set(const std::string& property, double val)
+void Translator::set(std::string_view property, double val)
 {
     if (transOp) {
         transOp->set(property, val);
     }
 }
 
-void Translator::setString(const std::string& property, const std::string& val)
+void Translator::setString(std::string_view property, std::string_view val)
 {
     if (transOp) {
         transOp->setString(property, val);

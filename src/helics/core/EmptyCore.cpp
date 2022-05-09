@@ -507,7 +507,7 @@ const std::string& EmptyCore::getInterfaceInfo(InterfaceHandle /*handle*/) const
     return emptyStr;
 }
 
-void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string /*info*/) {}
+void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string_view /*info*/) {}
 
 const std::string& EmptyCore::getInterfaceTag(InterfaceHandle /*handle*/,
                                               std::string_view /*tag*/) const

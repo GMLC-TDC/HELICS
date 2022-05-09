@@ -18,12 +18,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-MessageFederate::MessageFederate(const std::string& fedName, const FederateInfo& fi):
+MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
-MessageFederate::MessageFederate(const std::string& fedName,
+MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
                                  const FederateInfo& fi):
     Federate(fedName, core, fi)
@@ -31,13 +31,13 @@ MessageFederate::MessageFederate(const std::string& fedName,
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
 
-MessageFederate::MessageFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi):
+MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
 }
 
-MessageFederate::MessageFederate(const std::string& fedName, const std::string& configString):
+MessageFederate::MessageFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
@@ -47,12 +47,12 @@ MessageFederate::MessageFederate(const std::string& fedName, const std::string& 
 }
 
 MessageFederate::MessageFederate(const std::string& configString):
-    MessageFederate(std::string{}, configString)
+    MessageFederate(std::string_view{}, configString)
 {
 }
 
 MessageFederate::MessageFederate(const char* configString):
-    MessageFederate(std::string{}, std::string{configString})
+    MessageFederate(std::string_view{}, std::string{configString})
 {
 }
 
@@ -101,36 +101,30 @@ void MessageFederate::initializeToExecuteStateTransition(IterationResult result)
     mfManager->initializeToExecuteStateTransition(result);
 }
 
-std::string MessageFederate::localQuery(const std::string& queryStr) const
+std::string MessageFederate::localQuery(std::string_view queryStr) const
 {
     return mfManager->localQuery(queryStr);
 }
 
-Endpoint& MessageFederate::registerEndpoint(const std::string& eptName, const std::string& type)
+Endpoint& MessageFederate::registerEndpoint(std::string_view eptName, std::string_view type)
 {
-    return mfManager->registerEndpoint((!eptName.empty()) ?
-                                           (getName() + nameSegmentSeparator + eptName) :
-                                           eptName,
+    return mfManager->registerEndpoint(localNameGenerator(eptName),
                                        type);
 }
 
-Endpoint& MessageFederate::registerTargetedEndpoint(const std::string& eptName,
-                                                    const std::string& type)
+Endpoint& MessageFederate::registerTargetedEndpoint(std::string_view eptName, std::string_view type)
 {
-    return mfManager->registerTargetedEndpoint((!eptName.empty()) ?
-                                                   (getName() + nameSegmentSeparator + eptName) :
-                                                   eptName,
+    return mfManager->registerTargetedEndpoint(localNameGenerator(eptName),
                                                type);
 }
 
-Endpoint& MessageFederate::registerGlobalEndpoint(const std::string& eptName,
-                                                  const std::string& type)
+Endpoint& MessageFederate::registerGlobalEndpoint(std::string_view eptName, std::string_view type)
 {
     return mfManager->registerEndpoint(eptName, type);
 }
 
-Endpoint& MessageFederate::registerGlobalTargetedEndpoint(const std::string& eptName,
-                                                          const std::string& type)
+Endpoint& MessageFederate::registerGlobalTargetedEndpoint(std::string_view eptName,
+                                                          std::string_view type)
 {
     return mfManager->registerTargetedEndpoint(eptName, type);
 }
@@ -294,11 +288,11 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
     return nullptr;
 }
 
-Endpoint& MessageFederate::getEndpoint(const std::string& eptName) const
+Endpoint& MessageFederate::getEndpoint(std::string_view eptName) const
 {
     auto& id = mfManager->getEndpoint(eptName);
     if (!id.isValid()) {
-        return mfManager->getEndpoint(getName() + nameSegmentSeparator + eptName);
+        return mfManager->getEndpoint(localNameGenerator(eptName));
     }
     return id;
 }
