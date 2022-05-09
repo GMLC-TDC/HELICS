@@ -170,32 +170,26 @@ void ConnectorFederateManager::closeAllConnectors()
 {
     if (coreObject != nullptr) {
         auto filts = filters.lock();
-        filts->apply([this](auto& filt) {
+        filts->modify([this](auto& filt) {
             coreObject->closeHandle(filt->getHandle());
             filt->disconnectFromCore();
         });
 
-        // TODO(PT) some missing operations need to be added to the StableBlockVector including `at`
-        // and `operate`
         auto trans = translators.lock();
-        for (int ii = 0; ii < trans->size(); ++ii) {
-            coreObject->closeHandle(trans->operator[](ii).getHandle());
-            trans->operator[](ii).disconnectFromCore();
-        }
+        trans->modify([this](auto& tran) {
+            coreObject->closeHandle(tran.getHandle());
+            tran.disconnectFromCore();
+        });
     }
 }
 
 void ConnectorFederateManager::disconnectAllConnectors()
 {
     auto filts = filters.lock();
-    filts->apply([](auto& filt) { filt->disconnectFromCore(); });
+    filts->modify([](auto& filt) { filt->disconnectFromCore(); });
 
-    // TODO(PT) some missing operations need to be added to the StableBlockVector including `at` and
-    // `operate`
     auto trans = translators.lock();
-    for (int ii = 0; ii < trans->size(); ++ii) {
-        trans->operator[](ii).disconnectFromCore();
-    }
+    trans->modify([](auto& tran) { tran.disconnectFromCore(); });
 }
 
 static EmptyCore eCore;
