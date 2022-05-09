@@ -319,7 +319,7 @@ FederateState* CommonCore::getFederateCore(GlobalFederateId federateID)
 
 FederateState* CommonCore::getFederateCore(std::string_view federateName)
 {
-    auto fed = loopFederates.find(std::string(federateName));
+    auto fed = loopFederates.find(federateName);
     return (fed != loopFederates.end()) ? (fed->fed) : nullptr;
 }
 
@@ -664,8 +664,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             local_id = LocalFederateId(static_cast<int32_t>(*id));
             fed = (*feds)[*id];
         } else {
-            throw(RegistrationFailure("duplicate names " + std::string(name) +
-                                      "detected multiple federates with the same name"));
+            throw(RegistrationFailure(fmt::format("duplicate names {} detected: multiple federates with the same name",name)));
         }
         if (feds->size() == 1) {
             checkProperties = true;
@@ -2423,7 +2422,7 @@ void CommonCore::setIdentifier(std::string_view name)
     }
 }
 
-static const std::map<std::string, std::pair<std::uint16_t, bool>> mapIndex{
+static const std::map<std::string_view, std::pair<std::uint16_t, bool>> mapIndex{
     {"global_time", {CURRENT_TIME_MAP, true}},
     {"global_status", {GLOBAL_STATUS, false}},
     {"dependency_graph", {DEPENDENCY_GRAPH, false}},
@@ -2778,7 +2777,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
         });
         return fileops::generateJsonString(base);
     }
-    auto mi = mapIndex.find(std::string(queryStr));
+    auto mi = mapIndex.find(queryStr);
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
@@ -2996,9 +2995,9 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_REG_FED:
             // this one in the core needs to be the thread-safe version of getFederate
-            loopFederates.insert(std::string(command.name()),
+            loopFederates.insert(command.name(),
                                  no_search,
-                                 getFederate(std::string(command.name())));
+                                 getFederate(command.name()));
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -3074,7 +3073,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             }
             break;
         case CMD_FED_ACK: {
-            auto* fed = getFederateCore(std::string(command.name()));
+            auto* fed = getFederateCore(command.name());
             if (fed != nullptr) {
                 if (checkActionFlag(command, error_flag)) {
                     LOG_ERROR(
@@ -3085,7 +3084,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                                     commandErrorString(command.messageID)));
                 } else {
                     fed->global_id = command.dest_id;
-                    loopFederates.addSearchTerm(command.dest_id, std::string(command.name()));
+                    loopFederates.addSearchTerm(command.dest_id, command.name());
                     if (!keyFed.isValid()) {
                         keyFed = fed->global_id;
                     }
@@ -3097,7 +3096,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
         } break;
         case CMD_REG_ROUTE:
             // TODO(PT): double check this
-            addRoute(route_id(command.getExtraData()), 0, std::string(command.payload.to_string()));
+            addRoute(route_id(command.getExtraData()), 0, command.payload.to_string());
             break;
         case CMD_PRIORITY_DISCONNECT:
             checkAndProcessDisconnect();
@@ -3415,7 +3414,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             routeMessage(std::move(command));
             break;
         case CMD_SEARCH_DEPENDENCY: {
-            auto* fed = getFederateCore(std::string(command.name()));
+            auto* fed = getFederateCore(command.name());
             if (fed != nullptr) {
                 if (fed->global_id.load().isValid()) {
                     ActionMessage dep(CMD_ADD_DEPENDENCY, fed->global_id.load(), command.source_id);
@@ -4704,7 +4703,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
         case CMD_BROKER_QUERY:
 
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == gDirectCoreId) {
-                std::string repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
+                std::string repStr = coreQuery(cmd.payload.to_string(), force_ordered);
                 if (repStr != "#wait") {
                     if (cmd.source_id == gDirectCoreId) {
                         // TODO(PT) make setDelayedValue have a move method
@@ -4733,7 +4732,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     queryResp.messageID = cmd.messageID;
                     queryResp.counter = cmd.counter;
                     std::get<1>(
-                        mapBuilders[mapIndex.at(std::string(cmd.payload.to_string())).first])
+                        mapBuilders[mapIndex.at(cmd.payload.to_string()).first])
                         .push_back(queryResp);
                 }
 
@@ -4781,11 +4780,11 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 const std::string& target = cmd.getString(targetStringLoc);
                 if (target == getIdentifier()) {
                     queryResp.source_id = global_broker_id_local;
-                    repStr = coreQuery(std::string(cmd.payload.to_string()), force_ordered);
+                    repStr = coreQuery(cmd.payload.to_string(), force_ordered);
                 } else {
                     auto* fedptr = getFederateCore(target);
                     repStr =
-                        federateQuery(fedptr, std::string(cmd.payload.to_string()), force_ordered);
+                        federateQuery(fedptr, cmd.payload.to_string(), force_ordered);
                     if (repStr == "#wait") {
                         if (fedptr != nullptr) {
                             cmd.dest_id = fedptr->global_id;

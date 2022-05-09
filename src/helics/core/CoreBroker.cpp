@@ -238,7 +238,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     }
     bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     if (command.counter > 0) {  // this indicates it is a resend
-        auto brk = mBrokers.find(std::string(command.name()));
+        auto brk = mBrokers.find(command.name());
         if (brk != mBrokers.end()) {
             // we would get this if the ack didn't go through for some reason
             brk->route = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
@@ -362,7 +362,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         }
         return;
     }
-    auto inserted = mBrokers.insert(std::string(command.name()), no_search, command.name());
+    auto inserted = mBrokers.insert(command.name(), no_search, command.name());
     if (!inserted) {
         route_id newroute;
         bool route_created = false;
@@ -488,7 +488,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     // this checks for duplicate federate names
-    if (mFederates.find(std::string(command.name())) != mFederates.end()) {
+    if (mFederates.find(command.name()) != mFederates.end()) {
         ActionMessage badName(CMD_FED_ACK);
         setActionFlag(badName, error_flag);
         badName.source_id = global_broker_id_local;
@@ -497,7 +497,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         transmit(getRoute(command.source_id), badName);
         return;
     }
-    mFederates.insert(std::string(command.name()), no_search, std::string(command.name()));
+    mFederates.insert(command.name(), no_search, command.name());
     mFederates.back().route = getRoute(command.source_id);
     mFederates.back().parent = command.source_id;
     if (checkActionFlag(command, non_counting_flag)) {
@@ -605,7 +605,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
             brokerRegistration(std::move(command));
             break;
         case CMD_FED_ACK: {  // we can't be root if we got one of these
-            auto fed = mFederates.find(std::string(command.name()));
+            auto fed = mFederates.find(command.name());
             if (fed != mFederates.end()) {
                 auto route = fed->route;
                 if (!fed->global_id.isValid()) {
@@ -623,9 +623,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 }
             } else {
                 // this means we haven't seen this federate before for some reason
-                mFederates.insert(std::string(command.name()),
+                mFederates.insert(command.name(),
                                   command.dest_id,
-                                  std::string(command.name()));
+                                  command.name());
                 mFederates.back().route = getRoute(command.source_id);
                 mFederates.back().global_id = command.dest_id;
                 routing_table.emplace(fed->global_id, mFederates.back().route);
@@ -662,7 +662,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                 timeoutMon->reset();
                 return;
             }
-            auto broker = mBrokers.find(std::string(command.name()));
+            auto broker = mBrokers.find(command.name());
             if (broker != mBrokers.end()) {
                 if (broker->global_id == GlobalBrokerId(command.dest_id)) {
                     // drop the packet since we have seen this ack already
@@ -677,7 +677,7 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                                                              // change the source_id
                 transmit(route, command);
             } else {
-                mBrokers.insert(std::string(command.name()),
+                mBrokers.insert(command.name(),
                                 GlobalBrokerId(command.dest_id),
                                 command.name());
                 mBrokers.back().route = getRoute(command.source_id);
@@ -1071,7 +1071,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             processInitCommand(command);
             break;
         case CMD_SEARCH_DEPENDENCY: {
-            auto fed = mFederates.find(std::string(command.name()));
+            auto fed = mFederates.find(command.name());
             if (fed != mFederates.end()) {
                 if (fed->global_id.isValid()) {
                     ActionMessage dep(CMD_ADD_DEPENDENCY, fed->global_id, command.source_id);
@@ -1095,7 +1095,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             break;
         case CMD_DISCONNECT_NAME:
             if (command.dest_id == parent_broker_id) {
-                auto brk = mBrokers.find(std::string(command.name()));
+                auto brk = mBrokers.find(command.name());
                 if (brk != mBrokers.end()) {
                     command.source_id = brk->global_id;
                 }
@@ -1707,7 +1707,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
                             auto& apub = handles.addHandle(command.source_id,
                                                            command.source_handle,
                                                            InterfaceType::PUBLICATION,
-                                                           std::string(),
+                                                           std::string_view(),
                                                            command.getString(typeStringLoc),
                                                            command.getString(unitStringLoc));
 
@@ -2303,10 +2303,10 @@ void CoreBroker::unregister()
     if (keepBrokerAlive) {
         BrokerFactory::unregisterBroker(identifier);
     }
-    if (!previous_local_broker_identifier.empty()) {
-        auto keepBrokerAlive2 = BrokerFactory::findBroker(previous_local_broker_identifier);
+    if (!mPreviousLocalBrokerIdentifier.empty()) {
+        auto keepBrokerAlive2 = BrokerFactory::findBroker(mPreviousLocalBrokerIdentifier);
         if (keepBrokerAlive2) {
-            BrokerFactory::unregisterBroker(previous_local_broker_identifier);
+            BrokerFactory::unregisterBroker(mPreviousLocalBrokerIdentifier);
         }
     }
 }
@@ -2694,7 +2694,7 @@ void CoreBroker::processError(ActionMessage& command)
 {
     sendToLogger(command.source_id,
                  LogLevels::ERROR_LEVEL,
-                 std::string(),
+                 std::string_view(),
                  command.payload.to_string());
     if (command.source_id == global_broker_id_local) {
         setBrokerState(BrokerState::errored);
@@ -3288,7 +3288,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             return fileops::generateJsonString(gs);
         }
     }
-    auto mi = mapIndex.find(std::string(request));
+    auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
         if (isValidIndex(index, mapBuilders) && !mi->second.second) {
@@ -3542,7 +3542,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
     queryRep.source_id = global_broker_id_local;
     queryRep.dest_id = m.source_id;
     queryRep.messageID = m.messageID;
-    queryRep.payload = generateQueryAnswer(std::string(m.payload.to_string()), force_ordered);
+    queryRep.payload = generateQueryAnswer(m.payload.to_string(), force_ordered);
     queryRep.counter = m.counter;
     if (queryRep.payload.to_string() == "#wait") {
         if (queryRep.dest_id == global_broker_id_local) {
@@ -3551,7 +3551,7 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(std::string(m.payload.to_string())).first])
+        std::get<1>(mapBuilders[mapIndex.at(m.payload.to_string()).first])
             .push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(m.messageID, std::string(queryRep.payload.to_string()));
@@ -3664,7 +3664,7 @@ void CoreBroker::processQuery(ActionMessage& m)
         queryResp.dest_id = m.source_id;
         queryResp.source_id = global_broker_id_local;
         queryResp.messageID = m.messageID;
-        queryResp.payload = getNameList(std::string(m.payload.to_string()));
+        queryResp.payload = getNameList(m.payload.to_string());
         if (queryResp.dest_id == global_broker_id_local) {
             activeQueries.setDelayedValue(m.messageID, std::string(queryResp.payload.to_string()));
         } else {

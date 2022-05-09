@@ -100,12 +100,14 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
-    gmlc::containers::DualStringMappedVector<BasicFedInfo, GlobalFederateId>
+    gmlc::containers::DualStringMappedVector<BasicFedInfo, GlobalFederateId,reference_stability::unstable>
         mFederates;  //!< container for all federates
-    gmlc::containers::DualStringMappedVector<BasicBrokerInfo, GlobalBrokerId>
+    gmlc::containers::
+        DualStringMappedVector<BasicBrokerInfo, GlobalBrokerId, reference_stability::unstable>
         mBrokers;  //!< container for all the broker information
+    /// the previous identifier in case a rename is required
     std::string
-        previous_local_broker_identifier;  //!< the previous identifier in case a rename is required
+        mPreviousLocalBrokerIdentifier;  
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
     UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
