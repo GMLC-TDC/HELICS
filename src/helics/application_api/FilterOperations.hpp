@@ -17,9 +17,9 @@ file defines some common filter operations
 #include <atomic>
 #include <memory>
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
-#include <string>
 
 namespace helics {
 class Core;

@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "timeOperations.hpp"
 
 #include "../utilities/timeStringOps.hpp"
+
 #include <string>
 
 namespace helics {
