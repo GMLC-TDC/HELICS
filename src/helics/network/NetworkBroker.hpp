@@ -19,7 +19,7 @@ class NetworkBroker: public CommsBroker<COMMS, CoreBroker> {
   public:
     /** default constructor*/
     explicit NetworkBroker(bool rootBroker = false) noexcept;
-    explicit NetworkBroker(const std::string& broker_name);
+    explicit NetworkBroker(std::string_view broker_name);
 
   public:
     virtual std::string generateLocalAddressString() const override;

@@ -63,7 +63,7 @@ static void loadTypeSpecificArgs(
     }
 }
 */
-MultiBroker::MultiBroker(const std::string& brokerName): CoreBroker(brokerName) {}
+MultiBroker::MultiBroker(std::string_view brokerName): CoreBroker(brokerName) {}
 
 MultiBroker::MultiBroker() noexcept {}
 
@@ -274,7 +274,7 @@ void MultiBroker::transmit(route_id rid, ActionMessage&& cmd)
     }
 }
 
-void MultiBroker::addRoute(route_id rid, int interfaceId, const std::string& routeInfo)
+void MultiBroker::addRoute(route_id rid, int interfaceId, std::string_view routeInfo)
 {
     if (interfaceId <= 0) {
         if (masterComm) {

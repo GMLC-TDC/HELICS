@@ -40,16 +40,16 @@ class InterfaceInfo {
     EndpointInfo* getEndpoint(InterfaceHandle handle);
 
     void createPublication(InterfaceHandle handle,
-                           const std::string& key,
-                           const std::string& type,
-                           const std::string& units);
+                           std::string_view key,
+                           std::string_view type,
+                           std::string_view units);
     void createInput(InterfaceHandle handle,
-                     const std::string& key,
-                     const std::string& type,
-                     const std::string& units);
+                     std::string_view key,
+                     std::string_view type,
+                     std::string_view units);
     void createEndpoint(InterfaceHandle handle,
-                        const std::string& endpointName,
-                        const std::string& type);
+                        std::string_view endpointName,
+                        std::string_view type);
 
     auto getEndpoints() { return endpoints.lock(); }
     auto getPublications() { return publications.lock(); }

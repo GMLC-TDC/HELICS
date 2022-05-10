@@ -308,9 +308,9 @@ void FederateState::addAction(ActionMessage&& action)
 
 void FederateState::createInterface(InterfaceType htype,
                                     InterfaceHandle handle,
-                                    const std::string& key,
-                                    const std::string& type,
-                                    const std::string& units,
+                                    std::string_view key,
+                                    std::string_view type,
+                                    std::string_view units,
                                     uint16_t flags)
 {
     std::lock_guard<FederateState> plock(*this);
@@ -2303,7 +2303,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
     return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized Federate query");
 }
 
-std::string FederateState::processQuery(const std::string& query, bool force_ordering) const
+std::string FederateState::processQuery(std::string_view query, bool force_ordering) const
 {
     std::string qstring;
     if (!force_ordering &&
@@ -2331,7 +2331,7 @@ int FederateState::loggingLevel() const
     return mLogManager->getConsoleLevel();
 }
 
-void FederateState::setTag(const std::string& tag, const std::string& value)
+void FederateState::setTag(std::string_view tag, std::string_view value)
 {
     spinlock();
     for (auto& tg : tags) {
@@ -2347,7 +2347,7 @@ void FederateState::setTag(const std::string& tag, const std::string& value)
 
 static const std::string emptyStr;
 
-const std::string& FederateState::getTag(const std::string& tag) const
+const std::string& FederateState::getTag(std::string_view tag) const
 {
     spinlock();
     for (const auto& tg : tags) {

@@ -51,7 +51,7 @@ class Core {
      * Should be invoked a single time to initialize the co-simulation core.
      *
      */
-    virtual void configure(const std::string& configureString) = 0;
+    virtual void configure(std::string_view configureString) = 0;
     /**
      * Configure the core from command line arguments.
      *
@@ -111,7 +111,7 @@ class Core {
      */
     virtual void globalError(LocalFederateId federateID,
                              int32_t errorCode,
-                             const std::string& errorString) = 0;
+                             std::string_view errorString) = 0;
 
     /**
      * Federate has encountered a local error and should be disconnected.
@@ -119,9 +119,8 @@ class Core {
      * @param errorCode a numerical code associated with the error
      * @param errorString a text message associated with the error
      */
-    virtual void localError(LocalFederateId federateID,
-                            int32_t errorCode,
-                            const std::string& errorString) = 0;
+    virtual void
+        localError(LocalFederateId federateID, int32_t errorCode, std::string_view errorString) = 0;
 
     /** get the last error code from a core*/
     virtual int getErrorCode() const = 0;
@@ -186,7 +185,7 @@ class Core {
      *
      * May only be invoked in initialize state otherwise throws an error
      */
-    virtual LocalFederateId registerFederate(const std::string& name,
+    virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) = 0;
 
     /**
@@ -199,7 +198,7 @@ class Core {
      * Returns the federate Id.
      *
      */
-    virtual LocalFederateId getFederateId(const std::string& name) const = 0;
+    virtual LocalFederateId getFederateId(std::string_view name) const = 0;
 
     /**
      * Returns the global number of federates that are registered only return accurately after the
@@ -335,16 +334,16 @@ class Core {
      @return a handle to identify the publication
      */
     virtual InterfaceHandle registerPublication(LocalFederateId federateID,
-                                                const std::string& key,
-                                                const std::string& type,
-                                                const std::string& units) = 0;
+                                                std::string_view key,
+                                                std::string_view type,
+                                                std::string_view units) = 0;
 
     /** get a publication Handle from its key
     @param federateID the identifier for the federate
     @param key the name of the publication
      @return a handle to identify the publication*/
     virtual InterfaceHandle getPublication(LocalFederateId federateID,
-                                           const std::string& key) const = 0;
+                                           std::string_view key) const = 0;
 
     /**
      * Register a control input for the specified federate.
@@ -356,14 +355,14 @@ class Core {
      * @param units a string naming the units of the federate
      */
     virtual InterfaceHandle registerInput(LocalFederateId federateID,
-                                          const std::string& key,
-                                          const std::string& type,
-                                          const std::string& units) = 0;
+                                          std::string_view key,
+                                          std::string_view type,
+                                          std::string_view units) = 0;
     /** get a subscription Handle from its key
     @param federateID the identifier for the federate
     @param key the tag of the named input
     @return a handle to identify the input*/
-    virtual InterfaceHandle getInput(LocalFederateId federateID, const std::string& key) const = 0;
+    virtual InterfaceHandle getInput(LocalFederateId federateID, std::string_view key) const = 0;
 
     /**
      * Returns the name or identifier for a specified handle
@@ -470,8 +469,8 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual InterfaceHandle registerEndpoint(LocalFederateId federateID,
-                                             const std::string& name,
-                                             const std::string& type) = 0;
+                                             std::string_view name,
+                                             std::string_view type) = 0;
 
     /**
      * Register an endpoint which can only send or receive to specific targets
@@ -480,15 +479,15 @@ class Core {
      @param type the type of data the endpoint should accept or generate(can be left empty)
      */
     virtual InterfaceHandle registerTargetedEndpoint(LocalFederateId federateID,
-                                                     const std::string& name,
-                                                     const std::string& type) = 0;
+                                                     std::string_view name,
+                                                     std::string_view type) = 0;
 
     /** get an endpoint Handle from its name
     @param federateID the identifier for the federate
     @param name the name of the endpoint
     @return a handle to identify the endpoint*/
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
-                                        const std::string& name) const = 0;
+                                        std::string_view name) const = 0;
 
     /**
     * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual
@@ -501,9 +500,9 @@ class Core {
     type)
     @return the handle for the new filter
     */
-    virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
-                                                  const std::string& type_in,
-                                                  const std::string& type_out) = 0;
+    virtual InterfaceHandle registerCloningFilter(std::string_view filterName,
+                                                  std::string_view type_in,
+                                                  std::string_view type_out) = 0;
 
     /**
      * Register filter.
@@ -516,9 +515,9 @@ class Core {
      type) this is important for ordering in filters with operators
      @return the handle for the new filter
      */
-    virtual InterfaceHandle registerFilter(const std::string& filterName,
-                                           const std::string& type_in,
-                                           const std::string& type_out) = 0;
+    virtual InterfaceHandle registerFilter(std::string_view filterName,
+                                           std::string_view type_in,
+                                           std::string_view type_out) = 0;
 
     /**
    * Register translator.
@@ -576,13 +575,13 @@ class Core {
     only find the first one)
     @param name the name of the filter or its target
     @return a handle to identify the filter*/
-    virtual InterfaceHandle getFilter(const std::string& name) const = 0;
+    virtual InterfaceHandle getFilter(std::string_view name) const = 0;
 
     /** get a translator handle from its name or target (this may not be unique so it will
     only find the first one)
     @param name the name of the translator or its target
     @return a handle to identify the translator*/
-    virtual InterfaceHandle getTranslator(const std::string& name) const = 0;
+    virtual InterfaceHandle getTranslator(std::string_view name) const = 0;
 
     /**
     * add a time dependency between federates
@@ -593,7 +592,7 @@ class Core {
     @param federateID  the identifier for the federate
     @param federateName the name of the dependent federate
     */
-    virtual void addDependency(LocalFederateId federateID, const std::string& federateName) = 0;
+    virtual void addDependency(LocalFederateId federateID, std::string_view federateName) = 0;
 
     /**
      * Register communicating source/destination endpoint targets.
@@ -601,7 +600,7 @@ class Core {
      * @param dest the endpoint receiving the data
      *
      */
-    virtual void linkEndpoints(const std::string& source, const std::string& dest) = 0;
+    virtual void linkEndpoints(std::string_view source, std::string_view dest) = 0;
 
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
@@ -610,19 +609,18 @@ class Core {
     /** create a data connection between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/
-    virtual void dataLink(const std::string& source, const std::string& target) = 0;
+    virtual void dataLink(std::string_view source, std::string_view target) = 0;
     /** create a filter connection between a named filter and a named endpoint for messages coming
     from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void addSourceFilterToEndpoint(const std::string& filter,
-                                           const std::string& target) = 0;
+    virtual void addSourceFilterToEndpoint(std::string_view filter, std::string_view target) = 0;
     /** create a filter connection between a named filter and a named endpoint for destination
     processing
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& target) = 0;
+    virtual void addDestinationFilterToEndpoint(std::string_view filter,
+                                                std::string_view target) = 0;
 
     /**
      * Send data from a source to its targets
@@ -733,7 +731,7 @@ class Core {
     @param messageToLog the string to send to a logger
     */
     virtual void
-        logMessage(LocalFederateId federateID, int logLevel, const std::string& messageToLog) = 0;
+        logMessage(LocalFederateId federateID, int logLevel, std::string_view messageToLog) = 0;
 
     /** set the filter callback operator
     @param filter  the handle of the filter
@@ -764,14 +762,14 @@ class Core {
     virtual void setLoggingLevel(int logLevel) = 0;
 
     /** set the core logging file*/
-    virtual void setLogFile(const std::string& lfile) = 0;
+    virtual void setLogFile(std::string_view lfile) = 0;
 
     /** set a federation global value
     @details this overwrites any previous value for this name
     @param valueName the name of the global to set
     @param value the value of the global
     */
-    virtual void setGlobal(const std::string& valueName, const std::string& value) = 0;
+    virtual void setGlobal(std::string_view valueName, std::string_view value) = 0;
 
     /** send a command to a specific target
   @details the format is somewhat unspecified; target is the name of an object, typically one of
@@ -781,9 +779,9 @@ class Core {
   @param source the designated source of the command, for return values or indication
   @param mode the sequencing mode for the command, fast or ordered
   */
-    virtual void sendCommand(const std::string& target,
-                             const std::string& commandStr,
-                             const std::string& source,
+    virtual void sendCommand(std::string_view target,
+                             std::string_view commandStr,
+                             std::string_view source,
                              HelicsSequencingModes mode) = 0;
 
     /** get a command for a specific federate
@@ -805,9 +803,8 @@ class Core {
     @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target,
-                              const std::string& queryStr,
-                              HelicsSequencingModes mode) = 0;
+    virtual std::string
+        query(std::string_view target, std::string_view queryStr, HelicsSequencingModes mode) = 0;
 
     /** supply a query callback function
     @details the intention of the query callback is to allow federates to answer particular requests
@@ -826,7 +823,7 @@ class Core {
      * @param handle the identifiers for the interface to set the info data on
      * @param info a string containing the info data
      */
-    virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) = 0;
+    virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) = 0;
 
     /**
      * getter for the interface information
@@ -840,16 +837,15 @@ class Core {
      * @param tag a string containing the name of the tag
      * @param value a string containing the value for the tag
      */
-    virtual void setInterfaceTag(InterfaceHandle handle,
-                                 const std::string& tag,
-                                 const std::string& value) = 0;
+    virtual void
+        setInterfaceTag(InterfaceHandle handle, std::string_view tag, std::string_view value) = 0;
     /**
      * getter for the interface tags
      * @param handle the identifier for the interface to set the info data on
      * @param tag the name of the tag to retrieve
      */
     virtual const std::string& getInterfaceTag(InterfaceHandle handle,
-                                               const std::string& tag) const = 0;
+                                               std::string_view tag) const = 0;
 
     /**
      * setter for federate tags which are key-value pairs
@@ -858,15 +854,14 @@ class Core {
      * @param value a string containing the value for the tag
      */
     virtual void
-        setFederateTag(LocalFederateId fid, const std::string& tag, const std::string& value) = 0;
+        setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value) = 0;
     /**
      * getter for the federate tags
      * @param fid the identifier for the federate to get the tag data for
      * @param tag the name of the tag to retrieve
      * @return a reference to a const std::string with the tag value.
      */
-    virtual const std::string& getFederateTag(LocalFederateId fid,
-                                              const std::string& tag) const = 0;
+    virtual const std::string& getFederateTag(LocalFederateId fid, std::string_view tag) const = 0;
 };
 
 }  // namespace helics

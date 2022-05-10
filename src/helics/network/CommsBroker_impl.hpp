@@ -38,7 +38,7 @@ CommsBroker<COMMS, BrokerT>::CommsBroker(bool arg) noexcept: BrokerT(arg)
 }
 
 template<class COMMS, class BrokerT>
-CommsBroker<COMMS, BrokerT>::CommsBroker(const std::string& obj_name): BrokerT(obj_name)
+CommsBroker<COMMS, BrokerT>::CommsBroker(std::string_view obj_name): BrokerT(obj_name)
 {
     static_assert(std::is_base_of<CommsInterface, COMMS>::value,
                   "COMMS object must be a CommsInterface Object");
@@ -108,7 +108,7 @@ void CommsBroker<COMMS, BrokerT>::transmit(route_id rid, ActionMessage&& cmd)
 template<class COMMS, class BrokerT>
 void CommsBroker<COMMS, BrokerT>::addRoute(route_id rid,
                                            int /*interfaceId*/,
-                                           const std::string& routeInfo)
+                                           std::string_view routeInfo)
 {
     comms->addRoute(rid, routeInfo);
 }

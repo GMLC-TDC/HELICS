@@ -79,19 +79,19 @@ class HELICS_CXX_EXPORT Input: public Interface {
     /** construct from a federate and handle, mainly used by the valueFederateManager*/
     Input(ValueFederate* valueFed,
           InterfaceHandle id,
-          const std::string& actName,
-          const std::string& unitsOut = std::string{});
+          std::string_view actName,
+          std::string_view unitsOut = std::string{});
 
     Input(ValueFederate* valueFed,
-          const std::string& key,
-          const std::string& defaultType = "def",
-          const std::string& units = std::string{});
+          std::string_view key,
+          std::string_view defaultType = "def",
+          std::string_view units = std::string{});
 
     template<class FedPtr>
     Input(FedPtr& valueFed,
-          const std::string& key,
-          const std::string& defaultType = "def",
-          const std::string& units = std::string{}):
+          std::string_view key,
+          std::string_view defaultType = "def",
+          std::string_view units = std::string{}):
         Input(std::addressof(*valueFed), key, defaultType, units)
     {
         static_assert(
@@ -101,16 +101,16 @@ class HELICS_CXX_EXPORT Input: public Interface {
 
     Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
-          const std::string& key,
-          const std::string& defaultType = "def",
-          const std::string& units = std::string{});
+          std::string_view key,
+          std::string_view defaultType = "def",
+          std::string_view units = std::string{});
 
     template<class FedPtr>
     Input(InterfaceVisibility locality,
           FedPtr& valueFed,
-          const std::string& key,
-          const std::string& defaultType = "def",
-          const std::string& units = std::string{}):
+          std::string_view key,
+          std::string_view defaultType = "def",
+          std::string_view units = std::string{}):
         Input(locality, std::addressof(*valueFed), key, defaultType, units)
     {
         static_assert(
@@ -119,26 +119,26 @@ class HELICS_CXX_EXPORT Input: public Interface {
     }
 
     Input(ValueFederate* valueFed,
-          const std::string& key,
+          std::string_view key,
           DataType defType,
-          const std::string& units = std::string{}):
+          std::string_view units = std::string{}):
         Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
     template<class FedPtr>
     Input(FedPtr& valueFed,
-          const std::string& key,
+          std::string_view key,
           DataType defType,
-          const std::string& units = std::string()):
+          std::string_view units = std::string()):
         Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
 
     Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
-          const std::string& key,
-          const std::string& units = std::string{}):
+          std::string_view key,
+          std::string_view units = std::string{}):
         Input(locality, valueFed, key, "def", units)
     {
     }
@@ -146,17 +146,17 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class FedPtr>
     Input(InterfaceVisibility locality,
           FedPtr& valueFed,
-          const std::string& key,
-          const std::string& units = std::string{}):
+          std::string_view key,
+          std::string_view units = std::string{}):
         Input(locality, valueFed, key, "def", units)
     {
     }
 
     Input(InterfaceVisibility locality,
           ValueFederate* valueFed,
-          const std::string& key,
+          std::string_view key,
           DataType defType,
-          const std::string& units = std::string{}):
+          std::string_view units = std::string{}):
         Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
     }
@@ -164,9 +164,9 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class FedPtr>
     Input(InterfaceVisibility locality,
           FedPtr& valueFed,
-          const std::string& key,
+          std::string_view key,
           DataType defType,
-          const std::string& units = std::string{}):
+          std::string_view units = std::string{}):
         Input(locality, valueFed, key, typeNameStringRef(defType), units)
     {
     }
@@ -242,7 +242,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class X>
     void setDefault_impl(std::integral_constant<int, 0> /*V*/, X&& val)
     {
-        /** still need to make_valid for bool and Time*/
+        /** TODO(PT) still need to make_valid for bool and Time*/
         lastValue = make_valid(std::forward<X>(val));
     }
 

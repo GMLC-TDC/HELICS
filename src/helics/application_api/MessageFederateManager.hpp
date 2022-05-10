@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/FederateIdExtra.hpp"
 #include "Endpoints.hpp"
 #include "data_view.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
 
 #include <cstdint>
@@ -42,14 +42,14 @@ class MessageFederateManager {
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerEndpoint(const std::string& name, const std::string& type);
+    Endpoint& registerEndpoint(std::string_view name, std::string_view type);
 
     /** register a targeted endpoint
 @details call is only valid in startup mode
 @param name the name of the endpoint
 @param type the defined type of the interface for endpoint checking if requested
 */
-    Endpoint& registerTargetedEndpoint(const std::string& name, const std::string& type);
+    Endpoint& registerTargetedEndpoint(std::string_view name, std::string_view type);
 
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
@@ -81,13 +81,13 @@ class MessageFederateManager {
     /** transition from initialize to execution State*/
     void initializeToExecuteStateTransition(IterationResult result);
     /** generate results for a local query */
-    std::string localQuery(const std::string& queryStr) const;
+    std::string localQuery(std::string_view queryStr) const;
 
     /** get the id of a registered publication from its id
     @param name the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    Endpoint& getEndpoint(const std::string& name);
-    const Endpoint& getEndpoint(const std::string& name) const;
+    Endpoint& getEndpoint(std::string_view name);
+    const Endpoint& getEndpoint(std::string_view name) const;
 
     Endpoint& getEndpoint(int index);
     const Endpoint& getEndpoint(int index) const;
@@ -116,9 +116,7 @@ class MessageFederateManager {
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
         atomic_guarded<std::function<void(Endpoint&, Time)>> callback;
     };
-    shared_guarded<
-        gmlc::containers::
-            DualMappedVector<Endpoint, std::string, InterfaceHandle, reference_stability::stable>>
+    shared_guarded<gmlc::containers::DualStringMappedVector<Endpoint, InterfaceHandle>>
         local_endpoints;  //!< storage for the local endpoint information
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
     Time CurrentTime = Time::minVal();  //!< the current simulation time

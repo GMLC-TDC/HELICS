@@ -13,20 +13,20 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-Endpoint::Endpoint(MessageFederate* mFed, const std::string& name, InterfaceHandle id, void* data):
+Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id, void* data):
     Interface(mFed, id, name), fed(mFed), dataReference(data)
 {
 }
 
-Endpoint::Endpoint(MessageFederate* mFed, const std::string& name, const std::string& type):
+Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, std::string_view type):
     Endpoint(mFed->registerEndpoint(name, type))
 {
 }
 
 Endpoint::Endpoint(InterfaceVisibility locality,
                    MessageFederate* mFed,
-                   const std::string& name,
-                   const std::string& type)
+                   std::string_view name,
+                   std::string_view type)
 {
     if (locality == InterfaceVisibility::GLOBAL) {
         operator=(mFed->registerGlobalEndpoint(name, type));
@@ -139,7 +139,7 @@ const std::string& Endpoint::getDefaultDestination() const
                                 ((cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr);
 }
 
-void Endpoint::subscribe(const std::string& key)
+void Endpoint::subscribe(std::string_view key)
 {
     if (cr != nullptr) {
         cr->addSourceTarget(handle, key, helics::InterfaceType::PUBLICATION);

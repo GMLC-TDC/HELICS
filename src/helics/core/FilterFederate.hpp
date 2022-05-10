@@ -50,7 +50,7 @@ class FilterFederate {
 
     std::function<void(ActionMessage&)> mDeliverMessage;
 
-    std::function<void(int, const std::string&, const std::string&)> mLogger;
+    std::function<void(int, std::string_view, std::string_view)> mLogger;
     std::function<gmlc::containers::AirLock<std::any>&(int)> mGetAirLock;
     std::deque<std::pair<int32_t, Time>> timeBlockProcesses;
     Time minReturnTime{Time::maxVal()};
@@ -79,9 +79,9 @@ class FilterFederate {
     /** create a filter */
     FilterInfo* createFilter(GlobalBrokerId dest,
                              InterfaceHandle handle,
-                             const std::string& key,
-                             const std::string& type_in,
-                             const std::string& type_out,
+                             std::string_view key,
+                             std::string_view type_in,
+                             std::string_view type_out,
                              bool cloning);
 
     void setCallbacks(std::function<void(const ActionMessage&)> queueMessage,
@@ -95,7 +95,7 @@ class FilterFederate {
         mSendMessageMove = std::move(sendMessageMove);
     }
 
-    void setLogger(std::function<void(int, const std::string&, const std::string&)> logger)
+    void setLogger(std::function<void(int, std::string_view, std::string_view)> logger)
     {
         mLogger = std::move(logger);
     }
@@ -124,7 +124,7 @@ class FilterFederate {
 
     void setHandleManager(HandleManager* handles) { mHandles = handles; }
 
-    std::string query(const std::string& queryStr) const;
+    std::string query(std::string_view queryStr) const;
     /** check if the filter federate has active time dependencies other than parent*/
     bool hasActiveTimeDependencies() const;
 

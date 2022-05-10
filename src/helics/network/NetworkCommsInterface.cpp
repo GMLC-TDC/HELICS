@@ -156,7 +156,7 @@ void NetworkCommsInterface::setBrokerPort(int brokerPortNumber)
     }
 }
 
-int NetworkCommsInterface::findOpenPort(int count, const std::string& host)
+int NetworkCommsInterface::findOpenPort(int count, std::string_view host)
 {
     if (openPorts.getDefaultStartingPort() < 0) {
         auto dport = PortNumber - getDefaultBrokerPort();
@@ -165,7 +165,7 @@ int NetworkCommsInterface::findOpenPort(int count, const std::string& host)
             PortNumber + 5 * count;
         openPorts.setStartingPortNumber(start);
     }
-    return openPorts.findOpenPort(count, host);
+    return openPorts.findOpenPort(count, std::string(host));
 }
 
 void NetworkCommsInterface::setPortNumber(int localPortNumber)
@@ -187,7 +187,7 @@ void NetworkCommsInterface::setAutomaticPortStartPort(int startingPort)
     }
 }
 
-void NetworkCommsInterface::setFlag(const std::string& flag, bool val)
+void NetworkCommsInterface::setFlag(std::string_view flag, bool val)
 {
     if (flag == "os_port") {
         if (propertyLock()) {

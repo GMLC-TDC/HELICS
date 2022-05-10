@@ -39,7 +39,7 @@ namespace fileops {
             for (const auto& conn : connArray) {
                 if (conn.is_array()) {
                     auto& connAct = conn.as_array();
-                    brk->dataLink(connAct[0].as_string(), connAct[1].as_string());
+                    brk->dataLink(connAct[0].as_string().str, connAct[1].as_string().str);
                 } else {
                     std::string pub = getOrDefault(conn, "publication", std::string());
                     if (!pub.empty()) {
@@ -76,7 +76,7 @@ namespace fileops {
             for (const auto& conn : connArray) {
                 if (conn.is_array()) {
                     auto& connAct = conn.as_array();
-                    brk->linkEndpoints(connAct[0].as_string(), connAct[1].as_string());
+                    brk->linkEndpoints(connAct[0].as_string().str, connAct[1].as_string().str);
                 } else {
                     std::string pub = getOrDefault(conn, "publication", std::string());
                     if (!pub.empty()) {
@@ -113,7 +113,8 @@ namespace fileops {
             for (const auto& filt : filtArray) {
                 if (filt.is_array()) {
                     auto& filtAct = filt.as_array();
-                    brk->addSourceFilterToEndpoint(filtAct[0].as_string(), filtAct[1].as_string());
+                    brk->addSourceFilterToEndpoint(filtAct[0].as_string().str,
+                                                   filtAct[1].as_string().str);
                 } else {
                     std::string fname = getOrDefault(filt, "filter", std::string());
                     if (!fname.empty()) {
@@ -136,11 +137,12 @@ namespace fileops {
         if (!globals.is_uninitialized()) {
             if (globals.is_array()) {
                 for (auto& val : globals.as_array()) {
-                    brk->setGlobal(val.as_array()[0].as_string(), val.as_array()[1].as_string());
+                    brk->setGlobal(val.as_array()[0].as_string().str,
+                                   val.as_array()[1].as_string().str);
                 }
             } else {
                 for (const auto& val : globals.as_table()) {
-                    brk->setGlobal(val.first, val.second.as_string());
+                    brk->setGlobal(val.first, val.second.as_string().str);
                 }
             }
         }

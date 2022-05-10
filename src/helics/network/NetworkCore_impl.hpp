@@ -27,7 +27,7 @@ NetworkCore<COMMS, baseline>::NetworkCore() noexcept
 }
 
 template<class COMMS, InterfaceTypes baseline>
-NetworkCore<COMMS, baseline>::NetworkCore(const std::string& coreName):
+NetworkCore<COMMS, baseline>::NetworkCore(std::string_view coreName):
     CommsBroker<COMMS, CommonCore>(coreName)
 {
     netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_DEACTIVATED;

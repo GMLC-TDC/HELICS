@@ -59,22 +59,22 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param argc the number of arguments
     @param argv the strings in the input
     */
-    BrokerApp(CoreType ctype, const std::string& brokerName, int argc, char* argv[]);
+    BrokerApp(CoreType ctype, std::string_view brokerName, int argc, char* argv[]);
     /** construct from command line arguments parsed as a single string
     @param argString a merged string with all the arguments
     */
-    explicit BrokerApp(const std::string& argString);
+    explicit BrokerApp(std::string_view argString);
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    explicit BrokerApp(CoreType ctype, const std::string& argString = std::string{});
+    explicit BrokerApp(CoreType ctype, std::string_view argString = std::string{});
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker
     @param argString a merged string with all the arguments
     */
-    BrokerApp(CoreType ctype, const std::string& brokerName, const std::string& argString);
+    BrokerApp(CoreType ctype, std::string_view brokerName, std::string_view argString);
 
     /** create a BrokerApp from a broker pointer*/
     explicit BrokerApp(std::shared_ptr<Broker> brk);
@@ -92,13 +92,13 @@ class HELICS_CXX_EXPORT BrokerApp {
     /** wait for the broker to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
     /** link two endpoints source to destination*/
-    void linkEndpoints(const std::string& source, const std::string& target);
+    void linkEndpoints(std::string_view source, std::string_view target);
     /** link a publication and input*/
-    void dataLink(const std::string& source, const std::string& target);
+    void dataLink(std::string_view source, std::string_view target);
     /** add a source Filter to an endpoint*/
-    void addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint);
+    void addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint);
     /** add a destination Filter to an endpoint*/
-    void addDestinationFilterToEndpoint(const std::string& filter, const std::string& endpoint);
+    void addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint);
     /** make connections between interfaces with a file*/
     void makeConnections(const std::string& file);
     /** get the identifier of the broker*/
@@ -113,8 +113,8 @@ class HELICS_CXX_EXPORT BrokerApp {
     slower but well ordered queries)
     @return a string containing the query results
     */
-    std::string query(const std::string& target,
-                      const std::string& queryStr,
+    std::string query(std::string_view target,
+                      std::string_view queryStr,
                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
     /** set a federation global value
      @details this overwrites any previous value for this name
@@ -123,7 +123,7 @@ class HELICS_CXX_EXPORT BrokerApp {
      @param valueName the name of the global to set
      @param value the value of the global
      */
-    void setGlobal(const std::string& valueName, const std::string& value);
+    void setGlobal(std::string_view valueName, std::string_view value);
 
     /** send a command to a specific target
    @details the format is somewhat unspecified; target is the name of an object, typically one of
@@ -133,12 +133,12 @@ class HELICS_CXX_EXPORT BrokerApp {
    @param mode the ordering mode to use (fast for asynchronous priority channels, and ordered for
     slower but well ordered commands)
    */
-    void sendCommand(const std::string& target,
-                     const std::string& commandStr,
+    void sendCommand(std::string_view target,
+                     std::string_view commandStr,
                      HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** set the log file to use for the broker*/
-    void setLogFile(const std::string& logFile);
+    void setLogFile(std::string_view logFile);
     /** set the minimum log level to use in the broker*/
     void setLoggingLevel(int loglevel);
     /** clear the pointer to the broker*/
@@ -171,7 +171,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     /** clear a global time Barrier*/
     void clearTimeBarrier();
     /** generate a global error that will halt a co-simulation*/
-    void globalError(int32_t errorCode, const std::string& errorString);
+    void globalError(int32_t errorCode, std::string_view errorString);
 
   private:
     void processArgs(std::unique_ptr<helicsCLI11App>& app);

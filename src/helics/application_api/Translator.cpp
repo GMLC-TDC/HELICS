@@ -16,19 +16,18 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-static const std::map<std::string, TranslatorTypes> translatorTypes{{"json", TranslatorTypes::JSON},
-                                                                    {"binary",
-                                                                     TranslatorTypes::BINARY},
-                                                                    {"custom",
-                                                                     TranslatorTypes::CUSTOM}};
+static const std::map<std::string_view, TranslatorTypes> translatorTypes{
+    {"json", TranslatorTypes::JSON},
+    {"binary", TranslatorTypes::BINARY},
+    {"custom", TranslatorTypes::CUSTOM}};
 
-TranslatorTypes translatorTypeFromString(const std::string& translatorType) noexcept
+TranslatorTypes translatorTypeFromString(std::string_view translatorType) noexcept
 {
     auto fnd = translatorTypes.find(translatorType);
     if (fnd != translatorTypes.end()) {
         return fnd->second;
     }
-    auto nfilt = translatorType;
+    std::string nfilt{translatorType};
     std::transform(nfilt.begin(), nfilt.end(), nfilt.begin(), ::tolower);
     fnd = translatorTypes.find(nfilt);
     if (fnd != translatorTypes.end()) {
@@ -91,14 +90,14 @@ void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> t
 
 static const std::string emptyStr;
 
-void Translator::set(const std::string& property, double val)
+void Translator::set(std::string_view property, double val)
 {
     if (transOp) {
         transOp->set(property, val);
     }
 }
 
-void Translator::setString(const std::string& property, const std::string& val)
+void Translator::setString(std::string_view property, std::string_view val)
 {
     if (transOp) {
         transOp->setString(property, val);

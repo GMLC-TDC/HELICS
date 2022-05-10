@@ -17,7 +17,7 @@ namespace helics {
 // timeoutMon is a unique_ptr
 EmptyCore::EmptyCore() noexcept {}
 
-void EmptyCore::configure(const std::string& /*configureString*/) {}
+void EmptyCore::configure(std::string_view /*configureString*/) {}
 
 void EmptyCore::configureFromArgs(int /*argc*/, char* /*argv*/[]) {}
 
@@ -70,14 +70,14 @@ bool EmptyCore::hasError() const
 }
 void EmptyCore::globalError(LocalFederateId /*federateID*/,
                             int errorCode,
-                            const std::string& errorString)
+                            std::string_view errorString)
 {
     throw(FederateError(errorCode, errorString));
 }
 
 void EmptyCore::localError(LocalFederateId /*federateID*/,
                            int errorCode,
-                           const std::string& errorString)
+                           std::string_view errorString)
 {
     throw(FederateError(errorCode, errorString));
 }
@@ -104,7 +104,7 @@ IterationResult EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
     return IterationResult::HALTED;
 }
 
-LocalFederateId EmptyCore::registerFederate(const std::string& /*name*/,
+LocalFederateId EmptyCore::registerFederate(std::string_view /*name*/,
                                             const CoreFederateInfo& /*info*/)
 {
     throw(RegistrationFailure(std::string("Registration is not possible for Null Core")));
@@ -117,7 +117,7 @@ const std::string& EmptyCore::getFederateName(LocalFederateId /*federateID*/) co
 
 static const std::string unknownString("#unknown");
 
-LocalFederateId EmptyCore::getFederateId(const std::string& /*name*/) const
+LocalFederateId EmptyCore::getFederateId(std::string_view /*name*/) const
 {
     return {};
 }
@@ -186,9 +186,9 @@ bool EmptyCore::getFlagOption(LocalFederateId /*federateID*/, int32_t /*flag*/) 
 static const std::string emptyString;
 
 InterfaceHandle EmptyCore::registerInput(LocalFederateId /*federateID*/,
-                                         const std::string& /*key*/,
-                                         const std::string& /*type*/,
-                                         const std::string& /*units*/)
+                                         std::string_view /*key*/,
+                                         std::string_view /*type*/,
+                                         std::string_view /*units*/)
 {
     return {};
 }
@@ -200,22 +200,21 @@ InterfaceHandle EmptyCore::registerTranslator(std::string_view /*translatorName*
     return {};
 }
 
-InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/,
-                                    const std::string& /*key*/) const
+InterfaceHandle EmptyCore::getInput(LocalFederateId /*federateID*/, std::string_view /*key*/) const
 {
     return {};
 }
 
 InterfaceHandle EmptyCore::registerPublication(LocalFederateId /*federateID*/,
-                                               const std::string& /*key*/,
-                                               const std::string& /*type*/,
-                                               const std::string& /*units*/)
+                                               std::string_view /*key*/,
+                                               std::string_view /*type*/,
+                                               std::string_view /*units*/)
 {
     return {};
 }
 
 InterfaceHandle EmptyCore::getPublication(LocalFederateId /*federateID*/,
-                                          const std::string& /*key*/) const
+                                          std::string_view /*key*/) const
 {
     return {};
 }
@@ -308,67 +307,65 @@ const std::vector<InterfaceHandle>& EmptyCore::getValueUpdates(LocalFederateId /
 }
 
 InterfaceHandle EmptyCore::registerEndpoint(LocalFederateId /*federateID*/,
-                                            const std::string& /*name*/,
-                                            const std::string& /*type*/)
+                                            std::string_view /*name*/,
+                                            std::string_view /*type*/)
 {
     return {};
 }
 
 InterfaceHandle EmptyCore::registerTargetedEndpoint(LocalFederateId /*federateID*/,
-                                                    const std::string& /*name*/,
-                                                    const std::string& /*type*/)
+                                                    std::string_view /*name*/,
+                                                    std::string_view /*type*/)
 {
     return {};
 }
 
 InterfaceHandle EmptyCore::getEndpoint(LocalFederateId /*federateID*/,
-                                       const std::string& /*name*/) const
+                                       std::string_view /*name*/) const
 {
     return {};
 }
 
-InterfaceHandle EmptyCore::registerFilter(const std::string& /*filterName*/,
-                                          const std::string& /*type_in*/,
-                                          const std::string& /*type_out*/)
+InterfaceHandle EmptyCore::registerFilter(std::string_view /*filterName*/,
+                                          std::string_view /*type_in*/,
+                                          std::string_view /*type_out*/)
 {
     return {};
 }
 
-InterfaceHandle EmptyCore::registerCloningFilter(const std::string& /*filterName*/,
-                                                 const std::string& /*type_in*/,
-                                                 const std::string& /*type_out*/)
+InterfaceHandle EmptyCore::registerCloningFilter(std::string_view /*filterName*/,
+                                                 std::string_view /*type_in*/,
+                                                 std::string_view /*type_out*/)
 {
     return {};
 }
 
-InterfaceHandle EmptyCore::getFilter(const std::string& /*name*/) const
+InterfaceHandle EmptyCore::getFilter(std::string_view /*name*/) const
 {
     return {};
 }
 
-InterfaceHandle EmptyCore::getTranslator(const std::string& /*name*/) const
+InterfaceHandle EmptyCore::getTranslator(std::string_view /*name*/) const
 {
     return {};
 }
 void EmptyCore::makeConnections(const std::string& /*file*/) {}
 
-void EmptyCore::linkEndpoints(const std::string& /*source*/, const std::string& /*dest*/) {}
+void EmptyCore::linkEndpoints(std::string_view /*source*/, std::string_view /*dest*/) {}
 
-void EmptyCore::dataLink(const std::string& /*source*/, const std::string& /*target*/) {}
+void EmptyCore::dataLink(std::string_view /*source*/, std::string_view /*target*/) {}
 
-void EmptyCore::addSourceFilterToEndpoint(const std::string& /*filter*/,
-                                          const std::string& /*endpoint*/)
+void EmptyCore::addSourceFilterToEndpoint(std::string_view /*filter*/,
+                                          std::string_view /*endpoint*/)
 {
 }
 
-void EmptyCore::addDestinationFilterToEndpoint(const std::string& /*filter*/,
-                                               const std::string& /*endpoint*/)
+void EmptyCore::addDestinationFilterToEndpoint(std::string_view /*filter*/,
+                                               std::string_view /*endpoint*/)
 {
 }
 
-void EmptyCore::addDependency(LocalFederateId /*federateID*/, const std::string& /*federateName*/)
-{
-}
+void EmptyCore::addDependency(LocalFederateId /*federateID*/, std::string_view /*federateName*/) {}
 
 void EmptyCore::sendTo(InterfaceHandle /*sourceHandle*/,
                        const void* /*data*/,
@@ -421,7 +418,7 @@ uint64_t EmptyCore::receiveCountAny(LocalFederateId /*federateID*/)
 
 void EmptyCore::logMessage(LocalFederateId /*federateID*/,
                            int logLevel,
-                           const std::string& messageToLog)
+                           std::string_view messageToLog)
 {
     if (logLevel <= HELICS_LOG_LEVEL_WARNING) {
         std::cerr << messageToLog << std::endl;
@@ -432,7 +429,7 @@ void EmptyCore::logMessage(LocalFederateId /*federateID*/,
 
 void EmptyCore::setLoggingLevel(int /*logLevel*/) {}
 
-void EmptyCore::setLogFile(const std::string& /*lfile*/) {}
+void EmptyCore::setLogFile(std::string_view /*lfile*/) {}
 
 std::pair<std::string, std::string> EmptyCore::getCommand(LocalFederateId /*federateID*/)
 {
@@ -464,7 +461,7 @@ void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
 {
 }
 
-static std::string quickCoreQueries(const std::string& queryStr)
+static std::string quickCoreQueries(std::string_view queryStr)
 {
     if ((queryStr == "queries") || (queryStr == "available_queries")) {
         return "[\"isinit\",\"isconnected\",\"exists\",\"name\",\"identifier\",\"address\",\"queries\",\"address\",\"federates\",\"inputs\",\"endpoints\",\"filtered_endpoints\","
@@ -485,8 +482,8 @@ static std::string quickCoreQueries(const std::string& queryStr)
     return generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Core is disconnected");
 }
 
-std::string EmptyCore::query(const std::string& target,
-                             const std::string& queryStr,
+std::string EmptyCore::query(std::string_view target,
+                             std::string_view queryStr,
                              HelicsSequencingModes /*mode*/)
 {
     if (target == "core" || target == getIdentifier() || target.empty()) {
@@ -495,11 +492,11 @@ std::string EmptyCore::query(const std::string& target,
     return generateJsonErrorResponse(JsonErrorCodes::DISCONNECTED, "Federate is disconnected");
 }
 
-void EmptyCore::setGlobal(const std::string& /*valueName*/, const std::string& /*value*/) {}
+void EmptyCore::setGlobal(std::string_view /*valueName*/, std::string_view /*value*/) {}
 
-void EmptyCore::sendCommand(const std::string& /*target*/,
-                            const std::string& /*commandStr*/,
-                            const std::string& /*source*/,
+void EmptyCore::sendCommand(std::string_view /*target*/,
+                            std::string_view /*commandStr*/,
+                            std::string_view /*source*/,
                             HelicsSequencingModes /*mode*/)
 {
 }
@@ -509,30 +506,29 @@ const std::string& EmptyCore::getInterfaceInfo(InterfaceHandle /*handle*/) const
     return emptyStr;
 }
 
-void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string /*info*/) {}
+void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string_view /*info*/) {}
 
 const std::string& EmptyCore::getInterfaceTag(InterfaceHandle /*handle*/,
-                                              const std::string& /*tag*/) const
+                                              std::string_view /*tag*/) const
 {
     return emptyStr;
 }
 
 void EmptyCore::setInterfaceTag(InterfaceHandle /*handle*/,
-                                const std::string& /*tag*/,
-                                const std::string& /*value*/)
+                                std::string_view /*tag*/,
+                                std::string_view /*value*/)
 {
 }
 
 const std::string& EmptyCore::getFederateTag(LocalFederateId /*fid*/,
-                                             const std::string& /*tag*/) const
+                                             std::string_view /*tag*/) const
 {
     return emptyStr;
 }
 
 void EmptyCore::setFederateTag(LocalFederateId /*fid*/,
-                               const std::string& /*tag*/
-                               ,
-                               const std::string& /*value*/)
+                               std::string_view /*tag*/,
+                               std::string_view /*value*/)
 {
 }
 

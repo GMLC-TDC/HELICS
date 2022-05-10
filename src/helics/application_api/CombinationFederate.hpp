@@ -24,14 +24,14 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param fi  a federate information structure
     */
-    explicit CombinationFederate(const std::string& fedName, const FederateInfo& fi);
+    explicit CombinationFederate(std::string_view fedName, const FederateInfo& fi);
 
     /**constructor taking a federate information structure and using the given core
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-    CombinationFederate(const std::string& fedName,
+    CombinationFederate(std::string_view fedName,
                         const std::shared_ptr<Core>& core,
                         const FederateInfo& fi = FederateInfo{});
 
@@ -40,7 +40,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     @param core a CoreApp object representing the core to connect to
     @param fi  a federate information structure
     */
-    CombinationFederate(const std::string& fedName,
+    CombinationFederate(std::string_view fedName,
                         CoreApp& core,
                         const FederateInfo& fi = FederateInfo{});
 
@@ -49,7 +49,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string
     containing JSON code or a string with command line arguments
     */
-    CombinationFederate(const std::string& fedName, const std::string& configString);
+    CombinationFederate(std::string_view fedName, const std::string& configString);
 
     /**constructor taking a file with the required information
      @param configString can be either a JSON file a TOML file (with extension TOML) or a string
@@ -74,7 +74,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition() override;
     virtual void initializeToExecuteStateTransition(IterationResult result) override;
-    virtual std::string localQuery(const std::string& queryStr) const override;
+    virtual std::string localQuery(std::string_view queryStr) const override;
 
   public:
     virtual void registerInterfaces(const std::string& configString) override;

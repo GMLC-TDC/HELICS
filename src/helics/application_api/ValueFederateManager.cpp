@@ -55,11 +55,11 @@ int getTypeSize(const std::string& type)
     return (ret == typeSizes.end()) ? (-1) : ret->second;
 }
 
-static const std::string jsonStringType{"json"};
+static constexpr std::string_view jsonStringType{"json"};
 
-Publication& ValueFederateManager::registerPublication(const std::string& key,
-                                                       std::string type,
-                                                       const std::string& units)
+Publication& ValueFederateManager::registerPublication(std::string_view key,
+                                                       std::string_view type,
+                                                       std::string_view units)
 {
     type = useJsonSerialization ? jsonStringType : getCleanedTypeName(type);
     auto coreID = coreObject->registerPublication(fedID, key, type, units);
@@ -78,9 +78,9 @@ Publication& ValueFederateManager::registerPublication(const std::string& key,
     throw(RegistrationFailure("Unable to register Publication"));
 }
 
-Input& ValueFederateManager::registerInput(const std::string& key,
-                                           std::string type,
-                                           const std::string& units)
+Input& ValueFederateManager::registerInput(std::string_view key,
+                                           std::string_view type,
+                                           std::string_view units)
 {
     type = useJsonSerialization ? jsonStringType : getCleanedTypeName(type);
     auto coreID = coreObject->registerInput(fedID, key, type, units);
@@ -107,7 +107,7 @@ Input& ValueFederateManager::registerInput(const std::string& key,
     throw(RegistrationFailure("Unable to register Input"));
 }
 
-void ValueFederateManager::addAlias(const Input& inp, const std::string& shortcutName)
+void ValueFederateManager::addAlias(const Input& inp, std::string_view shortcutName)
 {
     if (inp.isValid()) {
         auto inpHandle = inputs.lock();
@@ -118,7 +118,7 @@ void ValueFederateManager::addAlias(const Input& inp, const std::string& shortcu
     }
 }
 
-void ValueFederateManager::addAlias(const Publication& pub, const std::string& shortcutName)
+void ValueFederateManager::addAlias(const Publication& pub, std::string_view shortcutName)
 {
     if (pub.isValid()) {
         auto pubHandle = publications.lock();
@@ -311,7 +311,7 @@ void ValueFederateManager::initializeToExecuteStateTransition(IterationResult re
     updateTime(ctime, initializationTime);
 }
 
-std::string ValueFederateManager::localQuery(const std::string& queryStr) const
+std::string ValueFederateManager::localQuery(std::string_view queryStr) const
 {
     std::string ret;
     if (queryStr == "inputs") {
@@ -417,7 +417,7 @@ const std::string& ValueFederateManager::getTarget(const Input& inp) const
 static const Input invalidIpt{};
 static Input invalidIptNC{};
 
-const Input& ValueFederateManager::getInput(const std::string& key) const
+const Input& ValueFederateManager::getInput(std::string_view key) const
 {
     auto inpHandle = inputs.lock_shared();
     auto inpF = inpHandle->find(key);
@@ -427,7 +427,7 @@ const Input& ValueFederateManager::getInput(const std::string& key) const
     return invalidIpt;
 }
 
-Input& ValueFederateManager::getInput(const std::string& key)
+Input& ValueFederateManager::getInput(std::string_view key)
 {
     auto inpHandle = inputs.lock();
     auto inpF = inpHandle->find(key);
@@ -455,10 +455,10 @@ Input& ValueFederateManager::getInput(int index)
     return invalidIptNC;
 }
 
-const Input& ValueFederateManager::getSubscription(const std::string& key) const
+const Input& ValueFederateManager::getSubscription(std::string_view key) const
 {
     auto TIDhandle = targetIDs.lock_shared();
-    auto res = TIDhandle->equal_range(key);
+    auto res = TIDhandle->equal_range(std::string(key));
     if (res.first != res.second) {
         auto inps = inputs.lock_shared();
         auto ret = inps->find(res.first->second);
@@ -469,10 +469,10 @@ const Input& ValueFederateManager::getSubscription(const std::string& key) const
     return invalidIpt;
 }
 
-Input& ValueFederateManager::getSubscription(const std::string& key)
+Input& ValueFederateManager::getSubscription(std::string_view key)
 {
     auto TIDhandle = targetIDs.lock_shared();
-    auto res = TIDhandle->equal_range(key);
+    auto res = TIDhandle->equal_range(std::string(key));
     if (res.first != res.second) {
         auto inps = inputs.lock();
         auto ret = inps->find(res.first->second);
@@ -486,7 +486,7 @@ Input& ValueFederateManager::getSubscription(const std::string& key)
 static const Publication invalidPub{};
 static Publication invalidPubNC{};
 
-const Publication& ValueFederateManager::getPublication(const std::string& key) const
+const Publication& ValueFederateManager::getPublication(std::string_view key) const
 {
     auto pubHandle = publications.lock_shared();
     auto pubF = pubHandle->find(key);
@@ -496,7 +496,7 @@ const Publication& ValueFederateManager::getPublication(const std::string& key) 
     return invalidPub;
 }
 
-Publication& ValueFederateManager::getPublication(const std::string& key)
+Publication& ValueFederateManager::getPublication(std::string_view key)
 {
     auto pubHandle = publications.lock();
     auto pubF = pubHandle->find(key);

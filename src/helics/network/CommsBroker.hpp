@@ -29,7 +29,7 @@ class CommsBroker: public BrokerT {
     /** create from a single argument*/
     explicit CommsBroker(bool arg) noexcept;
     /** create from an object name*/
-    explicit CommsBroker(const std::string& obj_name);
+    explicit CommsBroker(std::string_view obj_name);
     /** destructor*/
     ~CommsBroker();
 
@@ -45,7 +45,7 @@ class CommsBroker: public BrokerT {
     virtual void transmit(route_id rid, const ActionMessage& cmd) override;
     virtual void transmit(route_id rid, ActionMessage&& cmd) override;
 
-    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) override;
+    virtual void addRoute(route_id rid, int interfaceId, std::string_view routeInfo) override;
 
     virtual void removeRoute(route_id rid) override;
     /** get a pointer to the comms object*/

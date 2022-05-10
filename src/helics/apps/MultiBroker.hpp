@@ -42,7 +42,7 @@ class MultiBroker: public CoreBroker {
     /** construct from command line arguments
     @param brokerName the name of the broker
     */
-    explicit MultiBroker(const std::string& brokerName);
+    explicit MultiBroker(std::string_view brokerName);
 
     /** destructor*/
     ~MultiBroker();
@@ -62,7 +62,7 @@ class MultiBroker: public CoreBroker {
     virtual void transmit(route_id rid, const ActionMessage& cmd) override;
     virtual void transmit(route_id rid, ActionMessage&& cmd) override;
 
-    virtual void addRoute(route_id rid, int interfaceId, const std::string& routeInfo) override;
+    virtual void addRoute(route_id rid, int interfaceId, std::string_view routeInfo) override;
 
     virtual void removeRoute(route_id rid) override;
 };

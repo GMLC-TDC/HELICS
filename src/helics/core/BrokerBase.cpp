@@ -63,7 +63,7 @@ BrokerBase::BrokerBase(bool DisableQueue) noexcept:
 {
 }
 
-BrokerBase::BrokerBase(const std::string& broker_name, bool DisableQueue):
+BrokerBase::BrokerBase(std::string_view broker_name, bool DisableQueue):
     identifier(broker_name), queueDisabled(DisableQueue),
     mLogManager(std::make_shared<LogManager>())
 {
@@ -80,10 +80,9 @@ BrokerBase::~BrokerBase()
         }
     }
 }
-std::function<void(int, const std::string&, const std::string&)>
-    BrokerBase::getLoggingCallback() const
+std::function<void(int, std::string_view, std::string_view)> BrokerBase::getLoggingCallback() const
 {
-    return [this](int level, const std::string& name, const std::string& message) {
+    return [this](int level, std::string_view name, std::string_view message) {
         sendToLogger(global_id.load(), level, name, message);
     };
 }
@@ -265,12 +264,12 @@ int BrokerBase::parseArgs(std::vector<std::string> args)
     return static_cast<int>(res);
 }
 
-int BrokerBase::parseArgs(const std::string& initializationString)
+int BrokerBase::parseArgs(std::string_view initializationString)
 {
     auto app = generateBaseCLI();
     auto sApp = generateCLI();
     app->add_subcommand(sApp);
-    auto res = app->helics_parse(initializationString);
+    auto res = app->helics_parse(std::string(initializationString));
     return static_cast<int>(res);
 }
 

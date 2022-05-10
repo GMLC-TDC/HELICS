@@ -10,14 +10,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownPublication(const std::string& key,
+void UnknownHandleManager::addUnknownPublication(std::string_view key,
                                                  GlobalHandle target,
                                                  uint16_t flags)
 {
     unknown_publications.emplace(key, std::make_pair(target, flags));
 }
 /** add a missingPublication*/
-void UnknownHandleManager::addUnknownInput(const std::string& key,
+void UnknownHandleManager::addUnknownInput(std::string_view key,
                                            GlobalHandle target,
                                            uint16_t flags)
 {
@@ -25,38 +25,37 @@ void UnknownHandleManager::addUnknownInput(const std::string& key,
 }
 
 /** add a missing destination endpoint*/
-void UnknownHandleManager::addUnknownEndpoint(const std::string& key,
+void UnknownHandleManager::addUnknownEndpoint(std::string_view key,
                                               GlobalHandle target,
                                               uint16_t flags)
 {
     unknown_endpoints.emplace(key, std::make_pair(target, flags));
 }
 /** add a missing filter*/
-void UnknownHandleManager::addUnknownFilter(const std::string& key,
+void UnknownHandleManager::addUnknownFilter(std::string_view key,
                                             GlobalHandle target,
                                             uint16_t flags)
 {
     unknown_filters.emplace(key, std::make_pair(target, flags));
 }
 
-void UnknownHandleManager::addDataLink(const std::string& source, const std::string& target)
+void UnknownHandleManager::addDataLink(std::string_view source, std::string_view target)
 {
     unknown_links.emplace(source, target);
 }
 
-void UnknownHandleManager::addEndpointLink(const std::string& source, const std::string& target)
+void UnknownHandleManager::addEndpointLink(std::string_view source, std::string_view target)
 {
     unknown_endpoint_links.emplace(source, target);
 }
 
-void UnknownHandleManager::addSourceFilterLink(const std::string& filter,
-                                               const std::string& endpoint)
+void UnknownHandleManager::addSourceFilterLink(std::string_view filter, std::string_view endpoint)
 {
     unknown_src_filters.emplace(filter, endpoint);
 }
 
-void UnknownHandleManager::addDestinationFilterLink(const std::string& filter,
-                                                    const std::string& endpoint)
+void UnknownHandleManager::addDestinationFilterLink(std::string_view filter,
+                                                    std::string_view endpoint)
 {
     unknown_dest_filters.emplace(filter, endpoint);
 }

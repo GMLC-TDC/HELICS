@@ -64,7 +64,7 @@ std::unique_ptr<Message> CustomTranslatorOperator::convertToMessage(const SmallB
     return {};
 }
 
-void TranslatorOperations::set(const std::string& property, double /*val*/)
+void TranslatorOperations::set(std::string_view property, double /*val*/)
 {
     if (property == "delay") {
     } else if (property == "inputdelay") {
@@ -72,7 +72,7 @@ void TranslatorOperations::set(const std::string& property, double /*val*/)
     }
 }
 
-void TranslatorOperations::setString(const std::string& property, const std::string& /*val*/)
+void TranslatorOperations::setString(std::string_view property, std::string_view /*val*/)
 {
     if (property == "delay") {
     } else if (property == "inputdelay") {

@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "Federate.hpp"
-#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewOps.h"
 
 #include <algorithm>
 #include <thread>
@@ -16,7 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
+std::vector<std::string> vectorizeQueryResult(std::string_view queryres)
 {
     if (queryres.empty()) {
         return std::vector<std::string>();
@@ -45,39 +45,11 @@ std::vector<std::string> vectorizeQueryResult(std::string&& queryres)
         }
     }
     std::vector<std::string> res;
-    res.push_back(std::move(queryres));
+    res.emplace_back(queryres);
     return res;
 }
 
-std::vector<std::string> vectorizeQueryResult(const std::string& queryres)
-{
-    if (queryres.front() == '[') {
-        try {
-            auto v = fileops::loadJsonStr(queryres);
-            std::vector<std::string> strs;
-            if (v.isArray()) {
-                for (auto& str : v) {
-                    if (str.isString()) {
-                        strs.emplace_back(str.asCString());
-                    } else {
-                        strs.emplace_back(fileops::generateJsonString(str));
-                    }
-                }
-            } else if (v.isString()) {
-                strs.emplace_back(v.asCString());
-            } else {
-                strs.emplace_back(fileops::generateJsonString(v));
-            }
-            return strs;
-        }
-        catch (...) {
-        }
-    }
-    std::vector<std::string> res{queryres};
-    return res;
-}
-
-std::vector<int> vectorizeIndexQuery(const std::string& queryres)
+std::vector<int> vectorizeIndexQuery(std::string_view queryres)
 {
     std::vector<int> result;
     if (queryres.empty()) {
@@ -104,7 +76,7 @@ std::vector<int> vectorizeIndexQuery(const std::string& queryres)
             } else if (v.isString()) {
                 result.push_back(std::stoi(v.asString()));
             } else {
-                result.push_back(std::stoi(queryres));
+                result.push_back(std::stoi(std::string(queryres)));
             }
             return result;
         }
@@ -112,30 +84,21 @@ std::vector<int> vectorizeIndexQuery(const std::string& queryres)
         }
     }
     try {
-        result.push_back(std::stoi(queryres));
+        result.push_back(std::stoi(std::string(queryres)));
     }
     catch (const std::invalid_argument&) {
     }
     return result;
 }
 
-std::vector<std::string> vectorizeAndSortQueryResult(const std::string& queryres)
+std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres)
 {
     auto vec = vectorizeQueryResult(queryres);
     std::sort(vec.begin(), vec.end());
     return vec;
 }
 
-std::vector<std::string> vectorizeAndSortQueryResult(std::string&& queryres)
-{
-    auto vec = vectorizeQueryResult(std::move(queryres));
-    std::sort(vec.begin(), vec.end());
-    return vec;
-}
-
-bool waitForInit(helics::Federate* fed,
-                 const std::string& fedName,
-                 std::chrono::milliseconds timeout)
+bool waitForInit(helics::Federate* fed, std::string_view fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "isinit", HELICS_SEQUENCING_MODE_ORDERED);
     std::chrono::milliseconds waitTime{0};
@@ -154,9 +117,7 @@ bool waitForInit(helics::Federate* fed,
     return true;
 }
 
-bool waitForFed(helics::Federate* fed,
-                const std::string& fedName,
-                std::chrono::milliseconds timeout)
+bool waitForFed(helics::Federate* fed, std::string_view fedName, std::chrono::milliseconds timeout)
 {
     auto res = fed->query(fedName, "exists");
     std::chrono::milliseconds waitTime{0};
@@ -172,7 +133,7 @@ bool waitForFed(helics::Federate* fed,
     return true;
 }
 
-std::string queryFederateSubscriptions(helics::Federate* fed, const std::string& fedName)
+std::string queryFederateSubscriptions(helics::Federate* fed, std::string_view fedName)
 {
     auto res = fed->query(fedName, "subscriptions", HELICS_SEQUENCING_MODE_ORDERED);
     if (res.size() > 2 && res.find("error") == std::string::npos) {

@@ -23,7 +23,7 @@ class EmptyCore: public Core {
 
     virtual ~EmptyCore();
 
-    virtual void configure(const std::string& configureString) override;
+    virtual void configure(std::string_view configureString) override;
     virtual void configureFromArgs(int argc, char* argv[]) override;
     virtual void configureFromVector(std::vector<std::string> args) override;
     virtual bool isConfigured() const override;
@@ -31,10 +31,10 @@ class EmptyCore: public Core {
     virtual bool hasError() const override;
     virtual void globalError(LocalFederateId federateID,
                              int errorCode,
-                             const std::string& errorString) override;
+                             std::string_view errorString) override;
     virtual void localError(LocalFederateId federateID,
                             int errorCode,
-                            const std::string& errorString) override;
+                            std::string_view errorString) override;
     virtual int getErrorCode() const override;
     virtual std::string getErrorMessage() const override;
     virtual void finalize(LocalFederateId federateID) override;
@@ -42,10 +42,10 @@ class EmptyCore: public Core {
     virtual void setCoreReadyToInit() override;
     virtual IterationResult enterExecutingMode(LocalFederateId federateID,
                                                IterationRequest iterate = NO_ITERATION) override;
-    virtual LocalFederateId registerFederate(const std::string& name,
+    virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) override;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override;
-    virtual LocalFederateId getFederateId(const std::string& name) const override;
+    virtual LocalFederateId getFederateId(std::string_view name) const override;
     virtual int32_t getFederationSize() override;
     virtual Time timeRequest(LocalFederateId federateID, Time next) override;
     virtual iteration_time requestTimeIterative(LocalFederateId federateID,
@@ -66,18 +66,18 @@ class EmptyCore: public Core {
     virtual bool getFlagOption(LocalFederateId federateID, int32_t flag) const override;
 
     virtual InterfaceHandle registerPublication(LocalFederateId federateID,
-                                                const std::string& key,
-                                                const std::string& type,
-                                                const std::string& units) override;
+                                                std::string_view key,
+                                                std::string_view type,
+                                                std::string_view units) override;
     virtual InterfaceHandle getPublication(LocalFederateId federateID,
-                                           const std::string& key) const override;
+                                           std::string_view key) const override;
     virtual InterfaceHandle registerInput(LocalFederateId federateID,
-                                          const std::string& key,
-                                          const std::string& type,
-                                          const std::string& units) override;
+                                          std::string_view key,
+                                          std::string_view type,
+                                          std::string_view units) override;
 
     virtual InterfaceHandle getInput(LocalFederateId federateID,
-                                     const std::string& key) const override;
+                                     std::string_view key) const override;
 
     virtual InterfaceHandle registerTranslator(std::string_view translatorName,
                                                std::string_view message_type,
@@ -111,31 +111,30 @@ class EmptyCore: public Core {
     virtual const std::vector<InterfaceHandle>&
         getValueUpdates(LocalFederateId federateID) override;
     virtual InterfaceHandle registerEndpoint(LocalFederateId federateID,
-                                             const std::string& name,
-                                             const std::string& type) override;
+                                             std::string_view name,
+                                             std::string_view type) override;
 
     virtual InterfaceHandle registerTargetedEndpoint(LocalFederateId federateID,
-                                                     const std::string& name,
-                                                     const std::string& type) override;
+                                                     std::string_view name,
+                                                     std::string_view type) override;
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
-                                        const std::string& name) const override;
-    virtual InterfaceHandle registerFilter(const std::string& filterName,
-                                           const std::string& type_in,
-                                           const std::string& type_out) override;
-    virtual InterfaceHandle registerCloningFilter(const std::string& filterName,
-                                                  const std::string& type_in,
-                                                  const std::string& type_out) override;
-    virtual InterfaceHandle getFilter(const std::string& name) const override;
-    virtual InterfaceHandle getTranslator(const std::string& name) const override;
-    virtual void addDependency(LocalFederateId federateID,
-                               const std::string& federateName) override;
-    virtual void linkEndpoints(const std::string& source, const std::string& dest) override;
+                                        std::string_view name) const override;
+    virtual InterfaceHandle registerFilter(std::string_view filterName,
+                                           std::string_view type_in,
+                                           std::string_view type_out) override;
+    virtual InterfaceHandle registerCloningFilter(std::string_view filterName,
+                                                  std::string_view type_in,
+                                                  std::string_view type_out) override;
+    virtual InterfaceHandle getFilter(std::string_view name) const override;
+    virtual InterfaceHandle getTranslator(std::string_view name) const override;
+    virtual void addDependency(LocalFederateId federateID, std::string_view federateName) override;
+    virtual void linkEndpoints(std::string_view source, std::string_view dest) override;
     virtual void makeConnections(const std::string& file) override;
-    virtual void dataLink(const std::string& source, const std::string& target) override;
-    virtual void addSourceFilterToEndpoint(const std::string& filter,
-                                           const std::string& endpoint) override;
-    virtual void addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& endpoint) override;
+    virtual void dataLink(std::string_view source, std::string_view target) override;
+    virtual void addSourceFilterToEndpoint(std::string_view filter,
+                                           std::string_view endpoint) override;
+    virtual void addDestinationFilterToEndpoint(std::string_view filter,
+                                                std::string_view endpoint) override;
     virtual void send(InterfaceHandle sourceHandle, const void* data, uint64_t length) override;
     virtual void
         sendAt(InterfaceHandle sourceHandle, const void* data, uint64_t length, Time time) override;
@@ -157,7 +156,7 @@ class EmptyCore: public Core {
     virtual uint64_t receiveCountAny(LocalFederateId federateID) override;
     virtual void logMessage(LocalFederateId federateID,
                             int logLevel,
-                            const std::string& messageToLog) override;
+                            std::string_view messageToLog) override;
     virtual void setFilterOperator(InterfaceHandle filter,
                                    std::shared_ptr<FilterOperator> callback) override;
     virtual void setTranslatorOperator(InterfaceHandle translator,
@@ -172,18 +171,18 @@ class EmptyCore: public Core {
         LocalFederateId federateID,
         std::function<void(int, std::string_view, std::string_view)> logFunction) override;
 
-    virtual void setLogFile(const std::string& lfile) override;
+    virtual void setLogFile(std::string_view lfile) override;
 
-    virtual std::string query(const std::string& target,
-                              const std::string& queryStr,
+    virtual std::string query(std::string_view target,
+                              std::string_view queryStr,
                               HelicsSequencingModes mode) override;
     virtual void
         setQueryCallback(LocalFederateId federateID,
                          std::function<std::string(std::string_view)> queryFunction) override;
-    virtual void setGlobal(const std::string& valueName, const std::string& value) override;
-    virtual void sendCommand(const std::string& target,
-                             const std::string& commandStr,
-                             const std::string& source,
+    virtual void setGlobal(std::string_view valueName, std::string_view value) override;
+    virtual void sendCommand(std::string_view target,
+                             std::string_view commandStr,
+                             std::string_view source,
                              HelicsSequencingModes mode) override;
     virtual std::pair<std::string, std::string> getCommand(LocalFederateId federateID) override;
 
@@ -196,21 +195,20 @@ class EmptyCore: public Core {
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override;
 
     /** set the local information field of the interface*/
-    virtual void setInterfaceInfo(InterfaceHandle handle, std::string info) override;
+    virtual void setInterfaceInfo(InterfaceHandle handle, std::string_view info) override;
     /** get the local information field of the interface*/
     virtual const std::string& getInterfaceInfo(InterfaceHandle handle) const override;
 
     virtual void setInterfaceTag(InterfaceHandle handle,
-                                 const std::string& tag,
-                                 const std::string& value) override;
+                                 std::string_view tag,
+                                 std::string_view value) override;
     virtual const std::string& getInterfaceTag(InterfaceHandle handle,
-                                               const std::string& tag) const override;
+                                               std::string_view tag) const override;
 
-    virtual void setFederateTag(LocalFederateId fid,
-                                const std::string& tag,
-                                const std::string& value) override;
+    virtual void
+        setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value) override;
     virtual const std::string& getFederateTag(LocalFederateId fid,
-                                              const std::string& tag) const override;
+                                              std::string_view tag) const override;
 };
 
 }  // namespace helics

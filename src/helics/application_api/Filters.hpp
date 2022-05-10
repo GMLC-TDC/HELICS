@@ -30,10 +30,10 @@ enum class FilterTypes {
 
 };
 
-#define EMPTY_STRING std::string()
+#define EMPTY_STRING std::string_view()
 
 /** get the filter type from a string*/
-HELICS_CXX_EXPORT FilterTypes filterTypeFromString(const std::string& filterType) noexcept;
+HELICS_CXX_EXPORT FilterTypes filterTypeFromString(std::string_view filterType) noexcept;
 
 /** class for managing a particular filter*/
 class HELICS_CXX_EXPORT Filter: public Interface {
@@ -47,17 +47,15 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** default constructor*/
     Filter() = default;
     /** construct through a federate*/
-    explicit Filter(Federate* ffed, const std::string& filtName = EMPTY_STRING);
+    explicit Filter(Federate* ffed, std::string_view filtName = EMPTY_STRING);
     /** construct from handle and federate*/
-    Filter(Federate* ffed, const std::string& filtName, InterfaceHandle ihandle);
+    Filter(Federate* ffed, std::string_view filtName, InterfaceHandle ihandle);
     /** construct from handle and core*/
-    Filter(Core* core, const std::string& filtName, InterfaceHandle ihandle);
+    Filter(Core* core, std::string_view filtName, InterfaceHandle ihandle);
     /** construct through a federate*/
-    Filter(InterfaceVisibility locality,
-           Federate* ffed,
-           const std::string& filtName = EMPTY_STRING);
+    Filter(InterfaceVisibility locality, Federate* ffed, std::string_view filtName = EMPTY_STRING);
     /** construct through a core object*/
-    explicit Filter(Core* cr, const std::string& filtName = EMPTY_STRING);
+    explicit Filter(Core* cr, std::string_view filtName = EMPTY_STRING);
     /** virtual destructor*/
     virtual ~Filter() = default;
 
@@ -78,15 +76,15 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
     */
-    virtual void set(const std::string& property, double val);
+    virtual void set(std::string_view property, double val);
 
     /** set a string property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
     */
-    virtual void setString(const std::string& property, const std::string& val);
+    virtual void setString(std::string_view property, std::string_view val);
 
-    void addTarget(const std::string& target) { addSourceTarget(target); }
+    void addTarget(std::string_view target) { addSourceTarget(target); }
 
   protected:
     /** set a filter operations object */
@@ -102,18 +100,18 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
     CloningFilter() = default;
     /** construct from a core object
      */
-    explicit CloningFilter(Core* cr, const std::string& filtName = EMPTY_STRING);
+    explicit CloningFilter(Core* cr, std::string_view filtName = EMPTY_STRING);
     /** construct from a Federate
      */
-    explicit CloningFilter(Federate* ffed, const std::string& filtName = EMPTY_STRING);
+    explicit CloningFilter(Federate* ffed, std::string_view filtName = EMPTY_STRING);
     /** construct from a Federate
      */
     CloningFilter(InterfaceVisibility locality,
                   Federate* ffed,
-                  const std::string& filtName = EMPTY_STRING);
+                  std::string_view filtName = EMPTY_STRING);
 
     /** constructor used by FilterFederateManager*/
-    CloningFilter(Federate* ffed, const std::string& filtName, InterfaceHandle handle);
+    CloningFilter(Federate* ffed, std::string_view filtName, InterfaceHandle handle);
     /** move the filter to a new cloning filter*/
     CloningFilter(CloningFilter&& filt) = default;
     /** copy the filter, a copied filter will point to the same object*/
@@ -125,12 +123,12 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
     /** destructor */
     ~CloningFilter() = default;
     /** add a delivery address this is the name of an endpoint to deliver the message to*/
-    void addDeliveryEndpoint(const std::string& endpoint);
+    void addDeliveryEndpoint(std::string_view endpoint);
 
     /** remove a delivery address this is the name of an endpoint to deliver the message to*/
-    void removeDeliveryEndpoint(const std::string& endpoint);
+    void removeDeliveryEndpoint(std::string_view endpoint);
 
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
 
   private:
     friend class FilterFederateManager;
@@ -144,7 +142,7 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
 deactivate the filter
 */
 HELICS_CXX_EXPORT Filter&
-    make_filter(FilterTypes type, Federate* fed, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, Federate* fed, std::string_view name = EMPTY_STRING);
 
 /** create a  filter
 @param locality the visibility of the filter global or local
@@ -157,7 +155,7 @@ deactivate the filter
 HELICS_CXX_EXPORT Filter& make_filter(InterfaceVisibility locality,
                                       FilterTypes type,
                                       Federate* fed,
-                                      const std::string& name = EMPTY_STRING);
+                                      std::string_view name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
@@ -167,7 +165,7 @@ HELICS_CXX_EXPORT Filter& make_filter(InterfaceVisibility locality,
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, Core* cr, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, Core* cr, std::string_view name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
@@ -177,7 +175,7 @@ HELICS_CXX_EXPORT std::unique_ptr<Filter>
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, CoreApp& cr, const std::string& name = EMPTY_STRING);
+    make_filter(FilterTypes type, CoreApp& cr, std::string_view name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -189,8 +187,8 @@ deactivate the filter
 */
 HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(FilterTypes type,
                                                      Federate* fed,
-                                                     const std::string& delivery,
-                                                     const std::string& name = EMPTY_STRING);
+                                                     std::string_view delivery,
+                                                     std::string_view name = EMPTY_STRING);
 
 /** create a cloning filter with a specified visibility
 @param locality can be global or local
@@ -204,8 +202,8 @@ deactivate the filter
 HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(InterfaceVisibility locality,
                                                      FilterTypes type,
                                                      Federate* fed,
-                                                     const std::string& delivery,
-                                                     const std::string& name = EMPTY_STRING);
+                                                     std::string_view delivery,
+                                                     std::string_view name = EMPTY_STRING);
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
@@ -218,8 +216,8 @@ the filter
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
                         Core* cr,
-                        const std::string& delivery,
-                        const std::string& name = EMPTY_STRING);
+                        std::string_view delivery,
+                        std::string_view name = EMPTY_STRING);
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
@@ -232,7 +230,7 @@ the filter
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
                         CoreApp& cr,
-                        const std::string& delivery,
-                        const std::string& name = EMPTY_STRING);
+                        std::string_view delivery,
+                        std::string_view name = EMPTY_STRING);
 
 }  // namespace helics

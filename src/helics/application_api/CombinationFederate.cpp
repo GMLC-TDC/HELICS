@@ -11,11 +11,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 CombinationFederate::CombinationFederate() = default;
-CombinationFederate::CombinationFederate(const std::string& fedName, const FederateInfo& fi):
+CombinationFederate::CombinationFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi), ValueFederate(true), MessageFederate(true)
 {
 }
-CombinationFederate::CombinationFederate(const std::string& fedName,
+CombinationFederate::CombinationFederate(std::string_view fedName,
                                          const std::shared_ptr<Core>& core,
                                          const FederateInfo& fi):
     Federate(fedName, core, fi),
@@ -23,7 +23,7 @@ CombinationFederate::CombinationFederate(const std::string& fedName,
 {
 }
 
-CombinationFederate::CombinationFederate(const std::string& fedName,
+CombinationFederate::CombinationFederate(std::string_view fedName,
                                          CoreApp& core,
                                          const FederateInfo& fi):
     Federate(fedName, core, fi),
@@ -32,16 +32,14 @@ CombinationFederate::CombinationFederate(const std::string& fedName,
 }
 
 CombinationFederate::CombinationFederate(const std::string& configString):
-    Federate(std::string(), loadFederateInfo(configString)), ValueFederate(true),
+    Federate(std::string_view{}, loadFederateInfo(configString)), ValueFederate(true),
     MessageFederate(true)
 {
     CombinationFederate::registerInterfaces(configString);
 }
 
-CombinationFederate::CombinationFederate(const std::string& fedName,
-                                         const std::string& configString):
-    Federate(fedName, loadFederateInfo(configString)),
-    ValueFederate(true), MessageFederate(true)
+CombinationFederate::CombinationFederate(std::string_view fedName, const std::string& configString):
+    Federate(fedName, loadFederateInfo(configString)), ValueFederate(true), MessageFederate(true)
 {
     CombinationFederate::registerInterfaces(configString);
 }
@@ -80,7 +78,7 @@ void CombinationFederate::initializeToExecuteStateTransition(IterationResult res
     MessageFederate::initializeToExecuteStateTransition(result);
 }
 
-std::string CombinationFederate::localQuery(const std::string& queryStr) const
+std::string CombinationFederate::localQuery(std::string_view queryStr) const
 {
     std::string res = ValueFederate::localQuery(queryStr);
     if (res.empty()) {

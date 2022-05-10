@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/ActionMessage.hpp"
 #include "ZmqContextManager.h"
 #include "cppzmq/zmq.hpp"
-#include "gmlc/containers/extra/optional.hpp"
 
 #include <deque>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -54,7 +54,7 @@ no reason to make it thread safe
         /** check if there are any waiting message without scanning the sockets*/
         bool hasMessages() const;
         /** get any messages that have been received*/
-        stx::optional<ActionMessage> getMessage();
+        std::optional<ActionMessage> getMessage();
         /** close all the sockets*/
         void close();
 

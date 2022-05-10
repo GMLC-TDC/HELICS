@@ -51,7 +51,7 @@ NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(bool rootBroker) noexcept:
 }
 
 template<class COMMS, gmlc::networking::InterfaceTypes baseline, int tcode>
-NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(const std::string& broker_name):
+NetworkBroker<COMMS, baseline, tcode>::NetworkBroker(std::string_view broker_name):
     CommsBroker<COMMS, CoreBroker>(broker_name)
 {
     netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEFAULT_ACTIVE;

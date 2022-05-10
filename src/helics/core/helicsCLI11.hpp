@@ -30,9 +30,9 @@ using helics::to_string;
 using helics::core::coreTypeFromString;
 using helics::core::to_string;
 /** generate a local function that uses the utilities library*/
-inline helics::Time loadTimeFromString(const std::string& str, time_units defUnit)
+inline helics::Time loadTimeFromString(std::string_view str, time_units defUnit)
 {
-    return gmlc::utilities::loadTimeFromString<helics::Time>(str, defUnit);
+    return gmlc::utilities::loadTimeFromString<helics::Time>(std::string(str), defUnit);
 }
 
 #endif

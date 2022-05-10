@@ -43,7 +43,7 @@ void TcpComms::loadNetworkInfo(const NetworkBrokerData& netInfo)
     propertyUnLock();
 }
 
-void TcpComms::setFlag(const std::string& flag, bool val)
+void TcpComms::setFlag(std::string_view flag, bool val)
 {
     if (flag == "reuse_address") {
         if (propertyLock()) {

@@ -17,29 +17,30 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 void InterfaceInfo::createPublication(InterfaceHandle handle,
-                                      const std::string& key,
-                                      const std::string& type,
-                                      const std::string& units)
+                                      std::string_view key,
+                                      std::string_view type,
+                                      std::string_view units)
 {
-    publications.lock()->insert(key, handle, GlobalHandle{global_id, handle}, key, type, units);
+    publications.lock()->insert(
+        std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
 }
 
 void InterfaceInfo::createInput(InterfaceHandle handle,
-                                const std::string& key,
-                                const std::string& type,
-                                const std::string& units)
+                                std::string_view key,
+                                std::string_view type,
+                                std::string_view units)
 {
     auto ciHandle = inputs.lock();
-    ciHandle->insert(key, handle, GlobalHandle{global_id, handle}, key, type, units);
+    ciHandle->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
 }
 
 void InterfaceInfo::createEndpoint(InterfaceHandle handle,
-                                   const std::string& endpointName,
-                                   const std::string& type)
+                                   std::string_view endpointName,
+                                   std::string_view type)
 {
     endpoints.lock()->insert(
-        endpointName, handle, GlobalHandle{global_id, handle}, endpointName, type);
+        std::string(endpointName), handle, GlobalHandle{global_id, handle}, endpointName, type);
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)

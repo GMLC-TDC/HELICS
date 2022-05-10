@@ -27,7 +27,7 @@ additional map find operation vs the member getValue calls
 @param key  the name of the publication
 */
 template<class X>
-X getValue(ValueFederate& fed, const std::string& key)
+X getValue(ValueFederate& fed, std::string_view key)
 {
     return fed.getInput(key).getValue<X>();
 }
@@ -41,7 +41,7 @@ additional map find operation vs the member getValue calls
 @param obj the obj to store the retrieved value
 */
 template<class X>
-void getValue(ValueFederate& fed, const std::string& key, X& obj)
+void getValue(ValueFederate& fed, std::string_view key, X& obj)
 {
     fed.getSubscription(key).getValue<X>(obj);
 }
@@ -70,11 +70,11 @@ class VectorSubscription {
    @param units the units associated with the Subscription
    */
     VectorSubscription(ValueFederate* valueFed,
-                       const std::string& key,
+                       std::string_view key,
                        int startIndex,
                        int count,
                        const X& defValue,
-                       const std::string& units = std::string()):
+                       std::string_view units = std::string_view{}):
         fed(valueFed),
         m_key(key), m_units(units)
     {
@@ -102,11 +102,11 @@ class VectorSubscription {
     */
     template<class FedPtr>
     VectorSubscription(FedPtr valueFed,
-                       const std::string& key,
+                       std::string_view key,
                        int startIndex,
                        int count,
                        const X& defValue,
-                       const std::string& units = std::string()):
+                       std::string_view units = std::string_view{}):
         VectorSubscription(std::addressof(*valueFed), key, startIndex, count, defValue, units)
     {
         static_assert(
@@ -200,13 +200,13 @@ class VectorSubscription2d {
     */
     template<class FedPtr>
     VectorSubscription2d(FedPtr valueFed,
-                         const std::string& key,
+                         std::string_view key,
                          int startIndex_x,
                          int count_x,
                          int startIndex_y,
                          int count_y,
                          const X& defValue,
-                         const std::string& units = std::string()):
+                         std::string_view units = std::string_view()):
         fed(std::addressof(*valueFed)),
         m_key(key), m_units(units)
     {

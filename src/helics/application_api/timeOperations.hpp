@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsTime.hpp"
 #include "helics_cxx_export.h"
 
-#include <string>
+#include <string_view>
 /** @file
 @details defining the time representation to use throughout helics
 */
@@ -20,7 +20,7 @@ for example "1.234",  or "1032ms" or "10423425 ns"
 @return a helics time generated from the string
 @throw invalid_argument if the string is not a valid time
 */
-HELICS_CXX_EXPORT Time loadTimeFromString(const std::string& timeString);
+HELICS_CXX_EXPORT Time loadTimeFromString(std::string_view timeString);
 
 /** generate a time from a string
 @details the string can be a double or with units
@@ -30,12 +30,12 @@ for example "1.234"  or "1032ms"
 @return a helics time generated from the string
 @throws invalid_argument if the string is not a valid time
 */
-HELICS_CXX_EXPORT Time loadTimeFromString(std::string timeString, time_units defUnit);
+HELICS_CXX_EXPORT Time loadTimeFromString(std::string_view timeString, time_units defUnit);
 
 /** generate a time related unit,
 @return a time_units enumeration value
 @throw invalid_argument if the string is not a valid unit
 */
-HELICS_CXX_EXPORT time_units timeUnitsFromString(const std::string& unitString);
+HELICS_CXX_EXPORT time_units timeUnitsFromString(std::string_view unitString);
 
 }  // namespace helics

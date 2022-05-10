@@ -69,7 +69,7 @@ HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate f
 
     try {
         auto trans = std::make_unique<helics::TranslatorObject>();
-        trans->transPtr = &fedObj->registerTranslator(type, AS_STRING(name));
+        trans->transPtr = &fedObj->registerTranslator(type, AS_STRING_VIEW(name));
         trans->fedptr = std::move(fedObj);
         trans->custom = (type == HELICS_TRANSLATOR_TYPE_CUSTOM);
         return federateAddTranslator(fed, std::move(trans));
@@ -89,7 +89,7 @@ HelicsTranslator helicsFederateRegisterGlobalTranslator(HelicsFederate fed, Heli
 
     try {
         auto trans = std::make_unique<helics::TranslatorObject>();
-        trans->transPtr = &fedObj->registerGlobalTranslator(type, AS_STRING(name));
+        trans->transPtr = &fedObj->registerGlobalTranslator(type, AS_STRING_VIEW(name));
         trans->fedptr = std::move(fedObj);
         trans->custom = (type == HELICS_TRANSLATOR_TYPE_CUSTOM);
         return federateAddTranslator(fed, std::move(trans));
@@ -109,7 +109,7 @@ HelicsTranslator helicsCoreRegisterTranslator(HelicsCore cr, HelicsTranslatorTyp
     try {
         auto trans = std::make_unique<helics::TranslatorObject>();
 
-        trans->mTrans = std::make_unique<helics::Translator>(core.get(), AS_STRING(name));
+        trans->mTrans = std::make_unique<helics::Translator>(core.get(), AS_STRING_VIEW(name));
         trans->mTrans->setTranslatorType(type);
         trans->transPtr = trans->mTrans.get();
         trans->corePtr = std::move(core);
@@ -355,7 +355,7 @@ void helicsTranslatorSetInfo(HelicsTranslator trans, const char* info, HelicsErr
         return;
     }
     try {
-        transObj->transPtr->setInfo(AS_STRING(info));
+        transObj->transPtr->setInfo(AS_STRING_VIEW(info));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -371,7 +371,7 @@ const char* helicsTranslatorGetTag(HelicsTranslator trans, const char* tagname)
         return gEmptyStr.c_str();
     }
     try {
-        const std::string& info = transObj->transPtr->getTag(AS_STRING(tagname));
+        const std::string& info = transObj->transPtr->getTag(AS_STRING_VIEW(tagname));
         return info.c_str();
     }
     // LCOV_EXCL_START
@@ -388,7 +388,7 @@ void helicsTranslatorSetTag(HelicsTranslator trans, const char* tagname, const c
         return;
     }
     try {
-        transObj->transPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
+        transObj->transPtr->setTag(AS_STRING_VIEW(tagname), AS_STRING_VIEW(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {

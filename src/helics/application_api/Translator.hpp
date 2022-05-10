@@ -29,7 +29,7 @@ constexpr std::string_view emptyString{""};
 
 /** get the translator type from a string*/
 HELICS_CXX_EXPORT TranslatorTypes
-    translatorTypeFromString(const std::string& translatorType) noexcept;
+    translatorTypeFromString(std::string_view translatorType) noexcept;
 
 /** class for managing a particular translator*/
 class HELICS_CXX_EXPORT Translator: public Interface {
@@ -66,13 +66,13 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
     */
-    virtual void set(const std::string& property, double val);
+    virtual void set(std::string_view property, double val);
 
     /** set a string property on a translator
     @param property the name of the property of the translator to change
     @param val the numerical value of the property
     */
-    virtual void setString(const std::string& property, const std::string& val);
+    virtual void setString(std::string_view property, std::string_view val);
 
     void addPublication(std::string_view target)
     {

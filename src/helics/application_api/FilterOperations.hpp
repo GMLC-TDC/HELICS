@@ -18,6 +18,7 @@ file defines some common filter operations
 #include <memory>
 #include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace helics {
@@ -44,12 +45,12 @@ class FilterOperations {
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
     */
-    virtual void set(const std::string& property, double val);
+    virtual void set(std::string_view property, double val);
     /** set a string property on a filter
     @param property the name of the property of the filter to change
     @param val the numerical value of the property
     */
-    virtual void setString(const std::string& property, const std::string& val);
+    virtual void setString(std::string_view property, std::string_view val);
     virtual std::shared_ptr<FilterOperator> getOperator() = 0;
 };
 
@@ -61,8 +62,8 @@ class DelayFilterOperation: public FilterOperations {
 
   public:
     explicit DelayFilterOperation(Time delayTime = timeZero);
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 };
 
@@ -81,8 +82,8 @@ class RandomDelayFilterOperation: public FilterOperations {
     // object here
     /** destructor*/
     ~RandomDelayFilterOperation();
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 };
 
@@ -95,8 +96,8 @@ class RandomDropFilterOperation: public FilterOperations {
   public:
     RandomDropFilterOperation();
     ~RandomDropFilterOperation();
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 };
 
@@ -111,8 +112,8 @@ class RerouteFilterOperation: public FilterOperations {
   public:
     RerouteFilterOperation();
     ~RerouteFilterOperation();
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 
   private:
@@ -132,8 +133,8 @@ class FirewallFilterOperation: public FilterOperations {
   public:
     FirewallFilterOperation();
     ~FirewallFilterOperation();
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 
   private:
@@ -152,8 +153,8 @@ class CloneFilterOperation: public FilterOperations {
     explicit CloneFilterOperation();
 
     ~CloneFilterOperation();
-    virtual void set(const std::string& property, double val) override;
-    virtual void setString(const std::string& property, const std::string& val) override;
+    virtual void set(std::string_view property, double val) override;
+    virtual void setString(std::string_view property, std::string_view val) override;
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 
   private:

@@ -104,13 +104,13 @@ class HELICS_CXX_EXPORT Federate {
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param fi  a federate information structure
     */
-    Federate(const std::string& fedname, const FederateInfo& fi);
+    Federate(std::string_view fedname, const FederateInfo& fi);
     /**constructor taking a core and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a shared pointer to a core object, the pointer will be copied
     @param fi  a federate information structure
     */
-    Federate(const std::string& fedname,
+    Federate(std::string_view fedname,
              const std::shared_ptr<Core>& core,
              const FederateInfo& fi = FederateInfo{});
 
@@ -119,7 +119,7 @@ class HELICS_CXX_EXPORT Federate {
     @param core a CoreApp with the core core connect to.
     @param fi  a federate information structure
     */
-    Federate(const std::string& fedname, CoreApp& core, const FederateInfo& fi = FederateInfo{});
+    Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi = FederateInfo{});
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */
@@ -129,7 +129,7 @@ class HELICS_CXX_EXPORT Federate {
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     with extension (.toml, .TOML)
     */
-    Federate(const std::string& fedname, const std::string& configString);
+    Federate(std::string_view fedname, const std::string& configString);
     /**default constructor*/
     Federate() noexcept;
     /** move constructor*/
@@ -198,14 +198,14 @@ class HELICS_CXX_EXPORT Federate {
     @param errorcode an integral code for the error
     @param message a string describing the error to display in a log
     */
-    void localError(int errorcode, const std::string& message);
+    void localError(int errorcode, std::string_view message);
 
     /** specify the simulator had a global error with error code and message
     @details global errors propagate through the entire federation and will halt operations
     @param errorcode an integral code for the error
     @param message a string describing the error to display in the log
     */
-    void globalError(int errorcode, const std::string& message);
+    void globalError(int errorcode, std::string_view message);
 
     /** specify the simulator had a local error with error code
     @param errorcode an integral code for the error
@@ -273,14 +273,14 @@ class HELICS_CXX_EXPORT Federate {
     queryable through a "tags" query or "tag/<tagname>"
     @param tag the name of the tag to set the value for
     @param value the value for the given tag*/
-    void setTag(const std::string& tag, const std::string& value);
+    void setTag(std::string_view tag, std::string_view value);
     /** get the value of a specific tag (key-value pair) for a federate
     @details the tag is an arbitrary user defined string and value; the tags for a federate are
     queryable
     @param tag the name of the tag to get the value for
     @return a const std::string& containing the value of the tag, if the tag is not defined the
     value is an empty string*/
-    const std::string& getTag(const std::string& tag) const;
+    const std::string& getTag(std::string_view tag) const;
 
     /** set a time property for a federate
     @param option the option to set
@@ -379,8 +379,8 @@ class HELICS_CXX_EXPORT Federate {
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& target,
-                      const std::string& queryStr,
+    std::string query(std::string_view target,
+                      std::string_view queryStr,
                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** make a query of the core
@@ -395,7 +395,7 @@ class HELICS_CXX_EXPORT Federate {
     or a JSON string stored in the first element of the vector.  The string "#invalid" is returned
     if the query was not valid
     */
-    std::string query(const std::string& queryStr,
+    std::string query(std::string_view queryStr,
                       HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** make a query of the core in an async fashion
@@ -409,8 +409,8 @@ class HELICS_CXX_EXPORT Federate {
     ordered(synchronous) is slower but has more ordering guarantees
     @return a QueryId to use for returning the result
     */
-    QueryId queryAsync(const std::string& target,
-                       const std::string& queryStr,
+    QueryId queryAsync(std::string_view target,
+                       std::string_view queryStr,
                        HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** make a query of the core in an async fashion
@@ -422,7 +422,7 @@ class HELICS_CXX_EXPORT Federate {
     ordered(synchronous) is slower but has more ordering guarantees
     @return a QueryId used to get the results of the query in the future
     */
-    QueryId queryAsync(const std::string& queryStr,
+    QueryId queryAsync(std::string_view queryStr,
                        HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST);
 
     /** get the results of an async query
@@ -456,7 +456,7 @@ class HELICS_CXX_EXPORT Federate {
     @param valueName the name of the global to set
     @param value the value of the global
     */
-    void setGlobal(const std::string& valueName, const std::string& value);
+    void setGlobal(std::string_view valueName, std::string_view value);
 
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
@@ -467,8 +467,8 @@ class HELICS_CXX_EXPORT Federate {
     ordered(synchronous) is slower but has more ordering guarantees
   */
     void sendCommand(
-        const std::string& target,
-        const std::string& commandStr,
+        std::string_view target,
+        std::string_view commandStr,
         HelicsSequencingModes mode = HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
 
     /** get a command for the Federate
@@ -487,16 +487,16 @@ received
     @details adds an additional internal time dependency for the federate
     @param fedName the name of the federate to add a dependency on
     */
-    void addDependency(const std::string& fedName);
+    void addDependency(std::string_view fedName);
 
     /** define a named global filter interface
     @param filterName the name of the globally visible filter
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    Filter& registerGlobalFilter(const std::string& filterName,
-                                 const std::string& inputType = std::string(),
-                                 const std::string& outputType = std::string());
+    Filter& registerGlobalFilter(std::string_view filterName,
+                                 std::string_view inputType = std::string_view{},
+                                 std::string_view outputType = std::string_view{});
 
     /** define a cloning filter interface on a source
     @details a cloning filter will modify copy of messages coming from or going to target endpoints
@@ -504,9 +504,9 @@ received
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    CloningFilter& registerGlobalCloningFilter(const std::string& filterName,
-                                               const std::string& inputType = std::string(),
-                                               const std::string& outputType = std::string());
+    CloningFilter& registerGlobalCloningFilter(std::string_view filterName,
+                                               std::string_view inputType = std::string_view{},
+                                               std::string_view outputType = std::string_view{});
 
     /** define a filter interface
     @details a filter will modify messages coming from or going to target endpoints
@@ -514,9 +514,9 @@ received
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    Filter& registerFilter(const std::string& filterName,
-                           const std::string& inputType = std::string(),
-                           const std::string& outputType = std::string());
+    Filter& registerFilter(std::string_view filterName,
+                           std::string_view inputType = std::string_view{},
+                           std::string_view outputType = std::string_view{});
 
     /** define a cloning filter interface on a source
     @details a source filter will be sent any packets that come from a particular source
@@ -526,15 +526,15 @@ received
     @param inputType the inputType which the filter can handle
     @param outputType the outputType of the filter which the filter produces
     */
-    CloningFilter& registerCloningFilter(const std::string& filterName,
-                                         const std::string& inputType = std::string(),
-                                         const std::string& outputType = std::string());
+    CloningFilter& registerCloningFilter(std::string_view filterName,
+                                         std::string_view inputType = std::string_view{},
+                                         std::string_view outputType = std::string_view{});
 
     /** define a nameless filter interface
      */
     Filter& registerFilter()
     {
-        return registerGlobalFilter(std::string(), std::string(), std::string());
+        return registerGlobalFilter(std::string(), std::string_view{}, std::string_view{});
     }
 
     /** define a named global translator interface
@@ -598,7 +598,7 @@ received
     /** get a filter from its name
     @param filterName the name of the filter
     @return a reference to a filter object which could be invalid if filterName is not valid*/
-    const Filter& getFilter(const std::string& filterName) const;
+    const Filter& getFilter(std::string_view filterName) const;
 
     /** get a filter from its index
     @param index the index of a filter
@@ -608,7 +608,7 @@ received
     /** get a filter from its name
       @param filterName the name of the filter
       @return a reference to a filter object which could be invalid if filterName is not valid*/
-    Filter& getFilter(const std::string& filterName);
+    Filter& getFilter(std::string_view filterName);
 
     /** get a filter from its index
     @param index the index of a filter
@@ -632,7 +632,7 @@ received
     @param translatorName the name of the translator
     @return a reference to a translator object which will be invalid if translatorName is not
     valid*/
-    const Translator& getTranslator(const std::string& translatorName) const;
+    const Translator& getTranslator(std::string_view translatorName) const;
 
     /** get a translator from its index
     @param index the index of a translator
@@ -644,7 +644,7 @@ received
       @param translatorName the name of the translator
       @return a reference to a translator object which will be invalid if translatorName is not
       valid*/
-    Translator& getTranslator(const std::string& translatorName);
+    Translator& getTranslator(std::string_view translatorName);
 
     /** get a translator from its index
     @param index the index of a translator
@@ -677,7 +677,9 @@ received
     virtual void disconnectTransition();
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
-    virtual std::string localQuery(const std::string& queryStr) const;
+    virtual std::string localQuery(std::string_view queryStr) const;
+    /** generate a string with the local variant of the name*/
+    std::string localNameGenerator(std::string_view localName) const;
 
   public:
     /** register a set of interfaces defined in a file
@@ -709,33 +711,33 @@ received
    @param level the logging level of the message
    @param message the message to log
    */
-    void logMessage(int level, const std::string& message) const;
+    void logMessage(int level, std::string_view message) const;
 
     /** log an error message to the federate Logger
     @param message the message to log
     */
-    void logErrorMessage(const std::string& message) const
+    void logErrorMessage(std::string_view message) const
     {
         logMessage(HELICS_LOG_LEVEL_ERROR, message);
     }
     /** log a warning message to the federate Logger
     @param message the message to log
     */
-    void logWarningMessage(const std::string& message) const
+    void logWarningMessage(std::string_view message) const
     {
         logMessage(HELICS_LOG_LEVEL_WARNING, message);
     }
     /** log an info message to the federate Logger
     @param message the message to log
     */
-    void logInfoMessage(const std::string& message) const
+    void logInfoMessage(std::string_view message) const
     {
         logMessage(HELICS_LOG_LEVEL_SUMMARY, message);
     }
     /** log a debug message to the federate Logger
     @param message the message to log
     */
-    void logDebugMessage(const std::string& message) const
+    void logDebugMessage(std::string_view message) const
     {
         logMessage(HELICS_LOG_LEVEL_DEBUG, message);
     }
@@ -803,20 +805,20 @@ class HELICS_CXX_EXPORT Interface {
     /** get the interface information field of the input*/
     const std::string& getInfo() const;
     /** set the interface information field of the input*/
-    void setInfo(const std::string& info);
+    void setInfo(std::string_view info);
     /** set a tag (key-value pair) for an interface
     @details the tag is an arbitrary user defined string and value; the tags for an interface are
     queryable
     @param tag the name of the tag to set the value for
     @param value the value for the given tag*/
-    void setTag(const std::string& tag, const std::string& value);
+    void setTag(std::string_view tag, std::string_view value);
     /** get the value of a specific tag (key-value pair) for an interface
     @details the tag is an arbitrary user defined string and value; the tags for an interface are
     queryable
     @param tag the name of the tag to get the value for
     @return a const std::string& containing the value of the tag, if the tag is not defined the
     value is an empty string*/
-    const std::string& getTag(const std::string& tag) const;
+    const std::string& getTag(std::string_view tag) const;
     /** set a handle flag for the input*/
     virtual void setOption(int32_t option, int32_t value = 1);
 

@@ -20,7 +20,7 @@ namespace zeromq {
         /** default constructor*/
         explicit ZmqBroker(bool rootbroker = false) noexcept;
         /** construct using a particular name*/
-        explicit ZmqBroker(const std::string& brokerName);
+        explicit ZmqBroker(std::string_view brokerName);
 
       private:
         virtual bool brokerConnect() override;
@@ -34,7 +34,7 @@ namespace zeromq {
         /** default constructor*/
         explicit ZmqBrokerSS(bool rootbroker = false) noexcept;
         /** construct from with a core name*/
-        explicit ZmqBrokerSS(const std::string& broker_name);
+        explicit ZmqBrokerSS(std::string_view broker_name);
 
       private:
         virtual bool brokerConnect() override;
