@@ -11,6 +11,7 @@ functions for dealing with query results*/
 #include "helics_cxx_export.h"
 
 #include <chrono>
+#include <string>
 #include <string_view>
 #include <vector>
 

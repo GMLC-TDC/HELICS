@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/Core.hpp"
 #include "Federate.hpp"
 #include "helics/helics_enums.h"
+#include <string>
 
 #include <memory>
 

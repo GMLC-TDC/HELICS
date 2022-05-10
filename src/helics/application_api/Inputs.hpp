@@ -242,7 +242,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     template<class X>
     void setDefault_impl(std::integral_constant<int, 0> /*V*/, X&& val)
     {
-        /** still need to make_valid for bool and Time*/
+        /** TODO(PT) still need to make_valid for bool and Time*/
         lastValue = make_valid(std::forward<X>(val));
     }
 

@@ -19,6 +19,7 @@ file defines some common filter operations
 #include <set>
 #include <string_view>
 #include <vector>
+#include <string>
 
 namespace helics {
 class Core;

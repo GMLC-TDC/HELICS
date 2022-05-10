@@ -373,11 +373,11 @@ HelicsCore helicsCreateCore(const char* type, const char* name, const char* init
     try {
         auto core = std::make_unique<helics::CoreObject>();
         core->valid = gCoreValidationIdentifier;
-        auto nstring = AS_STRING(name);
+        auto nstring = AS_STRING_VIEW(name);
         if (nstring.empty()) {
-            core->coreptr = helics::CoreFactory::create(ct, AS_STRING(initString));
+            core->coreptr = helics::CoreFactory::create(ct, AS_STRING_VIEW(initString));
         } else {
-            core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING(initString));
+            core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING_VIEW(initString));
         }
 
         auto* retcore = reinterpret_cast<HelicsCore>(core.get());
@@ -412,7 +412,7 @@ HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc
         for (int ii = argc - 1; ii > 0; ii--) {
             args.emplace_back(argv[ii]);
         }
-        core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
+        core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING_VIEW(name), args);
 
         auto* retcore = reinterpret_cast<HelicsCore>(core.get());
         getMasterHolder()->addCore(std::move(core));
@@ -490,7 +490,7 @@ HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* 
     auto broker = std::make_unique<helics::BrokerObject>();
     broker->valid = gBrokerValidationIdentifier;
     try {
-        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), AS_STRING(initString));
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING_VIEW(name), AS_STRING_VIEW(initString));
         auto* retbroker = reinterpret_cast<HelicsBroker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -523,7 +523,7 @@ HelicsBroker helicsCreateBrokerFromArgs(const char* type, const char* name, int 
         for (int ii = argc - 1; ii > 0; ii--) {
             args.emplace_back(argv[ii]);
         }
-        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), args);
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING_VIEW(name), args);
         auto* retbroker = reinterpret_cast<HelicsBroker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -606,7 +606,7 @@ void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const cha
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    brk->setGlobal(valueName, AS_STRING(value));
+    brk->setGlobal(valueName, AS_STRING_VIEW(value));
 }
 
 void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
@@ -615,7 +615,7 @@ void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char
     if (brk == nullptr) {
         return;
     }
-    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_FAST);
+    brk->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), HELICS_SEQUENCING_MODE_FAST);
 }
 
 void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
@@ -624,7 +624,7 @@ void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, con
     if (brk == nullptr) {
         return;
     }
-    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_ORDERED);
+    brk->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err)
@@ -633,7 +633,7 @@ void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, Helics
     if (brk == nullptr) {
         return;
     }
-    brk->setLogFile(AS_STRING(logFileName));
+    brk->setLogFile(AS_STRING_VIEW(logFileName));
 }
 
 void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err)
@@ -660,7 +660,7 @@ void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* err
     if (brk == nullptr) {
         return;
     }
-    brk->globalError(errorCode, AS_STRING(errorString));
+    brk->globalError(errorCode, AS_STRING_VIEW(errorString));
 }
 
 void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err)
@@ -669,7 +669,7 @@ void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorStri
     if (cr == nullptr) {
         return;
     }
-    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING(errorString));
+    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING_VIEW(errorString));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err)
@@ -771,7 +771,7 @@ void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* val
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    cr->setGlobal(valueName, AS_STRING(value));
+    cr->setGlobal(valueName, AS_STRING_VIEW(value));
 }
 
 void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -780,7 +780,7 @@ void helicsCoreSendCommand(HelicsCore core, const char* target, const char* comm
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_FAST);
+    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string_view{}, HELICS_SEQUENCING_MODE_FAST);
 }
 
 void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -789,7 +789,7 @@ void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const cha
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
+    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err)
@@ -798,7 +798,7 @@ void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError*
     if (cr == nullptr) {
         return;
     }
-    cr->setLogFile(AS_STRING(logFileName));
+    cr->setLogFile(AS_STRING_VIEW(logFileName));
 }
 
 const char* helicsBrokerGetIdentifier(HelicsBroker broker)
