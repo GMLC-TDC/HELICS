@@ -25,13 +25,13 @@ namespace apps {
     class WebServer: public TypedBrokerServer {
       public:
         WebServer() = default;
-        explicit WebServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit WebServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
         /** process any command line arguments*/
-        virtual void processArgs(const std::string& args) override;
+        virtual void processArgs(std::string_view args) override;
         /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
         /** enable the websocket server*/

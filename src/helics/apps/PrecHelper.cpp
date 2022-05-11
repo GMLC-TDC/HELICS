@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "PrecHelper.hpp"
 
 #include "../application_api/Federate.hpp"
-#include "gmlc/utilities/stringOps.h"
+#include "gmlc/utilities/string_viewOps.h"
 
 #include <algorithm>
 #include <string>
@@ -15,7 +15,7 @@ using helics::DataType;
 
 DataType getType(const std::string& typeString)
 {
-    auto tstr = gmlc::utilities::stringOps::trim(typeString);
+    auto tstr = gmlc::utilities::string_viewOps::trim(typeString);
     // trim the string
     if (tstr.empty()) {
         return DataType::HELICS_CUSTOM;
@@ -46,8 +46,6 @@ DataType getType(const std::string& typeString)
                 return DataType::HELICS_CUSTOM;
         }
     }
-
-    gmlc::utilities::makeLowerCase(tstr);
 
     return helics::getTypeFromString(tstr);
 }

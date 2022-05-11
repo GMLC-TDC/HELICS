@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <string_view>
 
 namespace CLI {
 class App;
@@ -33,36 +34,36 @@ threads without external protection, that will result in undefined behavior
    @param defaultAppName the name to use if not specified in one of the arguments
    @param args the command line arguments to pass in a reverse vector
    */
-        App(const std::string& defaultAppName, std::vector<std::string> args);
+        App(std::string_view defaultAppName, std::vector<std::string> args);
         /** construct from command line arguments
     @param defaultAppName the name to use if not specified in one of the arguments
     @param argc the number of arguments
     @param argv the strings in the input
     */
-        App(const std::string& defaultAppName, int argc, char* argv[]);
+        App(std::string_view defaultAppName, int argc, char* argv[]);
         /** construct from a federate info object
     @param appName the name of the application, can be left empty to use a name specified in fi
     @param fi a pointer info object containing information on the desired federate configuration
     */
-        App(const std::string& appName, const FederateInfo& fi);
+        App(std::string_view appName, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param appName the name of the application, can be left empty to use a name specified in fi
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        App(const std::string& appName, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given coreApp
     @param appName the name of the application, can be left empty to use a name specified in fi
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        App(const std::string& appName, CoreApp& core, const FederateInfo& fi);
+        App(std::string_view appName, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param appName the name of the application, can be left empty to use a name specified in
     jsonString
     @param jsonString file or JSON string defining the federate information and other configuration
     */
-        App(const std::string& appName, const std::string& jsonString);
+        App(std::string_view appName, const std::string& jsonString);
 
         /** move construction*/
         App(App&& other_app) = default;
@@ -123,7 +124,7 @@ threads without external protection, that will result in undefined behavior
         /** process the command line arguments */
         void processArgs(std::unique_ptr<helicsCLI11App>& app,
                          FederateInfo& fi,
-                         const std::string& defaultAppName);
+                         std::string_view defaultAppName);
 
       protected:
         std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player

@@ -927,7 +927,7 @@ static const Json::Value null;
 
 namespace helics::apps {
 
-void WebServer::processArgs(const std::string& args)
+void WebServer::processArgs(std::string_view args)
 
 {
     CLI::App parser("http web server parser");
@@ -945,7 +945,7 @@ void WebServer::processArgs(const std::string& args)
                       "specify the interface to use for connecting a web server");
 
     try {
-        parser.parse(args);
+        parser.parse(std::string(args));
     }
     catch (const CLI::Error& ce) {
         logMessage(std::string("error processing command line arguments for web server :") +

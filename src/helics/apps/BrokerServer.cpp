@@ -26,21 +26,22 @@ BrokerServer::BrokerServer() noexcept:
 {
 }
 
-BrokerServer::BrokerServer(int argc, char* argv[]): server_name_{gmlc::utilities::randomString(5)}
+BrokerServer::BrokerServer(int argc, char* argv[]):
+    server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
     auto app = generateArgProcessing();
     app->helics_parse(argc, argv);
 }
 
 BrokerServer::BrokerServer(std::vector<std::string> args):
-    server_name_{gmlc::utilities::randomString(5)}
+    server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
     auto app = generateArgProcessing();
     app->helics_parse(args);
 }
 
-BrokerServer::BrokerServer(const std::string& configFile):
-    configFile_(configFile), server_name_{gmlc::utilities::randomString(5)}
+BrokerServer::BrokerServer(std::string_view configFile):
+    configFile_(configFile), server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
 }
 

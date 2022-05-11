@@ -41,12 +41,12 @@ namespace apps {
     class AsioBrokerServer: public TypedBrokerServer {
       public:
         AsioBrokerServer() = default;
-        explicit AsioBrokerServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit AsioBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
         virtual void startServer(const Json::Value* val) override;
         /** stop the server*/
         virtual void stopServer() override;
-        virtual void processArgs(const std::string& args) override;
+        virtual void processArgs(std::string_view args) override;
         void enableTcpServer(bool enabled) { tcp_enabled_ = enabled; }
         void enableUdpServer(bool enabled) { udp_enabled_ = enabled; }
 
@@ -91,7 +91,7 @@ namespace apps {
     class AsioBrokerServer: public TypedBrokerServer {
       public:
         AsioBrokerServer() = default;
-        explicit AsioBrokerServer(std::string /*server_name*/) {}
+        explicit AsioBrokerServer(std::string_view /*server_name*/) {}
         void enableTcpServer(bool /*enabled*/) {}
         void enableUdpServer(bool /*enabled*/) {}
         /** start the server*/

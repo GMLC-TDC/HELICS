@@ -13,7 +13,7 @@ constexpr double pi = 3.14159265358979323846;
 
 namespace helics {
 namespace apps {
-    void RampGenerator::set(const std::string& parameter, double val)
+    void RampGenerator::set(std::string_view parameter, double val)
     {
         if (parameter == "level") {
             level = val;
@@ -37,7 +37,7 @@ namespace apps {
         return newVal;
     }
 
-    void SineGenerator::set(const std::string& parameter, double val)
+    void SineGenerator::set(std::string_view parameter, double val)
     {
         if ((parameter == "frequency") || (parameter == "freq") || (parameter == "f")) {
             frequency = val;
@@ -76,7 +76,7 @@ namespace apps {
         return newValue;
     }
 
-    void PhasorGenerator::set(const std::string& parameter, double val)
+    void PhasorGenerator::set(std::string_view parameter, double val)
     {
         if ((parameter == "frequency") || (parameter == "freq") || (parameter == "f")) {
             frequency = val;
@@ -100,7 +100,7 @@ namespace apps {
         }
     }
 
-    void PhasorGenerator::set(const std::string& parameter, std::complex<double> val)
+    void PhasorGenerator::set(std::string_view parameter, std::complex<double> val)
     {
         if ((parameter == "bias") || (parameter == "level")) {
             bias_real = val.real();
@@ -108,7 +108,7 @@ namespace apps {
         }
     }
 
-    void PhasorGenerator::setString(const std::string& parameter, const std::string& val)
+    void PhasorGenerator::setString(std::string_view parameter, std::string_view val)
     {
         auto valc = helicsGetComplex(val);
         if (std::abs(valc) < 1e12) {

@@ -46,7 +46,7 @@ communication methods*/
         /** construct from command line arguments parsed as a single string
     @param configFile a configuration file for the broker Server
     */
-        explicit BrokerServer(const std::string& configFile);
+        explicit BrokerServer(std::string_view configFile);
         /** destructor*/
         ~BrokerServer();
         /** start the broker servers*/

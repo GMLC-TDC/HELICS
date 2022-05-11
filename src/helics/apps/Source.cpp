@@ -27,9 +27,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    void SignalGenerator::set(const std::string& /*parameter*/, double /*val*/) {}
+    void SignalGenerator::set(std::string_view /*parameter*/, double /*val*/) {}
     /** set a string parameter*/
-    void SignalGenerator::setString(const std::string& /*parameter*/, const std::string& /*val*/) {}
+    void SignalGenerator::setString(std::string_view /*parameter*/, std::string_view /*val*/) {}
 
     Source::Source(int argc, char* argv[]): App("source", argc, argv)
     {
@@ -56,12 +56,12 @@ namespace apps {
             std::cout << app.help();
         }
     }
-    Source::Source(const std::string& appName, const FederateInfo& fi): App(appName, fi)
+    Source::Source(std::string_view appName, const FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Source::Source(const std::string& appName,
+    Source::Source(std::string_view appName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
         App(appName, core, fi)
@@ -69,13 +69,13 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Source::Source(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+    Source::Source(std::string_view appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Source::Source(const std::string& name, const std::string& configString):
+    Source::Source(std::string_view name, const std::string& configString):
         App(name, configString)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
@@ -84,7 +84,7 @@ namespace apps {
     }
 
     static void
-        setGeneratorProperty(SignalGenerator* gen, const std::string& name, const Json::Value& prop)
+        setGeneratorProperty(SignalGenerator* gen, std::string_view name, const Json::Value& prop)
     {
         if (prop.isDouble()) {
             gen->set(name, prop.asDouble());
@@ -259,11 +259,11 @@ namespace apps {
         }
     }
 
-    void Source::addPublication(const std::string& key,
-                                const std::string& generator,
+    void Source::addPublication(std::string_view key,
+                                std::string_view generator,
                                 DataType type,
                                 Time period,
-                                const std::string& units)
+                                std::string_view units)
     {
         // skip already existing publications
         if (pubids.find(key) != pubids.end()) {
@@ -285,22 +285,22 @@ namespace apps {
             }
         }
         sources.push_back(std::move(newObj));
-        pubids[key] = static_cast<int>(sources.size()) - 1;
+        pubids[sources.back().pub.getName()] = static_cast<int>(sources.size()) - 1;
     }
 
-    int Source::addSignalGenerator(const std::string& name, const std::string& type)
+    int Source::addSignalGenerator(std::string_view name, std::string_view type)
     {
         std::shared_ptr<SignalGenerator> gen;
         if (type == "sine") {
-            gen = std::make_shared<SineGenerator>();
+            gen = std::make_shared<SineGenerator>(name);
         } else if (type == "ramp") {
-            gen = std::make_shared<RampGenerator>();
+            gen = std::make_shared<RampGenerator>(name);
         } else if ((type == "oscillator") || (type == "phasor")) {
-            gen = std::make_shared<PhasorGenerator>();
+            gen = std::make_shared<PhasorGenerator>(name);
         }
         generators.push_back(std::move(gen));
         auto index = static_cast<int>(generators.size() - 1);
-        generatorLookup.emplace(name, index);
+        generatorLookup.emplace(generators.back()->getName(), index);
         return index;
     }
 
@@ -313,7 +313,7 @@ namespace apps {
     }
 
     /** set the start time for a publication */
-    void Source::setStartTime(const std::string& key, Time startTime)
+    void Source::setStartTime(std::string_view key, Time startTime)
     {
         auto fnd = pubids.find(key);
         if (fnd != pubids.end()) {
@@ -321,7 +321,7 @@ namespace apps {
         }
     }
     /** set the start time for a publication */
-    void Source::setPeriod(const std::string& key, Time period)
+    void Source::setPeriod(std::string_view key, Time period)
     {
         auto fnd = pubids.find(key);
         if (fnd != pubids.end()) {
@@ -330,12 +330,12 @@ namespace apps {
     }
 
     /** tie a publication to a signal generator*/
-    void Source::linkPublicationToGenerator(const std::string& key, const std::string& generator)
+    void Source::linkPublicationToGenerator(std::string_view key, std::string_view generator)
     {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid publication"));
+            throw(InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
         }
         auto findGen = generatorLookup.find(generator);
         if (findGen != generatorLookup.end()) {
@@ -346,12 +346,12 @@ namespace apps {
     }
 
     /** tie a publication to a signal generator*/
-    void Source::linkPublicationToGenerator(const std::string& key, int genIndex)
+    void Source::linkPublicationToGenerator(std::string_view key, int genIndex)
     {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(key + " was not recognized as a valid publication"));
+            throw(InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
         }
         sources[fnd->second].generatorIndex = genIndex;
     }

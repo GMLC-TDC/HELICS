@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <deque>
 
 namespace helics {
 class CloningFilter;
@@ -25,7 +26,7 @@ namespace apps {
     class HELICS_CXX_EXPORT Tracer: public App {
       public:
         /** construct from a FederateInfo structure*/
-        explicit Tracer(const std::string& name, FederateInfo& fi);
+        explicit Tracer(std::string_view name, FederateInfo& fi);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -39,20 +40,20 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Tracer(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Tracer(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
 
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Tracer(const std::string& name, CoreApp& core, const FederateInfo& fi);
+        Tracer(std::string_view name, CoreApp& core, const FederateInfo& fi);
 
         /**constructor taking a file with the required information
     @param name the name of the app may be empty to pull name from the file
     @param file a file defining the federate information
     */
-        Tracer(const std::string& name, const std::string& file);
+        Tracer(std::string_view name, const std::string& file);
         /** move construction*/
         Tracer(Tracer&& other_tracer) = default;
         /** move assignment*/
@@ -61,17 +62,17 @@ namespace apps {
         ~Tracer();
         virtual void runTo(Time runToTime) override;
         /** add a subscription to capture*/
-        void addSubscription(const std::string& key);
+        void addSubscription(std::string_view key);
         /** add an endpoint*/
-        void addEndpoint(const std::string& endpoint);
+        void addEndpoint(std::string_view endpoint);
         /** copy all messages that come from a specified endpoint*/
-        void addSourceEndpointClone(const std::string& sourceEndpoint);
+        void addSourceEndpointClone(std::string_view sourceEndpoint);
         /** copy all messages that are going to a specific endpoint*/
-        void addDestEndpointClone(const std::string& destEndpoint);
+        void addDestEndpointClone(std::string_view destEndpoint);
         /** add a capture interface
     @param captureDesc describes a federate to capture all the interfaces for
     */
-        void addCapture(const std::string& captureDesc);
+        void addCapture(std::string_view captureDesc);
 
         /** set the callback for a message received through cloned interfaces
     @details the function signature will take the time in the Tracer a unique_ptr to the message
@@ -85,7 +86,7 @@ namespace apps {
     and a unique_ptr to the message
     */
         void setEndpointMessageCallback(
-            std::function<void(Time, const std::string&, std::unique_ptr<Message>)> callback)
+            std::function<void(Time, std::string_view, std::unique_ptr<Message>)> callback)
         {
             endpointMessageCallback = std::move(callback);
         }
@@ -93,8 +94,7 @@ namespace apps {
     @details the function signature will take the time in the Tracer, the publication key as a
     string, and the value as a string
     */
-        void setValueCallback(
-            std::function<void(Time, const std::string&, const std::string&)> callback)
+        void setValueCallback(std::function<void(Time, std::string_view, std::string_view)> callback)
         {
             valueCallback = std::move(callback);
         }
@@ -128,18 +128,18 @@ namespace apps {
         bool skiplog = false;  //!< skip the log function and print directly to cout
         std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
 
-        std::vector<Input> subscriptions;  //!< the actual subscription objects
-        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::deque<Input> subscriptions;  //!< the actual subscription objects
+        std::map<std::string_view, int> subkeys;  //!< translate subscription names to an index
 
-        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::deque<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string_view, int> eptNames;  //!< translate endpoint name to index
         std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
         std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
 
         std::function<void(Time, std::unique_ptr<Message>)> clonedMessageCallback;
-        std::function<void(Time, const std::string&, std::unique_ptr<Message>)>
+        std::function<void(Time, std::string_view, std::unique_ptr<Message>)>
             endpointMessageCallback;
-        std::function<void(Time, const std::string&, const std::string&)> valueCallback;
+        std::function<void(Time, std::string_view, std::string_view)> valueCallback;
     };
 
 }  // namespace apps

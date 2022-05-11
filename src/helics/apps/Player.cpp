@@ -27,7 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** test if a string has a base64 wrapper*/
-static int hasB64Wrapper(const std::string& str);
+static int hasB64Wrapper(std::string_view str);
 /** function to decode data strings for messages*/
 static std::string decode(std::string&& stringToDecode);
 
@@ -119,12 +119,12 @@ namespace apps {
         return app;
     }
 
-    Player::Player(const std::string& appName, const FederateInfo& fi): App(appName, fi)
+    Player::Player(std::string_view appName, const FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Player::Player(const std::string& appName,
+    Player::Player(std::string_view appName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
         App(appName, core, fi)
@@ -132,13 +132,13 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Player::Player(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+    Player::Player(std::string_view appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Player::Player(const std::string& appName, const std::string& configString):
+    Player::Player(std::string_view appName, const std::string& configString):
         App(appName, configString)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
@@ -146,9 +146,9 @@ namespace apps {
     }
 
     void Player::addMessage(Time sendTime,
-                            const std::string& src,
-                            const std::string& dest,
-                            const std::string& payload)
+                            std::string_view src,
+                            std::string_view dest,
+                            std::string_view payload)
     {
         messages.resize(messages.size() + 1);
         messages.back().sendTime = sendTime;
@@ -160,9 +160,9 @@ namespace apps {
 
     void Player::addMessage(Time sendTime,
                             Time actionTime,
-                            const std::string& src,
-                            const std::string& dest,
-                            const std::string& payload)
+                            std::string_view src,
+                            std::string_view dest,
+                            std::string_view payload)
     {
         messages.resize(messages.size() + 1);
         messages.back().sendTime = sendTime;
@@ -172,12 +172,12 @@ namespace apps {
         messages.back().mess.time = actionTime;
     }
 
-    helics::Time Player::extractTime(const std::string& str, int lineNumber) const
+    helics::Time Player::extractTime(std::string_view str, int lineNumber) const
     {
         try {
             if (units == time_units::ns)  // ns
             {
-                return {std::stoll(str), time_units::ns};
+                return {std::stoll(std::string(str)), time_units::ns};
             }
             return loadTimeFromString(str, units);
         }
@@ -736,11 +736,12 @@ namespace apps {
         }
     }
 
-    void Player::addPublication(const std::string& name, DataType type, const std::string& pubUnits)
+    void Player::addPublication(std::string_view name, DataType type, std::string_view pubUnits)
     {
         // skip already existing publications
         if (pubids.find(name) != pubids.end()) {
             std::cerr << "publication already exists\n";
+            return;
         }
         if (!useLocal) {
             publications.emplace_back(
@@ -754,14 +755,15 @@ namespace apps {
                     helics::InterfaceVisibility::GLOBAL, fed.get(), name, type, pubUnits);
             }
         }
-        pubids[name] = static_cast<int>(publications.size()) - 1;
+        pubids[publications.back().getName()] = static_cast<int>(publications.size()) - 1;
     }
 
-    void Player::addEndpoint(const std::string& endpointName, const std::string& endpointType)
+    void Player::addEndpoint(std::string_view endpointName, std::string_view endpointType)
     {
         // skip already existing publications
         if (eptids.find(endpointName) != eptids.end()) {
             std::cerr << "Endpoint already exists\n";
+            return;
         }
         if (!useLocal) {
             endpoints.emplace_back(helics::InterfaceVisibility::GLOBAL,
@@ -779,13 +781,13 @@ namespace apps {
                                        endpointType);
             }
         }
-        eptids[endpointName] = static_cast<int>(endpoints.size()) - 1;
+        eptids[endpoints.back().getName()] = static_cast<int>(endpoints.size()) - 1;
     }
 
 }  // namespace apps
 }  // namespace helics
 
-static int hasB64Wrapper(const std::string& str)
+static int hasB64Wrapper(std::string_view str)
 {
     if (str.front() == '\"') {
         if (str.size() < 8) {

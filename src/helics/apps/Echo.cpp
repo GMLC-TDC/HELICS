@@ -48,23 +48,23 @@ namespace apps {
         }
     }
 
-    Echo::Echo(const std::string& name, const FederateInfo& fi): App(name, fi)
+    Echo::Echo(std::string_view name, const FederateInfo& fi): App(name, fi)
     {
         fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
     }
 
-    Echo::Echo(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
+    Echo::Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi):
         App(name, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
     }
 
-    Echo::Echo(const std::string& name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
+    Echo::Echo(std::string_view name, CoreApp& core, const FederateInfo& fi): App(name, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
     }
 
-    Echo::Echo(const std::string& name, const std::string& jsonString): App(name, jsonString)
+    Echo::Echo(std::string_view name, const std::string& jsonString): App(name, jsonString)
     {
         fed->setFlagOption(HELICS_FLAG_EVENT_TRIGGERED);
         Echo::loadJsonFile(jsonString);
@@ -119,7 +119,7 @@ namespace apps {
         }
     }
 
-    void Echo::addEndpoint(const std::string& endpointName, const std::string& endpointType)
+    void Echo::addEndpoint(std::string_view endpointName, std::string_view endpointType)
     {
         endpoints.emplace_back(fed->registerGlobalEndpoint(endpointName, endpointType));
         endpoints.back().setCallback(
