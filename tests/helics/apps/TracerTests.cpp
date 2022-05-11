@@ -27,9 +27,8 @@ TEST(tracer_tests, simple_tracer_test)
 {
     std::atomic<double> lastVal{-1e49};
     std::atomic<double> lastTime{0.0};
-    auto cb = [&lastVal, &lastTime](helics::Time tm,
-                                    std::string_view /*unused*/,
-                                    std::string_view newval) {
+    auto cb = [&lastVal,
+               &lastTime](helics::Time tm, std::string_view /*unused*/, std::string_view newval) {
         lastTime = static_cast<double>(tm);
         lastVal = std::stod(std::string(newval));
     };

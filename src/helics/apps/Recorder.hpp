@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
@@ -17,7 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 #include <vector>
-#include <deque>
 
 namespace helics {
 class CloningFilter;
@@ -45,9 +45,7 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Recorder(std::string_view name,
-                 const std::shared_ptr<Core>& core,
-                 const FederateInfo& fi);
+        Recorder(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
@@ -80,7 +78,7 @@ namespace apps {
     */
         void addCapture(std::string_view captureDesc);
         /** save the data to a file*/
-        void saveFile(const std::string &filename);
+        void saveFile(const std::string& filename);
         /** get the number of captured points*/
         auto pointCount() const { return points.size(); }
         /** get the number of captured messages*/

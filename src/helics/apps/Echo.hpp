@@ -9,11 +9,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/MessageFederate.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
-#include <deque>
 
 namespace helics {
 namespace apps {

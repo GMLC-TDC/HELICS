@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Publications.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <deque>
 
 namespace helics {
 namespace apps {
@@ -39,6 +39,7 @@ namespace apps {
         Time lastTime{timeZero};
         Time keyTime{timeZero};
         std::string mName;
+
       public:
         SignalGenerator() = default;
         explicit SignalGenerator(std::string_view name): mName{name} {};

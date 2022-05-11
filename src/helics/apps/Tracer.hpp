@@ -10,13 +10,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <deque>
 
 namespace helics {
 class CloningFilter;
@@ -94,7 +94,8 @@ namespace apps {
     @details the function signature will take the time in the Tracer, the publication key as a
     string, and the value as a string
     */
-        void setValueCallback(std::function<void(Time, std::string_view, std::string_view)> callback)
+        void
+            setValueCallback(std::function<void(Time, std::string_view, std::string_view)> callback)
         {
             valueCallback = std::move(callback);
         }

@@ -155,7 +155,7 @@ void App::loadJsonFile(const std::string& jsonString)
     loadJsonFileConfiguration("application", jsonString);
 }
 
-void App::loadJsonFileConfiguration(const std::string &appName, const std::string& jsonString)
+void App::loadJsonFileConfiguration(const std::string& appName, const std::string& jsonString)
 {
     fed->registerInterfaces(jsonString);
 

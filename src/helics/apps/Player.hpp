@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Publications.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
 #include <string>
 #include <vector>
-#include <deque>
 
 namespace helics {
 namespace apps {
@@ -116,8 +116,7 @@ external protection, that will result in undefined behavior
                 publications.emplace_back(
                     InterfaceVisibility::GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits);
             } else {
-                publications.emplace_back(
-                    fed.get(), key, helicsType<valType>(), pubUnits);
+                publications.emplace_back(fed.get(), key, helicsType<valType>(), pubUnits);
             }
 
             pubids[key] = static_cast<int>(publications.size()) - 1;

@@ -36,7 +36,8 @@ namespace udp {
         {
             mSocket.open(asio::ip::udp::v4());
             mSocket.bind(
-                asio::ip::udp::endpoint(asio::ip::address::from_string(std::string(interface)), portNum));
+                asio::ip::udp::endpoint(asio::ip::address::from_string(std::string(interface)),
+                                        portNum));
         }
 
         ~UdpServer()

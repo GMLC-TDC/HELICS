@@ -10,8 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
-#include <vector>
 #include <string_view>
+#include <vector>
 
 namespace CLI {
 class App;

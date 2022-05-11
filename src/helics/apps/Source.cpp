@@ -75,8 +75,7 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
     }
 
-    Source::Source(std::string_view name, const std::string& configString):
-        App(name, configString)
+    Source::Source(std::string_view name, const std::string& configString): App(name, configString)
     {
         fed->setFlagOption(HELICS_FLAG_SOURCE_ONLY);
 
@@ -335,7 +334,8 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
+            throw(
+                InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
         }
         auto findGen = generatorLookup.find(generator);
         if (findGen != generatorLookup.end()) {
@@ -351,7 +351,8 @@ namespace apps {
         auto fnd = pubids.find(key);
         if (fnd == pubids.end()) {
             // only get here if something wasn't found
-            throw(InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
+            throw(
+                InvalidParameter(std::string(key) + " was not recognized as a valid publication"));
         }
         sources[fnd->second].generatorIndex = genIndex;
     }

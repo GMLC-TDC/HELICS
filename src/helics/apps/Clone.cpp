@@ -85,8 +85,7 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Clone::Clone(std::string_view appName, const std::string& jsonString):
-        App(appName, jsonString)
+    Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Clone::loadJsonFile(jsonString);
@@ -103,7 +102,7 @@ namespace apps {
         }
     }
 
-    void Clone::saveFile(const std::string &filename)
+    void Clone::saveFile(const std::string& filename)
     {
         if (filename.empty()) {
             if (!outFileName.empty()) {
