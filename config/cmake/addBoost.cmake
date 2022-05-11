@@ -15,8 +15,8 @@ if(WIN32 AND NOT UNIX_LIKE)
 
     set(
         boost_versions
-		boost_1_79_0
-		boost_1_78_0
+        boost_1_79_0
+        boost_1_78_0
         boost_1_77_0
         boost_1_76_0
         boost_1_75_0

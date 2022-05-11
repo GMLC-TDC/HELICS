@@ -108,13 +108,14 @@ class DependencyInfo: public TimeData {
     DependencyInfo() = default;
     DependencyInfo(const DependencyInfo&) = default;
     DependencyInfo& operator=(const DependencyInfo&) = default;
-    DependencyInfo(DependencyInfo &&) = default;
+    DependencyInfo(DependencyInfo&&) = default;
     DependencyInfo& operator=(DependencyInfo&&) = default;
     /** construct from a federate id*/
     explicit DependencyInfo(GlobalFederateId id): fedID(id), forwarding{id.isBroker()} {}
 
     template<class... Args>
-    explicit DependencyInfo(Time start, Args&&... args): TimeData(start, std::forward<Args>(args)...)
+    explicit DependencyInfo(Time start, Args&&... args):
+        TimeData(start, std::forward<Args>(args)...)
     {
     }
 };
