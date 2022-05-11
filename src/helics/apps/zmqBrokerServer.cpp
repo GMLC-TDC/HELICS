@@ -27,7 +27,7 @@ static const Json::Value null;
 
 namespace helics::apps {
 
-void zmqBrokerServer::processArgs(const std::string& args)
+void zmqBrokerServer::processArgs(std::string_view args)
 
 {
     CLI::App parser("zmq broker server parser");
@@ -38,7 +38,7 @@ void zmqBrokerServer::processArgs(const std::string& args)
                       "specify the interface to use for connecting the zmq broker server");
 
     try {
-        parser.parse(args);
+        parser.parse(std::string(args));
     }
     catch (const CLI::Error& ce) {
         logMessage(std::string("error processing command line arguments for web server :") +

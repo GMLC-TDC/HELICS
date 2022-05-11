@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/MessageFederate.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -40,24 +41,24 @@ consistent answers if used from multiple threads unless protected.
     @param name the name of the echo app, can be empty to get name from fi or default
     @param fi a pointer info object containing information on the desired federate configuration
     */
-        explicit Echo(const std::string& name, const FederateInfo& fi);
+        explicit Echo(std::string_view name, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the echo app, can be empty to get name from fi or default
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Echo(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Echo(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Echo(const std::string& name, CoreApp& core, const FederateInfo& fi);
+        Echo(std::string_view name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param name the name of the echo app, can be empty to get name from fi or default
     @param jsonString file or JSON string defining the federate information and other configuration
     */
-        Echo(const std::string& name, const std::string& jsonString);
+        Echo(std::string_view name, const std::string& jsonString);
 
         /** move construction*/
         Echo(Echo&& other_echo) noexcept;
@@ -73,7 +74,7 @@ consistent answers if used from multiple threads unless protected.
     @param endpointName the name of the endpoint
     @param endpointType the named type of the endpoint
     */
-        void addEndpoint(const std::string& endpointName, const std::string& endpointType = "");
+        void addEndpoint(std::string_view endpointName, std::string_view endpointType = "");
 
         /** get the number of points loaded*/
         auto echoCount() const { return echoCounter; }
@@ -94,7 +95,7 @@ consistent answers if used from multiple threads unless protected.
       private:
         /** process remaining command line arguments*/
         void processArgs();
-        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::deque<Endpoint> endpoints;  //!< the actual endpoint objects
         Time delayTime = timeZero;  //!< respond to each message with the specified delay
         size_t echoCounter = 0;  //!< the current message index
         std::mutex delayTimeLock;  // mutex protecting delayTime

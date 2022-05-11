@@ -14,7 +14,7 @@ namespace helics {
 class FederateInfo;
 }  // namespace helics
 
-helics::DataType getType(const std::string& typeString);
+helics::DataType getType(std::string_view typeString);
 
 char typeCharacter(helics::DataType type);
 

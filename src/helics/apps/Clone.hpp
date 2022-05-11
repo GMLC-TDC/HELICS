@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
@@ -31,7 +32,7 @@ namespace apps {
     federateInfo object
     @param fi  a federate information structure
     */
-        Clone(const std::string& appName, FederateInfo& fi);
+        Clone(std::string_view appName, FederateInfo& fi);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -45,22 +46,20 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Clone(const std::string& appName,
-              const std::shared_ptr<Core>& core,
-              const FederateInfo& fi);
+        Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi);
 
         /**constructor taking a federate information structure and using the given core
     @param appName the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Clone(const std::string& appName, CoreApp& core, const FederateInfo& fi);
+        Clone(std::string_view appName, CoreApp& core, const FederateInfo& fi);
 
         /**constructor taking a file with the required information
     @param appName the name of the app
     @param jsonString a file or json string defining the federate information in JSON or text
     */
-        Clone(const std::string& appName, const std::string& jsonString);
+        Clone(std::string_view appName, const std::string& jsonString);
         /** move construction*/
         Clone(Clone&& other_recorder) = default;
         /** move assignment*/
@@ -89,17 +88,17 @@ namespace apps {
         /** set the name of the federate to Clone
     @param federateName the name of the federate to clone
     */
-        void setFederateToClone(const std::string& federateName);
+        void setFederateToClone(std::string_view federateName);
         /** set the name of the output file
     @param fileName  the name of the file, can be "" if no file should be auto saved*/
-        void setOutputFile(std::string fileName) { outFileName = std::move(fileName); }
+        void setOutputFile(std::string_view fileName) { outFileName = fileName; }
 
       private:
         /** add a subscription to capture*/
-        void addSubscription(const std::string& key);
+        void addSubscription(std::string_view key);
 
         /** copy all messages that come from a specified endpoint*/
-        void addSourceEndpointClone(const std::string& sourceEndpoint);
+        void addSourceEndpointClone(std::string_view sourceEndpoint);
 
         virtual void initialize() override;
         void generateInterfaces();
@@ -119,7 +118,7 @@ namespace apps {
             bool first{false};
             std::string value;
             ValueCapture() = default;
-            ValueCapture(helics::Time t1, int id1, const std::string& val):
+            ValueCapture(helics::Time t1, int id1, std::string_view val):
                 time(t1), index(id1), value(val)
             {
             }
@@ -132,15 +131,15 @@ namespace apps {
             helics::timeZero};  //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
         std::vector<ValueCapture> points;  //!< lists of points that were captured
-        std::vector<Input> subscriptions;  //!< the actual subscription objects
+        std::deque<Input> subscriptions;  //!< the actual subscription objects
         std::vector<std::string>
             cloneSubscriptionNames;  //!< string of the subscriptions of the cloned federate
         std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
         std::map<helics::InterfaceHandle, int> subids;  //!< map of the subscription ids
-        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::map<std::string_view, int> subkeys;  //!< translate subscription names to an index
         std::map<helics::InterfaceHandle, int> eptids;  // translate subscription id to index
-        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::map<std::string_view, int> eptNames;  //!< translate endpoint name to index
         std::string captureFederate;  //!< storage for the name of the federate to clone
         std::string fedConfig;  //!< storage for the federateConfiguration
         std::string outFileName{"clone.json"};  //!< the final output file

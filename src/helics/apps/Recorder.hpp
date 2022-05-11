@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Subscriptions.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
@@ -30,7 +31,7 @@ namespace apps {
     federateInfo object
     @param fi  a federate information structure
     */
-        Recorder(const std::string& name, FederateInfo& fi);
+        Recorder(std::string_view name, FederateInfo& fi);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -44,20 +45,18 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Recorder(const std::string& name,
-                 const std::shared_ptr<Core>& core,
-                 const FederateInfo& fi);
+        Recorder(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Recorder(const std::string& name, CoreApp& core, const FederateInfo& fi);
+        Recorder(std::string_view name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param name the name of the app
     @param jsonString a file or JSON string defining the federate information in JSON
     */
-        Recorder(const std::string& name, const std::string& jsonString);
+        Recorder(std::string_view name, const std::string& jsonString);
         /** move construction*/
         Recorder(Recorder&& other_recorder) = default;
         /** move assignment*/
@@ -67,17 +66,17 @@ namespace apps {
         /** run the Player until the specified time*/
         virtual void runTo(Time runToTime) override;
         /** add a subscription to capture*/
-        void addSubscription(const std::string& key);
+        void addSubscription(std::string_view key);
         /** add an endpoint*/
-        void addEndpoint(const std::string& endpoint);
+        void addEndpoint(std::string_view endpoint);
         /** copy all messages that come from a specified endpoint*/
-        void addSourceEndpointClone(const std::string& sourceEndpoint);
+        void addSourceEndpointClone(std::string_view sourceEndpoint);
         /** copy all messages that are going to a specific endpoint*/
-        void addDestEndpointClone(const std::string& destEndpoint);
+        void addDestEndpointClone(std::string_view destEndpoint);
         /** add a capture interface
     @param captureDesc describes a federate to capture all the interfaces for
     */
-        void addCapture(const std::string& captureDesc);
+        void addCapture(std::string_view captureDesc);
         /** save the data to a file*/
         void saveFile(const std::string& filename);
         /** get the number of captured points*/
@@ -128,7 +127,7 @@ namespace apps {
             bool first{false};
             std::string value;
             ValueCapture() = default;
-            ValueCapture(helics::Time t1, int id1, const std::string& val):
+            ValueCapture(helics::Time t1, int id1, std::string_view val):
                 time(t1), index(id1), value(val)
             {
             }
@@ -149,15 +148,15 @@ namespace apps {
             helics::timeZero};  //!< the time advancement period for printing markers
         std::unique_ptr<CloningFilter> cFilt;  //!< a pointer to a clone filter
         std::vector<ValueCapture> points;  //!< lists of points that were captured
-        std::vector<Input> subscriptions;  //!< the actual subscription objects
+        std::deque<Input> subscriptions;  //!< the actual subscription objects
         std::vector<std::string> targets;  //!< specified targets for the subscriptions
-        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::deque<Endpoint> endpoints;  //!< the actual endpoint objects
         std::unique_ptr<Endpoint> cloneEndpoint;  //!< the endpoint for cloned message delivery
         std::vector<std::unique_ptr<Message>> messages;  //!< list of messages
         std::map<helics::InterfaceHandle, int> subids;  //!< map of the subscription ids
-        std::map<std::string, int> subkeys;  //!< translate subscription names to an index
+        std::map<std::string_view, int> subkeys;  //!< translate subscription names to an index
         std::map<helics::InterfaceHandle, int> eptids;  // translate subscription id to index
-        std::map<std::string, int> eptNames;  //!< translate endpoint name to index
+        std::map<std::string_view, int> eptNames;  //!< translate endpoint name to index
         std::vector<ValueStats> vStat;  //!< storage for statistics capture
         std::vector<std::string> captureInterfaces;  //!< storage for the interfaces to capture
         std::string mapfile;  //!< file name for the on-line file updater

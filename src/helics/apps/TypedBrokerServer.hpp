@@ -29,7 +29,7 @@ namespace apps {
         /** stop the server*/
         virtual void stopServer() = 0;
         /** process some potential command line arguments for the typed server*/
-        virtual void processArgs(const std::string& args);
+        virtual void processArgs(std::string_view args);
 
       protected:
         /** generate a reply to a message*/
@@ -40,7 +40,7 @@ namespace apps {
         /* assign a port in the portData structure*/
         static void assignPort(portData& pd, int pnumber, std::shared_ptr<Broker>& brk);
         /* log a message to the console */
-        static void logMessage(const std::string& message);
+        static void logMessage(std::string_view message);
     };
 }  // namespace apps
 }  // namespace helics

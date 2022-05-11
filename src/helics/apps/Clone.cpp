@@ -41,7 +41,7 @@ static std::string encode(std::string_view str2encode)
 
 namespace helics {
 namespace apps {
-    Clone::Clone(const std::string& appName, FederateInfo& fi): App(appName, fi)
+    Clone::Clone(std::string_view appName, FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
@@ -71,7 +71,7 @@ namespace apps {
         }
     }
 
-    Clone::Clone(const std::string& appName,
+    Clone::Clone(std::string_view appName,
                  const std::shared_ptr<Core>& core,
                  const FederateInfo& fi):
         App(appName, core, fi)
@@ -79,14 +79,13 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Clone::Clone(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+    Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Clone::Clone(const std::string& appName, const std::string& jsonString):
-        App(appName, jsonString)
+    Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Clone::loadJsonFile(jsonString);
@@ -310,7 +309,7 @@ namespace apps {
         }
     }
     /** add a subscription to record*/
-    void Clone::addSubscription(const std::string& key)
+    void Clone::addSubscription(std::string_view key)
     {
         auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
@@ -318,11 +317,11 @@ namespace apps {
             auto index = static_cast<int>(subscriptions.size()) - 1;
             auto id = subscriptions.back().getHandle();
             subids[id] = index;  // this is a new element
-            subkeys[key] = index;  // this is a potential replacement
+            subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
         }
     }
 
-    void Clone::addSourceEndpointClone(const std::string& sourceEndpoint)
+    void Clone::addSourceEndpointClone(std::string_view sourceEndpoint)
     {
         if (!cFilt) {
             cFilt = std::make_unique<CloningFilter>(fed.get());
@@ -332,7 +331,7 @@ namespace apps {
         cFilt->addSourceTarget(sourceEndpoint);
     }
 
-    void Clone::setFederateToClone(const std::string& federateName)
+    void Clone::setFederateToClone(std::string_view federateName)
     {
         captureFederate = federateName;
     }
