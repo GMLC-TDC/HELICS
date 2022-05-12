@@ -11,10 +11,10 @@ cmake_minimum_required(VERSION 3.4)
 # Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
 # policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
 # of a bug in MSVC 15.7 built-in and modified CMake 3.11
-if(CMAKE_VERSION VERSION_LESS 3.20)
+if(CMAKE_VERSION VERSION_LESS 3.23)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 else()
-    cmake_policy(VERSION 3.20)
+    cmake_policy(VERSION 3.23)
 endif()
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
@@ -23,14 +23,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 2.8.0)
+project(HELICS VERSION 2.8.1)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2021-09-17")
+set(HELICS_DATE "2022-05-17")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
