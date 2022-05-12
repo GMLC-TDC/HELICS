@@ -1092,7 +1092,7 @@ TEST(logging, remote_log_multiObjects)
     int remote_cntFed2{0};
     int remote_cntBroker{0};
     auto llock2 = mlogFed.lock();
-    
+
     for (const auto& lg : llock2) {
         if (std::get<1>(lg).find("broker12") != std::string::npos ||
             std::get<1>(lg).find("root") != std::string::npos) {
