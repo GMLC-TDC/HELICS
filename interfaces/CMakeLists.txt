@@ -29,10 +29,14 @@ Re-run cmake with the `-U${tmp_py_interface_option}` option to get rid of this e
     )
 endif()
 
-cmake_dependent_option(
-    HELICS_BUILD_MATLAB_INTERFACE "Build Matlab Extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
-    OFF
-)
+if(HELICS_BUILD_MATLAB_INTERFACE)
+    message(
+        FATAL_ERROR
+            "The matlab interface is no longer compiled as part of building HELICS. please see the new repository at https://github.com/gmlc-tdc/matHELICS for details.
+Re-run cmake with the `-UHELICS_BUILD_MATLAB_INTERFACE` option to get rid of this error message."
+    )
+endif()
+
 cmake_dependent_option(
     HELICS_BUILD_OCTAVE_INTERFACE "Build Octave extension" OFF "NOT HELICS_DISABLE_C_SHARED_LIB"
     OFF
@@ -121,10 +125,6 @@ include_directories(${HELICS_SWIG_INCLUDE_DIRS})
 
 if(HELICS_BUILD_JAVA_INTERFACE)
     add_subdirectory(java)
-endif()
-
-if(HELICS_BUILD_MATLAB_INTERFACE)
-    add_subdirectory(matlab)
 endif()
 
 if(HELICS_BUILD_OCTAVE_INTERFACE)
