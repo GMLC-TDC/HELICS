@@ -28,12 +28,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef HELICS_DEPRECATED
 #    if defined _WIN32 || defined __CYGWIN__
 #        ifdef __GNUC__
-#            define HELICS__DEPRECATED __attribute__((deprecated))
+#            define HELICS_DEPRECATED __attribute__((deprecated))
 #        else
-#            define HELICS__DEPRECATED __declspec(deprecated)
+#            define HELICS_DEPRECATED __declspec(deprecated)
 #        endif
 #    else
-#        define HELICS__DEPRECATED __attribute__((deprecated))
+#        define HELICS_DEPRECATED __attribute__((deprecated))
 #    endif
 #endif
 
