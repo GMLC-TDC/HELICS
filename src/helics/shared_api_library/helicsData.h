@@ -44,7 +44,7 @@ HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data);
 HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
 
 /** convert a bool to serialized bytes*/
 HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);

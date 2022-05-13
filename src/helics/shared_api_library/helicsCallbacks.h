@@ -215,13 +215,13 @@ HELICS_EXPORT void
  * to specific queries with answers specific to a federate.
  *
  * @param buffer The buffer received in a helicsQueryCallback.
- * @param str Pointer to the data to fill the buffer with.
+ * @param queryResult Pointer to the data wiht the query result to fill the buffer with.
  * @param strSize The size of the string.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
+HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* queryResult, int strSize, HelicsError* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
