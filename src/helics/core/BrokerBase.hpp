@@ -108,18 +108,18 @@ class BrokerBase {
     std::shared_ptr<LogManager> mLogManager;  //!< object to handle the logging considerations
     /** enumeration of the possible core states*/
     enum class BrokerState : int16_t {
-        created = -10,  //!< the broker has been created
-        configuring = -7,  //!< the broker is in the processing of configuring
-        configured = -6,  //!< the broker itself has been configured and is ready to connect
-        connecting = -4,  //!< the connection process has started
-        connected = -3,  //!< the connection process has completed
-        initializing = -1,  //!< the enter initialization process has started
-        operating = 0,  //!< normal operating conditions
-        connected_error = 3,  //!< error state but still connected
-        terminating = 4,  //!< the termination process has started
-        terminating_error = 5,  //!< the termination process has started while in an error state
-        terminated = 6,  //!< the termination process has started
-        errored = 7,  //!< an error was encountered
+        CREATED = -10,  //!< the broker has been created
+        CONFIGURING = -7,  //!< the broker is in the processing of configuring
+        CONFIGURED = -6,  //!< the broker itself has been configured and is ready to connect
+        CONNECTING = -4,  //!< the connection process has started
+        CONNECTED = -3,  //!< the connection process has completed
+        INITIALIZING = -1,  //!< the enter initialization process has started
+        OPERATING = 0,  //!< normal operating conditions
+        CONNECTED_ERROR = 3,  //!< error state but still connected
+        TERMINATING = 4,  //!< the termination process has started
+        TERMINATING_ERROR = 5,  //!< the termination process has started while in an error state
+        TERMINATED = 6,  //!< the termination process has started
+        ERRORED = 7,  //!< an error was encountered
     };
 
     enum class TickForwardingReasons : uint32_t {
@@ -157,7 +157,7 @@ class BrokerBase {
     /** reasons ticks might be forwarded*/
     uint32_t forwardingReasons{0U};
     /** storage for the current state of the system */
-    std::atomic<BrokerState> brokerState{BrokerState::created};
+    std::atomic<BrokerState> brokerState{BrokerState::CREATED};
 
   public:
     explicit BrokerBase(bool DisableQueue = false) noexcept;

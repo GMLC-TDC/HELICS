@@ -27,8 +27,8 @@ class CommsInterface {
     /** enumeration of whether the threading system should generate a single thread or multiple
      * threads*/
     enum class thread_generation {
-        single,  // indicate that a single thread is used for transmitting and receiving
-        dual  // indicate that separate threads are used 1 for transmission and one for reception
+        single,  //!< indicate that a single thread is used for transmitting and receiving
+        dual  //!< indicate that separate threads are used 1 for transmission and one for reception
     };
     /** default constructor*/
     CommsInterface() = default;
@@ -104,18 +104,19 @@ class CommsInterface {
   protected:
     /// enumeration of the connection status flags for more immediate feedback from the processing
     /// threads
-    enum class connection_status : int {
+    enum class ConnectionStatus : int {
 
-        startup = -1,  //!< the connection is in startup mode
-        connected = 0,  //!< we are connected
-        reconnecting = 1,  //!< we are trying reconnect
-        terminated = 2,  //!< the connection has been terminated
-        error = 4  //!< some error occurred on the connection
+        STARTUP = -1,  //!< the connection is in STARTUP mode
+        CONNECTED = 0,  //!< we are CONNECTED
+        RECONNECTING = 1,  //!< we are trying reconnect
+        TERMINATED = 2,  //!< the connection has been TERMINATED
+        ERRORED = 4  //!< some ERRORED occurred on the connection
     };
 
   private:
-    std::atomic<connection_status> rx_status{
-        connection_status::startup};  //!< the status of the receiver thread
+    /// the status of the receiver thread
+    std::atomic<ConnectionStatus> rxStatus{
+        ConnectionStatus::STARTUP};  
   protected:
     gmlc::concurrency::TriggerVariable rxTrigger;
 
@@ -123,14 +124,16 @@ class CommsInterface {
     std::string localTargetAddress;  //!< the base for the receive address
     std::string brokerTargetAddress;  //!< the base for the broker address
     std::string brokerName;  //!< the identifier for the broker
+    /// the initialization string for any automatically generated broker
     std::string
-        brokerInitString;  //!< the initialization string for any automatically generated broker
+        brokerInitString;  
   private:
     std::string randomID;  //!< randomized id for preventing crosstalk in some situations
-    std::atomic<connection_status> tx_status{
-        connection_status::startup};  //!< the status of the transmitter thread
+    /// the status of the transmitter thread
+    std::atomic<ConnectionStatus> txStatus{
+        ConnectionStatus::STARTUP};  
     gmlc::concurrency::TriggerVariable txTrigger;
-    std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
+    std::atomic<bool> operating{false};  //!< the comms interface is in STARTUP mode
     const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
@@ -169,10 +172,10 @@ class CommsInterface {
     virtual void reconnectTransmitter();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver();  //!< function to reconnect the receiver
   protected:
-    void setTxStatus(connection_status txStatus);
-    void setRxStatus(connection_status rxStatus);
-    connection_status getRxStatus() const { return rx_status.load(); }
-    connection_status getTxStatus() const { return tx_status.load(); }
+    void setTxStatus(ConnectionStatus status);
+    void setRxStatus(ConnectionStatus status);
+    ConnectionStatus getRxStatus() const { return rxStatus.load(); }
+    ConnectionStatus getTxStatus() const { return txStatus.load(); }
     /** function to protect certain properties in a threaded environment
     these functions should be called in a pair*/
     bool propertyLock();

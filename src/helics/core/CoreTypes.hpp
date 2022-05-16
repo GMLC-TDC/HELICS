@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** enumeration of the possible federate states*/
-enum FederateStates {
+enum class FederateStates: std::uint8_t {
     HELICS_CREATED, /*!> state upon creation, all registration calls are allowed*/
     HELICS_INITIALIZING,  //!< the federation has entered initialization state and initial values
                           //!< can be published

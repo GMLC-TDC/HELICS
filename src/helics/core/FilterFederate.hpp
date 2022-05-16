@@ -38,7 +38,7 @@ class FilterFederate {
     // Core* mCore{nullptr};
     TimeCoordinator mCoord;
     HandleManager* mHandles{nullptr};
-    FederateStates current_state{HELICS_CREATED};
+    FederateStates current_state{FederateStates::HELICS_CREATED};
     /// map of all local filters
     std::map<InterfaceHandle, std::unique_ptr<FilterCoordinator>> filterCoord;
     // The interface_handle used is here is usually referencing an endpoint

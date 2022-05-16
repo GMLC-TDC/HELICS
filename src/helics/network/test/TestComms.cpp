@@ -62,20 +62,20 @@ namespace testcore {
             if (!brokerName.empty()) {
                 if (!CoreFactory::copyCoreIdentifier(name, localTargetAddress)) {
                     if (!BrokerFactory::copyBrokerIdentifier(name, localTargetAddress)) {
-                        setRxStatus(connection_status::error);
-                        setTxStatus(connection_status::error);
+                        setRxStatus(ConnectionStatus::ERRORED);
+                        setTxStatus(ConnectionStatus::ERRORED);
                         return;
                     }
                 }
             } else {
                 if (!BrokerFactory::copyBrokerIdentifier(name, localTargetAddress)) {
-                    setRxStatus(connection_status::error);
-                    setTxStatus(connection_status::error);
+                    setRxStatus(ConnectionStatus::ERRORED);
+                    setTxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
             }
         }
-        setRxStatus(connection_status::connected);
+        setRxStatus(ConnectionStatus::CONNECTED);
         std::shared_ptr<CoreBroker> tbroker;
 
         if (brokerName.empty()) {
@@ -96,8 +96,8 @@ namespace testcore {
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                         std::this_thread::sleep_for(milliseconds(200));
@@ -111,8 +111,8 @@ namespace testcore {
                         BrokerFactory::cleanUpBrokers(milliseconds(200));
                         totalSleep += milliseconds(200);
                         if (totalSleep > milliseconds(connectionTimeout)) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                     }
@@ -130,8 +130,8 @@ namespace testcore {
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                         std::this_thread::sleep_for(milliseconds(200));
@@ -149,7 +149,7 @@ namespace testcore {
             }
         }
 
-        setTxStatus(connection_status::connected);
+        setTxStatus(ConnectionStatus::CONNECTED);
         std::map<route_id, std::shared_ptr<BrokerBase>> routes;
         bool haltLoop{false};
         while (!haltLoop) {
@@ -206,7 +206,7 @@ namespace testcore {
                             processed = true;
                             break;
                         case CLOSE_RECEIVER:
-                            setRxStatus(connection_status::terminated);
+                            setRxStatus(ConnectionStatus::TERMINATED);
                             processed = true;
                             break;
                         case DISCONNECT:
@@ -270,17 +270,17 @@ namespace testcore {
         routes.clear();
         tbroker = nullptr;
 
-        setTxStatus(connection_status::terminated);
+        setTxStatus(ConnectionStatus::TERMINATED);
     }
 
     void TestComms::haltComms()
     {
-        if (getRxStatus() == connection_status::connected) {
+        if (getRxStatus() == ConnectionStatus::CONNECTED) {
             ActionMessage cmd(CMD_PROTOCOL);
             cmd.messageID = CLOSE_RECEIVER;
             transmit(control_route, cmd);
         }
-        if (getTxStatus() == connection_status::connected) {
+        if (getTxStatus() == ConnectionStatus::CONNECTED) {
             ActionMessage cmd(CMD_PROTOCOL);
             cmd.messageID = DISCONNECT;
             transmit(control_route, cmd);
@@ -289,7 +289,7 @@ namespace testcore {
 
     void TestComms::pauseComms(bool paused)
     {
-        if (getTxStatus() == connection_status::connected) {
+        if (getTxStatus() == ConnectionStatus::CONNECTED) {
             ActionMessage cmd(CMD_PROTOCOL);
             cmd.messageID = (paused) ? PAUSE_TRANSMITTER : UNPAUSE_TRANSMITTER;
             transmit(control_route, cmd);
@@ -298,7 +298,7 @@ namespace testcore {
 
     void TestComms::allowMessages(int count)
     {
-        if (getTxStatus() == connection_status::connected) {
+        if (getTxStatus() == ConnectionStatus::CONNECTED) {
             ActionMessage cmd(CMD_PROTOCOL);
             cmd.messageID = ALLOW_MESSAGES;
             cmd.setExtraData(count);

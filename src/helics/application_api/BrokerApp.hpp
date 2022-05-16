@@ -170,7 +170,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     void setTimeBarrier(Time barrierTime);
     /** clear a global time Barrier*/
     void clearTimeBarrier();
-    /** generate a global error that will halt a co-simulation*/
+    /** generate a global ERRORED that will halt a co-simulation*/
     void globalError(int32_t errorCode, std::string_view errorString);
 
   private:
@@ -191,7 +191,7 @@ class BrokerKeeper {
     BrokerKeeper(const BrokerKeeper& brkeep) = default;
     BrokerKeeper& operator=(BrokerKeeper&& brkeep) = default;
     BrokerKeeper& operator=(const BrokerKeeper& brkeep) = default;
-    /// is the broker connected
+    /// is the broker CONNECTED
     bool isConnected() { return brk.isConnected(); }
     /// Force terminate the broker
     void forceTerminate() { brk.forceTerminate(); }

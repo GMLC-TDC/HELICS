@@ -145,8 +145,8 @@ void TcpCommsSS::queue_tx_function()
     }
     if (!serverMode && !outgoingConnectionsAllowed) {
         logError("no server and no outgoing connections-> no way to connect to comms");
-        setRxStatus(connection_status::error);
-        setTxStatus(connection_status::error);
+        setRxStatus(ConnectionStatus::ERRORED);
+        setTxStatus(ConnectionStatus::ERRORED);
         return;
     }
     gmlc::networking::TcpServer::pointer server;
@@ -177,8 +177,8 @@ void TcpCommsSS::queue_tx_function()
             if (!connected) {
                 logError("unable to bind to tcp connection socket");
                 server->close();
-                setRxStatus(connection_status::error);
-                setTxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
+                setTxStatus(ConnectionStatus::ERRORED);
                 return;
             }
         }
@@ -216,7 +216,7 @@ void TcpCommsSS::queue_tx_function()
             }
         }
     }
-    setRxStatus(connection_status::connected);
+    setRxStatus(ConnectionStatus::CONNECTED);
     std::vector<char> buffer;
 
     TcpConnection::pointer brokerConnection;
@@ -243,8 +243,8 @@ void TcpCommsSS::queue_tx_function()
                     if (server) {
                         server->close();
                     }
-                    setTxStatus(connection_status::error);
-                    setRxStatus(connection_status::error);
+                    setTxStatus(ConnectionStatus::ERRORED);
+                    setRxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
 
@@ -257,8 +257,8 @@ void TcpCommsSS::queue_tx_function()
             catch (std::exception& e) {
                 logError(std::string("unable to establish connection with ") + brokerTargetAddress +
                          "::" + e.what());
-                setTxStatus(connection_status::error);
-                setRxStatus(connection_status::error);
+                setTxStatus(ConnectionStatus::ERRORED);
+                setRxStatus(ConnectionStatus::ERRORED);
                 return;
             }
             established_routes[gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort)] =
@@ -266,7 +266,7 @@ void TcpCommsSS::queue_tx_function()
         }
     }
 
-    setTxStatus(connection_status::connected);
+    setTxStatus(ConnectionStatus::CONNECTED);
 
     bool haltLoop{false};
     //  std::vector<ActionMessage> txlist;
@@ -360,7 +360,7 @@ void TcpCommsSS::queue_tx_function()
                         processed = true;
                         break;
                     case CLOSE_RECEIVER:
-                        setRxStatus(connection_status::terminated);
+                        setRxStatus(ConnectionStatus::TERMINATED);
                         break;
                     case DISCONNECT:
                         haltLoop = true;
@@ -448,14 +448,14 @@ void TcpCommsSS::queue_tx_function()
     }
     routes.clear();
     brokerConnection = nullptr;
-    setTxStatus(connection_status::terminated);
+    setTxStatus(ConnectionStatus::TERMINATED);
     if (server) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         server->close();
         server = nullptr;
     }
-    if (getRxStatus() == connection_status::connected) {
-        setRxStatus(connection_status::terminated);
+    if (getRxStatus() == ConnectionStatus::CONNECTED) {
+        setRxStatus(ConnectionStatus::TERMINATED);
     }
 }
 

@@ -35,8 +35,8 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
 
 FilterFederate::~FilterFederate()
 {
-    mHandles = {nullptr};
-    current_state = {HELICS_CREATED};
+    mHandles = nullptr;
+    current_state = FederateStates::HELICS_CREATED;
     /// map of all local filters
     filterCoord.clear();
     // The interface_handle used is here is usually referencing an endpoint
@@ -500,7 +500,7 @@ void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
     timeBlockProcesses.emplace_back(id, TimeVal);
     if (TimeVal < minReturnTime) {
         minReturnTime = TimeVal;
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
+        mCoord.updateMessageTime(minReturnTime, current_state == FederateStates::HELICS_EXECUTING);
     }
 }
 
@@ -524,7 +524,7 @@ void FilterFederate::clearTimeReturn(int32_t id)
                 minReturnTime = tBP.second;
             }
         }
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
+        mCoord.updateMessageTime(minReturnTime, current_state == FederateStates::HELICS_EXECUTING);
     }
 }
 
@@ -532,7 +532,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
 {
     auto proc_result = processCoordinatorMessage(command, &mCoord, current_state, false, mFedID);
 
-    if (std::get<2>(proc_result) && current_state == HELICS_EXECUTING) {
+    if (std::get<2>(proc_result) && current_state == FederateStates::HELICS_EXECUTING) {
         mCoord.disconnect();
         ActionMessage disconnect(CMD_DISCONNECT);
         disconnect.source_id = mFedID;
@@ -542,7 +542,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
     if (current_state != std::get<0>(proc_result)) {
         current_state = std::get<0>(proc_result);
         switch (current_state) {
-            case HELICS_INITIALIZING:
+            case FederateStates::HELICS_INITIALIZING:
                 mCoord.enteringExecMode(IterationRequest::NO_ITERATIONS);
                 {
                     ActionMessage echeck{CMD_EXEC_CHECK};
@@ -551,12 +551,12 @@ void FilterFederate::handleMessage(ActionMessage& command)
                     handleMessage(echeck);
                 }
                 break;
-            case HELICS_EXECUTING:
+            case FederateStates::HELICS_EXECUTING:
                 mCoord.timeRequest(cBigTime, IterationRequest::NO_ITERATIONS, cBigTime, cBigTime);
                 break;
-            case HELICS_FINISHED:
+            case FederateStates::HELICS_FINISHED:
                 break;
-            case HELICS_ERROR: {
+            case FederateStates::HELICS_ERROR: {
                 std::string errorString;
                 if (command.payload.empty()) {
                     errorString = commandErrorString(command.messageID);
