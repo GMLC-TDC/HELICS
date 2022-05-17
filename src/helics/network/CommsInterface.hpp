@@ -115,8 +115,8 @@ class CommsInterface {
 
   private:
     /// the status of the receiver thread
-    std::atomic<ConnectionStatus> rxStatus{
-        ConnectionStatus::STARTUP};  
+    std::atomic<ConnectionStatus> rxStatus{ConnectionStatus::STARTUP};
+
   protected:
     gmlc::concurrency::TriggerVariable rxTrigger;
 
@@ -125,13 +125,12 @@ class CommsInterface {
     std::string brokerTargetAddress;  //!< the base for the broker address
     std::string brokerName;  //!< the identifier for the broker
     /// the initialization string for any automatically generated broker
-    std::string
-        brokerInitString;  
+    std::string brokerInitString;
+
   private:
     std::string randomID;  //!< randomized id for preventing crosstalk in some situations
     /// the status of the transmitter thread
-    std::atomic<ConnectionStatus> txStatus{
-        ConnectionStatus::STARTUP};  
+    std::atomic<ConnectionStatus> txStatus{ConnectionStatus::STARTUP};
     gmlc::concurrency::TriggerVariable txTrigger;
     std::atomic<bool> operating{false};  //!< the comms interface is in STARTUP mode
     const bool singleThread{false};  //!< specify that the interface should operate a single thread

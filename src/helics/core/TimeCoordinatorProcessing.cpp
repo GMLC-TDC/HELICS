@@ -144,8 +144,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             break;
         case CMD_DISCONNECT_FED_ACK:
             if ((cmd.dest_id == localID) && (cmd.source_id == parent_broker_id)) {
-                if ((state != FederateStates::FINISHED) &&
-                    (state != FederateStates::TERMINATING)) {
+                if ((state != FederateStates::FINISHED) && (state != FederateStates::TERMINATING)) {
                     timeCoord->disconnect();
                 }
                 newState = FederateStates::FINISHED;
@@ -159,8 +158,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == localID) {
-                if ((state != FederateStates::FINISHED) &&
-                    (state != FederateStates::TERMINATING)) {
+                if ((state != FederateStates::FINISHED) && (state != FederateStates::TERMINATING)) {
                     timeCoord->disconnect();
                     cmd.dest_id = parent_broker_id;
                     newState = FederateStates::TERMINATING;
@@ -273,8 +271,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             if (cmd.action() == CMD_GLOBAL_ERROR || cmd.source_id == localID ||
                 cmd.source_id == parent_broker_id || cmd.source_id == gRootBrokerID ||
                 cmd.dest_id != localID) {
-                if ((state != FederateStates::FINISHED) &&
-                    (state != FederateStates::TERMINATING)) {
+                if ((state != FederateStates::FINISHED) && (state != FederateStates::TERMINATING)) {
                     if (cmd.action() != CMD_GLOBAL_ERROR) {
                         timeCoord->localError();
                     }

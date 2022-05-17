@@ -18,10 +18,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 /** enumeration of the possible federate states*/
-enum class FederateStates: std::uint8_t {
+enum class FederateStates : std::uint8_t {
     CREATED, /*!> state upon creation, all registration calls are allowed*/
     INITIALIZING,  //!< the federation has entered initialization state and initial values
-                          //!< can be published
+                   //!< can be published
     EXECUTING,  //!< the federation has entered execution state and it now advancing in time
     TERMINATING,  //!< the federate is in the process of shutting down
     HELICS_ERROR,  //!< the federation has encountered an error

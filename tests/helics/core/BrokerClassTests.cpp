@@ -18,7 +18,8 @@ TEST(broker_tests, global_value_test)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "gbroker", "-f2 --root");
     constexpr std::string_view globalVal = "this is a string constant that functions as a global";
-    constexpr std::string_view globalVal2 = "this is a second string constant that functions as a global";
+    constexpr std::string_view globalVal2 =
+        "this is a second string constant that functions as a global";
     brk->setGlobal("testglobal", globalVal);
     auto res = brk->query("global_value", "testglobal");
     EXPECT_EQ(res, globalVal);

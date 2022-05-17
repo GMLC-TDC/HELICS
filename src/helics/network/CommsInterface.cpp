@@ -557,8 +557,7 @@ void CommsInterface::setServerMode(bool serverActive)
 
 bool CommsInterface::isConnected() const
 {
-    return ((txStatus == ConnectionStatus::CONNECTED) &&
-            (rxStatus == ConnectionStatus::CONNECTED));
+    return ((txStatus == ConnectionStatus::CONNECTED) && (rxStatus == ConnectionStatus::CONNECTED));
 }
 
 void CommsInterface::logMessage(std::string_view message) const

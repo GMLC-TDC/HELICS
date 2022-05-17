@@ -1204,8 +1204,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             break;
         case CMD_GLOBAL_DISCONNECT:
         case CMD_USER_DISCONNECT:
-            if ((state != FederateStates::FINISHED) &&
-                (state != FederateStates::TERMINATING)) {
+            if ((state != FederateStates::FINISHED) && (state != FederateStates::TERMINATING)) {
                 timeCoord->disconnect();
                 cmd.dest_id = parent_broker_id;
                 if (state != FederateStates::HELICS_ERROR) {
@@ -1217,8 +1216,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == global_id.load()) {
-                if ((state != FederateStates::FINISHED) &&
-                    (state != FederateStates::TERMINATING)) {
+                if ((state != FederateStates::FINISHED) && (state != FederateStates::TERMINATING)) {
                     timeCoord->disconnect();
                     cmd.dest_id = parent_broker_id;
                     if (state != FederateStates::HELICS_ERROR) {
@@ -1653,8 +1651,7 @@ void FederateState::setProperty(int timeProperty, Time propertyVal)
             auto prevTimeout = grantTimeOutPeriod;
             grantTimeOutPeriod = propertyVal;
             if (prevTimeout == timeZero) {
-                if (getState() >= FederateStates::INITIALIZING &&
-                    grantTimeOutPeriod > timeZero) {
+                if (getState() >= FederateStates::INITIALIZING && grantTimeOutPeriod > timeZero) {
                     if (!mTimer) {
                         if (!mTimer) {
                             mTimer = std::make_shared<MessageTimer>([this](ActionMessage&& mess) {
