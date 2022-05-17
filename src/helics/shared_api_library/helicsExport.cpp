@@ -948,7 +948,6 @@ void helicsCoreFree(HelicsCore core)
 {
     auto* coreObj = helics::getCoreObject(core, nullptr);
     if (coreObj != nullptr) {
-        coreObj->valid = 0;
         getMasterHolder()->clearCore(coreObj->index);
     }
     helics::CoreFactory::cleanUpCores();
@@ -958,7 +957,6 @@ void helicsBrokerFree(HelicsBroker broker)
 {
     auto* brokerObj = helics::getBrokerObject(broker, nullptr);
     if (brokerObj != nullptr) {
-        brokerObj->valid = 0;
         getMasterHolder()->clearBroker(brokerObj->index);
     }
     helics::BrokerFactory::cleanUpBrokers();
@@ -968,7 +966,6 @@ void helicsFederateFree(HelicsFederate fed)
 {
     auto* fedObj = helics::getFedObject(fed, nullptr);
     if (fedObj != nullptr) {
-        fedObj->valid = 0;
         getMasterHolder()->clearFed(fedObj->index);
     }
 
