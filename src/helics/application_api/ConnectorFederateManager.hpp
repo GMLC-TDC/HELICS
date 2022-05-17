@@ -30,7 +30,7 @@ class ConnectorFederateManager {
     ~ConnectorFederateManager();
 
     /** register a Filter
-    @details call is only valid in STARTUP mode
+    @details call is only valid in startup mode
     @param name the name of the endpoint
     @param type_in the type the filter is expecting as an input
     @param type_out the type the filter generates
@@ -39,7 +39,7 @@ class ConnectorFederateManager {
         registerFilter(std::string_view name, std::string_view type_in, std::string_view type_out);
 
     /** register a cloningFilter
-    @details call is only valid in STARTUP mode
+    @details call is only valid in startup mode
     @param name the name of the endpoint
     @param type_in the type the filter is expecting as an input
     @param type_out the type the filter generates
@@ -49,14 +49,14 @@ class ConnectorFederateManager {
                                          std::string_view type_out);
 
     /** register a Filter
-    @details call is only valid in STARTUP mode
+    @details call is only valid in startup mode
     @param type the defined type of the filter
     @param name the name of the filter
     */
     Filter& registerFilter(FilterTypes type, std::string_view name);
 
     /** register a cloningFilter
-    @details call is only valid in STARTUP mode
+    @details call is only valid in startup mode
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
@@ -71,7 +71,7 @@ class ConnectorFederateManager {
     const Filter& getFilter(int index) const;
 
     /** register a Translator
-    @details call is only valid in STARTUP mode
+    @details call is only valid in startup mode
     @param name the name of the translator
     @param type_in the type the translator is expecting on the value interface
     @param type_out the type the translator for the endpoint

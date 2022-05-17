@@ -44,11 +44,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             auto processed = timeCoord->processTimeMessage(cmd);
             if (processed == message_process_result::processed) {
                 if (!timeGranted_mode) {
-                    if (state == FederateStates::HELICS_INITIALIZING) {
+                    if (state == FederateStates::INITIALIZING) {
                         cmd.setAction(CMD_EXEC_CHECK);
                         proc = MessageProcessingResult::REPROCESS_MESSAGE;
                     }
-                    if (state == FederateStates::HELICS_EXECUTING) {
+                    if (state == FederateStates::EXECUTING) {
                         cmd.setAction(CMD_TIME_CHECK);
                         proc = MessageProcessingResult::REPROCESS_MESSAGE;
                     }
@@ -57,11 +57,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             break;
         }
         case CMD_INIT_GRANT:
-            if (state == FederateStates::HELICS_CREATED) {
+            if (state == FederateStates::CREATED) {
                 if (checkActionFlag(cmd, observer_flag)) {
                     timeCoord->setDynamicJoining();
                 }
-                newState = FederateStates::HELICS_INITIALIZING;
+                newState = FederateStates::INITIALIZING;
                 newMode = true;
                 proc = MessageProcessingResult::NEXT_STEP;
             }
@@ -101,7 +101,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             [[fallthrough]];
         case CMD_EXEC_CHECK:  // just check the time for entry
         {
-            if (state != FederateStates::HELICS_INITIALIZING) {
+            if (state != FederateStates::INITIALIZING) {
                 break;
             }
             if (!timeGranted_mode) {
@@ -114,7 +114,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                         proc = grant;
                         break;
                     case MessageProcessingResult::NEXT_STEP:
-                        newState = FederateStates::HELICS_EXECUTING;
+                        newState = FederateStates::EXECUTING;
                         newMode = true;
                         // returnable = true;
                         proc = grant;
@@ -134,21 +134,21 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             }
         } break;
         case CMD_TERMINATE_IMMEDIATELY:
-            newState = FederateStates::HELICS_FINISHED;
+            newState = FederateStates::FINISHED;
             proc = MessageProcessingResult::HALTED;
             break;
         case CMD_STOP:
-            newState = FederateStates::HELICS_FINISHED;
+            newState = FederateStates::FINISHED;
             timeCoord->disconnect();
             proc = MessageProcessingResult::HALTED;
             break;
         case CMD_DISCONNECT_FED_ACK:
             if ((cmd.dest_id == localID) && (cmd.source_id == parent_broker_id)) {
-                if ((state != FederateStates::HELICS_FINISHED) &&
-                    (state != FederateStates::HELICS_TERMINATING)) {
+                if ((state != FederateStates::FINISHED) &&
+                    (state != FederateStates::TERMINATING)) {
                     timeCoord->disconnect();
                 }
-                newState = FederateStates::HELICS_FINISHED;
+                newState = FederateStates::FINISHED;
                 proc = MessageProcessingResult::HALTED;
             }
             break;
@@ -159,11 +159,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_DISCONNECT_FED:
         case CMD_DISCONNECT:
             if (cmd.source_id == localID) {
-                if ((state != FederateStates::HELICS_FINISHED) &&
-                    (state != FederateStates::HELICS_TERMINATING)) {
+                if ((state != FederateStates::FINISHED) &&
+                    (state != FederateStates::TERMINATING)) {
                     timeCoord->disconnect();
                     cmd.dest_id = parent_broker_id;
-                    newState = FederateStates::HELICS_TERMINATING;
+                    newState = FederateStates::TERMINATING;
                     proc = MessageProcessingResult::REPROCESS_MESSAGE;
                 }
             } else {
@@ -180,7 +180,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                     default:
                         break;
                 }
-                if (state != FederateStates::HELICS_EXECUTING) {
+                if (state != FederateStates::EXECUTING) {
                     break;
                 }
                 if (!timeGranted_mode) {
@@ -210,7 +210,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             if (returnable) {
                 break;
             }
-            if (state != FederateStates::HELICS_EXECUTING) {
+            if (state != FederateStates::EXECUTING) {
                 break;
             }
             if (!timeGranted_mode) {
@@ -241,8 +241,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             }
             [[fallthrough]];
         case CMD_TIME_CHECK:
-            if (state != FederateStates::HELICS_EXECUTING) {
-                if (state == FederateStates::HELICS_INITIALIZING) {
+            if (state != FederateStates::EXECUTING) {
+                if (state == FederateStates::INITIALIZING) {
                     cmd.setAction(CMD_EXEC_CHECK);
                     proc = MessageProcessingResult::REPROCESS_MESSAGE;
                 }
@@ -273,8 +273,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             if (cmd.action() == CMD_GLOBAL_ERROR || cmd.source_id == localID ||
                 cmd.source_id == parent_broker_id || cmd.source_id == gRootBrokerID ||
                 cmd.dest_id != localID) {
-                if ((state != FederateStates::HELICS_FINISHED) &&
-                    (state != FederateStates::HELICS_TERMINATING)) {
+                if ((state != FederateStates::FINISHED) &&
+                    (state != FederateStates::TERMINATING)) {
                     if (cmd.action() != CMD_GLOBAL_ERROR) {
                         timeCoord->localError();
                     }
@@ -294,7 +294,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                     default:
                         break;
                 }
-                if (state != FederateStates::HELICS_EXECUTING) {
+                if (state != FederateStates::EXECUTING) {
                     break;
                 }
                 if (returnable) {

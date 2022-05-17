@@ -63,7 +63,7 @@ class FederateState {
 
   private:
     std::atomic<FederateStates> state{
-        FederateStates::HELICS_CREATED};  //!< the current state of the federate
+        FederateStates::CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
