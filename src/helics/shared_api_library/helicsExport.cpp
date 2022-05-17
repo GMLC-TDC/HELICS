@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
 #include <atomic>
 #include <csignal>
 #include <future>
@@ -22,7 +23,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 #include <vector>
-#include <algorithm>
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"
