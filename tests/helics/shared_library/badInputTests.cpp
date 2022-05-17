@@ -20,25 +20,34 @@ TEST_F(bad_input_nosan, test_bad_fed)
     // this number is a completely garbage value to test bad input and not give a system fault
     auto vFed2 = reinterpret_cast<HelicsFederate>(reinterpret_cast<uint64_t>(vFed1) + 8);
     // register the publications
-
+    std::cout << "t1" << std::endl;
     CE(helicsFederateEnterInitializingMode(vFed1, &err));
+    std::cout << "t2" << std::endl;
     helicsFederateEnterInitializingMode(vFed2, &err);
+    std::cout << "t3" << std::endl;
     EXPECT_EQ(err.error_code, HELICS_ERROR_INVALID_OBJECT);
     helicsErrorClear(&err);
     // auto core = helicsFederateGetCoreObject(vFed1);
-
+    std::cout << "t4" << std::endl;
     CE(helicsFederateFinalize(vFed1, &err));
+    std::cout << "t5" << std::endl;
     helicsFederateFinalize(vFed2, &err);
     EXPECT_EQ(err.error_code, HELICS_ERROR_INVALID_OBJECT);
-
+    std::cout << "t6" << std::endl;
     helicsFederateFree(vFed1);
+    std::cout << "t7" << std::endl;
     helicsFederateGetCurrentTime(vFed1, &err);
+    std::cout << "t8" << std::endl;
     EXPECT_EQ(err.error_code, HELICS_ERROR_INVALID_OBJECT);
+    std::cout << "t9" << std::endl;
     helicsErrorClear(&err);
+    std::cout << "t10" << std::endl;
     // just make sure this doesn't crash
     helicsFederateFree(vFed1);
+    std::cout << "t11" << std::endl;
     // and make sure this doesn't crash
     helicsFederateFree(vFed2);
+    std::cout << "t12" << std::endl;
 }
 
 /** test simple creation and destruction*/
