@@ -28,7 +28,7 @@ class CommsInterface {
      * threads*/
     enum class thread_generation {
         single,  //!< indicate that a single thread is used for transmitting and receiving
-        dual  //!< indicate that separate threads are used 1 for transmission and one for reception
+        dual  //!< indicate that separate threads are used, 1 for transmission and 1 for reception
     };
     /** default constructor*/
     CommsInterface() = default;
