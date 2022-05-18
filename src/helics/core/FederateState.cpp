@@ -1060,8 +1060,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
             error_cmd = true;
         }
     }
-    if (ret_code == MessageProcessingResult::ERROR_RESULT &&
-        state == FederateStates::ERRORED) {
+    if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
         if (!initError && !error_cmd) {
             if (parent_ != nullptr) {
                 ActionMessage gError(CMD_LOCAL_ERROR);

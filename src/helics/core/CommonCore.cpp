@@ -3301,8 +3301,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             auto res = checkAndProcessDisconnect();
             auto pred = [](const auto& fed) {
                 auto state = fed->getState();
-                return (FederateStates::FINISHED == state) ||
-                    (FederateStates::ERRORED == state);
+                return (FederateStates::FINISHED == state) || (FederateStates::ERRORED == state);
             };
             auto afed = std::all_of(loopFederates.begin(), loopFederates.end(), pred);
             LOG_WARNING(global_broker_id_local,
@@ -4833,8 +4832,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
                 bye.source_id = parent_broker_id;
                 loopFederates.apply([&bye](auto& fed) {
                     auto state = fed->getState();
-                    if ((FederateStates::FINISHED == state) ||
-                        (FederateStates::ERRORED == state)) {
+                    if ((FederateStates::FINISHED == state) || (FederateStates::ERRORED == state)) {
                         return;
                     }
                     bye.dest_id = fed->global_id.load();
