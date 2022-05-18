@@ -611,13 +611,14 @@ void helicsFederateProtect(HelicsFederate fed, HelicsError* err)
     fedObj->valid = fedPreservationIdentifier;
 }
 
-void helicsFederateUnProtect(const char* fedName, HelicsError* err) {
+void helicsFederateUnProtect(const char* fedName, HelicsError* err)
+{
     static constexpr const char* unrecognizedFederate = "Federate was not found";
-    bool result = getMasterHolder()->removeFed(fedName,fedPreservationIdentifier);
+    bool result = getMasterHolder()->removeFed(fedName, fedPreservationIdentifier);
     if (!result) {
         if (!(getMasterHolder()->findFed(fedName) != nullptr)) {
-            if (err!=nullptr) {
-                if (err->error_code==0) {
+            if (err != nullptr) {
+                if (err->error_code == 0) {
                     err->error_code = HELICS_ERROR_INVALID_OBJECT;
                     err->message = unrecognizedFederate;
                 }
