@@ -24,7 +24,7 @@ enum class FederateStates : std::uint8_t {
                    //!< can be published
     EXECUTING,  //!< the federation has entered execution state and it now advancing in time
     TERMINATING,  //!< the federate is in the process of shutting down
-    HELICS_ERROR,  //!< the federation has encountered an error
+    ERRORED,  //!< the federation has encountered an error
     FINISHED,  //!< the federation has finished its execution
     UNKNOWN,  //!< unknown state
 };

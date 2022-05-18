@@ -556,7 +556,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 break;
             case FederateStates::FINISHED:
                 break;
-            case FederateStates::HELICS_ERROR: {
+            case FederateStates::ERRORED: {
                 std::string errorString;
                 if (command.payload.empty()) {
                     errorString = commandErrorString(command.messageID);

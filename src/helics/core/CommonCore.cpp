@@ -396,7 +396,7 @@ void CommonCore::globalError(LocalFederateId federateID,
     MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
     while (ret != MessageProcessingResult::ERROR_RESULT) {
         if (fed->getState() == FederateStates::FINISHED ||
-            fed->getState() == FederateStates::HELICS_ERROR) {
+            fed->getState() == FederateStates::ERRORED) {
             return;
         }
         ret = fed->genericUnspecifiedQueueProcess(false);
@@ -426,7 +426,7 @@ void CommonCore::localError(LocalFederateId federateID, int errorCode, std::stri
     MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
     while (ret != MessageProcessingResult::ERROR_RESULT) {
         if (fed->getState() == FederateStates::FINISHED ||
-            fed->getState() == FederateStates::HELICS_ERROR) {
+            fed->getState() == FederateStates::ERRORED) {
             return;
         }
         ret = fed->genericUnspecifiedQueueProcess(false);
@@ -827,7 +827,7 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
         case FederateStates::INITIALIZING:
             return iteration_time{timeZero, IterationResult::ERROR_RESULT};
         case FederateStates::UNKNOWN:
-        case FederateStates::HELICS_ERROR:
+        case FederateStates::ERRORED:
             return iteration_time{Time::maxVal(), IterationResult::ERROR_RESULT};
     }
 
@@ -3302,7 +3302,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             auto pred = [](const auto& fed) {
                 auto state = fed->getState();
                 return (FederateStates::FINISHED == state) ||
-                    (FederateStates::HELICS_ERROR == state);
+                    (FederateStates::ERRORED == state);
             };
             auto afed = std::all_of(loopFederates.begin(), loopFederates.end(), pred);
             LOG_WARNING(global_broker_id_local,
@@ -3657,7 +3657,7 @@ void CommonCore::processCommand(ActionMessage&& command)
                 auto* fed = getFederateCore(command.dest_id);
                 if (fed != nullptr) {
                     if ((fed->getState() != FederateStates::FINISHED) &&
-                        (fed->getState() != FederateStates::HELICS_ERROR)) {
+                        (fed->getState() != FederateStates::ERRORED)) {
                         fed->forceProcessMessage(command);
                     } else {
                         auto rep = fed->processPostTerminationAction(command);
@@ -4834,7 +4834,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
                 loopFederates.apply([&bye](auto& fed) {
                     auto state = fed->getState();
                     if ((FederateStates::FINISHED == state) ||
-                        (FederateStates::HELICS_ERROR == state)) {
+                        (FederateStates::ERRORED == state)) {
                         return;
                     }
                     bye.dest_id = fed->global_id.load();
@@ -5118,7 +5118,7 @@ void CommonCore::routeMessage(const ActionMessage& cmd)
         auto* fed = getFederateCore(cmd.dest_id);
         if (fed != nullptr) {
             if ((fed->getState() != FederateStates::FINISHED) &&
-                (fed->getState() != FederateStates::HELICS_ERROR)) {
+                (fed->getState() != FederateStates::ERRORED)) {
                 fed->addAction(cmd);
             } else {
                 auto rep = fed->processPostTerminationAction(cmd);

@@ -275,7 +275,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                     if (cmd.action() != CMD_GLOBAL_ERROR) {
                         timeCoord->localError();
                     }
-                    newState = FederateStates::HELICS_ERROR;
+                    newState = FederateStates::ERRORED;
                     proc = MessageProcessingResult::ERROR_RESULT;
                 }
             } else {

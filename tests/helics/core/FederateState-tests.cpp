@@ -231,7 +231,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     fs_process.wait();
     EXPECT_TRUE(fs_process.get() == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->global_id.load(), fed22);
-    EXPECT_EQ(fs->getState(), FederateStates::HELICS_ERROR);
+    EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
     // Return to initializing state
     fs->reInit();
@@ -251,7 +251,7 @@ TEST_F(federateStateTests, basic_processmessage_test)
     }
 
     EXPECT_TRUE(res == IterationResult::ERROR_RESULT);
-    EXPECT_EQ(fs->getState(), FederateStates::HELICS_ERROR);
+    EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
     fs->reset();
 
