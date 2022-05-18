@@ -451,30 +451,6 @@ HelicsBool helicsCoreIsValid(HelicsCore core)
     return (coreObj->coreptr) ? HELICS_TRUE : HELICS_FALSE;
 }
 
-HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
-{
-    if ((err != nullptr) && (err->error_code != 0)) {
-        return nullptr;
-    }
-    if (fedName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
-            err->message = getMasterHolder()->addErrorString("fedName is empty");
-        }
-        return nullptr;
-    }
-    auto mob = getMasterHolder();
-    auto* fed = mob->findFed(fedName);
-    if (fed == nullptr) {
-        if (err != nullptr) {
-            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
-            err->message = getMasterHolder()->addErrorString(std::string(fedName) + " is not an active federate identifier");
-        }
-        return nullptr;
-    }
-    return helicsFederateClone(reinterpret_cast<HelicsFederate>(fed), err);
-}
-
 HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* initString, HelicsError* err)
 {
     if ((err != nullptr) && (err->error_code != 0)) {
@@ -1248,7 +1224,7 @@ int MasterObjectHolder::addFed(std::unique_ptr<helics::FedObject> fed)
     return index;
 }
 
-helics::FedObject* MasterObjectHolder::findFed(const std::string& fedName)
+helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 {
     auto handle = feds.lock();
     for (auto& fed : (*handle)) {
@@ -1259,6 +1235,22 @@ helics::FedObject* MasterObjectHolder::findFed(const std::string& fedName)
         }
     }
     return nullptr;
+}
+
+/** remove a federate object*/
+bool MasterObjectHolder::removeFed(std::string_view fedName, int validationCode) {
+    auto handle = feds.lock();
+    for (auto& fed : (*handle)) {
+        if ((fed) && (fed->fedptr)) {
+            if (fed->fedptr->getName() == fedName && fed->valid==validationCode) {
+                fed->valid = 0;
+                fed->fedptr.reset();
+                fed.reset();
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 void MasterObjectHolder::clearBroker(int index)
@@ -1303,13 +1295,13 @@ void MasterObjectHolder::clearFed(int index)
     }
 }
 
-void MasterObjectHolder::abortAll(int code, const std::string& error)
+void MasterObjectHolder::abortAll(int code, std::string_view error)
 {
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + error + "'");
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + std::string(error) + "'");
             }
         }
     }
@@ -1356,10 +1348,10 @@ void MasterObjectHolder::deleteAll()
     errorStrings.lock()->clear();
 }
 
-const char* MasterObjectHolder::addErrorString(std::string newError)
+const char* MasterObjectHolder::addErrorString(std::string_view newError)
 {
     auto estring = errorStrings.lock();
-    estring->push_back(std::move(newError));
+    estring->emplace_back(newError);
     auto& v = estring->back();
     return v.c_str();
 }

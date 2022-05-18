@@ -18,10 +18,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <string_view>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int gCoreValidationIdentifier = 0x378424EC;
-static const int gBrokerValidationIdentifier = 0xA3467D20;
+static constexpr int gCoreValidationIdentifier = 0x378424EC;
+static constexpr int gBrokerValidationIdentifier = 0xA3467D20;
 
 namespace helics {
 class Core;
@@ -232,21 +233,23 @@ class MasterObjectHolder {
   public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
-    helics::FedObject* findFed(const std::string& fedName);
+    helics::FedObject* findFed(std::string_view fedName);
     /** add a broker to the holder*/
     int addBroker(std::unique_ptr<helics::BrokerObject> broker);
     /** add a core to the holder*/
     int addCore(std::unique_ptr<helics::CoreObject> core);
     /** add a federate to the holder*/
     int addFed(std::unique_ptr<helics::FedObject> fed);
+    /** remove a federate object*/
+    bool removeFed(std::string_view name, int validationCode);
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);
     void deleteAll();
-    void abortAll(int errorCode, const std::string& error);
+    void abortAll(int errorCode, std::string_view error);
     /** store an error string to a string buffer
     @return a pointer to the memory location*/
-    const char* addErrorString(std::string newError);
+    const char* addErrorString(std::string_view newError);
 };
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder();

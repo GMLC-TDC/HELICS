@@ -19,8 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int fedValidationIdentifier = 0x2352188;
-static const char* invalidFedString = "federate object is not valid";
+static constexpr int fedValidationIdentifier = 0x235'2188;
+static constexpr int fedPreservationIdentifier = 0x235'2185;
+static constexpr const char* invalidFedString = "federate object is not valid";
 
 static constexpr char nullcstr[] = "";
 
@@ -563,10 +564,66 @@ HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err)
     fedClone->fedptr = fedObj->fedptr;
 
     fedClone->type = fedObj->type;
-    fedClone->valid = fedObj->valid;
+    fedClone->valid = fedValidationIdentifier;
     auto* fedB = reinterpret_cast<HelicsFederate>(fedClone.get());
     getMasterHolder()->addFed(std::move(fedClone));
     return (fedB);
+}
+
+HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
+{
+    if ((err != nullptr) && (err->error_code != 0)) {
+        return nullptr;
+    }
+    if (fedName == nullptr) {
+        if (err != nullptr) {
+            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
+            err->message = getMasterHolder()->addErrorString("fedName is empty");
+        }
+        return nullptr;
+    }
+    auto mob = getMasterHolder();
+    auto* fed = mob->findFed(fedName);
+    if (fed == nullptr) {
+        if (err != nullptr) {
+            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
+            err->message = getMasterHolder()->addErrorString(std::string(fedName) + " is not an active federate identifier");
+        }
+        return nullptr;
+    }
+    auto fedClone = std::make_unique<helics::FedObject>();
+    fedClone->fedptr = fed->fedptr;
+
+    fedClone->type = fed->type;
+    fedClone->valid = fedValidationIdentifier;
+    auto* fedB = reinterpret_cast<HelicsFederate>(fedClone.get());
+    getMasterHolder()->addFed(std::move(fedClone));
+    return (fedB);
+}
+
+void helicsFederateProtect(HelicsFederate fed, HelicsError* err)
+{
+    HelicsFederate newFed = helicsFederateClone(fed, err);
+    auto* fedObj = helics::getFedObject(newFed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    fedObj->valid = fedPreservationIdentifier;
+}
+
+void helicsFederateUnProtect(const char* fedName, HelicsError* err) {
+    static constexpr const char* unrecognizedFederate = "Federate was not found";
+    bool result = getMasterHolder()->removeFed(fedName,fedPreservationIdentifier);
+    if (!result) {
+        if (!(getMasterHolder()->findFed(fedName) != nullptr)) {
+            if (err!=nullptr) {
+                if (err->error_code==0) {
+                    err->error_code = HELICS_ERROR_INVALID_OBJECT;
+                    err->message = unrecognizedFederate;
+                }
+            }
+        }
+    }
 }
 
 HelicsBool helicsFederateIsValid(HelicsFederate fed)
