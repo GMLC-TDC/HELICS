@@ -1241,17 +1241,18 @@ helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 bool MasterObjectHolder::removeFed(std::string_view fedName, int validationCode)
 {
     auto handle = feds.lock();
+    bool found{false};
     for (auto& fed : (*handle)) {
         if ((fed) && (fed->fedptr)) {
             if (fed->fedptr->getName() == fedName && fed->valid == validationCode) {
                 fed->valid = 0;
                 fed->fedptr.reset();
                 fed.reset();
-                return true;
+                found = true;
             }
         }
     }
-    return false;
+    return found;
 }
 
 void MasterObjectHolder::clearBroker(int index)
