@@ -819,7 +819,9 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         auto app = makeCLIApp();
         app->allow_extras();
         auto dptr = std::static_pointer_cast<HelicsConfigJSON>(app->get_config_formatter_base());
-        dptr->skipJson(true);
+        if (dptr) {
+            dptr->skipJson(true);
+        }
         try {
             if (tomlString.find('=') != std::string::npos) {
                 std::istringstream tstring(tomlString);
