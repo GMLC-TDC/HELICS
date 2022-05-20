@@ -75,10 +75,10 @@ jobs:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -nostdinc++ -nostdlib++ -L/root/develop/libcxx_asan/lib -lc++ -lc++abi  -isystem /root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -nostdinc++ -nostdlib++ -L/root/develop/libcxx_asan/lib -lc++ -lc++abi  -isystem /root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -fno-common -g -O1 -Wl,-rpath,/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
       UBSAN_OPTIONS: 'print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt'
-      ASAN_OPTIONS: 'detect_odr_violation=0 suppressions=/root/project/.circleci/asan_suppression2.txt'
+      ASAN_OPTIONS: 'detect_odr_violation=1 suppressions=/root/project/.circleci/asan_suppression2.txt'
     steps:
       - checkout
       - run: *setup_helics
