@@ -169,7 +169,17 @@ jobs:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+      
+  clang14:
+    docker:
+      - image: helics/buildenv:clang14-builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
     steps:
       - checkout
       - run: *setup_helics
@@ -192,14 +202,6 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - helicsMSan:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - helicsASan:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
       - helicsInstall1:
           filters:
             branches:
@@ -208,23 +210,41 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - helicsgccTSan:
+      - gcc12:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - helicsgccASan:
+      - clang14:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - helicsTSan:
+  sanitizers:
+    jobs:
+      - helicsTSan
           filters:
             branches:
-              ignore: /pre-commit\/.*/
-      - helicsoctave:
+              only: 
+                - /sanitizer\/.*/
+      - helicsAsan
           filters:
             branches:
-              ignore: /pre-commit\/.*/
-
+              only: 
+                - /sanitizer\/.*/
+      - helicsgccASan
+          filters:
+            branches:
+              only: 
+                - /sanitizer\/.*/
+      - helicsgccTSan
+          filters:
+            branches:
+              only: 
+                - /sanitizer\/.*/
+      - helicsMSan
+          filters:
+            branches:
+              only: 
+                - /sanitizer\/.*/
   nightly:
     triggers:
       - schedule:
@@ -236,7 +256,12 @@ workflows:
     jobs:
       - helicsTumbleweed
       - helicsNoZmq
-      - gcc12
+      - helicsoctave
+      - helicsTSan
+      - helicsAsan
+      - helicsgccASan
+      - helicsgccTSan
+      - helicsMSan
   benchmark:
     triggers:
       - schedule:
