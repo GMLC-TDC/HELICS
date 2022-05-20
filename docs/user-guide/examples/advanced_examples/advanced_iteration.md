@@ -11,7 +11,7 @@ This demonstrates the use of iteration both in the initialization phase, as well
 
 ## Where is the code?
 
-This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_message_comm/multi_input). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+This example on [Inter-Step Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 <!-- ADD PICTURE AND LINK 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) -->
@@ -152,8 +152,8 @@ The _requests_ are passed as inputs and the _results_ are returned.
 
 The relevant _requests_ are:
 - `NO_ITERATION`: this _forces_ movement to the next time step and should therefore be avoided by _all_ Federates if iteration is desired.
-- `FORCE_ITERATION`: this _forces_ iteration. If a federate _always_ requests this the simulation will be stuck in a never ending loop.
-- `ITERATE_IF_NEEDED`: in this case iteration only takes place if new values are _published_.
+- `FORCE_ITERATION`: this _forces_ iteration. If a federate _always_ requests this the simulation will be stuck in a never ending loop. It is intended to be used only in _rare_ cases.
+- `ITERATE_IF_NEEDED`: in this case iteration only takes place if new values are _published_. This is the _usual_ flag that should be used when iteration is desired.
 
 The last point is **_critical_**.
 The signal HELICS is looking for, is that no new values are published.
@@ -163,6 +163,10 @@ The relevant _results_ are:
 - `ITERATING`: simulation is still iterating.
 
 Each federate should therefore look for `NEXT_STEP` in order to continue.
+
+**Note**: An essentially equivalent method to checking the flag for `ITERATING` or `NEXT_STEP` is to check whether the currently granted time is the same the previous one.
+`ITERATING` $\Rightarrow$ `grantedtime == grantedtime_previous`.
+`NEXT_STEP` $\Rightarrow$ `grantedtime > grantedtime_previous`.
 
 #### Initialization
 The first step is to initialize the federates.
@@ -222,7 +226,7 @@ The basic structure is:
   feditr.get_sub(fed, subid, itr, charging_current, iinit, "EV", "current")
   ``` 
 - check error
-  - If the error is sufficiently small loop back and **_do not publish_**, othewise force iteration and continue
+  - If the error is sufficiently small loop back and **_do not publish_**, otherwise proceed to update and publishing, which will trigger another iteration.
   The function to check the error is ``check_error``:
   ```python
   def check_error(self, dState):
@@ -233,10 +237,8 @@ The basic structure is:
   error = feditr.check_error(charging_voltage)
   if (error < epsilon) and (itr > 0):
       # no further iteration necessary
-      itr_flag = h.helics_iteration_request_iterate_if_needed
       continue
   else:
-      itr_flag = h.helics_iteration_request_force_iteration
       pass
   ```
 - perform state update based on subscription values.
@@ -264,27 +266,60 @@ The basic structure is:
 The time loop looks almost identical to the initialization loop, except that instead of calling `helicsFederateEnterExecutingModeIterative`,
 the call is to `helicsFederateRequestTimeIterative`:
 ```python
+itr = 0
+itr_flag = h.helics_iteration_request_iterate_if_needed
 while True:
   grantedtime, itr_state = h.helicsFederateRequestTimeIterative(fed, requested_time, itr_flag)
-  if grantedtime < requested_time:
-      itr_flag = h.helics_iteration_request_iterate_if_needed
-      continue
-  elif itr_state == h.helics_iteration_result_next_step:
-      break
+  if itr_state == h.helics_iteration_result_next_step:
+      break #Iteration complete!
+  else:
+      pass  #Iterating
 ```
-In this case we don't want to take any action if the granted time is smaller than the requested time.
-In other situations this _could_ be different.
-The underlying assumption here is that any changes between time requests are effectively "too fast" to change the output.
+
+Similar to the initialization, it is **_critical_** to publish **_before_** the first time request, otherwise, HELICS will see no new data, and return `NEXT_STEP`.
+The general simulation code is therefore:
+```python
+while grantedtime < total_interval:
+    # Publication needed so we can actually iterate
+    feditr.set_pub(fed, pubid, publication_values)
+
+    # Time request for the next physical interval to be simulated
+    requested_time = grantedtime + update_interval
+
+    [...]
+```
+Note that this essentially means, that we publish our final values from time $t$ as the very first thing in time $t+\Delta t$.
 
 ## Execution Results
 ### Initialization
 Two figures are produced following the initialization iteration, which show how the currents and voltages converge.
-Note that all batteries are in the constant current phase of charging, as such they all converge to their rated current (30A for EV1-4 and 104A for EV5).
-THe voltages meanwhile are _not_ nominal (240V or 630V) but rather determined based on the effective impedance, which is dependent on the initialized soc.
+Note that all batteries are in the constant current phase of charging, as such they all converge to their rated current (30A for EV1-EV4 and 104A for EV5).
+The voltages meanwhile are _not_ nominal (240V or 630V) but rather determined based on the effective impedance, which is dependent on the initialized soc.
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_current_init.png?raw=true)
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_voltage_init.png?raw=true)
+
+### Co-Simulation
+Four figures are produced once the co-simulation runs its course, two from Batter.py and two from Charger.py.
+
+#### Battery Results
+The Battery results show the the charging current in each battery, and the development of the SoC over time.
+As desired, the charging current exhibits the constant current followed by a decay characteristic, and the SoC rise to 1.
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_current.png?raw=true)
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_SOCs.png?raw=true)
+
+#### Charger Results
+The Charger results show the how the voltage rises to its rated value and then remains there. 
+The total power plot is also quite interesting
+Since initially the current remains fixed while the voltage rises, the total power draw increases.
+Once the charging mode switches to constant voltage and the current decreases the power draw follows suite.
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true)
+
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true)
 
 ## [Questions and Help](../../support.md)
 
