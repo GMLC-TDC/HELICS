@@ -61,7 +61,7 @@ add_test(NAME application-api-tests COMMAND application-api-tests)
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
 # Tests for Continuous Integration builds
-add_test(NAME application-api-ci-tests COMMAND application-api-tests --gtest_filter=-*ci_skip*)
+add_test(NAME application-api-ci-tests COMMAND application-api-tests --gtest_filter=-*ci_skip*:*nosan*)
 set_property(TEST application-api-ci-tests PROPERTY LABELS ApplicationApiCI Continuous)
 
 if(HELICS_BUILD_CXX_SHARED_LIB)

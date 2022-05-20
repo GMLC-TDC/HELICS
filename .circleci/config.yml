@@ -35,7 +35,7 @@ aliases:
   - &run_helics_sanitizer_tests
     name: run_helics_tests
     command: |
-      /root/project/scripts/run-circleci-tests-santizer.sh
+      /root/project/scripts/run-circleci-tests-sanitizer.sh
       RESULT=$?
       exit $RESULT
 
