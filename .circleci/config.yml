@@ -220,23 +220,23 @@ workflows:
               ignore: /pre-commit\/.*/
   sanitizers:
     jobs:
-      - helicsTSan
+      - helicsTSan:
           filters:
             branches:
               only: /sanitizer\/.*/
-      - helicsAsan
+      - helicsASan:
           filters:
             branches:
               only: /sanitizer\/.*/
-      - helicsgccASan
+      - helicsgccASan:
           filters:
             branches:
               only: /sanitizer\/.*/
-      - helicsgccTSan
+      - helicsgccTSan:
           filters:
             branches:
               only: /sanitizer\/.*/
-      - helicsMSan
+      - helicsMSan:
           filters:
             branches:
               only: /sanitizer\/.*/
@@ -253,7 +253,7 @@ workflows:
       - helicsNoZmq
       - helicsoctave
       - helicsTSan
-      - helicsAsan
+      - helicsASan
       - helicsgccASan
       - helicsgccTSan
       - helicsMSan
