@@ -28,7 +28,7 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           std::string_view units)
 {
     auto index = static_cast<int32_t>(handles.size());
-    std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
+    std::string actKey = (!key.empty()) ? std::string{key} : generateName(what);
     handles.emplace_back(fed_id, local_id, what, actKey, type, units);
     addSearchFields(handles.back(), index);
     return handles.back();
