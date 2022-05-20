@@ -223,28 +223,23 @@ workflows:
       - helicsTSan
           filters:
             branches:
-              only: 
-                - /sanitizer\/.*/
+              only: /sanitizer\/.*/
       - helicsAsan
           filters:
             branches:
-              only: 
-                - /sanitizer\/.*/
+              only: /sanitizer\/.*/
       - helicsgccASan
           filters:
             branches:
-              only: 
-                - /sanitizer\/.*/
+              only: /sanitizer\/.*/
       - helicsgccTSan
           filters:
             branches:
-              only: 
-                - /sanitizer\/.*/
+              only: /sanitizer\/.*/
       - helicsMSan
           filters:
             branches:
-              only: 
-                - /sanitizer\/.*/
+              only: /sanitizer\/.*/
   nightly:
     triggers:
       - schedule:
