@@ -76,7 +76,7 @@ jobs:
       - image: helics/buildenv:gcc12-builder
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
-
+      ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
     steps:
       - checkout
       - run: *setup_helics
@@ -89,6 +89,7 @@ jobs:
       CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
       UBSAN_OPTIONS: 'print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt'
+      ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
     steps:
       - checkout
       - run: *setup_helics
@@ -104,6 +105,18 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
+      
+  helicsTSan:
+    docker:
+      - image: helics/buildenv:sanitizers-14
+    environment:
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath,/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      TSAN_OPTIONS: 'suppressions=/root/project/.circleci/tsan_suppression.txt'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+
 
   helicsInstall1:
     docker:
@@ -191,6 +204,10 @@ workflows:
             branches:
               ignore: /pre-commit\/.*/
       - helicsgccASan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsTSan:
           filters:
             branches:
               ignore: /pre-commit\/.*/
