@@ -70,7 +70,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-   
+
   helicsgccASan:
     docker:
       - image: helics/buildenv:gcc12-builder

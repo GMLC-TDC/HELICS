@@ -31,7 +31,7 @@ aliases:
       /root/project/scripts/run-circleci-tests.sh
       RESULT=$?
       exit $RESULT
-      
+
   - &run_helics_sanitizer_tests
     name: run_helics_tests
     command: |
@@ -77,7 +77,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_sanitizer_tests
-   
+
   helicsgccASan:
     docker:
       - image: helics/buildenv:gcc12-builder
@@ -113,7 +113,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_sanitizer_tests
-      
+
   helicsTSan:
     docker:
       - image: helics/buildenv:sanitizers-14
@@ -174,7 +174,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-      
+
   clang14:
     docker:
       - image: helics/buildenv:clang14-builder
@@ -223,27 +223,27 @@ workflows:
       - helicsTSan
           filters:
             branches:
-              only: 
+              only:
                 - /sanitizer\/.*/
       - helicsAsan
           filters:
             branches:
-              only: 
+              only:
                 - /sanitizer\/.*/
       - helicsgccASan
           filters:
             branches:
-              only: 
+              only:
                 - /sanitizer\/.*/
       - helicsgccTSan
           filters:
             branches:
-              only: 
+              only:
                 - /sanitizer\/.*/
       - helicsMSan
           filters:
             branches:
-              only: 
+              only:
                 - /sanitizer\/.*/
   nightly:
     triggers:

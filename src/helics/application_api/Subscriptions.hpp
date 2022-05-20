@@ -8,11 +8,11 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ValueFederate.hpp"
 
+#include <algorithm>
 #include <array>
 #include <string>
 #include <utility>
 #include <vector>
-#include <algorithm>
 
 /** @file
 @details helper function for generate subscriptions of specify types
