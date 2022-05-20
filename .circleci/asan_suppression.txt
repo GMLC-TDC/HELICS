@@ -1,7 +1,7 @@
 # Lines starting with # are ignored.
 # Turn off checks for the source file (use absolute path or path relative
 # to the current working directory):
-src:functional.cpp
+src:*functional.cpp
 # Turn off checks for a particular functions (use mangled names):
 #fun:MyFooBar
 #fun:_Z8MyFooBarv
