@@ -1,4 +1,4 @@
-# Inter Timestep Iteration
+# Iteration
 
 This demonstrates the use of iteration both in the initialization phase, as well as execution, in order to reach convergence between federates.
 
@@ -11,7 +11,7 @@ This demonstrates the use of iteration both in the initialization phase, as well
 
 ## Where is the code?
 
-This example on [Inter-Step Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
+This example on [Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
 <!-- ADD PICTURE AND LINK 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) -->
