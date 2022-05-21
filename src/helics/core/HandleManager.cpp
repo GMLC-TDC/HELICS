@@ -326,7 +326,7 @@ const BasicHandleInfo* HandleManager::getTranslator(std::string_view name) const
 {
     auto fnd = endpoints.find(name);
     if (fnd != endpoints.end()) {
-        auto& hand = handles[fnd->second.baseValue()];
+        const auto& hand = handles[fnd->second.baseValue()];
         if (hand.handleType == InterfaceType::TRANSLATOR) {
             return &hand;
         }
