@@ -552,12 +552,16 @@ class Federate {
     }
 
     /** protect the federate and make it retrievable even if not library objects exist*/
-    void protect() {
+    void protect()
+    {
         helicsFederateProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR);
     }
 
     /** unprotect the federate and make it retrievable even if not library objects exist*/
-    void unProtect() { helicsFederateUnProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR); }
+    void unProtect()
+    {
+        helicsFederateUnProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR);
+    }
 
     /** make a query of the federate
     @details this call is blocking until the value is returned which make take some time depending

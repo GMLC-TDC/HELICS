@@ -47,7 +47,7 @@ if(Python_EXECUTABLE)
                 api-data.h
                 ../helics_enums.h
     )
-    
+
 else()
     configure_file(
         ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h

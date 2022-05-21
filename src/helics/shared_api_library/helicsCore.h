@@ -595,7 +595,7 @@ HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError
  * @param[in,out] err An error object that will contain an error code and string if any error
  occurred during the execution of the function, in particular if no federate with the given name exists
  */
-HELICS_EXPORT void helicsFederateProtect(const char *fedName, HelicsError* err);
+HELICS_EXPORT void helicsFederateProtect(const char* fedName, HelicsError* err);
 
 /**
  * remove the protection of an existing federate

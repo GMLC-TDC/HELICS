@@ -482,10 +482,9 @@ TEST(federate, federateNoProtection)
     std::string fed1Nm = helicsFederateGetName(fed1);
     HelicsError err = helicsErrorInitialize();
 
-
     EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
     helicsFederateFree(fed1);
-    
+
     auto fedFind = helicsGetFederateByName(fed1Nm.c_str(), &err);
 
     EXPECT_FALSE(helicsFederateIsValid(fedFind));
@@ -513,14 +512,13 @@ TEST(federate, federateProtection)
 
     EXPECT_TRUE(helicsFederateIsValid(fedFind));
     EXPECT_EQ(err.error_code, 0);
-    
+
     helicsFederateUnProtect(fed1Nm.c_str(), &err);
     EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
     helicsFederateFinalize(fedFind, &err);
     helicsFederateFree(fedFind);
     EXPECT_EQ(err.error_code, 0);
 
-     EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
+    EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
     EXPECT_NE(err.error_code, 0);
-    
 }

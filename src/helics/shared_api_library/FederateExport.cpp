@@ -629,17 +629,17 @@ void helicsFederateUnProtect(const char* fedName, HelicsError* err)
 
 HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err)
 {
-   auto fed = getMasterHolder()->findFed(fedName, fedPreservationIdentifier);
+    auto fed = getMasterHolder()->findFed(fedName, fedPreservationIdentifier);
     if (fed != nullptr) {
         return HELICS_TRUE;
     }
     if (!(getMasterHolder()->findFed(fedName) != nullptr)) {
         if (err != nullptr) {
-                if (err->error_code == 0) {
-                    err->error_code = HELICS_ERROR_INVALID_OBJECT;
-                    err->message = unrecognizedFederate;
-                }
+            if (err->error_code == 0) {
+                err->error_code = HELICS_ERROR_INVALID_OBJECT;
+                err->message = unrecognizedFederate;
             }
+        }
     }
     return HELICS_FALSE;
 }
