@@ -204,7 +204,7 @@ void UdpComms::queue_tx_function()
                 std::chrono::steady_clock::now()};
             int errorCount{0};
             while (!connectionEstablished) {
-                if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                if (requestDisconnect.load(std::memory_order_acquire)) {
                     if (PortNumber.load() <= 0) {
                         PortNumber = -1;
                         promisePort.set_value(-1);
@@ -235,7 +235,7 @@ void UdpComms::queue_tx_function()
                     if (std::chrono::steady_clock::now() - startTime > connectionTimeout) {
                         timeout = true;
                     }
-                    if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                    if (requestDisconnect.load(std::memory_order_acquire)) {
                         if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);

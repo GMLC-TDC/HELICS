@@ -247,7 +247,7 @@ bool TcpComms::establishBrokerConnection(
         }
         int retries = 0;
         while (!brokerConnection) {
-            if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+            if (requestDisconnect.load(std::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
             }
             if (retries == 0) {
@@ -265,7 +265,7 @@ bool TcpComms::establishBrokerConnection(
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
 
-            if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+            if (requestDisconnect.load(std::memory_order_acquire)) {
                 return terminate(connection_status::terminated);
             }
             try {
@@ -281,7 +281,7 @@ bool TcpComms::establishBrokerConnection(
                 brokerConnection = nullptr;
             }
         }
-        if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+        if (requestDisconnect.load(std::memory_order_acquire)) {
             return terminate(connection_status::terminated);
         }
         // monitor the total waiting time before connections

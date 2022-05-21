@@ -393,7 +393,7 @@ void CommsInterface::disconnect()
             return;
         }
     }
-    requestDisconnect.store(true, std::memory_order::memory_order_release);
+    requestDisconnect.store(true, std::memory_order_release);
 
     if (rx_status.load() <= connection_status::connected) {
         closeReceiver();
