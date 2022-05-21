@@ -590,12 +590,12 @@ HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError
  * @details this function allows a federate to be retrieved on demand, it must be explicitly close later otherwise it will be destroyed
  * when the library is closed
  *
- * @param fed An existing HelicsFederate.
+ * @param fedName The name of an existing HelicsFederate.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error
- occurred during the execution of the function.
+ occurred during the execution of the function, in particular if no federate with the given name exists
  */
-HELICS_EXPORT void helicsFederateProtect(HelicsFederate fed, HelicsError* err);
+HELICS_EXPORT void helicsFederateProtect(const char *fedName, HelicsError* err);
 
 /**
  * remove the protection of an existing federate
@@ -609,6 +609,16 @@ HELICS_EXPORT void helicsFederateProtect(HelicsFederate fed, HelicsError* err);
  * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
  */
 HELICS_EXPORT void helicsFederateUnProtect(const char* fedName, HelicsError* err);
+
+/**
+ * checks if an existing federate is protected
+ *
+ *
+ * @param fed the name of an existing federate to check the protection status
+ *
+ * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
+ */
+HELICS_EXPORT HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err);
 
 /**
  * Create a federate info object for specifying federate information when constructing a federate.

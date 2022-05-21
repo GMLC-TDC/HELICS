@@ -234,6 +234,8 @@ class MasterObjectHolder {
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
     helics::FedObject* findFed(std::string_view fedName);
+    /** find a specific fed by name and validation code*/
+    helics::FedObject* findFed(std::string_view fedName, int validationCode);
     /** add a broker to the holder*/
     int addBroker(std::unique_ptr<helics::BrokerObject> broker);
     /** add a core to the holder*/

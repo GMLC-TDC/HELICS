@@ -601,9 +601,9 @@ HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
     return (fedB);
 }
 
-void helicsFederateProtect(HelicsFederate fed, HelicsError* err)
+void helicsFederateProtect(const char* fedName, HelicsError* err)
 {
-    HelicsFederate newFed = helicsFederateClone(fed, err);
+    HelicsFederate newFed = helicsGetFederateByName(fedName, err);
     auto* fedObj = helics::getFedObject(newFed, err);
     if (fedObj == nullptr) {
         return;
@@ -611,9 +611,9 @@ void helicsFederateProtect(HelicsFederate fed, HelicsError* err)
     fedObj->valid = fedPreservationIdentifier;
 }
 
+static constexpr const char* unrecognizedFederate = "Federate was not found";
 void helicsFederateUnProtect(const char* fedName, HelicsError* err)
 {
-    static constexpr const char* unrecognizedFederate = "Federate was not found";
     bool result = getMasterHolder()->removeFed(fedName, fedPreservationIdentifier);
     if (!result) {
         if (!(getMasterHolder()->findFed(fedName) != nullptr)) {
@@ -625,6 +625,23 @@ void helicsFederateUnProtect(const char* fedName, HelicsError* err)
             }
         }
     }
+}
+
+HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err)
+{
+   auto fed = getMasterHolder()->findFed(fedName, fedPreservationIdentifier);
+    if (fed != nullptr) {
+        return HELICS_TRUE;
+    }
+    if (!(getMasterHolder()->findFed(fedName) != nullptr)) {
+        if (err != nullptr) {
+                if (err->error_code == 0) {
+                    err->error_code = HELICS_ERROR_INVALID_OBJECT;
+                    err->message = unrecognizedFederate;
+                }
+            }
+    }
+    return HELICS_FALSE;
 }
 
 HelicsBool helicsFederateIsValid(HelicsFederate fed)

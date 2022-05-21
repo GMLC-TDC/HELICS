@@ -1237,6 +1237,19 @@ helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
     return nullptr;
 }
 
+helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName, int validationCode)
+{
+    auto handle = feds.lock();
+    for (auto& fed : (*handle)) {
+        if ((fed) && (fed->fedptr)) {
+            if (fed->valid == validationCode && fed->fedptr->getName() == fedName) {
+                return fed.get();
+            }
+        }
+    }
+    return nullptr;
+}
+
 /** remove a federate object*/
 bool MasterObjectHolder::removeFed(std::string_view fedName, int validationCode)
 {
