@@ -125,7 +125,6 @@ jobs:
       - run: *setup_helics
       - run: *run_helics_sanitizer_tests
 
-
   helicsInstall1:
     docker:
       - image: helics/buildenv:builder
