@@ -910,7 +910,7 @@ void FederateState::processCommunications(std::chrono::milliseconds period)
     }
 }
 
-//const std::vector<InterfaceHandle> emptyHandles;
+// const std::vector<InterfaceHandle> emptyHandles;
 
 const std::vector<InterfaceHandle>& FederateState::getEvents() const
 {
