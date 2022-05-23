@@ -29,7 +29,7 @@ DECLARE_TRIPLINE()
 
 namespace helics::CoreFactory {
 
-static const std::string gEmptyString;
+static const std::string gHelicsEmptyString;
 
 /*** class to hold the set of builders
 @details this doesn't work as a global since it tends to get initialized after some of the things
@@ -128,12 +128,12 @@ std::shared_ptr<Core> create(std::string_view initializationString)
     tparser.addTypeOption();
     tparser.allow_extras();
     tparser.parse(std::string(initializationString));
-    return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
+    return create(tparser.getCoreType(), gHelicsEmptyString, tparser.remaining_for_passthrough());
 }
 
 std::shared_ptr<Core> create(CoreType type, std::string_view configureString)
 {
-    return create(type, gEmptyString, configureString);
+    return create(type, gHelicsEmptyString, configureString);
 }
 
 std::shared_ptr<Core>
@@ -160,12 +160,12 @@ std::shared_ptr<Core> create(std::vector<std::string> args)
 
     tparser.allow_extras();
     tparser.parse(std::move(args));
-    return create(tparser.getCoreType(), gEmptyString, tparser.remaining_for_passthrough());
+    return create(tparser.getCoreType(), gHelicsEmptyString, tparser.remaining_for_passthrough());
 }
 
 std::shared_ptr<Core> create(CoreType type, std::vector<std::string> args)
 {
-    return create(type, gEmptyString, std::move(args));
+    return create(type, gHelicsEmptyString, std::move(args));
 }
 
 std::shared_ptr<Core>
@@ -194,7 +194,7 @@ std::shared_ptr<Core> create(int argc, char* argv[])
 
 std::shared_ptr<Core> create(CoreType type, int argc, char* argv[])
 {
-    return create(type, gEmptyString, argc, argv);
+    return create(type, gHelicsEmptyString, argc, argv);
 }
 
 std::shared_ptr<Core> create(CoreType type, std::string_view coreName, int argc, char* argv[])
@@ -402,14 +402,14 @@ void displayHelp(CoreType type)
 {
     if (type == CoreType::DEFAULT || type == CoreType::UNRECOGNIZED) {
         std::cout << "All core types have similar options\n";
-        auto cr = makeCore(CoreType::DEFAULT, gEmptyString);
+        auto cr = makeCore(CoreType::DEFAULT, gHelicsEmptyString);
         cr->configure(helpStr);
 #ifdef HELICS_ENABLE_TCP_CORE
-        cr = makeCore(CoreType::TCP_SS, gEmptyString);
+        cr = makeCore(CoreType::TCP_SS, gHelicsEmptyString);
         cr->configure(helpStr);
 #endif
     } else {
-        auto cr = makeCore(type, gEmptyString);
+        auto cr = makeCore(type, gHelicsEmptyString);
         cr->configure(helpStr);
     }
 }

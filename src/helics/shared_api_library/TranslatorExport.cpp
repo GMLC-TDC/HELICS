@@ -210,7 +210,7 @@ const char* helicsTranslatorGetName(HelicsTranslator trans)
 {
     auto* translator = getTranslator(trans, nullptr);
     if (translator == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     const auto& name = translator->getName();
     return name.c_str();
@@ -335,7 +335,7 @@ const char* helicsTranslatorGetInfo(HelicsTranslator trans)
 {
     auto* transObj = getTranslatorObj(trans, nullptr);
     if (transObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = transObj->transPtr->getInfo();
@@ -343,7 +343,7 @@ const char* helicsTranslatorGetInfo(HelicsTranslator trans)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -368,7 +368,7 @@ const char* helicsTranslatorGetTag(HelicsTranslator trans, const char* tagname)
 {
     auto* transObj = getTranslatorObj(trans, nullptr);
     if (transObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = transObj->transPtr->getTag(AS_STRING_VIEW(tagname));
@@ -376,7 +376,7 @@ const char* helicsTranslatorGetTag(HelicsTranslator trans, const char* tagname)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }

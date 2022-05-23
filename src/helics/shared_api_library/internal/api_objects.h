@@ -184,16 +184,16 @@ inline void assignError(HelicsError* err, int error_code, const char* string)
     }
 }
 
-extern const std::string gEmptyStr;
-extern const std::string gNullStringArgument;
-#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gEmptyStr
+extern const std::string gHelicsEmptyStr;
+extern const std::string gHelicsNullStringArgument;
+#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gHelicsEmptyStr
 
-#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gEmptyStr)
+#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gHelicsEmptyStr)
 
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gNullStringArgument.c_str());                                                  \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                                  \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
