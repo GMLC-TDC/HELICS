@@ -25,7 +25,7 @@ RUN if [ "${ENABLE_GITHUB-}" = "true" ]; then rm -rf HELICS && git clone --depth
 # Generates the makefiles for building HELICS without tests, examples, C shared library, or the IPC core
 # Build type is set to release for the optimized binaries (and smaller size)
 RUN mkdir build && cd build && cmake -DHELICS_BUILD_TESTS=OFF \
-  -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_DISABLE_C_SHARED_LIB=ON -DENABLE_IPC_CORE=OFF \
+  -DHELICS_BUILD_EXAMPLES=OFF -DHELICS_DISABLE_C_SHARED_LIB=ON -DHELICS_ENABLE_IPC_CORE=OFF \
   -DCMAKE_BUILD_TYPE=Release -DHELICS_BINARY_ONLY_INSTALL=ON -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON \
   -DCMAKE_INSTALL_PREFIX=/root/develop/helics-install /root/HELICS
 
