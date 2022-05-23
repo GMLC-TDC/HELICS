@@ -193,7 +193,7 @@ extern const std::string gHelicsNullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                                  \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                            \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
