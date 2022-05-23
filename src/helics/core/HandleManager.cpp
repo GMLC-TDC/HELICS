@@ -28,7 +28,7 @@ BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           std::string_view units)
 {
     auto index = static_cast<int32_t>(handles.size());
-    std::string actKey = (!key.empty()) ? std::string(key) : generateName(what);
+    std::string actKey = (!key.empty()) ? std::string{key} : generateName(what);
     handles.emplace_back(fed_id, local_id, what, actKey, type, units);
     addSearchFields(handles.back(), index);
     return handles.back();
@@ -326,7 +326,7 @@ const BasicHandleInfo* HandleManager::getTranslator(std::string_view name) const
 {
     auto fnd = endpoints.find(name);
     if (fnd != endpoints.end()) {
-        auto& hand = handles[fnd->second.baseValue()];
+        const auto& hand = handles[fnd->second.baseValue()];
         if (hand.handleType == InterfaceType::TRANSLATOR) {
             return &hand;
         }

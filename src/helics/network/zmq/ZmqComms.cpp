@@ -238,7 +238,7 @@ void ZmqComms::queue_rx_function()
                 }
             }
         }
-        if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+        if (requestDisconnect.load(std::memory_order_acquire)) {
             break;
         }
     }
@@ -278,7 +278,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
 
             int cnt2 = 0;
             while (PortNumber < 0) {
-                if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                if (requestDisconnect.load(std::memory_order_acquire)) {
                     ActionMessage M(CMD_PROTOCOL);
                     M.messageID = DISCONNECT;
                     controlSocket.send(M.to_string());
@@ -304,7 +304,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                         break;
                     }
                     if (rc == 0) {
-                        if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                        if (requestDisconnect.load(std::memory_order_acquire)) {
                             ActionMessage M(CMD_PROTOCOL);
                             M.messageID = DISCONNECT;
                             controlSocket.send(M.to_string());
