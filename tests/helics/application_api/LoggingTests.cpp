@@ -904,6 +904,7 @@ TEST(logging, remote_log_broker)
             ++remote_cnt;
         }
     }
+    llock.unlock();
     EXPECT_GT(remote_cnt, 0);
 }
 
@@ -938,6 +939,7 @@ TEST(logging, remote_log_fed)
             ++remote_cnt;
         }
     }
+    llock.unlock();
     EXPECT_GT(remote_cnt, 0);
 }
 
@@ -971,14 +973,15 @@ TEST(logging, remote_log_core)
     Fed->finalize();
 
     broker.reset();
-    auto llock = mlog.lock();
     int remote_cnt{0};
+    auto llock = mlog.lock();
     for (const auto& lg : llock) {
         if (std::get<1>(lg).find("broker10") != std::string::npos ||
             std::get<1>(lg).find("root") != std::string::npos) {
             ++remote_cnt;
         }
     }
+    llock.unlock();
     EXPECT_GT(remote_cnt, 0);
 }
 
@@ -1012,11 +1015,11 @@ TEST(logging, remote_log_multifed)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed2->finalize();
-    broker->query("root", "global_flush");
+    broker->waitForDisconnect();
     broker.reset();
-    auto llock = mlog.lock();
     int remote_cnt1{0};
     int remote_cnt2{0};
+    auto llock = mlog.lock();
     for (const auto& lg : llock) {
         if (std::get<1>(lg).find("monitor1") != std::string::npos) {
             ++remote_cnt1;
@@ -1025,6 +1028,7 @@ TEST(logging, remote_log_multifed)
             ++remote_cnt2;
         }
     }
+    llock.unlock();
     EXPECT_GT(remote_cnt1, 0);
     EXPECT_GT(remote_cnt2, 0);
 }
@@ -1068,11 +1072,11 @@ TEST(logging, remote_log_multiObjects)
     rtime = Fed2->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
     Fed2->finalize();
-    broker->query("root", "global_flush");
+    broker->waitForDisconnect();
     broker.reset();
-    auto llock = mlog.lock();
     int remote_cnt1{0};
     int remote_cnt2{0};
+    auto llock = mlog.lock();
     for (const auto& lg : llock) {
         if (std::get<1>(lg).find("monitor1") != std::string::npos) {
             ++remote_cnt1;
@@ -1081,12 +1085,14 @@ TEST(logging, remote_log_multiObjects)
             ++remote_cnt2;
         }
     }
+    llock.unlock();
     EXPECT_GT(remote_cnt1, 0);
     EXPECT_GT(remote_cnt2, 0);
 
-    auto llock2 = mlogFed.lock();
     int remote_cntFed2{0};
     int remote_cntBroker{0};
+    auto llock2 = mlogFed.lock();
+
     for (const auto& lg : llock2) {
         if (std::get<1>(lg).find("broker12") != std::string::npos ||
             std::get<1>(lg).find("root") != std::string::npos) {
@@ -1096,6 +1102,7 @@ TEST(logging, remote_log_multiObjects)
             ++remote_cntFed2;
         }
     }
+    llock2.unlock();
     EXPECT_GT(remote_cntBroker, 0);
     EXPECT_GT(remote_cntFed2, 0);
 }
