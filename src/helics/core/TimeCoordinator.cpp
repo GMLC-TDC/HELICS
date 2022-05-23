@@ -1041,7 +1041,12 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                     ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                         MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;
+                } else if (info.wait_for_current_time_updates && dependencies.checkAllPastExec(true)) {
+                    ret = (iterating == IterationRequest::FORCE_ITERATION) ?
+                        MessageProcessingResult::ITERATING :
+                        MessageProcessingResult::NEXT_STEP;
                 } else {
+
                     bool allowed{!info.wait_for_current_time_updates};
                     bool restricted{info.restrictive_time_policy};
                     bool restrictionAdvance{restricted};

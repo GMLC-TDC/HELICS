@@ -172,7 +172,8 @@ class TimeDependencies {
 
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry(bool iterating, bool waiting) const;
-
+    /** check if all dependencies have passed exec mode and are requesting time*/
+    bool checkAllPastExec(bool iterating) const;
     /** check if the dependencies would allow a grant of the time
     @param iterating true if the object is iterating
     @param desiredGrantTime  the time to check for granting

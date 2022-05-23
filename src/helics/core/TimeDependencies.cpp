@@ -439,6 +439,17 @@ DependencyProcessingResult TimeDependencies::updateTime(const ActionMessage& m)
     return processMessage(m, *depInfo);
 }
 
+bool TimeDependencies::checkAllPastExec(bool iterating) const
+{
+    auto minstate =
+        iterating ? TimeState::time_requested_require_iteration : TimeState::time_requested;
+
+        return std::none_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
+            return (dep.dependency && dep.connection != ConnectionType::self &&
+                    (dep.mTimeState < minstate));
+        });
+}
+
 bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) const
 {
     if (iterating) {
@@ -469,10 +480,7 @@ bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) co
         });
     }
     if (waiting) {
-        return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
-            return (dep.dependency && dep.connection != ConnectionType::self &&
-                    (dep.mTimeState < TimeState::time_requested));
-        });
+        return checkAllPastExec(false);
     }
     return std::none_of(dependencies.begin(), dependencies.end(), [](const auto& dep) {
         return (dep.dependency &&
