@@ -825,7 +825,7 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
     EXPECT_FALSE(epid1.hasMessage());
-    vFed1->requestTimeIterativeAsync(1.0,ITERATE_IF_NEEDED);
+    vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
     it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
 
@@ -836,7 +836,6 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_
     broker.reset();
     vFed1->finalize();
 }
-
 
 TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_request)
 {
@@ -884,7 +883,7 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_requ
     it = vFed1->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
     EXPECT_EQ(sub1_1.getValue<int>(), 31);
-    vFed1->requestTimeIterativeAsync(1.0,ITERATE_IF_NEEDED);
+    vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
     it = vFed2->enterExecutingModeComplete();
     EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
 

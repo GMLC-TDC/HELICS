@@ -444,10 +444,10 @@ bool TimeDependencies::checkAllPastExec(bool iterating) const
     auto minstate =
         iterating ? TimeState::time_requested_require_iteration : TimeState::time_requested;
 
-        return std::none_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
-            return (dep.dependency && dep.connection != ConnectionType::self &&
-                    (dep.mTimeState < minstate));
-        });
+    return std::none_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
+        return (dep.dependency && dep.connection != ConnectionType::self &&
+                (dep.mTimeState < minstate));
+    });
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) const
