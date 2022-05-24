@@ -1408,7 +1408,7 @@ TEST_F(filter, separate_slow_dest_filter_ci_skip)
     filt->finalize();
 }
 
-TEST_F(filter, reroute_separate2_5message)
+TEST_F(filter, reroute_separate2_5message_nocov)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1525,7 +1525,7 @@ TEST_F(filter, reroute_separate2_5message)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter, reroute_separate2_5000message_ci_skip)
+TEST_F(filter, reroute_separate2_5000message_ci_skip_nocov)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);
@@ -1644,7 +1644,7 @@ TEST_F(filter, reroute_separate2_5000message_ci_skip)
     broker->waitForDisconnect();
 }
 
-TEST_F(filter, reroute_separate2_5message_b)
+TEST_F(filter, reroute_separate2_5message_b_nocov)
 {
     extraBrokerArgs = " --globaltime";
     auto broker = AddBroker(rerouteType, 3);

@@ -587,7 +587,7 @@ TEST_F(timing2, wait_for_current_time_flag_endpoint_error)
     broker.reset();
 }
 
-TEST_F(timing2, wait_for_current_time_flag_endpoint)
+TEST_F(timing2, wait_for_current_time_flag_endpoint_nocov)
 {
     extraBrokerArgs = "--debugging";
     auto broker = AddBroker("test", 2);

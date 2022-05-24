@@ -2,12 +2,12 @@
 tests=(
     ./bin/core-tests
     ./bin/common-tests
-    "./bin/system-tests --gtest_filter=*"
-    ./bin/helics_apps-tests
-    "./bin/shared-library-tests-cpp --gtest_filter=-*death*"
-    "./bin/shared-library-tests --gtest_filter=-*death*"
-    "./bin/application-api-tests --gtest_filter=*"
-    "./bin/helics_webserver-tests --gtest_filter=*"
+    "./bin/system-tests --gtest_filter=-*nocov*"
+    "./bin/helics_apps-tests --gtest_filter=-*nocov*"
+    "./bin/shared-library-tests-cpp --gtest_filter=-*death*:*nocov*"
+    "./bin/shared-library-tests --gtest_filter=-*death*:*nocov*"
+    "./bin/application-api-tests --gtest_filter=-*nocov*"
+    "./bin/helics_webserver-tests --gtest_filter=-*nocov*"
     "./bin/network-tests --gtest_filter=*"
 )
 
