@@ -154,7 +154,7 @@ bool CommsInterface::propertyLock()
 {
     bool exp = false;
     while (!operating.compare_exchange_weak(exp, true)) {
-        if (tx_status != connection_status::startup) {
+        if (txStatus != ConnectionStatus::STARTUP) {
             return false;
         }
     }
@@ -202,60 +202,60 @@ void CommsInterface::removeRoute(route_id rid)
     transmit(control_route, rt);
 }
 
-void CommsInterface::setTxStatus(connection_status txStatus)
+void CommsInterface::setTxStatus(ConnectionStatus status)
 {
-    if (tx_status == txStatus) {
+    if (txStatus == status) {
         return;
     }
-    switch (txStatus) {
-        case connection_status::connected:
-            if (tx_status == connection_status::startup) {
-                tx_status = txStatus;
+    switch (status) {
+        case ConnectionStatus::CONNECTED:
+            if (txStatus == ConnectionStatus::STARTUP) {
+                txStatus = status;
                 txTrigger.activate();
             }
             break;
-        case connection_status::terminated:
-        case connection_status::error:
-            if (tx_status == connection_status::startup) {
-                tx_status = txStatus;
+        case ConnectionStatus::TERMINATED:
+        case ConnectionStatus::ERRORED:
+            if (txStatus == ConnectionStatus::STARTUP) {
+                txStatus = status;
                 txTrigger.activate();
                 txTrigger.trigger();
             } else {
-                tx_status = txStatus;
+                txStatus = status;
                 txTrigger.trigger();
             }
             break;
         default:
-            tx_status = txStatus;
+            txStatus = status;
     }
 }
 
-void CommsInterface::setRxStatus(connection_status rxStatus)
+void CommsInterface::setRxStatus(ConnectionStatus status)
 {
-    if (rx_status == rxStatus) {
+    if (rxStatus == status) {
         return;
     }
-    switch (rxStatus) {
-        case connection_status::connected:
-            if (rx_status == connection_status::startup) {
-                rx_status = rxStatus;
+    switch (status) {
+        case ConnectionStatus::CONNECTED:
+            if (rxStatus == ConnectionStatus::STARTUP) {
+                rxStatus = status;
                 rxTrigger.activate();
             }
             break;
-        case connection_status::terminated:
-        case connection_status::error:
-            if (rx_status == connection_status::startup) {
-                rx_status = rxStatus;
+        case ConnectionStatus::TERMINATED:
+        case ConnectionStatus::ERRORED:
+            if (rxStatus == ConnectionStatus::STARTUP) {
+                rxStatus = status;
                 rxTrigger.activate();
                 rxTrigger.trigger();
             } else {
-                rx_status = rxStatus;
+                rxStatus = status;
                 rxTrigger.trigger();
             }
 
             break;
         default:
-            rx_status = rxStatus;
+            rxStatus = status;
     }
 }
 
@@ -264,10 +264,10 @@ bool CommsInterface::connect()
     if (isConnected()) {
         return true;
     }
-    if (rx_status != connection_status::startup) {
+    if (rxStatus != ConnectionStatus::STARTUP) {
         return false;
     }
-    if (tx_status != connection_status::startup) {
+    if (txStatus != ConnectionStatus::STARTUP) {
         return false;
     }
     // bool exp = false;
@@ -295,7 +295,7 @@ bool CommsInterface::connect()
                 queue_rx_function();
             }
             catch (const std::exception& e) {
-                rx_status = connection_status::error;
+                rxStatus = ConnectionStatus::ERRORED;
                 logError(std::string("error in receiver >") + e.what());
             }
         });
@@ -306,19 +306,19 @@ bool CommsInterface::connect()
             queue_tx_function();
         }
         catch (const std::exception& e) {
-            tx_status = connection_status::error;
+            txStatus = ConnectionStatus::ERRORED;
             logError(std::string("error in transmitter >") + e.what());
         }
     });
     syncLock.unlock();
     txTrigger.waitActivation();
     rxTrigger.waitActivation();
-    if (rx_status != connection_status::connected) {
+    if (rxStatus != ConnectionStatus::CONNECTED) {
         if (!requestDisconnect.load()) {
             logError("receiver connection failure");
         }
 
-        if (tx_status == connection_status::connected) {
+        if (txStatus == ConnectionStatus::CONNECTED) {
             syncLock.lock();
             if (queue_transmitter.joinable()) {
                 syncLock.unlock();
@@ -339,12 +339,12 @@ bool CommsInterface::connect()
         return false;
     }
 
-    if (tx_status != connection_status::connected) {
+    if (txStatus != ConnectionStatus::CONNECTED) {
         if (!requestDisconnect.load()) {
             logError("transmitter connection failure");
         }
         if (!singleThread) {
-            if (rx_status == connection_status::connected) {
+            if (rxStatus == ConnectionStatus::CONNECTED) {
                 syncLock.lock();
                 if (queue_watcher.joinable()) {
                     syncLock.unlock();
@@ -386,28 +386,28 @@ void CommsInterface::disconnect()
 {
     if (!operating) {
         if (propertyLock()) {
-            setRxStatus(connection_status::terminated);
-            setTxStatus(connection_status::terminated);
+            setRxStatus(ConnectionStatus::TERMINATED);
+            setTxStatus(ConnectionStatus::TERMINATED);
             propertyUnLock();
             join_tx_rx_thread();
             return;
         }
     }
-    requestDisconnect.store(true, std::memory_order::memory_order_release);
+    requestDisconnect.store(true, std::memory_order_release);
 
-    if (rx_status.load() <= connection_status::connected) {
+    if (rxStatus.load() <= ConnectionStatus::CONNECTED) {
         closeReceiver();
     }
-    if (tx_status.load() <= connection_status::connected) {
+    if (txStatus.load() <= ConnectionStatus::CONNECTED) {
         closeTransmitter();
     }
     if (tripDetector.isTripped()) {
-        setRxStatus(connection_status::terminated);
-        setTxStatus(connection_status::terminated);
+        setRxStatus(ConnectionStatus::TERMINATED);
+        setTxStatus(ConnectionStatus::TERMINATED);
         return;
     }
     int cnt = 0;
-    while (rx_status.load() <= connection_status::connected) {
+    while (rxStatus.load() <= ConnectionStatus::CONNECTED) {
         if (rxTrigger.wait_for(std::chrono::milliseconds(800))) {
             continue;
         }
@@ -424,13 +424,13 @@ void CommsInterface::disconnect()
         }
         // check the trip detector
         if (tripDetector.isTripped()) {
-            rx_status = connection_status::terminated;
-            tx_status = connection_status::terminated;
+            rxStatus = ConnectionStatus::TERMINATED;
+            txStatus = ConnectionStatus::TERMINATED;
             return;
         }
     }
     cnt = 0;
-    while (tx_status.load() <= connection_status::connected) {
+    while (txStatus.load() <= ConnectionStatus::CONNECTED) {
         if (txTrigger.wait_for(std::chrono::milliseconds(800))) {
             continue;
         }
@@ -447,8 +447,8 @@ void CommsInterface::disconnect()
         }
         // check the trip detector
         if (tripDetector.isTripped()) {
-            rx_status = connection_status::terminated;
-            tx_status = connection_status::terminated;
+            rxStatus = ConnectionStatus::TERMINATED;
+            txStatus = ConnectionStatus::TERMINATED;
             return;
         }
     }
@@ -470,12 +470,12 @@ void CommsInterface::join_tx_rx_thread()
 
 bool CommsInterface::reconnect()
 {
-    rx_status = connection_status::reconnecting;
-    tx_status = connection_status::reconnecting;
+    rxStatus = ConnectionStatus::RECONNECTING;
+    txStatus = ConnectionStatus::RECONNECTING;
     reconnectReceiver();
     reconnectTransmitter();
     int cnt = 0;
-    while (rx_status.load() == connection_status::reconnecting) {
+    while (rxStatus.load() == ConnectionStatus::RECONNECTING) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         ++cnt;
         if (cnt == 400)  // Eventually give up
@@ -485,7 +485,7 @@ bool CommsInterface::reconnect()
         }
     }
     cnt = 0;
-    while (tx_status.load() == connection_status::reconnecting) {
+    while (txStatus.load() == ConnectionStatus::RECONNECTING) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
         ++cnt;
         if (cnt == 400) {
@@ -494,8 +494,8 @@ bool CommsInterface::reconnect()
         }
     }
 
-    return ((rx_status.load() == connection_status::connected) &&
-            (tx_status.load() == connection_status::connected));
+    return ((rxStatus.load() == ConnectionStatus::CONNECTED) &&
+            (txStatus.load() == ConnectionStatus::CONNECTED));
 }
 
 void CommsInterface::setCallback(std::function<void(ActionMessage&&)> callback)
@@ -557,8 +557,7 @@ void CommsInterface::setServerMode(bool serverActive)
 
 bool CommsInterface::isConnected() const
 {
-    return ((tx_status == connection_status::connected) &&
-            (rx_status == connection_status::connected));
+    return ((txStatus == ConnectionStatus::CONNECTED) && (rxStatus == ConnectionStatus::CONNECTED));
 }
 
 void CommsInterface::logMessage(std::string_view message) const

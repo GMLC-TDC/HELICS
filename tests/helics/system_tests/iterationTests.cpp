@@ -769,3 +769,128 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint)
     broker.reset();
     vFed1->finalize();
 }
+
+TEST_F(iteration, wait_for_current_time_iterative_enter_exec_endpoint_iterating_time_request)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& epid1 = vFed1->registerGlobalEndpoint("ep1");
+
+    auto& epid2 = vFed2->registerGlobalEndpoint("ep2");
+
+    vFed2->enterInitializingModeAsync();
+    vFed1->enterInitializingMode();
+
+    epid1.sendTo("test_5", "ep2");
+
+    vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+
+    vFed2->enterInitializingModeComplete();
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    for (int ii = 0; ii < 5; ++ii) {
+        auto it = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_TRUE(epid2.hasMessage());
+        if (epid2.hasMessage()) {
+            EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_" + std::to_string(ii + 5));
+        }
+
+        epid2.sendTo("test_" + std::to_string(ii + 27), "ep1");
+
+        vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+        it = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_TRUE(epid1.hasMessage());
+        if (epid1.hasMessage()) {
+            EXPECT_EQ(epid1.getMessage()->data.to_string(), "test_" + std::to_string(ii + 27));
+        }
+
+        epid1.sendTo("test_" + std::to_string(ii + 6), "ep2");
+        vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    }
+    auto it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    EXPECT_TRUE(epid2.hasMessage());
+    if (epid2.hasMessage()) {
+        EXPECT_EQ(epid2.getMessage()->data.to_string(), "test_10");
+    }
+
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    it = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    EXPECT_FALSE(epid1.hasMessage());
+    vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
+    it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+
+    vFed2->finalize();
+    auto tmi = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(tmi.grantedTime, 1.0);
+    EXPECT_EQ(tmi.state, helics::IterationResult::NEXT_STEP);
+    broker.reset();
+    vFed1->finalize();
+}
+
+TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_request)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed2->setFlagOption(helics::defs::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<int>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    sub2_1.setDefault(-6);
+    sub1_1.setDefault(-28);
+    vFed2->enterInitializingModeAsync();
+    vFed1->enterInitializingMode();
+
+    pub1_1.publish(4);
+
+    vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+
+    vFed2->enterInitializingModeComplete();
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    for (int ii = 0; ii < 5; ++ii) {
+        auto it = vFed2->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub2_1.getValue<int>(), ii + 4);
+        pub2_1.publish(ii + 27);
+        vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+        it = vFed1->enterExecutingModeComplete();
+        EXPECT_EQ(it, helics::IterationResult::ITERATING);
+        EXPECT_EQ(sub1_1.getValue<int>(), ii + 27);
+        pub1_1.publish(ii + 5);
+        vFed1->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    }
+    auto it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::ITERATING);
+    EXPECT_EQ(sub2_1.getValue<int>(), 9);
+    vFed2->enterExecutingModeAsync(ITERATE_IF_NEEDED);
+    it = vFed1->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    EXPECT_EQ(sub1_1.getValue<int>(), 31);
+    vFed1->requestTimeIterativeAsync(1.0, ITERATE_IF_NEEDED);
+    it = vFed2->enterExecutingModeComplete();
+    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+
+    vFed2->finalize();
+    auto tm = vFed1->requestTimeIterativeComplete();
+    EXPECT_EQ(tm.grantedTime, 1.0);
+    EXPECT_EQ(tm.state, helics::IterationResult::NEXT_STEP);
+    broker.reset();
+    vFed1->finalize();
+}

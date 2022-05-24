@@ -62,7 +62,8 @@ class FederateState {
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<FederateStates> state{HELICS_CREATED};  //!< the current state of the federate
+    std::atomic<FederateStates> state{
+        FederateStates::CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time

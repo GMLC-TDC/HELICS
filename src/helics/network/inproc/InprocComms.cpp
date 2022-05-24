@@ -58,20 +58,20 @@ namespace inproc {
             if (!brokerName.empty()) {
                 if (!CoreFactory::copyCoreIdentifier(name, localTargetAddress)) {
                     if (!BrokerFactory::copyBrokerIdentifier(name, localTargetAddress)) {
-                        setRxStatus(connection_status::error);
-                        setTxStatus(connection_status::error);
+                        setRxStatus(ConnectionStatus::ERRORED);
+                        setTxStatus(ConnectionStatus::ERRORED);
                         return;
                     }
                 }
             } else {
                 if (!BrokerFactory::copyBrokerIdentifier(name, localTargetAddress)) {
-                    setRxStatus(connection_status::error);
-                    setTxStatus(connection_status::error);
+                    setRxStatus(ConnectionStatus::ERRORED);
+                    setTxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
             }
         }
-        setRxStatus(connection_status::connected);
+        setRxStatus(ConnectionStatus::CONNECTED);
         std::shared_ptr<CoreBroker> tbroker;
 
         if (brokerName.empty()) {
@@ -92,8 +92,8 @@ namespace inproc {
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                         std::this_thread::sleep_for(milliseconds(200));
@@ -107,8 +107,8 @@ namespace inproc {
                         BrokerFactory::cleanUpBrokers(milliseconds(200));
                         totalSleep += milliseconds(200);
                         if (totalSleep > milliseconds(connectionTimeout)) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                     }
@@ -126,8 +126,8 @@ namespace inproc {
                         tbroker->connect();
                     } else {
                         if (totalSleep > connectionTimeout) {
-                            setTxStatus(connection_status::error);
-                            setRxStatus(connection_status::error);
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
                         std::this_thread::sleep_for(milliseconds(200));
@@ -145,7 +145,7 @@ namespace inproc {
             }
         }
 
-        setTxStatus(connection_status::connected);
+        setTxStatus(ConnectionStatus::CONNECTED);
         std::map<route_id, std::shared_ptr<BrokerBase>> routes;
         bool haltLoop{false};
         while (!haltLoop) {
@@ -188,7 +188,7 @@ namespace inproc {
                             processed = true;
                             break;
                         case CLOSE_RECEIVER:
-                            setRxStatus(connection_status::terminated);
+                            setRxStatus(ConnectionStatus::TERMINATED);
                             processed = true;
                             break;
                         case DISCONNECT:
@@ -229,7 +229,7 @@ namespace inproc {
         routes.clear();
         tbroker = nullptr;
 
-        setTxStatus(connection_status::terminated);
+        setTxStatus(ConnectionStatus::TERMINATED);
     }
 
     std::string InprocComms::getAddress() const

@@ -32,13 +32,6 @@ aliases:
       RESULT=$?
       exit $RESULT
 
-  - &run_helics_sanitizer_tests
-    name: run_helics_tests
-    command: |
-      /root/project/scripts/run-circleci-tests-sanitizer.sh
-      RESULT=$?
-      exit $RESULT
-
   - &run_installer_tests
     name: run_installer_tests
     command: |
@@ -76,32 +69,30 @@ jobs:
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *run_helics_tests
 
   helicsgccASan:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
       CMAKE_FLAGS: '-DCMAKE_CXX_FLAGS="-ggdb -fsanitize=address -fno-omit-frame-pointer -static-libstdc++ -static-libasan -lrt -g -O1 "  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON'
-      ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
-      LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression_gcc.txt'
+
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *run_helics_tests
 
   helicsASan:
     docker:
       - image: helics/buildenv:sanitizers-14
     environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -lc++ -lc++abi -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1  -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
+      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=undefined,address -fsanitize-address-use-after-scope -fsanitize-ignorelist=/root/project/.circleci/asan_suppression.txt -nostdinc++ -nostdlib++ -L/root/develop/libcxx_asan/lib -lc++ -lc++abi  -isystem /root/develop/libcxx_asan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O1 -Wl,-rpath,/root/develop/libcxx_asan/lib -fsanitize-blacklist=/root/project/.circleci/asan_blacklist.txt"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON  -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
       LSAN_OPTIONS: 'suppressions=/root/project/.circleci/leak_suppression.txt'
       UBSAN_OPTIONS: 'print_stacktrace=1 suppressions=/root/project/.circleci/ubsan_suppression.txt'
-      ASAN_OPTIONS: 'alloc_dealloc_mismatch=0'
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *run_helics_tests
 
   helicsMSan:
     docker:
@@ -112,18 +103,7 @@ jobs:
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
-
-  helicsTSan:
-    docker:
-      - image: helics/buildenv:sanitizers-14
-    environment:
-      CMAKE_FLAGS: '-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_FLAGS="-fsanitize=thread -nostdinc++ -nostdlib++ -L/root/develop/libcxx_tsan/lib -lc++ -lc++abi -I/root/develop/libcxx_tsan/include -I/root/develop/libcxx_tsan/include/c++/v1 -Wno-unused-command-line-argument -fno-omit-frame-pointer -g -O2 -Wl,-rpath,/root/develop/libcxx_tsan/lib"  -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON'
-      TSAN_OPTIONS: 'suppressions=/root/project/.circleci/tsan_suppression.txt'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_helics_sanitizer_tests
+      - run: *run_helics_tests
 
   helicsInstall1:
     docker:
@@ -149,7 +129,7 @@ jobs:
     docker:
       - image: helics/buildenv:tumbleweed-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_ENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_ENABLE_UDP_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
     steps:
       - checkout
       - run: *setup_helics
@@ -168,21 +148,10 @@ jobs:
     docker:
       - image: helics/buildenv:gcc12-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags'
     steps:
       - checkout
       - run: *setup_helics
-      - run: *run_helics_tests
-
-  clang14:
-    docker:
-      - image: helics/buildenv:clang14-builder
-    environment:
-      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=20'
-    steps:
-      - checkout
-      - run: *setup_helics
-      - run: *run_helics_tests
 
   benchmarkjob:
     docker:
@@ -201,6 +170,14 @@ workflows:
   version: 2
   helics_test:
     jobs:
+      - helicsMSan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - helicsASan:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
       - helicsInstall1:
           filters:
             branches:
@@ -209,36 +186,19 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - gcc12:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - clang14:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-  sanitizers:
-    jobs:
-      - helicsTSan:
-          filters:
-            branches:
-              only: /sanitizer\/.*/
-      - helicsASan:
-          filters:
-            branches:
-              only: /sanitizer\/.*/
-      - helicsgccASan:
-          filters:
-            branches:
-              only: /sanitizer\/.*/
       - helicsgccTSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
-      - helicsMSan:
+              ignore: /pre-commit\/.*/
+      - helicsgccASan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              ignore: /pre-commit\/.*/
+      - helicsoctave:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+
   nightly:
     triggers:
       - schedule:
@@ -250,12 +210,7 @@ workflows:
     jobs:
       - helicsTumbleweed
       - helicsNoZmq
-      - helicsoctave
-      - helicsTSan
-      - helicsASan
-      - helicsgccASan
-      - helicsgccTSan
-      - helicsMSan
+      - gcc12
   benchmark:
     triggers:
       - schedule:

@@ -1,0 +1,22 @@
+# Lines starting with # are ignored.
+# Turn off checks for the source file (use absolute path or path relative
+# to the current working directory):
+src:*functional.cpp
+# Turn off checks for a particular functions (use mangled names):
+#fun:MyFooBar
+#fun:_Z8MyFooBarv
+# Extended regular expressions are supported:
+#fun:bad_(foo|bar)
+#src:bad_source[1-9].c
+# Shell like usage of * is supported (* is treated as .*):
+#src:bad/sources/*
+#fun:*BadFunction*
+# Specific sanitizer tools may introduce categories.
+#src:/special/path/*=special_sources
+# Sections can be used to limit ignorelist entries to specific sanitizers
+#[address]
+#fun:*BadASanFunc*
+# Section names are regular expressions
+#[cfi-vcall|cfi-icall]
+#fun:*BadCfiCall
+# Entries without sections are placed into [*] and apply to all sanitizers

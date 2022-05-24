@@ -85,9 +85,11 @@ set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Da
 set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Coverage Daily)
 
 # Tests used for Continuous Integration builds
-add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --gtest_filter=-*ci_skip*)
+add_test(NAME shared-library-ci-tests COMMAND shared-library-tests
+                                              --gtest_filter=-*ci_skip*:*nosan*
+)
 add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp
-                                                  --gtest_filter=-*ci_skip*
+                                                  --gtest_filter=-*ci_skip*:*nosan*
 )
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibraryCI Continuous)

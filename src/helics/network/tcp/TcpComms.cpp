@@ -130,13 +130,13 @@ void TcpComms::queue_rx_function()
                 case CLOSE_RECEIVER:
                 case DISCONNECT:
                     disconnecting = true;
-                    setRxStatus(connection_status::terminated);
+                    setRxStatus(ConnectionStatus::TERMINATED);
                     return;
             }
         }
     }
     if (PortNumber < 0) {
-        setRxStatus(connection_status::error);
+        setRxStatus(ConnectionStatus::ERRORED);
         return;
     }
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
@@ -166,7 +166,7 @@ void TcpComms::queue_rx_function()
             if (!connected) {
                 logError("unable to bind to tcp connection socket");
                 server->close();
-                setRxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
                 return;
             }
         }
@@ -182,7 +182,7 @@ void TcpComms::queue_rx_function()
             return commErrorHandler(ci, connection.get(), error);
         });
     server->start();
-    setRxStatus(connection_status::connected);
+    setRxStatus(ConnectionStatus::CONNECTED);
     bool loopRunning = true;
     while (loopRunning) {
         auto message = rxMessageQueue.pop();
@@ -199,7 +199,7 @@ void TcpComms::queue_rx_function()
     disconnecting = true;
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     server->close();
-    setRxStatus(connection_status::terminated);
+    setRxStatus(ConnectionStatus::TERMINATED);
 }
 
 void TcpComms::txReceive(const char* data, size_t bytes_received, const std::string& errorMessage)
@@ -219,7 +219,7 @@ bool TcpComms::establishBrokerConnection(
     std::shared_ptr<TcpConnection>& brokerConnection)
 {
     // lambda function that does the proper termination
-    auto terminate = [&, this](connection_status status) -> bool {
+    auto terminate = [&, this](ConnectionStatus status) -> bool {
         if (brokerConnection) {
             brokerConnection->close();
             brokerConnection = nullptr;
@@ -247,8 +247,8 @@ bool TcpComms::establishBrokerConnection(
         }
         int retries = 0;
         while (!brokerConnection) {
-            if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
-                return terminate(connection_status::terminated);
+            if (requestDisconnect.load(std::memory_order_acquire)) {
+                return terminate(ConnectionStatus::TERMINATED);
             }
             if (retries == 0) {
                 logWarning("initial connection to broker timed out ");
@@ -257,7 +257,7 @@ bool TcpComms::establishBrokerConnection(
             if (retries > maxRetries) {
                 logWarning(
                     "initial connection to broker timed out exceeding max number of retries ");
-                return terminate(connection_status::error);
+                return terminate(ConnectionStatus::ERRORED);
             }
             if (retries % 2 == 1) {
                 std::this_thread::yield();
@@ -265,8 +265,8 @@ bool TcpComms::establishBrokerConnection(
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
 
-            if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
-                return terminate(connection_status::terminated);
+            if (requestDisconnect.load(std::memory_order_acquire)) {
+                return terminate(ConnectionStatus::TERMINATED);
             }
             try {
                 brokerConnection = gmlc::networking::establishConnection(sf,
@@ -281,8 +281,8 @@ bool TcpComms::establishBrokerConnection(
                 brokerConnection = nullptr;
             }
         }
-        if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
-            return terminate(connection_status::terminated);
+        if (requestDisconnect.load(std::memory_order_acquire)) {
+            return terminate(ConnectionStatus::TERMINATED);
         }
         // monitor the total waiting time before connections
         std::chrono::milliseconds cumulativeSleep{0};
@@ -302,7 +302,7 @@ bool TcpComms::establishBrokerConnection(
             }
             catch (const std::system_error& error) {
                 logError(std::string("error in initial send to broker ") + error.what());
-                return terminate(connection_status::error);
+                return terminate(ConnectionStatus::ERRORED);
             }
             std::vector<char> rx(512);
             tcp::endpoint brk;
@@ -333,7 +333,7 @@ bool TcpComms::establishBrokerConnection(
                         }
                     }
                     if (mess->second.messageID == DISCONNECT) {
-                        return terminate(connection_status::terminated);
+                        return terminate(ConnectionStatus::TERMINATED);
                     }
                     if (mess->second.messageID == NEW_BROKER_INFORMATION) {
                         logMessage("got new broker information");
@@ -357,7 +357,7 @@ bool TcpComms::establishBrokerConnection(
                             brokerConnection = nullptr;
                             logError(std::string(" unable to create broker connection to ") +
                                      brokerTargetAddress + "::" + e.what());
-                            return terminate(connection_status::error);
+                            return terminate(ConnectionStatus::ERRORED);
                         }
                         continue;
                     }
@@ -374,14 +374,14 @@ bool TcpComms::establishBrokerConnection(
                 if (cumulativeSleep >= connectionTimeout) {
                     brokerConnection->cancel();
                     logError("port number query to broker timed out");
-                    return terminate(connection_status::error);
+                    return terminate(ConnectionStatus::ERRORED);
                 }
             }
         }
     }
     catch (std::exception& e) {
         logError(std::string("error connecting with Broker") + e.what());
-        return terminate(connection_status::error);
+        return terminate(ConnectionStatus::ERRORED);
     }
     return true;
 }
@@ -415,7 +415,7 @@ void TcpComms::queue_tx_function()
             rxMessageQueue.push(m);
         }
     }
-    setTxStatus(connection_status::connected);
+    setTxStatus(ConnectionStatus::CONNECTED);
 
     //  std::vector<ActionMessage> txlist;
     bool processing{true};
@@ -530,10 +530,10 @@ void TcpComms::queue_tx_function()
         rt.second->close();
     }
     routes.clear();
-    if (getRxStatus() == connection_status::connected) {
+    if (getRxStatus() == ConnectionStatus::CONNECTED) {
         closeReceiver();
     }
-    setTxStatus(connection_status::terminated);
+    setTxStatus(ConnectionStatus::TERMINATED);
 }
 
 void TcpComms::closeReceiver()
