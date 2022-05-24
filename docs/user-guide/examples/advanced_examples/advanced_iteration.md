@@ -27,7 +27,7 @@ As a result, each time step requires some iteration to find the fixed-point, whe
 
 In very loose terms, the charging philosophy is Constant Current followed by Constant Voltage once rated voltage is achieved:
 ![](https://batteryuniversity.com/img/content/new.jpg)
-_source: https://batteryuniversity.com/article/bu-409-charging-lithium-ion_
+_source: <https://batteryuniversity.com/article/bu-409-charging-lithium-ion>_
 
 #### Charger Behavior
 
@@ -228,6 +228,7 @@ The basic structure is:
 
 - Call `helicsFederateEnterExecutingModeIterative`.
   - If the result is `NEXT_STEP` then we're done.
+  
   ```python
   itr = 0
   itr_flag = h.helics_iteration_request_iterate_if_needed
@@ -236,6 +237,7 @@ The basic structure is:
       if itr_status == h.helics_iteration_result_next_step:
           break
   ```
+
 - Get subscriptions. Done via the `get_sub` function:
 
   ```python
@@ -264,11 +266,14 @@ The basic structure is:
 - check error
   - If the error is sufficiently small loop back and **_do not publish_**, otherwise proceed to update and publishing, which will trigger another iteration.
     The function to check the error is `check_error`:
+  
   ```python
   def check_error(self, dState):
       return sum([abs(vals[0] - vals[1]) for vals in dState.values()])
   ```
+  
   The function call looks like[^2]:
+  
   ```python
   error = feditr.check_error(charging_voltage)
   if (error < epsilon) and (itr > 0):
@@ -277,6 +282,7 @@ The basic structure is:
   else:
       pass
   ```
+
 - perform state update based on subscription values.
 
   ```python
@@ -339,7 +345,7 @@ Note that this essentially means, that we publish our final values from time $t$
 
 ## Execution Results
 
-### Initialization
+### Initialization Results
 
 Two figures are produced following the initialization iteration, which show how the currents and voltages converge.
 Note that all batteries are in the constant current phase of charging, as such they all converge to their rated current (30A for EV1-EV4 and 104A for EV5).
@@ -349,7 +355,7 @@ The voltages meanwhile are _not_ nominal (240V or 630V) but rather determined ba
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_voltage_init.png?raw=true)
 
-### Co-Simulation
+### Time Loop Results 
 
 Four figures are produced once the co-simulation runs its course, two from Batter.py and two from Charger.py.
 
