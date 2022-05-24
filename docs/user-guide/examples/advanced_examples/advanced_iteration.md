@@ -227,8 +227,9 @@ Next, the federates _iterate_ using `helicsFederateEnterExecutingModeIterative`.
 The basic structure is:
 
 - Call `helicsFederateEnterExecutingModeIterative`.
+
   - If the result is `NEXT_STEP` then we're done.
-  
+
   ```python
   itr = 0
   itr_flag = h.helics_iteration_request_iterate_if_needed
@@ -264,16 +265,17 @@ The basic structure is:
   ```
 
 - check error
+
   - If the error is sufficiently small loop back and **_do not publish_**, otherwise proceed to update and publishing, which will trigger another iteration.
     The function to check the error is `check_error`:
-  
+
   ```python
   def check_error(self, dState):
       return sum([abs(vals[0] - vals[1]) for vals in dState.values()])
   ```
-  
+
   The function call looks like[^2]:
-  
+
   ```python
   error = feditr.check_error(charging_voltage)
   if (error < epsilon) and (itr > 0):
@@ -355,7 +357,7 @@ The voltages meanwhile are _not_ nominal (240V or 630V) but rather determined ba
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_voltage_init.png?raw=true)
 
-### Time Loop Results 
+### Time Loop Results
 
 Four figures are produced once the co-simulation runs its course, two from Batter.py and two from Charger.py.
 
