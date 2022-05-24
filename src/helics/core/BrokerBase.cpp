@@ -306,7 +306,7 @@ void BrokerBase::configureBase()
     timeCoord->setRestrictivePolicy(restrictive_time_policy);
 
     mLogManager->setTransmitCallback([this](ActionMessage&& m) {
-        if (getBrokerState() < BrokerState::terminating) {
+        if (getBrokerState() < BrokerState::TERMINATING) {
             m.source_id = global_id.load();
             addActionMessage(std::move(m));
         }
@@ -315,7 +315,7 @@ void BrokerBase::configureBase()
     maxLogLevel.store(mLogManager->getMaxLevel());
     mainLoopIsRunning.store(true);
     queueProcessingThread = std::thread(&BrokerBase::queueProcessingLoop, this);
-    brokerState = BrokerState::configured;
+    brokerState = BrokerState::CONFIGURED;
 }
 
 bool BrokerBase::sendToLogger(GlobalFederateId federateID,
@@ -376,11 +376,11 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
     lastErrorString.assign(estring.data(), estring.size());
     lastErrorCode.store(eCode);
     auto cBrokerState = brokerState.load();
-    if (cBrokerState != BrokerState::errored && cBrokerState != BrokerState::connected_error) {
-        if (cBrokerState > BrokerState::configured && cBrokerState < BrokerState::terminating) {
-            brokerState.store(BrokerState::connected_error);
+    if (cBrokerState != BrokerState::ERRORED && cBrokerState != BrokerState::CONNECTED_ERROR) {
+        if (cBrokerState > BrokerState::CONFIGURED && cBrokerState < BrokerState::TERMINATING) {
+            brokerState.store(BrokerState::CONNECTED_ERROR);
         } else {
-            brokerState.store(BrokerState::errored);
+            brokerState.store(BrokerState::ERRORED);
         }
         if (errorDelay <= timeZero) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
@@ -704,7 +704,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 }
                 // deal with error state timeout
-                if (brokerState.load() == BrokerState::connected_error) {
+                if (brokerState.load() == BrokerState::CONNECTED_ERROR) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td >= errorDelay.to_ms()) {
@@ -759,7 +759,7 @@ void BrokerBase::queueProcessingLoop()
 #endif
                 break;
             case CMD_ERROR_CHECK:
-                if (brokerState.load() == BrokerState::connected_error) {
+                if (brokerState.load() == BrokerState::CONNECTED_ERROR) {
                     auto ctime = std::chrono::steady_clock::now();
                     auto td = ctime - errorTimeStart;
                     if (td > errorDelay.to_ms()) {
@@ -846,29 +846,29 @@ bool BrokerBase::setBrokerState(BrokerState newState)
 {
     auto currentState = brokerState.load();
     switch (currentState) {
-        case BrokerState::errored:
-            return (newState == BrokerState::errored);
-        case BrokerState::connected_error:
-            if (newState == BrokerState::terminating) {
-                newState = BrokerState::terminating_error;
-            } else if (newState == BrokerState::terminated || newState == BrokerState::errored) {
-                newState = BrokerState::errored;
+        case BrokerState::ERRORED:
+            return (newState == BrokerState::ERRORED);
+        case BrokerState::CONNECTED_ERROR:
+            if (newState == BrokerState::TERMINATING) {
+                newState = BrokerState::TERMINATING_ERROR;
+            } else if (newState == BrokerState::TERMINATED || newState == BrokerState::ERRORED) {
+                newState = BrokerState::ERRORED;
             } else {
-                return (newState == BrokerState::connected_error);
+                return (newState == BrokerState::CONNECTED_ERROR);
             }
             break;
-        case BrokerState::terminating_error:
-            if (newState == BrokerState::terminated || newState == BrokerState::errored) {
-                newState = BrokerState::errored;
+        case BrokerState::TERMINATING_ERROR:
+            if (newState == BrokerState::TERMINATED || newState == BrokerState::ERRORED) {
+                newState = BrokerState::ERRORED;
             } else {
-                return (newState == BrokerState::terminating_error);
+                return (newState == BrokerState::TERMINATING_ERROR);
             }
             break;
         default:
-            if (newState == BrokerState::errored) {
-                if (currentState > BrokerState::connecting &&
-                    currentState < BrokerState::terminating) {
-                    newState = BrokerState::connected_error;
+            if (newState == BrokerState::ERRORED) {
+                if (currentState > BrokerState::CONNECTING &&
+                    currentState < BrokerState::TERMINATING) {
+                    newState = BrokerState::CONNECTED_ERROR;
                 }
             }
             break;
@@ -955,29 +955,29 @@ const std::string& brokerStateName(BrokerBase::BrokerState state)
     static const std::string connectedErrorString = "connected_error";
     static const std::string otherString = "other";
     switch (state) {
-        case BrokerBase::BrokerState::created:
+        case BrokerBase::BrokerState::CREATED:
             return createdString;
-        case BrokerBase::BrokerState::configuring:
+        case BrokerBase::BrokerState::CONFIGURING:
             return configuringString;
-        case BrokerBase::BrokerState::configured:
+        case BrokerBase::BrokerState::CONFIGURED:
             return configuredString;
-        case BrokerBase::BrokerState::connecting:
+        case BrokerBase::BrokerState::CONNECTING:
             return connectingString;
-        case BrokerBase::BrokerState::connected:
+        case BrokerBase::BrokerState::CONNECTED:
             return connectedString;
-        case BrokerBase::BrokerState::initializing:
+        case BrokerBase::BrokerState::INITIALIZING:
             return initializingString;
-        case BrokerBase::BrokerState::operating:
+        case BrokerBase::BrokerState::OPERATING:
             return operatingString;
-        case BrokerBase::BrokerState::terminating:
+        case BrokerBase::BrokerState::TERMINATING:
             return terminatingString;
-        case BrokerBase::BrokerState::terminating_error:
+        case BrokerBase::BrokerState::TERMINATING_ERROR:
             return terminatingErrorString;
-        case BrokerBase::BrokerState::terminated:
+        case BrokerBase::BrokerState::TERMINATED:
             return terminatedString;
-        case BrokerBase::BrokerState::errored:
+        case BrokerBase::BrokerState::ERRORED:
             return erroredString;
-        case BrokerBase::BrokerState::connected_error:
+        case BrokerBase::BrokerState::CONNECTED_ERROR:
             return connectedErrorString;
         default:
             return otherString;

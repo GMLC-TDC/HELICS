@@ -62,7 +62,7 @@ ZmqCommsSS::~ZmqCommsSS()
 {
     if (requestDisconnect.load() || disconnecting.load()) {
         auto status = getRxStatus();
-        while (status != connection_status::terminated && status != connection_status::error) {
+        while (status != ConnectionStatus::TERMINATED && status != ConnectionStatus::ERRORED) {
             std::this_thread::yield();
             status = getRxStatus();
         }
@@ -101,28 +101,28 @@ int ZmqCommsSS::processIncomingMessage(zmq::message_t& msg,
                 break;
             case NAME_NOT_FOUND:
                 disconnecting = true;
-                setRxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
                 status = -1;
                 break;
             case CONNECTION_ACK:
-                setTxStatus(connection_status::connected);
+                setTxStatus(ConnectionStatus::CONNECTED);
                 break;
             case DISCONNECT:
                 disconnecting = true;
-                setRxStatus(connection_status::terminated);
+                setRxStatus(ConnectionStatus::TERMINATED);
                 status = -1;
                 break;
             case DISCONNECT_ERROR:
                 disconnecting = true;
-                setRxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
                 status = -1;
                 break;
             case CLOSE_RECEIVER:
-                setRxStatus(connection_status::terminated);
+                setRxStatus(ConnectionStatus::TERMINATED);
                 status = -1;
                 break;
             case RECONNECT_RECEIVER:
-                setRxStatus(connection_status::connected);
+                setRxStatus(ConnectionStatus::CONNECTED);
                 break;
             case CONNECTION_INFORMATION:
                 if (serverMode) {
@@ -195,7 +195,7 @@ int ZmqCommsSS::initializeConnectionToBroker(zmq::socket_t& brokerConnection)
         logError(std::string("unable to connect with broker at ") +
                  gmlc::networking::makePortAddress(brokerTargetAddress, brokerPort + 1) + ":(" +
                  name + ")" + ze.what());
-        setTxStatus(connection_status::error);
+        setTxStatus(ConnectionStatus::ERRORED);
         return -1;
     }
     std::vector<char> buffer;
@@ -222,7 +222,7 @@ int ZmqCommsSS::initializeBrokerConnections(zmq::socket_t& brokerSocket,
             disconnecting = true;
             logError(std::string("Unable to bind zmq router socket giving up ") +
                      gmlc::networking::makePortAddress(localTargetAddress, PortNumber));
-            setRxStatus(connection_status::error);
+            setRxStatus(ConnectionStatus::ERRORED);
             return -1;
         }
     }
@@ -243,7 +243,7 @@ bool ZmqCommsSS::processTxControlCmd(const ActionMessage& cmd,
 
     switch (cmd.messageID) {
         case RECONNECT_TRANSMITTER:
-            setTxStatus(connection_status::connected);
+            setTxStatus(ConnectionStatus::CONNECTED);
             break;
         case CONNECTION_INFORMATION:
             // Shouldn't reach here ideally
@@ -329,7 +329,7 @@ void ZmqCommsSS::queue_tx_function()
     zmq::socket_t brokerConnection(ctx->getContext(), ZMQ_DEALER);
     auto res = initializeBrokerConnections(brokerSocket, brokerConnection);
     if (res < 0) {
-        setTxStatus(connection_status::error);
+        setTxStatus(ConnectionStatus::ERRORED);
         brokerSocket.close();
         brokerConnection.close();
         return;
@@ -340,15 +340,15 @@ void ZmqCommsSS::queue_tx_function()
     }
     if (!hasBroker) {
         brokerConnection.close();
-        setTxStatus(connection_status::connected);
+        setTxStatus(ConnectionStatus::CONNECTED);
     }
-    // setTxStatus(connection_status::connected);
+    // setTxStatus(ConnectionStatus::CONNECTED);
 
     std::vector<zmq::pollitem_t> poller(2);
     std::vector<zmq::socket_t*> sockets(2);
     loadPoller(poller, sockets, brokerSocket, brokerConnection, serverMode, hasBroker);
 
-    setRxStatus(connection_status::connected);
+    setRxStatus(ConnectionStatus::CONNECTED);
 
     int status{0};
 
@@ -469,9 +469,9 @@ void ZmqCommsSS::queue_tx_function()
     if (hasBroker) {
         brokerConnection.close();
     }
-    setTxStatus(connection_status::terminated);
-    if (getRxStatus() == connection_status::connected) {
-        setRxStatus(connection_status::terminated);
+    setTxStatus(ConnectionStatus::TERMINATED);
+    if (getRxStatus() == ConnectionStatus::CONNECTED) {
+        setRxStatus(ConnectionStatus::TERMINATED);
     }
 }
 
