@@ -59,7 +59,7 @@ jobs:
         source ../scripts/setup-helics-ci-options.sh
         export CTEST_OPTIONS="--output-on-failure"
         echo "Running CI tests with flags ${CI_TEST_FLAGS}"
-        ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+        ../scripts/run-coverage-tests.sh ${CI_TEST_FLAGS}
 
     - name: Gather and upload coverage results
       run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov
