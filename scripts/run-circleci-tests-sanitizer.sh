@@ -7,7 +7,7 @@ tests=(
     "/root/project/build/bin/shared-library-tests-cpp --gtest_filter=-*death*:*nosan*"
     "/root/project/build/bin/shared-library-tests --gtest_filter=-*bad_input*:*evil*:*after_close*:*death*:*nosan*"
     "/root/project/build/bin/application-api-tests --gtest_filter=-*ci_skip*:*nosan*"
-    "/root/project/build/bin/helics_wevserver-tests --gtest_filter=*"
+    "/root/project/build/bin/helics_webserver-tests --gtest_filter=*"
     "/root/project/build/bin/network-tests --gtest_filter=*"
 )
 
