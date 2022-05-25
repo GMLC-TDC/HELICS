@@ -4,11 +4,11 @@
 *helicsPublication*
 *helicsInput*
 *helicsEndpoint*
+*helicsSubscription*
 *helicsFilter*
 *helicsCreate*
 *helicsGet*
-*HelicsError*
-*HelicsComplex*
+*helicsError*
 *helicsQuery*
 *helicsClose*
 *helicsCleanup*
