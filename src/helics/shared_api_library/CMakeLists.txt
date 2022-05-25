@@ -105,6 +105,10 @@ if(UNIX OR MINGW)
             )
             target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
         endif()
+    else(NOT_APPLE)
+        target_link_libraries(
+                helics PRIVATE -Wl,-exported_symbols_list=${CMAKE_CURRENT_SOURCE_DIR}/export_mac.txt
+            )
     endif(NOT APPLE)
 endif()
 
