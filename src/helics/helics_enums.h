@@ -238,7 +238,7 @@ typedef enum {
     /** the function executed successfully */
     HELICS_OK = 0,
     /** user system abort to match typical SIGINT value*/
-    HELICS_ERROR_USER_ABORT = 2
+    HELICS_ERROR_USER_ABORT = 130
 } HelicsErrorTypes;
 
 const int HELICS_INVALID_OPTION_INDEX = -101;
