@@ -95,10 +95,15 @@ if(UNIX OR MINGW)
                     helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
                 )
             endif()
+            check_linker_flag(CXX "-Wl,--exclude-libs,ALL" flag_linker_exclude_libs)
+            if(flag_linker_exclude_libs)
+                target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
+            endif()
         else()
             target_link_libraries(
                 helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
             )
+            target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
         endif()
     endif(NOT APPLE)
 endif()
