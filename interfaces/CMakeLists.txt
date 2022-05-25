@@ -32,7 +32,7 @@ endif()
 if(HELICS_BUILD_MATLAB_INTERFACE)
     message(
         FATAL_ERROR
-            "The matlab interface is no longer compiled as part of building HELICS. please see the new repository at https://github.com/gmlc-tdc/matHELICS for details.
+            "The matlab interface is no longer compiled as part of building HELICS. Please see the new repository at https://github.com/gmlc-tdc/matHELICS for details.
 Re-run cmake with the `-UHELICS_BUILD_MATLAB_INTERFACE` option to get rid of this error message."
     )
 endif()
