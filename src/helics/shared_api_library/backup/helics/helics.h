@@ -2065,7 +2065,7 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
 /**
- * Send a command to another helics object though a core.
+ * Send a command to another helics object though a core using asynchronous(fast) operations.
  *
  * @param core The core to send the command through.
  * @param target The name of the object to send the command to.
@@ -2076,7 +2076,18 @@ HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueN
 HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
 /**
- * Send a command to another helics object through a broker.
+ * Send a command to another helics object though a core using ordered operations.
+ *
+ * @param core The core to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using asynchronous(fast) messages.
  *
  * @param broker The broker to send the command through.
  * @param target The name of the object to send the command to.
@@ -2085,6 +2096,17 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using ordered sequencing.
+ *
+ * @param broker The broker to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
 /**
  * Set the log file on a core.
@@ -3595,6 +3617,15 @@ HELICS_EXPORT HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
  * @return A new HelicsMessage.
  */
 HELICS_EXPORT HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* err);
+
+/**
+ * Clear all stored messages stored from an endpoint.
+ *
+ * @details This clears messages retrieved through helicsEndpointGetMessage or helicsEndpointCreateMessage
+ *
+ * @param endpoint The endpoint to clear the message for.
+ */
+HELICS_EXPORT void helicsEndpointClearMessages(HelicsEndpoint endpoint);
 
 /**
  * Receive a communication message for any endpoint in the federate.

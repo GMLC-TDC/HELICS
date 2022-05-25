@@ -219,32 +219,6 @@ const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint)
     return str.c_str();
 }
 
-void helicsEndpointSendData(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dest, HelicsError* err)
-{
-    auto* endObj = verifyEndpoint(endpoint, err);
-    if (endObj == nullptr) {
-        return;
-    }
-    try {
-        if ((data == nullptr) || (inputDataLength <= 0)) {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(gEmptyStr);
-            } else {
-                endObj->endPtr->sendTo(dest, gEmptyStr);
-            }
-        } else {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
-            } else {
-                endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, dest);
-            }
-        }
-    }
-    catch (...) {
-        helicsErrorHandler(err);
-    }
-}
-
 void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
