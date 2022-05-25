@@ -12,7 +12,7 @@ HelicsComplex*
 helicsQuery*
 helicsClose*
 helicsCleanup*
-helicsWrapDataInBuffer
+helics*Data*
 helicsData*
 helics*ToBytes
 helicsMessage*
