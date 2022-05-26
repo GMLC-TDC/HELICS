@@ -27,7 +27,7 @@ toml::value loadToml(const std::string& tomlString)
         try {
             return loadTomlStr(tomlString);
         }
-        catch (const toml::syntax_error&) {
+        catch (const std::invalid_argument&) {
             // just pass through this was an assumption
         }
     }
@@ -39,7 +39,7 @@ toml::value loadToml(const std::string& tomlString)
         }
         return loadTomlStr(tomlString);
     }
-    catch (const toml::syntax_error& se) {
+    catch (const toml::exception& se) {
         throw(std::invalid_argument(se.what()));
     }
 }
@@ -51,7 +51,7 @@ toml::value loadTomlStr(const std::string& tomlString)
         toml::value pr = toml::parse(tstring);
         return pr;
     }
-    catch (const toml::syntax_error& se) {
+    catch (const toml::exception& se) {
         throw(std::invalid_argument(se.what()));
     }
 }

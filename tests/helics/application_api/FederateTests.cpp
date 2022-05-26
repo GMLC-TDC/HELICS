@@ -644,6 +644,23 @@ TEST(federate_tests, from_file9)
     helics::CoreFactory::terminateAllCores();
 }
 
+TEST(federate_tests, from_file10)
+{
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+
+    auto fstr2 = std::string(TEST_DIR) +
+        "extra_files_testing_for_very_long_file_paths/this_is_a_ridiculously_long_file_name_to_test_some_odd_conditions_in_the_toml_parser_so_we_need_a_long_file_name.toml";
+    if (fstr2.size() < FILENAME_MAX) {
+        // this test would fail if the file name exceeeds the max filename length
+        std::shared_ptr<helics::Federate> Fed1;
+        EXPECT_NO_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2));
+        Fed1->finalize();
+    }
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+}
+
 TEST(federate_tests, from_string2)
 {
     auto Fed1 = std::make_shared<helics::Federate>(

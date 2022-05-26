@@ -213,8 +213,6 @@ typedef enum {
     HELICS_ERROR_OTHER = -101,
     /** user code generated exception */
     HELICS_USER_EXCEPTION = -29,
-    /** user system abort*/
-    HELICS_ERROR_USER_ABORT = -27,
     /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
     /** the function execution has failed */
@@ -238,7 +236,9 @@ typedef enum {
     /** registration has failed */
     HELICS_ERROR_REGISTRATION_FAILURE = -1,
     /** the function executed successfully */
-    HELICS_OK = 0
+    HELICS_OK = 0,
+    /** user system abort to match typical SIGINT value*/
+    HELICS_ERROR_USER_ABORT = 130
 } HelicsErrorTypes;
 
 const int HELICS_INVALID_OPTION_INDEX = -101;

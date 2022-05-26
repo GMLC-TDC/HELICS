@@ -34,6 +34,7 @@ toml::value loadToml(const std::string& tomlString);
 
 bool hasTomlExtension(std::string_view tomlString);
 /** load a TOML object in a string
+ * @throws std::invalid_argument if the string parsing failed through toml
  */
 toml::value loadTomlStr(const std::string& tomlString);
 
