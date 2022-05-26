@@ -1,6 +1,6 @@
 # Iteration
 
-In simulation in general, iteration at a time step is can be helpful in the case of [algebraic loops](https://www.mathworks.com/help/simulink/ug/algebraic-loops.html), that is, when two state variables are co-dependent on each other. If the analysis requires the two sub-systems to reach a consistent state, then iteration is required. In these situation, different methods (generally Fixed-Point Methods, like Newton's method), can be used to arrive at the desired solution. When modeling such systems in a single executable a traditional solver can be used as all the system states are visible to said solver. When modeling these systems in a co-simulation environment, no single solver has the necessary visibilty to force convergence between the two sets of states variables and iteration must instead by facilitated by HELICS. Iterations at a single time step are intended to resolve this issue by allowing Federates to exchange data back and forth until convergence to a consistent state is reached.
+In simulation in general, iteration at a time step is can be helpful in the case of [algebraic loops](https://www.mathworks.com/help/simulink/ug/algebraic-loops.html), that is, when two state variables are co-dependent on each other. If the analysis requires the two sub-systems to reach a consistent state, then iteration is required. In these situation, different methods (generally Fixed-Point Methods, like Newton's method), can be used to arrive at the desired solution. When modeling such systems in a single executable a traditional solver can be used as all the system states are visible to said solver. When modeling these systems in a co-simulation environment, no single solver has the necessary visibility to force convergence between the two sets of states variables and iteration must instead by facilitated by HELICS. Iterations at a single time step are intended to resolve this issue by allowing Federates to exchange data back and forth until convergence to a consistent state is reached.
 
 ```{note}
 Since neither federate has a full view of the problem, convergence issues cannot be dealt with quite in the same way as general numerical solvers. In fact, convergence cannot be guaranteed, because no federate really knows the logic/trajectory of the state variables in the other federates it is iterating against.
@@ -22,7 +22,6 @@ There are two possible co-simulation states where iterations are possible in HEL
 | `EXECUTION`      | `helicsFederateRequestTimeIterative()`        |
 
 Both calls take an `iteration_request` as an input and return an `iteration_result` as an output. The only difference between the two, is that `helicsFederateRequestTimeIterative()` additionally takes requested time as an argument and additionally returns granted time as an output alongside `iteration_result`. If iterating in execution mode, it is necessary that the requested time be the next time appropriate for the federate (as if you were not iterateing). Requesting the same simulated time a federate is at AND making it an iterative time request is a recipe for HELICS disaster; don't do it.
-
 
 ### `iteration_request`
 
@@ -53,12 +52,15 @@ Because federates don't generally expose all of their internal states (just thos
 ## Guiding Principles
 
 ### Publish Before Iterative Time Requests
-Iteration in HELICS is driven by the presence of new data produced by other members of federation. If a federate does not have new input data from the federations then HELICS assumes there is no need to iterate and will return `NEXT_STEP` from the interating call. Because of this, a critical aspect to iteration in HELICS is: **_publish before making the iterating call_**. This will ensure all other federates relying on these inputs will have them and know they need to iterate. Producing new outputs effectively forces all federates that have requested `ITERATE_IF_NEEDED` to iterate once more. 
+
+Iteration in HELICS is driven by the presence of new data produced by other members of federation. If a federate does not have new input data from the federations then HELICS assumes there is no need to iterate and will return `NEXT_STEP` from the interating call. Because of this, a critical aspect to iteration in HELICS is: **_publish before making the iterating call_**. This will ensure all other federates relying on these inputs will have them and know they need to iterate. Producing new outputs effectively forces all federates that have requested `ITERATE_IF_NEEDED` to iterate once more.
 
 ### Indicate Convergence By Not Publishing Before Iterative Time Requests
+
 The big and important exception to this is if a given federate has reached a state where it considers itself converged. At this point, the only thing the federate needs to do to indicate this to the rest of the federation is not publish any new values before making the exact same iterative time request. That iterative time request should still use `ITERATE_IF_NEEDED` and if it is returned `ITERATING` it should look for new inputs. If the convergence criterion is met, it once again would not publish anything and make the same request again. If the convergence criterion is no longer met it should recalculate the model state and publish new outputs.
 
 ### `only_update_on_change`
+
 Since iteration is highly dependent on received inputs, an implicit convergence criterion is implemented through the [`only_update_on_change`](../../references/configuration_options_reference) flag. When set this flag will only show new inputs to federates if they have changed since the last time they have been published. This can be helpful in that if there is a slightly mis-behaving federate that published every time, regardless of whether it thinks it has converged, those republications can be screened out. Additionally, `only_update_on_change` has a related parameter called [`tolerance`](../../references/configuration_options_reference#tolerance) that allows values within a certain numerical range from the previously published value to be considered "unchanged" and will not be presented to the federate. This can effecively be used to define the convergence criterion as it limits the changes in inputs to a federate.
 
 ## Example Iterative Federate Psuedo-code
@@ -73,7 +75,7 @@ while grantedtime < maxtime:
 
     # update requested time
     requestedtime = grantedtime + deltatime
-    
+
     converged = false
 
     # Iteration loop
@@ -89,11 +91,10 @@ while grantedtime < maxtime:
         # Save old input states and get new one
         s_old = s
         s = h.helicsInputGetDouble(subid)
-        
 
         # check convergence (e.g. any significant change on the inputs)
         converged = check_convergence(s, s_old)
-        
+
         if not converged():
             # perform internal update
             pubval = state_update(s)
