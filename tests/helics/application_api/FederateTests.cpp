@@ -657,6 +657,8 @@ TEST(federate_tests, from_file10)
         EXPECT_NO_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2));
         Fed1->finalize();
     }
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
 }
 
 TEST(federate_tests, from_string2)
