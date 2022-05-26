@@ -13,19 +13,16 @@ This demonstrates the use of iteration both in the initialization phase, as well
 
 This example on [Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced/advanced_iteration). If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-<!-- ADD PICTURE AND LINK
-[![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_multi_input_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) -->
-
 ## What is this co-simulation doing?
 
-This example shows how to use set up the iteration calls and determine convergence.
+This example shows how to use set up the iteration calls that support state convergence across federates. This is discussed in more detail in the [User Guide](../../advanced_topics/iteration.md).
 
 ### Differences compared to the Default example
 
 This example changes the model of the default example so that the charger voltage is a function of the battery current: $V_{ch}(I_{b})$. Conversely, battery current is a function of charger voltage: $I_{b}(V_{ch})$.
-As a result, each time step requires some iteration to find the fixed-point, where both characteristics hold.
+As a result, each time step requires some iteration to find the converged fixed-point, where both models are in a consistent state.
 
-In very loose terms, the charging philosophy is Constant Current followed by Constant Voltage once rated voltage is achieved:
+In very loose terms, the charging strategy uses constant current below a specific state of charge followed by constant voltage once rated voltage is achieved:
 ![](https://batteryuniversity.com/img/content/new.jpg)
 _source: <https://batteryuniversity.com/article/bu-409-charging-lithium-ion>_
 
@@ -65,7 +62,12 @@ def get_charger_ratings(EV_list):
     return out
 ```
 
-The charging function, $V_{ch}(I_{b})$ is implemented `voltage_update` in `Charger.py`.
+The charging function, $V_{ch}(I_{b})$ is implemented `voltage_update` in `Charger.py`. It considers 4 different cases (the very first `if` statement is an initialization option):
+
+- _Case 1_: Current is within tolerance $\epsilon$ of rated current $\to$ voltage remains the same.
+- _Case 2_: Current is below rated current _and_ voltage is below rated voltage $\to$ voltage is increased via bisection search.
+- _Case 3_: Current is below rated _and_ voltage is rated voltage $\to$ retain rated voltage.
+- _Case 4_: Current is greater than rated current $\to$ reduce voltage via bisection search.
 
 ```python
 def voltage_update(
@@ -105,16 +107,11 @@ def voltage_update(
     return charging_voltage
 ```
 
-It considers 4 different cases (the very first `if` statement is an initialization option):
 
-- _Case 1_: Current is within tolerance $\epsilon$ of rated current $\to$ voltage remains the same.
-- _Case 2_: Current is below rated current _and_ voltage is below rated voltage $\to$ voltage is increased via bisection search.
-- _Case 3_: Current is below rated _and_ voltage is rated voltage $\to$ retain rated voltage.
-- _Case 4_: Current is greater than rated current $\to$ reduce voltage via bisection search.
 
-#### Battery Behavior
+#### Battery Model Development
 
-In order to achieve the desired charging profile a fictitious battery resistance $R(soc)$ is used.
+In order to achieve the desired charging profile, a fictitious battery resistance $R(soc)$ is used.
 As this $R$ increases the voltage must increase to maintain the rated current $I_{\text{rated}}$ until $V_{\text{rated}}$ is reached and held, at which point the current begins to taper.
 
 We utilize the following design criteria:
@@ -173,8 +170,7 @@ def current_update(charging_voltage, soc):
 
 The majority of the iteration related code is found in `iterutils.py` in order to reuse it in both `Battery.py` and `Charger.py`.
 
-Before diving into the details, HELICS has iteration _requests_ and _results_.
-The _requests_ are passed as inputs and the _results_ are returned.
+Before diving into the details, HELICS has iteration _requests_ and _results_. The _requests_ are passed as inputs and the _results_ are returned (see the [User Guide section on iteration](../../advanced_topics/iteration.md) for further details).
 
 The relevant _requests_ are:
 
@@ -182,15 +178,14 @@ The relevant _requests_ are:
 - `FORCE_ITERATION`: this _forces_ iteration. If a federate _always_ requests this the simulation will be stuck in a never ending loop. It is intended to be used only in _rare_ cases.
 - `ITERATE_IF_NEEDED`: in this case iteration only takes place if new values are _published_. This is the _usual_ flag that should be used when iteration is desired.
 
-The last point is **_critical_**.
-The signal HELICS is looking for, is that no new values are published.
+The last point is **_critical_**; HELICS uses the relevant outputs of other federates to determine if a given federate needs to iterate.
 
 The relevant _results_ are:
 
 - `NEXT_STEP`: simulation is moving on.
 - `ITERATING`: simulation is still iterating.
 
-Each federate should therefore look for `NEXT_STEP` in order to continue.
+Each federate should therefore look for `NEXT_STEP` in order to advance in time and otherwise continue to iterate at the current time.
 
 **Note**: An essentially equivalent method to checking the flag for `ITERATING` or `NEXT_STEP` is to check whether the currently granted time is the same the previous one.
 `ITERATING` $\Rightarrow$ `grantedtime == grantedtime_previous`.
