@@ -17,3 +17,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "application_api/Subscriptions.hpp"
 #include "application_api/Translator.hpp"
 #include "core/helics_definitions.hpp"
+#include "application_api/queryFunctions.hpp"
+#include "application_api/HelicsPrimaryTypes.hpp"
+
