@@ -8,7 +8,13 @@
 *helicsTranslator*
 *helicsFilter*
 *helicsCreate*
-*helicsGet*
+*helicsGet*Index*
+*helicsGetDataType*
+*helicsGetOption*
+*helicsGetFederate*
+*helicsGetBuildFlags*
+*helicsGet*Version*
+*helicsGetSystemInfo*
 *helicsErrorInitialize*
 *helicsErrorClear*
 *helicsQuery*
