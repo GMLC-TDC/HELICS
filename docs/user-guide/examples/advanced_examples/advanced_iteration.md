@@ -107,8 +107,6 @@ def voltage_update(
     return charging_voltage
 ```
 
-
-
 #### Battery Model Development
 
 In order to achieve the desired charging profile, a fictitious battery resistance $R(soc)$ is used.
