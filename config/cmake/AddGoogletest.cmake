@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -14,7 +14,7 @@
 
 set(gtest_version release-1.10.0)
 
-set(gtest_version_new aa533ab)
+set(gtest_version_new f079775)
 
 set(gtest_vtype GIT_TAG)
 # depending on what the version is set to the git_clone command may need to change to
