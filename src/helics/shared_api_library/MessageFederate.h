@@ -308,6 +308,15 @@ HELICS_EXPORT HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
 HELICS_EXPORT HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* err);
 
 /**
+ * Clear all stored messages stored from an endpoint.
+ *
+ * @details This clears messages retrieved through helicsEndpointGetMessage or helicsEndpointCreateMessage
+ *
+ * @param endpoint The endpoint to clear the message for.
+ */
+HELICS_EXPORT void helicsEndpointClearMessages(HelicsEndpoint endpoint);
+
+/**
  * Receive a communication message for any endpoint in the federate.
  *
  * @details The return order will be in order of endpoint creation.
