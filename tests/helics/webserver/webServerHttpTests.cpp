@@ -124,7 +124,8 @@ class httpTest: public ::testing::Test {
             res.skip(true);
             // Receive the HTTP response
             http::read(*stream, buffer, res);
-            return std::to_string(*res.content_length());
+            return (res.content_length()) ? std::to_string(*res.content_length()) :
+                                            std::string("0");
         }
         // Declare a container to hold the response
         http::response<http::string_body> res;
