@@ -222,7 +222,8 @@ workflows:
       - helicsTSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only: 
+              - /sanitizer\/.*/
       - helicsASan:
           filters:
             branches:
