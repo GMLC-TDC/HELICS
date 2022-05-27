@@ -162,24 +162,24 @@ Json::Value webTest::config;
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
-#    define CORE1 "zmq";
+#    define CORE1 "zmq"
 #    ifdef HELICS_ENABLE_TCP_CORE
-#        define CORE2 "TCP";
+#        define CORE2 "TCP"
 #    else
-#        define CORE2 "ZMQ";
+#        define CORE2 "ZMQ"
 #    endif
 #elif defined(HELICS_ENABLE_TCP_CORE)
 constexpr helics::CoreType tCore = helics::CoreType::TCP;
-#    define CORE1 "tcp";
+#    define CORE1 "tcp"
 #    ifdef HELICS_ENABLE_UDP_CORE
-#        define CORE2 "UDP";
+#        define CORE2 "UDP"
 #    else
-#        define CORE2 "TCP";
+#        define CORE2 "TCP"
 #    endif
 #else
 constexpr helics::CoreType tCore = helics::CoreType::TEST;
-#    define CORE1 "test";
-#    define CORE2 "TEST";
+#    define CORE1 "test"
+#    define CORE2 "TEST"
 #endif
 
 TEST_F(webTest, test1)
