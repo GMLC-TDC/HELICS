@@ -469,8 +469,9 @@ TEST_F(httpTest, deleteJson)
 
 TEST_F(httpTest, timeBlock)
 {
-    sendCommand(http::verb::post, "brk_timer", "type=ZMQ&log_level=timing");
-    auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timer");
+    std::string init = "type=" CORE1 "&log_level=timing";
+    sendCommand(http::verb::post, "brk_timer",init );
+    auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timer");
     EXPECT_TRUE(cr->connect());
 
     helics::ValueFederate vFed("fed1", cr);
