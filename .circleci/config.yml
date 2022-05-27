@@ -223,23 +223,27 @@ workflows:
           filters:
             branches:
               only: 
-              - /sanitizer\/.*/
+                - sanitizer_tests
       - helicsASan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only: 
+                - sanitizer_tests
       - helicsgccASan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only: 
+                - sanitizer_tests
       - helicsgccTSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only: 
+                - sanitizer_tests
       - helicsMSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only: 
+                - sanitizer_tests
   dailies:
     jobs:
       - helicsTumbleweed:
