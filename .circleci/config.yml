@@ -239,6 +239,23 @@ workflows:
           filters:
             branches:
               only: /sanitizer\/.*/
+  dailies:
+    jobs:
+      - helicsTumbleweed:
+          filters:
+            branches:
+              only: 
+                - dailies_tests
+      - helicsoctave:
+          filters:
+            branches:
+              only: 
+                - dailies_tests
+      - helicsNoZmq:
+          filters:
+            branches:
+              only: 
+                - dailies_tests
   nightly:
     triggers:
       - schedule:
