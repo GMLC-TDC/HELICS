@@ -203,14 +203,14 @@ TEST_F(httpTest, test1)
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
-#define    CORE1 "zmq"
-#ifdef HELICS_ENABLE_TCP_CORE
-#define        CORE2 "TCP"
-#else
-#define        CORE2  "ZMQ"
-#endif
+#    define CORE1 "zmq"
+#    ifdef HELICS_ENABLE_TCP_CORE
+#        define CORE2 "TCP"
+#    else
+#        define CORE2 "ZMQ"
+#    endif
 #elif defined(HELICS_ENABLE_TCP_CORE)
-constexpr helics::CoreType  tCore = helics::CoreType::TCP;
+constexpr helics::CoreType tCore = helics::CoreType::TCP;
 #    define CORE1 "tcp"
 #    ifdef HELICS_ENABLE_UDP_CORE
 #        define CORE2 "UDP"
@@ -469,8 +469,8 @@ TEST_F(httpTest, deleteJson)
 
 TEST_F(httpTest, timeBlock)
 {
-    const std::string init = std::string("type=")+ std::string(CORE1) + "&log_level=timing";
-    sendCommand(http::verb::post, "brk_timer",init );
+    const std::string init = std::string("type=") + std::string(CORE1) + "&log_level=timing";
+    sendCommand(http::verb::post, "brk_timer", init);
     auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timer");
     EXPECT_TRUE(cr->connect());
 

@@ -159,7 +159,6 @@ std::unique_ptr<websocket::stream<tcp::socket>> webTest::stream;
 net::io_context webTest::ioc;
 Json::Value webTest::config;
 
-
 #ifdef HELICS_ENABLE_ZMQ_CORE
 constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
 #    define CORE1 "zmq"

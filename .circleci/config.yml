@@ -244,17 +244,17 @@ workflows:
       - helicsTumbleweed:
           filters:
             branches:
-              only: 
+              only:
                 - dailies_tests
       - helicsoctave:
           filters:
             branches:
-              only: 
+              only:
                 - dailies_tests
       - helicsNoZmq:
           filters:
             branches:
-              only: 
+              only:
                 - dailies_tests
   nightly:
     triggers:
