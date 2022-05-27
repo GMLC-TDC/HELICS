@@ -986,6 +986,7 @@ void WebServer::stopServer()
 
 void WebServer::mainLoop()
 {
+    auto localP = shared_from_this();
     if (http_enabled_) {
         if (config->isMember("http")) {
             auto V = (*config)["http"];
@@ -1019,6 +1020,7 @@ void WebServer::mainLoop()
         context->ioc.run();
     }
     executing.store(false);
+    localP.reset();
 }
 
 }  // namespace helics::apps

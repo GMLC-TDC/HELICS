@@ -897,7 +897,7 @@ void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }

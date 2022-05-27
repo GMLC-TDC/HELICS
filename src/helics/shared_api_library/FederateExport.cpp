@@ -190,7 +190,7 @@ void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char*
         info->loadInfoFromArgs(args);
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -204,7 +204,7 @@ void helicsFederateInfoLoadFromString(HelicsFederateInfo fi, const char* args, H
         info->loadInfoFromArgs(args);
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -218,7 +218,7 @@ void helicsFederateInfoSetCoreName(HelicsFederateInfo fi, const char* corename, 
         info->coreName = AS_STRING(corename);
     }
     catch (...) {  // LCOV_EXCL_LINE
-        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -232,7 +232,7 @@ void helicsFederateInfoSetCoreInitString(HelicsFederateInfo fi, const char* core
         info->coreInitString = AS_STRING(coreinit);
     }
     catch (...) {  // LCOV_EXCL_LINE
-        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -246,7 +246,7 @@ void helicsFederateInfoSetBrokerInitString(HelicsFederateInfo fi, const char* br
         info->brokerInitString = AS_STRING(brokerinit);
     }
     catch (...) {  // LCOV_EXCL_LINE
-        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -290,7 +290,7 @@ void helicsFederateInfoSetBroker(HelicsFederateInfo fi, const char* broker, Heli
         info->broker = AS_STRING(broker);
     }
     catch (...) {  // LCOV_EXCL_LINE
-        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -304,7 +304,7 @@ void helicsFederateInfoSetBrokerKey(HelicsFederateInfo fi, const char* brokerkey
         info->key = AS_STRING(brokerkey);
     }
     catch (...) {  // LCOV_EXCL_LINE
-        return helicsErrorHandler(err);  // LCOV_EXCL_LINE
+        helicsErrorHandler(err);  // LCOV_EXCL_LINE
     }
 }
 
@@ -680,7 +680,7 @@ void helicsFederateRegisterInterfaces(HelicsFederate fed, const char* file, Heli
         fedObj->registerInterfaces(file);
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -695,7 +695,7 @@ void helicsFederateGlobalError(HelicsFederate fed, int errorCode, const char* er
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -711,7 +711,7 @@ void helicsFederateLocalError(HelicsFederate fed, int errorCode, const char* err
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -790,7 +790,7 @@ void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err)
         fedObj->enterInitializingMode();
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -804,7 +804,7 @@ void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* e
         fedObj->enterInitializingModeAsync();
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -827,7 +827,7 @@ void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError
         fedObj->enterInitializingModeComplete();
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -842,7 +842,7 @@ void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err)
         fedObj->enterExecutingMode();
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -916,7 +916,7 @@ void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate fed, HelicsIt
         fedObj->enterExecutingModeAsync(getIterationRequest(iterate));
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -930,7 +930,7 @@ void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* e
         fedObj->enterExecutingModeComplete();
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 HelicsIterationResult helicsFederateEnterExecutingModeIterativeComplete(HelicsFederate fed, HelicsError* err)
@@ -1036,7 +1036,7 @@ void helicsFederateRequestTimeAsync(HelicsFederate fed, HelicsTime requestTime, 
         fedObj->requestTimeAsync(requestTime);
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -1066,7 +1066,7 @@ void helicsFederateRequestTimeIterativeAsync(HelicsFederate fed, HelicsTime requ
         fedObj->requestTimeIterativeAsync(requestTime, getIterationRequest(iterate));
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -1233,7 +1233,7 @@ void helicsFederateSetTimeProperty(HelicsFederate fed, int timeProperty, HelicsT
         fedObj->setProperty(timeProperty, time);
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -1248,7 +1248,7 @@ void helicsFederateSetFlagOption(HelicsFederate fed, int flag, HelicsBool flagVa
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -1264,7 +1264,7 @@ void helicsFederateSetIntegerProperty(HelicsFederate fed, int intProperty, int p
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -1310,7 +1310,7 @@ int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, Helics
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
-        return -101;
+        return HELICS_INVALID_OPTION_INDEX;
     }
     try {
         return fedObj->getIntegerProperty(intProperty);
@@ -1318,7 +1318,7 @@ int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, Helics
     // LCOV_EXCL_START
     catch (...) {
         helicsErrorHandler(err);
-        return -101;
+        return HELICS_INVALID_OPTION_INDEX;
     }
     // LCOV_EXCL_STOP
 }

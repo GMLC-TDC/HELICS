@@ -22,7 +22,7 @@ namespace apps {
     class IocWrapper;
 
     /** a virtual class to use as a base for broker servers of various types*/
-    class WebServer: public TypedBrokerServer {
+    class WebServer: public TypedBrokerServer, std::enable_shared_from_this<WebServer> {
       public:
         WebServer() = default;
         explicit WebServer(std::string_view server_name): name_(server_name) {}

@@ -233,7 +233,7 @@ void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inpu
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -251,7 +251,7 @@ void helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int in
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -269,7 +269,7 @@ void helicsEndpointSendBytesAt(HelicsEndpoint endpoint, const void* data, int in
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -292,7 +292,7 @@ void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
