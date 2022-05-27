@@ -159,6 +159,29 @@ std::unique_ptr<websocket::stream<tcp::socket>> webTest::stream;
 net::io_context webTest::ioc;
 Json::Value webTest::config;
 
+
+#ifdef HELICS_ENABLE_ZMQ_CORE
+constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
+#    define CORE1 "zmq";
+#    ifdef HELICS_ENABLE_TCP_CORE
+#        define CORE2 "TCP";
+#    else
+#        define CORE2 "ZMQ";
+#    endif
+#elif defined(HELICS_ENABLE_TCP_CORE)
+constexpr helics::CoreType tCore = helics::CoreType::TCP;
+#    define CORE1 "tcp";
+#    ifdef HELICS_ENABLE_UDP_CORE
+#        define CORE2 "UDP";
+#    else
+#        define CORE2 "TCP";
+#    endif
+#else
+constexpr helics::CoreType tCore = helics::CoreType::TEST;
+#    define CORE1 "test";
+#    define CORE2 "TEST";
+#endif
+
 TEST_F(webTest, test1)
 {
     Json::Value query;
@@ -173,7 +196,7 @@ TEST_F(webTest, test1)
 
 TEST_F(webTest, single)
 {
-    addBroker(helics::CoreType::ZMQ, "--name=brk1");
+    addBroker(tCore, "--name=brk1");
     Json::Value query;
     query["command"] = "query";
     query["query"] = "brokers";
@@ -274,7 +297,7 @@ TEST_F(webTest, create)
     Json::Value create;
     create["command"] = "create";
     create["broker"] = "brk3";
-    create["type"] = "TCP";
+    create["type"] = CORE2;
     create["args"] = "-f1";
 
     sendText(generateJsonString(create));
@@ -340,7 +363,7 @@ TEST_F(webTest, createBrokerUUID)
 
     Json::Value v1;
     v1["command"] = "create";
-    v1["core_type"] = "ZMQ";
+    v1["core_type"] = CORE1;
     v1["num_feds"] = 3;
     result = sendText(generateJsonString(v1));
     val = loadJson(result);
@@ -390,10 +413,10 @@ TEST_F(webTest, timeBlock)
     Json::Value create;
     create["broker"] = "brk_timerws";
     create["command"] = "create";
-    create["core_type"] = "ZMQ";
+    create["core_type"] = CORE1;
     create["num_feds"] = 1;
     sendText(generateJsonString(create));
-    auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timerws");
+    auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timerws");
     EXPECT_TRUE(cr->connect());
 
     helics::ValueFederate vFed("fed1", cr);
