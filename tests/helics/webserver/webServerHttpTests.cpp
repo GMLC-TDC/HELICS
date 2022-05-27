@@ -124,7 +124,8 @@ class httpTest: public ::testing::Test {
             res.skip(true);
             // Receive the HTTP response
             http::read(*stream, buffer, res);
-            return std::to_string(*res.content_length());
+            return (res.content_length()) ? std::to_string(*res.content_length()) :
+                                            std::string("0");
         }
         // Declare a container to hold the response
         http::response<http::string_body> res;
@@ -201,9 +202,31 @@ TEST_F(httpTest, test1)
     EXPECT_EQ(val["brokers"].size(), 0U);
 }
 
+#ifdef HELICS_ENABLE_ZMQ_CORE
+constexpr helics::CoreType tCore = helics::CoreType::ZMQ;
+#    define CORE1 "zmq"
+#    ifdef HELICS_ENABLE_TCP_CORE
+#        define CORE2 "TCP"
+#    else
+#        define CORE2 "ZMQ"
+#    endif
+#elif defined(HELICS_ENABLE_TCP_CORE)
+constexpr helics::CoreType tCore = helics::CoreType::TCP;
+#    define CORE1 "tcp"
+#    ifdef HELICS_ENABLE_UDP_CORE
+#        define CORE2 "UDP"
+#    else
+#        define CORE2 "TCP"
+#    endif
+#else
+constexpr helics::CoreType tCore = helics::CoreType::TEST;
+#    define CORE1 "test"
+#    define CORE2 "TEST"
+#endif
+
 TEST_F(httpTest, single)
 {
-    addBroker(helics::CoreType::ZMQ, "--name=brk1");
+    addBroker(tCore, "--name=brk1");
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -358,7 +381,8 @@ TEST_F(httpTest, coreBody)
 
 TEST_F(httpTest, post)
 {
-    sendCommand(http::verb::post, "brk3", "type=TCP");
+    std::string init = "type=" CORE2;
+    sendCommand(http::verb::post, "brk3", init);
     auto result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     auto val = loadJson(result);
@@ -390,8 +414,8 @@ TEST_F(httpTest, createBrokerUUID)
     auto val = loadJson(result);
     EXPECT_TRUE(val["brokers"].isArray());
     auto brksize = val["brokers"].size();
-
-    result = sendCommand(http::verb::post, "/", "core_type=zmq&num_feds=2");
+    std::string init = "core_type=" CORE1 "&num_feds=2";
+    result = sendCommand(http::verb::post, "/", init);
     val = loadJson(result);
     EXPECT_TRUE(val["broker_uuid"].isString());
     auto uuid = val["broker_uuid"].asString();
@@ -446,8 +470,9 @@ TEST_F(httpTest, deleteJson)
 
 TEST_F(httpTest, timeBlock)
 {
-    sendCommand(http::verb::post, "brk_timer", "type=ZMQ&log_level=timing");
-    auto cr = addCore(helics::CoreType::ZMQ, "--name=c_timer -f1 --broker=brk_timer");
+    const std::string init = std::string("type=") + std::string(CORE1) + "&log_level=timing";
+    sendCommand(http::verb::post, "brk_timer", init);
+    auto cr = addCore(tCore, "--name=c_timer -f1 --broker=brk_timer");
     EXPECT_TRUE(cr->connect());
 
     helics::ValueFederate vFed("fed1", cr);

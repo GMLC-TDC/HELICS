@@ -845,8 +845,9 @@ std::string errorMessageString(const ActionMessage& command)
 std::string prettyPrintString(const ActionMessage& command)
 {
     std::string ret(actionMessageType(command.action()));
-    if (ret == unknownStr) {
-        ret += " " + std::to_string(static_cast<int>(command.action()));
+    if (std::string_view(ret) == std::string_view(unknownStr)) {
+        ret.push_back(' ');
+        ret.append(std::to_string(static_cast<int>(command.action())));
         return ret;
     }
     switch (command.action()) {
