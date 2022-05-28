@@ -189,8 +189,9 @@ void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char*
         }
         info->loadInfoFromArgs(args);
     }
-    catch (...) {
+    catch (const helics::InvalidParameter &m) {
         helicsErrorHandler(err);
+        (void)m;
     }
 }
 
