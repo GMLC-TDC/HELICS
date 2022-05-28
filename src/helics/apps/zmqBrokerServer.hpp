@@ -35,7 +35,8 @@ namespace apps {
         zmqBrokerServer() = default;
         explicit zmqBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val) override;
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
 

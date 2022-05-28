@@ -953,7 +953,7 @@ void WebServer::processArgs(std::string_view args)
     }
 }
 
-void WebServer::startServer(const Json::Value* val)
+void WebServer::startServer(const Json::Value* val, const std::shared_ptr<TypedBrokerServer>& ptr)
 {
     logMessage("starting broker web server");
     config = (val != nullptr) ? val : &null;
@@ -964,7 +964,11 @@ void WebServer::startServer(const Json::Value* val)
 
         std::lock_guard<std::mutex> tlock(threadGuard);
 
-        mainLoopThread = std::thread([this]() { mainLoop(); });
+        auto webptr = std::dynamic_pointer_cast<WebServer>(ptr);
+        if (!webptr) {
+            throw(std::invalid_argument("pointer to a webserver required for operation"));
+        }
+        mainLoopThread = std::thread([this,webptr=std::move(webptr)]() { mainLoop(webptr); });
         mainLoopThread.detach();
         std::this_thread::yield();
         while (!executing) {
@@ -984,9 +988,9 @@ void WebServer::stopServer()
     }
 }
 
-void WebServer::mainLoop()
+
+void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {
-    auto localP = shared_from_this();
     if (http_enabled_) {
         if (config->isMember("http")) {
             auto V = (*config)["http"];
@@ -1020,7 +1024,7 @@ void WebServer::mainLoop()
         context->ioc.run();
     }
     executing.store(false);
-    localP.reset();
+    keepAlive.reset();
 }
 
 }  // namespace helics::apps

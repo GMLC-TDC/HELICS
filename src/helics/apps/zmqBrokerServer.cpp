@@ -46,7 +46,8 @@ void zmqBrokerServer::processArgs(std::string_view args)
     }
 }
 
-void zmqBrokerServer::startServer(const Json::Value* val)
+void zmqBrokerServer::startServer(const Json::Value* val,
+                                  const std::shared_ptr<TypedBrokerServer>& /*ptr*/)
 {
     config_ = (val != nullptr) ? val : &null;
 #ifdef HELICS_ENABLE_ZMQ_CORE

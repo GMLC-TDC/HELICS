@@ -237,7 +237,8 @@ namespace apps {
 
     static const Json::Value null;
 
-    void AsioBrokerServer::startServer(const Json::Value* val)
+    void AsioBrokerServer::startServer(const Json::Value* val,
+                                       const std::shared_ptr<TypedBrokerServer>& /*ptr*/)
     {
         config_ = (val != nullptr) ? val : &null;
 
