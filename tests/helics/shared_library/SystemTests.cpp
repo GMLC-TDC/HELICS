@@ -159,15 +159,7 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    argv[3] = "--period=frogs";  // this is meant to generate an error in command line processing
-
-    auto fi2 = helicsFederateInfoClone(fi, &err);
-    EXPECT_NE(fi2, nullptr);
-    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
-    EXPECT_NE(err.error_code, 0);
-    helicsErrorClear(&err);
-
-    helicsFederateInfoFree(fi2);
+   
     helicsFederateInfoFree(fi);
 
     std::string globalVal = "this is a string constant that functions as a global";
@@ -225,7 +217,14 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
 
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
+    argv[3] = "--period=frogs";  // this is meant to generate an error in command line processing
 
+    auto fi2 = helicsFederateInfoClone(fi, &err);
+    EXPECT_NE(fi2, nullptr);
+    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    helicsFederateInfoFree(fi2);
     helicsFederateInfoFree(fi);
 
     auto q = helicsCreateQuery("global_value", "testglobal2");
