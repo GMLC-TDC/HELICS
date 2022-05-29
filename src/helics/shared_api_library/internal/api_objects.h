@@ -19,6 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <utility>
 #include <vector>
+#include <exception>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
 static constexpr int gCoreValidationIdentifier = 0x378424EC;
