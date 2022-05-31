@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Translators.h"
 #include "helicsCallbacks.h"
 #include "internal/api_objects.h"
+#include "helicsData.h"
 
 #include <memory>
 #include <mutex>
@@ -429,13 +430,13 @@ int helicsTranslatorGetOption(HelicsTranslator trans, int option)
     // LCOV_EXCL_STOP
 }
 
-void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
-                                        void (* /*toValueCall*/)(HelicsMessage message, HelicsDataBuffer out, void* userData),
-                                        void (* /*toMessageCall*/)(HelicsDataBuffer value, HelicsMessage out, void* userData),
-                                        void* /*userdata*/,
-                                        HelicsError* err)
+HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator,
+                                                     void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage message, void* userData),
+                                                     void (*toValueCall)(HelicsMessage message, HelicsDataBuffer value, void* userData),
+                                                     void* userdata,
+                                                     HelicsError* err)
 {
-    auto* fObj = getTranslatorObj(trans, err);
+    auto* fObj = getTranslatorObj(translator, err);
     if (fObj == nullptr || fObj->transPtr == nullptr) {
         return;
     }
@@ -446,6 +447,24 @@ void helicsTranslatorSetCustomCallbacks(HelicsTranslator trans,
         return;
     }
     auto op = std::make_shared<helics::CustomTranslatorOperator>();
+
+    op->setToMessageFunction([userdata, toMessageCall](helics::SmallBuffer data) {
+        std::unique_ptr<helics::Message> mess = std::make_unique<helics::Message>();
+        
+        auto buff = createAPIDataBuffer(data);
+        auto mm = createAPIMessage(mess);
+        toMessageCall(buff, mm,userdata);
+        return mess;
+    });
+
+    op->setToValueFunction([userdata, toValueCall](std::unique_ptr<helics::Message> mess) {
+        helics::SmallBuffer data;
+
+        auto buff = createAPIDataBuffer(data);
+        auto mm = createAPIMessage(mess);
+        toValueCall( mm,buff, userdata);
+        return data;
+    });
 
     try {
         fObj->transPtr->setOperator(std::move(op));

@@ -22,8 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static constexpr int gCoreValidationIdentifier = 0x378424EC;
-static constexpr int gBrokerValidationIdentifier = 0xA3467D20;
+static constexpr int gCoreValidationIdentifier = 0x3784'24EC;
+static constexpr int gBrokerValidationIdentifier = 0xA346'7D20;
 
 namespace helics {
 class Core;
@@ -205,9 +205,12 @@ helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
+
 std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
+
+HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);
