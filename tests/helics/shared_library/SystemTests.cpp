@@ -327,18 +327,28 @@ TEST(other_tests, core_creation)
     EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsCoreGetIdentifier(cr), "gcore");
 
+    helicsBrokerDisconnect(brk, &err);
+    helicsCoreDisconnect(cr, &err);
+
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+}
+
+
+// test core creation from command line arguments
+TEST(other_tests, core_creation_error_nosan)
+{
+    auto err = helicsErrorInitialize();
+
+    const char* argv[4];
+    argv[0] = "";
     argv[1] = "--name=gcore2";
     argv[2] = "--log_level=what_logs?";
+    argv[3] = "--broker=gbrokerc";
 
     auto cr2 = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(cr2, nullptr);
-
-    helicsBrokerDisconnect(brk, &err);
-    helicsCoreDisconnect(cr, &err);
-
-    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
 // test broker creation from command line arguments
@@ -367,7 +377,25 @@ TEST(other_tests, broker_creation)
     helicsBrokerDisconnect(brk, &err);
 }
 
-TEST(federate, federateGeneratedLocalError)
+// test broker creation error pathway
+TEST(other_tests, broker_creation_nosan)
+{
+    auto err = helicsErrorInitialize();
+
+    const char* argv[4];
+    argv[0] = "";
+    argv[1] = "--name=gbrokerc2";
+    argv[2] = "--log_level=what_logs?";
+    argv[3] = "--root";
+
+    auto brk2 = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_EQ(brk2, nullptr);
+
+}
+
+TEST(federate_tests, federateGeneratedLocalError)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
