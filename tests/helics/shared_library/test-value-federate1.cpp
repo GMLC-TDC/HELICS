@@ -38,7 +38,11 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
 
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
+    helicsFederateFree(vFed1);
     helicsCloseLibrary();
+    
+    //We closed everything here already as part of the test
+    NoFree = true;
 }
 
 TEST_F(vfed_single_tests, publication_registration)
