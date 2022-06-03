@@ -988,9 +988,9 @@ void helicsAbort(int errorCode, const char* message)
     }
 }
 
-static const char* invalidQueryString = "Query object is invalid";
+static constexpr const char* invalidQueryString = "Query object is invalid";
 
-static const int validQueryIdentifier = 0x2706'3885;
+static constexpr int validQueryIdentifier = 0x2706'3885;
 
 static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
 {

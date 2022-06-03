@@ -387,7 +387,7 @@ TEST(other_tests, broker_creation_nosan)
 
 }
 
-TEST(federate_tests, federateGeneratedLocalError)
+TEST(federate_tests, federateGeneratedLocalError_nosan)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -411,7 +411,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateDestroy(fed1);
 }
 
-TEST(federate, federateGeneratedGlobalError)
+TEST(federate, federateGeneratedGlobalError_nosan)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -433,7 +433,7 @@ TEST(federate, federateGeneratedGlobalError)
 }
 
 // test generating a global from a broker and some of its error pathways
-TEST(other_tests, broker_after_close)
+TEST(other_tests, broker_after_close_nosan)
 {
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbroker_test", "--root", &err);
