@@ -2,7 +2,7 @@
 tests=(
     /root/project/build/bin/core-tests
     /root/project/build/bin/common-tests
-    "/root/project/build/bin/system-tests --gtest_filter=-*realtime*:*nosan*"
+    "/root/project/build/bin/system-tests --gtest_filter=-*realtime*:*nosan*:*error*"
     /root/project/build/bin/helics_apps-tests
     "/root/project/build/bin/shared-library-tests-cpp --gtest_filter=-*death*:*nosan*"
     "/root/project/build/bin/shared-library-tests --gtest_filter=-*bad_input*:*evil*:*after_close*:*death*:*nosan*"

@@ -366,14 +366,6 @@ TEST(other_tests, broker_creation)
     EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokerc");
 
-    argv[1] = "--name=gbrokerc2";
-    argv[2] = "--log_level=what_logs?";
-
-    auto brk2 = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
-    EXPECT_NE(err.error_code, 0);
-    helicsErrorClear(&err);
-    EXPECT_EQ(brk2, nullptr);
-
     helicsBrokerDisconnect(brk, &err);
 }
 
