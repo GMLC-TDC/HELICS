@@ -1052,9 +1052,10 @@ const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsErro
 
 const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err)
 {
-    constexpr auto invalidCoreObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Core object is not valid\"\n  }}\n}}";
+    
     auto* coreObj = getCore(core, err);
     if (coreObj == nullptr) {
+        constexpr auto invalidCoreObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Core object is not valid\"\n  }}\n}}";
         return invalidCoreObConst;
     }
     auto* queryObj = getQueryObj(query, err);
@@ -1075,9 +1076,11 @@ const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsErr
 
 const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, HelicsError* err)
 {
-    constexpr auto invalidBrokerObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Broker object is not valid\"\n  }}\n}}";
+    
     auto* brokerObj = getBroker(broker, err);
     if (brokerObj == nullptr) {
+        constexpr auto invalidBrokerObConst =
+            "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Broker object is not valid\"\n  }}\n}}";
         return invalidBrokerObConst;
     }
 
