@@ -629,7 +629,7 @@ void helicsFederateUnProtect(const char* fedName, HelicsError* err)
 
 HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err)
 {
-    auto fed = getMasterHolder()->findFed(fedName, fedPreservationIdentifier);
+    auto* fed = getMasterHolder()->findFed(fedName, fedPreservationIdentifier);
     if (fed != nullptr) {
         return HELICS_TRUE;
     }
