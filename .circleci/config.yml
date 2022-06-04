@@ -8,7 +8,7 @@ aliases:
       cd build
       eval cmake .. ${CMAKE_FLAGS}
       make -j 4
-      
+
   - &setup_helics_low_mem
     name: setup_helics
     environment:
