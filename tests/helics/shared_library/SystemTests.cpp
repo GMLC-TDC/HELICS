@@ -113,7 +113,7 @@ TEST(other_tests, core_global_value_errors_nosan_ci_skip)
     EXPECT_EQ(err.error_code, 0);
     EXPECT_EQ(helicsCoreIsConnected(cr), HELICS_TRUE);
     auto q = helicsCreateQuery("global_value", "testglobal");
-    
+
     auto res = helicsQueryCoreExecute(nullptr, cr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -159,7 +159,6 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-   
     helicsFederateInfoFree(fi);
 
     std::string globalVal = "this is a string constant that functions as a global";
@@ -195,7 +194,6 @@ TEST(other_tests, federate_global_value)
     helicsQueryFree(q2);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
-
 
 TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
 {
@@ -233,7 +231,7 @@ TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
     auto res = helicsQueryExecute(nullptr, fed, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_NE(std::string_view(res).find("error"),std::string_view::npos);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     res = helicsQueryExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
@@ -333,7 +331,6 @@ TEST(other_tests, core_creation)
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
-
 // test core creation from command line arguments
 TEST(other_tests, core_creation_error_nosan)
 {
@@ -384,7 +381,6 @@ TEST(other_tests, broker_creation_nosan)
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(brk2, nullptr);
-
 }
 
 TEST(federate_tests, federateGeneratedLocalError_nosan)

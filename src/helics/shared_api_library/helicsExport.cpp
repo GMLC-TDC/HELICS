@@ -1099,7 +1099,6 @@ const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, Hel
 
 void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err)
 {
-    
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
         return;

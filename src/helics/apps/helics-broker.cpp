@@ -81,7 +81,7 @@ int main(int argc, char* argv[])  // NOLINT
         webserver = std::make_shared<helics::apps::WebServer>();
         webserver->enableHttpServer(http_webserver);
         webserver->enableWebSocketServer(websocket_server);
-        webserver->startServer(nullptr,webserver);
+        webserver->startServer(nullptr, webserver);
     }
 #else
     if (http_webserver || websocket_server) {

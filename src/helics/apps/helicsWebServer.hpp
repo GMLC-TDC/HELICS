@@ -44,7 +44,7 @@ namespace apps {
         std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;
         std::mutex threadGuard;
-        
+
         const Json::Value* config{nullptr};
         const std::string name_;
         std::string mArgs;

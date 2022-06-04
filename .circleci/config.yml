@@ -222,27 +222,27 @@ workflows:
       - helicsTSan:
           filters:
             branches:
-              only: 
+              only:
                 - sanitizer_tests
       - helicsASan:
           filters:
             branches:
-              only: 
+              only:
                 - sanitizer_tests
       - helicsgccASan:
           filters:
             branches:
-              only: 
+              only:
                 - sanitizer_tests
       - helicsgccTSan:
           filters:
             branches:
-              only: 
+              only:
                 - sanitizer_tests
       - helicsMSan:
           filters:
             branches:
-              only: 
+              only:
                 - sanitizer_tests
   dailies:
     jobs:

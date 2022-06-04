@@ -968,7 +968,7 @@ void WebServer::startServer(const Json::Value* val, const std::shared_ptr<TypedB
         if (!webptr) {
             throw(std::invalid_argument("pointer to a webserver required for operation"));
         }
-        mainLoopThread = std::thread([this,webptr=std::move(webptr)]() { mainLoop(webptr); });
+        mainLoopThread = std::thread([this, webptr = std::move(webptr)]() { mainLoop(webptr); });
         mainLoopThread.detach();
         std::this_thread::yield();
         while (!executing) {
@@ -987,7 +987,6 @@ void WebServer::stopServer()
         context->ioc.stop();
     }
 }
-
 
 void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {

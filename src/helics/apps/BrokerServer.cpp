@@ -108,7 +108,7 @@ void BrokerServer::startServers()
 #endif
     }
     for (auto& server : servers) {
-        server->startServer(config_.get(),server);
+        server->startServer(config_.get(), server);
     }
 }
 

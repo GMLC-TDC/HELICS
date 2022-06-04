@@ -54,7 +54,7 @@ class httpTest: public ::testing::Test {
         config["http"] = Json::objectValue;
         config["http"]["port"] = 26242;
 
-        webs->startServer(&config,webs);
+        webs->startServer(&config, webs);
 
         // These objects perform our I/O
         tcp::resolver resolverObj(ioc);
