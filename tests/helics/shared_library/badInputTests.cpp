@@ -93,7 +93,7 @@ TEST_F(bad_input_nosan, test_creation)
     EXPECT_TRUE(helicsFederateIsValid(fed2) == HELICS_TRUE);
 }
 
-TEST(error_tests, unavailable_CoreType)
+TEST(error_tests, unavailable_CoreType_nosan)
 {
     auto err = helicsErrorInitialize();
     auto core = helicsCreateCore("nullcore", "test", "", &err);
