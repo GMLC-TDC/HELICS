@@ -4201,7 +4201,7 @@ TEST(evil_query_test, helicsQueryExecute)
     err.error_code = 45;
     auto res1 = helicsQueryExecute(nullptr, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_NE(std::string_view(res1).find("error"),std::string_view::npos);
+    EXPECT_NE(std::string_view(res1).find("error"), std::string_view::npos);
     helicsErrorClear(&err);
     auto res2 = helicsQueryExecute(nullptr, nullptr, nullptr);
     EXPECT_NE(std::string_view(res2).find("error"), std::string_view::npos);
