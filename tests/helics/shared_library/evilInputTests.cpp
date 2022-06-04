@@ -4201,12 +4201,12 @@ TEST(evil_query_test, helicsQueryExecute)
     err.error_code = 45;
     auto res1 = helicsQueryExecute(nullptr, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_STREQ(res1, "#invalid");
+    EXPECT_NE(std::string_view(res1).find("error"),std::string_view::npos);
     helicsErrorClear(&err);
     auto res2 = helicsQueryExecute(nullptr, nullptr, nullptr);
-    EXPECT_STREQ(res2, "#invalid");
+    EXPECT_NE(std::string_view(res2).find("error"), std::string_view::npos);
     auto res3 = helicsQueryExecute(evil_query, evil_query, &err);
-    EXPECT_STREQ(res3, "#invalid");
+    EXPECT_NE(std::string_view(res3).find("error"), std::string_view::npos);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -4219,12 +4219,12 @@ TEST(evil_query_test, helicsQueryCoreExecute)
     err.error_code = 45;
     auto res1 = helicsQueryCoreExecute(nullptr, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_STREQ(res1, "#invalid");
+    EXPECT_NE(std::string_view(res1).find("error"), std::string_view::npos);
     helicsErrorClear(&err);
     auto res2 = helicsQueryCoreExecute(nullptr, nullptr, nullptr);
-    EXPECT_STREQ(res2, "#invalid");
+    EXPECT_NE(std::string_view(res2).find("error"), std::string_view::npos);
     auto res3 = helicsQueryCoreExecute(evil_query, evil_query, &err);
-    EXPECT_STREQ(res3, "#invalid");
+    EXPECT_NE(std::string_view(res3).find("error"), std::string_view::npos);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -4238,12 +4238,12 @@ TEST(evil_query_test, helicsQueryBrokerExecute)
     err.error_code = 45;
     auto res1 = helicsQueryBrokerExecute(nullptr, nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_STREQ(res1, "#invalid");
+    EXPECT_NE(std::string_view(res1).find("error"), std::string_view::npos);
     helicsErrorClear(&err);
     auto res2 = helicsQueryBrokerExecute(nullptr, nullptr, nullptr);
-    EXPECT_STREQ(res2, "#invalid");
+    EXPECT_NE(std::string_view(res2).find("error"), std::string_view::npos);
     auto res3 = helicsQueryBrokerExecute(evil_query, evil_query, &err);
-    EXPECT_STREQ(res3, "#invalid");
+    EXPECT_NE(std::string_view(res3).find("error"), std::string_view::npos);
     EXPECT_NE(err.error_code, 0);
 }
 
@@ -4270,12 +4270,12 @@ TEST(evil_query_test, helicsQueryExecuteComplete)
     err.error_code = 45;
     auto res1 = helicsQueryExecuteComplete(nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_STREQ(res1, "#invalid");
+    EXPECT_NE(std::string_view(res1).find("error"), std::string_view::npos);
     helicsErrorClear(&err);
     auto res2 = helicsQueryExecuteComplete(nullptr, nullptr);
-    EXPECT_STREQ(res2, "#invalid");
+    EXPECT_NE(std::string_view(res2).find("error"), std::string_view::npos);
     auto res3 = helicsQueryExecuteComplete(evil_query, &err);
-    EXPECT_STREQ(res3, "#invalid");
+    EXPECT_NE(std::string_view(res3).find("error"), std::string_view::npos);
     EXPECT_NE(err.error_code, 0);
 }
 
