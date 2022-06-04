@@ -300,7 +300,7 @@ TEST(other_tests, broker_creation)
     helicsBrokerDisconnect(brk, &err);
 }
 
-TEST(federate_tests, federateGeneratedLocalError)
+TEST(federate, federateGeneratedLocalError)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -324,7 +324,7 @@ TEST(federate_tests, federateGeneratedLocalError)
     helicsFederateDestroy(fed1);
 }
 
-TEST(federate_tests, federateGeneratedGlobalError)
+TEST(federate, federateGeneratedGlobalError)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -466,4 +466,59 @@ TEST(other_tests, signal_handler_fed_construction_death_ci_skip)
     helicsClearSignalHandler();
     helicsCleanupLibrary();
     helicsCloseLibrary();
+}
+
+TEST(federate, federateNoProtection)
+{
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_protect", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+
+    auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
+
+    helicsFederateEnterExecutingMode(fed1, nullptr);
+
+    std::string fed1Nm = helicsFederateGetName(fed1);
+    HelicsError err = helicsErrorInitialize();
+
+    EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
+    helicsFederateFree(fed1);
+
+    auto fedFind = helicsGetFederateByName(fed1Nm.c_str(), &err);
+
+    EXPECT_FALSE(helicsFederateIsValid(fedFind));
+    EXPECT_NE(err.error_code, 0);
+}
+
+TEST(federate, federateProtection)
+{
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
+    helicsFederateInfoSetCoreName(fi, "core_protect", nullptr);
+    helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
+
+    auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
+
+    helicsFederateEnterExecutingMode(fed1, nullptr);
+
+    std::string fed1Nm = helicsFederateGetName(fed1);
+    HelicsError err = helicsErrorInitialize();
+    helicsFederateProtect(fed1Nm.c_str(), &err);
+    helicsFederateFree(fed1);
+
+    EXPECT_TRUE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
+    auto fedFind = helicsGetFederateByName(fed1Nm.c_str(), &err);
+
+    EXPECT_TRUE(helicsFederateIsValid(fedFind));
+    EXPECT_EQ(err.error_code, 0);
+
+    helicsFederateUnProtect(fed1Nm.c_str(), &err);
+    EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
+    helicsFederateFinalize(fedFind, &err);
+    helicsFederateFree(fedFind);
+    EXPECT_EQ(err.error_code, 0);
+
+    EXPECT_FALSE(helicsFederateIsProtected(fed1Nm.c_str(), &err));
+    EXPECT_NE(err.error_code, 0);
 }

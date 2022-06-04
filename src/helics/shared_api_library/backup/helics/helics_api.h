@@ -336,6 +336,9 @@ HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, Hel
 HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
 HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
+void helicsFederateProtect(const char* fedName, HelicsError* err);
+void helicsFederateUnProtect(const char* fedName, HelicsError* err);
+HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err);
 HelicsFederateInfo helicsCreateFederateInfo(void);
 HelicsFederateInfo helicsFederateInfoClone(HelicsFederateInfo fi, HelicsError* err);
 void helicsFederateInfoLoadFromArgs(HelicsFederateInfo fi, int argc, const char* const* argv, HelicsError* err);

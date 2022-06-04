@@ -42,23 +42,23 @@ class MessageTimer {};
 #endif
 
 #include "../common/fmt_format.h"
-static const std::string gEmptyStr;
-#define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gEmptyStr, message)
-#define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gEmptyStr, message)
+static const std::string gHelicsEmptyStr;
+#define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
+#define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)
 
 #ifdef HELICS_ENABLE_LOGGING
 
 #    define LOG_SUMMARY(message)                                                                   \
         do {                                                                                       \
             if (maxLogLevel >= HELICS_LOG_LEVEL_SUMMARY) {                                         \
-                logMessage(HELICS_LOG_LEVEL_SUMMARY, gEmptyStr, message);                          \
+                logMessage(HELICS_LOG_LEVEL_SUMMARY, gHelicsEmptyStr, message);                    \
             }                                                                                      \
         } while (false)
 
 #    define LOG_INTERFACES(message)                                                                \
         do {                                                                                       \
             if (maxLogLevel >= HELICS_LOG_LEVEL_INTERFACES) {                                      \
-                logMessage(HELICS_LOG_LEVEL_INTERFACES, gEmptyStr, message);                       \
+                logMessage(HELICS_LOG_LEVEL_INTERFACES, gHelicsEmptyStr, message);                 \
             }                                                                                      \
         } while (false)
 
@@ -66,14 +66,14 @@ static const std::string gEmptyStr;
 #        define LOG_TIMING(message)                                                                \
             do {                                                                                   \
                 if (maxLogLevel >= HELICS_LOG_LEVEL_TIMING) {                                      \
-                    logMessage(HELICS_LOG_LEVEL_TIMING, gEmptyStr, message);                       \
+                    logMessage(HELICS_LOG_LEVEL_TIMING, gHelicsEmptyStr, message);                 \
                 }                                                                                  \
             } while (false)
 
 #        define LOG_DATA(message)                                                                  \
             do {                                                                                   \
                 if (maxLogLevel >= HELICS_LOG_LEVEL_DATA) {                                        \
-                    logMessage(HELICS_LOG_LEVEL_DATA, gEmptyStr, message);                         \
+                    logMessage(HELICS_LOG_LEVEL_DATA, gHelicsEmptyStr, message);                   \
                 }                                                                                  \
             } while (false)
 #    else
@@ -85,7 +85,7 @@ static const std::string gEmptyStr;
 #        define LOG_TRACE(message)                                                                 \
             do {                                                                                   \
                 if (maxLogLevel >= HELICS_LOG_LEVEL_TRACE) {                                       \
-                    logMessage(HELICS_LOG_LEVEL_TRACE, gEmptyStr, message);                        \
+                    logMessage(HELICS_LOG_LEVEL_TRACE, gHelicsEmptyStr, message);                  \
                 }                                                                                  \
             } while (false)
 #    else

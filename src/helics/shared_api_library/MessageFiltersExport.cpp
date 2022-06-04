@@ -284,7 +284,7 @@ const char* helicsFilterGetName(HelicsFilter filt)
 {
     auto* filter = getFilter(filt, nullptr);
     if (filter == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     const auto& name = filter->getName();
     return name.c_str();
@@ -409,7 +409,7 @@ const char* helicsFilterGetInfo(HelicsFilter filt)
 {
     auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = filtObj->filtPtr->getInfo();
@@ -417,7 +417,7 @@ const char* helicsFilterGetInfo(HelicsFilter filt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -442,7 +442,7 @@ const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname)
 {
     auto* filtObj = getFilterObj(filt, nullptr);
     if (filtObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = filtObj->filtPtr->getTag(AS_STRING(tagname));
@@ -450,7 +450,7 @@ const char* helicsFilterGetTag(HelicsFilter filt, const char* tagname)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }

@@ -551,6 +551,18 @@ class Federate {
         return helicsFederateGetName(fed);
     }
 
+    /** protect the federate and make it retrievable even if not library objects exist*/
+    void protect()
+    {
+        helicsFederateProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR);
+    }
+
+    /** unprotect the federate and make it retrievable even if not library objects exist*/
+    void unProtect()
+    {
+        helicsFederateUnProtect(helicsFederateGetName(fed), HELICS_IGNORE_ERROR);
+    }
+
     /** make a query of the federate
     @details this call is blocking until the value is returned which make take some time depending
     on the size of the federation and the specific string being queried
@@ -932,6 +944,20 @@ class Federate {
     }
 #endif
 };
+
+inline void protect(const std::string& name)
+{
+    helicsFederateProtect(name.c_str(), hThrowOnError());
+}
+inline void unProtect(const std::string& name)
+{
+    helicsFederateUnProtect(name.c_str(), hThrowOnError());
+}
+
+inline bool isProtected(const std::string& name)
+{
+    return (helicsFederateIsProtected(name.c_str(), hThrowOnError()) == HELICS_TRUE) ? true : false;
+}
 
 }  // namespace helicscpp
 

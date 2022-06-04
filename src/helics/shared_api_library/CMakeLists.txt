@@ -32,11 +32,11 @@ set(helicsShared_sources
 
 include(GenerateExportHeader)
 
-if(PYTHON_EXECUTABLE)
+if(Python_EXECUTABLE)
     add_custom_command(
         OUTPUT ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
                ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
-        COMMAND ${PYTHON_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py
+        COMMAND ${Python_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py
                 ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/ ${PROJECT_SOURCE_DIR}
         DEPENDS helicsCore.h
                 helicsCallbacks.h
@@ -47,6 +47,7 @@ if(PYTHON_EXECUTABLE)
                 api-data.h
                 ../helics_enums.h
     )
+
 else()
     configure_file(
         ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h

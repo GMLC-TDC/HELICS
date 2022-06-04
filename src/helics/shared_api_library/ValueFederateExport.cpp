@@ -1139,6 +1139,7 @@ void helicsInputSetDefaultComplexVector(HelicsInput inp, const double* vectorInp
             inpObj->inputPtr->setDefault(std::vector<std::complex<double>>{});
         } else {
             std::vector<std::complex<double>> CV;
+            CV.reserve(vectorLength);
             for (int ii = 0; ii < vectorLength; ++ii) {
                 CV.emplace_back(vectorInput[2 * ii], vectorInput[2 * ii + 1]);
             }
@@ -1172,7 +1173,7 @@ const char* helicsInputGetType(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1181,7 +1182,7 @@ const char* helicsInputGetType(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1190,7 +1191,7 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1199,7 +1200,7 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1213,7 +1214,7 @@ const char* helicsPublicationGetType(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1222,7 +1223,7 @@ const char* helicsPublicationGetType(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1231,7 +1232,7 @@ const char* helicsInputGetName(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1240,7 +1241,7 @@ const char* helicsInputGetName(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1249,7 +1250,7 @@ const char* helicsSubscriptionGetTarget(HelicsInput sub)
 {
     auto* inpObj = verifyInput(sub, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1258,7 +1259,7 @@ const char* helicsSubscriptionGetTarget(HelicsInput sub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1267,7 +1268,7 @@ const char* helicsPublicationGetName(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& key = pubObj->pubPtr->getName();
@@ -1275,7 +1276,7 @@ const char* helicsPublicationGetName(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1284,7 +1285,7 @@ const char* helicsInputGetInjectionUnits(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& units = inpObj->inputPtr->getInjectionUnits();
@@ -1292,7 +1293,7 @@ const char* helicsInputGetInjectionUnits(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1301,7 +1302,7 @@ const char* helicsInputGetExtractionUnits(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& units = inpObj->inputPtr->getUnits();
@@ -1309,7 +1310,7 @@ const char* helicsInputGetExtractionUnits(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1323,7 +1324,7 @@ const char* helicsPublicationGetUnits(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     const std::string& units = pubObj->pubPtr->getUnits();
     return units.c_str();
@@ -1333,7 +1334,7 @@ const char* helicsInputGetInfo(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = inpObj->inputPtr->getInfo();
@@ -1341,7 +1342,7 @@ const char* helicsInputGetInfo(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1366,7 +1367,7 @@ const char* helicsPublicationGetInfo(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = pubObj->pubPtr->getInfo();
@@ -1374,7 +1375,7 @@ const char* helicsPublicationGetInfo(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1399,7 +1400,7 @@ const char* helicsInputGetTag(HelicsInput inp, const char* tagname)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = inpObj->inputPtr->getTag(AS_STRING_VIEW(tagname));
@@ -1407,7 +1408,7 @@ const char* helicsInputGetTag(HelicsInput inp, const char* tagname)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1432,7 +1433,7 @@ const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = pubObj->pubPtr->getTag(AS_STRING_VIEW(tagname));
@@ -1440,7 +1441,7 @@ const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
