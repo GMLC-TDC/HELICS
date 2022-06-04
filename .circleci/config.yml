@@ -8,6 +8,15 @@ aliases:
       cd build
       eval cmake .. ${CMAKE_FLAGS}
       make -j 4
+      
+  - &setup_helics_low_mem
+    name: setup_helics
+    environment:
+    command: |
+      mkdir -p build
+      cd build
+      eval cmake .. ${CMAKE_FLAGS}
+      make -j 2
 
   - &run_octave_tests
     name: run_octave_tests
@@ -75,7 +84,7 @@ jobs:
 
     steps:
       - checkout
-      - run: *setup_helics
+      - run: *setup_helics_low_mem
       - run: *run_helics_sanitizer_tests
 
   helicsgccASan:
