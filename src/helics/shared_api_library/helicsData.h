@@ -19,6 +19,9 @@ extern "C" {
 /** create a helics managed data buffer with initial capacity*/
 HELICS_EXPORT HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity);
 
+/** check whether a buffer is Valid*/
+HELICS_EXPORT HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data);
+
 /** wrap user data in a buffer object*/
 HELICS_EXPORT HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity);
 
@@ -46,6 +49,9 @@ HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 /** convert a string to serialized bytes*/
 HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
 
+/** convert a raw string(may contain nulls) to serialized bytes*/
+HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str,int stringSize, HelicsDataBuffer data);
+
 /** convert a bool to serialized bytes*/
 HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);
 
@@ -57,6 +63,9 @@ HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
 
 /** convert a complex pair to serialized bytes*/
 HELICS_EXPORT int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
+
+/** convert a complex object to serialized bytes*/
+HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data);
 
 /** convert a real vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
@@ -72,6 +81,44 @@ HELICS_EXPORT double helicsDataBufferToDouble(HelicsDataBuffer data);
 
 /** convert a data buffer to a boolean*/
 HELICS_EXPORT HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
+
+/** convert a data buffer to a char*/
+HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
+
+/** get the length of a string if a string were to be retrieved*/
+HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
+
+    /* convert a data buffer to a string*/
+HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
+
+/** convert a data buffer to a time*/
+HELICS_EXPORT HelicsTime helicsDataBufferToTime(HelicsDataBuffer data);
+
+/** convert a data buffer to a time*/
+HELICS_EXPORT HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data);
+
+/** convert a data buffer to complex values*/
+HELICS_EXPORT void helicsDataBufferToComplex(HelicsDataBuffer data, double* real, double* imag);
+
+/** get the number of elements that would be required if a vector were retrieved*/
+HELICS_EXPORT int helicsDataBufferVectorSize(HelicsDataBuffer data);
+
+    /** convert a data buffer to double vector values*/
+HELICS_EXPORT void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
+
+/** convert a data buffer to complex double vector values
+@param data the buffer containing data
+@param values the storage for the converted data
+@param maxlen the number of complex values the the values vector can hold
+@param actualSize the number of complex values copied to values array
+*/
+HELICS_EXPORT void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
+
+/** convert the data in a data buffer to a different type representation
+@param data the buffer to convert
+@param newDataType the type that it is desired for the buffer to be converted to
+@return true if the conversion was successful*/
+HELICS_EXPORT HelicsBool helicsDataBufferConvertToType(HelicsDataBuffer data, int newDataType);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

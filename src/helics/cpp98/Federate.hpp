@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "Filter.hpp"
+#include "Translator.hpp"
 #include "config.hpp"
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
