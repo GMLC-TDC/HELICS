@@ -35,16 +35,14 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
 
 static helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
 {
-    helics::SmallBuffer* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
+    auto * ptr = reinterpret_cast<helics::SmallBuffer*>(data);
     return (ptr != nullptr && ptr->userKey == bufferValidationIdentifier) ? ptr : nullptr;
 }
 
 void helicsDataBufferFree(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
-    if (ptr != nullptr) {
-        delete ptr;
-    }
+    delete ptr;
 }
 
 HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data)
@@ -166,7 +164,7 @@ int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data)
     if (ptr == nullptr) {
         return 0;
     }
-    auto dataValue = (value == HELICS_FALSE) ? "0" : "1";
+    const auto *dataValue = (value == HELICS_FALSE) ? "0" : "1";
     try {
         helics::ValueConverter<std::string>::convert(dataValue, *ptr);
         return static_cast<int32_t>(ptr->size());
@@ -297,7 +295,7 @@ HelicsBool helicsDataBufferToBool(HelicsDataBuffer data)
     }
     bool val;
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), val);
-    return val;
+    return (val)?HELICS_TRUE:HELICS_FALSE;
 }
 
 char helicsDataBufferToChar(HelicsDataBuffer data)
@@ -396,6 +394,10 @@ void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int max
     std::memcpy(outputString, v.data(), length);
     if (actualLength != nullptr) {
         *actualLength = length;
+    }
+    // add a null terminator if possible
+    if (length < maxStringLen) {
+        outputString[length] = '\0';
     }
 }
 
