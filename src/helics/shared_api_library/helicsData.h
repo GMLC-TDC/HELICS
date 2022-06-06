@@ -37,10 +37,11 @@ HELICS_EXPORT int32_t helicsDataBufferCapacity(HelicsDataBuffer data);
 /** get a pointer to the raw data*/
 HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 
-/** increase the capacity a data buffer can hold without reallocating memory*/
+/** increase the capacity a data buffer can hold without reallocating memory
+@return HELICS_TRUE if the reservation was successful HELICS_FALSE otherwise*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
-/** clone a data buffer*/
+/** create a new data buffer and copy an existing buffer*/
 HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
 
 /** convert an integer to serialized bytes*/
