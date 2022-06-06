@@ -196,7 +196,7 @@ TEST(data, converter)
     auto cnt = helicsDoubleToBytes(v1, buff);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
-    bool res = helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT)!=HELICS_FALSE;
+    bool res = helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT) != HELICS_FALSE;
     EXPECT_TRUE(res);
 
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_INT);
