@@ -9,8 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../core/SmallBuffer.hpp"
-
+#include <algorithm>
 #include <string>
+#include <vector>
 
 static const int bufferValidationIdentifier = 0x24EA'663F;
 
@@ -390,7 +391,7 @@ void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int max
     std::string v;
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
 
-    auto length = std::min(static_cast<int>(v.size()), maxStringLen);
+    auto length = (std::min)(static_cast<int>(v.size()), maxStringLen);
     std::memcpy(outputString, v.data(), length);
     if (actualLength != nullptr) {
         *actualLength = length;
@@ -440,7 +441,7 @@ void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen
     std::vector<double> v;
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
 
-    auto length = std::min(static_cast<int>(v.size()), maxlen);
+    auto length = (std::min)(static_cast<int>(v.size()), maxlen);
     std::memcpy(values, v.data(), length * sizeof(double));
     if (actualSize != nullptr) {
         *actualSize = length;
@@ -466,7 +467,7 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
     std::vector<std::complex<double>> v;
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
 
-    auto length = std::min(static_cast<int>(v.size()), maxlen);
+    auto length = (std::min)(static_cast<int>(v.size()), maxlen);
     std::memcpy(values, reinterpret_cast<const double*>(v.data()), length * sizeof(double) * 2);
 
     if (actualSize != nullptr) {
