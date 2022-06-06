@@ -16,19 +16,20 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helicscpp {
 class DataBuffer {
   public:
-    DataBuffer() { buff = helicsCreateDataBuffer(0); }
-    explicit DataBuffer(int capacity) { buff = helicsCreateDataBuffer(capacity); }
+    DataBuffer() HELICS_NOTHROW: buff(helicsCreateDataBuffer(0)) {}
+    explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {
+        }
 
     void toBytes(double val) { helicsDoubleToBytes(val, buff); }
     void toBytes(int64_t val) { helicsIntToBytes(val, buff); }
     void toBytes(const std::string& val) { helicsStringToBytes(val.c_str(), buff); }
-    void toBytes(const std::vector<double> val)
+    void toBytes(const std::vector<double> &val)
     {
         helicsVectorToBytes(val.data(), static_cast<int>(val.size()), buff);
     }
 
   private:
-    HelicsDataBuffer buff = nullptr;
+    HelicsDataBuffer buff;
 };
 }  // namespace helicscpp
 #endif
