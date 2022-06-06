@@ -19,9 +19,9 @@ set(helicsCpp98_headers
     Publication.hpp
     Input.hpp
     Endpoint.hpp
-DataBuffer.hpp
+    DataBuffer.hpp
     Filter.hpp
-Translator.hpp
+    Translator.hpp
     config.hpp
 )
 

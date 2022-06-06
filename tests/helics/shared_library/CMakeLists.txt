@@ -19,7 +19,7 @@ set(c_shared_library_test_sources
     evilInputTests.cpp
     iterationTests.cpp
     QueryTests.cpp
-DataAPITests.cpp
+    DataAPITests.cpp
     badInputTests.cpp
     comboConfigTests.cpp
     loggingTests.cpp

@@ -5,7 +5,7 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #ifndef HELICS_CPP98_TRANSLATOR_HPP_
-#    define HELICS_CPP98_TRANSLATOR_HPP_
+#define HELICS_CPP98_TRANSLATOR_HPP_
 
 #include "DataBuffer.hpp"
 #include "helics/helics.h"
@@ -114,7 +114,8 @@ class Translator {
     void setCallback(HelicsMessage (*translatorCall)(HelicsMessage message, void* userData),
                      void* userData)
     {
-        helicsTranslatorSetCustomCallback(translator, translatorCall, userData, HELICS_IGNORE_ERROR);
+        helicsTranslatorSetCustomCallback(translator, translatorCall, userData,
+    HELICS_IGNORE_ERROR);
     }
     */
   protected:

@@ -22,8 +22,6 @@ HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
     return static_cast<HelicsDataBuffer>(ptr);
 }
 
-
-
 HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity)
 {
     auto* ptr = new helics::SmallBuffer();
@@ -50,7 +48,7 @@ void helicsDataBufferFree(HelicsDataBuffer data)
 HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
-    return (ptr != nullptr) ? HELICS_TRUE: HELICS_FALSE;
+    return (ptr != nullptr) ? HELICS_TRUE : HELICS_FALSE;
 }
 
 int32_t helicsDataBufferSize(HelicsDataBuffer data)
@@ -86,7 +84,8 @@ HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity)
     }
 }
 
-HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data) {
+HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return nullptr;
@@ -151,7 +150,7 @@ HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, He
         return 0;
     }
     try {
-        helics::ValueConverter<std::string_view>::convert(std::string_view(str,stringSize), *ptr);
+        helics::ValueConverter<std::string_view>::convert(std::string_view(str, stringSize), *ptr);
         return static_cast<int32_t>(ptr->size());
     }
     catch (const std::bad_alloc&) {
@@ -249,7 +248,7 @@ int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsData
         return 0;
     }
     try {
-        helics::ValueConverter<std::complex<double>>::convert(reinterpret_cast<const std::complex<double> *>(value), dataSize, *ptr);
+        helics::ValueConverter<std::complex<double>>::convert(reinterpret_cast<const std::complex<double>*>(value), dataSize, *ptr);
         return static_cast<int32_t>(ptr->size());
     }
     catch (const std::bad_alloc&) {
@@ -321,7 +320,8 @@ HelicsTime helicsDataBufferToTime(HelicsDataBuffer data)
     return static_cast<HelicsTime>(val);
 }
 
-HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data) {
+HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     HelicsComplex val{HELICS_TIME_INVALID, HELICS_TIME_INVALID};
     if (ptr != nullptr) {
@@ -333,12 +333,13 @@ HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data) {
     return val;
 }
 
-void helicsDataBufferToComplex(HelicsDataBuffer data, double* real, double* imag) {
+void helicsDataBufferToComplex(HelicsDataBuffer data, double* real, double* imag)
+{
     auto* ptr = getBuffer(data);
     if (ptr != nullptr) {
         std::complex<double> v;
         helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
-        if (real!=nullptr) {
+        if (real != nullptr) {
             *real = v.real();
         }
         if (imag != nullptr) {
@@ -354,7 +355,8 @@ void helicsDataBufferToComplex(HelicsDataBuffer data, double* real, double* imag
     }
 }
 
-int helicsDataBufferStringSize(HelicsDataBuffer data) {
+int helicsDataBufferStringSize(HelicsDataBuffer data)
+{
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
         return 0;
@@ -366,14 +368,12 @@ int helicsDataBufferStringSize(HelicsDataBuffer data) {
             std::string v;
             helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
             return static_cast<int>(v.size());
-        }
-            break;
-
+        } break;
     }
 }
 
-
-void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength) {
+void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength)
+{
     if ((outputString == nullptr) || (maxStringLen <= 0)) {
         if (actualLength != nullptr) {
             *actualLength = 0;
@@ -422,7 +422,7 @@ int helicsDataBufferVectorSize(HelicsDataBuffer data)
 }
 
 void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize)
-    {
+{
     if ((values == nullptr) || (maxlen <= 0)) {
         if (actualSize != nullptr) {
             *actualSize = 0;
@@ -437,14 +437,14 @@ void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen
         return;
     }
 
-        std::vector<double> v;
-        helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
-        
-        auto length = std::min(static_cast<int>(v.size()), maxlen);
-        std::memcpy(values, v.data(), length * sizeof(double));
-        if (actualSize != nullptr) {
-            *actualSize = length;
-        }
+    std::vector<double> v;
+    helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
+
+    auto length = std::min(static_cast<int>(v.size()), maxlen);
+    std::memcpy(values, v.data(), length * sizeof(double));
+    if (actualSize != nullptr) {
+        *actualSize = length;
+    }
 }
 
 void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize)
@@ -474,7 +474,6 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
     }
 }
 
-
 HelicsBool helicsDataBufferConvertToType(HelicsDataBuffer data, int newDataType)
 {
     auto* ptr = getBuffer(data);
@@ -487,6 +486,6 @@ HelicsBool helicsDataBufferConvertToType(HelicsDataBuffer data, int newDataType)
     }
     helics::defV oVal;
     helics::valueExtract(*ptr, helics::DataType::HELICS_ANY, oVal);
-    *ptr=helics::typeConvertDefV(static_cast<helics::DataType>(newDataType), oVal);
+    *ptr = helics::typeConvertDefV(static_cast<helics::DataType>(newDataType), oVal);
     return HELICS_TRUE;
 }

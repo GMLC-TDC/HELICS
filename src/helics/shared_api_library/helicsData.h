@@ -53,7 +53,7 @@ HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
 
 /** convert a raw string(may contain nulls) to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str,int stringSize, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
 
 /** convert a bool to serialized bytes*/
 HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);
@@ -94,7 +94,7 @@ HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
 /** get the length of a string if a string were to be retrieved*/
 HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
 
-    /* convert a data buffer to a string*/
+/* convert a data buffer to a string*/
 HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
 /** convert a data buffer to a time*/
@@ -109,7 +109,7 @@ HELICS_EXPORT void helicsDataBufferToComplex(HelicsDataBuffer data, double* real
 /** get the number of elements that would be required if a vector were retrieved*/
 HELICS_EXPORT int helicsDataBufferVectorSize(HelicsDataBuffer data);
 
-    /** convert a data buffer to double vector values*/
+/** convert a data buffer to double vector values*/
 HELICS_EXPORT void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
 
 /** convert a data buffer to complex double vector values

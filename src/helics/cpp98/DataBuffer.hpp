@@ -13,13 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helicscpp {
-    class DataBuffer {
+class DataBuffer {
   public:
-        DataBuffer() { buff = helicsCreateDataBuffer(0); }
+    DataBuffer() { buff = helicsCreateDataBuffer(0); }
     explicit DataBuffer(int capacity) { buff = helicsCreateDataBuffer(capacity); }
 
   private:
-        HelicsDataBuffer buff = nullptr;
-    };
-}
+    HelicsDataBuffer buff = nullptr;
+};
+}  // namespace helicscpp
 #endif
