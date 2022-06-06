@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../core/SmallBuffer.hpp"
+
 #include <algorithm>
 #include <string>
 #include <vector>
