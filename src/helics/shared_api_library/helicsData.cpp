@@ -86,6 +86,16 @@ HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity)
     }
 }
 
+HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data) {
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return nullptr;
+    }
+    auto* newptr = new helics::SmallBuffer(*ptr);
+    newptr->userKey = bufferValidationIdentifier;
+    return static_cast<HelicsDataBuffer>(newptr);
+}
+
 HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
@@ -232,6 +242,21 @@ int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer 
     }
 }
 
+int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
+    try {
+        helics::ValueConverter<std::complex<double>>::convert(reinterpret_cast<const std::complex<double> *>(value), dataSize, *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
+}
+
 int helicsDataBufferType(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
@@ -353,6 +378,7 @@ void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int max
         if (actualLength != nullptr) {
             *actualLength = 0;
         }
+        return;
     }
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -401,6 +427,7 @@ void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
+        return;
     }
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -414,7 +441,7 @@ void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen
         helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
         
         auto length = std::min(static_cast<int>(v.size()), maxlen);
-        std::memcpy(data, v.data(), length * sizeof(double));
+        std::memcpy(values, v.data(), length * sizeof(double));
         if (actualSize != nullptr) {
             *actualSize = length;
         }
@@ -426,6 +453,7 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
         if (actualSize != nullptr) {
             *actualSize = 0;
         }
+        return;
     }
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -439,7 +467,7 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
 
     auto length = std::min(static_cast<int>(v.size()), maxlen);
-    std::memcpy(data, reinterpret_cast<const double*>(v.data()), length * sizeof(double) * 2);
+    std::memcpy(values, reinterpret_cast<const double*>(v.data()), length * sizeof(double) * 2);
 
     if (actualSize != nullptr) {
         *actualSize = length;

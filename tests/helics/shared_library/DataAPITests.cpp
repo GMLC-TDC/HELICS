@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/helics.h"
 #include "ctestFixtures.hpp"
+#include <complex>
 
 #include <gtest/gtest.h>
 
@@ -51,6 +52,7 @@ TEST(data, toFromInt) {
     EXPECT_GT(cnt, 0);
     int64_t v2 = helicsDataBufferToInt(buff);
     EXPECT_EQ(v1, v2);
+    helicsDataBufferFree(buff);
 }
 
 
@@ -64,6 +66,7 @@ TEST(data, toFromDouble)
     EXPECT_GT(cnt, 0);
     double v2 = helicsDataBufferToDouble(buff);
     EXPECT_EQ(v1, v2);
+    helicsDataBufferFree(buff);
 }
 
 TEST(data, toFromChar)
@@ -75,6 +78,7 @@ TEST(data, toFromChar)
     EXPECT_GT(cnt, 0);
     double v2 = helicsDataBufferToChar(buff);
     EXPECT_EQ(v1, v2);
+    helicsDataBufferFree(buff);
 }
 
 TEST(data, toFromTime)
@@ -86,6 +90,7 @@ TEST(data, toFromTime)
     EXPECT_GT(cnt, 0);
     HelicsTime v2 = helicsDataBufferToTime(buff);
     EXPECT_EQ(v1, v2);
+    helicsDataBufferFree(buff);
 }
 
 
@@ -105,6 +110,7 @@ TEST(data, toFromString)
     EXPECT_EQ(asize, v1.size());
     v2.resize(asize);
     EXPECT_STREQ(v1.c_str(), v2.c_str());
+    helicsDataBufferFree(buff);
 }
 
 
@@ -113,7 +119,7 @@ TEST(data, toFromRawString)
     auto buff = helicsCreateDataBuffer(500);
 
     std::string v1 = "this is an interesting string";
-    auto cnt = helicsRawStringToBytes(v1.c_str(),v1.size(), buff);
+    auto cnt = helicsRawStringToBytes(v1.c_str(),static_cast<int>(v1.size()), buff);
     EXPECT_GT(cnt, 0);
     std::string v2;
     v2.resize(100);
@@ -124,4 +130,103 @@ TEST(data, toFromRawString)
     EXPECT_EQ(asize, v1.size());
     v2.resize(asize);
     EXPECT_STREQ(v1.c_str(), v2.c_str());
+    helicsDataBufferFree(buff);
+}
+
+
+TEST(data, toFromVector)
+{
+    auto buff = helicsCreateDataBuffer(500);
+
+    std::vector<double> v1{34.7, -99.99999, 0, 43.7e231, std::nan("0")};
+    auto cnt = helicsVectorToBytes(v1.data(),static_cast<int>(v1.size()),buff);
+    EXPECT_GT(cnt, 0);
+    std::vector<double> v2;
+    v2.resize(5);
+    int asize{0};
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_VECTOR);
+    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferVectorSize(buff));
+    helicsDataBufferToVector(buff, v2.data(), 5, &asize);
+    EXPECT_EQ(asize, v1.size());
+    EXPECT_EQ(v1[0], v2[0]);
+    EXPECT_EQ(v1[1], v2[1]);
+    EXPECT_EQ(v1[2], v2[2]);
+    EXPECT_EQ(v1[3], v2[3]);
+    EXPECT_TRUE(std::isnan(v2[4]));
+    helicsDataBufferFree(buff);
+
+}
+
+TEST(data, toFromComplexVector)
+{
+    auto buff = helicsCreateDataBuffer(500);
+    using cv=std::complex<double>;
+
+    std::vector<cv> v1{cv{34.7, -19.7},
+                       cv{-99.99999, 0.0000001},
+                       cv{0, 0},
+                       cv{43.7e231, -19.3e-88},
+                       cv{std::nan("0"), 0}};
+    auto cnt = helicsComplexVectorToBytes(reinterpret_cast<double *>(v1.data()), static_cast<int>(v1.size()), buff);
+    EXPECT_GT(cnt, 0);
+    std::vector<double> v2;
+    v2.resize(10);
+    int asize{0};
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_COMPLEX_VECTOR);
+    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferVectorSize(buff));
+    helicsDataBufferToComplexVector(buff, v2.data(), 5, &asize);
+    EXPECT_EQ(asize, v1.size());
+    EXPECT_EQ(v1[0].real(), v2[0]);
+    EXPECT_EQ(v1[0].imag(), v2[1]);
+    EXPECT_EQ(v1[1].real(), v2[2]);
+    EXPECT_EQ(v1[1].imag(), v2[3]);
+    EXPECT_EQ(v1[2].real(), v2[4]);
+    EXPECT_EQ(v1[2].imag(), v2[5]);
+    EXPECT_EQ(v1[3].real(), v2[6]);
+    EXPECT_EQ(v1[3].imag(), v2[7]);
+    EXPECT_TRUE(std::isnan(v2[8]));
+    EXPECT_EQ(v1[4].imag(), v2[9]);
+    helicsDataBufferFree(buff);
+   
+}
+
+TEST(data, converter)
+{
+    auto buff = helicsCreateDataBuffer(500);
+
+    double v1 = 35.7;
+    auto cnt = helicsDoubleToBytes(v1, buff);
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_GT(cnt, 0);
+    bool res=helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(res);
+
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_INT);
+    double v2 = helicsDataBufferToDouble(buff);
+    EXPECT_EQ(35.0, v2);
+    helicsDataBufferFree(buff);
+}
+
+
+TEST(data, clone)
+{
+    auto buff = helicsCreateDataBuffer(500);
+
+    double v1 = 35.7;
+    auto cnt = helicsDoubleToBytes(v1, buff);
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_GT(cnt, 0);
+    auto newbuff = helicsDataBufferClone(buff);
+
+    bool res = helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT);
+    EXPECT_TRUE(res);
+
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_INT);
+    EXPECT_EQ(helicsDataBufferType(newbuff), HELICS_DATA_TYPE_DOUBLE);
+    double v2 = helicsDataBufferToDouble(buff);
+    EXPECT_EQ(35.0, v2);
+    helicsDataBufferFree(buff);
+
+    v2 = helicsDataBufferToDouble(newbuff);
+    EXPECT_EQ(v1, v2);
 }

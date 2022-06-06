@@ -40,6 +40,9 @@ HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 /** increase the capacity a data buffer can hold without reallocating memory*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
+/** clone a data buffer*/
+HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
+
 /** convert an integer to serialized bytes*/
 HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data);
 
@@ -69,6 +72,9 @@ HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsData
 
 /** convert a real vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+
+/** convert a complex vector to serialized bytes*/
+HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
 
 /** extract the data type from the data buffer, if the type isn't recognized UNKNOWN is returned*/
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
