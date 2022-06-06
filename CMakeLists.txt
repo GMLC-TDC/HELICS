@@ -1,5 +1,5 @@
 # ~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -8,7 +8,7 @@
 # ~~~
 
 cmake_minimum_required(VERSION 3.4)
-# Make sure users don't get warnings on a tested (3.4 to 3.17) version of CMake. For most of the
+# Make sure users don't get warnings on a tested (3.4 to 3.23) version of CMake. For most of the
 # policies, the new version is better (hence the change). We don't use the 3.0...3.16 syntax because
 # of a bug in MSVC 15.7 built-in and modified CMake 3.11
 if(CMAKE_VERSION VERSION_LESS 3.23)
@@ -30,7 +30,7 @@ project(HELICS VERSION 2.8.1)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2022-05-17")
+set(HELICS_DATE "2022-06-09")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
