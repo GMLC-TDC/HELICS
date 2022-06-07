@@ -204,18 +204,17 @@ void ZmqComms::queue_rx_function()
                                                 PortNumber + 1,
                                                 connectionTimeout);
                     if (!bindsuccess) {
+                        std::this_thread::sleep_for(connectionTimeout);
                         bindsuccess = bindzmqSocket(repSocket,
                                                     localTargetAddress,
                                                     PortNumber + 1,
                                                     connectionTimeout);
                         if (!bindsuccess) {
-                            // try one more sleep
-                            std::this_thread::sleep_for(connectionTimeout);
                             pullSocket.close();
                             repSocket.close();
                             disconnecting = true;
                             logError(std::string(
-                                         "Unable to bind zmq reply even after force termination") +
+                                         "Unable to bind zmq reply even after force termination ") +
                                      makePortAddress(localTargetAddress, PortNumber + 1));
                             setRxStatus(ConnectionStatus::ERRORED);
                             return;

@@ -1,6 +1,6 @@
 #!/bin/bash
 tests=(
-    /root/project/build/bin/core-tests
+    "/root/project/build/bin/core-tests --gtest_filter=-*ci_skip*"
     /root/project/build/bin/common-tests
     "/root/project/build/bin/system-tests --gtest_filter=-*realtime*"
     /root/project/build/bin/helics_apps-tests
