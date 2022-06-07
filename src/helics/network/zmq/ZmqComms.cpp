@@ -181,9 +181,8 @@ void ZmqComms::queue_rx_function()
                     brokerReqTerm.connect(makePortAddress(localTargetAddress, PortNumber + 1));
                     ActionMessage term(CMD_GLOBAL_ERROR);
                     term.messageID = HELICS_ERROR_TERMINATED;
-                    term.payload="force termination for new broker";
-                    auto str =
-                        (useJsonSerialization) ? term.to_json_string() : term.to_string();
+                    term.payload = "force termination for new broker";
+                    auto str = (useJsonSerialization) ? term.to_json_string() : term.to_string();
 
                     brokerReqTerm.send(str);
                     zmq::pollitem_t poller;
@@ -198,7 +197,7 @@ void ZmqComms::queue_rx_function()
                     } else {
                         brokerReqTerm.close();
                     }
-                    
+
                     bindsuccess = bindzmqSocket(repSocket,
                                                 localTargetAddress,
                                                 PortNumber + 1,
@@ -229,9 +228,8 @@ void ZmqComms::queue_rx_function()
                     logError(
                         std::string(
                             "unable to make connection with existing server, force override failed with error ") +
-                        std::string(ze.what()) +
-                        " on "+
-                             makePortAddress(localTargetAddress, PortNumber + 1));
+                        std::string(ze.what()) + " on " +
+                        makePortAddress(localTargetAddress, PortNumber + 1));
                     setRxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
@@ -244,7 +242,6 @@ void ZmqComms::queue_rx_function()
                 setRxStatus(ConnectionStatus::ERRORED);
                 return;
             }
-            
         }
     }
 

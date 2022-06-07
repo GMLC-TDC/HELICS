@@ -111,9 +111,9 @@ TEST(brokers, broker_log_command_failures)
 }
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
-TEST(brokers, force_override_ci_skip) {
-    auto brk = helics::BrokerFactory::create(helics::CoreType::ZMQ,
-                                             "gbroker_f1","");
+TEST(brokers, force_override_ci_skip)
+{
+    auto brk = helics::BrokerFactory::create(helics::CoreType::ZMQ, "gbroker_f1", "");
     EXPECT_TRUE(brk->isConnected());
     auto cr1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "c1", "");
     EXPECT_TRUE(cr1->connect());

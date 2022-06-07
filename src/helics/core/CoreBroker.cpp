@@ -2210,8 +2210,10 @@ bool CoreBroker::connect()
                     transmit(parent_route_id, m);
                 }
                 LOG_SUMMARY(parent_broker_id,
-                                getIdentifier(),
-                                fmt::format("Broker {} connected on {}", getIdentifier(),getAddress()));
+                            getIdentifier(),
+                            fmt::format("Broker {} connected on {}",
+                                        getIdentifier(),
+                                        getAddress()));
             } else {
                 setBrokerState(BrokerState::CONFIGURED);
             }
