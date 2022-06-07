@@ -134,10 +134,11 @@ jobs:
     docker:
       - image: helics/buildenv:gcc10-builder
     environment:
-      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags'
+      CMAKE_FLAGS: '-DHELICS_EXTRA_COMPILE_FLAGS=-Wredundant-tags -DHELICS_BUILD_TESTS=ON'
     steps:
       - checkout
       - run: *setup_helics
+      - run: *run_helics_tests
 
   benchmarkjob:
     docker:
@@ -156,14 +157,6 @@ workflows:
   version: 2
   helics_test:
     jobs:
-      - helicsMSan:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
-      - helicsASan:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
       - helicsInstall1:
           filters:
             branches:
@@ -172,36 +165,7 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - helicsgccTSan:
+      - gcc10:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-
-  nightly:
-    triggers:
-      - schedule:
-          cron: '0 8 * * *'
-          filters:
-            branches:
-              only:
-                - develop
-                - helics2
-    jobs:
-      - helicsoctave
-      - helicsMSan
-      - helicsASan
-      - helicsTumbleweed
-      - helicsNoZmq
-      - helicsgccTSan
-      - gcc10
-  benchmark:
-    triggers:
-      - schedule:
-          cron: '17 9 * * 0,2,5'
-          filters:
-            branches:
-              only:
-                - develop
-                - helics2
-    jobs:
-      - benchmarkjob
