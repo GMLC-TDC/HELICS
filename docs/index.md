@@ -1,10 +1,10 @@
 # HELICS documentation
 
 [![](https://badges.gitter.im/GMLC-TDC/HELICS.png)](https://gitter.im/GMLC-TDC/HELICS)
-[![](https://img.shields.io/badge/docs-ready-blue.svg)](https://helics.readthedocs.io/en/latest)
+[![](https://img.shields.io/badge/docs-ready-blue.svg)](https://docs.helics.org/en/helics2)
 [![](https://img.shields.io/conda/pn/gmlc-tdc/helics.svg)](https://anaconda.org/gmlc-tdc/helics/)
 [![](https://img.shields.io/github/tag-date/GMLC-TDC/HELICS.svg)](https://github.com/GMLC-TDC/HELICS/releases)
-[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/master/LICENSE)
+[![](https://img.shields.io/badge/License-BSD-blue.svg)](https://github.com/GMLC-TDC/HELICS/blob/helics2/LICENSE)
 
 This is the documentation for the Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS). HELICS is an
 open-source cyber-physical-energy co-simulation framework for energy systems, with a strong tie to the electric
@@ -19,7 +19,7 @@ Motivation: Energy systems and their associated information and communication te
 
 - [Gitter](https://gitter.im/GMLC-TDC/HELICS)
 
-```eval_rst
+```{eval-rst}
 .. toctree::
    :maxdepth: 1
    :caption: Basics
@@ -30,7 +30,7 @@ Motivation: Energy systems and their associated information and communication te
    Tools_using_HELICS
 ```
 
-```eval_rst
+```{eval-rst}
 .. toctree::
    :maxdepth: 1
    :caption: Reference
@@ -39,7 +39,7 @@ Motivation: Energy systems and their associated information and communication te
    apps/index
 ```
 
-```eval_rst
+```{eval-rst}
 .. toctree::
    :maxdepth: 1
    :caption: API Docs
@@ -48,7 +48,7 @@ Motivation: Energy systems and their associated information and communication te
    doxygen/index
 ```
 
-```eval_rst
+```{eval-rst}
 .. toctree::
    :maxdepth: 1
    :caption: Contributing
@@ -57,4 +57,4 @@ Motivation: Energy systems and their associated information and communication te
    ROADMAP
 ```
 
-You can find [Doxygen documentation here](doxygen/index.html).
+You can find [Doxygen documentation here](doxygen/index.md).

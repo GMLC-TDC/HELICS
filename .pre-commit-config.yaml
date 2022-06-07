@@ -56,14 +56,17 @@ repos:
             '--skip="*.csv"',
             "--ignore-words=./config/spelling_whitelist.txt",
           ]
-  - repo: local
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v13.0.0
     hooks:
-      - id: docker-clang-format
-        name: Docker Clang Format
-        language: docker_image
+      - id: clang-format
         types:
           - c++
-        entry: unibeautify/clang-format:latest
-        args:
-          - -style=file
-          - -i
+  - repo: local
+    hooks:
+      - id: shfmt
+        name: shfmt
+        language: golang
+        additional_dependencies: [mvdan.cc/sh/v3/cmd/shfmt@v3.3.0]
+        entry: shfmt -w
+        types: [shell]

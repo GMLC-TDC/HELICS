@@ -23,4 +23,4 @@ The type of publication is represented as an open string but the Application API
 
 These are all convertible and known to the Application API but some conversions are lossy, so there is a flag to allow only string matching if that is required.
 
-Publication can add a target which is an [Input](./Inputs). A publication can target as many inputs as desired.
+Publication can add a target which is an [Input](Inputs.md). A publication can target as many inputs as desired.

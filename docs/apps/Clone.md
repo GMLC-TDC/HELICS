@@ -32,7 +32,7 @@ Options:
 
 also permissible are all arguments allowed for federates and any specific broker specified:
 
-[Command line reference](cmdArgs.html)
+[Command line reference](cmdArgs.md)
 
 the clone app is accessible through the helics_app
 

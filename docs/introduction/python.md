@@ -35,12 +35,12 @@ Windows CMD:
 
 Next, make a new source file and call it `pisender.py`. Copy
 the contents from
-[pisender.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/python/pi-exchange/pisender.py)
+[pisender.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/python/pi-exchange/pisender.py)
 and paste it into the file.
 
 Next, create a new source file and call it `pireceiver.py`.
 Copy the contents from
-[pireceiver.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/master/python/pi-exchange/pireceiver.py)
+[pireceiver.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/python/pi-exchange/pireceiver.py)
 and paste it into the file.
 
 Save the files.

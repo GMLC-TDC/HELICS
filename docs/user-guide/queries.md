@@ -14,7 +14,7 @@ std::string query(const std::string& target, const std::string& queryStr,
 
 A target is specified, and can be one of the following. A federate named one of the key words is valid for the federation, but cannot be queried using the name.
 
-```eval_rst
+```{eval-rst}
 +------------------------------------------+---------------------------------------------------------------------------------------+
 | target                                   | Description                                                                           |
 +==========================================+=======================================================================================+
@@ -53,7 +53,7 @@ As of HELICS 2.7.0 Queries have an optional parameter to describe a sequencing m
 
 The following queries are defined for federates. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +--------------------+------------------------------------------------------------+
 | queryString        | Description                                                |
 +====================+============================================================+
@@ -99,7 +99,7 @@ The `global_time_debugging` and `global_flush` queries are also acknowledged by 
 
 The following queries are defined for federates but can only be queried on the local federate. Federates may specify a callback function which allows arbitrary user defined Queries. The queries defined here are available inside of HELICS.
 
-```eval_rst
+```{eval-rst}
 +---------------------------+------------------------------------------------------------+
 | queryString               | Description                                                |
 +===========================+============================================================+
@@ -121,7 +121,7 @@ Other strings may be defined for specific federates.
 
 The following queries will be answered by a core.
 
-```eval_rst
+```{eval-rst}
 +--------------------------+-------------------------------------------------------------------------------------+
 | queryString              | Description                                                                         |
 +==========================+=====================================================================================+
@@ -187,7 +187,7 @@ The `version` and `version_all` queries are valid but are not usually queried di
 
 The Following queries will be answered by a broker.
 
-```eval_rst
+```{eval-rst}
 +--------------------------+-------------------------------------------------------------------------------------+
 | queryString              | Description                                                                         |
 +==========================+=====================================================================================+

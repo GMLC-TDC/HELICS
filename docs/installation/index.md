@@ -36,7 +36,7 @@ Use Spack (requires Spack develop branch or versions released after v0.14.1) on 
 spack install helics
 ```
 
-For more information on supported options (e.g. using a custom HELICS build with MPI support) and troubleshooting tips, see the [package managers](https://helics.readthedocs.io/en/latest/installation/package_manager.html) page for more details, or the documentation for your package manager.
+For more information on supported options (e.g. using a custom HELICS build with MPI support) and troubleshooting tips, see the [package managers](package_manager.md) page for more details, or the documentation for your package manager.
 
 ## Using an installer for your operating system
 
@@ -55,7 +55,7 @@ Be sure to restart your CMD prompt on Windows or Terminal on your MacOS/Linux to
 
 You can install it using one of the supported package managers.
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -66,7 +66,7 @@ Alternatively, you can install from source. See the next section for more inform
 
 ## OS Specific installation from source
 
-```eval_rst
+```{eval-rst}
 .. toctree::
     :maxdepth: 1
 
@@ -84,8 +84,8 @@ The following are a few things that could be useful to know before starting out.
 Firstly, you can follow HELICS development on our [GitHub](https://github.com/GMLC-TDC/HELICS) page.
 HELICS is open-source. The development team uses `git` for version control, and GitHub to host the code publicly.
 The latest HELICS will be on the `develop` branch.
-Tagged releases occur on the `master` branch.
-If you clone the HELICS repository, you will be placed in the `master` branch by default.
+Tagged releases occur on the `main` branch.
+If you clone the HELICS repository, you will be placed in the `main` branch by default.
 To switch to the `develop` branch, you can type the following:
 
 ```bash
@@ -116,4 +116,4 @@ This means you can pass it configurations settings as a key value pair by adding
 For example, to build the Python extension all you need to do is pass in `-DBUILD_PYTHON_INTERFACE=ON`.
 You can also run `ccmake .` in the build folder, to get a command line interactive prompt to change configuration settings.
 On Windows, you can use the cmake GUI to do the same.
-Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](https://helics.readthedocs.io/en/latest/installation/helics_cmake_options.html).
+Again, there are more instructions in the individual installation pages but a useful trick to know if something isn't documented or a slightly more advanced feature is required. Available CMake options for HELICS are documented [here](helics_cmake_options.md).

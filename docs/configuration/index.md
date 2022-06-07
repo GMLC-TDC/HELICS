@@ -4,7 +4,7 @@ Federates have a number of options for configuration. This includes a number of 
 Other options to specify how the federate communicates with HELICS. There are also a variety of options for specifying the interfaces of a federate and the communication points by which a
 federate interacts with others. This can be through file configurations (JSON) or through API calls.
 
-```eval_rst
+```{eval-rst}
 .. toctree::
   :maxdepth: 1
 

@@ -28,7 +28,7 @@ At some point, maybe from the very beginning of your time with HELICS co-simulat
 
 With the answers to those clarifying questions in mind, let's look at the normal execution process used by a HELICS federate when co-simulating and the associated APIs for each of the languages. Many of these APIs are wrappers for one or more lower level APIs; additionally, there are many more detailed APIs that won't be discussed at all. If, as the simulator integrator, you have needs beyond what is discussed here you'll have to dig into the [developer documentation on the APIs](../doxygen/index.md) to get the details you need.
 
-For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](https://helics.readthedocs.io/en/latest/installation/index.html)), you'll have to do something like this:
+For the remainder of this section of the guide, we'll assume the use of a Python binding and thus, at the top of the Python script ([after installing the Python HELICS module](../installation/index.md)), you'll have to do something like this:
 
 ```python
 import helics as h
@@ -106,7 +106,7 @@ And now begins the core of the co-simulation where the following several steps a
   grantedtime = h.helicsFederateRequestTime (fed, time)
   ```
 
-  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](./timing.md) as well, just to keep the simulator on these intervals.)
+  Assuming any necessary calculations have been completed, the federate requests a simulated time. This time is determined by the nature of the simulator and generally represents the maximum time over which, in none of the inputs of the simulator change, no new outputs would need to be calculated. For simulators with a fixed time-step, the time requested will be the next time-step. (For these types of simulators, it's a good idea to [set the "uninterruptible" flag](timing.md) as well, just to keep the simulator on these intervals.)
 
   For other types of simulators, controller for example, you may want to change an output every time an input changes, but never any other time. In these cases, you can make the time request of `maxTime`; this is the end of the simulation time and thus the federate will do nothing until a new input value changes and the federate is granted that time. (In this case, you would want to make sure the "uninterruptible" flag was NOT set so that the federate is woken up on these input changes.)
 
