@@ -139,9 +139,10 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     noAckConnection = netInfo.noAckConnection;
     useJsonSerialization = netInfo.useJsonSerialization;
     encrypted = netInfo.encrypted;
+    forceConnection = netInfo.forceConnection;
 #ifndef HELICS_ENABLE_ENCRYPTION
     if (encrypted) {
-        std::cerr << "encryption not enabled in HELICS, recompile with encryption enabled"
+        std::cerr << "encryption not enabled in HELICS, recompile with encryption enabled if required"
                   << std::endl;
     }
 #endif

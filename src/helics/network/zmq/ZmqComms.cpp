@@ -173,13 +173,78 @@ void ZmqComms::queue_rx_function()
         auto bindsuccess =
             bindzmqSocket(repSocket, localTargetAddress, PortNumber + 1, connectionTimeout);
         if (!bindsuccess) {
-            pullSocket.close();
-            repSocket.close();
-            disconnecting = true;
-            logError(std::string("Unable to bind zmq reply socket giving up ") +
-                     makePortAddress(localTargetAddress, PortNumber + 1));
-            setRxStatus(ConnectionStatus::ERRORED);
-            return;
+            if (forceConnection) {
+                logWarning("attempting to override existing broker and force network connection");
+                zmq::socket_t brokerReqTerm(ctx->getContext(), ZMQ_REQ);
+                brokerReqTerm.setsockopt(ZMQ_LINGER, 50);
+                try {
+                    brokerReqTerm.connect(makePortAddress(localTargetAddress, PortNumber + 1));
+                    ActionMessage term(CMD_GLOBAL_ERROR);
+                    term.messageID = HELICS_ERROR_TERMINATED;
+                    term.payload="force termination for new broker";
+                    auto str =
+                        (useJsonSerialization) ? term.to_json_string() : term.to_string();
+
+                    brokerReqTerm.send(str);
+                    zmq::pollitem_t poller;
+                    poller.socket = static_cast<void*>(brokerReqTerm);
+                    poller.events = ZMQ_POLLIN;
+                    int rc = zmq::poll(&poller, 1, connectionTimeout);
+                    if (rc != 0) {
+                        zmq::message_t msg;
+                        brokerReqTerm.recv(msg);
+                        brokerReqTerm.close();
+                        std::this_thread::sleep_for(connectionTimeout);
+                    } else {
+                        brokerReqTerm.close();
+                    }
+                    
+                    bindsuccess = bindzmqSocket(repSocket,
+                                                localTargetAddress,
+                                                PortNumber + 1,
+                                                connectionTimeout);
+                    if (!bindsuccess) {
+                        bindsuccess = bindzmqSocket(repSocket,
+                                                    localTargetAddress,
+                                                    PortNumber + 1,
+                                                    connectionTimeout);
+                        if (!bindsuccess) {
+                            // try one more sleep
+                            std::this_thread::sleep_for(connectionTimeout);
+                            pullSocket.close();
+                            repSocket.close();
+                            disconnecting = true;
+                            logError(std::string(
+                                         "Unable to bind zmq reply even after force termination") +
+                                     makePortAddress(localTargetAddress, PortNumber + 1));
+                            setRxStatus(ConnectionStatus::ERRORED);
+                            return;
+                        }
+                    }
+                }
+                catch (zmq::error_t& ze) {
+                    pullSocket.close();
+                    repSocket.close();
+                    disconnecting = true;
+                    logError(
+                        std::string(
+                            "unable to make connection with existing server, force override failed with error ") +
+                        std::string(ze.what()) +
+                        " on "+
+                             makePortAddress(localTargetAddress, PortNumber + 1));
+                    setRxStatus(ConnectionStatus::ERRORED);
+                    return;
+                }
+            } else {
+                pullSocket.close();
+                repSocket.close();
+                disconnecting = true;
+                logError(std::string("Unable to bind zmq reply socket giving up ") +
+                         makePortAddress(localTargetAddress, PortNumber + 1));
+                setRxStatus(ConnectionStatus::ERRORED);
+                return;
+            }
+            
         }
     }
 

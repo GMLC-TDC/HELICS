@@ -60,6 +60,8 @@ class NetworkCommsInterface: public CommsInterface {
     bool appendNameToAddress{false};  //!< flag to append the name to the network address
     bool noAckConnection{false};  //!< flag to bypass the connection acknowledge requirement
     bool encrypted{false};  //!< enable encryption if applicable
+    /// if enabled will attempt to force the server connection and terminate any existing connections
+    bool forceConnection{false}; 
     const gmlc::networking::InterfaceTypes networkType;
     gmlc::networking::InterfaceNetworks network{gmlc::networking::InterfaceNetworks::IPV4};
     std::atomic<bool> hasBroker{false};
