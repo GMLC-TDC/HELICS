@@ -142,8 +142,9 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
     forceConnection = netInfo.forceConnection;
 #ifndef HELICS_ENABLE_ENCRYPTION
     if (encrypted) {
-        std::cerr << "encryption not enabled in HELICS, recompile with encryption enabled if required"
-                  << std::endl;
+        std::cerr
+            << "encryption not enabled in HELICS, recompile with encryption enabled if required"
+            << std::endl;
     }
 #endif
     propertyUnLock();

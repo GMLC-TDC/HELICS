@@ -382,7 +382,8 @@ void BrokerBase::setErrorState(int eCode, std::string_view estring)
         } else {
             brokerState.store(BrokerState::ERRORED);
         }
-        if (errorDelay <= timeZero || eCode==HELICS_ERROR_TERMINATED || eCode==HELICS_ERROR_USER_ABORT) {
+        if (errorDelay <= timeZero || eCode == HELICS_ERROR_TERMINATED ||
+            eCode == HELICS_ERROR_USER_ABORT) {
             ActionMessage halt(CMD_USER_DISCONNECT, global_id.load(), global_id.load());
             addActionMessage(halt);
         } else {
