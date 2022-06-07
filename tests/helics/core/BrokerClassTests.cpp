@@ -14,7 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <future>
 
 /** test the assignment and retrieval of global value from a broker object*/
-TEST(broker_tests, global_value_test)
+TEST(brokers, global_value)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "gbroker", "-f2 --root");
     constexpr std::string_view globalVal = "this is a string constant that functions as a global";
@@ -34,7 +34,7 @@ TEST(broker_tests, global_value_test)
 }
 
 /** test the assignment and retrieval of global value from a broker object*/
-TEST(broker_tests, subbroker_min_test)
+TEST(brokers, subbroker_min)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST,
                                              "gbroker2",
@@ -91,8 +91,8 @@ TEST(broker_tests, subbroker_min_test)
     EXPECT_TRUE(brk3->waitForDisconnect());
 }
 
-/** This test should be removed once log levels with numbers is re-enabled ~helics 3.2 */
-TEST(broker_tests, broker_log_command_failures)
+/** This test should be removed once log levels with numbers is re-enabled ~helics 3.3 */
+TEST(brokers, broker_log_command_failures)
 {
     EXPECT_THROW(helics::BrokerFactory::create(helics::CoreType::TEST,
                                                "brokerlog1",
@@ -109,3 +109,19 @@ TEST(broker_tests, broker_log_command_failures)
                                                "--fileloglevel=-4 --root"),
                  std::exception);
 }
+
+#ifdef HELICS_ENABLE_ZMQ_CORE
+TEST(brokers, force_override) {
+    auto brk = helics::BrokerFactory::create(helics::CoreType::ZMQ,
+                                             "gbroker_f1","");
+    EXPECT_TRUE(brk->isConnected());
+    auto cr1 = helics::CoreFactory::create(helics::CoreType::ZMQ, "c1", "");
+    EXPECT_TRUE(cr1->connect());
+    EXPECT_TRUE(cr1->isConnected());
+
+    brk->disconnect();
+
+    auto brk2 = helics::BrokerFactory::create(helics::CoreType::ZMQ, "gbroker_f2", "");
+    EXPECT_FALSE(brk2->isConnected());
+}
+#endif

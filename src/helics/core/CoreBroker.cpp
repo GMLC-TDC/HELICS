@@ -2161,6 +2161,8 @@ std::shared_ptr<helicsCLI11App> CoreBroker::generateCLI()
     app->remove_helics_specifics();
     app->add_flag_callback(
         "--root", [this]() { setAsRoot(); }, "specify whether the broker is a root");
+    app->add_flag(
+        "--force", force_connection, "if set to true the broker will on an unsuccessful connection as root broker attempt to terminate any existing brokers and reconnect");
     auto* tfed = app->add_option(
         "--timemonitor",
         mTimeMonitorFederate,
@@ -2209,9 +2211,9 @@ bool CoreBroker::connect()
                     }
                     transmit(parent_route_id, m);
                 }
-                LOG_CONNECTIONS(parent_broker_id,
+                LOG_SUMMARY(parent_broker_id,
                                 getIdentifier(),
-                                fmt::format("||connected on {}", getAddress()));
+                                fmt::format("Broker {} connected on {}", getIdentifier(),getAddress()));
             } else {
                 setBrokerState(BrokerState::CONFIGURED);
             }
