@@ -358,7 +358,7 @@ namespace apps {
         app->add_flag("--allow_iteration", allow_iteration, "allow iteration on values")
             ->ignore_underscore();
 
-        app->add_option("--output,-o", outFileName, "the output file for recording the data", true);
+        app->add_option("--output,-o", outFileName, "the output file for recording the data");
         app->add_option("capture", captureFederate, "name of the federate to clone");
 
         return app;

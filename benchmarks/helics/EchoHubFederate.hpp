@@ -31,8 +31,7 @@ class EchoHub: public BenchmarkFederate {
 
         app->add_option("--num_leafs",
                         num_leafs,
-                        "the number of echoleaf federates to expect",
-                        true);
+                        "the number of echoleaf federates to expect");
     }
 
     std::string getName() override { return "echohub"; }

@@ -33,8 +33,7 @@ class TimingHub: public BenchmarkFederate {
 
         app->add_option("--num_leafs",
                         num_leafs,
-                        "the number of timingleaf federates to expect",
-                        true);
+                        "the number of timingleaf federates to expect");
     }
 
     void doFedInit() override
