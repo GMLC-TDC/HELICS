@@ -895,7 +895,7 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_requ
     vFed1->finalize();
 }
 
-TEST_F(iteration, iteration_high_count_nocov_skip_ci_nosan)
+TEST_F(iteration, iteration_high_count_nocov_ci_skip_nosan)
 {
     auto broker = AddBroker("test", 2);
     AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
