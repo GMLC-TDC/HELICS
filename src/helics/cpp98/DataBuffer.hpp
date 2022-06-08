@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <string>
 #include <vector>
+#include <complex>
 
 namespace helicscpp {
 class DataBuffer {
@@ -26,7 +27,18 @@ class DataBuffer {
     {
         helicsVectorToBytes(val.data(), static_cast<int>(val.size()), buff);
     }
-
+    void toBytes(const std::complex<double> val)
+    {
+        helicsComplexToBytes(val.real(),val.imag(), buff);
+    }
+    void toBytes(const double *vals, int size)
+    {
+        helicsVectorToBytes(vals, size, buff);
+    }
+    void toBytes(HelicsNamedPoint val)
+    {
+        helicsNamedPointToBytes(vals, size, buff);
+    }
   private:
     HelicsDataBuffer buff;
 };
