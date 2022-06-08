@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [2.8.1][] - 2022-06-09
 
-Final release in the 2.X series of HELICS. This release updates dependencies and a few minor fixes, no further bug fixes are expected
+Final release in the 2.X series of HELICS. This release updates dependencies and a few minor fixes, no further bug fixes are expected.
 
 ### Changed
 
