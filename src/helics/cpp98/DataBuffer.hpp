@@ -10,9 +10,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics.h"
 #include "helicsExceptions.hpp"
 
+#include <complex>
 #include <string>
 #include <vector>
-#include <complex>
 
 namespace helicscpp {
 class DataBuffer {
@@ -29,22 +29,16 @@ class DataBuffer {
     }
     void toBytes(const std::complex<double> val)
     {
-        helicsComplexToBytes(val.real(),val.imag(), buff);
+        helicsComplexToBytes(val.real(), val.imag(), buff);
     }
-    void toBytes(const double *vals, int size)
+    void toBytes(const double* vals, int size) { helicsVectorToBytes(vals, size, buff); }
+    void toBytes(const std::string& name, double val)
     {
-        helicsVectorToBytes(vals, size, buff);
+        helicsNamedPointToBytes(name.c_str(), val, buff);
     }
-    void toBytes(const std::string &name, double val)
-    {
-        helicsNamedPointToBytes(name.c_str(),val, buff);
-    }
-    void toBytes(bool val) {
-        helicsBooleanToBytes(val ? HELICS_TRUE : HELICS_FALSE, buff);
-    }
+    void toBytes(bool val) { helicsBooleanToBytes(val ? HELICS_TRUE : HELICS_FALSE, buff); }
     void toBytes(char val) { helicsCharToBytes(val, buff); }
 
-    
     /** get the size of the raw value */
     int size() { return helicsDataBufferSize(buff); }
 
@@ -52,10 +46,7 @@ class DataBuffer {
     int capacity() { return helicsDataBufferCapacity(buff); }
 
     /** get the size of the value as a string */
-    int stringSize()
-    {
-        return helicsDataBufferStringSize(buff);
-    }
+    int stringSize() { return helicsDataBufferStringSize(buff); }
 
     /** get the current value as a string*/
     std::string toString()
@@ -143,6 +134,7 @@ class DataBuffer {
         // maxlen contains the actual length now
         return maxlen;
     }
+
   private:
     HelicsDataBuffer buff;
 };

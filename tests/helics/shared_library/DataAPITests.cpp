@@ -188,21 +188,19 @@ TEST(data, toFromComplexVector)
     helicsDataBufferFree(buff);
 }
 
-
 TEST(data, toFromNamedPoint)
 {
     auto buff = helicsCreateDataBuffer(500);
 
-    
     auto cnt = helicsNamedPointToBytes("string_thing", 45.7, buff);
     EXPECT_GT(cnt, 0);
-   std::string v2name;
+    std::string v2name;
     double v2val;
     v2name.resize(15);
     int asize{0};
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_NAMED_POINT);
 
-    helicsDataBufferToNamedPoint(buff, v2name.data(), 15, &asize,&v2val);
+    helicsDataBufferToNamedPoint(buff, v2name.data(), 15, &asize, &v2val);
     EXPECT_STREQ(v2name.c_str(), "string_thing");
     EXPECT_EQ(v2val, 45.7);
     helicsDataBufferFree(buff);

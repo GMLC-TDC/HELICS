@@ -75,7 +75,7 @@ HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsData
 HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
 
 /** convert a named point to serialized bytes*/
-HELICS_EXPORT int32_t helicsNamedPointToBytes(const char * name, double value, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsNamedPointToBytes(const char* name, double value, HelicsDataBuffer data);
 
 /** convert a complex vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
