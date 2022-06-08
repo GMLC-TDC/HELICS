@@ -596,7 +596,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     iteration = 0;
                     sequenceCounter = 0;
                 }
-                
+
                 updateTimeGrant();
                 return (iterating == IterationRequest::FORCE_ITERATION) ?
                     MessageProcessingResult::ITERATING :
@@ -858,7 +858,7 @@ void TimeCoordinator::updateTimeGrant()
     treq.source_id = mSourceId;
     treq.actionTime = time_granted;
     treq.counter = sequenceCounter;
-    if (static_cast<std::int32_t>(treq.counter)!=sequenceCounter) {
+    if (static_cast<std::int32_t>(treq.counter) != sequenceCounter) {
         sequenceCounter = 0;
     }
     if (iterating != IterationRequest::NO_ITERATIONS) {

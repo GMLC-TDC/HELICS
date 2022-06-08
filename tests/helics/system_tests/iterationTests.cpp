@@ -895,7 +895,6 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_requ
     vFed1->finalize();
 }
 
-
 TEST_F(iteration, iteration_high_count_nocov_skip_ci_nosan)
 {
     auto broker = AddBroker("test", 2);
@@ -911,7 +910,7 @@ TEST_F(iteration, iteration_high_count_nocov_skip_ci_nosan)
     auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
 
     auto& sub2_1 = vFed2->registerSubscription("pub1_1");
-    
+
     vFed2->enterInitializingModeAsync();
     vFed1->enterInitializingMode();
     vFed2->enterInitializingModeComplete();
@@ -931,7 +930,8 @@ TEST_F(iteration, iteration_high_count_nocov_skip_ci_nosan)
             pub2_1.publish(itCount + 400000);
             pub1_1.publish(itCount + 800000);
             ++itCount;
-            vFed1->requestTimeIterativeAsync(ctime + 1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+            vFed1->requestTimeIterativeAsync(ctime + 1.0,
+                                             helics::IterationRequest::ITERATE_IF_NEEDED);
             vFed2->requestTimeIterative(ctime + 1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
             vFed1->requestTimeIterativeComplete();
         }
@@ -942,5 +942,5 @@ TEST_F(iteration, iteration_high_count_nocov_skip_ci_nosan)
 
     EXPECT_GE(itCount, 200000);
     vFed2->finalize();
-    vFed1->finalize(); 
+    vFed1->finalize();
 }
