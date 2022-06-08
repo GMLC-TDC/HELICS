@@ -1422,3 +1422,10 @@ Specifies the port the rest of the federation should use when contacting this fe
 
 _API:_ (none)
 starting port for automatic port definitions.
+
+---
+
+### `force` []
+
+_API:_ (none)
+Flag specifying that the broker network connection should attempt to override and terminate any existing broker using the specified port.

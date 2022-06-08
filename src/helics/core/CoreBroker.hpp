@@ -123,6 +123,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
+    bool force_connection{false};
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
     std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;

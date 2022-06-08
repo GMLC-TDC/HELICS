@@ -46,17 +46,18 @@ class NetworkBrokerData {
     gmlc::networking::InterfaceNetworks interfaceNetwork{
         gmlc::networking::InterfaceNetworks::LOCAL};
     bool reuse_address{false};  //!< allow reuse of binding address
-    bool use_os_port{false};  //!< specify that any automatic port allocation should use operating
-                              //!< system allocation
+    /// specify that any automatic port allocation should use operating system allocation
+    bool use_os_port{false};
     bool autobroker{false};  //!< flag for specifying an automatic broker generation
-    bool appendNameToAddress{
-        false};  //!< flag indicating that the name should be appended to the address
+    /// flag indicating that the name should be appended to the address
+    bool appendNameToAddress{false};
     bool noAckConnection{false};  //!< flag indicating that a connection ack message is not required
                                   //!< for broker connections
     bool useJsonSerialization{false};  //!< for message serialization use JSON
     bool observer{false};  //!< specify that the network connection is used for observation only
     ServerModeOptions server_mode{ServerModeOptions::UNSPECIFIED};  //!< setup a server mode
     bool encrypted{false};  // enable encryption
+    bool forceConnection{false};  // force the connection and terminate existing connections
     std::string encryptionConfig;
 
   public:
