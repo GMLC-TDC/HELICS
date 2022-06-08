@@ -45,7 +45,7 @@ HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t 
 HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
 
 /** convert an integer to serialized bytes*/
-HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data);
 
 /** convert a double to serialized bytes*/
 HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
@@ -57,7 +57,7 @@ HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data
 HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
 
 /** convert a bool to serialized bytes*/
-HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data);
 
 /** convert a char to serialized bytes*/
 HELICS_EXPORT int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
@@ -74,8 +74,8 @@ HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsData
 /** convert a real vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
 
-/** convert a real vector to serialized bytes*/
-HELICS_EXPORT int32_t helicsNamedPointToBytes(HelicsNamedPoint value, HelicsDataBuffer data);
+/** convert a named point to serialized bytes*/
+HELICS_EXPORT int32_t helicsNamedPointToBytes(const char * name, double value, HelicsDataBuffer data);
 
 /** convert a complex vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
@@ -84,13 +84,13 @@ HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSi
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
 
 /** convert a data buffer to an int*/
-HELICS_EXPORT int64_t helicsDataBufferToInt(HelicsDataBuffer data);
+HELICS_EXPORT int64_t helicsDataBufferToInteger(HelicsDataBuffer data);
 
 /** convert a data buffer to a double*/
 HELICS_EXPORT double helicsDataBufferToDouble(HelicsDataBuffer data);
 
 /** convert a data buffer to a boolean*/
-HELICS_EXPORT HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
+HELICS_EXPORT HelicsBool helicsDataBufferToBoolean(HelicsDataBuffer data);
 
 /** convert a data buffer to a char*/
 HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
@@ -123,6 +123,9 @@ HELICS_EXPORT void helicsDataBufferToVector(HelicsDataBuffer data, double values
 @param actualSize the number of complex values copied to values array
 */
 HELICS_EXPORT void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
+
+HELICS_EXPORT void
+    helicsDataBufferToNamedPoint(HelicsDataBuffer data, char* outputString, int maxStringLength, int* actualLength, double* val);
 
 /** convert the data in a data buffer to a different type representation
 @param data the buffer to convert

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsData.h"
-
+#include "internal/api_objects.h"
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../core/SmallBuffer.hpp"
 
@@ -95,7 +95,7 @@ HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
     return static_cast<HelicsDataBuffer>(newptr);
 }
 
-HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -158,7 +158,7 @@ HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, He
     }
 }
 
-int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data)
+int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -221,6 +221,21 @@ int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
     }
 }
 
+int32_t helicsNamedPointToBytes(const char *name, double val, HelicsDataBuffer data)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        return 0;
+    }
+    try {
+        helics::ValueConverter<helics::NamedPoint>::convert(helics::NamedPoint(AS_STRING_VIEW(name), val), *ptr);
+        return static_cast<int32_t>(ptr->size());
+    }
+    catch (const std::bad_alloc&) {
+        return 0;
+    }
+}
+
 int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data)
 {
     return helicsComplexToBytes(value.real, value.imag, data);
@@ -265,7 +280,7 @@ int helicsDataBufferType(HelicsDataBuffer data)
     return static_cast<int>(helics::detail::detectType(ptr->data()));
 }
 
-int64_t helicsDataBufferToInt(HelicsDataBuffer data)
+int64_t helicsDataBufferToInteger(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -287,7 +302,7 @@ double helicsDataBufferToDouble(HelicsDataBuffer data)
     return val;
 }
 
-HelicsBool helicsDataBufferToBool(HelicsDataBuffer data)
+HelicsBool helicsDataBufferToBoolean(HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -475,6 +490,37 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
 
     if (actualSize != nullptr) {
         *actualSize = length;
+    }
+}
+
+void helicsDataBufferToNamedPoint(HelicsDataBuffer data, char* outputString, int maxStringLength, int* actualLength, double* val)
+{
+    auto* ptr = getBuffer(data);
+    if (ptr == nullptr) {
+        if (actualLength != nullptr) {
+            *actualLength = 0;
+        }
+        return;
+    }
+
+    helics::NamedPoint v;
+    helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
+
+    if (outputString != nullptr && maxStringLength > 0) {
+        auto length = (std::min)(static_cast<int>(v.name.size()), maxStringLength);
+        std::memcpy(outputString, reinterpret_cast<const char*>(v.name.data()), length);
+
+        if (actualLength != nullptr) {
+            *actualLength = length;
+        }
+    } else {
+        if (actualLength != nullptr) {
+            *actualLength = 0;
+        }
+    }
+
+    if (val != nullptr) {
+        *val = v.value;
     }
 }
 

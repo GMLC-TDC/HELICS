@@ -49,10 +49,10 @@ TEST(data, toFromInt)
     auto buff = helicsCreateDataBuffer(500);
 
     int64_t v1 = 35;
-    auto cnt = helicsIntToBytes(v1, buff);
+    auto cnt = helicsIntegerToBytes(v1, buff);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_INT);
     EXPECT_GT(cnt, 0);
-    int64_t v2 = helicsDataBufferToInt(buff);
+    int64_t v2 = helicsDataBufferToInteger(buff);
     EXPECT_EQ(v1, v2);
     helicsDataBufferFree(buff);
 }
@@ -185,6 +185,26 @@ TEST(data, toFromComplexVector)
     EXPECT_EQ(v1[3].imag(), v2[7]);
     EXPECT_TRUE(std::isnan(v2[8]));
     EXPECT_EQ(v1[4].imag(), v2[9]);
+    helicsDataBufferFree(buff);
+}
+
+
+TEST(data, toFromNamedPoint)
+{
+    auto buff = helicsCreateDataBuffer(500);
+
+    
+    auto cnt = helicsNamedPointToBytes("string_thing", 45.7, buff);
+    EXPECT_GT(cnt, 0);
+   std::string v2name;
+    double v2val;
+    v2name.resize(15);
+    int asize{0};
+    EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_NAMED_POINT);
+
+    helicsDataBufferToNamedPoint(buff, v2name.data(), 15, &asize,&v2val);
+    EXPECT_STREQ(v2name.c_str(), "string_thing");
+    EXPECT_EQ(v2val, 45.7);
     helicsDataBufferFree(buff);
 }
 
