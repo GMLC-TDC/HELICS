@@ -8,9 +8,9 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [2.8.1][] - 2022-06-08
+## [2.8.1][] - 2022-06-09
 
-Final release in the 2.X series of HELICS. This release updates dependencies and a few minor fixes, no further bug fixes are expected
+Final release in the 2.X series of HELICS. This release updates dependencies and a few minor fixes, no further bug fixes are expected.
 
 ### Changed
 
