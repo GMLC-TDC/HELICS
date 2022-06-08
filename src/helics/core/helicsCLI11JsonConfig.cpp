@@ -50,7 +50,7 @@ std::vector<CLI::ConfigItem>
     std::vector<CLI::ConfigItem> results;
 
     if (j.isObject()) {
-        if (prefix.size() > maxLayers_) {
+        if (prefix.size() > maximumLayers) {
             return results;
         }
         auto fields = j.getMemberNames();
@@ -87,7 +87,7 @@ std::vector<CLI::ConfigItem>
             throw CLI::ConversionError("Failed to convert " + name);
         }
     } else {
-        throw CLI::ConversionError("You must make all top level values objects in json!");
+        throw CLI::ConversionError("You must make all top level values objects in JSON!");
     }
 
     return results;
