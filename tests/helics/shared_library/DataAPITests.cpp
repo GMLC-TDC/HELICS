@@ -105,11 +105,17 @@ TEST(data, toFromString)
     v2.resize(100);
     int asize{0};
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_STRING);
-    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferStringSize(buff));
+    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferStringSize(buff)-1);
     helicsDataBufferToString(buff, v2.data(), 100, &asize);
     EXPECT_EQ(asize, v1.size());
     v2.resize(asize);
     EXPECT_STREQ(v1.c_str(), v2.c_str());
+
+    helicsDataBufferToString(buff, v2.data(), 11, &asize);
+    EXPECT_EQ(asize, 10);
+    v2.resize(asize);
+    EXPECT_STREQ("this is an", v2.c_str());
+
     helicsDataBufferFree(buff);
 }
 
@@ -117,18 +123,17 @@ TEST(data, toFromRawString)
 {
     auto buff = helicsCreateDataBuffer(500);
 
-    std::string v1 = "this is an interesting string";
+    std::string v1 = "this is an interesting\0 string";
     auto cnt = helicsRawStringToBytes(v1.c_str(), static_cast<int>(v1.size()), buff);
     EXPECT_GT(cnt, 0);
     std::string v2;
     v2.resize(100);
     int asize{0};
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_STRING);
-    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferStringSize(buff));
-    helicsDataBufferToString(buff, v2.data(), 100, &asize);
+    helicsDataBufferToRawString(buff, v2.data(), 100, &asize);
     EXPECT_EQ(asize, v1.size());
     v2.resize(asize);
-    EXPECT_STREQ(v1.c_str(), v2.c_str());
+    EXPECT_EQ(v1, v2);
     helicsDataBufferFree(buff);
 }
 

@@ -95,11 +95,17 @@ HELICS_EXPORT HelicsBool helicsDataBufferToBoolean(HelicsDataBuffer data);
 /** convert a data buffer to a char*/
 HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
 
-/** get the length of a string if a string were to be retrieved*/
+/** get the size of memory required to retrieve a string from a data buffer this includes space for a null terminator*/
 HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
 
-/* convert a data buffer to a string*/
+/* convert a data buffer to a string including a null terminator
+NOTE:  data may contain 0 prior to the end but actualLength will the number of characters in the string
+outputString[actualLength] is a null terminator*/
 HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
+
+/* convert a data buffer to a Raw string with no null terminator
+*/
+HELICS_EXPORT void helicsDataBufferToRawString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
 /** convert a data buffer to a time*/
 HELICS_EXPORT HelicsTime helicsDataBufferToTime(HelicsDataBuffer data);
