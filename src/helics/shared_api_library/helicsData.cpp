@@ -407,7 +407,7 @@ void helicsDataBufferToRawString(HelicsDataBuffer data, char* outputString, int 
     helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
 
     auto length = (std::min)(static_cast<int>(v.size()), maxStringLen);
-    //NOLINTNEXTLINE
+    // NOLINTNEXTLINE
     std::memcpy(outputString, v.data(), length);
 
     if (actualLength != nullptr) {
