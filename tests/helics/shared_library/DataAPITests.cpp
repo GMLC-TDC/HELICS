@@ -123,7 +123,9 @@ TEST(data, toFromRawString)
 {
     auto buff = helicsCreateDataBuffer(500);
 
-    std::string v1 = "this is an interesting\0 string";
+    std::string v1 = "this is an interesting";
+    v1.push_back('\0');
+    v1.append(" string ");
     auto cnt = helicsRawStringToBytes(v1.c_str(), static_cast<int>(v1.size()), buff);
     EXPECT_GT(cnt, 0);
     std::string v2;
