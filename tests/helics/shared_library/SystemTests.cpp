@@ -32,20 +32,31 @@ TEST(other_tests, broker_global_value)
     res = helicsQueryBrokerExecute(q, brk, &err);
     EXPECT_EQ(res, globalVal2);
 
-    res = helicsQueryBrokerExecute(nullptr, brk, &err);
+    helicsBrokerDisconnect(brk, &err);
+    helicsQueryFree(q);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+    helicsBrokerFree(brk);
+}
+
+TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbroker", "--root", &err);
+    auto q = helicsCreateQuery("global_value", "testglobal");
+    auto res = helicsQueryBrokerExecute(nullptr, brk, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     res = helicsQueryBrokerExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     res = helicsQueryBrokerExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     helicsBrokerSetGlobal(brk, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
@@ -81,18 +92,40 @@ TEST(other_tests, core_global_value)
     q = helicsCreateQuery("global_value", "testglobal2");
     res = helicsQueryCoreExecute(q, cr, &err);
     EXPECT_EQ(res, globalVal2);
-    res = helicsQueryCoreExecute(nullptr, cr, &err);
+    helicsBrokerDisconnect(brk, &err);
+    helicsCoreDisconnect(cr, &err);
+
+    helicsQueryFree(q);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+}
+
+// test global value creation from a core and its error pathways
+TEST(other_tests, core_global_value_errors_nosan_ci_skip)
+{
+    helicsCloseLibrary();
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+
+    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    EXPECT_EQ(err.error_code, 0);
+    auto connected = helicsCoreConnect(cr, &err);
+    EXPECT_EQ(connected, HELICS_TRUE);
+    EXPECT_EQ(err.error_code, 0);
+    EXPECT_EQ(helicsCoreIsConnected(cr), HELICS_TRUE);
+    auto q = helicsCreateQuery("global_value", "testglobal");
+
+    auto res = helicsQueryCoreExecute(nullptr, cr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
     res = helicsQueryCoreExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
     res = helicsQueryCoreExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
     helicsCoreSetGlobal(cr, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
@@ -126,15 +159,6 @@ TEST(other_tests, federate_global_value)
     auto fed = helicsCreateValueFederate("fed0", fi, &err);
     EXPECT_EQ(err.error_code, 0);
 
-    argv[3] = "--period=frogs";  // this is meant to generate an error in command line processing
-
-    auto fi2 = helicsFederateInfoClone(fi, &err);
-    EXPECT_NE(fi2, nullptr);
-    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
-    EXPECT_NE(err.error_code, 0);
-    helicsErrorClear(&err);
-
-    helicsFederateInfoFree(fi2);
     helicsFederateInfoFree(fi);
 
     std::string globalVal = "this is a string constant that functions as a global";
@@ -161,21 +185,63 @@ TEST(other_tests, federate_global_value)
     res = helicsQueryExecuteComplete(q2, &err);
     EXPECT_STREQ(res, "false");
 
-    // a series of invalid query calls
-    res = helicsQueryExecute(nullptr, fed, &err);
+    helicsFederateFinalize(fed, &err);
+
+    helicsCoreDisconnect(cr, &err);
+    helicsBrokerDisconnect(brk, &err);
+
+    helicsQueryFree(q);
+    helicsQueryFree(q2);
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+}
+
+TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
+{
+    auto err = helicsErrorInitialize();
+    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+
+    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+
+    // test creation of federateInfo from command line arguments
+    const char* argv[4];
+    argv[0] = "";
+    argv[1] = "--corename=gcore";
+    argv[2] = "--coretype=test";
+    argv[3] = "--period=1.0";
+
+    auto fi = helicsCreateFederateInfo();
+    helicsFederateInfoLoadFromArgs(fi, 4, argv, &err);
+    EXPECT_EQ(err.error_code, 0);
+
+    auto fed = helicsCreateValueFederate("fed0", fi, &err);
+    EXPECT_EQ(err.error_code, 0);
+    argv[3] = "--period=frogs";  // this is meant to generate an error in command line processing
+
+    auto fi2 = helicsFederateInfoClone(fi, &err);
+    EXPECT_NE(fi2, nullptr);
+    helicsFederateInfoLoadFromArgs(fi2, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    helicsFederateInfoFree(fi2);
+    helicsFederateInfoFree(fi);
+
+    auto q = helicsCreateQuery("global_value", "testglobal2");
+
+    // a series of invalid query calls
+    auto res = helicsQueryExecute(nullptr, fed, &err);
+    EXPECT_NE(err.error_code, 0);
+    helicsErrorClear(&err);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     res = helicsQueryExecute(q, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     res = helicsQueryExecute(nullptr, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    EXPECT_STREQ("#invalid", res);
+    EXPECT_NE(std::string_view(res).find("error"), std::string_view::npos);
 
     helicsFederateSetGlobal(fed, nullptr, "v2", &err);
     EXPECT_NE(err.error_code, 0);
@@ -195,7 +261,6 @@ TEST(other_tests, federate_global_value)
     helicsBrokerDisconnect(brk, &err);
 
     helicsQueryFree(q);
-    helicsQueryFree(q2);
     EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
@@ -260,18 +325,27 @@ TEST(other_tests, core_creation)
     EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsCoreGetIdentifier(cr), "gcore");
 
+    helicsBrokerDisconnect(brk, &err);
+    helicsCoreDisconnect(cr, &err);
+
+    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
+}
+
+// test core creation from command line arguments
+TEST(other_tests, core_creation_error_nosan)
+{
+    auto err = helicsErrorInitialize();
+
+    const char* argv[4];
+    argv[0] = "";
     argv[1] = "--name=gcore2";
     argv[2] = "--log_level=what_logs?";
+    argv[3] = "--broker=gbrokerc";
 
     auto cr2 = helicsCreateCoreFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(cr2, nullptr);
-
-    helicsBrokerDisconnect(brk, &err);
-    helicsCoreDisconnect(cr, &err);
-
-    EXPECT_EQ(helicsBrokerIsConnected(brk), HELICS_FALSE);
 }
 
 // test broker creation from command line arguments
@@ -289,18 +363,27 @@ TEST(other_tests, broker_creation)
     EXPECT_EQ(err.error_code, 0);
     EXPECT_STREQ(helicsBrokerGetIdentifier(brk), "gbrokerc");
 
+    helicsBrokerDisconnect(brk, &err);
+}
+
+// test broker creation error pathway
+TEST(other_tests, broker_creation_nosan)
+{
+    auto err = helicsErrorInitialize();
+
+    const char* argv[4];
+    argv[0] = "";
     argv[1] = "--name=gbrokerc2";
     argv[2] = "--log_level=what_logs?";
+    argv[3] = "--root";
 
     auto brk2 = helicsCreateBrokerFromArgs("test", nullptr, 4, argv, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
     EXPECT_EQ(brk2, nullptr);
-
-    helicsBrokerDisconnect(brk, &err);
 }
 
-TEST(federate, federateGeneratedLocalError)
+TEST(federate_tests, federateGeneratedLocalError_nosan)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -324,7 +407,7 @@ TEST(federate, federateGeneratedLocalError)
     helicsFederateDestroy(fed1);
 }
 
-TEST(federate, federateGeneratedGlobalError)
+TEST(federate, federateGeneratedGlobalError_nosan)
 {
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreType(fi, HELICS_CORE_TYPE_TEST, nullptr);
@@ -346,7 +429,7 @@ TEST(federate, federateGeneratedGlobalError)
 }
 
 // test generating a global from a broker and some of its error pathways
-TEST(other_tests, broker_after_close)
+TEST(other_tests, broker_after_close_nosan)
 {
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbroker_test", "--root", &err);

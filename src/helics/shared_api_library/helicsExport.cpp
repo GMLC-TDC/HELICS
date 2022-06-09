@@ -897,7 +897,7 @@ void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -988,9 +988,9 @@ void helicsAbort(int errorCode, const char* message)
     }
 }
 
-static const char* invalidQueryString = "Query object is invalid";
+static constexpr const char* invalidQueryString = "Query object is invalid";
 
-static const int validQueryIdentifier = 0x2706'3885;
+static constexpr int validQueryIdentifier = 0x2706'3885;
 
 static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
 {
@@ -1018,37 +1018,48 @@ HelicsQuery helicsCreateQuery(const char* target, const char* query)
     return reinterpret_cast<void*>(queryObj);
 }
 
-constexpr auto invalidStringConst = "#invalid";
+constexpr auto invalidQueryObConst = "{{\n  \"error\":{{\n    \"code\":400,\n    \"message\":\"query object is not valid\"\n  }}\n}}";
+constexpr auto invalidFedObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"federate object is not valid\"\n  }}\n}}";
+constexpr auto queryErrorString = "{{\n  \"error\":{{\n    \"code\":500,\n    \"message\":\"Error on query Evaluation\"\n  }}\n}}";
 
 const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
-        return invalidStringConst;
+        return invalidFedObConst;
     }
 
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
-    if (queryObj->target.empty()) {
-        queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
-    } else {
-        queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
-    }
+    try {
+        if (queryObj->target.empty()) {
+            queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
+        } else {
+            queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
+        }
 
-    return queryObj->response.c_str();
+        return queryObj->response.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    return queryErrorString;
+    // LCOV_EXCL_START
 }
 
 const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err)
 {
     auto* coreObj = getCore(core, err);
     if (coreObj == nullptr) {
-        return invalidStringConst;
+        constexpr auto invalidCoreObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Core object is not valid\"\n  }}\n}}";
+        return invalidCoreObConst;
     }
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
     try {
         queryObj->response = coreObj->query(queryObj->target, queryObj->query, queryObj->mode);
@@ -1058,7 +1069,7 @@ const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsErr
     catch (...) {
         helicsErrorHandler(err);
     }
-    return invalidStringConst;
+    return queryErrorString;
     // LCOV_EXCL_START
 }
 
@@ -1066,12 +1077,14 @@ const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, Hel
 {
     auto* brokerObj = getBroker(broker, err);
     if (brokerObj == nullptr) {
-        return invalidStringConst;
+        constexpr auto invalidBrokerObConst =
+            "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Broker object is not valid\"\n  }}\n}}";
+        return invalidBrokerObConst;
     }
 
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
     try {
         queryObj->response = brokerObj->query(queryObj->target, queryObj->query, queryObj->mode);
@@ -1081,18 +1094,19 @@ const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, Hel
     catch (...) {
         helicsErrorHandler(err);
     }
-    return invalidStringConst;
+    return queryErrorString;
     // LCOV_EXCL_STOP
 }
 
 void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err)
 {
-    auto fedObj = getFedSharedPtr(fed, err);
-    if (fedObj == nullptr) {
-        return;
-    }
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
+        return;
+    }
+    auto fedObj = getFedSharedPtr(fed, err);
+    if (fedObj == nullptr) {
+        queryObj->response = invalidFedObConst;
         return;
     }
     try {
@@ -1115,15 +1129,23 @@ const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err)
 {
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
-    if (queryObj->asyncIndexCode.isValid()) {
-        queryObj->response = queryObj->activeFed->queryComplete(queryObj->asyncIndexCode);
+    try {
+        if (queryObj->asyncIndexCode.isValid()) {
+            queryObj->response = queryObj->activeFed->queryComplete(queryObj->asyncIndexCode);
+        }
+        queryObj->activeAsync = false;
+        queryObj->activeFed = nullptr;
+        queryObj->asyncIndexCode = helics::QueryId();
+        return queryObj->response.c_str();
     }
-    queryObj->activeAsync = false;
-    queryObj->activeFed = nullptr;
-    queryObj->asyncIndexCode = helics::QueryId();
-    return queryObj->response.c_str();
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    return queryErrorString;
+    // LCOV_EXCL_STOP
 }
 
 HelicsBool helicsQueryIsCompleted(HelicsQuery query)
@@ -1132,11 +1154,18 @@ HelicsBool helicsQueryIsCompleted(HelicsQuery query)
     if (queryObj == nullptr) {
         return HELICS_FALSE;
     }
-    if (queryObj->asyncIndexCode.isValid()) {
-        auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-        return (res) ? HELICS_TRUE : HELICS_FALSE;
+    try {
+        if (queryObj->asyncIndexCode.isValid()) {
+            auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
+            return (res) ? HELICS_TRUE : HELICS_FALSE;
+        }
+        return HELICS_FALSE;
     }
-    return HELICS_FALSE;
+    // LCOV_EXCL_START
+    catch (...) {
+        return HELICS_FALSE;
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsQuerySetTarget(HelicsQuery query, const char* target, HelicsError* err)

@@ -24,8 +24,9 @@ namespace apps {
     class TypedBrokerServer {
       public:
         virtual ~TypedBrokerServer() = default;
-        /** start the server*/
-        virtual void startServer(const Json::Value* val) = 0;
+        /** start the server, the server may require a shared pointer to keep the data alive */
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) = 0;
         /** stop the server*/
         virtual void stopServer() = 0;
         /** process some potential command line arguments for the typed server*/

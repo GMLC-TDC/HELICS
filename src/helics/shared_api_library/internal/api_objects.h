@@ -13,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/TripWire.hpp"
 
 #include <deque>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <string>

@@ -51,6 +51,7 @@ struct FederateTestFixture {
     HelicsError err;
 
     std::string ctype;
+    bool NoFree{false};
 
   private:
     static bool hasIndexCode(const std::string& type_name);

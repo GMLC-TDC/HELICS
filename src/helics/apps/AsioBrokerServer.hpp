@@ -43,7 +43,8 @@ namespace apps {
         AsioBrokerServer() = default;
         explicit AsioBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val) override;
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
         virtual void processArgs(std::string_view args) override;
@@ -95,7 +96,10 @@ namespace apps {
         void enableTcpServer(bool /*enabled*/) {}
         void enableUdpServer(bool /*enabled*/) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* /*val*/) override {}
+        virtual void startServer(const Json::Value* /*val*/,
+                                 const std::shared_ptr<TypedBrokerServer>& /*ptr*/) override
+        {
+        }
         /** stop the server*/
         virtual void stopServer() override {}
     };

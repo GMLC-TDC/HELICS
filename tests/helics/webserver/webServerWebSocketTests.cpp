@@ -54,7 +54,7 @@ class webTest: public ::testing::Test {
         webs->enableWebSocketServer(true);
         config["websocket"] = Json::objectValue;
         config["websocket"]["port"] = 26247;
-        webs->startServer(&config);
+        webs->startServer(&config, webs);
 
         // These objects perform our I/O
         tcp::resolver resolverObj(ioc);

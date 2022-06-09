@@ -58,7 +58,7 @@ void BrokerServer::startServers()
         config_ = std::make_unique<Json::Value>();
     }
     if (zmq_server || zmq_ss_server) {
-        auto zmqs = std::make_unique<zmqBrokerServer>(server_name_);
+        auto zmqs = std::make_shared<zmqBrokerServer>(server_name_);
         if (zmq_server) {
             zmqs->enableZmqServer(true);
         }
@@ -71,7 +71,7 @@ void BrokerServer::startServers()
         servers.push_back(std::move(zmqs));
     }
     if (tcp_server || udp_server) {
-        auto asios = std::make_unique<AsioBrokerServer>(server_name_);
+        auto asios = std::make_shared<AsioBrokerServer>(server_name_);
         if (tcp_server) {
             asios->enableTcpServer(true);
             if (!mTcpArgs.empty()) {
@@ -89,7 +89,7 @@ void BrokerServer::startServers()
 
     if (http_server || websocket_server) {
 #ifdef HELICS_ENABLE_WEBSERVER
-        auto webs = std::make_unique<WebServer>(server_name_);
+        auto webs = std::make_shared<WebServer>(server_name_);
         if (http_server) {
             webs->enableHttpServer(true);
             if (!mHttpArgs.empty()) {
@@ -108,7 +108,7 @@ void BrokerServer::startServers()
 #endif
     }
     for (auto& server : servers) {
-        server->startServer(config_.get());
+        server->startServer(config_.get(), server);
     }
 }
 

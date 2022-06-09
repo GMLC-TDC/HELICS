@@ -9,6 +9,15 @@ aliases:
       eval cmake .. ${CMAKE_FLAGS}
       make -j 4
 
+  - &setup_helics_low_mem
+    name: setup_helics
+    environment:
+    command: |
+      mkdir -p build
+      cd build
+      eval cmake .. ${CMAKE_FLAGS}
+      make -j 2
+
   - &run_octave_tests
     name: run_octave_tests
     command: |
@@ -75,7 +84,7 @@ jobs:
 
     steps:
       - checkout
-      - run: *setup_helics
+      - run: *setup_helics_low_mem
       - run: *run_helics_sanitizer_tests
 
   helicsgccASan:
@@ -222,23 +231,28 @@ workflows:
       - helicsTSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only:
+                - sanitizer_tests
       - helicsASan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only:
+                - sanitizer_tests
       - helicsgccASan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only:
+                - sanitizer_tests
       - helicsgccTSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only:
+                - sanitizer_tests
       - helicsMSan:
           filters:
             branches:
-              only: /sanitizer\/.*/
+              only:
+                - sanitizer_tests
   dailies:
     jobs:
       - helicsTumbleweed:

@@ -27,7 +27,8 @@ namespace apps {
         WebServer() = default;
         explicit WebServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val) override;
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
         /** process any command line arguments*/
@@ -38,8 +39,7 @@ namespace apps {
         void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; }
 
       private:
-        void mainLoop();
-
+        void mainLoop(std::shared_ptr<WebServer> keepAlive);
         std::atomic<bool> running{false};
         std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;
