@@ -40,6 +40,6 @@ ans = 3.x.x (20XX-XX-XX)
 
 Octave 4.2 will require swig 3.0.12, Octave 4.4 and 5.0 and higher will require swig 4.0 or higher. The Octave interface has built and run smoothly on Linux systems and on the Windows system with Octave 5.0 installed through Chocolatey. There is a regular CI test that builds and tests the interface on Octave 4.2.
 
-## HELICS with C#
+## HELICS with C Sharp
 
-C# is supported through SWIG.  This requires swig being installed and generating the CMake for HELICS with HELICS_BUILD_CSHARP_INTERFACE=ON.  If in Visual studio this will generate the appropriate files for C# usage.  
+C\# is supported through SWIG.  This requires swig being installed and generating the CMake for HELICS with HELICS_BUILD_CSHARP_INTERFACE=ON.  If in Visual studio this will generate the appropriate files for C# usage.  
