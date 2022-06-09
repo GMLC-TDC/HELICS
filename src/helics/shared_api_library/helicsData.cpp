@@ -379,11 +379,11 @@ int helicsDataBufferStringSize(HelicsDataBuffer data)
     }
     switch (helics::detail::detectType(ptr->data())) {
         case helics::DataType::HELICS_STRING:
-            return static_cast<int>(helics::detail::getDataSize(ptr->data()))+1;
+            return static_cast<int>(helics::detail::getDataSize(ptr->data())) + 1;
         default: {
             std::string v;
             helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
-            return static_cast<int>(v.size())+1;
+            return static_cast<int>(v.size()) + 1;
         } break;
     }
 }
@@ -435,7 +435,7 @@ void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int max
 
     auto length = (std::min)(static_cast<int>(v.size()), maxStringLen);
     std::memcpy(outputString, v.data(), length);
-    
+
     // add a null terminator
     if (length >= maxStringLen) {
         --length;
@@ -445,8 +445,6 @@ void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int max
         *actualLength = length;
     }
 }
-
-
 
 int helicsDataBufferVectorSize(HelicsDataBuffer data)
 {

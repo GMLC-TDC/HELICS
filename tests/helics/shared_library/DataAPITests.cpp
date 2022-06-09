@@ -105,7 +105,7 @@ TEST(data, toFromString)
     v2.resize(100);
     int asize{0};
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_STRING);
-    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferStringSize(buff)-1);
+    EXPECT_EQ(static_cast<int>(v1.size()), helicsDataBufferStringSize(buff) - 1);
     helicsDataBufferToString(buff, v2.data(), 100, &asize);
     EXPECT_EQ(asize, v1.size());
     v2.resize(asize);

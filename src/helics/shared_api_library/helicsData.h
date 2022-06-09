@@ -104,7 +104,7 @@ outputString[actualLength] is a null terminator*/
 HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
 /* convert a data buffer to a Raw string with no null terminator
-*/
+ */
 HELICS_EXPORT void helicsDataBufferToRawString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
 /** convert a data buffer to a time*/
