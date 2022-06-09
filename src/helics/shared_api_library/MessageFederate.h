@@ -720,11 +720,11 @@ HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, H
  * Set the data payload of a message as a string.
  *
  * @param message The message object in question.
- * @param str A string containing the message data.
+ * @param data A null terminated string containing the message data.
  *
  * @param[in,out] err An error object to fill out in case of an error.
  */
-HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* data, HelicsError* err);
 
 /**
  * Set the data payload of a message as raw data.
