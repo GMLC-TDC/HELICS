@@ -19,7 +19,7 @@ extern "C" {
 /** create a helics managed data buffer with initial capacity*/
 HELICS_EXPORT HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity);
 
-/** check whether a buffer is Valid*/
+/** check whether a buffer is valid*/
 HELICS_EXPORT HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data);
 
 /** wrap user data in a buffer object*/
@@ -53,7 +53,7 @@ HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 /** convert a string to serialized bytes*/
 HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
 
-/** convert a raw string(may contain nulls) to serialized bytes*/
+/** convert a raw string (may contain nulls) to serialized bytes*/
 HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
 
 /** convert a bool to serialized bytes*/
@@ -104,7 +104,7 @@ HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputS
 /** convert a data buffer to a time*/
 HELICS_EXPORT HelicsTime helicsDataBufferToTime(HelicsDataBuffer data);
 
-/** convert a data buffer to a time*/
+/** convert a data buffer to a complex object*/
 HELICS_EXPORT HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data);
 
 /** convert a data buffer to complex values*/
@@ -119,7 +119,7 @@ HELICS_EXPORT void helicsDataBufferToVector(HelicsDataBuffer data, double values
 /** convert a data buffer to complex double vector values
 @param data the buffer containing data
 @param values the storage for the converted data
-@param maxlen the number of complex values the the values vector can hold
+@param maxlen the number of complex values that the values vector can hold
 @param actualSize the number of complex values copied to values array
 */
 HELICS_EXPORT void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
