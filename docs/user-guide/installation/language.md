@@ -42,4 +42,4 @@ Octave 4.2 will require swig 3.0.12, Octave 4.4 and 5.0 and higher will require 
 
 ## HELICS with C Sharp
 
-C\# is supported through SWIG.  This requires swig being installed and generating the CMake for HELICS with HELICS_BUILD_CSHARP_INTERFACE=ON.  If in Visual studio this will generate the appropriate files for C# usage.  
+C\# is supported through SWIG. This requires swig being installed and generating the CMake for HELICS with HELICS_BUILD_CSHARP_INTERFACE=ON. If in Visual studio this will generate the appropriate files for C# usage.
