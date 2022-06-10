@@ -99,7 +99,7 @@ HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
         return nullptr;
     }
     auto* newptr = new helics::SmallBuffer(*ptr);
-    newptr->userKey = bufferValidationIdentifier;
+    newptr->userKey = gBufferValidationIdentifier;
     return static_cast<HelicsDataBuffer>(newptr);
 }
 

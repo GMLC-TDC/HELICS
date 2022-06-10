@@ -279,7 +279,7 @@ HelicsInput
 
     try {
         auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr = &(fedObj->registerInput(AS_STRING_VIEW(key),
+        inp->inputPtr = &(fedObj->registerGlobalInput(AS_STRING_VIEW(key),
                                                 helics::typeNameStringRef(static_cast<helics::DataType>(type)),
                                                 AS_STRING_VIEW(units)));
         inp->fedptr = std::move(fedObj);

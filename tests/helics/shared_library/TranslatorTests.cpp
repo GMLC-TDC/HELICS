@@ -114,7 +114,8 @@ TEST_F(translator, core_translator_reg)
     helicsCloseLibrary();
 }
 
-TEST_P(translator_simple_type, message_filter_function)
+/*
+TEST_P(translator_simple_type, message_translator_function)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
     AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
@@ -176,7 +177,8 @@ TEST_P(translator_simple_type, message_filter_function)
     CE(state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
-
+*/
+/*
 TEST_P(translator_simple_type, function_mObj)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
@@ -239,10 +241,12 @@ TEST_P(translator_simple_type, function_mObj)
     CE(state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
-/** test a filter operator
+*/
+/** test a translator operator
 The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
 simulation
 */
+/*
 TEST_P(translator_simple_type, function_two_stage)
 {
     HelicsBroker broker = AddBroker(GetParam(), 3);
@@ -321,151 +325,88 @@ TEST_P(translator_simple_type, function_two_stage)
     CE(state = helicsFederateGetState(fFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
-
-/** test two filter operators
-The filter operator delays the message by 2.5 seconds meaning it should arrive by 3 sec into the
-simulation
 */
 
-TEST_P(translator_simple_type, function2)
+void toMC(HelicsDataBuffer value, HelicsMessage message, void* /*userData*/)
 {
-    HelicsBroker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
-
-    auto fFed = GetFederateAt(0);
-    auto mFed = GetFederateAt(1);
-
-    auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
-    auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "", &err);
-    EXPECT_EQ(err.error_code, HELICS_OK);
-
-    CE(auto f1 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter1", &err));
-    helicsFilterAddSourceTarget(f1, "port1", nullptr);
-    EXPECT_TRUE(f1 != nullptr);
-    CE(helicsFilterSet(f1, "delay", 2.5, &err));
-
-    CE(auto f2 = helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter2", &err));
-    helicsFilterAddSourceTarget(f2, "port2", nullptr);
-    EXPECT_TRUE(f2 != nullptr);
-    CE(helicsFilterSet(f2, "delay", 2.5, &err));
-    // this is expected to fail since a regular filter doesn't have a delivery endpoint
-    helicsFilterAddDeliveryEndpoint(f2, "port1", &err);
-    EXPECT_NE(err.error_code, 0);
-    helicsErrorClear(&err);
-
-    CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
-    CE(helicsFederateEnterExecutingMode(mFed, &err));
-    CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
-
-    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
-    std::string data(500, 'a');
-    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
-
-    CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
-    CE(helicsFederateRequestTime(fFed, 1.0, &err));
-    CE(helicsFederateRequestTimeComplete(mFed, &err));
-
-    auto res = helicsFederateHasMessage(mFed);
-    EXPECT_TRUE(!res);
-    CE(helicsEndpointSendBytesTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
-    CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
-    CE(helicsFederateRequestTime(fFed, 2.0, &err));
-    CE(helicsFederateRequestTimeComplete(mFed, &err));
-    ASSERT_TRUE(!helicsEndpointHasMessage(p2));
-    // there may be something wrong here yet but this test isn't the one to find it and
-    // this may prevent spurious errors for now.
-    std::this_thread::yield();
-    CE(helicsFederateRequestTime(mFed, 3.0, &err));
-
-    ASSERT_TRUE(helicsEndpointHasMessage(p2));
-
-    auto m2 = helicsEndpointGetMessage(p2);
-    EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
-    EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
-
-    EXPECT_TRUE(!helicsEndpointHasMessage(p1));
-    CE(helicsFederateRequestTime(mFed, 4.0, &err));
-    EXPECT_TRUE(helicsEndpointHasMessage(p1));
-    CE(helicsFederateFinalizeAsync(mFed, &err));
-    CE(helicsFederateFinalize(fFed, &err));
-    CE(helicsFederateFinalizeComplete(mFed, &err));
-    CE(state = helicsFederateGetState(fFed, &err));
-    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
+    double val = helicsDataBufferToDouble(value);
+    helicsMessageSetString(message, std::to_string(val).c_str(), nullptr);
 }
 
-TEST_P(translator_simple_type, message_filter_function3)
+void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
+{
+    const auto *str = helicsMessageGetString(message);
+    double v = atof(str) + 9.0;
+    helicsDoubleToBytes(v, value);
+}
+
+TEST_P(translator_simple_type, custom_translator)
 {
     HelicsBroker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "filter");
-    AddFederates(helicsCreateMessageFederate, GetParam(), 1, broker, 1.0, "message");
+    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "value");
+    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "message");
 
-    auto fFed = GetFederateAt(0);
+    auto vFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    auto p1 = helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
-    auto p2 = helicsFederateRegisterGlobalEndpoint(mFed, "port2", "random", &err);
+    auto e1 = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
+ 
     EXPECT_EQ(err.error_code, HELICS_OK);
 
-    CE(auto f1 =
-           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_CUSTOM, "filter1", &err));
-    EXPECT_TRUE(f1 != nullptr);
-    helicsFilterAddSourceTarget(f1, "port1", nullptr);
-    CE(auto f2 =
-           helicsFederateRegisterGlobalFilter(fFed, HELICS_FILTER_TYPE_DELAY, "filter2", &err));
-    helicsFilterAddSourceTarget(f2, "port1", nullptr);
+    auto p1 =
+        helicsFederateRegisterGlobalPublication(vFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
-    helicsFederateRegisterEndpoint(fFed, "fout", "", &err);
-    CE(auto f3 =
-           helicsFederateRegisterFilter(fFed, HELICS_FILTER_TYPE_RANDOM_DELAY, "filter3", &err));
-    helicsFilterAddSourceTarget(f3, "filter0/fout", nullptr);
+    auto i1 = helicsFederateRegisterGlobalInput(vFed, "in1", HELICS_DATA_TYPE_DOUBLE, "V", &err);
 
-    CE(helicsFilterSet(f2, "delay", 2.5, &err));
+    EXPECT_EQ(err.error_code, HELICS_OK);
 
-    CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
+    CE(auto t1 =
+           helicsFederateRegisterGlobalTranslator(mFed, HELICS_TRANSLATOR_TYPE_CUSTOM, "t1", &err));
+    EXPECT_TRUE(t1 != nullptr);
+
+    helicsTranslatorAddSourceEndpoint(t1, "port1", nullptr);
+    helicsTranslatorAddDestinationEndpoint(t1, "port1", nullptr);
+
+    helicsTranslatorAddPublicationTarget(t1, "pub1", nullptr);
+    helicsTranslatorAddInputTarget(t1, "in1", nullptr);
+
+    helicsTranslatorSetCustomCallback(t1, toMC, toVC, nullptr, &err);
+
+    EXPECT_EQ(err.error_code, HELICS_OK);
+
+    CE(helicsFederateEnterExecutingModeAsync(vFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));
-    CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
+    CE(helicsFederateEnterExecutingModeComplete(vFed, &err));
 
-    CE(HelicsFederateState state = helicsFederateGetState(fFed, &err));
+    CE(HelicsFederateState state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
-    std::string data = "hello world";
-    CE(helicsEndpointSendBytesTo(p1, data.c_str(), static_cast<int>(data.size()), "port2", &err));
+    std::string data = "45.7";
+    CE(helicsEndpointSendBytes(e1, data.c_str(), static_cast<int>(data.size()), &err));
+
+    helicsPublicationPublishDouble(p1, 99.23, &err);
 
     CE(helicsFederateRequestTimeAsync(mFed, 1.0, &err));
-    CE(helicsFederateRequestTime(fFed, 1.0, &err));
+    CE(helicsFederateRequestTime(vFed, 1.0, &err));
     CE(helicsFederateRequestTimeComplete(mFed, &err));
 
     auto res = helicsFederateHasMessage(mFed);
-    EXPECT_TRUE(!res);
-    CE(helicsEndpointSendBytesTo(p2, data.c_str(), static_cast<int>(data.size()), "port1", &err));
-    CE(helicsFederateRequestTimeAsync(mFed, 2.0, &err));
-    CE(helicsFederateRequestTime(fFed, 2.0, &err));
-    CE(helicsFederateRequestTimeComplete(mFed, &err));
-    EXPECT_TRUE(!helicsEndpointHasMessage(p2));
-    // there may be something wrong here yet but this test isn't the one to find it and
-    // this may prevent spurious errors for now.
-    std::this_thread::yield();
-    CE(helicsFederateRequestTimeAsync(mFed, 3.0, &err));
-    CE(helicsFederateRequestTime(fFed, 3.0, &err));
-    CE(helicsFederateRequestTimeComplete(mFed, &err));
+    EXPECT_TRUE(res);
 
-    EXPECT_TRUE(helicsEndpointHasMessage(p2));
 
-    auto m2 = helicsEndpointGetMessage(p2);
-    EXPECT_STREQ(helicsMessageGetSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "port1");
-    EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
-    EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
-    EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
+    EXPECT_TRUE(helicsInputIsUpdated(i1)==HELICS_TRUE);
 
-    EXPECT_TRUE(helicsEndpointHasMessage(p1));
+    double v3 = helicsInputGetDouble(i1, nullptr);
+    EXPECT_DOUBLE_EQ(v3, 54.7);
+    auto m2 = helicsEndpointGetMessage(e1);
+    EXPECT_STREQ(helicsMessageGetSource(m2), "t1");
+    EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "pub1");
+    EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
+    
+    EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
+    EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
     CE(helicsFederateFinalize(mFed, &err));
-    CE(helicsFederateFinalize(fFed, &err));
-    CE(state = helicsFederateGetState(fFed, &err));
+    CE(helicsFederateFinalize(vFed, &err));
+    CE(state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
