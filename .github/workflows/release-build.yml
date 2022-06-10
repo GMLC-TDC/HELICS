@@ -57,13 +57,13 @@ jobs:
     if: (github.event.action != 'helics-release-build') || (contains(github.event.client_payload.packages, 'msvc') || contains(github.event.client_payload.packages, 'everything'))
     strategy:
       matrix:
-        os: [windows-2016, windows-latest]
+        os: [windows-2016, windows-2019]
         arch: [x64]
         include:
           - os: windows-2016
             cmake_gen: 'Visual Studio 15 2017'
             msvc_ver: 'msvc2017'
-          - os: windows-latest
+          - os: windows-2019
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
     steps:
@@ -121,13 +121,13 @@ jobs:
         id: [windows-x64, windows-x86, macos-x64, linux-x64]
         include:
           - id: windows-x64
-            os: windows-latest
+            os: windows-2019
             arch: x64
             cpack_gen: NSIS;ZIP
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: windows-x86
-            os: windows-latest
+            os: windows-2019
             arch: x86
             cpack_gen: ZIP
             cmake_gen: 'Visual Studio 16 2019'
@@ -212,12 +212,12 @@ jobs:
         id: [windows-x86, windows-x64, macos-x64, ubuntu-x64]
         include:
           - id: windows-x86
-            os: windows-latest
+            os: windows-2019
             arch: x86
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
           - id: windows-x64
-            os: windows-latest
+            os: windows-2019
             arch: x64
             cmake_gen: 'Visual Studio 16 2019'
             msvc_ver: 'msvc2019'
