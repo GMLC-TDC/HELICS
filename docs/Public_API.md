@@ -47,7 +47,7 @@ The public API includes the following
 
   - All C library operations are merged into a single header `helics.h`
   - A `helics_api.h` header is available for generating interfaces which strips out import declarations and comments. The C shared library API is the primary driver of versioning and changes to that will be considered in all versioning decisions.
-  - Translator and helicsData API's and methods are in Beta and subject to revision until the HELICS 3.3 release comments or bugs are welcome
+  - Translator and helicsData API's and methods are in Beta and subject to revision until the HELICS 3.3 release comments or bugs are welcome, the 3.2.1 release includes updates to the API's and is mostly considered feature complete though still subject to reivisions.
 
 - App Library
 

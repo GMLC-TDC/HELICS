@@ -141,7 +141,7 @@ std::uint64_t getTotalSystemMemory()
 std::string os_info()
 {
     std::string osInfo;
-    struct utsname details = {};
+    utsname details = {};
 
     int ret = uname(&details);
 

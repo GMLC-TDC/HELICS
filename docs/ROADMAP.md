@@ -2,30 +2,31 @@
 
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library. All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
-## \[2.8.1\] ~ 2022-05-20
 
-This will be the last of the 2.X series releases
+## \[3.3\] ~ Late July 2022
 
-Mainly includes any relevant bug fixes and other minor tweaks for compatibility, and a final refresh of the third-party libraries to bring them up to date.
+Performance and Usability improvements related to the Domain API requirements
 
-## \[3.2.1\] ~ 2022-05-28
-
-Mostly refinement of the 3.2 release, additional testing, and bug fixes
-
-- Additional refinement on Translators and their interfaces
-- Additional refinement and development of the data API in the C based interface
-- Further use of string_view in the C++ interfaces
-- Separate out Matlab HELICS interface in Matlab oriented way vs current swig build
-- additional testing of the global time coordinator
-
-## \[3.3\] ~ July 2022
-
-Mostly things that didn't make it into the 3.2 release and some features related to performance
-
-- Full Dynamic Federation support (Observer feds in 3.1)
+- Additional Dynamic Federation support
 - Single thread cores (partial at release)
 - Full xSDK compatibility
-- Plugin architecture for user defined cores
 - Performance improvements
-- Bug fixes, tests and tuning related to HELICS 3 increased use.
-- Update of the minimum compiler, CMake, and library requirements.
+- Update of the minimum compiler, and minimum CMake version.
+- Iteration mode for entering initializing mode
+- Alias operations
+- wildcard support for subscribing
+- Catchall interface of some type
+- scheduled small federates required for supporting a huge number of federates
+- Separate Java Interface
+- Observer App
+
+## \[3.4\] ~ October 2022
+
+- Full Dynamic Federation support
+- Single thread cores (full)
+- Plugin architecture for user defined cores
+- enable mesh networking in HELICS
+- enable data aggregation
+- separate octave interface
+
+## \[3.5\] ~ December 2022
