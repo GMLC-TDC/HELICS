@@ -10,32 +10,32 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.2.1][] - 2022-06-11
 
-The Matlab interface to HELICS has been moved to [matHELICS](http://www.github.com/GMLC_TDC/matHELICS), the C++ interface now uses `std::string_view` in nearly all places, and the translator C API, and the dataBuffer API to the C interface were fleshed out a bit more and will be finalized in the 3.3 release.  Subsequent releases will change the minimum compiler requirements to build HELICS to Visual Studio 2019,  GCC 8.0, Clang 7, Xcode 11.0, and CMake 3.11.  
+The Matlab interface to HELICS has been moved to [matHELICS](http://www.github.com/GMLC_TDC/matHELICS), the C++ interface now uses `std::string_view` in nearly all places, and the translator C API, and the dataBuffer API to the C interface were fleshed out a bit more and will be finalized in the 3.3 release. Subsequent releases will change the minimum compiler requirements to build HELICS to Visual Studio 2019, GCC 8.0, Clang 7, Xcode 11.0, and CMake 3.11.
 
 ### Fixed
 
 - A bug related to iterations and the `wait_for_current_time` flag in which a deadlock may occur if the flag were set and another federate was requesting iterations at time zero.
-- A bug which could cause a deadlock if a very large number of iterations occured
+- A bug which could cause a deadlock if a very large number of iterations occurred
 - A naming bug in the creation of globalInput objects through the C API.
 - Fixed some potential race conditions in the Webserver
 - Fixed some race conditions and potential segmentation faults when running the C shared library tests
 - Fix some tests that were failing when executed without ZMQ support.
 - Fix the symbol visibility on Linux systems to reduce the number of visible symbols in the C shared library
 - Fix an issue with very long file names when used for configuration
-- Fix a race condition and deadlock potential in the log buffer tests.  
+- Fix a race condition and deadlock potential in the log buffer tests.
 - Fix a Typo in `HELICS_DEPRECATED` use.
 
 ### Changed
 
 - Docker images were updated to be based on Ubuntu 22.04.
-- All string interfaces in the C++ interface were altered to use `std::string_view` instead of `const std::string &` this corresponds with updates in some third party libraries to better take advantage of the capabilities of std::string_view.  The exception to this is strings which reference file names or file contents.  These have been left as std::string to match up with iostreams and other file interfaces.
+- All string interfaces in the C++ interface were altered to use `std::string_view` instead of `const std::string &` this corresponds with updates in some third party libraries to better take advantage of the capabilities of std::string_view. The exception to this is strings which reference file names or file contents. These have been left as std::string to match up with iostreams and other file interfaces.
 - Updated the Google test version in use.
 - Change the symbol visibility for mac systems to be explicitly limited to the HELICS related operations.
 - Changed the signal abort code to match standard SIGINT codes
 - Some enumerations used inside the CoreLibrary were updated to better match the Style Guide
 - Updated the Circle-CI build tests to use more recent compilers and tweak the tests to be more appropriate to test being executed.
-- Update the Units, frozen, asio, filesystem, and spdlog libraries to recent releases.  
-- Updated support CMake 3.23, Boost 1.79, and Visual Studio 2022.  
+- Update the Units, frozen, asio, filesystem, and spdlog libraries to recent releases.
+- Updated support CMake 3.23, Boost 1.79, and Visual Studio 2022.
 
 ### Added
 

@@ -2,7 +2,6 @@
 
 This document contains tentative plans for changes and improvements of note in upcoming versions of the HELICS library. All dates are approximate and subject to change, but this is a snapshot of the current planning thoughts. See the [projects](https://github.com/GMLC-TDC/HELICS/projects) for additional details
 
-
 ## \[3.3\] ~ Late July 2022
 
 Performance and Usability improvements related to the Domain API requirements

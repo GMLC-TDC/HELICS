@@ -20,7 +20,6 @@ Final release in the 2.X series of HELICS. This release updates dependencies and
 - update boost support to 1.79
 - update CMake supported versions to 3.23
 
-
 ## [2.8.0][] - 2021-09-17
 
 Final Minor release in the 2.X series of HELICS. This includes profiling capabilities and a compatibility layer for future compatibility through the "--json" flag. There may be more bug fix releases but no major new features will be added to HELICS 2.
