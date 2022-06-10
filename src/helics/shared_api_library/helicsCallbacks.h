@@ -98,7 +98,6 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  void* userdata,
                                                  HelicsError* err);
 
-
 /**
  * Set a general callback for a custom translator.
  *
@@ -107,20 +106,20 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
  * @param translator The translator object to set the callbacks for.
  *  * @param toMessageCall A callback with signature void(HelicsDataBuffer, HelicsMessage, void *);
  *                 The function arguments are raw Value data, the messageObject to fill out and a pointer to user data.
- *                 
+ *
  * @param toValueCall A callback with signature void(HelicsMessage, HelicsDataBuffer, void *);
  *                 The function arguments are a message object, the data buffer to fill out and a pointer to user data.
- *                 
+ *
  * @param userdata A pointer to user data that is passed to the functions when executing.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
 HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator,
-                                                 void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage message, void* userData),
-                                                 void (*toValueCall)(HelicsMessage message, HelicsDataBuffer value, void* userData),
-                                                 void* userdata,
-                                                 HelicsError* err);
+                                                     void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage message, void* userData),
+                                                     void (*toValueCall)(HelicsMessage message, HelicsDataBuffer value, void* userData),
+                                                     void* userdata,
+                                                     HelicsError* err);
 
 /**
  * Set callback for queries executed against a federate.

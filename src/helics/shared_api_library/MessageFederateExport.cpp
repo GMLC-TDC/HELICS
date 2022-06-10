@@ -784,7 +784,6 @@ void helicsEndpointAddDestinationFilter(HelicsEndpoint end, const char* filterNa
     // LCOV_EXCL_STOP
 }
 
-
 HelicsMessage wrapMessage(std::unique_ptr<helics::Message>& mess)
 {
     mess->messageValidation = messageKeyCode;

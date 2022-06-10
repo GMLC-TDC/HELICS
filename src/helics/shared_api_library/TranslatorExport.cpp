@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "MessageFederate.h"
 #include "Translators.h"
 #include "helicsCallbacks.h"
-#include "internal/api_objects.h"
 #include "helicsData.h"
+#include "internal/api_objects.h"
 
 #include <memory>
 #include <mutex>
@@ -450,10 +450,10 @@ HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator
 
     op->setToMessageFunction([userdata, toMessageCall](helics::SmallBuffer data) {
         std::unique_ptr<helics::Message> mess = std::make_unique<helics::Message>();
-        
+
         auto buff = createAPIDataBuffer(data);
         auto mm = createAPIMessage(mess);
-        toMessageCall(buff, mm,userdata);
+        toMessageCall(buff, mm, userdata);
         return mess;
     });
 
@@ -462,7 +462,7 @@ HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator
 
         auto buff = createAPIDataBuffer(data);
         auto mm = createAPIMessage(mess);
-        toValueCall( mm,buff, userdata);
+        toValueCall(mm, buff, userdata);
         return data;
     });
 

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helicsData.h"
-#include "internal/api_objects.h"
+
 #include "../application_api/HelicsPrimaryTypes.hpp"
 #include "../core/SmallBuffer.hpp"
 #include "internal/api_objects.h"
@@ -17,12 +17,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 static constexpr int gBufferValidationIdentifier = 0x24EA'663F;
 
-HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff) {
+HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff)
+{
     buff.userKey = gBufferValidationIdentifier;
-    
+
     return static_cast<HelicsDataBuffer>(&buff);
 }
-
 
 HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
 {

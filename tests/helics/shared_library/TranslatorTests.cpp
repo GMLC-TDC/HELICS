@@ -40,20 +40,19 @@ TEST_P(translator_simple_type, registration)
     auto fFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    CE(auto t1=helicsFederateRegisterGlobalTranslator(
-        fFed, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "trans1", &err));
+    CE(auto t1 = helicsFederateRegisterGlobalTranslator(
+           fFed, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "trans1", &err));
     helicsFederateRegisterGlobalEndpoint(mFed, "port1", "", &err);
-
 
     CE(auto t2 = helicsFederateRegisterTranslator(
            fFed, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "trans2", &err));
 
     EXPECT_EQ(err.error_code, HELICS_OK);
-    CE(auto p1 = helicsFederateRegisterPublication(fFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "", &err));
+    CE(auto p1 =
+           helicsFederateRegisterPublication(fFed, "pub1", HELICS_DATA_TYPE_DOUBLE, "", &err));
     CE(helicsPublicationAddTarget(p1, "trans1", &err));
     EXPECT_NE(t1, nullptr);
     EXPECT_NE(t1, t2);
-    
 
     auto f1_b = helicsFederateGetTranslator(fFed, "trans1", &err);
     const char* tmp;
@@ -83,8 +82,6 @@ TEST_P(translator_simple_type, registration)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-
-
 TEST_F(translator, core_translator_reg)
 {
     CE(auto core1 = helicsCreateCore("test", "core1", "--autobroker", &err));
@@ -97,13 +94,13 @@ TEST_F(translator, core_translator_reg)
 
     CE(auto t1 = helicsCoreRegisterTranslator(
            core1, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "core1trans", &err));
-    
+
     CE(helicsTranslatorAddDestinationEndpoint(t1, "ep1", &err));
     CE(helicsCoreRegisterTranslator(
-           core1, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "core1trans2", &err));
+        core1, HelicsTranslatorTypes::HELICS_TRANSLATOR_TYPE_JSON, "core1trans2", &err));
 
     helicsTranslatorAddSourceEndpoint(t1, "ep2", &err);
-   
+
     int core1IsConnected = helicsCoreIsConnected(core1);
     EXPECT_NE(core1IsConnected, HELICS_FALSE);
     helicsCoreSetReadyToInit(core1, &err);
@@ -335,7 +332,7 @@ void toMC(HelicsDataBuffer value, HelicsMessage message, void* /*userData*/)
 
 void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
 {
-    const auto *str = helicsMessageGetString(message);
+    const auto* str = helicsMessageGetString(message);
     double v = atof(str) + 9.0;
     helicsDoubleToBytes(v, value);
 }
@@ -350,7 +347,7 @@ TEST_P(translator_simple_type, custom_translator)
     auto mFed = GetFederateAt(1);
 
     auto e1 = helicsFederateRegisterGlobalTargetedEndpoint(mFed, "port1", "", &err);
- 
+
     EXPECT_EQ(err.error_code, HELICS_OK);
 
     auto p1 =
@@ -392,8 +389,7 @@ TEST_P(translator_simple_type, custom_translator)
     auto res = helicsFederateHasMessage(mFed);
     EXPECT_TRUE(res);
 
-
-    EXPECT_TRUE(helicsInputIsUpdated(i1)==HELICS_TRUE);
+    EXPECT_TRUE(helicsInputIsUpdated(i1) == HELICS_TRUE);
 
     double v3 = helicsInputGetDouble(i1, nullptr);
     EXPECT_DOUBLE_EQ(v3, 54.7);
@@ -401,7 +397,7 @@ TEST_P(translator_simple_type, custom_translator)
     EXPECT_STREQ(helicsMessageGetSource(m2), "t1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "pub1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
-    
+
     EXPECT_EQ(helicsMessageGetTime(m2), 1e-9);
     EXPECT_STREQ(helicsMessageGetString(m2), "99.230000");
     CE(helicsFederateFinalize(mFed, &err));
@@ -409,7 +405,6 @@ TEST_P(translator_simple_type, custom_translator)
     CE(state = helicsFederateGetState(vFed, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
-
 
 INSTANTIATE_TEST_SUITE_P(translator,
                          translator_simple_type,

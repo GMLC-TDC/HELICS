@@ -54,19 +54,20 @@ class CustomTranslatorOperator: public TranslatorOperator {
     /** default constructor*/
     CustomTranslatorOperator() = default;
 
-     /** set the function to modify the data of the message*/
+    /** set the function to modify the data of the message*/
     void setToValueFunction(
         std::function<SmallBuffer(std::unique_ptr<Message> message)> userToValueFunction)
     {
         toValueFunction = std::move(userToValueFunction);
     }
 
-     /** set the function to modify the data of the message*/
+    /** set the function to modify the data of the message*/
     void setToMessageFunction(
         std::function<std::unique_ptr<Message>(const SmallBuffer& value)> userToMessageFunction)
     {
         toMessageFunction = std::move(userToMessageFunction);
     }
+
   private:
     /** the custom operation to convert a message to a value*/
     std::function<SmallBuffer(std::unique_ptr<Message> message)> toValueFunction;
