@@ -178,6 +178,7 @@ void ZmqComms::queue_rx_function()
                 zmq::socket_t brokerReqTerm(ctx->getContext(), ZMQ_REQ);
                 brokerReqTerm.setsockopt(ZMQ_LINGER, 50);
                 try {
+                    repSocket.close();
                     brokerReqTerm.connect(makePortAddress(localTargetAddress, PortNumber + 1));
                     ActionMessage term(CMD_GLOBAL_ERROR);
                     term.messageID = HELICS_ERROR_TERMINATED;
@@ -192,22 +193,36 @@ void ZmqComms::queue_rx_function()
                     if (rc != 0) {
                         zmq::message_t msg;
                         brokerReqTerm.recv(msg);
+                        
                         brokerReqTerm.close();
-                        std::this_thread::sleep_for(connectionTimeout);
+                        //this sleep is to exceed the linger timeout on the port
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1050));
                     } else {
                         brokerReqTerm.close();
                     }
-
-                    bindsuccess = bindzmqSocket(repSocket,
-                                                localTargetAddress,
-                                                PortNumber + 1,
-                                                connectionTimeout);
-                    if (!bindsuccess) {
-                        std::this_thread::sleep_for(connectionTimeout);
+                    bool notConnected = true;
+                    int cnt = 0;
+                    while (notConnected) {
+                        ++cnt;
+                        repSocket = zmq::socket_t(ctx->getContext(), ZMQ_REP);
+                        if (serverMode) {
+                            repSocket.setsockopt(ZMQ_LINGER, 500);
+                        }
+                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
                         bindsuccess = bindzmqSocket(repSocket,
                                                     localTargetAddress,
                                                     PortNumber + 1,
                                                     connectionTimeout);
+                        if (bindsuccess) {
+                            notConnected = false;
+                        } else {
+                            if (cnt>=10) {
+                                break;
+                            }
+                            std::this_thread::sleep_for(connectionTimeout);
+                        }
+                    }
+                    
                         if (!bindsuccess) {
                             pullSocket.close();
                             repSocket.close();
@@ -218,7 +233,6 @@ void ZmqComms::queue_rx_function()
                             setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
-                    }
                 }
                 catch (zmq::error_t& ze) {
                     pullSocket.close();
