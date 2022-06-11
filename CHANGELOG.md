@@ -10,7 +10,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.2.1][] - 2022-06-11
 
-The Matlab interface to HELICS has been moved to [matHELICS](http://www.github.com/GMLC_TDC/matHELICS), the C++ interface now uses `std::string_view` in nearly all places, and the translator C API, and the dataBuffer API to the C interface were fleshed out a bit more and will be finalized in the 3.3 release. Subsequent releases will change the minimum compiler requirements to build HELICS to Visual Studio 2019, GCC 8.0, Clang 7, Xcode 11.0, and CMake 3.11.
+The Matlab interface to HELICS has been moved to [matHELICS](https://www.github.com/GMLC-TDC/matHELICS), the C++ interface now uses `std::string_view` in nearly all places, and the translator C API, and the dataBuffer API to the C interface were fleshed out a bit more and will be finalized in the 3.3 release. Subsequent releases will change the minimum compiler requirements to build HELICS to Visual Studio 2019, GCC 8.0, Clang 7, Xcode 11.0, and CMake 3.11.
 
 ### Fixed
 
@@ -47,7 +47,7 @@ The Matlab interface to HELICS has been moved to [matHELICS](http://www.github.c
 
 ### Removed
 
-- The `HELICS_BUILD_MATLAB_INTERFACE` has been removed and all HELICS support for Matlab in the future will be through the [matHELICS](http://www.github.com/GMLC_TDC/matHELICS) repository.
+- The `HELICS_BUILD_MATLAB_INTERFACE` has been removed and all HELICS support for Matlab in the future will be through the [matHELICS](https://www.github.com/GMLC-TDC/matHELICS) repository.
 
 ## [3.2.0][] - 2022-05-03
 
