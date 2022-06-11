@@ -29,7 +29,7 @@ namespace zeromq {
                 socket.bind(gmlc::networking::makePortAddress(address, port));
                 bindsuccess = true;
             }
-            catch (const zmq::error_t&ze ) {
+            catch (const zmq::error_t& ze) {
                 if (tcount == milliseconds{0}) {
                     // std::cerr << "zmq binding error on socket sleeping then will try again \n";
                 }

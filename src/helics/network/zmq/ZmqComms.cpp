@@ -193,9 +193,9 @@ void ZmqComms::queue_rx_function()
                     if (rc != 0) {
                         zmq::message_t msg;
                         brokerReqTerm.recv(msg);
-                        
+
                         brokerReqTerm.close();
-                        //this sleep is to exceed the linger timeout on the port
+                        // this sleep is to exceed the linger timeout on the port
                         std::this_thread::sleep_for(std::chrono::milliseconds(1050));
                     } else {
                         brokerReqTerm.close();
@@ -216,23 +216,23 @@ void ZmqComms::queue_rx_function()
                         if (bindsuccess) {
                             notConnected = false;
                         } else {
-                            if (cnt>=10) {
+                            if (cnt >= 10) {
                                 break;
                             }
                             std::this_thread::sleep_for(connectionTimeout);
                         }
                     }
-                    
-                        if (!bindsuccess) {
-                            pullSocket.close();
-                            repSocket.close();
-                            disconnecting = true;
-                            logError(std::string(
-                                         "Unable to bind zmq reply even after force termination ") +
-                                     makePortAddress(localTargetAddress, PortNumber + 1));
-                            setRxStatus(ConnectionStatus::ERRORED);
-                            return;
-                        }
+
+                    if (!bindsuccess) {
+                        pullSocket.close();
+                        repSocket.close();
+                        disconnecting = true;
+                        logError(
+                            std::string("Unable to bind zmq reply even after force termination ") +
+                            makePortAddress(localTargetAddress, PortNumber + 1));
+                        setRxStatus(ConnectionStatus::ERRORED);
+                        return;
+                    }
                 }
                 catch (zmq::error_t& ze) {
                     pullSocket.close();
