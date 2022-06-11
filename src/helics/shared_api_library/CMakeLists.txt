@@ -44,6 +44,9 @@ if(Python_EXECUTABLE)
                 ValueFederate.h
                 MessageFilters.h
                 Translators.h
+                helicsData.h
+                helicsCore.h
+                Translators.h
                 api-data.h
                 ../helics_enums.h
     )
