@@ -99,7 +99,7 @@ HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
 HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
 
 /* convert a data buffer to a string including a null terminator
-NOTE:  data may contain 0 prior to the end but actualLength will the number of characters in the string
+NOTE:  data may contain null bytes prior to the end but actualLength will be the number of characters in the string
 outputString[actualLength] is a null terminator*/
 HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
