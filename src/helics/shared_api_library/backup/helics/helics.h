@@ -264,7 +264,9 @@ typedef enum {
     /** the function executed successfully */
     HELICS_OK = 0,
     /** user system abort to match typical SIGINT value*/
-    HELICS_ERROR_USER_ABORT = 130
+    HELICS_ERROR_USER_ABORT = 130,
+    /** force termination to match typical SIGKILL value*/
+    HELICS_ERROR_TERMINATED = 143
 } HelicsErrorTypes;
 
 const int HELICS_INVALID_OPTION_INDEX = -101;
@@ -608,7 +610,7 @@ HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
 HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
 
 /** convert a raw string (may contain nulls) to serialized bytes*/
 HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
@@ -656,7 +658,7 @@ HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
 HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
 
 /* convert a data buffer to a string including a null terminator
-NOTE:  data may contain 0 prior to the end but actualLength will the number of characters in the string
+NOTE:  data may contain null bytes prior to the end but actualLength will be the number of characters in the string
 outputString[actualLength] is a null terminator*/
 HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
 
@@ -2714,12 +2716,12 @@ HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const vo
  * Publish a string.
  *
  * @param pub The publication to publish for.
- * @param str The string to publish.
+ * @param val The null terminated string to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* val, HelicsError* err);
 
 /**
  * Publish an integer value.
@@ -2817,13 +2819,13 @@ HELICS_EXPORT void
  * Publish a named point.
  *
  * @param pub The publication to publish for.
- * @param str A string for the name to publish.
+ * @param field A null terminated string for the field name of the namedPoint to publish.
  * @param val A double for the value to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* field, double val, HelicsError* err);
 
 /**
  * Add a named input to the list of targets a publication publishes to.
@@ -3051,11 +3053,11 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data,
  * Set the default as a string.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to the default string.
+ * @param defaultString A pointer to the default string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* defaultString, HelicsError* err);
 
 /**
  * Set the default as an integer.
@@ -3144,12 +3146,12 @@ HELICS_EXPORT void helicsInputSetDefaultComplexVector(HelicsInput ipt, const dou
  * Set the default as a NamedPoint.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to a string representing the name.
+ * @param defaultName A pointer to a null terminated string representing the field name to use in the named point.
  * @param val A double value for the value of the named point.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* defaultName, double val, HelicsError* err);
 
 /**@}*/
 
@@ -4133,11 +4135,11 @@ HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, H
  * Set the data payload of a message as a string.
  *
  * @param message The message object in question.
- * @param str A string containing the message data.
+ * @param data A null terminated string containing the message data.
  *
  * @param[in,out] err An error object to fill out in case of an error.
  */
-HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* data, HelicsError* err);
 
 /**
  * Set the data payload of a message as raw data.
@@ -4864,6 +4866,29 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  HelicsError* err);
 
 /**
+ * Set a general callback for a custom translator.
+ *
+ * @details Add a pair of custom callbacks for running a translator operation in the C shared library.
+ *
+ * @param translator The translator object to set the callbacks for.
+ *  * @param toMessageCall A callback with signature void(HelicsDataBuffer, HelicsMessage, void *);
+ *                 The function arguments are raw Value data, the messageObject to fill out and a pointer to user data.
+ *
+ * @param toValueCall A callback with signature void(HelicsMessage, HelicsDataBuffer, void *);
+ *                 The function arguments are a message object, the data buffer to fill out and a pointer to user data.
+ *
+ * @param userdata A pointer to user data that is passed to the functions when executing.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator,
+                                                     void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage message, void* userData),
+                                                     void (*toValueCall)(HelicsMessage message, HelicsDataBuffer value, void* userData),
+                                                     void* userdata,
+                                                     HelicsError* err);
+
+/**
  * Set callback for queries executed against a federate.
  *
  * @details There are many queries that HELICS understands directly, but it is occasionally useful to have a federate be able to respond
@@ -4980,13 +5005,13 @@ HELICS_EXPORT void
  * to specific queries with answers specific to a federate.
  *
  * @param buffer The buffer received in a helicsQueryCallback.
- * @param str Pointer to the data to fill the buffer with.
+ * @param queryResult Pointer to the data with the query result to fill the buffer with.
  * @param strSize The size of the string.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
+HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* queryResult, int strSize, HelicsError* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
