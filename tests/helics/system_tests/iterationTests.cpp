@@ -894,3 +894,53 @@ TEST_F(iteration, wait_for_current_time_iterative_enter_exec_iterating_time_requ
     broker.reset();
     vFed1->finalize();
 }
+
+TEST_F(iteration, iteration_high_count_nocov_ci_skip_nosan)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0);
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    auto& pub1_1 = vFed1->registerGlobalPublication<int>("pub1_1");
+    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+
+    auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
+
+    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+
+    vFed2->enterInitializingModeAsync();
+    vFed1->enterInitializingMode();
+    vFed2->enterInitializingModeComplete();
+
+    pub1_1.publish(4);
+    pub2_1.publish(8);
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    helics::Time ctime = helics::timeZero;
+    size_t itCount = 0;
+
+    while (itCount < 200000) {
+        for (int ii = 0; ii < 10; ++ii) {
+            pub2_1.publish(itCount + 400000);
+            pub1_1.publish(itCount + 800000);
+            ++itCount;
+            vFed1->requestTimeIterativeAsync(ctime + 1.0,
+                                             helics::IterationRequest::ITERATE_IF_NEEDED);
+            vFed2->requestTimeIterative(ctime + 1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+            vFed1->requestTimeIterativeComplete();
+        }
+        vFed1->requestTimeIterativeAsync(ctime + 1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+        vFed2->requestTimeIterative(ctime + 1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+        vFed1->requestTimeIterativeComplete();
+    }
+
+    EXPECT_GE(itCount, 200000);
+    vFed2->finalize();
+    vFed1->finalize();
+}
