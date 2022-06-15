@@ -451,8 +451,8 @@ HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator
     op->setToMessageFunction([userdata, toMessageCall](helics::SmallBuffer data) {
         std::unique_ptr<helics::Message> mess = std::make_unique<helics::Message>();
 
-        auto buff = createAPIDataBuffer(data);
-        auto mm = createAPIMessage(mess);
+        auto* buff = createAPIDataBuffer(data);
+        auto* mm = createAPIMessage(mess);
         toMessageCall(buff, mm, userdata);
         return mess;
     });
@@ -460,8 +460,8 @@ HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator
     op->setToValueFunction([userdata, toValueCall](std::unique_ptr<helics::Message> mess) {
         helics::SmallBuffer data;
 
-        auto buff = createAPIDataBuffer(data);
-        auto mm = createAPIMessage(mess);
+        auto* buff = createAPIDataBuffer(data);
+        auto* mm = createAPIMessage(mess);
         toValueCall(mm, buff, userdata);
         return data;
     });
