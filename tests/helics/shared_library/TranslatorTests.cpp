@@ -334,7 +334,7 @@ void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
 {
     const auto* str = helicsMessageGetString(message);
     char* ptr{nullptr};
-    double v = strtod(str,&ptr) + 9.0;
+    double v = strtod(str, &ptr) + 9.0;
     helicsDoubleToBytes(v, value);
 }
 
