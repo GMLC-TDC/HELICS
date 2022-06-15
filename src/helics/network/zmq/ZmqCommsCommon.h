@@ -18,14 +18,14 @@ class socket_t;
 }
 
 namespace helics::zeromq {
-    static const std::chrono::milliseconds defaultPeriod(200);
+static const std::chrono::milliseconds defaultPeriod(200);
 
-    /** bind a zmq socket, with a timeout and timeout period*/
-    bool bindzmqSocket(zmq::socket_t& socket,
-                       const std::string& address,
-                       int port,
-                       std::chrono::milliseconds timeout,
-                       std::chrono::milliseconds period = defaultPeriod);
-    /** get the ZeroMQ version currently in use*/
-    std::string getZMQVersion();
-}  // namespace helics
+/** bind a zmq socket, with a timeout and timeout period*/
+bool bindzmqSocket(zmq::socket_t& socket,
+                   const std::string& address,
+                   int port,
+                   std::chrono::milliseconds timeout,
+                   std::chrono::milliseconds period = defaultPeriod);
+/** get the ZeroMQ version currently in use*/
+std::string getZMQVersion();
+}  // namespace helics::zeromq
