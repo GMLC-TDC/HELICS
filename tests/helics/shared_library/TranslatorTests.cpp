@@ -337,11 +337,11 @@ void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
     helicsDoubleToBytes(v, value);
 }
 
-TEST_P(translator_simple_type, custom_translator)
+TEST_F(translator, custom_translator)
 {
-    HelicsBroker broker = AddBroker(GetParam(), 2);
-    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "value");
-    AddFederates(helicsCreateCombinationFederate, GetParam(), 1, broker, 1.0, "message");
+    HelicsBroker broker = AddBroker("test_2", 2);
+    AddFederates(helicsCreateCombinationFederate, "test_2", 1, broker, 1.0, "value");
+    AddFederates(helicsCreateCombinationFederate, "test_2", 1, broker, 1.0, "message");
 
     auto vFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
