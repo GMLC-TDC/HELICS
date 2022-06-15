@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <thread>
 
-namespace helics {
-namespace zeromq {
+namespace helics::zeromq
+{
     using std::chrono::milliseconds;
     /** bind a zmq socket, with a timeout and timeout period*/
     bool bindzmqSocket(zmq::socket_t& socket,
@@ -50,5 +50,4 @@ namespace zeromq {
             std::to_string(std::get<1>(vers)) + '.' + std::to_string(std::get<2>(vers));
     }
 
-}  // namespace zeromq
 }  // namespace helics
