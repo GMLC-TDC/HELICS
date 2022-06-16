@@ -9,11 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #define CLI11_EXPERIMENTAL_OPTIONAL 0
 #include "helics/external/CLI11/CLI11.hpp"
+#undef CLI11_EXPERIMENTAL_OPTIONAL
 
 #include <string>
 #include <utility>
 #include <vector>
-#undef CLI11_EXPERIMENTAL_OPTIONAL
+
 #include "CoreTypes.hpp"
 #include "helicsTime.hpp"
 #if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
