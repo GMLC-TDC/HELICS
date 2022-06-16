@@ -127,9 +127,7 @@ class HELICS_CXX_EXPORT Input: public Interface {
     }
 
     template<class FedPtr>
-    Input(FedPtr& valueFed,
-          std::string_view key,
-          DataType defType, std::string_view units = {}):
+    Input(FedPtr& valueFed, std::string_view key, DataType defType, std::string_view units = {}):
         Input(valueFed, key, typeNameStringRef(defType), units)
     {
     }
