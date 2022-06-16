@@ -171,8 +171,7 @@ class helicsCLI11App: public CLI::App {
 }  // namespace helics
 
 // use the CLI lexical cast function overload to convert a string into a time
-namespace CLI {
-namespace detail {
+namespace CLI::detail {
     template<>
     inline bool lexical_cast<helics::Time>(const std::string& input, helics::Time& output)
     {
@@ -190,5 +189,4 @@ namespace detail {
     {
         return "TIME";
     }
-}  // namespace detail
 }  // namespace CLI
