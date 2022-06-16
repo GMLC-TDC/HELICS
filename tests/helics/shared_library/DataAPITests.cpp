@@ -251,4 +251,5 @@ TEST(data, clone)
 
     v2 = helicsDataBufferToDouble(newbuff);
     EXPECT_EQ(v1, v2);
+    helicsDataBufferFree(newbuff);
 }

@@ -905,11 +905,11 @@ TEST_F(iteration, iteration_high_count_nocov_ci_skip_nosan)
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
     auto& pub1_1 = vFed1->registerGlobalPublication<int>("pub1_1");
-    auto& sub1_1 = vFed1->registerSubscription("pub2_1");
+    vFed1->registerSubscription("pub2_1");
 
     auto& pub2_1 = vFed2->registerGlobalPublication<int>("pub2_1");
 
-    auto& sub2_1 = vFed2->registerSubscription("pub1_1");
+    vFed2->registerSubscription("pub1_1");
 
     vFed2->enterInitializingModeAsync();
     vFed1->enterInitializingMode();
