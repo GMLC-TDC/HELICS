@@ -16,7 +16,7 @@ jobs:
           use_mpi: 'true'
           encrypted: 'true'
         gcc8:
-          containerImage: 'helics/buildenv:gcc9-builder'
+          containerImage: 'helics/buildenv:gcc8-builder'
           test_config: 'ci'
           use_mpi: 'true'
           encrypted: 'true'
@@ -66,7 +66,7 @@ jobs:
         XCode-oldest:
           test_config: 'ci'
           vmImage: 'macOS-10.15'
-          xcode_path: '/Applications/Xcode_11.0.app'
+          xcode_path: '/Applications/Xcode_11.2.1.app'
     pool:
       vmImage: $[ variables['vmImage'] ]
     timeoutInMinutes: 60
