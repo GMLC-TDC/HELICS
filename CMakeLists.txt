@@ -510,7 +510,7 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(helics_base INTERFACE rt)
 endif()
 
-target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
+target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=1")
 target_compile_definitions(helics_base INTERFACE "USE_STD_OPTIONAL=1")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
@@ -587,8 +587,6 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
-# TODO(PT): this should be removed when we require a compiler with the filesystem header defined
-target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)

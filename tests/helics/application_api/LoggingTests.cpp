@@ -13,12 +13,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
-#include "helics/external/filesystem.hpp"
 
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
 #include <thread>
+#include <filesystem>
 
 /** these test cases test out user-directed logging functionality
  */
@@ -48,13 +48,13 @@ TEST(logging, basic_logging)
 TEST(logging, file_logging)
 {
     const std::string lfilename = "logfile.txt";
-    if (ghc::filesystem::exists(lfilename)) {
+    if (std::filesystem::exists(lfilename)) {
         std::error_code ec;
-        bool res = ghc::filesystem::remove(lfilename, ec);
+        bool res = std::filesystem::remove(lfilename, ec);
         int ii = 0;
         while (!res) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            res = ghc::filesystem::remove(lfilename, ec);
+            res = std::filesystem::remove(lfilename, ec);
             ++ii;
             if (ii > 15) {
                 break;
@@ -72,24 +72,24 @@ TEST(logging, file_logging)
     auto cr{Fed->getCorePointer()};
     Fed.reset();
 
-    EXPECT_TRUE(ghc::filesystem::exists(lfilename));
+    EXPECT_TRUE(std::filesystem::exists(lfilename));
     cr->waitForDisconnect();
     cr.reset();
     helics::cleanupHelicsLibrary();
     std::error_code ec;
-    ghc::filesystem::remove(lfilename, ec);
+    std::filesystem::remove(lfilename, ec);
 }
 
 TEST(logging, file_logging_p2)
 {
     const std::string lfilename = "logfile2.txt";
-    if (ghc::filesystem::exists(lfilename)) {
+    if (std::filesystem::exists(lfilename)) {
         std::error_code ec;
-        bool res = ghc::filesystem::remove(lfilename, ec);
+        bool res = std::filesystem::remove(lfilename, ec);
         int ii = 0;
         while (!res) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            res = ghc::filesystem::remove(lfilename, ec);
+            res = std::filesystem::remove(lfilename, ec);
             ++ii;
             if (ii > 15) {
                 break;
@@ -108,12 +108,12 @@ TEST(logging, file_logging_p2)
     Fed->finalize();
 
     Fed.reset();
-    EXPECT_TRUE(ghc::filesystem::exists(lfilename));
+    EXPECT_TRUE(std::filesystem::exists(lfilename));
     cr->waitForDisconnect();
     cr.reset();
     helics::cleanupHelicsLibrary();
     std::error_code ec;
-    ghc::filesystem::remove(lfilename, ec);
+    std::filesystem::remove(lfilename, ec);
 }
 
 TEST(logging, check_log_message)
