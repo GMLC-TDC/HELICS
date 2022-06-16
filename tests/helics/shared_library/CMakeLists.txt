@@ -13,6 +13,7 @@ set(c_shared_library_test_sources
     test-value-federate1.cpp
     test-value-federate2.cpp
     FilterTests.cpp
+    TranslatorTests.cpp
     test-message-federate.cpp
     SystemTests.cpp
     TimingTests.cpp

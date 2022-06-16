@@ -15,12 +15,19 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-static const int bufferValidationIdentifier = 0x24EA'663F;
+static constexpr int gBufferValidationIdentifier = 0x24EA'663F;
+
+HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff)
+{
+    buff.userKey = gBufferValidationIdentifier;
+
+    return static_cast<HelicsDataBuffer>(&buff);
+}
 
 HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
 {
     auto* ptr = new helics::SmallBuffer();
-    ptr->userKey = bufferValidationIdentifier;
+    ptr->userKey = gBufferValidationIdentifier;
     ptr->reserve(initialCapacity);
     return static_cast<HelicsDataBuffer>(ptr);
 }
@@ -28,7 +35,7 @@ HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity)
 HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity)
 {
     auto* ptr = new helics::SmallBuffer();
-    ptr->userKey = bufferValidationIdentifier;
+    ptr->userKey = gBufferValidationIdentifier;
     ptr->spanAssign(data, dataSize, dataCapacity);
     ptr->lock(true);
     return static_cast<HelicsDataBuffer>(ptr);
@@ -37,7 +44,7 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
 static helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
 {
     auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
-    return (ptr != nullptr && ptr->userKey == bufferValidationIdentifier) ? ptr : nullptr;
+    return (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) ? ptr : nullptr;
 }
 
 void helicsDataBufferFree(HelicsDataBuffer data)
@@ -92,7 +99,7 @@ HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
         return nullptr;
     }
     auto* newptr = new helics::SmallBuffer(*ptr);
-    newptr->userKey = bufferValidationIdentifier;
+    newptr->userKey = gBufferValidationIdentifier;
     return static_cast<HelicsDataBuffer>(newptr);
 }
 

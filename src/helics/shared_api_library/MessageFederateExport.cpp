@@ -784,6 +784,12 @@ void helicsEndpointAddDestinationFilter(HelicsEndpoint end, const char* filterNa
     // LCOV_EXCL_STOP
 }
 
+HelicsMessage wrapMessage(std::unique_ptr<helics::Message>& mess)
+{
+    mess->messageValidation = messageKeyCode;
+    return reinterpret_cast<HelicsMessage>(mess.get());
+}
+
 static constexpr char invalidMessageObject[] = "The message object was not valid";
 
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err)
