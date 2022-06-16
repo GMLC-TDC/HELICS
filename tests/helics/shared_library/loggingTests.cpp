@@ -6,9 +6,9 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "../ThirdParty/concurrency/gmlc/libguarded/guarded.hpp"
-#include <filesystem>
 
 #include <complex>
+#include <filesystem>
 #include <gtest/gtest.h>
 #include <thread>
 

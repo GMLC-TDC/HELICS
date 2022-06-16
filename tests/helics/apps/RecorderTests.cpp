@@ -15,9 +15,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Recorder.hpp"
 
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <thread>
-#include <filesystem>
 
 TEST(recorder_tests, simple_recorder_test)
 {

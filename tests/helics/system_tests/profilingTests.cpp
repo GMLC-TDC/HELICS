@@ -12,13 +12,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
 #include <regex>
 #include <thread>
-#include <filesystem>
-#include <fstream>
 
 /** these test cases test out user-directed logging functionality
  */

@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using ::testing::HasSubstr;
 
-
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
@@ -18,9 +17,9 @@ using ::testing::HasSubstr;
 #include "helics/core/core-exceptions.hpp"
 
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <thread>
-#include <filesystem>
 
 TEST(CoreAppTests, constructor1)
 {

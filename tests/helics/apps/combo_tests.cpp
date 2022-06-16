@@ -4,8 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "gtest/gtest.h"
-
 #include "exeTestHelper.h"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Publications.hpp"
@@ -14,9 +12,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Recorder.hpp"
 #include "helics/core/BrokerFactory.hpp"
 
+#include "gtest/gtest.h"
 #include <cstdio>
-#include <future>
 #include <filesystem>
+#include <future>
 
 static void generateFiles(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {

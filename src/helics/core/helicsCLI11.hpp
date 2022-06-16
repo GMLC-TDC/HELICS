@@ -11,12 +11,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/external/CLI11/CLI11.hpp"
 #undef CLI11_EXPERIMENTAL_OPTIONAL
 
+#include "CoreTypes.hpp"
+#include "helicsTime.hpp"
+
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "CoreTypes.hpp"
-#include "helicsTime.hpp"
 #if defined HELICS_SHARED_LIBRARY || !defined HELICS_STATIC_CORE_LIBRARY
 #    include "../application_api/timeOperations.hpp"
 #    include "../application_api/typeOperations.hpp"
@@ -172,21 +172,21 @@ class helicsCLI11App: public CLI::App {
 
 // use the CLI lexical cast function overload to convert a string into a time
 namespace CLI::detail {
-    template<>
-    inline bool lexical_cast<helics::Time>(const std::string& input, helics::Time& output)
-    {
-        try {
-            output = loadTimeFromString(input, time_units::ms);
-        }
-        catch (std::invalid_argument&) {
-            return false;
-        }
-        return true;
+template<>
+inline bool lexical_cast<helics::Time>(const std::string& input, helics::Time& output)
+{
+    try {
+        output = loadTimeFromString(input, time_units::ms);
     }
+    catch (std::invalid_argument&) {
+        return false;
+    }
+    return true;
+}
 
-    template<>
-    constexpr const char* type_name<helics::Time>()
-    {
-        return "TIME";
-    }
-}  // namespace CLI
+template<>
+constexpr const char* type_name<helics::Time>()
+{
+    return "TIME";
+}
+}  // namespace CLI::detail
