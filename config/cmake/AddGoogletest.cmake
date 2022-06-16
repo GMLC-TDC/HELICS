@@ -12,8 +12,6 @@
 # which gives output on failed tests without having to set an environment variable.
 #
 
-set(gtest_version release-1.10.0)
-
 set(gtest_version_new f079775)
 
 set(gtest_vtype GIT_TAG)
@@ -22,7 +20,6 @@ set(gtest_vtype GIT_TAG)
 
 string(TOLOWER "googletest" gtName)
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     include(FetchContent)
     mark_as_advanced(FETCHCONTENT_BASE_DIR)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
@@ -44,26 +41,7 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     endif()
     hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
     hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
-else() # cmake <3.11
 
-    # create the directory first
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
-
-    include(GitUtils)
-    git_clone(
-        PROJECT_NAME
-        googletest
-        GIT_URL
-        https://github.com/google/googletest.git
-        ${gtest_vtype}
-        ${gtest_version}
-        DIRECTORY
-        ${PROJECT_BINARY_DIR}/_deps
-    )
-
-    set(${gtName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${gtName}-build)
-
-endif()
 
 set(gtest_force_shared_crt ON CACHE INTERNAL "")
 
