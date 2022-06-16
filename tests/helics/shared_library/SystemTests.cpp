@@ -572,6 +572,7 @@ TEST(federate, federateNoProtection)
 
     EXPECT_FALSE(helicsFederateIsValid(fedFind));
     EXPECT_NE(err.error_code, 0);
+    helicsFederateInfoFree(fi);
 }
 
 TEST(federate, federateProtection)
@@ -582,7 +583,7 @@ TEST(federate, federateProtection)
     helicsFederateInfoSetCoreInitString(fi, "-f 1 --autobroker --error_timeout=0", nullptr);
 
     auto fed1 = helicsCreateValueFederate("fed1", fi, nullptr);
-
+    helicsFederateInfoFree(fi);
     helicsFederateEnterExecutingMode(fed1, nullptr);
 
     std::string fed1Nm = helicsFederateGetName(fed1);
