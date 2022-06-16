@@ -46,7 +46,7 @@ communication methods*/
         /** construct from command line arguments parsed as a single string
     @param configFile a configuration file for the broker Server
     */
-        explicit BrokerServer(const std::string& configFile);
+        explicit BrokerServer(std::string_view configFile);
         /** destructor*/
         ~BrokerServer();
         /** start the broker servers*/
@@ -71,7 +71,7 @@ communication methods*/
         bool http_server{false};  //!< activate the HTTP web server REST API
         bool websocket_server{false};  //!< activate the websocket API
         std::atomic<bool> exitall{false};
-        std::vector<std::unique_ptr<TypedBrokerServer>> servers;
+        std::vector<std::shared_ptr<TypedBrokerServer>> servers;
         std::string configFile_;
         std::string server_name_;
         std::unique_ptr<Json::Value> config_;

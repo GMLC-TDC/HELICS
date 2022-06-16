@@ -63,7 +63,7 @@ void UdpComms::queue_rx_function()
         PortNumber = futurePort.get();
     }
     if (PortNumber < 0) {
-        setRxStatus(connection_status::error);
+        setRxStatus(ConnectionStatus::ERRORED);
         return;
     }
     auto ioctx = gmlc::networking::AsioContextManager::getContextPointer();
@@ -101,7 +101,7 @@ void UdpComms::queue_rx_function()
                                          makePortAddress(localTargetAddress, PortNumber),
                                          error.what()));
                     socket.close();
-                    setRxStatus(connection_status::error);
+                    setRxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
                 continue;
@@ -119,7 +119,7 @@ void UdpComms::queue_rx_function()
                                      makePortAddress(localTargetAddress, PortNumber),
                                      error.what()));
                 socket.close();
-                setRxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
                 return;
             }
         }
@@ -129,11 +129,11 @@ void UdpComms::queue_rx_function()
     udp::endpoint remote_endp;
     std::error_code error;
     std::error_code ignored_error;
-    setRxStatus(connection_status::connected);
+    setRxStatus(ConnectionStatus::CONNECTED);
     while (true) {
         auto len = socket.receive_from(asio::buffer(data), remote_endp, 0, error);
         if (error) {
-            setRxStatus(connection_status::error);
+            setRxStatus(ConnectionStatus::ERRORED);
             return;
         }
         if (len == 5) {
@@ -163,7 +163,7 @@ void UdpComms::queue_rx_function()
         }
     }
     disconnecting = true;
-    setRxStatus(connection_status::terminated);
+    setRxStatus(ConnectionStatus::TERMINATED);
 }
 
 void UdpComms::queue_tx_function()
@@ -204,12 +204,12 @@ void UdpComms::queue_tx_function()
                 std::chrono::steady_clock::now()};
             int errorCount{0};
             while (!connectionEstablished) {
-                if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                if (requestDisconnect.load(std::memory_order_acquire)) {
                     if (PortNumber.load() <= 0) {
                         PortNumber = -1;
                         promisePort.set_value(-1);
                     }
-                    setTxStatus(connection_status::terminated);
+                    setTxStatus(ConnectionStatus::TERMINATED);
                     return;
                 }
                 ActionMessage m(CMD_PROTOCOL_PRIORITY);
@@ -223,7 +223,7 @@ void UdpComms::queue_tx_function()
                         promisePort.set_value(-1);
                     }
 
-                    setTxStatus(connection_status::error);
+                    setTxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
 
@@ -235,12 +235,12 @@ void UdpComms::queue_tx_function()
                     if (std::chrono::steady_clock::now() - startTime > connectionTimeout) {
                         timeout = true;
                     }
-                    if (requestDisconnect.load(std::memory_order::memory_order_acquire)) {
+                    if (requestDisconnect.load(std::memory_order_acquire)) {
                         if (PortNumber.load() <= 0) {
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
-                        setTxStatus(connection_status::terminated);
+                        setTxStatus(ConnectionStatus::TERMINATED);
                         return;
                     }
                     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -253,7 +253,7 @@ void UdpComms::queue_tx_function()
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
-                        setTxStatus(connection_status::error);
+                        setTxStatus(ConnectionStatus::ERRORED);
                         return;
                     }
                     continue;
@@ -269,7 +269,7 @@ void UdpComms::queue_tx_function()
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
-                        setTxStatus(connection_status::error);
+                        setTxStatus(ConnectionStatus::ERRORED);
                         logError(fmt::format("timeerror in broker receive {}", error.message()));
                         return;
                     }
@@ -307,7 +307,7 @@ void UdpComms::queue_tx_function()
                             PortNumber = -1;
                             promisePort.set_value(-1);
                         }
-                        setTxStatus(connection_status::terminated);
+                        setTxStatus(ConnectionStatus::TERMINATED);
                         return;
                     }
                 }
@@ -317,7 +317,7 @@ void UdpComms::queue_tx_function()
             logError(std::string("error connecting to broker ") + e.what());
             PortNumber = -1;
             promisePort.set_value(-1);
-            setTxStatus(connection_status::error);
+            setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
     } else {
@@ -341,13 +341,13 @@ void UdpComms::queue_tx_function()
         auto result = resolver.resolve(queryLocal, error);
         if (error) {
             logError(std::string("Unable to resolve:") + localTargetAddress);
-            setTxStatus(connection_status::error);
+            setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
         rxEndpoint = *result;
     }
 
-    setTxStatus(connection_status::connected);
+    setTxStatus(ConnectionStatus::CONNECTED);
     bool continueProcessing{true};
     while (continueProcessing) {
         route_id rid;
@@ -449,7 +449,7 @@ void UdpComms::queue_tx_function()
         }
     }
     routes.clear();
-    if (getRxStatus() == connection_status::connected) {
+    if (getRxStatus() == ConnectionStatus::CONNECTED) {
         if (closingRx) {
             if (!(rxTrigger.wait_for(std::chrono::milliseconds(3000)))) {
                 std::string cls("close");
@@ -473,12 +473,12 @@ void UdpComms::queue_tx_function()
         }
     }
 
-    setTxStatus(connection_status::terminated);
+    setTxStatus(ConnectionStatus::TERMINATED);
 }
 
 void UdpComms::closeReceiver()
 {
-    if (getTxStatus() == connection_status::connected) {
+    if (getTxStatus() == ConnectionStatus::CONNECTED) {
         ActionMessage cmd(CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
         transmit(control_route, cmd);

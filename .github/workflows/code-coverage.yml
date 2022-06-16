@@ -2,43 +2,35 @@ name: Code Coverage
 
 on:
   workflow_dispatch:
-    inputs:
-      testConfig:
-        description: 'Test Config'
-        default: 'Coverage'
   schedule:
     - cron: '15 09 * * *' # Run in the early hours of the morning (UTC)
   push:
     branches: [ main ]
-#  pull_request:
-#    branches: [ main, develop ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: helics/buildenv:ubuntu20.04-default-builder
+    container: helics/buildenv:ubuntu22.04-default-builder
     defaults:
       run:
         shell: bash
     env:
       BUILD_TYPE: Coverage
-      TEST_TYPE: ${{ github.event.inputs.testConfig }}
       GCOV_TOOL: gcov
       CMAKE_GENERATOR: Unix Makefiles
       MAKEFLAGS: '-j 4'
       DISABLE_INTERFACES: 'Java'
       DISABLE_EXAMPLES: 'true'
       DISABLE_CXX_SHARED: 'true'
-      CI_TEST_FLAGS: ""
       
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -54,12 +46,7 @@ jobs:
 
     - name: Run tests
       working-directory: build
-      run: |
-        export TEST_TYPE=${TEST_TYPE:-"Coverage"}
-        source ../scripts/setup-helics-ci-options.sh
-        export CTEST_OPTIONS="--output-on-failure"
-        echo "Running CI tests with flags ${CI_TEST_FLAGS}"
-        ../scripts/run-ci-tests.sh ${CI_TEST_FLAGS}
+      run: ../scripts/run-coverage-tests.sh
 
     - name: Gather and upload coverage results
       run: scripts/lcov-helper.sh gather-coverage-info --gcov ${GCOV_TOOL} --codecov

@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Publications.hpp"
 #include "helicsApp.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <set>
@@ -56,25 +57,25 @@ external protection, that will result in undefined behavior
     @param name the name of the federate (can be empty to use defaults from fi)
     @param fi a pointer info object containing information on the desired federate configuration
     */
-        explicit Player(const std::string& name, const FederateInfo& fi);
+        explicit Player(std::string_view name, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a pointer to core object which the federate can join
     @param fi  a federate information structure
     */
-        Player(const std::string& name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Player(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fi)
     @param core a coreApp object that can be joined
     @param fi  a federate information structure
     */
-        Player(const std::string& name, CoreApp& core, const FederateInfo& fi);
+        Player(std::string_view name, CoreApp& core, const FederateInfo& fi);
         /**constructor taking a file with the required information
     @param appName the name of the app
     @param configString JSON, TOML or text file or JSON string defining the federate information and
     other configuration
     */
-        Player(const std::string& appName, const std::string& configString);
+        Player(std::string_view appName, const std::string& configString);
 
         /** move construction*/
         Player(Player&& other_player) = default;
@@ -99,9 +100,9 @@ external protection, that will result in undefined behavior
     @param type the type of the publication
     @param pubUnits the units associated with the publication
     */
-        void addPublication(const std::string& key,
+        void addPublication(std::string_view key,
                             DataType type,
-                            const std::string& pubUnits = std::string());
+                            std::string_view pubUnits = std::string_view());
 
         /** add a publication to a Player
     @param key the key of the publication to add
@@ -109,14 +110,13 @@ external protection, that will result in undefined behavior
     */
         template<class valType>
         typename std::enable_if_t<helicsType<valType>() != DataType::HELICS_CUSTOM>
-            addPublication(const std::string& key, const std::string& pubUnits = std::string())
+            addPublication(std::string_view key, std::string_view pubUnits = std::string_view())
         {
             if (!useLocal) {
-                publications.push_back(Publication(
-                    InterfaceVisibility::GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits));
+                publications.emplace_back(
+                    InterfaceVisibility::GLOBAL, fed.get(), key, helicsType<valType>(), pubUnits);
             } else {
-                publications.push_back(
-                    Publication(fed.get(), key, helicsType<valType>(), pubUnits));
+                publications.emplace_back(fed.get(), key, helicsType<valType>(), pubUnits);
             }
 
             pubids[key] = static_cast<int>(publications.size()) - 1;
@@ -126,15 +126,15 @@ external protection, that will result in undefined behavior
     @param endpointName the name of the endpoint
     @param endpointType the named type of the endpoint
     */
-        void addEndpoint(const std::string& endpointName,
-                         const std::string& endpointType = std::string());
+        void addEndpoint(std::string_view endpointName,
+                         std::string_view endpointType = std::string_view());
         /** add a data point to publish through a Player
     @param pubTime the time of the publication
     @param key the key for the publication
     @param val the value to publish
     */
         template<class valType>
-        void addPoint(Time pubTime, const std::string& key, const valType& val)
+        void addPoint(Time pubTime, std::string_view key, const valType& val)
         {
             points.resize(points.size() + 1);
             points.back().time = pubTime;
@@ -149,7 +149,7 @@ external protection, that will result in undefined behavior
     @param val the value to publish
     */
         template<class valType>
-        void addPoint(Time pubTime, int iteration, const std::string& key, const valType& val)
+        void addPoint(Time pubTime, int iteration, std::string_view key, const valType& val)
         {
             points.resize(points.size() + 1);
             points.back().time = pubTime;
@@ -164,9 +164,9 @@ external protection, that will result in undefined behavior
     @param payload the payload of the message
     */
         void addMessage(Time sendTime,
-                        const std::string& src,
-                        const std::string& dest,
-                        const std::string& payload);
+                        std::string_view src,
+                        std::string_view dest,
+                        std::string_view payload);
 
         /** add an event for a specific time to a Player queue
     @param sendTime  the time the message should be sent
@@ -177,9 +177,9 @@ external protection, that will result in undefined behavior
     */
         void addMessage(Time sendTime,
                         Time actionTime,
-                        const std::string& src,
-                        const std::string& dest,
-                        const std::string& payload);
+                        std::string_view src,
+                        std::string_view dest,
+                        std::string_view payload);
 
         /** get the number of points loaded*/
         auto pointCount() const { return points.size(); }
@@ -220,17 +220,17 @@ external protection, that will result in undefined behavior
     @param str the string containing the time
     @param lineNumber the lineNumber of the file which is used in case of invalid specification
     */
-        helics::Time extractTime(const std::string& str, int lineNumber = 0) const;
+        helics::Time extractTime(std::string_view str, int lineNumber = 0) const;
 
       private:
         std::vector<ValueSetter> points;  //!< the points to generate into the federation
         std::vector<MessageHolder> messages;  //!< list of message to hold
         std::map<std::string, std::string> tags;  //!< map of the key and type strings
         std::set<std::string> epts;  //!< set of the used endpoints
-        std::vector<Publication> publications;  //!< the actual publication objects
-        std::vector<Endpoint> endpoints;  //!< the actual endpoint objects
-        std::map<std::string, int> pubids;  //!< publication id map
-        std::map<std::string, int> eptids;  //!< endpoint id maps
+        std::deque<Publication> publications;  //!< the actual publication objects
+        std::deque<Endpoint> endpoints;  //!< the actual endpoint objects
+        std::map<std::string_view, int> pubids;  //!< publication id map
+        std::map<std::string_view, int> eptids;  //!< endpoint id maps
         helics::DataType defType =
             helics::DataType::HELICS_STRING;  //!< the default data type unless otherwise specified
         size_t pointIndex = 0;  //!< the current point index

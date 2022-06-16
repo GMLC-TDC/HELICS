@@ -27,8 +27,8 @@ class CommsInterface {
     /** enumeration of whether the threading system should generate a single thread or multiple
      * threads*/
     enum class thread_generation {
-        single,  // indicate that a single thread is used for transmitting and receiving
-        dual  // indicate that separate threads are used 1 for transmission and one for reception
+        single,  //!< indicate that a single thread is used for transmitting and receiving
+        dual  //!< indicate that separate threads are used, 1 for transmission and 1 for reception
     };
     /** default constructor*/
     CommsInterface() = default;
@@ -38,8 +38,8 @@ class CommsInterface {
 
     /** load network information into the comms object*/
     virtual void loadNetworkInfo(const NetworkBrokerData& netInfo);
-    void loadTargetInfo(const std::string& localTarget,
-                        const std::string& brokerTarget,
+    void loadTargetInfo(std::string_view localTarget,
+                        std::string_view brokerTarget,
                         gmlc::networking::InterfaceNetworks targetNetwork =
                             gmlc::networking::InterfaceNetworks::LOCAL);
     /** transmit a message along a particular route
@@ -50,7 +50,7 @@ class CommsInterface {
     void transmit(route_id rid, ActionMessage&& cmd);
     /** add a new route assigned to the appropriate id
      */
-    void addRoute(route_id rid, const std::string& routeInfo);
+    void addRoute(route_id rid, std::string_view routeInfo);
     /** remove a route from use*/
     void removeRoute(route_id rid);
     /** connect the commsInterface
@@ -77,8 +77,7 @@ class CommsInterface {
     /** set the callback for processing the messages
      */
     void setLoggingCallback(
-        std::function<void(int level, const std::string& name, const std::string& message)>
-            callback);
+        std::function<void(int level, std::string_view name, std::string_view message)> callback);
     /** set the max message size and max Queue size
      */
     void setMessageSize(int maxMsgSize, int maxCount);
@@ -91,32 +90,33 @@ class CommsInterface {
     */
     void setTimeout(std::chrono::milliseconds timeOut);
     /** set a flag for the comms system*/
-    virtual void setFlag(const std::string& flag, bool val);
+    virtual void setFlag(std::string_view flag, bool val);
     /** enable or disable the server mode for the comms*/
     void setServerMode(bool serverActive);
 
     /** generate a log message as a warning*/
-    void logWarning(const std::string& message) const;
+    void logWarning(std::string_view message) const;
     /** generate a log message as an error*/
-    void logError(const std::string& message) const;
+    void logError(std::string_view message) const;
     /** generate a log message as a level above warning or error*/
-    void logMessage(const std::string& message) const;
+    void logMessage(std::string_view message) const;
 
   protected:
     /// enumeration of the connection status flags for more immediate feedback from the processing
     /// threads
-    enum class connection_status : int {
+    enum class ConnectionStatus : int {
 
-        startup = -1,  //!< the connection is in startup mode
-        connected = 0,  //!< we are connected
-        reconnecting = 1,  //!< we are trying reconnect
-        terminated = 2,  //!< the connection has been terminated
-        error = 4  //!< some error occurred on the connection
+        STARTUP = -1,  //!< the connection is in STARTUP mode
+        CONNECTED = 0,  //!< we are CONNECTED
+        RECONNECTING = 1,  //!< we are trying reconnect
+        TERMINATED = 2,  //!< the connection has been TERMINATED
+        ERRORED = 4  //!< some ERRORED occurred on the connection
     };
 
   private:
-    std::atomic<connection_status> rx_status{
-        connection_status::startup};  //!< the status of the receiver thread
+    /// the status of the receiver thread
+    std::atomic<ConnectionStatus> rxStatus{ConnectionStatus::STARTUP};
+
   protected:
     gmlc::concurrency::TriggerVariable rxTrigger;
 
@@ -124,14 +124,15 @@ class CommsInterface {
     std::string localTargetAddress;  //!< the base for the receive address
     std::string brokerTargetAddress;  //!< the base for the broker address
     std::string brokerName;  //!< the identifier for the broker
-    std::string
-        brokerInitString;  //!< the initialization string for any automatically generated broker
+    /// the initialization string for any automatically generated broker
+    std::string brokerInitString;
+
   private:
     std::string randomID;  //!< randomized id for preventing crosstalk in some situations
-    std::atomic<connection_status> tx_status{
-        connection_status::startup};  //!< the status of the transmitter thread
+    /// the status of the transmitter thread
+    std::atomic<ConnectionStatus> txStatus{ConnectionStatus::STARTUP};
     gmlc::concurrency::TriggerVariable txTrigger;
-    std::atomic<bool> operating{false};  //!< the comms interface is in startup mode
+    std::atomic<bool> operating{false};  //!< the comms interface is in STARTUP mode
     const bool singleThread{false};  //!< specify that the interface should operate a single thread
 
   protected:
@@ -148,7 +149,7 @@ class CommsInterface {
     std::atomic<bool> requestDisconnect{false};  //!< flag gets set when disconnect is called
     std::function<void(ActionMessage&&)>
         ActionCallback;  //!< the callback for what to do with a received message
-    std::function<void(int level, const std::string& name, const std::string& message)>
+    std::function<void(int level, std::string_view name, std::string_view message)>
         loggingCallback;  //!< callback for logging
     gmlc::containers::BlockingPriorityQueue<std::pair<route_id, ActionMessage>>
         txQueue;  //!< set of messages waiting to be transmitted
@@ -170,10 +171,10 @@ class CommsInterface {
     virtual void reconnectTransmitter();  //!< function to reconnect the transmitter
     virtual void reconnectReceiver();  //!< function to reconnect the receiver
   protected:
-    void setTxStatus(connection_status txStatus);
-    void setRxStatus(connection_status rxStatus);
-    connection_status getRxStatus() const { return rx_status.load(); }
-    connection_status getTxStatus() const { return tx_status.load(); }
+    void setTxStatus(ConnectionStatus status);
+    void setRxStatus(ConnectionStatus status);
+    ConnectionStatus getRxStatus() const { return rxStatus.load(); }
+    ConnectionStatus getTxStatus() const { return txStatus.load(); }
     /** function to protect certain properties in a threaded environment
     these functions should be called in a pair*/
     bool propertyLock();
@@ -210,13 +211,12 @@ namespace CommFactory {
     };
 
     /** define a new Comm Builder from the builder give a name and build code*/
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb,
-                           const std::string& commTypeName,
-                           int code);
+    void
+        defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view commTypeName, int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CommTYPE>
-    std::shared_ptr<CommBuilder> addCommType(const std::string& commTypeName, int code)
+    std::shared_ptr<CommBuilder> addCommType(std::string_view commTypeName, int code)
     {
         auto bld = std::make_shared<CommTypeBuilder<CommTYPE>>();
         std::shared_ptr<CommBuilder> cbld = std::static_pointer_cast<CommBuilder>(bld);
@@ -225,7 +225,7 @@ namespace CommFactory {
     }
 
     std::unique_ptr<CommsInterface> create(CoreType type);
-    std::unique_ptr<CommsInterface> create(const std::string& type);
+    std::unique_ptr<CommsInterface> create(std::string_view type);
 
 }  // namespace CommFactory
 

@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest.h>
 
-struct bad_input_tests: public FederateTestFixture, public ::testing::Test {};
+struct bad_input_nosan: public FederateTestFixture, public ::testing::Test {};
 
 /** test simple creation and destruction*/
-TEST_F(bad_input_tests, test_bad_fed)
+TEST_F(bad_input_nosan, test_bad_fed)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -42,7 +42,7 @@ TEST_F(bad_input_tests, test_bad_fed)
 }
 
 /** test simple creation and destruction*/
-TEST_F(bad_input_tests, test_mistaken_free)
+TEST_F(bad_input_nosan, test_mistaken_free)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -62,7 +62,7 @@ TEST_F(bad_input_tests, test_mistaken_free)
 }
 
 /** test simple creation and destruction*/
-TEST_F(bad_input_tests, test_mistaken_finalize)
+TEST_F(bad_input_nosan, test_mistaken_finalize)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -84,7 +84,7 @@ TEST_F(bad_input_tests, test_mistaken_finalize)
 }
 
 /** test simple creation and destruction*/
-TEST_F(bad_input_tests, test_creation)
+TEST_F(bad_input_nosan, test_creation)
 {
     SetupTest(helicsCreateValueFederate, "zmq", 1);
 
@@ -93,7 +93,7 @@ TEST_F(bad_input_tests, test_creation)
     EXPECT_TRUE(helicsFederateIsValid(fed2) == HELICS_TRUE);
 }
 
-TEST(error_tests, unavailable_CoreType)
+TEST(error_tests, unavailable_CoreType_nosan)
 {
     auto err = helicsErrorInitialize();
     auto core = helicsCreateCore("nullcore", "test", "", &err);
@@ -110,9 +110,9 @@ TEST(error_tests, unavailable_CoreType)
     helicsBrokerDestroy(brk);
 }
 
-struct function_tests: public FederateTestFixture, public ::testing::Test {};
+struct function_nosan: public FederateTestFixture, public ::testing::Test {};
 
-TEST_F(function_tests, execution_iteration_test)
+TEST_F(function_nosan, execution_iteration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -153,7 +153,7 @@ TEST_F(function_tests, execution_iteration_test)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-TEST_F(function_tests, input_test)
+TEST_F(function_nosan, input)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -222,7 +222,7 @@ TEST_F(function_tests, input_test)
 }
 
 // test registrations with invalid types and some improper getValue calls
-TEST_F(function_tests, raw)
+TEST_F(function_nosan, raw)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -274,7 +274,7 @@ TEST_F(function_tests, raw)
 }
 
 // test registrations with invalid types
-TEST_F(function_tests, raw2)
+TEST_F(function_nosan, raw2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -330,7 +330,7 @@ TEST_F(function_tests, raw2)
 }
 
 // check string conversions and duplicate publication errors
-TEST_F(function_tests, string)
+TEST_F(function_nosan, string)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -371,7 +371,7 @@ TEST_F(function_tests, string)
 }
 
 // check duplicate publication and inputs error pathways
-TEST_F(function_tests, typePub)
+TEST_F(function_nosan, typePub)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -417,7 +417,7 @@ TEST_F(function_tests, typePub)
 }
 
 // check duplicate GlobalTypePublications and inputs and failures in register interface functions
-TEST_F(function_tests, typePub2)
+TEST_F(function_nosan, typePub2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -518,7 +518,7 @@ TEST_F(function_tests, typePub2)
 // generate an error in the init calls so these tests go through a series of different ways
 // and functions that error can get propagated to test the error paths of the different functions
 
-TEST_F(function_tests, initError)
+TEST_F(function_nosan, initError)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -560,7 +560,7 @@ TEST_F(function_tests, initError)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-TEST_F(function_tests, initError2)
+TEST_F(function_nosan, initError2)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -619,7 +619,7 @@ TEST_F(function_tests, initError2)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-TEST_F(function_tests, initError3)
+TEST_F(function_nosan, initError3)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -648,7 +648,7 @@ TEST_F(function_tests, initError3)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-TEST_F(function_tests, initError4)
+TEST_F(function_nosan, initError4)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -691,19 +691,19 @@ TEST_F(function_tests, initError4)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST_F(function_tests, version)
+TEST_F(function_nosan, version)
 {
     auto b = helicsGetVersion();
     EXPECT_NE(b, nullptr);
 }
 
-TEST_F(function_tests, systemInfo)
+TEST_F(function_nosan, systemInfo)
 {
     auto b = helicsGetSystemInfo();
     EXPECT_NE(b, nullptr);
 }
 
-TEST_F(function_tests, initError5)
+TEST_F(function_nosan, initError5)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -734,7 +734,7 @@ TEST_F(function_tests, initError5)
     helicsFederateFinalize(vFed1, nullptr);
 }
 
-TEST_F(function_tests, initError6)
+TEST_F(function_nosan, initError6)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -773,7 +773,7 @@ TEST_F(function_tests, initError6)
 }
 
 // Test the core data link function and Get Federate By Name function for functionality and errors
-TEST_F(function_tests, CoreLink)
+TEST_F(function_nosan, CoreLink)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -818,7 +818,7 @@ TEST_F(function_tests, CoreLink)
 }
 
 // Test the core data link function and Get Federate By Name function for functionality and errors
-TEST_F(function_tests, BrokerLink)
+TEST_F(function_nosan, BrokerLink)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
@@ -851,7 +851,7 @@ TEST_F(function_tests, BrokerLink)
 }
 
 // the next series of tests out error paths and different functions related to the message federate
-TEST_F(function_tests, messageFed)
+TEST_F(function_nosan, messageFed)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -900,7 +900,7 @@ TEST_F(function_tests, messageFed)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST_F(function_tests, messageFed_event)
+TEST_F(function_nosan, messageFed_event)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -931,7 +931,7 @@ TEST_F(function_tests, messageFed_event)
     EXPECT_NE(err.error_code, 0);
 }
 
-TEST_F(function_tests, messageFed_messageObject)
+TEST_F(function_nosan, messageFed_messageObject)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -986,7 +986,7 @@ TEST_F(function_tests, messageFed_messageObject)
 }
 
 // test different paths for sending message objects
-TEST_F(function_tests, messageFed_message_object)
+TEST_F(function_nosan, messageFed_message_object)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
     auto mFed1 = GetFederateAt(0);
@@ -1031,7 +1031,7 @@ TEST_F(function_tests, messageFed_message_object)
 }
 
 // test error paths for filters
-TEST_F(function_tests, filter)
+TEST_F(function_nosan, filter)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 
@@ -1047,7 +1047,7 @@ TEST_F(function_tests, filter)
 }
 
 // test some other filter creation functions and error paths
-TEST_F(function_tests, filter_tests2)
+TEST_F(function_nosan, filter_tests2)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 
@@ -1074,7 +1074,7 @@ TEST_F(function_tests, filter_tests2)
     helicsFederateFinalize(mFed1, nullptr);
 }
 
-TEST_F(function_tests, filter_tests3)
+TEST_F(function_nosan, filter_tests3)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 
@@ -1089,7 +1089,7 @@ TEST_F(function_tests, filter_tests3)
     helicsFederateFinalize(mFed1, nullptr);
 }
 
-TEST_F(function_tests, filter_tests4)
+TEST_F(function_nosan, filter_tests4)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 
@@ -1122,7 +1122,7 @@ TEST_F(function_tests, filter_tests4)
 }
 
 // test filter creation in a core and error pathways
-TEST_F(function_tests, filter_core_tests)
+TEST_F(function_nosan, filter_core)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 
@@ -1145,7 +1145,7 @@ TEST_F(function_tests, filter_core_tests)
 }
 
 // test cloning filter creation from a core and some error paths
-TEST_F(function_tests, filter_core_tests2)
+TEST_F(function_nosan, filter_core_tests2)
 {
     SetupTest(helicsCreateMessageFederate, "test", 1);
 

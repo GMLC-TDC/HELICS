@@ -13,6 +13,7 @@
     advanced_query
     advanced_multi_input
     advanced_orchestration
+    advanced_iteration
 
 ```
 

@@ -22,7 +22,7 @@ template class NetworkBroker<tcp::TcpComms,
 namespace tcp {
     TcpBrokerSS::TcpBrokerSS(bool rootBroker) noexcept: NetworkBroker(rootBroker) {}
 
-    TcpBrokerSS::TcpBrokerSS(const std::string& broker_name): NetworkBroker(broker_name) {}
+    TcpBrokerSS::TcpBrokerSS(std::string_view broker_name): NetworkBroker(broker_name) {}
 
     std::shared_ptr<helicsCLI11App> TcpBrokerSS::generateCLI()
     {

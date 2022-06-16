@@ -24,12 +24,13 @@ namespace apps {
     class TypedBrokerServer {
       public:
         virtual ~TypedBrokerServer() = default;
-        /** start the server*/
-        virtual void startServer(const Json::Value* val) = 0;
+        /** start the server, the server may require a shared pointer to keep the data alive */
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) = 0;
         /** stop the server*/
         virtual void stopServer() = 0;
         /** process some potential command line arguments for the typed server*/
-        virtual void processArgs(const std::string& args);
+        virtual void processArgs(std::string_view args);
 
       protected:
         /** generate a reply to a message*/
@@ -40,7 +41,7 @@ namespace apps {
         /* assign a port in the portData structure*/
         static void assignPort(portData& pd, int pnumber, std::shared_ptr<Broker>& brk);
         /* log a message to the console */
-        static void logMessage(const std::string& message);
+        static void logMessage(std::string_view message);
     };
 }  // namespace apps
 }  // namespace helics

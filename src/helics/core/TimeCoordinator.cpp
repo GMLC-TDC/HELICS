@@ -553,6 +553,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
         case IterationRequest::NO_ITERATIONS:
             if (time_allow > time_exec) {
                 iteration = 0;
+                sequenceCounter = 0;
                 updateTimeGrant();
                 return MessageProcessingResult::NEXT_STEP;
             }
@@ -561,6 +562,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     if (time_requested <= time_exec) {
                         // this is the non interrupted case
                         iteration = 0;
+                        sequenceCounter = 0;
                         updateTimeGrant();
                         return MessageProcessingResult::NEXT_STEP;
                     }
@@ -570,6 +572,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     getDelayMode(info.wait_for_current_time_updates, (time_requested > time_exec));
                 if (dependencies.checkIfReadyForTimeGrant(false, time_exec, delayMode)) {
                     iteration = 0;
+                    sequenceCounter = 0;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
                 }
@@ -587,7 +590,13 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                     updateTimeGrant();
                     return MessageProcessingResult::ITERATING;
                 }
-                iteration = 0;
+                if (iterating == IterationRequest::FORCE_ITERATION) {
+                    ++iteration;
+                } else {
+                    iteration = 0;
+                    sequenceCounter = 0;
+                }
+
                 updateTimeGrant();
                 return (iterating == IterationRequest::FORCE_ITERATION) ?
                     MessageProcessingResult::ITERATING :
@@ -710,6 +719,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                 ret = MessageProcessingResult::ITERATING;
             } else {
                 iteration = 0;
+                sequenceCounter = 0;
                 hasIterationData = false;
                 updateTimeGrant();
             }
@@ -848,6 +858,9 @@ void TimeCoordinator::updateTimeGrant()
     treq.source_id = mSourceId;
     treq.actionTime = time_granted;
     treq.counter = sequenceCounter;
+    if (static_cast<std::int32_t>(treq.counter) != sequenceCounter) {
+        sequenceCounter = 0;
+    }
     if (iterating != IterationRequest::NO_ITERATIONS) {
         dependencies.resetIteratingTimeRequests(time_exec);
     }
@@ -1036,8 +1049,9 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             if (hasInitUpdates) {
                 ret = MessageProcessingResult::ITERATING;
             } else {
-                if (dependencies.checkIfReadyForExecEntry(false,
-                                                          info.wait_for_current_time_updates)) {
+                if ((dependencies.checkIfReadyForExecEntry(false,
+                                                           info.wait_for_current_time_updates)) ||
+                    (info.wait_for_current_time_updates && dependencies.checkAllPastExec(true))) {
                     ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                         MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;

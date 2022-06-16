@@ -326,12 +326,12 @@ HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const vo
  * Publish a string.
  *
  * @param pub The publication to publish for.
- * @param str The string to publish.
+ * @param val The null terminated string to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* val, HelicsError* err);
 
 /**
  * Publish an integer value.
@@ -429,13 +429,13 @@ HELICS_EXPORT void
  * Publish a named point.
  *
  * @param pub The publication to publish for.
- * @param str A string for the name to publish.
+ * @param field A null terminated string for the field name of the namedPoint to publish.
  * @param val A double for the value to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* field, double val, HelicsError* err);
 
 /**
  * Add a named input to the list of targets a publication publishes to.
@@ -663,11 +663,11 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data,
  * Set the default as a string.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to the default string.
+ * @param defaultString A pointer to the default string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* defaultString, HelicsError* err);
 
 /**
  * Set the default as an integer.
@@ -756,12 +756,12 @@ HELICS_EXPORT void helicsInputSetDefaultComplexVector(HelicsInput ipt, const dou
  * Set the default as a NamedPoint.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to a string representing the name.
+ * @param defaultName A pointer to a null terminated string representing the field name to use in the named point.
  * @param val A double value for the value of the named point.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* defaultName, double val, HelicsError* err);
 
 /**@}*/
 

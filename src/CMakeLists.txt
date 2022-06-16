@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -11,7 +11,7 @@ get_directory_property(hasParent PARENT_DIRECTORY)
 if(hasParent)
     add_subdirectory(helics)
 else()
-    cmake_minimum_required(VERSION 3.10...3.22)
+    cmake_minimum_required(VERSION 3.10...3.23)
 
     set(HELICS_BUILD_TESTS OFF CACHE INTERNAL "")
     set(HELICS_BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")

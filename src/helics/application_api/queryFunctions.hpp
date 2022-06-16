@@ -12,6 +12,7 @@ functions for dealing with query results*/
 
 #include <chrono>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // forward declare Federate
@@ -21,25 +22,25 @@ class Federate;
 /** function takes a query result and vectorizes it if the query is a vector result, if not the
  * results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string&& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string_view queryres);
 /** function takes a query result and vectorizes it if the query is a vector result, if not the
  * results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeQueryResult(std::string_view queryres);
 
 /** function takes a query result and vectorizes it if the query is a vector result of integer
  * indices, if not the results are an empty vector
  */
-HELICS_CXX_EXPORT std::vector<int> vectorizeIndexQuery(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<int> vectorizeIndexQuery(std::string_view queryres);
 
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not
  * the results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string&& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres);
 /** function takes a query result, vectorizes and sorts it if the query is a vector result, if not
  * the results go into the first element of the vector
  */
-HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(const std::string& queryres);
+HELICS_CXX_EXPORT std::vector<std::string> vectorizeAndSortQueryResult(std::string_view queryres);
 
 /** helper function to wait for a particular federate has requested initialization mode
 @details this is useful for querying information and being reasonably certain the federate is done
@@ -51,7 +52,7 @@ adding to its interface
 */
 HELICS_CXX_EXPORT bool
     waitForInit(helics::Federate* fed,
-                const std::string& fedName,
+                std::string_view fedName,
                 std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
 
 /** helper function to wait for a particular federate to be created
@@ -63,7 +64,7 @@ HELICS_CXX_EXPORT bool
 */
 HELICS_CXX_EXPORT bool
     waitForFed(helics::Federate* fed,
-               const std::string& fedName,
+               std::string_view fedName,
                std::chrono::milliseconds timeout = std::chrono::milliseconds(10000));
 
 /** helper function to get a list of all the publications a federate subscribes to
@@ -72,6 +73,6 @@ HELICS_CXX_EXPORT bool
 @return a string vector of the names of the publication that are subscribed to
 */
 HELICS_CXX_EXPORT std::string queryFederateSubscriptions(helics::Federate* fed,
-                                                         const std::string& fedName);
+                                                         std::string_view fedName);
 
 }  // namespace helics

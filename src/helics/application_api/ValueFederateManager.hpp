@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Inputs.hpp"
 #include "ValueFederate.hpp"
 #include "data_view.hpp"
-#include "gmlc/containers/DualMappedVector.hpp"
+#include "gmlc/containers/DualStringMappedVector.hpp"
 #include "helicsTypes.hpp"
 
 #include <map>
@@ -33,11 +33,8 @@ struct publication_info {
     PublicationId id;  //!< the id used as the identifier
     int size{-1};  //!< required size of a publication
     bool forward{true};
-    publication_info(const std::string& n_name,
-                     const std::string& n_type,
-                     const std::string& n_units):
-        name(n_name),
-        type(n_type), units(n_units)
+    publication_info(std::string_view n_name, std::string_view n_type, std::string_view n_units):
+        name(n_name), type(n_type), units(n_units)
     {
     }
 };
@@ -56,7 +53,7 @@ struct input_info {
 
     std::function<void(Input&, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
-    input_info(const std::string& n_name, const std::string& n_type, const std::string& n_units):
+    input_info(std::string_view n_name, std::string_view n_type, std::string_view n_units):
         name(n_name), type(n_type), units(n_units)
     {
     }
@@ -69,11 +66,11 @@ class ValueFederateManager {
     ~ValueFederateManager();
 
     Publication&
-        registerPublication(const std::string& key, std::string type, const std::string& units);
+        registerPublication(std::string_view key, std::string_view type, std::string_view units);
     /** register a subscription
     @details call is only valid in startup mode
     */
-    Input& registerInput(const std::string& key, std::string type, const std::string& units);
+    Input& registerInput(std::string_view key, std::string_view type, std::string_view units);
 
     /** add a shortcut for locating a subscription
     @details primarily for use in looking up an id from a different location
@@ -81,7 +78,7 @@ class ValueFederateManager {
     @param inp the subscription identifier
     @param shortcutName the name of the shortcut
     */
-    void addAlias(const Input& inp, const std::string& shortcutName);
+    void addAlias(const Input& inp, std::string_view shortcutName);
 
     /** add a alias/shortcut for locating a publication
     @details primarily for use in looking up an id from a different location
@@ -89,7 +86,7 @@ class ValueFederateManager {
     @param pub the subscription identifier
     @param shortcutName the name of the shortcut
     */
-    void addAlias(const Publication& pub, const std::string& shortcutName);
+    void addAlias(const Publication& pub, std::string_view shortcutName);
     /** add a destination target to a publication
    @param pub the identifier of the input
    @param target the name of the input to send the data to
@@ -143,7 +140,7 @@ class ValueFederateManager {
     /** transition from initialize to execution State*/
     void initializeToExecuteStateTransition(IterationResult result);
     /** generate results for a local query */
-    std::string localQuery(const std::string& queryStr) const;
+    std::string localQuery(std::string_view queryStr) const;
     /** get a list of all the values that have been updated since the last call
     @return a vector of subscription_ids with all the values that have not been retrieved since
     updated
@@ -156,22 +153,22 @@ class ValueFederateManager {
     /** get an Input from Its Name
     @param key the identifier or shortcut of the input
     @return ivalid_input_id if name is not a recognized*/
-    Input& getInput(const std::string& key);
-    const Input& getInput(const std::string& key) const;
+    Input& getInput(std::string_view key);
+    const Input& getInput(std::string_view key) const;
     /** get an input by index*/
     Input& getInput(int index);
     const Input& getInput(int index) const;
     /** get the id of a subscription
     @param key the target of a subscription
     @return ivalid_input_id if name is not a recognized*/
-    const Input& getSubscription(const std::string& key) const;
-    Input& getSubscription(const std::string& key);
+    const Input& getSubscription(std::string_view key) const;
+    Input& getSubscription(std::string_view key);
 
     /** get a publication based on its key
     @param key the publication id
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
-    Publication& getPublication(const std::string& key);
-    const Publication& getPublication(const std::string& key) const;
+    Publication& getPublication(std::string_view key);
+    const Publication& getPublication(std::string_view key) const;
 
     Publication& getPublication(int index);
     const Publication& getPublication(int index) const;
@@ -208,14 +205,8 @@ class ValueFederateManager {
     bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
     LocalFederateId fedID;  //!< the federation ID from the core API
-    shared_guarded_m<
-        gmlc::containers::
-            DualMappedVector<Input, std::string, InterfaceHandle, reference_stability::stable>>
-        inputs;
-    shared_guarded_m<gmlc::containers::DualMappedVector<Publication,
-                                                        std::string,
-                                                        InterfaceHandle,
-                                                        reference_stability::stable>>
+    shared_guarded_m<gmlc::containers::DualStringMappedVector<Input, InterfaceHandle>> inputs;
+    shared_guarded_m<gmlc::containers::DualStringMappedVector<Publication, InterfaceHandle>>
         publications;
     Time CurrentTime{-1.0};  //!< the current simulation time
     Core* coreObject{nullptr};  //!< the pointer to the actual core

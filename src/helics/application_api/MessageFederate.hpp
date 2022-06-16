@@ -28,7 +28,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     fi
     @param fi  a federate information structure
     */
-    MessageFederate(const std::string& fedName, const FederateInfo& fi);
+    MessageFederate(std::string_view fedName, const FederateInfo& fi);
     /**constructor taking a core and a federate information structure, core information in fi is
     ignored
     @param fedName the name of the messageFederate, can be left empty to use a default or one from
@@ -36,7 +36,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param core a shared ptr to a core to join
     @param fi  a federate information structure
     */
-    MessageFederate(const std::string& fedName,
+    MessageFederate(std::string_view fedName,
                     const std::shared_ptr<Core>& core,
                     const FederateInfo& fi = FederateInfo{});
 
@@ -47,7 +47,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param core a CoreApp object representing the core to connect to
     @param fi  a federate information structure
     */
-    MessageFederate(const std::string& fedName,
+    MessageFederate(std::string_view fedName,
                     CoreApp& core,
                     const FederateInfo& fi = FederateInfo{});
 
@@ -55,7 +55,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param name the name of the federate, can be empty to get name from config
     @param configString can be either a JSON file, TOML file or a string containing JSON code
     */
-    MessageFederate(const std::string& name, const std::string& configString);
+    MessageFederate(std::string_view name, const std::string& configString);
     /**constructor taking a string with the required information
     @param configString can be either a JSON file, TOML file or a string containing JSON code, or
     command line arguments it can also be just the federate name
@@ -90,7 +90,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     virtual void startupToInitializeStateTransition() override;
     virtual void initializeToExecuteStateTransition(IterationResult result) override;
     virtual void updateTime(Time newTime, Time oldTime) override;
-    virtual std::string localQuery(const std::string& queryStr) const override;
+    virtual std::string localQuery(std::string_view queryStr) const override;
 
   public:
     /** register an endpoint
@@ -98,16 +98,16 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerEndpoint(const std::string& eptName = std::string(),
-                               const std::string& type = std::string());
+    Endpoint& registerEndpoint(std::string_view eptName = std::string_view(),
+                               std::string_view type = std::string_view());
 
     /** register a targeted endpoint
     @details this type of endpoint can can send messages to predefined targets
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
-    Endpoint& registerTargetedEndpoint(const std::string& eptName = std::string(),
-                                       const std::string& type = std::string());
+    Endpoint& registerTargetedEndpoint(std::string_view eptName = std::string_view(),
+                                       std::string_view type = std::string_view());
 
     /** register an endpoint directly without prepending the federate name
     @details call is only valid in startup mode
@@ -115,16 +115,16 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param type the defined type of the interface for endpoint checking if requested
     @return a Reference to an Endpoint Object
     */
-    Endpoint& registerGlobalEndpoint(const std::string& eptName,
-                                     const std::string& type = std::string());
+    Endpoint& registerGlobalEndpoint(std::string_view eptName,
+                                     std::string_view type = std::string_view());
 
     /** register a targeted endpoint directly without prepending the federate name
   @param eptName the name of the endpoint
   @param type the defined type of the interface for endpoint checking if requested
   @return a Reference to an Endpoint Object
   */
-    Endpoint& registerGlobalTargetedEndpoint(const std::string& eptName,
-                                             const std::string& type = std::string());
+    Endpoint& registerGlobalTargetedEndpoint(std::string_view eptName,
+                                             std::string_view type = std::string_view());
 
     /** register an indexed Endpoint
     @details register a global endpoint as part of a 1D array of endpoints
@@ -132,11 +132,11 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param index1 the index into a 1 dimensional array of endpoints
     @param type the optional type on the endpoint
     */
-    Endpoint& registerIndexedEndpoint(const std::string& eptName,
+    Endpoint& registerIndexedEndpoint(std::string_view eptName,
                                       int index1,
-                                      const std::string& type = std::string())
+                                      std::string_view type = std::string_view())
     {
-        return registerGlobalEndpoint(eptName + '_' + std::to_string(index1), type);
+        return registerGlobalEndpoint(std::string(eptName) + '_' + std::to_string(index1), type);
     }
 
     virtual void registerInterfaces(const std::string& configString) override;
@@ -193,7 +193,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     /** get an endpoint by its name
     @param name the Endpoint
     @return an Endpoint*/
-    Endpoint& getEndpoint(const std::string& name) const;
+    Endpoint& getEndpoint(std::string_view name) const;
 
     /** get an Endpoint from an index
     @param index the index of the endpoint to retrieve index is 0 based

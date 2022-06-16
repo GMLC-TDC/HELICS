@@ -17,7 +17,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-CoreApp::CoreApp(CoreType ctype, const std::string& coreName, std::vector<std::string> args):
+CoreApp::CoreApp(CoreType ctype, std::string_view coreName, std::vector<std::string> args):
     name(coreName)
 {
     auto app = generateParser();
@@ -38,8 +38,7 @@ CoreApp::CoreApp(CoreType ctype, std::vector<std::string> args)
 
 CoreApp::CoreApp(std::vector<std::string> args): CoreApp(CoreType::DEFAULT, std::move(args)) {}
 
-CoreApp::CoreApp(CoreType ctype, const std::string& coreName, int argc, char* argv[]):
-    name(coreName)
+CoreApp::CoreApp(CoreType ctype, std::string_view coreName, int argc, char* argv[]): name(coreName)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
@@ -54,22 +53,22 @@ CoreApp::CoreApp(CoreType ctype, int argc, char* argv[]): CoreApp(ctype, std::st
 
 CoreApp::CoreApp(int argc, char* argv[]): CoreApp(CoreType::DEFAULT, std::string{}, argc, argv) {}
 
-CoreApp::CoreApp(CoreType ctype, const std::string& coreName, const std::string& argString):
+CoreApp::CoreApp(CoreType ctype, std::string_view coreName, std::string_view argString):
     name(coreName)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
-    if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string{argString}) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
 }
 
-CoreApp::CoreApp(CoreType ctype, const std::string& argString):
-    CoreApp(ctype, std::string{}, argString)
+CoreApp::CoreApp(CoreType ctype, std::string_view argString):
+    CoreApp(ctype, std::string_view{}, argString)
 {
 }
 
-CoreApp::CoreApp(const std::string& argString)
+CoreApp::CoreApp(std::string_view argString)
 {
     if (argString.find_first_of('-') == std::string::npos) {
         core = CoreFactory::findCore(argString);
@@ -79,7 +78,7 @@ CoreApp::CoreApp(const std::string& argString)
         }
     }
     auto app = generateParser();
-    if (app->helics_parse(argString) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string{argString}) == helicsCLI11App::parse_output::ok) {
         processArgs(app);
     }
 }
@@ -166,28 +165,28 @@ bool CoreApp::waitForDisconnect(std::chrono::milliseconds waitTime)
     return true;
 }
 
-void CoreApp::linkEndpoints(const std::string& source, const std::string& target)
+void CoreApp::linkEndpoints(std::string_view source, std::string_view target)
 {
     if (core) {
         core->linkEndpoints(source, target);
     }
 }
 
-void CoreApp::dataLink(const std::string& source, const std::string& target)
+void CoreApp::dataLink(std::string_view source, std::string_view target)
 {
     if (core) {
         core->dataLink(source, target);
     }
 }
 /** add a source Filter to an endpoint*/
-void CoreApp::addSourceFilterToEndpoint(const std::string& filter, const std::string& endpoint)
+void CoreApp::addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     if (core) {
         core->addSourceFilterToEndpoint(filter, endpoint);
     }
 }
 /** add a destination Filter to an endpoint*/
-void CoreApp::addDestinationFilterToEndpoint(const std::string& filter, const std::string& endpoint)
+void CoreApp::addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint)
 {
     if (core) {
         core->addDestinationFilterToEndpoint(filter, endpoint);
@@ -214,22 +213,21 @@ const std::string& CoreApp::getAddress() const
 }
 
 /** make a query at the core*/
-std::string CoreApp::query(const std::string& target,
-                           const std::string& queryStr,
-                           HelicsSequencingModes mode)
+std::string
+    CoreApp::query(std::string_view target, std::string_view queryStr, HelicsSequencingModes mode)
 {
     return (core) ? core->query(target, queryStr, mode) :
                     generateJsonErrorResponse(JsonErrorCodes::BAD_GATEWAY, "Core not available");
 }
 
-void CoreApp::setTag(const std::string& tag, const std::string& value)
+void CoreApp::setTag(std::string_view tag, std::string_view value)
 {
     if (core) {
         core->setFederateTag(gLocalCoreId, tag, value);
     }
 }
 
-const std::string& CoreApp::getTag(const std::string& tag) const
+const std::string& CoreApp::getTag(std::string_view tag) const
 {
     if (core) {
         return core->getFederateTag(gLocalCoreId, tag);
@@ -237,15 +235,15 @@ const std::string& CoreApp::getTag(const std::string& tag) const
     return estring;
 }
 
-void CoreApp::setGlobal(const std::string& valueName, const std::string& value)
+void CoreApp::setGlobal(std::string_view valueName, std::string_view value)
 {
     if (core) {
         core->setGlobal(valueName, value);
     }
 }
 
-void CoreApp::sendCommand(const std::string& target,
-                          const std::string& commandStr,
+void CoreApp::sendCommand(std::string_view target,
+                          std::string_view commandStr,
                           HelicsSequencingModes mode)
 {
     if (core) {
@@ -261,7 +259,7 @@ void CoreApp::setLoggingLevel(int loglevel)
 }
 
 /** set the log file to use for the core*/
-void CoreApp::setLogFile(const std::string& logFile)
+void CoreApp::setLogFile(std::string_view logFile)
 {
     if (core) {
         core->setLogFile(logFile);
@@ -287,7 +285,7 @@ void CoreApp::reset()
     name.clear();
 }
 
-void CoreApp::globalError(int32_t errorCode, const std::string& errorString)
+void CoreApp::globalError(int32_t errorCode, std::string_view errorString)
 {
     if (core) {
         core->globalError(gLocalCoreId, errorCode, errorString);

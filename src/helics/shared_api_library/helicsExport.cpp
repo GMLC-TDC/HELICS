@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
 #include <atomic>
 #include <csignal>
 #include <future>
@@ -22,6 +23,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <mutex>
 #include <thread>
 #include <vector>
+
 #ifdef HELICS_ENABLE_ZMQ_CORE
 #    include "../network/zmq/ZmqContextManager.h"
 #endif
@@ -49,7 +51,7 @@ const char* helicsGetSystemInfo(void)
 
 static constexpr const char* nullstrPtr = "";
 
-const std::string gEmptyStr;
+const std::string gHelicsEmptyStr;
 
 HelicsError helicsErrorInitialize(void)
 {
@@ -373,11 +375,11 @@ HelicsCore helicsCreateCore(const char* type, const char* name, const char* init
     try {
         auto core = std::make_unique<helics::CoreObject>();
         core->valid = gCoreValidationIdentifier;
-        auto nstring = AS_STRING(name);
+        auto nstring = AS_STRING_VIEW(name);
         if (nstring.empty()) {
-            core->coreptr = helics::CoreFactory::create(ct, AS_STRING(initString));
+            core->coreptr = helics::CoreFactory::create(ct, AS_STRING_VIEW(initString));
         } else {
-            core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING(initString));
+            core->coreptr = helics::CoreFactory::FindOrCreate(ct, nstring, AS_STRING_VIEW(initString));
         }
 
         auto* retcore = reinterpret_cast<HelicsCore>(core.get());
@@ -412,7 +414,7 @@ HelicsCore helicsCreateCoreFromArgs(const char* type, const char* name, int argc
         for (int ii = argc - 1; ii > 0; ii--) {
             args.emplace_back(argv[ii]);
         }
-        core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING(name), args);
+        core->coreptr = helics::CoreFactory::FindOrCreate(ct, AS_STRING_VIEW(name), args);
 
         auto* retcore = reinterpret_cast<HelicsCore>(core.get());
         getMasterHolder()->addCore(std::move(core));
@@ -449,30 +451,6 @@ HelicsBool helicsCoreIsValid(HelicsCore core)
     return (coreObj->coreptr) ? HELICS_TRUE : HELICS_FALSE;
 }
 
-HelicsFederate helicsGetFederateByName(const char* fedName, HelicsError* err)
-{
-    if ((err != nullptr) && (err->error_code != 0)) {
-        return nullptr;
-    }
-    if (fedName == nullptr) {
-        if (err != nullptr) {
-            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
-            err->message = getMasterHolder()->addErrorString("fedName is empty");
-        }
-        return nullptr;
-    }
-    auto mob = getMasterHolder();
-    auto* fed = mob->findFed(fedName);
-    if (fed == nullptr) {
-        if (err != nullptr) {
-            err->error_code = HELICS_ERROR_INVALID_ARGUMENT;
-            err->message = getMasterHolder()->addErrorString(std::string(fedName) + " is not an active federate identifier");
-        }
-        return nullptr;
-    }
-    return helicsFederateClone(reinterpret_cast<HelicsFederate>(fed), err);
-}
-
 HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* initString, HelicsError* err)
 {
     if ((err != nullptr) && (err->error_code != 0)) {
@@ -490,7 +468,7 @@ HelicsBroker helicsCreateBroker(const char* type, const char* name, const char* 
     auto broker = std::make_unique<helics::BrokerObject>();
     broker->valid = gBrokerValidationIdentifier;
     try {
-        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), AS_STRING(initString));
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING_VIEW(name), AS_STRING_VIEW(initString));
         auto* retbroker = reinterpret_cast<HelicsBroker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -523,7 +501,7 @@ HelicsBroker helicsCreateBrokerFromArgs(const char* type, const char* name, int 
         for (int ii = argc - 1; ii > 0; ii--) {
             args.emplace_back(argv[ii]);
         }
-        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING(name), args);
+        broker->brokerptr = helics::BrokerFactory::create(ct, AS_STRING_VIEW(name), args);
         auto* retbroker = reinterpret_cast<HelicsBroker>(broker.get());
         getMasterHolder()->addBroker(std::move(broker));
         return retbroker;
@@ -606,7 +584,7 @@ void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const cha
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    brk->setGlobal(valueName, AS_STRING(value));
+    brk->setGlobal(valueName, AS_STRING_VIEW(value));
 }
 
 void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
@@ -615,7 +593,7 @@ void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char
     if (brk == nullptr) {
         return;
     }
-    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_FAST);
+    brk->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), HELICS_SEQUENCING_MODE_FAST);
 }
 
 void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
@@ -624,7 +602,7 @@ void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, con
     if (brk == nullptr) {
         return;
     }
-    brk->sendCommand(AS_STRING(target), AS_STRING(command), HELICS_SEQUENCING_MODE_ORDERED);
+    brk->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, HelicsError* err)
@@ -633,7 +611,7 @@ void helicsBrokerSetLogFile(HelicsBroker broker, const char* logFileName, Helics
     if (brk == nullptr) {
         return;
     }
-    brk->setLogFile(AS_STRING(logFileName));
+    brk->setLogFile(AS_STRING_VIEW(logFileName));
 }
 
 void helicsBrokerSetTimeBarrier(HelicsBroker broker, HelicsTime barrierTime, HelicsError* err)
@@ -660,7 +638,7 @@ void helicsBrokerGlobalError(HelicsBroker broker, int errorCode, const char* err
     if (brk == nullptr) {
         return;
     }
-    brk->globalError(errorCode, AS_STRING(errorString));
+    brk->globalError(errorCode, AS_STRING_VIEW(errorString));
 }
 
 void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorString, HelicsError* err)
@@ -669,7 +647,7 @@ void helicsCoreGlobalError(HelicsCore core, int errorCode, const char* errorStri
     if (cr == nullptr) {
         return;
     }
-    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING(errorString));
+    cr->globalError(helics::gLocalCoreId, errorCode, AS_STRING_VIEW(errorString));
 }
 
 void helicsBrokerAddSourceFilterToEndpoint(HelicsBroker broker, const char* filter, const char* endpoint, HelicsError* err)
@@ -771,7 +749,7 @@ void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* val
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    cr->setGlobal(valueName, AS_STRING(value));
+    cr->setGlobal(valueName, AS_STRING_VIEW(value));
 }
 
 void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -780,7 +758,7 @@ void helicsCoreSendCommand(HelicsCore core, const char* target, const char* comm
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_FAST);
+    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string_view{}, HELICS_SEQUENCING_MODE_FAST);
 }
 
 void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -789,7 +767,7 @@ void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const cha
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING(target), AS_STRING(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
+    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
 }
 
 void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err)
@@ -798,7 +776,7 @@ void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError*
     if (cr == nullptr) {
         return;
     }
-    cr->setLogFile(AS_STRING(logFileName));
+    cr->setLogFile(AS_STRING_VIEW(logFileName));
 }
 
 const char* helicsBrokerGetIdentifier(HelicsBroker broker)
@@ -919,7 +897,7 @@ void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
 }
@@ -1010,9 +988,9 @@ void helicsAbort(int errorCode, const char* message)
     }
 }
 
-static const char* invalidQueryString = "Query object is invalid";
+static constexpr const char* invalidQueryString = "Query object is invalid";
 
-static const int validQueryIdentifier = 0x2706'3885;
+static constexpr int validQueryIdentifier = 0x2706'3885;
 
 static helics::QueryObject* getQueryObj(HelicsQuery query, HelicsError* err)
 {
@@ -1040,37 +1018,48 @@ HelicsQuery helicsCreateQuery(const char* target, const char* query)
     return reinterpret_cast<void*>(queryObj);
 }
 
-constexpr auto invalidStringConst = "#invalid";
+constexpr auto invalidQueryObConst = "{{\n  \"error\":{{\n    \"code\":400,\n    \"message\":\"query object is not valid\"\n  }}\n}}";
+constexpr auto invalidFedObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"federate object is not valid\"\n  }}\n}}";
+constexpr auto queryErrorString = "{{\n  \"error\":{{\n    \"code\":500,\n    \"message\":\"Error on query Evaluation\"\n  }}\n}}";
 
 const char* helicsQueryExecute(HelicsQuery query, HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
-        return invalidStringConst;
+        return invalidFedObConst;
     }
 
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
-    if (queryObj->target.empty()) {
-        queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
-    } else {
-        queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
-    }
+    try {
+        if (queryObj->target.empty()) {
+            queryObj->response = fedObj->query(queryObj->query, queryObj->mode);
+        } else {
+            queryObj->response = fedObj->query(queryObj->target, queryObj->query, queryObj->mode);
+        }
 
-    return queryObj->response.c_str();
+        return queryObj->response.c_str();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    return queryErrorString;
+    // LCOV_EXCL_START
 }
 
 const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsError* err)
 {
     auto* coreObj = getCore(core, err);
     if (coreObj == nullptr) {
-        return invalidStringConst;
+        constexpr auto invalidCoreObConst = "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Core object is not valid\"\n  }}\n}}";
+        return invalidCoreObConst;
     }
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
     try {
         queryObj->response = coreObj->query(queryObj->target, queryObj->query, queryObj->mode);
@@ -1080,7 +1069,7 @@ const char* helicsQueryCoreExecute(HelicsQuery query, HelicsCore core, HelicsErr
     catch (...) {
         helicsErrorHandler(err);
     }
-    return invalidStringConst;
+    return queryErrorString;
     // LCOV_EXCL_START
 }
 
@@ -1088,12 +1077,14 @@ const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, Hel
 {
     auto* brokerObj = getBroker(broker, err);
     if (brokerObj == nullptr) {
-        return invalidStringConst;
+        constexpr auto invalidBrokerObConst =
+            "{{\n  \"error\":{{\n    \"code\":404,\n    \"message\":\"Broker object is not valid\"\n  }}\n}}";
+        return invalidBrokerObConst;
     }
 
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
     try {
         queryObj->response = brokerObj->query(queryObj->target, queryObj->query, queryObj->mode);
@@ -1103,18 +1094,19 @@ const char* helicsQueryBrokerExecute(HelicsQuery query, HelicsBroker broker, Hel
     catch (...) {
         helicsErrorHandler(err);
     }
-    return invalidStringConst;
+    return queryErrorString;
     // LCOV_EXCL_STOP
 }
 
 void helicsQueryExecuteAsync(HelicsQuery query, HelicsFederate fed, HelicsError* err)
 {
-    auto fedObj = getFedSharedPtr(fed, err);
-    if (fedObj == nullptr) {
-        return;
-    }
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
+        return;
+    }
+    auto fedObj = getFedSharedPtr(fed, err);
+    if (fedObj == nullptr) {
+        queryObj->response = invalidFedObConst;
         return;
     }
     try {
@@ -1137,15 +1129,23 @@ const char* helicsQueryExecuteComplete(HelicsQuery query, HelicsError* err)
 {
     auto* queryObj = getQueryObj(query, err);
     if (queryObj == nullptr) {
-        return invalidStringConst;
+        return invalidQueryObConst;
     }
-    if (queryObj->asyncIndexCode.isValid()) {
-        queryObj->response = queryObj->activeFed->queryComplete(queryObj->asyncIndexCode);
+    try {
+        if (queryObj->asyncIndexCode.isValid()) {
+            queryObj->response = queryObj->activeFed->queryComplete(queryObj->asyncIndexCode);
+        }
+        queryObj->activeAsync = false;
+        queryObj->activeFed = nullptr;
+        queryObj->asyncIndexCode = helics::QueryId();
+        return queryObj->response.c_str();
     }
-    queryObj->activeAsync = false;
-    queryObj->activeFed = nullptr;
-    queryObj->asyncIndexCode = helics::QueryId();
-    return queryObj->response.c_str();
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    return queryErrorString;
+    // LCOV_EXCL_STOP
 }
 
 HelicsBool helicsQueryIsCompleted(HelicsQuery query)
@@ -1154,11 +1154,18 @@ HelicsBool helicsQueryIsCompleted(HelicsQuery query)
     if (queryObj == nullptr) {
         return HELICS_FALSE;
     }
-    if (queryObj->asyncIndexCode.isValid()) {
-        auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
-        return (res) ? HELICS_TRUE : HELICS_FALSE;
+    try {
+        if (queryObj->asyncIndexCode.isValid()) {
+            auto res = queryObj->activeFed->isQueryCompleted(queryObj->asyncIndexCode);
+            return (res) ? HELICS_TRUE : HELICS_FALSE;
+        }
+        return HELICS_FALSE;
     }
-    return HELICS_FALSE;
+    // LCOV_EXCL_START
+    catch (...) {
+        return HELICS_FALSE;
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsQuerySetTarget(HelicsQuery query, const char* target, HelicsError* err)
@@ -1246,7 +1253,7 @@ int MasterObjectHolder::addFed(std::unique_ptr<helics::FedObject> fed)
     return index;
 }
 
-helics::FedObject* MasterObjectHolder::findFed(const std::string& fedName)
+helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName)
 {
     auto handle = feds.lock();
     for (auto& fed : (*handle)) {
@@ -1257,6 +1264,37 @@ helics::FedObject* MasterObjectHolder::findFed(const std::string& fedName)
         }
     }
     return nullptr;
+}
+
+helics::FedObject* MasterObjectHolder::findFed(std::string_view fedName, int validationCode)
+{
+    auto handle = feds.lock();
+    for (auto& fed : (*handle)) {
+        if ((fed) && (fed->fedptr)) {
+            if (fed->valid == validationCode && fed->fedptr->getName() == fedName) {
+                return fed.get();
+            }
+        }
+    }
+    return nullptr;
+}
+
+/** remove a federate object*/
+bool MasterObjectHolder::removeFed(std::string_view fedName, int validationCode)
+{
+    auto handle = feds.lock();
+    bool found{false};
+    for (auto& fed : (*handle)) {
+        if ((fed) && (fed->fedptr)) {
+            if (fed->fedptr->getName() == fedName && fed->valid == validationCode) {
+                fed->valid = 0;
+                fed->fedptr.reset();
+                fed.reset();
+                found = true;
+            }
+        }
+    }
+    return found;
 }
 
 void MasterObjectHolder::clearBroker(int index)
@@ -1301,13 +1339,13 @@ void MasterObjectHolder::clearFed(int index)
     }
 }
 
-void MasterObjectHolder::abortAll(int code, const std::string& error)
+void MasterObjectHolder::abortAll(int code, std::string_view error)
 {
     {
         auto fedHandle = feds.lock();
         for (auto& fed : fedHandle) {
             if ((fed) && (fed->fedptr)) {
-                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + error + "'");
+                fed->fedptr->globalError(code, fed->fedptr->getName() + " sent abort message: '" + std::string(error) + "'");
             }
         }
     }
@@ -1354,10 +1392,10 @@ void MasterObjectHolder::deleteAll()
     errorStrings.lock()->clear();
 }
 
-const char* MasterObjectHolder::addErrorString(std::string newError)
+const char* MasterObjectHolder::addErrorString(std::string_view newError)
 {
     auto estring = errorStrings.lock();
-    estring->push_back(std::move(newError));
+    estring->emplace_back(newError);
     auto& v = estring->back();
     return v.c_str();
 }

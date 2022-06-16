@@ -24,7 +24,9 @@ namespace apps {
         double ramp = 0.0;  //!< the ramp rate in  X/sec;
 
       public:
-        virtual void set(const std::string& parameter, double val) override;
+        RampGenerator() = default;
+        explicit RampGenerator(std::string_view name): SignalGenerator(name) {}
+        virtual void set(std::string_view parameter, double val) override;
 
         virtual defV generate(Time signalTime) override;
     };
@@ -42,7 +44,9 @@ namespace apps {
         Time lastCycle = timeZero;
 
       public:
-        virtual void set(const std::string& parameter, double val) override;
+        SineGenerator() = default;
+        explicit SineGenerator(std::string_view name): SignalGenerator(name) {}
+        virtual void set(std::string_view parameter, double val) override;
 
         virtual defV generate(Time signalTime) override;
     };
@@ -63,10 +67,12 @@ namespace apps {
         std::complex<double> rotation{1.0, 0};
 
       public:
-        virtual void set(const std::string& parameter, double val) override;
+        PhasorGenerator() = default;
+        explicit PhasorGenerator(std::string_view name): SignalGenerator(name) {}
+        virtual void set(std::string_view parameter, double val) override;
         /** set overload for a complex parameter*/
-        void set(const std::string& parameter, std::complex<double> val);
-        virtual void setString(const std::string& parameter, const std::string& val) override;
+        void set(std::string_view parameter, std::complex<double> val);
+        virtual void setString(std::string_view parameter, std::string_view val) override;
         virtual defV generate(Time signalTime) override;
     };
 }  // namespace apps

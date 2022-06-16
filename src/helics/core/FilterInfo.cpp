@@ -15,8 +15,8 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 void FilterInfo::addDestinationEndpoint(GlobalHandle dest,
-                                        const std::string& destName,
-                                        const std::string& destType)
+                                        std::string_view destName,
+                                        std::string_view destType)
 {
     for (const auto& ti : destEndpoints) {
         if (ti.id == dest) {
@@ -35,8 +35,8 @@ void FilterInfo::addDestinationEndpoint(GlobalHandle dest,
 
 /** add a source to an endpoint*/
 void FilterInfo::addSourceEndpoint(GlobalHandle dest,
-                                   const std::string& sourceName,
-                                   const std::string& sourceType)
+                                   std::string_view sourceName,
+                                   std::string_view sourceType)
 {
     for (const auto& si : sourceEndpoints) {
         if (si.id == dest) {

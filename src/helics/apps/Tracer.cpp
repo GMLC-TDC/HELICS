@@ -32,7 +32,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 namespace apps {
-    Tracer::Tracer(const std::string& appName, FederateInfo& fi): App(appName, fi)
+    Tracer::Tracer(std::string_view appName, FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
@@ -61,7 +61,7 @@ namespace apps {
             std::cout << app->help();
         }
     }
-    Tracer::Tracer(const std::string& appName,
+    Tracer::Tracer(std::string_view appName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
         App(appName, core, fi)
@@ -69,13 +69,13 @@ namespace apps {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Tracer::Tracer(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+    Tracer::Tracer(std::string_view appName, CoreApp& core, const FederateInfo& fi):
         App(appName, core, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
     }
 
-    Tracer::Tracer(const std::string& name, const std::string& file): App(name, file)
+    Tracer::Tracer(std::string_view name, const std::string& file): App(name, file)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Tracer::loadJsonFile(file);
@@ -395,27 +395,27 @@ namespace apps {
         }
     }
     /** add a subscription to record*/
-    void Tracer::addSubscription(const std::string& key)
+    void Tracer::addSubscription(std::string_view key)
     {
         auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
             subscriptions.push_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
-            subkeys[key] = index;  // this is a potential replacement
+            subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
         }
     }
 
     /** add an endpoint*/
-    void Tracer::addEndpoint(const std::string& endpoint)
+    void Tracer::addEndpoint(std::string_view endpoint)
     {
         auto res = eptNames.find(endpoint);
         if ((res == eptNames.end()) || (res->second == -1)) {
             endpoints.emplace_back(InterfaceVisibility::GLOBAL, fed, endpoint);
             auto index = static_cast<int>(endpoints.size()) - 1;
-            eptNames[endpoint] = index;  // this is a potential replacement
+            eptNames[endpoints.back().getName()] = index;  // this is a potential replacement
         }
     }
-    void Tracer::addSourceEndpointClone(const std::string& sourceEndpoint)
+    void Tracer::addSourceEndpointClone(std::string_view sourceEndpoint)
     {
         if (!cFilt) {
             cFilt = std::make_unique<CloningFilter>(fed.get());
@@ -425,7 +425,7 @@ namespace apps {
         cFilt->addSourceTarget(sourceEndpoint);
     }
 
-    void Tracer::addDestEndpointClone(const std::string& destEndpoint)
+    void Tracer::addDestEndpointClone(std::string_view destEndpoint)
     {
         if (!cFilt) {
             cFilt = std::make_unique<CloningFilter>(fed.get());
@@ -435,9 +435,9 @@ namespace apps {
         cFilt->addDestinationTarget(destEndpoint);
     }
 
-    void Tracer::addCapture(const std::string& captureDesc)
+    void Tracer::addCapture(std::string_view captureDesc)
     {
-        captureInterfaces.push_back(captureDesc);
+        captureInterfaces.emplace_back(captureDesc);
     }
 
     std::shared_ptr<helicsCLI11App> Tracer::buildArgParserApp()

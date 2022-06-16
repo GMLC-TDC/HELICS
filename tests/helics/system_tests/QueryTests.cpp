@@ -301,7 +301,7 @@ TEST_F(query, current_time)
     EXPECT_EQ(val["requested_time"].asDouble(), 3.0);
     mFed2->requestTime(3.0);
     mFed1->requestTimeComplete();
-
+    mFed1->query("broker", "flush");
     res = mFed1->query("broker", "current_time");
     val = loadJsonStr(res);
     EXPECT_EQ(val["time_next"].asDouble(), 3.0);

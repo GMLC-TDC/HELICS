@@ -16,6 +16,8 @@ them using the toml library
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wshadow"
 #endif
+#include <string_view>
+#define TOML11_USING_STRING_VIEW 1
 #include "toml.hpp"
 #ifdef __GNUC__
 #    pragma GCC diagnostic pop
@@ -30,8 +32,9 @@ toml::Value to the root object
 */
 toml::value loadToml(const std::string& tomlString);
 
-bool hasTomlExtension(const std::string& tomlString);
+bool hasTomlExtension(std::string_view tomlString);
 /** load a TOML object in a string
+ * @throws std::invalid_argument if the string parsing failed through toml
  */
 toml::value loadTomlStr(const std::string& tomlString);
 

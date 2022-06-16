@@ -30,7 +30,7 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
 }
 
 static constexpr char nullcstr[] = "";
-const std::string gNullStringArgument("the supplied string argument is null and therefore invalid");
+const std::string gHelicsNullStringArgument("the supplied string argument is null and therefore invalid");
 
 static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
@@ -54,7 +54,7 @@ HelicsEndpoint helicsFederateRegisterEndpoint(HelicsFederate fed, const char* na
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerEndpoint(AS_STRING_VIEW(name), AS_STRING_VIEW(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
@@ -75,7 +75,7 @@ HelicsEndpoint helicsFederateRegisterTargetedEndpoint(HelicsFederate fed, const 
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerTargetedEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerTargetedEndpoint(AS_STRING_VIEW(name), AS_STRING_VIEW(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
@@ -96,7 +96,7 @@ HelicsEndpoint helicsFederateRegisterGlobalEndpoint(HelicsFederate fed, const ch
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerGlobalEndpoint(AS_STRING_VIEW(name), AS_STRING_VIEW(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
@@ -116,7 +116,7 @@ HelicsEndpoint helicsFederateRegisterGlobalTargetedEndpoint(HelicsFederate fed, 
     }
     try {
         auto end = std::make_unique<helics::EndpointObject>();
-        end->endPtr = &fedObj->registerGlobalTargetedEndpoint(AS_STRING(name), AS_STRING(type));
+        end->endPtr = &fedObj->registerGlobalTargetedEndpoint(AS_STRING_VIEW(name), AS_STRING_VIEW(type));
         end->fedptr = std::move(fedObj);
         end->fed = helics::getFedObject(fed, nullptr);
         return addEndpoint(fed, std::move(end));
@@ -219,32 +219,6 @@ const char* helicsEndpointGetDefaultDestination(HelicsEndpoint endpoint)
     return str.c_str();
 }
 
-void helicsEndpointSendData(HelicsEndpoint endpoint, const void* data, int inputDataLength, const char* dest, HelicsError* err)
-{
-    auto* endObj = verifyEndpoint(endpoint, err);
-    if (endObj == nullptr) {
-        return;
-    }
-    try {
-        if ((data == nullptr) || (inputDataLength <= 0)) {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(gEmptyStr);
-            } else {
-                endObj->endPtr->sendTo(dest, gEmptyStr);
-            }
-        } else {
-            if ((dest == nullptr) || (std::string(dest).empty())) {
-                endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
-            } else {
-                endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, dest);
-            }
-        }
-    }
-    catch (...) {
-        helicsErrorHandler(err);
-    }
-}
-
 void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inputDataLength, HelicsError* err)
 {
     auto* endObj = verifyEndpoint(endpoint, err);
@@ -253,13 +227,13 @@ void helicsEndpointSendBytes(HelicsEndpoint endpoint, const void* data, int inpu
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->send(gEmptyStr);
+            endObj->endPtr->send(gHelicsEmptyStr);
         } else {
             endObj->endPtr->send(reinterpret_cast<const char*>(data), inputDataLength);
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -271,13 +245,13 @@ void helicsEndpointSendBytesTo(HelicsEndpoint endpoint, const void* data, int in
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendTo(gEmptyStr, AS_STRING_VIEW(dest));
+            endObj->endPtr->sendTo(gHelicsEmptyStr, AS_STRING_VIEW(dest));
         } else {
             endObj->endPtr->sendTo(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest));
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -289,13 +263,13 @@ void helicsEndpointSendBytesAt(HelicsEndpoint endpoint, const void* data, int in
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendAt(gEmptyStr, time);
+            endObj->endPtr->sendAt(gHelicsEmptyStr, time);
         } else {
             endObj->endPtr->sendAt(reinterpret_cast<const char*>(data), inputDataLength, time);
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -312,13 +286,13 @@ void helicsEndpointSendBytesToAt(HelicsEndpoint endpoint,
     }
     try {
         if ((data == nullptr) || (inputDataLength <= 0)) {
-            endObj->endPtr->sendToAt(gEmptyStr, AS_STRING_VIEW(dest), time);
+            endObj->endPtr->sendToAt(gHelicsEmptyStr, AS_STRING_VIEW(dest), time);
         } else {
             endObj->endPtr->sendToAt(reinterpret_cast<const char*>(data), inputDataLength, AS_STRING_VIEW(dest), time);
         }
     }
     catch (...) {
-        return helicsErrorHandler(err);
+        helicsErrorHandler(err);
     }
 }
 
@@ -636,7 +610,7 @@ const char* helicsEndpointGetInfo(HelicsEndpoint end)
 {
     auto* endObj = verifyEndpoint(end, nullptr);
     if (endObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = endObj->endPtr->getInfo();
@@ -644,7 +618,7 @@ const char* helicsEndpointGetInfo(HelicsEndpoint end)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -656,7 +630,7 @@ void helicsEndpointSetInfo(HelicsEndpoint end, const char* info, HelicsError* er
         return;
     }
     try {
-        endObj->endPtr->setInfo(AS_STRING(info));
+        endObj->endPtr->setInfo(AS_STRING_VIEW(info));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -669,15 +643,15 @@ const char* helicsEndpointGetTag(HelicsEndpoint endpoint, const char* tagname)
 {
     auto* endObj = verifyEndpoint(endpoint, nullptr);
     if (endObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
-        const std::string& info = endObj->endPtr->getTag(AS_STRING(tagname));
+        const std::string& info = endObj->endPtr->getTag(AS_STRING_VIEW(tagname));
         return info.c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -689,7 +663,7 @@ void helicsEndpointSetTag(HelicsEndpoint end, const char* tagname, const char* t
         return;
     }
     try {
-        endObj->endPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
+        endObj->endPtr->setTag(AS_STRING_VIEW(tagname), AS_STRING_VIEW(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -808,6 +782,12 @@ void helicsEndpointAddDestinationFilter(HelicsEndpoint end, const char* filterNa
         helicsErrorHandler(err);
     }
     // LCOV_EXCL_STOP
+}
+
+HelicsMessage wrapMessage(std::unique_ptr<helics::Message>& mess)
+{
+    mess->messageValidation = messageKeyCode;
+    return reinterpret_cast<HelicsMessage>(mess.get());
 }
 
 static constexpr char invalidMessageObject[] = "The message object was not valid";
@@ -1091,7 +1071,7 @@ void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError*
     if (mess == nullptr) {
         return;
     }
-    mess->data = AS_STRING(str);
+    mess->data = AS_STRING_VIEW(str);
     mess->data.null_terminate();
 }
 

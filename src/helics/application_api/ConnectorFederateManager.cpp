@@ -23,9 +23,9 @@ ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,
 }
 ConnectorFederateManager::~ConnectorFederateManager() = default;
 
-Filter& ConnectorFederateManager::registerFilter(const std::string& name,
-                                                 const std::string& type_in,
-                                                 const std::string& type_out)
+Filter& ConnectorFederateManager::registerFilter(std::string_view name,
+                                                 std::string_view type_in,
+                                                 std::string_view type_out)
 {
     auto handle = coreObject->registerFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -48,22 +48,20 @@ Translator& ConnectorFederateManager::registerTranslator(std::string_view name,
 {
     auto handle = coreObject->registerTranslator(name, endpointType, units);
     if (handle.isValid()) {
-        auto tran = std::make_unique<Translator>(fed, name, handle);
-        Translator& t = *tran;
         auto trans = translators.lock();
         if (name.empty()) {
-            trans->insert(coreObject->getHandleName(tran->getHandle()), std::move(tran));
+            trans->insert(coreObject->getHandleName(handle), fed, name, handle);
         } else {
-            trans->insert(std::string(name), std::move(tran));
+            trans->insert(name, fed, name, handle);
         }
-        return t;
+        return trans->back();
     }
     throw(RegistrationFailure("Unable to register translator"));
 }
 
-CloningFilter& ConnectorFederateManager::registerCloningFilter(const std::string& name,
-                                                               const std::string& type_in,
-                                                               const std::string& type_out)
+CloningFilter& ConnectorFederateManager::registerCloningFilter(std::string_view name,
+                                                               std::string_view type_in,
+                                                               std::string_view type_out)
 {
     auto handle = coreObject->registerCloningFilter(name, type_in, type_out);
     if (handle.isValid()) {
@@ -71,7 +69,7 @@ CloningFilter& ConnectorFederateManager::registerCloningFilter(const std::string
         CloningFilter& f = *filt;
         auto filts = filters.lock();
         if (name.empty()) {
-            filts->insert(coreObject->getHandleName(filt->getHandle()), std::move(filt));
+            filts->insert(coreObject->getHandleName(handle), std::move(filt));
         } else {
             filts->insert(name, std::move(filt));
         }
@@ -80,15 +78,15 @@ CloningFilter& ConnectorFederateManager::registerCloningFilter(const std::string
     throw(RegistrationFailure("Unable to register Filter"));
 }
 
-Filter& ConnectorFederateManager::registerFilter(FilterTypes type, const std::string& name)
+Filter& ConnectorFederateManager::registerFilter(FilterTypes type, std::string_view name)
 {
     return make_filter(type, fed, name);
 }
 
 CloningFilter& ConnectorFederateManager::registerCloningFilter(FilterTypes type,
-                                                               const std::string& name)
+                                                               std::string_view name)
 {
-    return make_cloning_filter(type, fed, std::string(), name);
+    return make_cloning_filter(type, fed, std::string_view(), name);
 }
 
 static const Filter invalidFilt{};
@@ -97,13 +95,13 @@ static Filter invalidFiltNC{};
 static const Translator invalidTran{};
 static Translator invalidTranNC{};
 
-Filter& ConnectorFederateManager::getFilter(const std::string& name)
+Filter& ConnectorFederateManager::getFilter(std::string_view name)
 {
     auto filts = filters.lock();
     auto filt = filts->find(name);
     return (filt != filts.end()) ? (**filt) : invalidFiltNC;
 }
-const Filter& ConnectorFederateManager::getFilter(const std::string& name) const
+const Filter& ConnectorFederateManager::getFilter(std::string_view name) const
 {
     auto sharedFilt = filters.lock_shared();
     auto filt = sharedFilt->find(name);
@@ -133,24 +131,24 @@ int ConnectorFederateManager::getFilterCount() const
     return static_cast<int>(filters.lock_shared()->size());
 }
 
-Translator& ConnectorFederateManager::getTranslator(const std::string& name)
+Translator& ConnectorFederateManager::getTranslator(std::string_view name)
 {
     auto trans = translators.lock();
     auto tran = trans->find(name);
-    return (tran != trans.end()) ? (**tran) : invalidTranNC;
+    return (tran != trans.end()) ? (*tran) : invalidTranNC;
 }
-const Translator& ConnectorFederateManager::getTranslator(const std::string& name) const
+const Translator& ConnectorFederateManager::getTranslator(std::string_view name) const
 {
     auto sharedTran = translators.lock_shared();
     auto tran = sharedTran->find(name);
-    return (tran != sharedTran.end()) ? (**tran) : invalidTran;
+    return (tran != sharedTran.end()) ? (*tran) : invalidTran;
 }
 
 Translator& ConnectorFederateManager::getTranslator(int index)
 {
     auto sharedTran = translators.lock();
     if (isValidIndex(index, *sharedTran)) {
-        return *(*sharedTran)[index];
+        return (*sharedTran)[index];
     }
     return invalidTranNC;
 }
@@ -159,7 +157,7 @@ const Translator& ConnectorFederateManager::getTranslator(int index) const
 {
     auto sharedTran = translators.lock_shared();
     if (isValidIndex(index, *sharedTran)) {
-        return *(*sharedTran)[index];
+        return (*sharedTran)[index];
     }
     return invalidTran;
 }
@@ -172,29 +170,26 @@ void ConnectorFederateManager::closeAllConnectors()
 {
     if (coreObject != nullptr) {
         auto filts = filters.lock();
-        for (auto& filt : filts) {
+        filts->modify([this](auto& filt) {
             coreObject->closeHandle(filt->getHandle());
             filt->disconnectFromCore();
-        }
+        });
 
         auto trans = translators.lock();
-        for (auto& tran : trans) {
-            coreObject->closeHandle(tran->getHandle());
-            tran->disconnectFromCore();
-        }
+        trans->modify([this](auto& tran) {
+            coreObject->closeHandle(tran.getHandle());
+            tran.disconnectFromCore();
+        });
     }
 }
 
 void ConnectorFederateManager::disconnectAllConnectors()
 {
     auto filts = filters.lock();
-    for (auto& filt : filts) {
-        filt->disconnectFromCore();
-    }
+    filts->modify([](auto& filt) { filt->disconnectFromCore(); });
+
     auto trans = translators.lock();
-    for (auto& tran : trans) {
-        tran->disconnectFromCore();
-    }
+    trans->modify([](auto& tran) { tran.disconnectFromCore(); });
 }
 
 static EmptyCore eCore;

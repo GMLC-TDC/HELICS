@@ -60,8 +60,15 @@ FederateTestFixture::FederateTestFixture()
 }
 FederateTestFixture::~FederateTestFixture()
 {
+    if (NoFree) {
+        helicsCleanupLibrary();
+        return;
+    }
     for (auto& fed : federates) {
         if (fed != nullptr) {
+            if (helicsFederateIsValid(fed) == HELICS_FALSE) {
+                continue;
+            }
             HelicsFederateState state = helicsFederateGetState(fed, nullptr);
             HelicsCore core = helicsFederateGetCore(fed, nullptr);
             if (state != HELICS_STATE_FINALIZE) {

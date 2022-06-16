@@ -59,9 +59,9 @@ namespace mpi {
         {
             logMessage(fmt::format("Shutdown RX Loop for {}", localTargetAddress));
             shutdown = true;
-            setRxStatus(connection_status::terminated);
+            setRxStatus(ConnectionStatus::TERMINATED);
         };
-        setRxStatus(connection_status::connected);
+        setRxStatus(ConnectionStatus::CONNECTED);
 
         while (true) {
             auto M = rxMessageQueue.pop(std::chrono::milliseconds(2000));
@@ -92,7 +92,7 @@ namespace mpi {
 
     void MpiComms::queue_tx_function()
     {
-        setTxStatus(connection_status::connected);
+        setTxStatus(ConnectionStatus::CONNECTED);
 
         auto& mpi_service = MpiService::getInstance();
 
@@ -176,10 +176,10 @@ namespace mpi {
     CLOSE_TX_LOOP:
         logMessage(std::string("Shutdown TX Loop for ") + localTargetAddress);
         routes.clear();
-        if (getRxStatus() == connection_status::connected) {
+        if (getRxStatus() == ConnectionStatus::CONNECTED) {
             shutdown = true;
         }
-        setTxStatus(connection_status::terminated);
+        setTxStatus(ConnectionStatus::TERMINATED);
         mpi_service.removeMpiComms(this);
     }
 

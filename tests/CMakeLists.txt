@@ -33,7 +33,7 @@ if(hasParent)
     endif(NOT HELICS_SWIG_GENERATE_INTERFACE_FILES_ONLY)
 
 else()
-    cmake_minimum_required(VERSION 3.10..3.22)
+    cmake_minimum_required(VERSION 3.10..3.23)
 
     set(HELICS_BUILD_TESTS ON CACHE INTERNAL "")
     set(HELICS_BUILD_MATLAB_INTERFACE OFF CACHE INTERNAL "")

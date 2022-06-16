@@ -40,7 +40,7 @@ static std::string encode(std::string_view str2encode)
 }
 
 namespace helics::apps {
-Recorder::Recorder(const std::string& appName, FederateInfo& fi): App(appName, fi)
+Recorder::Recorder(std::string_view appName, FederateInfo& fi): App(appName, fi)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -70,7 +70,7 @@ void Recorder::processArgs()
     }
 }
 
-Recorder::Recorder(const std::string& appName,
+Recorder::Recorder(std::string_view appName,
                    const std::shared_ptr<Core>& core,
                    const FederateInfo& fi):
     App(appName, core, fi)
@@ -78,13 +78,13 @@ Recorder::Recorder(const std::string& appName,
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Recorder::Recorder(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fi):
     App(appName, core, fi)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Recorder::Recorder(const std::string& appName, const std::string& jsonString):
+Recorder::Recorder(std::string_view appName, const std::string& jsonString):
     App(appName, jsonString)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
@@ -517,7 +517,7 @@ void Recorder::runTo(Time runToTime)
     }
 }
 /** add a subscription to record*/
-void Recorder::addSubscription(const std::string& key)
+void Recorder::addSubscription(std::string_view key)
 {
     auto res = subkeys.find(key);
     if ((res == subkeys.end()) || (res->second == -1)) {
@@ -526,11 +526,11 @@ void Recorder::addSubscription(const std::string& key)
         auto index = static_cast<int>(subscriptions.size()) - 1;
         auto id = subscriptions.back().getHandle();
         subids[id] = index;  // this is a new element
-        subkeys[key] = index;  // this is a potential replacement
+        subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
     }
 }
 /** add an endpoint*/
-void Recorder::addEndpoint(const std::string& endpoint)
+void Recorder::addEndpoint(std::string_view endpoint)
 {
     auto res = eptNames.find(endpoint);
     if ((res == eptNames.end()) || (res->second == -1)) {
@@ -538,11 +538,11 @@ void Recorder::addEndpoint(const std::string& endpoint)
         auto index = static_cast<int>(endpoints.size()) - 1;
         auto id = endpoints.back().getHandle();
         eptids.emplace(id, index);  // this is a new element
-        eptNames[endpoint] = index;  // this is a potential replacement
+        eptNames[endpoints.back().getName()] = index;  // this is a potential replacement
     }
 }
 
-void Recorder::addSourceEndpointClone(const std::string& sourceEndpoint)
+void Recorder::addSourceEndpointClone(std::string_view sourceEndpoint)
 {
     if (!cFilt) {
         cFilt = std::make_unique<CloningFilter>(fed.get());
@@ -552,7 +552,7 @@ void Recorder::addSourceEndpointClone(const std::string& sourceEndpoint)
     cFilt->addSourceTarget(sourceEndpoint);
 }
 
-void Recorder::addDestEndpointClone(const std::string& destEndpoint)
+void Recorder::addDestEndpointClone(std::string_view destEndpoint)
 {
     if (!cFilt) {
         cFilt = std::make_unique<CloningFilter>(fed.get());
@@ -562,9 +562,9 @@ void Recorder::addDestEndpointClone(const std::string& destEndpoint)
     cFilt->addDestinationTarget(destEndpoint);
 }
 
-void Recorder::addCapture(const std::string& captureDesc)
+void Recorder::addCapture(std::string_view captureDesc)
 {
-    captureInterfaces.push_back(captureDesc);
+    captureInterfaces.emplace_back(captureDesc);
 }
 
 std::tuple<Time, std::string_view, std::string> Recorder::getValue(std::size_t index) const

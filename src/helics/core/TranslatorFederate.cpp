@@ -36,8 +36,8 @@ TranslatorFederate::TranslatorFederate(GlobalFederateId fedID,
 
 TranslatorFederate::~TranslatorFederate()
 {
-    mHandles = {nullptr};
-    current_state = {HELICS_CREATED};
+    mHandles = nullptr;
+    current_state = FederateStates::CREATED;
 
     mQueueMessage = nullptr;
     mQueueMessageMove = nullptr;
@@ -131,7 +131,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
 {
     auto proc_result = processCoordinatorMessage(command, &mCoord, current_state, false, mFedID);
 
-    if (std::get<2>(proc_result) && current_state == HELICS_EXECUTING) {
+    if (std::get<2>(proc_result) && current_state == FederateStates::EXECUTING) {
         mCoord.disconnect();
         ActionMessage disconnect(CMD_DISCONNECT);
         disconnect.source_id = mFedID;
@@ -141,7 +141,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
     if (current_state != std::get<0>(proc_result)) {
         current_state = std::get<0>(proc_result);
         switch (current_state) {
-            case HELICS_INITIALIZING:
+            case FederateStates::INITIALIZING:
                 mCoord.enteringExecMode(IterationRequest::NO_ITERATIONS);
                 {
                     ActionMessage echeck{CMD_EXEC_CHECK};
@@ -150,15 +150,15 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                     handleMessage(echeck);
                 }
                 break;
-            case HELICS_EXECUTING:
+            case FederateStates::EXECUTING:
                 mCoord.timeRequest(Time::maxVal(),
                                    IterationRequest::NO_ITERATIONS,
                                    Time::maxVal(),
                                    Time::maxVal());
                 break;
-            case HELICS_FINISHED:
+            case FederateStates::FINISHED:
                 break;
-            case HELICS_ERROR: {
+            case FederateStates::ERRORED: {
                 std::string errorString;
                 if (command.payload.empty()) {
                     errorString = commandErrorString(command.messageID);
@@ -288,9 +288,9 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
 
 TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
                                                      InterfaceHandle handle,
-                                                     const std::string& key,
-                                                     const std::string& endpointType,
-                                                     const std::string& units)
+                                                     std::string_view key,
+                                                     std::string_view endpointType,
+                                                     std::string_view units)
 {
     auto tran = std::make_unique<TranslatorInfo>(
         GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId(mFedID) : dest,
@@ -341,7 +341,7 @@ const TranslatorInfo* TranslatorFederate::getTranslatorInfo(GlobalFederateId fed
     return translators.find(GlobalHandle{fed, handle});
 }
 
-std::string TranslatorFederate::query(const std::string& queryStr) const
+std::string TranslatorFederate::query(std::string_view queryStr) const
 {
     if (queryStr == "exists") {
         return "true";

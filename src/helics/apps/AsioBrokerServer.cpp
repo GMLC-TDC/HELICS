@@ -31,12 +31,13 @@ namespace helics {
 namespace udp {
     class UdpServer: public std::enable_shared_from_this<UdpServer> {
       public:
-        UdpServer(asio::io_context& io_context, std::string& interface, std::uint16_t portNum):
+        UdpServer(asio::io_context& io_context, std::string_view interface, std::uint16_t portNum):
             mSocket(io_context)
         {
             mSocket.open(asio::ip::udp::v4());
             mSocket.bind(
-                asio::ip::udp::endpoint(asio::ip::address::from_string(interface), portNum));
+                asio::ip::udp::endpoint(asio::ip::address::from_string(std::string(interface)),
+                                        portNum));
         }
 
         ~UdpServer()
@@ -70,11 +71,11 @@ namespace udp {
             mDataCall = std::move(dataFunc);
         }
 
-        void send_to(const std::string& message, const asio::ip::udp::endpoint& ept)
+        void send_to(std::string_view message, const asio::ip::udp::endpoint& ept)
         {
             mSocket.send_to(asio::buffer(message), ept);
         }
-        void reply(const std::string& message)
+        void reply(std::string_view message)
         {
             mSocket.send_to(asio::buffer(message), mRemoteEndpoint);
         }
@@ -208,7 +209,7 @@ namespace apps {
 
 #endif  // HELICS_ENABLE_UDP_CORE
 
-    void AsioBrokerServer::processArgs(const std::string& /*unused*/)
+    void AsioBrokerServer::processArgs(std::string_view /*unused*/)
 
     {
         /*
@@ -236,7 +237,8 @@ namespace apps {
 
     static const Json::Value null;
 
-    void AsioBrokerServer::startServer(const Json::Value* val)
+    void AsioBrokerServer::startServer(const Json::Value* val,
+                                       const std::shared_ptr<TypedBrokerServer>& /*ptr*/)
     {
         config_ = (val != nullptr) ? val : &null;
 

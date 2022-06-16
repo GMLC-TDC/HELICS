@@ -62,7 +62,8 @@ class FederateState {
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
 
   private:
-    std::atomic<FederateStates> state{HELICS_CREATED};  //!< the current state of the federate
+    std::atomic<FederateStates> state{
+        FederateStates::CREATED};  //!< the current state of the federate
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
@@ -258,9 +259,9 @@ class FederateState {
     int loggingLevel() const;
 
     /** set a tag (key-value pair)*/
-    void setTag(const std::string& tag, const std::string& value);
+    void setTag(std::string_view tag, std::string_view value);
     /** search for a tag by name*/
-    const std::string& getTag(const std::string& tag) const;
+    const std::string& getTag(std::string_view tag) const;
     /** get a tag (key-value pair) by index*/
     const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
     {
@@ -389,7 +390,7 @@ class FederateState {
     /** move a message to the queue*/
     void addAction(ActionMessage&& action);
     /** sometime a message comes in after a federate has terminated and may require a response*/
-    opt<ActionMessage> processPostTerminationAction(const ActionMessage& action);
+    std::optional<ActionMessage> processPostTerminationAction(const ActionMessage& action);
 
     /** force processing of a specific message out of order*/
     void forceProcessMessage(ActionMessage& action);
@@ -424,7 +425,7 @@ class FederateState {
     @param force_ordering true if the query should be processed in a force_ordering way
     @return the resulting string from the query or "#wait" if the federate is not available to
     answer immediately*/
-    std::string processQuery(const std::string& query, bool force_ordering = false) const;
+    std::string processQuery(std::string_view query, bool force_ordering = false) const;
     /** check if a value should be published or not and if needed archive it as a changed value for
     future change detection
     @param pub_id the handle of the publication
@@ -439,9 +440,9 @@ class FederateState {
     /** create an interface*/
     void createInterface(InterfaceType htype,
                          InterfaceHandle handle,
-                         const std::string& key,
-                         const std::string& type,
-                         const std::string& units,
+                         std::string_view key,
+                         std::string_view type,
+                         std::string_view units,
                          uint16_t flags);
     /** close an interface*/
     void closeInterface(InterfaceHandle handle, InterfaceType type);

@@ -13,4 +13,6 @@ Header file for inclusion of the entire CPP shared library
 #include "application_api.hpp"
 #include "core/helicsVersion.hpp"
 #include "core/helics_definitions.hpp"
+#include "helics/application_api/timeOperations.hpp"
+#include "helics/application_api/typeOperations.hpp"
 #include "helics_enums.h"

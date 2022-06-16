@@ -585,6 +585,42 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
 HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
 
 /**
+ * Protect a federate from finalizing and closing if all references go out of scope
+ *
+ * @details this function allows a federate to be retrieved on demand, it must be explicitly close later otherwise it will be destroyed
+ * when the library is closed
+ *
+ * @param fedName The name of an existing HelicsFederate.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error
+ occurred during the execution of the function, in particular if no federate with the given name exists
+ */
+HELICS_EXPORT void helicsFederateProtect(const char* fedName, HelicsError* err);
+
+/**
+ * remove the protection of an existing federate
+ *
+ * @details this function allows a federate to be retrieved on demand, it must be explicitly close
+ later otherwise it will be destroyed
+ * when the library is closed
+ *
+ * @param fed the name of an existing federate that should not be protected
+ *
+ * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
+ */
+HELICS_EXPORT void helicsFederateUnProtect(const char* fedName, HelicsError* err);
+
+/**
+ * checks if an existing federate is protected
+ *
+ *
+ * @param fed the name of an existing federate to check the protection status
+ *
+ * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
+ */
+HELICS_EXPORT HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err);
+
+/**
  * Create a federate info object for specifying federate information when constructing a federate.
  *
  * @return A HelicsFederateInfo object which is a reference to the created object.
@@ -1453,7 +1489,7 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
 /**
- * Send a command to another helics object though a core.
+ * Send a command to another helics object though a core using asynchronous(fast) operations.
  *
  * @param core The core to send the command through.
  * @param target The name of the object to send the command to.
@@ -1464,7 +1500,18 @@ HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueN
 HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
 /**
- * Send a command to another helics object through a broker.
+ * Send a command to another helics object though a core using ordered operations.
+ *
+ * @param core The core to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using asynchronous(fast) messages.
  *
  * @param broker The broker to send the command through.
  * @param target The name of the object to send the command to.
@@ -1473,6 +1520,17 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using ordered sequencing.
+ *
+ * @param broker The broker to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
 /**
  * Set the log file on a core.

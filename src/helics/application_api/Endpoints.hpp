@@ -30,14 +30,12 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint() = default;
     /**/
     // constructor used by messageFederateManager
-    Endpoint(MessageFederate* mFed, const std::string& name, InterfaceHandle id, void* data);
+    Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id, void* data);
 
-    Endpoint(MessageFederate* mFed,
-             const std::string& name,
-             const std::string& type = std::string());
+    Endpoint(MessageFederate* mFed, std::string_view name, std::string_view type = std::string());
 
     template<class FedPtr>
-    Endpoint(FedPtr& mFed, const std::string& name, const std::string& type = std::string()):
+    Endpoint(FedPtr& mFed, std::string_view name, std::string_view type = std::string()):
         Endpoint(std::addressof(*mFed), name, type)
     {
         static_assert(
@@ -52,8 +50,8 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     */
     Endpoint(InterfaceVisibility locality,
              MessageFederate* mFed,
-             const std::string& name,
-             const std::string& type = std::string());
+             std::string_view name,
+             std::string_view type = std::string());
     /**constructor to build an endpoint object
     @param locality visibility of the endpoint either global or local
     @param mFed  the MessageFederate to use
@@ -63,8 +61,8 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     template<class FedPtr>
     Endpoint(InterfaceVisibility locality,
              FedPtr& mFed,
-             const std::string& name,
-             const std::string& type = std::string()):
+             std::string_view name,
+             std::string_view type = std::string()):
         Endpoint(locality, std::addressof(*mFed), name, type)
     {
         static_assert(
@@ -79,7 +77,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     void send(const char* data, size_t data_size) const;
 
     /** subscribe the endpoint to a particular publication*/
-    void subscribe(const std::string& key);
+    void subscribe(std::string_view key);
 
     /** send a data block and length
     @param dest string name of the destination

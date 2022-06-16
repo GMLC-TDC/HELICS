@@ -52,6 +52,11 @@ std::shared_ptr<helicsCLI11App>
             noAckConnection,
             "specify that a connection_ack message is not required to be connected with a broker")
         ->ignore_underscore();
+
+    nbparser->add_flag(
+        "--force",
+        forceConnection,
+        "if set to true the broker will on an unsuccessful connection as root broker attempt to terminate any existing brokers and reconnect");
     nbparser->add_option_function<std::string>(
         "--broker",
         [this, localAddress](std::string addr) {

@@ -927,7 +927,7 @@ static const Json::Value null;
 
 namespace helics::apps {
 
-void WebServer::processArgs(const std::string& args)
+void WebServer::processArgs(std::string_view args)
 
 {
     CLI::App parser("http web server parser");
@@ -945,7 +945,7 @@ void WebServer::processArgs(const std::string& args)
                       "specify the interface to use for connecting a web server");
 
     try {
-        parser.parse(args);
+        parser.parse(std::string(args));
     }
     catch (const CLI::Error& ce) {
         logMessage(std::string("error processing command line arguments for web server :") +
@@ -953,7 +953,7 @@ void WebServer::processArgs(const std::string& args)
     }
 }
 
-void WebServer::startServer(const Json::Value* val)
+void WebServer::startServer(const Json::Value* val, const std::shared_ptr<TypedBrokerServer>& ptr)
 {
     logMessage("starting broker web server");
     config = (val != nullptr) ? val : &null;
@@ -964,7 +964,11 @@ void WebServer::startServer(const Json::Value* val)
 
         std::lock_guard<std::mutex> tlock(threadGuard);
 
-        mainLoopThread = std::thread([this]() { mainLoop(); });
+        auto webptr = std::dynamic_pointer_cast<WebServer>(ptr);
+        if (!webptr) {
+            throw(std::invalid_argument("pointer to a webserver required for operation"));
+        }
+        mainLoopThread = std::thread([this, webptr = std::move(webptr)]() { mainLoop(webptr); });
         mainLoopThread.detach();
         std::this_thread::yield();
         while (!executing) {
@@ -984,7 +988,7 @@ void WebServer::stopServer()
     }
 }
 
-void WebServer::mainLoop()
+void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {
     if (http_enabled_) {
         if (config->isMember("http")) {
@@ -1019,6 +1023,7 @@ void WebServer::mainLoop()
         context->ioc.run();
     }
     executing.store(false);
+    keepAlive.reset();
 }
 
 }  // namespace helics::apps

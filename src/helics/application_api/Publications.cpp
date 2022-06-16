@@ -19,9 +19,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 Publication::Publication(ValueFederate* valueFed,
                          InterfaceHandle id,
-                         const std::string& key,
-                         const std::string& type,
-                         const std::string& units):
+                         std::string_view key,
+                         std::string_view type,
+                         std::string_view units):
     Interface(valueFed, id, key),
     fed(valueFed), pubUnits(units)
 {
@@ -35,9 +35,9 @@ Publication::Publication(ValueFederate* valueFed,
 }
 
 Publication::Publication(ValueFederate* valueFed,
-                         const std::string& key,
-                         const std::string& type,
-                         const std::string& units)
+                         std::string_view key,
+                         std::string_view type,
+                         std::string_view units)
 {
     auto& pub = valueFed->getPublication(key);
     if (pub.isValid()) {
@@ -49,9 +49,9 @@ Publication::Publication(ValueFederate* valueFed,
 
 Publication::Publication(InterfaceVisibility locality,
                          ValueFederate* valueFed,
-                         const std::string& key,
-                         const std::string& type,
-                         const std::string& units)
+                         std::string_view key,
+                         std::string_view type,
+                         std::string_view units)
 {
     try {
         if (locality == InterfaceVisibility::GLOBAL) {

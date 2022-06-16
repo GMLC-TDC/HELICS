@@ -32,11 +32,11 @@ set(helicsShared_sources
 
 include(GenerateExportHeader)
 
-if(PYTHON_EXECUTABLE)
+if(Python_EXECUTABLE)
     add_custom_command(
         OUTPUT ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
                ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
-        COMMAND ${PYTHON_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py
+        COMMAND ${Python_EXECUTABLE} ARGS ${PROJECT_SOURCE_DIR}/scripts/generateHelicsH.py
                 ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/ ${PROJECT_SOURCE_DIR}
         DEPENDS helicsCore.h
                 helicsCallbacks.h
@@ -44,9 +44,13 @@ if(PYTHON_EXECUTABLE)
                 ValueFederate.h
                 MessageFilters.h
                 Translators.h
+                helicsData.h
+                helicsCore.h
+                Translators.h
                 api-data.h
                 ../helics_enums.h
     )
+
 else()
     configure_file(
         ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h
@@ -95,11 +99,20 @@ if(UNIX OR MINGW)
                     helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
                 )
             endif()
+            check_linker_flag(CXX "-Wl,--exclude-libs,ALL" flag_linker_exclude_libs)
+            if(flag_linker_exclude_libs)
+                target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
+            endif()
         else()
             target_link_libraries(
                 helics PRIVATE -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export.txt
             )
+            target_link_libraries(helics PRIVATE -Wl,--exclude-libs,ALL)
         endif()
+    else(NOT_APPLE)
+        target_link_libraries(
+            helics PRIVATE -Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/export_mac.txt
+        )
     endif(NOT APPLE)
 endif()
 

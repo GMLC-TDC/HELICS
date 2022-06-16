@@ -33,13 +33,14 @@ namespace apps {
     class zmqBrokerServer: public TypedBrokerServer {
       public:
         zmqBrokerServer() = default;
-        explicit zmqBrokerServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit zmqBrokerServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val) override;
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
 
-        virtual void processArgs(const std::string& args) override;
+        virtual void processArgs(std::string_view args) override;
         void enableZmqServer(bool enabled) { zmq_enabled_ = enabled; }
         void enableZmqSsServer(bool enabled) { zmqss_enabled_ = enabled; }
 

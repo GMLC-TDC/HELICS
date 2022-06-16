@@ -411,7 +411,7 @@ static const std::set<std::string_view> convertible_set{"double_vector",
                                                         "time",
                                                         "char",
                                                         "uchar",
-                                                        "json"
+                                                        "json",
                                                         "int32",
                                                         "int64",
                                                         "uint32",

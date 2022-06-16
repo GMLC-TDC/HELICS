@@ -42,7 +42,7 @@ class Broker {
      */
     virtual bool isOpenToNewFederates() const = 0;
     /** start up the broker with an initialization string containing commands and parameters*/
-    virtual void configure(const std::string& configureString) = 0;
+    virtual void configure(std::string_view configureString) = 0;
     /** initialize from command line arguments
      */
     virtual void configureFromArgs(int argc, char* argv[]) = 0;
@@ -65,7 +65,7 @@ class Broker {
         const std::function<void(int, std::string_view, std::string_view)>& logFunction) = 0;
 
     /** set the broker logging file*/
-    virtual void setLogFile(const std::string& lfile) = 0;
+    virtual void setLogFile(std::string_view lfile) = 0;
 
     /** waits in the current thread until the broker is disconnected
     @param msToWait  the timeout to wait for disconnect
@@ -84,8 +84,8 @@ class Broker {
       @return a string containing the response to the query.  Query is a blocking call and will not
     return until the query is answered so use with caution
     */
-    virtual std::string query(const std::string& target,
-                              const std::string& queryStr,
+    virtual std::string query(std::string_view target,
+                              std::string_view queryStr,
                               HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) = 0;
 
     /** set a federation global value
@@ -95,7 +95,7 @@ class Broker {
     @param valueName the name of the global to set
     @param value the value of the global
     */
-    virtual void setGlobal(const std::string& valueName, const std::string& value) = 0;
+    virtual void setGlobal(std::string_view valueName, std::string_view value) = 0;
 
     /** send a command to a specific target
    @details the format is somewhat unspecified; target is the name of an object, typically one of
@@ -105,8 +105,8 @@ class Broker {
     @param mode fast (asynchronous; default) means the command goes on priority channels, ordered
     (synchronous) is slower but has more ordering guarantees
    */
-    virtual void sendCommand(const std::string& target,
-                             const std::string& commandStr,
+    virtual void sendCommand(std::string_view target,
+                             std::string_view commandStr,
                              HelicsSequencingModes mode = HELICS_SEQUENCING_MODE_FAST) = 0;
 
     /** load a file containing connection information
@@ -115,23 +115,22 @@ class Broker {
     /** create a data Link between two endpoints sending data from source to destination
     @param source the name of the endpoint to send from
     @param target the name of the endpoint to send the data to*/
-    virtual void linkEndpoints(const std::string& source, const std::string& target) = 0;
+    virtual void linkEndpoints(std::string_view source, std::string_view target) = 0;
     /** create a data Link between a named publication and a named input
     @param source the name of the publication
     @param target the name of the input*/
-    virtual void dataLink(const std::string& source, const std::string& target) = 0;
+    virtual void dataLink(std::string_view source, std::string_view target) = 0;
     /** create a filter connection between a named filter and a named endpoint for messages coming
     from that endpoint
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void addSourceFilterToEndpoint(const std::string& filter,
-                                           const std::string& target) = 0;
+    virtual void addSourceFilterToEndpoint(std::string_view filter, std::string_view target) = 0;
     /** create a filter connection between a named filter and a named endpoint for destination
     processing
     @param filter the name of the filter
     @param target the name of the source target*/
-    virtual void addDestinationFilterToEndpoint(const std::string& filter,
-                                                const std::string& target) = 0;
+    virtual void addDestinationFilterToEndpoint(std::string_view filter,
+                                                std::string_view target) = 0;
 
     /** update a time barrier with a new time*/
     virtual void setTimeBarrier(Time barrierTime) = 0;
@@ -144,6 +143,6 @@ class Broker {
     @param errorCode the code to use for the error
     @param errorString the error message to associate with the error
     */
-    virtual void globalError(int32_t errorCode, const std::string& errorString) = 0;
+    virtual void globalError(int32_t errorCode, std::string_view errorString) = 0;
 };
 }  // namespace helics

@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#include "gmlc/containers/extra/optional.hpp"
 #include "helics/core/ActionMessage.hpp"
 
 #include <algorithm>
@@ -16,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <cctype>
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 #include <thread>
 #include <vector>
@@ -106,7 +106,7 @@ namespace ipc {
 
         void changeState(queue_state_t newState);
 
-        stx::optional<ActionMessage> getMessage(int timeout);
+        std::optional<ActionMessage> getMessage(int timeout);
         ActionMessage getMessage();
 
         const std::string& getError() const { return errorString; }

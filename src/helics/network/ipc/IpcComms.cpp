@@ -75,13 +75,13 @@ namespace ipc {
                 err.messageID = defs::Errors::CONNECTION_FAILURE;
                 err.payload = rxQueue.getError();
                 ActionCallback(std::move(err));
-                setRxStatus(connection_status::error);  // the connection has failed
+                setRxStatus(ConnectionStatus::ERRORED);  // the connection has failed
                 rxQueue.changeState(queue_state_t::closing);
                 return;
             }
         }
         setRxStatus(
-            connection_status::connected);  // this is a atomic indicator that the rx queue is ready
+            ConnectionStatus::CONNECTED);  // this is a atomic indicator that the rx queue is ready
         bool IPCoperating = false;
         while (true) {
             auto bc = ipcbackchannel.load();
@@ -99,7 +99,7 @@ namespace ipc {
                         err.messageID = defs::Errors::CONNECTION_FAILURE;
                         err.payload = rxQueue.getError();
                         ActionCallback(std::move(err));
-                        setRxStatus(connection_status::error);  // the connection has failed
+                        setRxStatus(ConnectionStatus::ERRORED);  // the connection has failed
                         rxQueue.changeState(queue_state_t::closing);
                         ipcbackchannel = 0;
                         return;
@@ -141,7 +141,7 @@ namespace ipc {
         catch (boost::interprocess::interprocess_exception const& ipe) {
             logError(std::string("error changing states:") + ipe.what());
         }
-        setRxStatus(connection_status::terminated);
+        setRxStatus(ConnectionStatus::TERMINATED);
     }
 
     void IpcComms::queue_tx_function()
@@ -162,23 +162,23 @@ namespace ipc {
                                               brokerQueue.getError());
                     err.messageID = defs::Errors::CONNECTION_FAILURE;
                     ActionCallback(std::move(err));
-                    setTxStatus(connection_status::error);
+                    setTxStatus(ConnectionStatus::ERRORED);
                     return;
                 }
             }
             hasBroker = true;
         }
-        // wait for the receiver to startup
+        // wait for the receiver to STARTUP
         if (!rxTrigger.wait_forActivation(connectionTimeout)) {
             ActionMessage err(CMD_ERROR);
             err.messageID = defs::Errors::CONNECTION_FAILURE;
             err.payload = "Unable to link with receiver";
             ActionCallback(std::move(err));
-            setTxStatus(connection_status::error);
+            setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
-        if (getRxStatus() == connection_status::error) {
-            setTxStatus(connection_status::error);
+        if (getRxStatus() == ConnectionStatus::ERRORED) {
+            setTxStatus(ConnectionStatus::ERRORED);
             return;
         }
         bool conn = rxQueue.connect(localTargetAddress, false, 0);
@@ -186,12 +186,12 @@ namespace ipc {
             /** lets try a reset of the receiver*/
             ipcbackchannel = IPC_BACKCHANNEL_TRY_RESET;
             while (ipcbackchannel != 0) {
-                if (getRxStatus() != connection_status::connected) {
+                if (getRxStatus() != ConnectionStatus::CONNECTED) {
                     break;
                 }
                 std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
-            if (getRxStatus() == connection_status::connected) {
+            if (getRxStatus() == ConnectionStatus::CONNECTED) {
                 conn = rxQueue.connect(localTargetAddress, false, 0);
             }
             if (!conn) {
@@ -200,12 +200,12 @@ namespace ipc {
                 err.payload =
                     fmt::format("Unable to open receiver connection -> {}", rxQueue.getError());
                 ActionCallback(std::move(err));
-                setRxStatus(connection_status::error);
+                setRxStatus(ConnectionStatus::ERRORED);
                 return;
             }
         }
 
-        setTxStatus(connection_status::connected);
+        setTxStatus(ConnectionStatus::CONNECTED);
         bool IPCoperating = false;
         bool continueLoop{true};
         while (continueLoop) {
@@ -259,18 +259,18 @@ namespace ipc {
                 }
             }
         }
-        setTxStatus(connection_status::terminated);
+        setTxStatus(ConnectionStatus::TERMINATED);
     }
 
     void IpcComms::closeReceiver()
     {
-        if ((getRxStatus() == connection_status::error) ||
-            (getRxStatus() == connection_status::terminated)) {
+        if ((getRxStatus() == ConnectionStatus::ERRORED) ||
+            (getRxStatus() == ConnectionStatus::TERMINATED)) {
             return;
         }
         ActionMessage cmd(CMD_PROTOCOL);
         cmd.messageID = CLOSE_RECEIVER;
-        if (getTxStatus() == connection_status::connected) {
+        if (getTxStatus() == ConnectionStatus::CONNECTED) {
             transmit(control_route, cmd);
         } else if (!disconnecting) {
             try {

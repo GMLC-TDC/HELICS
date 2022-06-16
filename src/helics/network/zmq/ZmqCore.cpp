@@ -21,7 +21,7 @@ namespace zeromq {
         netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
     }
 
-    ZmqCore::ZmqCore(const std::string& coreName): NetworkCore(coreName)
+    ZmqCore::ZmqCore(std::string_view coreName): NetworkCore(coreName)
     {
         netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
     }
@@ -38,7 +38,7 @@ namespace zeromq {
         netInfo.appendNameToAddress = true;
     }
 
-    ZmqCoreSS::ZmqCoreSS(const std::string& coreName): NetworkCore(coreName)
+    ZmqCoreSS::ZmqCoreSS(std::string_view coreName): NetworkCore(coreName)
     {
         netInfo.server_mode = NetworkBrokerData::ServerModeOptions::SERVER_DEACTIVATED;
         netInfo.appendNameToAddress = true;

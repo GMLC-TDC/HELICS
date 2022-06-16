@@ -159,7 +159,7 @@ TEST_F(translator, translator_connections2)
     FullDisconnect();
 }
 
-TEST_F(translator, translator_connections3)
+TEST_F(translator, translator_connections3_nosan)
 {
     auto broker = AddBroker("test", 2);
 
@@ -256,7 +256,7 @@ TEST_F(translator, translator_connections5)
     FullDisconnect();
 }
 
-TEST_F(translator, translator_connections6)
+TEST_F(translator, translator_connections6_nosan)
 {
     auto broker = AddBroker("test", 2);
 
@@ -353,7 +353,7 @@ TEST_F(translator, translator_connections8)
     FullDisconnect();
 }
 
-TEST_F(translator, translator_connections9)
+TEST_F(translator, translator_connections9_nosan)
 {
     auto broker = AddBroker("test", 2);
 

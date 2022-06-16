@@ -25,21 +25,21 @@ namespace apps {
     class WebServer: public TypedBrokerServer {
       public:
         WebServer() = default;
-        explicit WebServer(std::string server_name): name_(std::move(server_name)) {}
+        explicit WebServer(std::string_view server_name): name_(server_name) {}
         /** start the server*/
-        virtual void startServer(const Json::Value* val) override;
+        virtual void startServer(const Json::Value* val,
+                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
         /** stop the server*/
         virtual void stopServer() override;
         /** process any command line arguments*/
-        virtual void processArgs(const std::string& args) override;
+        virtual void processArgs(std::string_view args) override;
         /** enable the HTTP server*/
         void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
         /** enable the websocket server*/
         void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; }
 
       private:
-        void mainLoop();
-
+        void mainLoop(std::shared_ptr<WebServer> keepAlive);
         std::atomic<bool> running{false};
         std::shared_ptr<IocWrapper> context;
         std::thread mainLoopThread;

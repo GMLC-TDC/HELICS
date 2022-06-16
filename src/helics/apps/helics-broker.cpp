@@ -76,12 +76,12 @@ int main(int argc, char* argv[])  // NOLINT
         }
     }
 #ifdef HELICS_ENABLE_WEBSERVER
-    std::unique_ptr<helics::apps::WebServer> webserver;
+    std::shared_ptr<helics::apps::WebServer> webserver;
     if (http_webserver || websocket_server) {
-        webserver = std::make_unique<helics::apps::WebServer>();
+        webserver = std::make_shared<helics::apps::WebServer>();
         webserver->enableHttpServer(http_webserver);
         webserver->enableWebSocketServer(websocket_server);
-        webserver->startServer(nullptr);
+        webserver->startServer(nullptr, webserver);
     }
 #else
     if (http_webserver || websocket_server) {

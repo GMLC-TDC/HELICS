@@ -32,7 +32,7 @@ void MessageFederateManager::disconnect()
     coreObject = &eCore;
 }
 
-Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, const std::string& type)
+Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::string_view type)
 {
     auto handle = coreObject->registerEndpoint(fedID, name, type);
     if (handle.isValid()) {
@@ -62,8 +62,8 @@ Endpoint& MessageFederateManager::registerEndpoint(const std::string& name, cons
     throw(RegistrationFailure("Unable to register Endpoint"));
 }
 
-Endpoint& MessageFederateManager::registerTargetedEndpoint(const std::string& name,
-                                                           const std::string& type)
+Endpoint& MessageFederateManager::registerTargetedEndpoint(std::string_view name,
+                                                           std::string_view type)
 {
     auto handle = coreObject->registerTargetedEndpoint(fedID, name, type);
     if (handle.isValid()) {
@@ -218,7 +218,7 @@ void MessageFederateManager::initializeToExecuteStateTransition(IterationResult 
     updateTime(ctime, initializationTime);
 }
 
-std::string MessageFederateManager::localQuery(const std::string& queryStr) const
+std::string MessageFederateManager::localQuery(std::string_view queryStr) const
 {
     std::string ret;
     if (queryStr == "endpoints") {
@@ -233,13 +233,13 @@ std::string MessageFederateManager::localQuery(const std::string& queryStr) cons
 static const Endpoint invalidEpt{};
 static Endpoint invalidEptNC{};
 
-Endpoint& MessageFederateManager::getEndpoint(const std::string& name)
+Endpoint& MessageFederateManager::getEndpoint(std::string_view name)
 {
     auto sharedEpt = local_endpoints.lock();
     auto ept = sharedEpt->find(name);
     return (ept != sharedEpt.end()) ? (*ept) : invalidEptNC;
 }
-const Endpoint& MessageFederateManager::getEndpoint(const std::string& name) const
+const Endpoint& MessageFederateManager::getEndpoint(std::string_view name) const
 {
     auto sharedEpt = local_endpoints.lock_shared();
     auto ept = sharedEpt->find(name);

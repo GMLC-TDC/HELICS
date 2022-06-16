@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace units {
@@ -49,9 +50,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param units an optional string defining the units*/
     Publication(ValueFederate* valueFed,
                 InterfaceHandle id,
-                const std::string& key,
-                const std::string& type,
-                const std::string& units);
+                std::string_view key,
+                std::string_view type,
+                std::string_view units);
 
     /** constructor for a publication
   @param valueFed a pointer the link valueFederate
@@ -59,9 +60,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
   @param type the type of the publication
   @param units an optional string defining the units*/
     Publication(ValueFederate* valueFed,
-                const std::string& key,
-                const std::string& type,
-                const std::string& units = std::string());
+                std::string_view key,
+                std::string_view type,
+                std::string_view units = std::string_view{});
 
     /** base constructor for a publication
     @param valueFed a pointer of some kind to a value federate (any dereferenceable type with * and
@@ -71,9 +72,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param units an optional string defining the units*/
     template<class FedPtr>
     Publication(FedPtr valueFed,
-                const std::string& key,
-                const std::string& type = std::string(),
-                const std::string& units = std::string()):
+                std::string_view key,
+                std::string_view type = std::string_view(),
+                std::string_view units = std::string_view()):
         Publication(std::addressof(*valueFed), key, type, units)
     {
         static_assert(
@@ -89,9 +90,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     @param units an optional string defining the units*/
     Publication(InterfaceVisibility locality,
                 ValueFederate* valueFed,
-                const std::string& key,
-                const std::string& type,
-                const std::string& units = std::string());
+                std::string_view key,
+                std::string_view type,
+                std::string_view units = std::string_view());
     /** base constructor for a publication
     @param locality either GLOBAL or LOCAL, LOCAL prepends the federate name to create a global
     identifier
@@ -103,9 +104,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     template<class FedPtr>
     Publication(InterfaceVisibility locality,
                 FedPtr& valueFed,
-                const std::string& key,
-                const std::string& type,
-                const std::string& units = std::string()):
+                std::string_view key,
+                std::string_view type,
+                std::string_view units = std::string_view()):
         Publication(locality, std::addressof(*valueFed), key, type, units)
     {
         static_assert(
@@ -120,9 +121,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
   @param units the units associated with a Federate
   */
     Publication(ValueFederate* valueFed,
-                const std::string& key,
+                std::string_view key,
                 DataType type,
-                const std::string& units = std::string()):
+                std::string_view units = std::string_view()):
         Publication(valueFed, key, typeNameStringRef(type), units)
     {
     }
@@ -134,9 +135,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     */
     template<class FedPtr>
     Publication(FedPtr& valueFed,
-                const std::string& key,
+                std::string_view key,
                 DataType type,
-                const std::string& units = std::string()):
+                std::string_view units = std::string_view()):
         Publication(valueFed, key, typeNameStringRef(type), units)
     {
     }
@@ -149,9 +150,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     */
     Publication(InterfaceVisibility locality,
                 ValueFederate* valueFed,
-                const std::string& key,
+                std::string_view key,
                 DataType type,
-                const std::string& units = std::string()):
+                std::string_view units = std::string_view()):
         Publication(locality, valueFed, key, typeNameStringRef(type), units)
     {
     }
@@ -166,9 +167,9 @@ class HELICS_CXX_EXPORT Publication: public Interface {
     template<class FedPtr>
     Publication(InterfaceVisibility locality,
                 FedPtr& valueFed,
-                const std::string& key,
+                std::string_view key,
                 DataType type,
-                const std::string& units = std::string()):
+                std::string_view units = std::string_view()):
         Publication(locality, valueFed, key, typeNameStringRef(type), units)
     {
     }

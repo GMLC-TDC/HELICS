@@ -35,8 +35,8 @@ FilterFederate::FilterFederate(GlobalFederateId fedID,
 
 FilterFederate::~FilterFederate()
 {
-    mHandles = {nullptr};
-    current_state = {HELICS_CREATED};
+    mHandles = nullptr;
+    current_state = FederateStates::CREATED;
     /// map of all local filters
     filterCoord.clear();
     // The interface_handle used is here is usually referencing an endpoint
@@ -500,7 +500,7 @@ void FilterFederate::addTimeReturn(int32_t id, Time TimeVal)
     timeBlockProcesses.emplace_back(id, TimeVal);
     if (TimeVal < minReturnTime) {
         minReturnTime = TimeVal;
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
+        mCoord.updateMessageTime(minReturnTime, current_state == FederateStates::EXECUTING);
     }
 }
 
@@ -524,7 +524,7 @@ void FilterFederate::clearTimeReturn(int32_t id)
                 minReturnTime = tBP.second;
             }
         }
-        mCoord.updateMessageTime(minReturnTime, current_state == HELICS_EXECUTING);
+        mCoord.updateMessageTime(minReturnTime, current_state == FederateStates::EXECUTING);
     }
 }
 
@@ -532,7 +532,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
 {
     auto proc_result = processCoordinatorMessage(command, &mCoord, current_state, false, mFedID);
 
-    if (std::get<2>(proc_result) && current_state == HELICS_EXECUTING) {
+    if (std::get<2>(proc_result) && current_state == FederateStates::EXECUTING) {
         mCoord.disconnect();
         ActionMessage disconnect(CMD_DISCONNECT);
         disconnect.source_id = mFedID;
@@ -542,7 +542,7 @@ void FilterFederate::handleMessage(ActionMessage& command)
     if (current_state != std::get<0>(proc_result)) {
         current_state = std::get<0>(proc_result);
         switch (current_state) {
-            case HELICS_INITIALIZING:
+            case FederateStates::INITIALIZING:
                 mCoord.enteringExecMode(IterationRequest::NO_ITERATIONS);
                 {
                     ActionMessage echeck{CMD_EXEC_CHECK};
@@ -551,12 +551,12 @@ void FilterFederate::handleMessage(ActionMessage& command)
                     handleMessage(echeck);
                 }
                 break;
-            case HELICS_EXECUTING:
+            case FederateStates::EXECUTING:
                 mCoord.timeRequest(cBigTime, IterationRequest::NO_ITERATIONS, cBigTime, cBigTime);
                 break;
-            case HELICS_FINISHED:
+            case FederateStates::FINISHED:
                 break;
-            case HELICS_ERROR: {
+            case FederateStates::ERRORED: {
                 std::string errorString;
                 if (command.payload.empty()) {
                     errorString = commandErrorString(command.messageID);
@@ -688,9 +688,9 @@ void FilterFederate::handleMessage(ActionMessage& command)
 
 FilterInfo* FilterFederate::createFilter(GlobalBrokerId dest,
                                          InterfaceHandle handle,
-                                         const std::string& key,
-                                         const std::string& type_in,
-                                         const std::string& type_out,
+                                         std::string_view key,
+                                         std::string_view type_in,
+                                         std::string_view type_out,
                                          bool cloning)
 {
     auto filt = std::make_unique<FilterInfo>((dest == parent_broker_id || dest == mCoreID) ?
@@ -972,7 +972,7 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fe
     }
 }
 
-std::string FilterFederate::query(const std::string& queryStr) const
+std::string FilterFederate::query(std::string_view queryStr) const
 {
     if (queryStr == "exists") {
         return "true";

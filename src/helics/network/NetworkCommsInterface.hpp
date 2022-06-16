@@ -50,7 +50,7 @@ class NetworkCommsInterface: public CommsInterface {
     /** set the automatic port numbering starting port*/
     void setAutomaticPortStartPort(int startingPort);
     /** set a flag on the communication system*/
-    virtual void setFlag(const std::string& flag, bool val) override;
+    virtual void setFlag(std::string_view flag, bool val) override;
 
   protected:
     int brokerPort{-1};  //!< standardized broker port to use for connection to the brokers
@@ -60,6 +60,9 @@ class NetworkCommsInterface: public CommsInterface {
     bool appendNameToAddress{false};  //!< flag to append the name to the network address
     bool noAckConnection{false};  //!< flag to bypass the connection acknowledge requirement
     bool encrypted{false};  //!< enable encryption if applicable
+    /// if enabled will attempt to force the server connection and terminate any existing
+    /// connections
+    bool forceConnection{false};
     const gmlc::networking::InterfaceTypes networkType;
     gmlc::networking::InterfaceNetworks network{gmlc::networking::InterfaceNetworks::IPV4};
     std::atomic<bool> hasBroker{false};
@@ -70,7 +73,7 @@ class NetworkCommsInterface: public CommsInterface {
 
   public:
     /** find an open port for a subBroker*/
-    int findOpenPort(int count, const std::string& host);
+    int findOpenPort(int count, std::string_view host);
     /** for protocol messages some require an immediate reply from the comms interface itself*/
     ActionMessage generateReplyToIncomingMessage(ActionMessage& cmd);
 

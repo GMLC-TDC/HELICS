@@ -28,12 +28,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #ifndef HELICS_DEPRECATED
 #    if defined _WIN32 || defined __CYGWIN__
 #        ifdef __GNUC__
-#            define HELICS__DEPRECATED __attribute__((deprecated))
+#            define HELICS_DEPRECATED __attribute__((deprecated))
 #        else
-#            define HELICS__DEPRECATED __declspec(deprecated)
+#            define HELICS_DEPRECATED __declspec(deprecated)
 #        endif
 #    else
-#        define HELICS__DEPRECATED __attribute__((deprecated))
+#        define HELICS_DEPRECATED __attribute__((deprecated))
 #    endif
 #endif
 
@@ -239,8 +239,6 @@ typedef enum {
     HELICS_ERROR_OTHER = -101,
     /** user code generated exception */
     HELICS_USER_EXCEPTION = -29,
-    /** user system abort*/
-    HELICS_ERROR_USER_ABORT = -27,
     /** insufficient space is available to store requested data */
     HELICS_ERROR_INSUFFICIENT_SPACE = -18,
     /** the function execution has failed */
@@ -264,7 +262,11 @@ typedef enum {
     /** registration has failed */
     HELICS_ERROR_REGISTRATION_FAILURE = -1,
     /** the function executed successfully */
-    HELICS_OK = 0
+    HELICS_OK = 0,
+    /** user system abort to match typical SIGINT value*/
+    HELICS_ERROR_USER_ABORT = 130,
+    /** force termination to match typical SIGKILL value*/
+    HELICS_ERROR_TERMINATED = 143
 } HelicsErrorTypes;
 
 const int HELICS_INVALID_OPTION_INDEX = -101;
@@ -576,6 +578,9 @@ typedef struct HelicsError {
 /** create a helics managed data buffer with initial capacity*/
 HELICS_EXPORT HelicsDataBuffer helicsCreateDataBuffer(int32_t initialCapacity);
 
+/** check whether a buffer is valid*/
+HELICS_EXPORT HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data);
+
 /** wrap user data in a buffer object*/
 HELICS_EXPORT HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapacity);
 
@@ -591,20 +596,27 @@ HELICS_EXPORT int32_t helicsDataBufferCapacity(HelicsDataBuffer data);
 /** get a pointer to the raw data*/
 HELICS_EXPORT void* helicsDataBufferData(HelicsDataBuffer data);
 
-/** increase the capacity a data buffer can hold without reallocating memory*/
+/** increase the capacity a data buffer can hold without reallocating memory
+@return HELICS_TRUE if the reservation was successful HELICS_FALSE otherwise*/
 HELICS_EXPORT HelicsBool helicsDataBufferReserve(HelicsDataBuffer data, int32_t newCapacity);
 
+/** create a new data buffer and copy an existing buffer*/
+HELICS_EXPORT HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data);
+
 /** convert an integer to serialized bytes*/
-HELICS_EXPORT int32_t helicsIntToBytes(int64_t value, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data);
 
 /** convert a double to serialized bytes*/
 HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data);
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsStringToBytes(const char* value, HelicsDataBuffer data);
+
+/** convert a raw string (may contain nulls) to serialized bytes*/
+HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data);
 
 /** convert a bool to serialized bytes*/
-HELICS_EXPORT int32_t helicsBoolToBytes(HelicsBool value, HelicsDataBuffer data);
+HELICS_EXPORT int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data);
 
 /** convert a char to serialized bytes*/
 HELICS_EXPORT int32_t helicsCharToBytes(char value, HelicsDataBuffer data);
@@ -615,20 +627,76 @@ HELICS_EXPORT int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
 /** convert a complex pair to serialized bytes*/
 HELICS_EXPORT int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data);
 
+/** convert a complex object to serialized bytes*/
+HELICS_EXPORT int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data);
+
 /** convert a real vector to serialized bytes*/
 HELICS_EXPORT int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
+
+/** convert a named point to serialized bytes*/
+HELICS_EXPORT int32_t helicsNamedPointToBytes(const char* name, double value, HelicsDataBuffer data);
+
+/** convert a complex vector to serialized bytes*/
+HELICS_EXPORT int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data);
 
 /** extract the data type from the data buffer, if the type isn't recognized UNKNOWN is returned*/
 HELICS_EXPORT int helicsDataBufferType(HelicsDataBuffer data);
 
 /** convert a data buffer to an int*/
-HELICS_EXPORT int64_t helicsDataBufferToInt(HelicsDataBuffer data);
+HELICS_EXPORT int64_t helicsDataBufferToInteger(HelicsDataBuffer data);
 
 /** convert a data buffer to a double*/
 HELICS_EXPORT double helicsDataBufferToDouble(HelicsDataBuffer data);
 
 /** convert a data buffer to a boolean*/
-HELICS_EXPORT HelicsBool helicsDataBufferToBool(HelicsDataBuffer data);
+HELICS_EXPORT HelicsBool helicsDataBufferToBoolean(HelicsDataBuffer data);
+
+/** convert a data buffer to a char*/
+HELICS_EXPORT char helicsDataBufferToChar(HelicsDataBuffer data);
+
+/** get the size of memory required to retrieve a string from a data buffer this includes space for a null terminator*/
+HELICS_EXPORT int helicsDataBufferStringSize(HelicsDataBuffer data);
+
+/* convert a data buffer to a string including a null terminator
+NOTE:  data may contain null bytes prior to the end but actualLength will be the number of characters in the string
+outputString[actualLength] is a null terminator*/
+HELICS_EXPORT void helicsDataBufferToString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
+
+/* convert a data buffer to a Raw string with no null terminator
+ */
+HELICS_EXPORT void helicsDataBufferToRawString(HelicsDataBuffer data, char* outputString, int maxStringLen, int* actualLength);
+
+/** convert a data buffer to a time*/
+HELICS_EXPORT HelicsTime helicsDataBufferToTime(HelicsDataBuffer data);
+
+/** convert a data buffer to a complex object*/
+HELICS_EXPORT HelicsComplex helicsDataBufferToComplexObject(HelicsDataBuffer data);
+
+/** convert a data buffer to complex values*/
+HELICS_EXPORT void helicsDataBufferToComplex(HelicsDataBuffer data, double* real, double* imag);
+
+/** get the number of elements that would be required if a vector were retrieved*/
+HELICS_EXPORT int helicsDataBufferVectorSize(HelicsDataBuffer data);
+
+/** convert a data buffer to double vector values*/
+HELICS_EXPORT void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
+
+/** convert a data buffer to complex double vector values
+@param data the buffer containing data
+@param values the storage for the converted data
+@param maxlen the number of complex values that the values vector can hold
+@param actualSize the number of complex values copied to values array
+*/
+HELICS_EXPORT void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize);
+
+HELICS_EXPORT void
+    helicsDataBufferToNamedPoint(HelicsDataBuffer data, char* outputString, int maxStringLength, int* actualLength, double* val);
+
+/** convert the data in a data buffer to a different type representation
+@param data the buffer to convert
+@param newDataType the type that it is desired for the buffer to be converted to
+@return true if the conversion was successful*/
+HELICS_EXPORT HelicsBool helicsDataBufferConvertToType(HelicsDataBuffer data, int newDataType);
 
 /**
  * @file
@@ -1195,6 +1263,42 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
  * @return A new reference to the same federate.
  */
 HELICS_EXPORT HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Protect a federate from finalizing and closing if all references go out of scope
+ *
+ * @details this function allows a federate to be retrieved on demand, it must be explicitly close later otherwise it will be destroyed
+ * when the library is closed
+ *
+ * @param fedName The name of an existing HelicsFederate.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error
+ occurred during the execution of the function, in particular if no federate with the given name exists
+ */
+HELICS_EXPORT void helicsFederateProtect(const char* fedName, HelicsError* err);
+
+/**
+ * remove the protection of an existing federate
+ *
+ * @details this function allows a federate to be retrieved on demand, it must be explicitly close
+ later otherwise it will be destroyed
+ * when the library is closed
+ *
+ * @param fed the name of an existing federate that should not be protected
+ *
+ * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
+ */
+HELICS_EXPORT void helicsFederateUnProtect(const char* fedName, HelicsError* err);
+
+/**
+ * checks if an existing federate is protected
+ *
+ *
+ * @param fed the name of an existing federate to check the protection status
+ *
+ * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
+ */
+HELICS_EXPORT HelicsBool helicsFederateIsProtected(const char* fedName, HelicsError* err);
 
 /**
  * Create a federate info object for specifying federate information when constructing a federate.
@@ -2065,7 +2169,7 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
 /**
- * Send a command to another helics object though a core.
+ * Send a command to another helics object though a core using asynchronous(fast) operations.
  *
  * @param core The core to send the command through.
  * @param target The name of the object to send the command to.
@@ -2076,7 +2180,18 @@ HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueN
 HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 
 /**
- * Send a command to another helics object through a broker.
+ * Send a command to another helics object though a core using ordered operations.
+ *
+ * @param core The core to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using asynchronous(fast) messages.
  *
  * @param broker The broker to send the command through.
  * @param target The name of the object to send the command to.
@@ -2085,6 +2200,17 @@ HELICS_EXPORT void helicsCoreSendCommand(HelicsCore core, const char* target, co
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
+
+/**
+ * Send a command to another helics object through a broker using ordered sequencing.
+ *
+ * @param broker The broker to send the command through.
+ * @param target The name of the object to send the command to.
+ * @param command The command to send.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsBrokerSendOrderedCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
 
 /**
  * Set the log file on a core.
@@ -2590,12 +2716,12 @@ HELICS_EXPORT void helicsPublicationPublishBytes(HelicsPublication pub, const vo
  * Publish a string.
  *
  * @param pub The publication to publish for.
- * @param str The string to publish.
+ * @param val The null terminated string to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishString(HelicsPublication pub, const char* val, HelicsError* err);
 
 /**
  * Publish an integer value.
@@ -2693,13 +2819,13 @@ HELICS_EXPORT void
  * Publish a named point.
  *
  * @param pub The publication to publish for.
- * @param str A string for the name to publish.
+ * @param field A null terminated string for the field name of the namedPoint to publish.
  * @param val A double for the value to publish.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, const char* field, double val, HelicsError* err);
 
 /**
  * Add a named input to the list of targets a publication publishes to.
@@ -2927,11 +3053,11 @@ HELICS_EXPORT void helicsInputSetDefaultBytes(HelicsInput ipt, const void* data,
  * Set the default as a string.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to the default string.
+ * @param defaultString A pointer to the default string.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultString(HelicsInput ipt, const char* defaultString, HelicsError* err);
 
 /**
  * Set the default as an integer.
@@ -3020,12 +3146,12 @@ HELICS_EXPORT void helicsInputSetDefaultComplexVector(HelicsInput ipt, const dou
  * Set the default as a NamedPoint.
  *
  * @param ipt The input to set the default for.
- * @param str A pointer to a string representing the name.
+ * @param defaultName A pointer to a null terminated string representing the field name to use in the named point.
  * @param val A double value for the value of the named point.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
-HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* str, double val, HelicsError* err);
+HELICS_EXPORT void helicsInputSetDefaultNamedPoint(HelicsInput ipt, const char* defaultName, double val, HelicsError* err);
 
 /**@}*/
 
@@ -3597,6 +3723,15 @@ HELICS_EXPORT HelicsMessage helicsEndpointGetMessage(HelicsEndpoint endpoint);
 HELICS_EXPORT HelicsMessage helicsEndpointCreateMessage(HelicsEndpoint endpoint, HelicsError* err);
 
 /**
+ * Clear all stored messages stored from an endpoint.
+ *
+ * @details This clears messages retrieved through helicsEndpointGetMessage or helicsEndpointCreateMessage
+ *
+ * @param endpoint The endpoint to clear the message for.
+ */
+HELICS_EXPORT void helicsEndpointClearMessages(HelicsEndpoint endpoint);
+
+/**
  * Receive a communication message for any endpoint in the federate.
  *
  * @details The return order will be in order of endpoint creation.
@@ -4000,11 +4135,11 @@ HELICS_EXPORT void helicsMessageSetFlagOption(HelicsMessage message, int flag, H
  * Set the data payload of a message as a string.
  *
  * @param message The message object in question.
- * @param str A string containing the message data.
+ * @param data A null terminated string containing the message data.
  *
  * @param[in,out] err An error object to fill out in case of an error.
  */
-HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* str, HelicsError* err);
+HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* data, HelicsError* err);
 
 /**
  * Set the data payload of a message as raw data.
@@ -4731,6 +4866,29 @@ HELICS_EXPORT void helicsFilterSetCustomCallback(HelicsFilter filter,
                                                  HelicsError* err);
 
 /**
+ * Set a general callback for a custom translator.
+ *
+ * @details Add a pair of custom callbacks for running a translator operation in the C shared library.
+ *
+ * @param translator The translator object to set the callbacks for.
+ *  * @param toMessageCall A callback with signature void(HelicsDataBuffer, HelicsMessage, void *);
+ *                 The function arguments are raw Value data, the messageObject to fill out and a pointer to user data.
+ *
+ * @param toValueCall A callback with signature void(HelicsMessage, HelicsDataBuffer, void *);
+ *                 The function arguments are a message object, the data buffer to fill out and a pointer to user data.
+ *
+ * @param userdata A pointer to user data that is passed to the functions when executing.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+
+ */
+HELICS_EXPORT void helicsTranslatorSetCustomCallback(HelicsTranslator translator,
+                                                     void (*toMessageCall)(HelicsDataBuffer value, HelicsMessage message, void* userData),
+                                                     void (*toValueCall)(HelicsMessage message, HelicsDataBuffer value, void* userData),
+                                                     void* userdata,
+                                                     HelicsError* err);
+
+/**
  * Set callback for queries executed against a federate.
  *
  * @details There are many queries that HELICS understands directly, but it is occasionally useful to have a federate be able to respond
@@ -4847,13 +5005,13 @@ HELICS_EXPORT void
  * to specific queries with answers specific to a federate.
  *
  * @param buffer The buffer received in a helicsQueryCallback.
- * @param str Pointer to the data to fill the buffer with.
+ * @param queryResult Pointer to the data with the query result to fill the buffer with.
  * @param strSize The size of the string.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  */
-HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* str, int strSize, HelicsError* err);
+HELICS_EXPORT void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* queryResult, int strSize, HelicsError* err);
 
 #ifdef __cplusplus
 } /* end of extern "C" { */

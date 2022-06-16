@@ -198,7 +198,7 @@ TEST(federate_tests, bad_broker_error_zmq_ci_skip)
                  helics::RegistrationFailure);
 }
 
-TEST(federate_tests, timeout_error_zmq_ci_skip)
+TEST(federate_tests, timeout_error_zmq_ci_skip_nosan)
 {
     helics::FederateInfo fi(helics::CoreType::ZMQ);
     fi.coreInitString = "--tick=200 --timeout=800 --networktimeout=400";
@@ -207,7 +207,7 @@ TEST(federate_tests, timeout_error_zmq_ci_skip)
                  helics::RegistrationFailure);
 }
 
-TEST(federate_tests, timeout_abort_zmq)
+TEST(federate_tests, timeout_abort_zmq_ci_skip_nosan)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -236,7 +236,7 @@ TEST(federate_tests, timeout_abort_zmq)
 #endif
 
 #ifdef HELICS_ENABLE_TCP_CORE
-TEST(federate_tests, timeout_abort_tcp)
+TEST(federate_tests, timeout_abort_tcp_ci_skip_nosan)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -262,7 +262,7 @@ TEST(federate_tests, timeout_abort_tcp)
     }
 }
 
-TEST(federate_tests, timeout_abort_tcpss)
+TEST(federate_tests, timeout_abort_tcpss_ci_skip_nosan)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -290,7 +290,7 @@ TEST(federate_tests, timeout_abort_tcpss)
 #endif
 
 #ifdef HELICS_ENABLE_UDP_CORE
-TEST(federate_tests, timeout_abort_udp)
+TEST(federate_tests, timeout_abort_udp_ci_skip_nosan)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -640,6 +640,23 @@ TEST(federate_tests, from_file9)
     EXPECT_THROW(Fed1->registerFilterInterfaces(std::string(TEST_DIR) + "unusual_filters2.toml"),
                  helics::InvalidParameter);
     Fed1->finalize();
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+}
+
+TEST(federate_tests, from_file10)
+{
+    helics::BrokerFactory::terminateAllBrokers();
+    helics::CoreFactory::terminateAllCores();
+
+    auto fstr2 = std::string(TEST_DIR) +
+        "extra_files_testing_for_very_long_file_paths/this_is_a_ridiculously_long_file_name_to_test_some_odd_conditions_in_the_toml_parser_so_we_need_a_long_file_name.toml";
+    if (fstr2.size() < FILENAME_MAX) {
+        // this test would fail if the file name exceeeds the max filename length
+        std::shared_ptr<helics::Federate> Fed1;
+        EXPECT_NO_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2));
+        Fed1->finalize();
+    }
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 }

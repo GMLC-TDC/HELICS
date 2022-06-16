@@ -13,12 +13,14 @@ set(c_shared_library_test_sources
     test-value-federate1.cpp
     test-value-federate2.cpp
     FilterTests.cpp
+    TranslatorTests.cpp
     test-message-federate.cpp
     SystemTests.cpp
     TimingTests.cpp
     evilInputTests.cpp
     iterationTests.cpp
     QueryTests.cpp
+    DataAPITests.cpp
     badInputTests.cpp
     comboConfigTests.cpp
     loggingTests.cpp
@@ -85,9 +87,11 @@ set_property(TEST shared-library-tests PROPERTY LABELS SharedLibrary Coverage Da
 set_property(TEST shared-library-tests-cpp PROPERTY LABELS SharedLibraryCpp Coverage Daily)
 
 # Tests used for Continuous Integration builds
-add_test(NAME shared-library-ci-tests COMMAND shared-library-tests --gtest_filter=-*ci_skip*)
+add_test(NAME shared-library-ci-tests COMMAND shared-library-tests
+                                              --gtest_filter=-*ci_skip*:*nosan*
+)
 add_test(NAME shared-library-ci-tests-cpp COMMAND shared-library-tests-cpp
-                                                  --gtest_filter=-*ci_skip*
+                                                  --gtest_filter=-*ci_skip*:*nosan*
 )
 
 set_property(TEST shared-library-ci-tests PROPERTY LABELS SharedLibraryCI Continuous)

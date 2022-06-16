@@ -363,7 +363,7 @@ INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_simple_type_tests, ::testing::ValuesIn
 INSTANTIATE_TEST_SUITE_P(mfed_tests, mfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
 // a series of tests exercising the different aspects of message object setting and retrieval
-TEST(message_object, test1)
+TEST(message_object, test1_nosan)
 {
     auto brk = helicsCreateBroker("test", "brk1", "", nullptr);
 

@@ -16,14 +16,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** random integer for validation purposes of inputs */
-static const int InputValidationIdentifier = 0x3456'E052;
+static constexpr int InputValidationIdentifier = 0x3456'E052;
 
 /** random integer for validation purposes of publications */
-static const int PublicationValidationIdentifier = 0x97B1'00A5;
+static constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
 
-static const char* invalidInputString = "The given input object does not point to a valid object";
+static constexpr const char* invalidInputString = "The given input object does not point to a valid object";
 
-static const char* invalidPublicationString = "The given publication object does not point to a valid object";
+static constexpr const char* invalidPublicationString = "The given publication object does not point to a valid object";
 
 static helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
 {
@@ -82,7 +82,7 @@ HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* k
     }
     try {
         auto sub = std::make_unique<helics::InputObject>();
-        sub->inputPtr = &fedObj->registerSubscription(AS_STRING(key), AS_STRING(units));
+        sub->inputPtr = &fedObj->registerSubscription(AS_STRING_VIEW(key), AS_STRING_VIEW(units));
         sub->fedptr = std::move(fedObj);
         return addInput(fed, std::move(sub));
     }
@@ -104,7 +104,7 @@ HelicsPublication
     }
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
-        pub->pubPtr = &fedObj->registerPublication(AS_STRING(key), AS_STRING(type), AS_STRING(units));
+        pub->pubPtr = &fedObj->registerPublication(AS_STRING_VIEW(key), AS_STRING_VIEW(type), AS_STRING_VIEW(units));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -130,8 +130,9 @@ HelicsPublication
     }
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
-        pub->pubPtr = &(
-            fedObj->registerPublication(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
+        pub->pubPtr = &(fedObj->registerPublication(AS_STRING_VIEW(key),
+                                                    helics::typeNameStringRef(static_cast<helics::DataType>(type)),
+                                                    AS_STRING_VIEW(units)));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -151,7 +152,7 @@ HelicsPublication
     }
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
-        pub->pubPtr = &fedObj->registerGlobalPublication(AS_STRING(key), AS_STRING(type), AS_STRING(units));
+        pub->pubPtr = &fedObj->registerGlobalPublication(AS_STRING_VIEW(key), AS_STRING_VIEW(type), AS_STRING_VIEW(units));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -178,9 +179,9 @@ HelicsPublication
 
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
-        pub->pubPtr = &(fedObj->registerGlobalPublication(AS_STRING(key),
+        pub->pubPtr = &(fedObj->registerGlobalPublication(AS_STRING_VIEW(key),
                                                           helics::typeNameStringRef(static_cast<helics::DataType>(type)),
-                                                          AS_STRING(units)));
+                                                          AS_STRING_VIEW(units)));
         pub->fedptr = std::move(fedObj);
         return addPublication(fed, std::move(pub));
     }
@@ -199,7 +200,7 @@ HelicsInput helicsFederateRegisterTypeInput(HelicsFederate fed, const char* key,
     }
     try {
         auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr = &(fedObj->registerInput(AS_STRING(key), AS_STRING(type), AS_STRING(units)));
+        inp->inputPtr = &(fedObj->registerInput(AS_STRING_VIEW(key), AS_STRING_VIEW(type), AS_STRING_VIEW(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -227,8 +228,9 @@ HelicsInput helicsFederateRegisterInput(HelicsFederate fed, const char* key, Hel
 
     try {
         auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr =
-            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
+        inp->inputPtr = &(fedObj->registerInput(AS_STRING_VIEW(key),
+                                                helics::typeNameStringRef(static_cast<helics::DataType>(type)),
+                                                AS_STRING_VIEW(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -248,7 +250,7 @@ HelicsInput
     }
     try {
         auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr = &(fedObj->registerGlobalInput(AS_STRING(key), AS_STRING(type), AS_STRING(units)));
+        inp->inputPtr = &(fedObj->registerGlobalInput(AS_STRING_VIEW(key), AS_STRING_VIEW(type), AS_STRING_VIEW(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -277,8 +279,9 @@ HelicsInput
 
     try {
         auto inp = std::make_unique<helics::InputObject>();
-        inp->inputPtr =
-            &(fedObj->registerInput(AS_STRING(key), helics::typeNameStringRef(static_cast<helics::DataType>(type)), AS_STRING(units)));
+        inp->inputPtr = &(fedObj->registerGlobalInput(AS_STRING_VIEW(key),
+                                                      helics::typeNameStringRef(static_cast<helics::DataType>(type)),
+                                                      AS_STRING_VIEW(units)));
         inp->fedptr = std::move(fedObj);
         return addInput(fed, std::move(inp));
     }
@@ -495,7 +498,7 @@ void helicsPublicationPublishString(HelicsPublication pub, const char* str, Heli
         return;
     }
     try {
-        pubObj->pubPtr->publish(std::string_view(AS_STRING(str)));
+        pubObj->pubPtr->publish(AS_STRING_VIEW(str));
     }
     catch (...) {
         helicsErrorHandler(err);
@@ -1136,6 +1139,7 @@ void helicsInputSetDefaultComplexVector(HelicsInput inp, const double* vectorInp
             inpObj->inputPtr->setDefault(std::vector<std::complex<double>>{});
         } else {
             std::vector<std::complex<double>> CV;
+            CV.reserve(vectorLength);
             for (int ii = 0; ii < vectorLength; ++ii) {
                 CV.emplace_back(vectorInput[2 * ii], vectorInput[2 * ii + 1]);
             }
@@ -1156,7 +1160,7 @@ void helicsInputSetDefaultNamedPoint(HelicsInput inp, const char* str, double va
         return;
     }
     try {
-        inpObj->inputPtr->setDefault(helics::NamedPoint(AS_STRING(str), val));
+        inpObj->inputPtr->setDefault(helics::NamedPoint(AS_STRING_VIEW(str), val));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1169,7 +1173,7 @@ const char* helicsInputGetType(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1178,7 +1182,7 @@ const char* helicsInputGetType(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1187,7 +1191,7 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1196,7 +1200,7 @@ const char* helicsInputGetPublicationType(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1210,7 +1214,7 @@ const char* helicsPublicationGetType(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1219,7 +1223,7 @@ const char* helicsPublicationGetType(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1228,7 +1232,7 @@ const char* helicsInputGetName(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1237,7 +1241,7 @@ const char* helicsInputGetName(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1246,7 +1250,7 @@ const char* helicsSubscriptionGetTarget(HelicsInput sub)
 {
     auto* inpObj = verifyInput(sub, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
 
     try {
@@ -1255,7 +1259,7 @@ const char* helicsSubscriptionGetTarget(HelicsInput sub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1264,7 +1268,7 @@ const char* helicsPublicationGetName(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& key = pubObj->pubPtr->getName();
@@ -1272,7 +1276,7 @@ const char* helicsPublicationGetName(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1281,7 +1285,7 @@ const char* helicsInputGetInjectionUnits(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& units = inpObj->inputPtr->getInjectionUnits();
@@ -1289,7 +1293,7 @@ const char* helicsInputGetInjectionUnits(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1298,7 +1302,7 @@ const char* helicsInputGetExtractionUnits(HelicsInput ipt)
 {
     auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& units = inpObj->inputPtr->getUnits();
@@ -1306,7 +1310,7 @@ const char* helicsInputGetExtractionUnits(HelicsInput ipt)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1320,7 +1324,7 @@ const char* helicsPublicationGetUnits(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     const std::string& units = pubObj->pubPtr->getUnits();
     return units.c_str();
@@ -1330,7 +1334,7 @@ const char* helicsInputGetInfo(HelicsInput inp)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = inpObj->inputPtr->getInfo();
@@ -1338,7 +1342,7 @@ const char* helicsInputGetInfo(HelicsInput inp)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1350,7 +1354,7 @@ void helicsInputSetInfo(HelicsInput inp, const char* info, HelicsError* err)
         return;
     }
     try {
-        inpObj->inputPtr->setInfo(AS_STRING(info));
+        inpObj->inputPtr->setInfo(AS_STRING_VIEW(info));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1363,7 +1367,7 @@ const char* helicsPublicationGetInfo(HelicsPublication pub)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
         const std::string& info = pubObj->pubPtr->getInfo();
@@ -1371,7 +1375,7 @@ const char* helicsPublicationGetInfo(HelicsPublication pub)
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1383,7 +1387,7 @@ void helicsPublicationSetInfo(HelicsPublication pub, const char* info, HelicsErr
         return;
     }
     try {
-        pubObj->pubPtr->setInfo(AS_STRING(info));
+        pubObj->pubPtr->setInfo(AS_STRING_VIEW(info));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1396,15 +1400,15 @@ const char* helicsInputGetTag(HelicsInput inp, const char* tagname)
 {
     auto* inpObj = verifyInput(inp, nullptr);
     if (inpObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
-        const std::string& info = inpObj->inputPtr->getTag(AS_STRING(tagname));
+        const std::string& info = inpObj->inputPtr->getTag(AS_STRING_VIEW(tagname));
         return info.c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1416,7 +1420,7 @@ void helicsInputSetTag(HelicsInput inp, const char* tagname, const char* tagvalu
         return;
     }
     try {
-        inpObj->inputPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
+        inpObj->inputPtr->setTag(AS_STRING_VIEW(tagname), AS_STRING_VIEW(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -1429,15 +1433,15 @@ const char* helicsPublicationGetTag(HelicsPublication pub, const char* tagname)
 {
     auto* pubObj = verifyPublication(pub, nullptr);
     if (pubObj == nullptr) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     try {
-        const std::string& info = pubObj->pubPtr->getTag(AS_STRING(tagname));
+        const std::string& info = pubObj->pubPtr->getTag(AS_STRING_VIEW(tagname));
         return info.c_str();
     }
     // LCOV_EXCL_START
     catch (...) {
-        return gEmptyStr.c_str();
+        return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
 }
@@ -1449,7 +1453,7 @@ void helicsPublicationSetTag(HelicsPublication pub, const char* tagname, const c
         return;
     }
     try {
-        pubObj->pubPtr->setTag(AS_STRING(tagname), AS_STRING(tagvalue));
+        pubObj->pubPtr->setTag(AS_STRING_VIEW(tagname), AS_STRING_VIEW(tagvalue));
     }
     // LCOV_EXCL_START
     catch (...) {

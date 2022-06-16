@@ -32,7 +32,7 @@ std::map<std::string, int> eptids;
 */
 
 namespace helics::apps {
-App::App(const std::string& defaultAppName, std::vector<std::string> args)
+App::App(std::string_view defaultAppName, std::vector<std::string> args)
 {
     auto app = generateParser();
     FederateInfo fi;
@@ -41,7 +41,7 @@ App::App(const std::string& defaultAppName, std::vector<std::string> args)
     processArgs(app, fi, defaultAppName);
 }
 
-App::App(const std::string& defaultAppName, int argc, char* argv[])
+App::App(std::string_view defaultAppName, int argc, char* argv[])
 {
     auto app = generateParser();
     FederateInfo fi;
@@ -52,7 +52,7 @@ App::App(const std::string& defaultAppName, int argc, char* argv[])
 
 void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
                       FederateInfo& fi,
-                      const std::string& defaultAppName)
+                      std::string_view defaultAppName)
 {
     remArgs = app->remaining_for_passthrough();
     auto ret = app->last_output;
@@ -79,22 +79,22 @@ void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
     fed = std::make_shared<CombinationFederate>("", fi);
 }
 
-App::App(const std::string& appName, const FederateInfo& fi):
+App::App(std::string_view appName, const FederateInfo& fi):
     fed(std::make_shared<CombinationFederate>(appName, fi))
 {
 }
 
-App::App(const std::string& appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
+App::App(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
     fed(std::make_shared<CombinationFederate>(appName, core, fi))
 {
 }
 
-App::App(const std::string& appName, CoreApp& core, const FederateInfo& fi):
+App::App(std::string_view appName, CoreApp& core, const FederateInfo& fi):
     fed(std::make_shared<CombinationFederate>(appName, core, fi))
 {
 }
 
-App::App(const std::string& appName, const std::string& jsonString):
+App::App(std::string_view appName, const std::string& jsonString):
     fed(std::make_shared<CombinationFederate>(appName, jsonString))
 {
     if (jsonString.size() < 200) {

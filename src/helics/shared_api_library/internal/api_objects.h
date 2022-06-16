@@ -13,15 +13,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/TripWire.hpp"
 
 #include <deque>
+#include <exception>
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 /** this is a random identifier put in place when the federate or core or broker gets created*/
-static const int gCoreValidationIdentifier = 0x378424EC;
-static const int gBrokerValidationIdentifier = 0xA3467D20;
+static constexpr int gCoreValidationIdentifier = 0x3784'24EC;
+static constexpr int gBrokerValidationIdentifier = 0xA346'7D20;
 
 namespace helics {
 class Core;
@@ -183,16 +185,16 @@ inline void assignError(HelicsError* err, int error_code, const char* string)
     }
 }
 
-extern const std::string gEmptyStr;
-extern const std::string gNullStringArgument;
-#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gEmptyStr
+extern const std::string gHelicsEmptyStr;
+extern const std::string gHelicsNullStringArgument;
+#define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gHelicsEmptyStr
 
-#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gEmptyStr)
+#define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gHelicsEmptyStr)
 
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gNullStringArgument.c_str());                                                  \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                            \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
@@ -203,9 +205,12 @@ helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
+
 std::unique_ptr<helics::Message> getMessageUniquePtr(HelicsMessage message, HelicsError* err);
 /** create a message object from a message pointer*/
 HelicsMessage createAPIMessage(std::unique_ptr<helics::Message>& mess);
+
+HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff);
 
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);
@@ -232,21 +237,25 @@ class MasterObjectHolder {
   public:
     MasterObjectHolder() noexcept;
     ~MasterObjectHolder();
-    helics::FedObject* findFed(const std::string& fedName);
+    helics::FedObject* findFed(std::string_view fedName);
+    /** find a specific fed by name and validation code*/
+    helics::FedObject* findFed(std::string_view fedName, int validationCode);
     /** add a broker to the holder*/
     int addBroker(std::unique_ptr<helics::BrokerObject> broker);
     /** add a core to the holder*/
     int addCore(std::unique_ptr<helics::CoreObject> core);
     /** add a federate to the holder*/
     int addFed(std::unique_ptr<helics::FedObject> fed);
+    /** remove a federate object*/
+    bool removeFed(std::string_view name, int validationCode);
     void clearBroker(int index);
     void clearCore(int index);
     void clearFed(int index);
     void deleteAll();
-    void abortAll(int errorCode, const std::string& error);
+    void abortAll(int errorCode, std::string_view error);
     /** store an error string to a string buffer
     @return a pointer to the memory location*/
-    const char* addErrorString(std::string newError);
+    const char* addErrorString(std::string_view newError);
 };
 
 std::shared_ptr<MasterObjectHolder> getMasterHolder();

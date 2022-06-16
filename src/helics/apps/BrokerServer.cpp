@@ -26,21 +26,22 @@ BrokerServer::BrokerServer() noexcept:
 {
 }
 
-BrokerServer::BrokerServer(int argc, char* argv[]): server_name_{gmlc::utilities::randomString(5)}
+BrokerServer::BrokerServer(int argc, char* argv[]):
+    server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
     auto app = generateArgProcessing();
     app->helics_parse(argc, argv);
 }
 
 BrokerServer::BrokerServer(std::vector<std::string> args):
-    server_name_{gmlc::utilities::randomString(5)}
+    server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
     auto app = generateArgProcessing();
     app->helics_parse(args);
 }
 
-BrokerServer::BrokerServer(const std::string& configFile):
-    configFile_(configFile), server_name_{gmlc::utilities::randomString(5)}
+BrokerServer::BrokerServer(std::string_view configFile):
+    configFile_(configFile), server_name_{gmlc::utilities::randomString(5) + "_broker_server"}
 {
 }
 
@@ -57,7 +58,7 @@ void BrokerServer::startServers()
         config_ = std::make_unique<Json::Value>();
     }
     if (zmq_server || zmq_ss_server) {
-        auto zmqs = std::make_unique<zmqBrokerServer>(server_name_);
+        auto zmqs = std::make_shared<zmqBrokerServer>(server_name_);
         if (zmq_server) {
             zmqs->enableZmqServer(true);
         }
@@ -70,7 +71,7 @@ void BrokerServer::startServers()
         servers.push_back(std::move(zmqs));
     }
     if (tcp_server || udp_server) {
-        auto asios = std::make_unique<AsioBrokerServer>(server_name_);
+        auto asios = std::make_shared<AsioBrokerServer>(server_name_);
         if (tcp_server) {
             asios->enableTcpServer(true);
             if (!mTcpArgs.empty()) {
@@ -88,7 +89,7 @@ void BrokerServer::startServers()
 
     if (http_server || websocket_server) {
 #ifdef HELICS_ENABLE_WEBSERVER
-        auto webs = std::make_unique<WebServer>(server_name_);
+        auto webs = std::make_shared<WebServer>(server_name_);
         if (http_server) {
             webs->enableHttpServer(true);
             if (!mHttpArgs.empty()) {
@@ -107,7 +108,7 @@ void BrokerServer::startServers()
 #endif
     }
     for (auto& server : servers) {
-        server->startServer(config_.get());
+        server->startServer(config_.get(), server);
     }
 }
 

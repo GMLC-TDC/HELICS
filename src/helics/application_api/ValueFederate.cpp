@@ -25,14 +25,14 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /**constructor taking a core engine and federate info structure
  */
-ValueFederate::ValueFederate(const std::string& fedName, const FederateInfo& fi):
+ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi)
 {
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
-ValueFederate::ValueFederate(const std::string& fedName,
+ValueFederate::ValueFederate(std::string_view fedName,
                              const std::shared_ptr<Core>& core,
                              const FederateInfo& fi):
     Federate(fedName, core, fi)
@@ -41,14 +41,14 @@ ValueFederate::ValueFederate(const std::string& fedName,
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
-ValueFederate::ValueFederate(const std::string& fedName, CoreApp& core, const FederateInfo& fi):
+ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
-ValueFederate::ValueFederate(const std::string& fedName, const std::string& configString):
+ValueFederate::ValueFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
@@ -96,39 +96,35 @@ ValueFederate& ValueFederate::operator=(ValueFederate&& fed) noexcept
     return *this;
 }
 
-Publication& ValueFederate::registerPublication(const std::string& name,
-                                                const std::string& type,
-                                                const std::string& units)
+Publication& ValueFederate::registerPublication(std::string_view name,
+                                                std::string_view type,
+                                                std::string_view units)
 {
-    return vfManager->registerPublication(
-        (!name.empty()) ? (getName() + nameSegmentSeparator + name) : name, type, units);
+    return vfManager->registerPublication(localNameGenerator(name), type, units);
 }
 
-Publication& ValueFederate::registerGlobalPublication(const std::string& name,
-                                                      const std::string& type,
-                                                      const std::string& units)
+Publication& ValueFederate::registerGlobalPublication(std::string_view name,
+                                                      std::string_view type,
+                                                      std::string_view units)
 {
     return vfManager->registerPublication(name, type, units);
 }
 
-Input& ValueFederate::registerInput(const std::string& name,
-                                    const std::string& type,
-                                    const std::string& units)
+Input& ValueFederate::registerInput(std::string_view name,
+                                    std::string_view type,
+                                    std::string_view units)
 {
-    return vfManager->registerInput((!name.empty()) ? (getName() + nameSegmentSeparator + name) :
-                                                      name,
-                                    type,
-                                    units);
+    return vfManager->registerInput(localNameGenerator(name), type, units);
 }
 
-Input& ValueFederate::registerGlobalInput(const std::string& name,
-                                          const std::string& type,
-                                          const std::string& units)
+Input& ValueFederate::registerGlobalInput(std::string_view name,
+                                          std::string_view type,
+                                          std::string_view units)
 {
     return vfManager->registerInput(name, type, units);
 }
 
-Input& ValueFederate::registerSubscription(const std::string& target, const std::string& units)
+Input& ValueFederate::registerSubscription(std::string_view target, std::string_view units)
 {
     auto& inp = vfManager->registerInput(std::string{}, std::string{}, units);
     inp.addTarget(target);
@@ -145,7 +141,7 @@ void ValueFederate::addTarget(const Input& inp, std::string_view target)
     vfManager->addTarget(inp, target);
 }
 
-void ValueFederate::addAlias(const Input& inp, const std::string& shortcutName)
+void ValueFederate::addAlias(const Input& inp, std::string_view shortcutName)
 {
     vfManager->addAlias(inp, shortcutName);
 }
@@ -169,7 +165,7 @@ void ValueFederate::setFlagOption(int flag, bool flagValue)
     }
 }
 
-void ValueFederate::addAlias(const Publication& pub, const std::string& shortcutName)
+void ValueFederate::addAlias(const Publication& pub, std::string_view shortcutName)
 {
     vfManager->addAlias(pub, shortcutName);
 }
@@ -526,7 +522,7 @@ void ValueFederate::initializeToExecuteStateTransition(IterationResult result)
     vfManager->initializeToExecuteStateTransition(result);
 }
 
-std::string ValueFederate::localQuery(const std::string& queryStr) const
+std::string ValueFederate::localQuery(std::string_view queryStr) const
 {
     return vfManager->localQuery(queryStr);
 }
@@ -541,20 +537,20 @@ const std::string& ValueFederate::getTarget(const Input& inp) const
     return vfManager->getTarget(inp);
 }
 
-const Input& ValueFederate::getInput(const std::string& name) const
+const Input& ValueFederate::getInput(std::string_view name) const
 {
     auto& inp = vfManager->getInput(name);
     if (!inp.isValid()) {
-        return vfManager->getInput(getName() + nameSegmentSeparator + name);
+        return vfManager->getInput(localNameGenerator(name));
     }
     return inp;
 }
 
-Input& ValueFederate::getInput(const std::string& name)
+Input& ValueFederate::getInput(std::string_view name)
 {
     auto& inp = vfManager->getInput(name);
     if (!inp.isValid()) {
-        return vfManager->getInput(getName() + nameSegmentSeparator + name);
+        return vfManager->getInput(localNameGenerator(name));
     }
     return inp;
 }
@@ -569,40 +565,41 @@ Input& ValueFederate::getInput(int index)
     return vfManager->getInput(index);
 }
 
-const Input& ValueFederate::getInput(const std::string& name, int index1) const
+const Input& ValueFederate::getInput(std::string_view name, int index1) const
 {
-    return vfManager->getInput(name + '_' + std::to_string(index1));
+    return vfManager->getInput(std::string(name) + '_' + std::to_string(index1));
 }
 
-const Input& ValueFederate::getInput(const std::string& name, int index1, int index2) const
+const Input& ValueFederate::getInput(std::string_view name, int index1, int index2) const
 {
-    return vfManager->getInput(name + '_' + std::to_string(index1) + '_' + std::to_string(index2));
+    return vfManager->getInput(std::string(name) + '_' + std::to_string(index1) + '_' +
+                               std::to_string(index2));
 }
 
-const Input& ValueFederate::getSubscription(const std::string& target) const
-{
-    return vfManager->getSubscription(target);
-}
-
-Input& ValueFederate::getSubscription(const std::string& target)
+const Input& ValueFederate::getSubscription(std::string_view target) const
 {
     return vfManager->getSubscription(target);
 }
 
-Publication& ValueFederate::getPublication(const std::string& name)
+Input& ValueFederate::getSubscription(std::string_view target)
+{
+    return vfManager->getSubscription(target);
+}
+
+Publication& ValueFederate::getPublication(std::string_view name)
 {
     auto& pub = vfManager->getPublication(name);
     if (!pub.isValid()) {
-        return vfManager->getPublication(getName() + nameSegmentSeparator + name);
+        return vfManager->getPublication(localNameGenerator(name));
     }
     return pub;
 }
 
-const Publication& ValueFederate::getPublication(const std::string& name) const
+const Publication& ValueFederate::getPublication(std::string_view name) const
 {
     auto& pub = vfManager->getPublication(name);
     if (!pub.isValid()) {
-        return vfManager->getPublication(getName() + nameSegmentSeparator + name);
+        return vfManager->getPublication(localNameGenerator(name));
     }
     return pub;
 }
@@ -617,15 +614,15 @@ const Publication& ValueFederate::getPublication(int index) const
     return vfManager->getPublication(index);
 }
 
-const Publication& ValueFederate::getPublication(const std::string& name, int index1) const
+const Publication& ValueFederate::getPublication(std::string_view name, int index1) const
 {
-    return vfManager->getPublication(name + '_' + std::to_string(index1));
+    return vfManager->getPublication(std::string(name) + '_' + std::to_string(index1));
 }
 
 const Publication&
-    ValueFederate::getPublication(const std::string& name, int index1, int index2) const
+    ValueFederate::getPublication(std::string_view name, int index1, int index2) const
 {
-    return vfManager->getPublication(name + '_' + std::to_string(index1) + '_' +
+    return vfManager->getPublication(std::string(name) + '_' + std::to_string(index1) + '_' +
                                      std::to_string(index2));
 }
 

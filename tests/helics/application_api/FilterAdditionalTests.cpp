@@ -566,7 +566,7 @@ TEST_P(filter_type_tests, message_random_delay_object_ci_skip)
 /**
 Test filter info fields
 */
-TEST_P(filter_type_tests, test_filter_info_field_ci_skip)
+TEST_P(filter_type_tests, test_filter_info_field_ci_skip_nocov)
 {
     auto broker = AddBroker(GetParam(), 2);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");

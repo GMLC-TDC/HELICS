@@ -21,7 +21,7 @@ namespace mpi {
     MpiCore::~MpiCore()
     { /*std::cout << "MpiCore destructor for " << MpiCore::getAddress () << std::endl;*/
     }
-    MpiCore::MpiCore(const std::string& core_name): CommsBroker(core_name) {}
+    MpiCore::MpiCore(std::string_view core_name): CommsBroker(core_name) {}
 
     std::shared_ptr<helicsCLI11App> MpiCore::generateCLI()
     {
