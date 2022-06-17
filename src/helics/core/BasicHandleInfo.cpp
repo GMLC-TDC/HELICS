@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+//NOLINTNEXTLINE
 const std::string BasicHandleInfo::emptyString{};
 
 void BasicHandleInfo::setTag(std::string_view tag, std::string_view value)

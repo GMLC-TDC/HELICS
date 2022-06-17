@@ -189,7 +189,7 @@ void ValueFederate::registerValueInterfaces(const std::string& configString)
         registerValueInterfacesJson(configString);
     }
 }
-static const std::string emptyStr;
+static constexpr std::string_view emptyStr;
 
 template<class Inp, class Obj>
 static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)

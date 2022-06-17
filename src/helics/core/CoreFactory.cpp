@@ -29,7 +29,7 @@ DECLARE_TRIPLINE()
 
 namespace helics::CoreFactory {
 
-static const std::string gHelicsEmptyString;
+static constexpr std::string_view gHelicsEmptyString;
 
 /*** class to hold the set of builders
 @details this doesn't work as a global since it tends to get initialized after some of the things

@@ -80,11 +80,11 @@ void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
     }
 }
 
-void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> transOps)
+void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> translatorOps)
 {
-    transOp = std::move(transOps);
+    transOp = std::move(translatorOps);
     if (cr != nullptr) {
-        cr->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
+        cr->setTranslatorOperator(handle, (translatorOps) ? translatorOps->getOperator() : nullptr);
     }
 }
 

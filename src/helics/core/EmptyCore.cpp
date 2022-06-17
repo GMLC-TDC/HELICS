@@ -184,7 +184,6 @@ bool EmptyCore::getFlagOption(LocalFederateId /*federateID*/, int32_t /*flag*/) 
     return false;
 }
 
-static const std::string emptyString;
 
 InterfaceHandle EmptyCore::registerInput(LocalFederateId /*federateID*/,
                                          std::string_view /*key*/,
@@ -264,12 +263,14 @@ void EmptyCore::addDestinationTarget(InterfaceHandle /*handle*/,
                                      std::string_view /*dest*/,
                                      InterfaceType /*hint*/)
 {
+    throw(InvalidFunctionCall("core is not connected unable to add targets"));
 }
 
 void EmptyCore::addSourceTarget(InterfaceHandle /*handle*/,
                                 std::string_view /*targetName*/,
                                 InterfaceType /*hint*/)
 {
+    throw(InvalidFunctionCall("core is not connected unable to add targets"));
 }
 
 const std::string& EmptyCore::getDestinationTargets(InterfaceHandle /*handle*/) const
