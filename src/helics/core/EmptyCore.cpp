@@ -184,7 +184,6 @@ bool EmptyCore::getFlagOption(LocalFederateId /*federateID*/, int32_t /*flag*/) 
     return false;
 }
 
-
 InterfaceHandle EmptyCore::registerInput(LocalFederateId /*federateID*/,
                                          std::string_view /*key*/,
                                          std::string_view /*type*/,
