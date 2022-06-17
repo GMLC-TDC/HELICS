@@ -14,9 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-    const std::string EmptyCore::emptyString{};
+const std::string EmptyCore::emptyString{};
 
-    // timeoutMon is a unique_ptr
+// timeoutMon is a unique_ptr
 EmptyCore::EmptyCore() noexcept {}
 
 void EmptyCore::configure(std::string_view /*configureString*/) {}
@@ -115,7 +115,7 @@ const std::string& EmptyCore::getFederateName(LocalFederateId /*federateID*/) co
     throw(InvalidIdentifier("federateID not valid (federateName)"));
 }
 
-//static const std::string unknownString("#unknown");
+// static const std::string unknownString("#unknown");
 
 LocalFederateId EmptyCore::getFederateId(std::string_view /*name*/) const
 {

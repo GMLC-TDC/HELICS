@@ -144,7 +144,7 @@ void ActionMessage::setAction(action_message_def::action_t newAction)
     messageAction = newAction;
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string emptyStr;
 const std::string& ActionMessage::getString(int index) const
 {

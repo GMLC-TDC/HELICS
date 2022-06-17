@@ -42,7 +42,7 @@ class MessageTimer {};
 #endif
 
 #include "../common/fmt_format.h"
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
 #define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)

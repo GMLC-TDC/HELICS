@@ -200,7 +200,7 @@ void CoreApp::makeConnections(const std::string& file)
     }
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string estring;
 
 /** get the identifier of the core*/
