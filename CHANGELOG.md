@@ -20,7 +20,7 @@ Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0
 
 ### Removed
 
-- included filesystem header files, since all minimum compilers have that header available.
+- ghc::filesystem, since all minimum compilers have support for std::filesystem available.
 
 ## [3.2.1][] - 2022-06-17
 
