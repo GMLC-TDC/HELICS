@@ -30,7 +30,7 @@ struct FederateTestFixture {
 
     std::shared_ptr<helics::Broker> AddBroker(std::string_view CoreType_name, int count);
     std::shared_ptr<helics::Broker> AddBroker(std::string_view CoreType_name,
-                                              const std::string & initialization_string);
+                                              const std::string& initialization_string);
 
     template<class FedType>
     void SetupTest(std::string_view CoreType_name,

@@ -724,7 +724,7 @@ const std::string& CommonCore::getFederateName(LocalFederateId federateID) const
     return fed->getIdentifier();
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string unknownString("#unknown");
 
 const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateID) const noexcept
@@ -1068,7 +1068,7 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
         return hndl;
     });
 }
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string gEmptyString;
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
