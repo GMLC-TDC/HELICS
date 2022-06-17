@@ -31,7 +31,6 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
 
 static constexpr char nullcstr[] = "";
 
-
 static constexpr char invalidEndpoint[] = "The given endpoint does not point to a valid object";
 
 static helics::EndpointObject* verifyEndpoint(HelicsEndpoint ept, HelicsError* err)

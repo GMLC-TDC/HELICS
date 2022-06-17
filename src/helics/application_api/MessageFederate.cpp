@@ -142,7 +142,7 @@ void MessageFederate::registerMessageInterfaces(const std::string& configString)
     }
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static constexpr std::string_view emptyStr;
 
 template<class Inp>
@@ -173,9 +173,7 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     });
     addTargets(data, "subscriptions", [&ept](std::string_view sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
-    addTargets(data, "sourceFilters", [&ept](std::string_view filt) {
-        ept.addSourceFilter(filt);
-    });
+    addTargets(data, "sourceFilters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
     addTargets(data, "destFilters", [&ept](std::string_view filt) {
         ept.addDestinationFilter(filt);
     });

@@ -51,7 +51,7 @@ const char* helicsGetSystemInfo(void)
 
 static constexpr const char* nullstrPtr = "";
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 const std::string gHelicsEmptyStr;
 
 HelicsError helicsErrorInitialize(void)

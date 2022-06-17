@@ -26,7 +26,8 @@ NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes ty
 {
 }
 
-NetworkCommsInterface::PortAllocator::PortAllocator() {
+NetworkCommsInterface::PortAllocator::PortAllocator()
+{
     addNewHost(localHostString);
 }
 
@@ -66,7 +67,7 @@ void NetworkCommsInterface::PortAllocator::addUsedPort(int port)
 void NetworkCommsInterface::PortAllocator::addUsedPort(std::string_view host, int port)
 {
     auto hst = usedPort.find(host);
-    if (hst!=usedPort.end()) {
+    if (hst != usedPort.end()) {
         hst->second.insert(port);
     } else {
         host = addNewHost(host);
@@ -87,11 +88,12 @@ bool NetworkCommsInterface::PortAllocator::isPortUsed(std::string_view host, int
     return (fnd->second.count(port) != 0);
 }
 
-std::string_view NetworkCommsInterface::PortAllocator::addNewHost(std::string_view host) {
+std::string_view NetworkCommsInterface::PortAllocator::addNewHost(std::string_view host)
+{
     auto [it, emplaced] = hosts.emplace(host);
     return std::string_view(*it);
 }
-    /** load network information into the comms object*/
+/** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {
     using gmlc::networking::InterfaceTypes;

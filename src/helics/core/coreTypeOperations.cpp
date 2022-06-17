@@ -246,10 +246,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
             break;
         case CoreType::HTTP:
         case CoreType::WEBSOCKET:
-            return false; //these are not yet built
+            return false;  // these are not yet built
             break;
         case CoreType::NULLCORE:
-            available = false; //nullcore is never available
+            available = false;  // nullcore is never available
             break;
         default:
             break;

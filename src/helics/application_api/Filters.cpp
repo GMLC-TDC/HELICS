@@ -106,18 +106,18 @@ Filter::Filter(InterfaceVisibility locality, Federate* ffed, std::string_view fi
 
 Filter::Filter(Core* core, std::string_view filtName): Interface(core, InterfaceHandle(), filtName)
 {
-        handle = cr->registerFilter(filtName, std::string_view{}, std::string_view{});
+    handle = cr->registerFilter(filtName, std::string_view{}, std::string_view{});
 }
 
 void Filter::setOperator(std::shared_ptr<FilterOperator> mo)
 {
-        cr->setFilterOperator(handle, std::move(mo));
+    cr->setFilterOperator(handle, std::move(mo));
 }
 
 void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move(filterOps);
-        cr->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
+    cr->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
 }
 
 void Filter::set(std::string_view property, double val)
@@ -137,7 +137,7 @@ void Filter::setString(std::string_view property, std::string_view val)
 CloningFilter::CloningFilter(Core* core, std::string_view filtName):
     Filter(core, filtName, InterfaceHandle())
 {
-        handle = cr->registerCloningFilter(filtName, std::string_view(), std::string_view());
+    handle = cr->registerCloningFilter(filtName, std::string_view(), std::string_view());
     setFilterOperations(std::make_shared<CloneFilterOperation>());
 }
 
@@ -147,7 +147,7 @@ CloningFilter::CloningFilter(Federate* ffed, std::string_view filtName):
     if (ffed != nullptr) {
         handle = ffed->registerCloningFilter(filtName);
     }
-        setFilterOperations(std::make_shared<CloneFilterOperation>());
+    setFilterOperations(std::make_shared<CloneFilterOperation>());
 }
 
 CloningFilter::CloningFilter(Federate* ffed, std::string_view filtName, InterfaceHandle ihandle):
