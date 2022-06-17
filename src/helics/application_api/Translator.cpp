@@ -74,7 +74,7 @@ Translator::Translator(Core* core, const std::string_view translatorName):
 void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
 {
     if (mo) {
-        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(mo));
+        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(std::move(mo)));
     } else {
         setTranslatorOperations(nullptr);
     }
@@ -84,7 +84,7 @@ void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> t
 {
     transOp = std::move(translatorOps);
     if (cr != nullptr) {
-        cr->setTranslatorOperator(handle, (translatorOps) ? translatorOps->getOperator() : nullptr);
+        cr->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
     }
 }
 
