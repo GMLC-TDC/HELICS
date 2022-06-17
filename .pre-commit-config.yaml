@@ -37,8 +37,8 @@ repos:
       - id: check-shebang-scripts-are-executable
       - id: check-executables-have-shebangs
       - id: debug-statements
-      - id: detect-aws-credentials
       - id: detect-private-key
+        exclude: ^(tests/helics/test_files/encryption_config/openssl_certs/)
   - repo: https://github.com/pre-commit/mirrors-prettier
     rev: v2.6.2
     hooks:
