@@ -148,7 +148,7 @@ type is used
     std::shared_ptr<Core> getEmptyCore();
 
     /** get a pointer to an emptyCore*/
-    Core* getEmptyCorePtr(); 
+    Core* getEmptyCorePtr();
 
     /** register a testCore so it can be found by others
 @details also cleans up any leftover Cores that were previously unregistered this can be controlled

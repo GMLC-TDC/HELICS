@@ -22,10 +22,10 @@ void addTargets(const toml::value& section, std::string targetName, Callable cal
         if (targets.is_array()) {
             auto& targetArray = targets.as_array();
             for (const auto& target : targetArray) {
-                callback(static_cast<const std::string &>(target.as_string()));
+                callback(static_cast<const std::string&>(target.as_string()));
             }
         } else {
-            callback(static_cast<const std::string &>(targets.as_string()));
+            callback(static_cast<const std::string&>(targets.as_string()));
         }
     }
     if (targetName.back() == 's') {

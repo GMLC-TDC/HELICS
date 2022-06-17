@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_CoreTypes.hpp"
 #include "flagOperations.hpp"
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
-#include <optional>
 
 namespace helics {
 

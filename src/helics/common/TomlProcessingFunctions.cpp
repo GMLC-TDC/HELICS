@@ -55,7 +55,7 @@ toml::value loadTomlStr(const std::string& tomlString)
         throw(std::invalid_argument(se.what()));
     }
 }
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 static const std::string emptyString;
 
 /** read a time from a JSON value element*/

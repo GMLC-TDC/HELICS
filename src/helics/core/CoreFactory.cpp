@@ -121,8 +121,8 @@ std::shared_ptr<Core> getEmptyCore()
     return emptyCore;
 }
 
-
-Core* getEmptyCorePtr() {
+Core* getEmptyCorePtr()
+{
     static EmptyCore c1;
     return &c1;
 }

@@ -1550,7 +1550,7 @@ const std::string& Interface::getTarget() const
 
 void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
-     cr->addSourceTarget(handle, newTarget, hint);
+    cr->addSourceTarget(handle, newTarget, hint);
 }
 
 void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
@@ -1560,7 +1560,6 @@ void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType h
 
 void Interface::removeTarget(std::string_view targetToRemove)
 {
-    
     cr->removeTarget(handle, targetToRemove);
 }
 
@@ -1581,12 +1580,12 @@ const std::string& Interface::getTag(std::string_view tag) const
 
 void Interface::setTag(std::string_view tag, std::string_view value)
 {
-   cr->setInterfaceTag(handle, tag, value);
+    cr->setInterfaceTag(handle, tag, value);
 }
 
 void Interface::setOption(int32_t option, int32_t value)
 {
-        cr->setHandleOption(handle, option, value);
+    cr->setHandleOption(handle, option, value);
 }
 
 int32_t Interface::getOption(int32_t option) const
@@ -1631,7 +1630,7 @@ const std::string& Interface::getDisplayName() const
 
 void Interface::close()
 {
-        cr->closeHandle(handle);
+    cr->closeHandle(handle);
     cr = CoreFactory::getEmptyCorePtr();
 }
 
