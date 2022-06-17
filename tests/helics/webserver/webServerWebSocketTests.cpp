@@ -41,7 +41,7 @@ namespace net = boost::asio;  // from <boost/asio.hpp>
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 using namespace helics::fileops;
-const std::string localhost{"localhost"};
+constexpr std::string_view localhost{"localhost"};
 
 class webTest: public ::testing::Test {
   protected:
@@ -73,7 +73,7 @@ class webTest: public ::testing::Test {
         }));
 
         // Perform the websocket handshake
-        stream->handshake(localhost, "/");
+        stream->handshake({localhost.data(), localhost.size()}, "/");
     }
 
     // Per-test-suite tear-down.

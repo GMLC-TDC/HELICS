@@ -724,6 +724,7 @@ const std::string& CommonCore::getFederateName(LocalFederateId federateID) const
     return fed->getIdentifier();
 }
 
+//NOLINTNEXTLINE
 static const std::string unknownString("#unknown");
 
 const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateID) const noexcept
@@ -1067,8 +1068,8 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
         return hndl;
     });
 }
-
-static const std::string emptyString;
+//NOLINTNEXTLINE
+static const std::string gEmptyString;
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
                                           std::string_view key,
@@ -1164,15 +1165,13 @@ InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, std::stri
     return pub->getInterfaceHandle();
 }
 
-const std::string emptyStr;
-
 const std::string& CommonCore::getHandleName(InterfaceHandle handle) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         return handleInfo->key;
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
@@ -1191,10 +1190,10 @@ const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
             case InterfaceType::PUBLICATION:
                 return handleInfo->units;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }  // namespace helics
 
 const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
@@ -1209,7 +1208,7 @@ const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
                 break;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getInjectionType(InterfaceHandle handle) const
@@ -1230,10 +1229,10 @@ const std::string& CommonCore::getInjectionType(InterfaceHandle handle) const
             case InterfaceType::FILTER:
                 return handleInfo->type_in;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getExtractionType(InterfaceHandle handle) const
@@ -1248,10 +1247,10 @@ const std::string& CommonCore::getExtractionType(InterfaceHandle handle) const
             case InterfaceType::FILTER:
                 return handleInfo->type_out;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setHandleOption(InterfaceHandle handle, int32_t option, int32_t option_value)
@@ -1502,7 +1501,7 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
                 break;
             }
             case InterfaceType::PUBLICATION:
-                return emptyStr;
+                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1513,10 +1512,10 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
             }
             case InterfaceType::FILTER:
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
@@ -1533,7 +1532,7 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
                 break;
             }
             case InterfaceType::PUBLICATION:
-                return emptyStr;
+                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1546,10 +1545,10 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
                 break;
             }
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len)
@@ -1679,7 +1678,7 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(
-        InterfaceType::ENDPOINT, id, name, type, emptyStr, fed->getInterfaceFlags());
+        InterfaceType::ENDPOINT, id, name, type, gEmptyString, fed->getInterfaceFlags());
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -1709,7 +1708,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr, flags);
+    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, gEmptyString, flags);
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -5215,7 +5214,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
     if (handleInfo != nullptr) {
         return handleInfo->getTag("local_info_");
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string_view info)
@@ -5230,7 +5229,7 @@ const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, std::stri
     if (handleInfo != nullptr) {
         return handleInfo->getTag(tag);
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,

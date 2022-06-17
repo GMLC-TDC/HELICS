@@ -112,7 +112,7 @@ static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
     {"test1", CoreType::TEST},
     {"multi", CoreType::MULTI}};
 
-CoreType coreTypeFromString(std::string type) noexcept
+CoreType coreTypeFromString(std::string_view type) noexcept
 {
     if (type.empty()) {
         return CoreType::DEFAULT;
@@ -121,13 +121,14 @@ CoreType coreTypeFromString(std::string type) noexcept
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
-    fnd = coreTypes.find(frozen::string(type));
+    std::string type2{type};
+    std::transform(type2.cbegin(), type2.cend(), type2.begin(), ::tolower);
+    fnd = coreTypes.find(frozen::string(type2));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    if ((type.front() == '=') || (type.front() == '-')) {
-        return coreTypeFromString(type.substr(1));
+    if ((type2.front() == '=') || (type2.front() == '-')) {
+        return coreTypeFromString(type2.substr(1));
     }
     if (type.compare(0, 4, "zmq2") == 0) {
         return CoreType::ZMQ_SS;

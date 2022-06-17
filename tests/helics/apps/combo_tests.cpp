@@ -114,7 +114,7 @@ static void useFile(const std::string& corename, const std::string& file)
     std::filesystem::remove(file);
 }
 
-static const std::string Message1("this is a test message\n and a \"secondMessage\"");
+static constexpr std::string_view Message1("this is a test message\n and a \"secondMessage\"");
 static const std::string Message2(55, 17);
 
 static void generateFiles2(const std::filesystem::path& f1, const std::filesystem::path& f2)

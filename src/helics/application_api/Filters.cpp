@@ -126,8 +126,6 @@ void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
     }
 }
 
-static const std::string emptyStr;
-
 void Filter::set(std::string_view property, double val)
 {
     if (filtOp) {

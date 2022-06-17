@@ -396,7 +396,7 @@ void addAssociatedCoreType(std::string_view name, CoreType type)
     addExtraTypes(std::string{name}, type);
 }
 
-static const std::string helpStr{"--help"};
+static constexpr std::string_view helpStr{"--help"};
 
 void displayHelp(CoreType type)
 {

@@ -209,6 +209,9 @@ class EmptyCore: public Core {
         setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value) override;
     virtual const std::string& getFederateTag(LocalFederateId fid,
                                               std::string_view tag) const override;
+
+  private:
+    static const std::string emptyString;
 };
 
 }  // namespace helics

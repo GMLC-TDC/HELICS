@@ -986,8 +986,8 @@ static Filter& generateFilter(Federate* fed,
     return (global) ? make_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
                       make_filter(operation, fed, name);
 }
-
-const std::string emptyStr;
+//NOLINTNEXTLINE
+static const std::string emptyStr;
 
 template<class Inp>
 static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
