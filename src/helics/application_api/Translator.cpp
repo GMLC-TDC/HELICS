@@ -88,8 +88,6 @@ void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> t
     }
 }
 
-static const std::string emptyStr;
-
 void Translator::set(std::string_view property, double val)
 {
     if (transOp) {

@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+    //NOLINTNEXTLINE
     const std::string EmptyCore::emptyString{};
 
     // timeoutMon is a unique_ptr

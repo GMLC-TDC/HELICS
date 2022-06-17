@@ -12,6 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 #include <vector>
+#include <optional>
 
 namespace helics {
 
@@ -75,5 +76,6 @@ class BasicHandleInfo {
 
   private:
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
+    static const std::string emptyString;
 };
 }  // namespace helics

@@ -117,7 +117,7 @@ CoreType coreTypeFromString(std::string_view type) noexcept
     if (type.empty()) {
         return CoreType::DEFAULT;
     }
-    auto fnd = coreTypes.find(frozen::string(type));
+    const auto* fnd = coreTypes.find(frozen::string(type));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
@@ -237,7 +237,8 @@ bool isCoreTypeAvailable(CoreType type) noexcept
         case CoreType::TCP_SS:
             available = tcp_availability;
             break;
-        case CoreType::DEFAULT:  // default should always be available
+        case CoreType::DEFAULT:  // default and empty should always be available
+        case CoreType::EMPTY:
             available = true;
             break;
         case CoreType::INPROC:
@@ -245,11 +246,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
             break;
         case CoreType::HTTP:
         case CoreType::WEBSOCKET:
-        case CoreType::NULLCORE:
-            available = false;
+            return false; //these are not yet built
             break;
-        case CoreType::EMPTY:
-            available = true;
+        case CoreType::NULLCORE:
+            available = false; //nullcore is never available
             break;
         default:
             break;
@@ -275,7 +275,7 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
     if ((type1.compare(0, 3, "def") == 0) || (type2.compare(0, 3, "def") == 0)) {
         return true;
     }
-    auto res = global_match_strings.find(type1);
+    const auto* res = global_match_strings.find(type1);
     if (res != global_match_strings.end()) {
         return true;
     }

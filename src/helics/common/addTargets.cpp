@@ -72,7 +72,7 @@ static std::pair<std::string, std::string> getTagPair(const TV& tv)
     std::string name = fileops::getName(tv);
     if (name.empty()) {
     } else {
-        std::string val = fileops::getOrDefault(tv, std::string("value"), std::string(""));
+        std::string val = fileops::getOrDefault(tv, std::string("value"), std::string_view{});
         return std::make_pair(name, val);
     }
 
@@ -80,7 +80,7 @@ static std::pair<std::string, std::string> getTagPair(const TV& tv)
 }
 
 void loadTags(const Json::Value& section,
-              const std::function<void(const std::string&, const std::string&)>& tagAction)
+              const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
     if (section.isMember("tags")) {
         auto tv = section["tags"];
@@ -108,7 +108,7 @@ void loadTags(const Json::Value& section,
 }
 
 void loadTags(const toml::value& section,
-              const std::function<void(const std::string&, const std::string&)>& tagAction)
+              const std::function<void(std::string_view, std::string_view)>& tagAction)
 {
     if (section.contains("tags")) {
         auto tv = section.at("tags");

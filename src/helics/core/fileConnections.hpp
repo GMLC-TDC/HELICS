@@ -16,9 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <type_traits>
 
-namespace helics {
+namespace helics::fileops {
 
-namespace fileops {
     template<class brkX>
     void makeConnectionsToml(brkX* brk, const std::string& file)
     {
@@ -166,28 +165,28 @@ namespace fileops {
                 if (conn.isArray() && conn.size() >= 2) {
                     brk->dataLink(conn[0].asString(), conn[1].asString());
                 } else {
-                    std::string pub = fileops::getOrDefault(conn, "publication", std::string());
+                    std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                     if (!pub.empty()) {
-                        addTargets(conn, "targets", [brk, &pub](const std::string& target) {
+                        addTargets(conn, "targets", [brk, &pub](std::string_view target) {
                             brk->dataLink(pub, target);
                         });
                     } else {
-                        std::string ipt = fileops::getOrDefault(conn, "input", std::string());
+                        std::string ipt = fileops::getOrDefault(conn, "input", std::string_view());
                         if (!ipt.empty()) {
-                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                            addTargets(conn, "targets", [brk, &ipt](std::string_view target) {
                                 brk->dataLink(target, ipt);
                             });
-                            addTargets(conn, "sources", [brk, &ipt](const std::string& source) {
+                            addTargets(conn, "sources", [brk, &ipt](std::string_view source) {
                                 brk->dataLink(source, ipt);
                             });
                         } else {
                             std::string ept =
-                                fileops::getOrDefault(conn, "endpoint", std::string());
+                                fileops::getOrDefault(conn, "endpoint", std::string_view());
                             if (!ept.empty()) {
-                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                addTargets(conn, "targets", [brk, &ept](std::string_view target) {
                                     brk->linkEndpoints(ept, target);
                                 });
-                                addTargets(conn, "sources", [brk, &ept](const std::string& source) {
+                                addTargets(conn, "sources", [brk, &ept](std::string_view source) {
                                     brk->linkEndpoints(source, ept);
                                 });
                             }
@@ -201,28 +200,28 @@ namespace fileops {
                 if (conn.isArray() && conn.size() >= 2) {
                     brk->linkEndpoints(conn[0].asString(), conn[1].asString());
                 } else {
-                    std::string pub = fileops::getOrDefault(conn, "publication", std::string());
+                    std::string pub = fileops::getOrDefault(conn, "publication", std::string_view());
                     if (!pub.empty()) {
-                        addTargets(conn, "targets", [brk, &pub](const std::string& target) {
+                        addTargets(conn, "targets", [brk, &pub](std::string_view target) {
                             brk->dataLink(pub, target);
                         });
                     } else {
                         std::string ipt = fileops::getOrDefault(conn, "input", std::string());
                         if (!ipt.empty()) {
-                            addTargets(conn, "targets", [brk, &ipt](const std::string& target) {
+                            addTargets(conn, "targets", [brk, &ipt](std::string_view target) {
                                 brk->dataLink(target, ipt);
                             });
-                            addTargets(conn, "sources", [brk, &ipt](const std::string& source) {
+                            addTargets(conn, "sources", [brk, &ipt](std::string_view source) {
                                 brk->dataLink(source, ipt);
                             });
                         } else {
                             std::string ept =
                                 fileops::getOrDefault(conn, "endpoint", std::string());
                             if (!ept.empty()) {
-                                addTargets(conn, "targets", [brk, &ept](const std::string& target) {
+                                addTargets(conn, "targets", [brk, &ept](std::string_view target) {
                                     brk->linkEndpoints(ept, target);
                                 });
-                                addTargets(conn, "sources", [brk, &ept](const std::string& source) {
+                                addTargets(conn, "sources", [brk, &ept](std::string_view source) {
                                     brk->linkEndpoints(source, ept);
                                 });
                             }
@@ -236,15 +235,15 @@ namespace fileops {
                 if (filt.isArray()) {
                     brk->addSourceFilterToEndpoint(filt[0].asString(), filt[1].asString());
                 } else {
-                    std::string fname = fileops::getOrDefault(filt, "filter", std::string());
+                    std::string fname = fileops::getOrDefault(filt, "filter", std::string_view());
                     if (!fname.empty()) {
-                        auto asrc = [brk, &fname](const std::string& ept) {
+                        auto asrc = [brk, &fname](std::string_view ept) {
                             brk->addSourceFilterToEndpoint(fname, ept);
                         };
                         addTargets(filt, "endpoints", asrc);
                         addTargets(filt, "source_endpoints", asrc);
                         addTargets(filt, "sourceEndpoints", asrc);
-                        auto adst = [brk, &fname](const std::string& ept) {
+                        auto adst = [brk, &fname](std::string_view ept) {
                             brk->addDestinationFilterToEndpoint(fname, ept);
                         };
                         addTargets(filt, "dest_endpoints", adst);
@@ -266,10 +265,9 @@ namespace fileops {
             }
         }
         if constexpr (std::is_base_of<Core, brkX>::value) {
-            loadTags(doc, [brk](const std::string& tagname, const std::string& tagvalue) {
+            loadTags(doc, [brk](std::string_view tagname, std::string_view tagvalue) {
                 brk->setFederateTag(gLocalCoreId, tagname, tagvalue);
             });
         }
     }
 }  // namespace fileops
-}  // namespace helics

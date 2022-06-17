@@ -144,8 +144,11 @@ type is used
 @return a shared_ptr to the testCore*/
     std::shared_ptr<Core> findCore(std::string_view name);
 
-    /** get a pointer to an empty core*/
+    /** get a shared pointer to an empty core*/
     std::shared_ptr<Core> getEmptyCore();
+
+    /** get a pointer to an emptyCore*/
+    Core* getEmptyCorePtr(); 
 
     /** register a testCore so it can be found by others
 @details also cleans up any leftover Cores that were previously unregistered this can be controlled

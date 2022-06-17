@@ -401,7 +401,7 @@ std::vector<int> ValueFederateManager::queryUpdates()
     }
     return updates;
 }
-
+//NOLINTNEXTLINE
 static const std::string emptyStr;
 
 const std::string& ValueFederateManager::getTarget(const Input& inp) const

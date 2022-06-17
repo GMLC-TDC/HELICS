@@ -19,18 +19,21 @@ class NetworkCommsInterface: public CommsInterface {
   private:
     class PortAllocator {
       public:
+        PortAllocator();
         /** get an open port for a particular host*/
-        int findOpenPort(int count, const std::string& host = "localhost");
+        int findOpenPort(int count, std::string_view host = "localhost");
         void setStartingPortNumber(int startPort) { startingPort = startPort; }
         int getDefaultStartingPort() const { return startingPort; }
         void addUsedPort(int port);
-        void addUsedPort(const std::string& host, int port);
+        void addUsedPort(std::string_view host, int port);
 
       private:
         int startingPort = -1;
-        std::map<std::string, std::set<int>> usedPort;
-        std::map<std::string, int> nextPorts;
-        bool isPortUsed(const std::string& host, int port) const;
+        std::map<std::string_view, std::set<int>> usedPort;
+        std::map<std::string_view, int> nextPorts;
+        bool isPortUsed(std::string_view host, int port) const;
+        std::set<std::string> hosts;
+        std::string_view addNewHost(std::string_view newHost);
     };
 
   public:

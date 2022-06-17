@@ -121,6 +121,12 @@ std::shared_ptr<Core> getEmptyCore()
     return emptyCore;
 }
 
+
+Core* getEmptyCorePtr() {
+    static EmptyCore c1;
+    return &c1;
+}
+
 std::shared_ptr<Core> create(std::string_view initializationString)
 {
     helicsCLI11App tparser;

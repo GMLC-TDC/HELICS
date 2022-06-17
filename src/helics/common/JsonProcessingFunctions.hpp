@@ -46,9 +46,9 @@ inline std::string JsonAsString(const Json::Value& element)
 }
 
 inline std::string
-    getOrDefault(const Json::Value& element, const std::string& key, const std::string& defVal)
+    getOrDefault(const Json::Value& element, const std::string& key, std::string_view defVal)
 {
-    return (element.isMember(key)) ? JsonAsString(element[key]) : defVal;
+    return (element.isMember(key)) ? JsonAsString(element[key]) : std::string(defVal);
 }
 
 inline double getOrDefault(const Json::Value& element, const std::string& key, double defVal)

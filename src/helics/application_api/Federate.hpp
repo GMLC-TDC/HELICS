@@ -678,8 +678,9 @@ received
     /** function to generate results for a local Query
     @details should return an empty string if the query is not recognized*/
     virtual std::string localQuery(std::string_view queryStr) const;
-    /** generate a string with the local variant of the name*/
-    std::string localNameGenerator(std::string_view localName) const;
+    /** generate a string with the local variant of the name with the specified suffix
+    @param[in] addition the suffix to append to the current object name*/
+    std::string localNameGenerator(std::string_view addition) const;
 
   public:
     /** register a set of interfaces defined in a file
