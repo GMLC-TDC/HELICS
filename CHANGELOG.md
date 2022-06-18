@@ -10,11 +10,13 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.3.0][] ~ 2022-08-07
 
-Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.0, Clang 7.0.
+Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.
 
 ### Fixed
 
 ### Changed
+
+- additional use of `std::string_view` in internal callbacks and network operations
 
 ### Added
 
