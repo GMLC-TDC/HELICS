@@ -144,7 +144,7 @@ if(MSVC)
         compile_flags_target
         INTERFACE -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /MP
     )
- 
+
     # these next two should be global
     add_compile_options(/EHsc /MP)
     target_compile_options(build_flags_target INTERFACE /EHsc)
