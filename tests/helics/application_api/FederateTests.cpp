@@ -649,8 +649,7 @@ TEST(federate_tests, from_file10)
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
 
-    auto fstr2 = std::string(TEST_DIR) +
-        "extra_files_testing_for_very_long_file_paths/this_is_a_ridiculously_long_file_name_to_test_some_odd_conditions_in_the_toml_parser_so_we_need_a_long_file_name.toml";
+    auto fstr2 = std::string(LONG_TEST_NAME);
     if (fstr2.size() < FILENAME_MAX) {
         // this test would fail if the file name exceeeds the max filename length
         std::shared_ptr<helics::Federate> Fed1;
