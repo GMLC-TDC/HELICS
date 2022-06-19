@@ -57,18 +57,24 @@ target_compile_definitions(
     application-api-tests PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
 )
 
-#generate a file for the extra long file name tests
-set(LONG_TEST_PATH ${CMAKE_CURRENT_BINARY_DIR}/test_files/extra_files_testing_for_very_long_file_paths)
-set(LONG_FILE_NAME this_is_a_ridiculously_long_file_name_to_test_some_odd_conditions_in_the_toml_parser_so_we_need_a_long_file_name.toml)
+# generate a file for the extra long file name tests
+set(LONG_TEST_PATH
+    ${CMAKE_CURRENT_BINARY_DIR}/test_files/extra_files_testing_for_very_long_file_paths
+)
+set(LONG_FILE_NAME
+    this_is_a_ridiculously_long_file_name_to_test_some_odd_conditions_in_the_toml_parser_so_we_need_a_long_file_name.toml
+)
 file(MAKE_DIRECTORY ${LONG_TEST_PATH})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../test_files/example_filters.toml
-${LONG_TEST_PATH}/${LONG_FILE_NAME} COPYONLY)
-        
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../test_files/example_filters.toml
+    ${LONG_TEST_PATH}/${LONG_FILE_NAME} COPYONLY
+)
+
 target_compile_definitions(
     application-api-tests PRIVATE "-DLONG_TEST_NAME=\"${LONG_TEST_PATH}/${LONG_FILE_NAME}\""
 )
-        
+
 add_test(NAME application-api-tests COMMAND application-api-tests)
 set_property(TEST application-api-tests PROPERTY LABELS ApplicationApi Coverage Daily)
 
