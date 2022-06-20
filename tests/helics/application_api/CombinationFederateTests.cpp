@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
+
 #include <gtest/gtest.h>
 
 class combofed_single_type_tests:
@@ -151,7 +152,6 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
- 
     mFed1->enterExecutingModeAsync();
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
