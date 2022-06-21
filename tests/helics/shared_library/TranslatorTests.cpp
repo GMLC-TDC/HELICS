@@ -395,7 +395,7 @@ TEST_F(translator, custom_translator)
     double v3 = helicsInputGetDouble(i1, nullptr);
     EXPECT_DOUBLE_EQ(v3, 54.7);
     auto m2 = helicsEndpointGetMessage(e1);
-    EXPECT_EQ(helicsMessageIsValid(m2),HELICS_TRUE);
+    EXPECT_EQ(helicsMessageIsValid(m2), HELICS_TRUE);
     EXPECT_STREQ(helicsMessageGetSource(m2), "t1");
     EXPECT_STREQ(helicsMessageGetOriginalSource(m2), "pub1");
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port1");
@@ -409,7 +409,6 @@ TEST_F(translator, custom_translator)
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
 
-
 TEST_F(translator, custom_translator2)
 {
     HelicsBroker broker = AddBroker("test_2", 2);
@@ -419,7 +418,6 @@ TEST_F(translator, custom_translator2)
     auto vFed = GetFederateAt(0);
     auto mFed = GetFederateAt(1);
 
-    
     CE(auto t1 =
            helicsFederateRegisterGlobalTranslator(mFed, HELICS_TRANSLATOR_TYPE_CUSTOM, "t1", &err));
     EXPECT_TRUE(t1 != nullptr);
