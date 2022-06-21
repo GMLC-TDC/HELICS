@@ -2533,7 +2533,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
 
         m.setDestination(target.first);
         m.setSource(handleInfo.handle);
-        m.payload = handleInfo.type;
+        m.payload = handleInfo.key;
         m.flags = handleInfo.flags;
         transmit(getRoute(m.dest_id), m);
 
@@ -2570,7 +2570,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
         m.setAction(CMD_ADD_PUBLISHER);
         m.setDestination(sub.first);
         m.setSource(handleInfo.handle);
-        m.payload = handleInfo.type;
+        m.payload = handleInfo.key;
         m.flags = handleInfo.flags;
         m.setStringData(handleInfo.type, handleInfo.units);
         transmit(getRoute(m.dest_id), std::move(m));
