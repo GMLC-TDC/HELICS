@@ -151,17 +151,17 @@ std::unique_ptr<Message> FirewallOperator::process(std::unique_ptr<Message> mess
                 break;
             case operations::set_flag1:
                 if (res) {
-                    setActionFlag(*message, extra_flag1);
+                    setActionFlag(*message, 10);
                 }
                 break;
             case operations::set_flag2:
                 if (res) {
-                    setActionFlag(*message, extra_flag2);
+                    setActionFlag(*message, 13);
                 }
                 break;
             case operations::set_flag3:
                 if (res) {
-                    setActionFlag(*message, extra_flag3);
+                    setActionFlag(*message, 14);
                 }
                 break;
             case operations::none:
