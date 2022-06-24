@@ -24,15 +24,14 @@ namespace helics {
         /// flag to indicate the request is from a non-granting federate
         non_granting_flag = 7,
 
-        /// flag to indicate the request is from federate with delayed timing
-        delayed_timing_flag = 10,
         /// flag to mark an interrupted event
         interrupted_flag = 8,
-        
-        /// overload of extra_flag3 indicating the message is from a parent object
+        /// flag to indicate the request is from federate with delayed timing
+        delayed_timing_flag = 10,
+        /// flag indicating the message is from a parent object
         parent_flag = 13,
 
-        /// overload of extra_flag4 indicating a message is from a child object
+        /// flag indicating a message is from a child object
         child_flag = 14
     };
 
@@ -64,32 +63,38 @@ namespace helics {
         /// indicator that the endpoint or filter has a destination filter that alters the message
         has_non_cloning_dest_filter_flag = 14,
         /// flag to indicate an interface is nameless
-        nameless_interface_flag = 15,
+        nameless_interface_flag = 15
     };
 
     /// @brief flags used when connecting a federate/core/broker to a federation
     enum ConnectionFlags : uint16_t {
         /// flag indicating that message comes from a core vs a broker
-        core_flag = 3,  
+        core_flag = 3,
+        /// flag indicating to use global timing (overload of indicator flag)
+        global_timing_flag = 5,
+
         /// flag to indicate it should use the json packetization
-        use_json_serialization_flag = 6,  
-        /// flag indicating that a broker/federate is disconnected
-        disconnected_flag = 12,  
+        use_json_serialization_flag = 6,
+        /// flag indicating use of asynchronous timing on a global level
+        async_timing_flag = 7,
         /// flag indicating that a federate is an observer only
         observer_flag = 8,
+        /// flag indicating that a broker/federate is disconnected
+        disconnected_flag = 12,  
+        
         /// flag indicating a federate, core or broker is slow responding
         slow_responding_flag = 14,
         /// flag indicating that a federate should not count in any totals
-        non_counting_flag = 15,
+        non_counting_flag = 15
         
     };
 
     /// @brief flags used for messages
     enum MessageFlags : uint16_t {
-        /// flag indicating the message is for destination processing
-        destination_processing_flag = 11,
         /// flag indicating that the message requires processing for filters yet
         filter_processing_required_flag = 7,
+        /// flag indicating the message is for destination processing
+        destination_processing_flag = 11,
         /// flag indicating the message is empty
         empty_flag = 15,
     };

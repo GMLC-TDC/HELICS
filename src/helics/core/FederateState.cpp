@@ -1261,7 +1261,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                 }
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                if (cmd.actionTime < time_granted) {
+                if (cmd.actionTime < time_granted &&
+                    timeMethod != TimeSynchronizationMethod::ASYNC) {
                     LOG_WARNING(
                         fmt::format("received message {} at time({}) earlier than granted time({})",
                                     prettyPrintString(cmd),
@@ -1288,7 +1289,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                     }
                     LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                    if (cmd.actionTime < time_granted) {
+                    if (cmd.actionTime < time_granted && timeMethod!=TimeSynchronizationMethod::ASYNC) {
                         LOG_WARNING(fmt::format(
                             "received message {} at time({}) earlier than granted time({})",
                             prettyPrintString(cmd),
@@ -1311,13 +1312,19 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 break;
             }
             for (auto& src : subI->input_sources) {
+                auto valueTime = cmd.actionTime;
+                if (timeMethod == TimeSynchronizationMethod::ASYNC) {
+                    if (valueTime < time_granted) {
+                        valueTime = time_granted;
+                    }
+                }
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
                     subI->addData(src,
-                                  cmd.actionTime,
+                                  valueTime,
                                   cmd.counter,
                                   std::make_shared<const SmallBuffer>(std::move(cmd.payload)));
                     if (!subI->not_interruptible) {
-                        timeCoord->updateValueTime(cmd.actionTime, !timeGranted_mode);
+                        timeCoord->updateValueTime(valueTime, !timeGranted_mode);
                         LOG_TRACE(timeCoord->printTimeStatus());
                     }
                     LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
@@ -1397,7 +1404,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.name(),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                    if (!usingGlobalTime) {
+                    if (timeMethod==TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }
@@ -1405,7 +1412,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (eptI != nullptr) {
                     eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
-                    if (!usingGlobalTime) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }
@@ -1415,7 +1422,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 if (pubI->addSubscriber(cmd.getSource())) {
-                    if (!usingGlobalTime) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependent(cmd.source_id);
                     }
                 }
@@ -1427,12 +1434,16 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (checkActionFlag(cmd, destination_target)) {
                     eptI->addDestination(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
-                        addDependent(cmd.source_id);
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependent(cmd.source_id);
+                        }
                     }
                 } else {
                     eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
-                        addDependency(cmd.source_id);
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependency(cmd.source_id);
+                        }
                     }
                 }
             }
@@ -1474,11 +1485,15 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     errorString = commandErrorString(cmd.messageID);
                     return MessageProcessingResult::ERROR_RESULT;
                 }
-                if (checkActionFlag(cmd, indicator_flag)) {
-                    usingGlobalTime = true;
-                    addDependent(gRootBrokerID);
-                    addDependency(gRootBrokerID);
-                    timeCoord->setAsParent(gRootBrokerID);
+                if (checkActionFlag(cmd, global_timing_flag)) {
+                    if (checkActionFlag(cmd, async_timing_flag)) {
+                        timeMethod = TimeSynchronizationMethod::ASYNC;
+                    } else {
+                        timeMethod = TimeSynchronizationMethod::GLOBAL;
+                        addDependent(gRootBrokerID);
+                        addDependency(gRootBrokerID);
+                        timeCoord->setAsParent(gRootBrokerID);
+                    }
                     timeCoord->globalTime = true;
                 }
                 global_id = cmd.dest_id;

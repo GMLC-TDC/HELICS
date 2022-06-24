@@ -254,7 +254,11 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
                 setActionFlag(brokerReply, slow_responding_flag);
             }
             if (globalTime || asyncTime) {
-                setActionFlag(brokerReply, indicator_flag);
+                setActionFlag(brokerReply, global_timing_flag);
+                if (asyncTime)
+                {
+                    setActionFlag(brokerReply, async_timing_flag);
+                }
             }
             transmit(brk->route, brokerReply);
             return;
@@ -431,7 +435,10 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             setActionFlag(brokerReply, slow_responding_flag);
         }
         if (globalTime || asyncTime) {
-            setActionFlag(brokerReply, indicator_flag);
+            setActionFlag(brokerReply, global_timing_flag);
+            if (asyncTime) {
+                setActionFlag(brokerReply, async_timing_flag);
+            }
         }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
@@ -538,7 +545,10 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             setActionFlag(fedReply, child_flag);
         }
         if (globalTime || asyncTime) {
-            setActionFlag(fedReply, indicator_flag);
+            setActionFlag(fedReply, global_timing_flag);
+            if (asyncTime) {
+                setActionFlag(fedReply, async_timing_flag);
+            }
             if (!checkActionFlag(command, non_counting_flag)) {
                 timeCoord->addDependency(global_fedid);
                 timeCoord->addDependent(global_fedid);
