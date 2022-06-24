@@ -77,9 +77,9 @@ MessageConditionalOperator::MessageConditionalOperator(
 }
 
 void MessageConditionalOperator::setConditionFunction(
-    std::function<bool(const Message*)> userConditionalFunction)
+    std::function<bool(const Message*)> userConditionFunction)
 {
-    evalFunction = std::move(userConditionalFunction);
+    evalFunction = std::move(userConditionFunction);
 }
 
 std::unique_ptr<Message> MessageConditionalOperator::process(std::unique_ptr<Message> message)

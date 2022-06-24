@@ -18,8 +18,9 @@ SPDX-License-Identifier: BSD-3-Clause
 extern "C" {
 #endif
 
+
 /** pick a core type depending on compile configuration usually either ZMQ if available or TCP */
-typedef enum {
+typedef enum { /* NOLINT */
     /** a default core type that will default to something available*/
     HELICS_CORE_TYPE_DEFAULT = 0,
     /** use the Zero MQ networking protocol */
@@ -60,7 +61,7 @@ typedef enum {
 } HelicsCoreTypes;
 
 /** enumeration of allowable data types for publications and inputs*/
-typedef enum {
+typedef enum { /* NOLINT */
     HELICS_DATA_TYPE_UNKNOWN = -1,
     /** a sequence of characters*/
     HELICS_DATA_TYPE_STRING = 0,
@@ -94,7 +95,7 @@ typedef enum {
 #define HELICS_DATA_TYPE_CHAR HELICS_DATA_TYPE_STRING
 
 /** enumeration of possible federate flags*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** flag indicating that a federate is observe only*/
     HELICS_FLAG_OBSERVER = 0,
     /** flag indicating that a federate can only return requested times*/
@@ -141,7 +142,7 @@ typedef enum {
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** used to delay a core from entering initialization mode even if it would otherwise be ready*/
     HELICS_FLAG_DELAY_INIT_ENTRY = 45,
     /** used to clear the HELICS_DELAY_INIT_ENTRY flag in cores*/
@@ -151,7 +152,7 @@ typedef enum {
 } HelicsCoreFlags;
 
 /** enumeration of general flags that can be used in federates/cores/brokers */
-typedef enum {
+typedef enum { /* NOLINT */
     /** flag specifying that a federate, core, or broker may be slow to respond to pings
         If the federate goes offline there is no good way to detect it so use with caution
         */
@@ -174,7 +175,7 @@ typedef enum {
 
 /** log level definitions
  */
-typedef enum {
+typedef enum { /* NOLINT */
     /** log level for dumping log messages*/
     HELICS_LOG_LEVEL_DUMPLOG = -10,
     /** don't print anything except a few catastrophic errors*/
@@ -204,7 +205,7 @@ typedef enum {
 
 /** enumeration of return values from the C interface functions
  */
-typedef enum {
+typedef enum { /* NOLINT */
     /** global fatal error for federation */
     HELICS_ERROR_FATAL = -404,
     /** an unknown non-helics error was produced */
@@ -246,7 +247,7 @@ typedef enum {
 const int HELICS_INVALID_OPTION_INDEX = -101;
 
 /** enumeration of properties that apply to federates and sometimes cores*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** the property controlling the minimum time delta for a federate*/
     HELICS_PROPERTY_TIME_DELTA = 137,
     /** the property controlling the period for a federate*/
@@ -287,7 +288,7 @@ typedef enum {
 const int HELICS_INVALID_PROPERTY_VALUE = -972;
 
 /** enumeration of the multi_input operations*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** time and priority order the inputs from the core library*/
     HELICS_MULTI_INPUT_NO_OP = 0,
     /** vectorize the inputs either double vector or string vector*/
@@ -310,7 +311,7 @@ typedef enum {
 } HelicsMultiInputModes;
 
 /** enumeration of options that apply to handles*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** specify that a connection is required for an interface and will generate an error if not
        available*/
     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED = 397,
@@ -345,7 +346,7 @@ typedef enum {
 } HelicsHandleOptions;
 
 /** enumeration of the predefined filter types*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** a custom filter type that executes a user defined callback*/
     HELICS_FILTER_TYPE_CUSTOM = 0,
     /** a filter type that executes a fixed delay on a message*/
@@ -365,7 +366,7 @@ typedef enum {
 } HelicsFilterTypes;
 
 /** enumeration of the predefined translator types*/
-typedef enum {
+typedef enum { /* NOLINT */
     /** a custom filter type that executes a user defined callback*/
     HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
     /** a translator type that converts to and from JSON*/
@@ -380,7 +381,7 @@ fast is the default, meaning the query travels along priority channels and takes
 existing messages; ordered means it follows normal priority patterns and will be ordered along with
 existing messages
 */
-typedef enum {
+typedef enum { /* NOLINT */
     /** sequencing mode to operate on priority channels*/
     HELICS_SEQUENCING_MODE_FAST = 0,
     /** sequencing mode to operate on the normal channels*/
@@ -391,6 +392,7 @@ typedef enum {
 
 #define HELICS_BIG_NUMBER 9223372036.854774
 const double cHelicsBigNumber = HELICS_BIG_NUMBER;
+
 
 #ifdef __cplusplus
 } /* end of extern "C" { */
