@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
 
-#include <future>
 #include <gtest/gtest.h>
 
 class combofed_single_type_tests:
@@ -25,6 +24,10 @@ class combofed_single_type_tests:
 class combofed_type_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
+
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
 
 // const std::string CoreTypes[] = {"udp" };
 /** test simple creation and destruction*/
@@ -149,9 +152,9 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
-    auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
+    mFed1->enterExecutingModeAsync();
     mFed2->enterExecutingMode();
-    f1finish.wait();
+    mFed1->enterExecutingModeComplete();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
@@ -162,11 +165,11 @@ TEST_P(combofed_type_tests, send_receive_2fed)
     epid.sendTo(data, "ep2");
     epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
-    auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
+    mFed1->requestTimeAsync(1.0);
     auto gtime = mFed2->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    EXPECT_EQ(f1time.get(), 1.0);
+    EXPECT_EQ(mFed1->requestTimeComplete(), 1.0);
 
     auto res = mFed1->hasMessage();
     EXPECT_TRUE(res);
@@ -211,9 +214,9 @@ TEST_P(combofed_type_tests, multimode_transfer)
     cFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     cFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
-    auto f1finish = std::async(std::launch::async, [&]() { cFed1->enterExecutingMode(); });
+    cFed1->enterExecutingModeAsync();
     cFed2->enterExecutingMode();
-    f1finish.wait();
+    cFed1->enterExecutingModeComplete();
     // publish string1 at time=0.0;
     pubid.publish("string1");
 
@@ -226,11 +229,11 @@ TEST_P(combofed_type_tests, multimode_transfer)
     epid.sendTo(data, "ep2");
     epid2.sendTo(data2, "fed0/ep1");
     // move the time to 1.0
-    auto f1time = std::async(std::launch::async, [&]() { return cFed1->requestTime(1.0); });
+    cFed1->requestTimeAsync(1.0);
     auto gtime = cFed2->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    EXPECT_EQ(f1time.get(), 1.0);
+    EXPECT_EQ(cFed1->requestTimeComplete(), 1.0);
 
     std::string s = subid.getString();
     // get the value
@@ -260,12 +263,12 @@ TEST_P(combofed_type_tests, multimode_transfer)
 
     EXPECT_EQ(M2->data[245], data[245]);
 
-    // advance time
-    f1time = std::async(std::launch::async, [&]() { return cFed1->requestTime(2.0); });
+    cFed1->requestTimeAsync(1.0);
+
     gtime = cFed2->requestTime(2.0);
 
     EXPECT_EQ(gtime, 2.0);
-    EXPECT_EQ(f1time.get(), 2.0);
+    EXPECT_EQ(cFed1->requestTimeComplete(), 2.0);
     // make sure the value was updated
 
     const auto& ns = subid.getString();
@@ -281,8 +284,12 @@ TEST_P(combofed_type_tests, multimode_transfer)
 
 INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          combofed_single_type_tests,
-                         ::testing::ValuesIn(CoreTypes_simple));
-INSTANTIATE_TEST_SUITE_P(combofed_tests, combofed_type_tests, ::testing::ValuesIn(CoreTypes));
+                         ::testing::ValuesIn(CoreTypes_simple),
+                         testNamer);
+INSTANTIATE_TEST_SUITE_P(combofed_tests,
+                         combofed_type_tests,
+                         ::testing::ValuesIn(CoreTypes),
+                         testNamer);
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
                                                      "example_combo_fed.toml"};
