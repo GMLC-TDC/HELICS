@@ -117,8 +117,7 @@ class FederateState {
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
     /// the time keeping method in use
-    TimeSynchronizationMethod timeMethod{
-        TimeSynchronizationMethod::DISTRIBUTED};  
+    TimeSynchronizationMethod timeMethod{TimeSynchronizationMethod::DISTRIBUTED};
     /** counter for the number of times time or execution mode has been granted */
     std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */

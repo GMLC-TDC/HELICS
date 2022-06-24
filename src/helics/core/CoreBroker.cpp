@@ -255,8 +255,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             }
             if (globalTime || asyncTime) {
                 setActionFlag(brokerReply, global_timing_flag);
-                if (asyncTime)
-                {
+                if (asyncTime) {
                     setActionFlag(brokerReply, async_timing_flag);
                 }
             }

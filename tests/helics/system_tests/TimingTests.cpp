@@ -708,7 +708,6 @@ TEST_F(timing, dual_fast_sender_tests_ci_skip)  // ci_skip
 
 #endif
 
-
 TEST_F(timing, async_timing)
 {
     extraBrokerArgs = "--async";
@@ -741,11 +740,10 @@ TEST_F(timing, async_timing)
     vFed1->requestTime(2.0);
     res = vFed2->requestTime(5.0);
     EXPECT_LT(res, 4.0);
-    
+
     vFed1->finalize();
     vFed2->finalize();
 }
-
 
 TEST_F(timing, async_timing_message)
 {
