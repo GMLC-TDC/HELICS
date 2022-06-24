@@ -5,8 +5,9 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#include "../common/fmt_format.h"
 #include "AsyncTimeCoordinator.hpp"
+
+#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
@@ -24,7 +25,7 @@ bool AsyncTimeCoordinator::updateTimeFactors()
     auto timeStream = generateMinTimeTotal(dependencies, true, mSourceId, NoIgnoredFederates, 0);
     currentMinTime = timeStream.next;
     currentTimeState = timeStream.mTimeState;
-    
+
     return false;
 }
 
@@ -84,7 +85,7 @@ void AsyncTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) co
 }
 
 void AsyncTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
-                                                             GlobalFederateId skipFed) const
+                                                            GlobalFederateId skipFed) const
 {
     if (!sendMessageFunction) {
         return;

@@ -1289,7 +1289,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                     }
                     LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                    if (cmd.actionTime < time_granted && timeMethod!=TimeSynchronizationMethod::ASYNC) {
+                    if (cmd.actionTime < time_granted &&
+                        timeMethod != TimeSynchronizationMethod::ASYNC) {
                         LOG_WARNING(fmt::format(
                             "received message {} at time({}) earlier than granted time({})",
                             prettyPrintString(cmd),
@@ -1404,7 +1405,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.name(),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                    if (timeMethod==TimeSynchronizationMethod::DISTRIBUTED) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }

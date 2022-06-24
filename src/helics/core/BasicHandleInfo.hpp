@@ -15,8 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
-
 /** class defining and capturing basic information about a handle*/
 class BasicHandleInfo {
   public:
@@ -41,7 +39,7 @@ class BasicHandleInfo {
     const InterfaceType handleType{InterfaceType::UNKNOWN};  //!< the type of the handle
     bool used{false};  //!< indicator that the handle is being used to link with another federate
     /// flags corresponding to the flags used in ActionMessages +some extra ones
-    uint16_t flags{0};  
+    uint16_t flags{0};
 
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle

@@ -13,107 +13,104 @@ operations and helper functions for handling flags in helics
 
 namespace helics {
 /** flag definitions for the action Message Flag field*/
-    enum GeneralFlags : uint16_t {
-        error_flag = 4,  //!< flag indicating an error condition associated with the command
-        indicator_flag = 5,  //!< flag used for setting values
-    };
+enum GeneralFlags : uint16_t {
+    error_flag = 4,  //!< flag indicating an error condition associated with the command
+    indicator_flag = 5,  //!< flag used for setting values
+};
 
-    /// @brief  flags used in timing messages
-    enum TimingFlags : uint16_t {
-        iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
-        /// flag to indicate the request is from a non-granting federate
-        non_granting_flag = 7,
+/// @brief  flags used in timing messages
+enum TimingFlags : uint16_t {
+    iteration_requested_flag = 0,  //!< indicator that an iteration has been requested
+    /// flag to indicate the request is from a non-granting federate
+    non_granting_flag = 7,
 
-        /// flag to mark an interrupted event
-        interrupted_flag = 8,
-        /// flag to indicate the request is from federate with delayed timing
-        delayed_timing_flag = 10,
-        /// flag indicating the message is from a parent object
-        parent_flag = 13,
+    /// flag to mark an interrupted event
+    interrupted_flag = 8,
+    /// flag to indicate the request is from federate with delayed timing
+    delayed_timing_flag = 10,
+    /// flag indicating the message is from a parent object
+    parent_flag = 13,
 
-        /// flag indicating a message is from a child object
-        child_flag = 14
-    };
+    /// flag indicating a message is from a child object
+    child_flag = 14
+};
 
-    /// @brief flags used on handles
-    enum InterfaceFlags : uint16_t {
-        /// indicator that the target is a destination target
-        destination_target = 1,  
-        /// flag indicating that an action or match is required
-        required_flag = 2,  
-        /// flag indicating that the interface accepts only a single connection
-        single_connection_flag = 3,
-        /// flag indicating that the values should only be updated on change
-        only_update_on_change_flag = 6,
-        /// flag indicating that the target is mapped
-        mapped_flag = 7,
-        /// flag indicating that a connection is optional and may not be matched
-        optional_flag = 8,  
-        /// flag indicating the filter is a clone filter or the data needs to be cloned
-        clone_flag = 9,  
-        /// flag indicating an endpoint is targeted
-        targeted_flag = 10,
-      
-        /// indicator that an endpoint or message has a source filter
-        has_source_filter_flag = 11,
-        /// indicator that the interface should only transmit on change
-        only_transmit_on_change_flag = 12,
-        /// indicator that an endpoint or message has a destination filter
-        has_dest_filter_flag = 13,
-        /// indicator that the endpoint or filter has a destination filter that alters the message
-        has_non_cloning_dest_filter_flag = 14,
-        /// flag to indicate an interface is nameless
-        nameless_interface_flag = 15
-    };
+/// @brief flags used on handles
+enum InterfaceFlags : uint16_t {
+    /// indicator that the target is a destination target
+    destination_target = 1,
+    /// flag indicating that an action or match is required
+    required_flag = 2,
+    /// flag indicating that the interface accepts only a single connection
+    single_connection_flag = 3,
+    /// flag indicating that the values should only be updated on change
+    only_update_on_change_flag = 6,
+    /// flag indicating that the target is mapped
+    mapped_flag = 7,
+    /// flag indicating that a connection is optional and may not be matched
+    optional_flag = 8,
+    /// flag indicating the filter is a clone filter or the data needs to be cloned
+    clone_flag = 9,
+    /// flag indicating an endpoint is targeted
+    targeted_flag = 10,
 
-    /// @brief flags used when connecting a federate/core/broker to a federation
-    enum ConnectionFlags : uint16_t {
-        /// flag indicating that message comes from a core vs a broker
-        core_flag = 3,
-        /// flag indicating to use global timing (overload of indicator flag)
-        global_timing_flag = 5,
+    /// indicator that an endpoint or message has a source filter
+    has_source_filter_flag = 11,
+    /// indicator that the interface should only transmit on change
+    only_transmit_on_change_flag = 12,
+    /// indicator that an endpoint or message has a destination filter
+    has_dest_filter_flag = 13,
+    /// indicator that the endpoint or filter has a destination filter that alters the message
+    has_non_cloning_dest_filter_flag = 14,
+    /// flag to indicate an interface is nameless
+    nameless_interface_flag = 15
+};
 
-        /// flag to indicate it should use the json packetization
-        use_json_serialization_flag = 6,
-        /// flag indicating use of asynchronous timing on a global level
-        async_timing_flag = 7,
-        /// flag indicating that a federate is an observer only
-        observer_flag = 8,
-        /// flag indicating that a broker/federate is disconnected
-        disconnected_flag = 12,  
-        
-        /// flag indicating a federate, core or broker is slow responding
-        slow_responding_flag = 14,
-        /// flag indicating that a federate should not count in any totals
-        non_counting_flag = 15
-        
-    };
+/// @brief flags used when connecting a federate/core/broker to a federation
+enum ConnectionFlags : uint16_t {
+    /// flag indicating that message comes from a core vs a broker
+    core_flag = 3,
+    /// flag indicating to use global timing (overload of indicator flag)
+    global_timing_flag = 5,
 
-    /// @brief flags used for messages
-    enum MessageFlags : uint16_t {
-        /// flag indicating that the message requires processing for filters yet
-        filter_processing_required_flag = 7,
-        /// flag indicating the message is for destination processing
-        destination_processing_flag = 11,
-        /// flag indicating the message is empty
-        empty_flag = 15,
-    };
+    /// flag to indicate it should use the json packetization
+    use_json_serialization_flag = 6,
+    /// flag indicating use of asynchronous timing on a global level
+    async_timing_flag = 7,
+    /// flag indicating that a federate is an observer only
+    observer_flag = 8,
+    /// flag indicating that a broker/federate is disconnected
+    disconnected_flag = 12,
 
-    /// @brief general flags used for other operations
-    enum OperationFlags : uint16_t {
-        /// flag indicating an operation is canceled
-        cancel_flag = 13
-    };
-    
-    //extra_flag1 = 7,  //!< extra flag
-    
-    //extra_flag2 = 10,  //!< extra flag
-   
-    
-    //extra_flag3 = 13,  //!< extra flag
-    //extra_flag4 = 14,  //!< extra flag
-    
+    /// flag indicating a federate, core or broker is slow responding
+    slow_responding_flag = 14,
+    /// flag indicating that a federate should not count in any totals
+    non_counting_flag = 15
 
+};
+
+/// @brief flags used for messages
+enum MessageFlags : uint16_t {
+    /// flag indicating that the message requires processing for filters yet
+    filter_processing_required_flag = 7,
+    /// flag indicating the message is for destination processing
+    destination_processing_flag = 11,
+    /// flag indicating the message is empty
+    empty_flag = 15,
+};
+
+/// @brief general flags used for other operations
+enum OperationFlags : uint16_t {
+    /// flag indicating an operation is canceled
+    cancel_flag = 13
+};
+
+// extra_flag1 = 7,  //!< extra flag
+
+// extra_flag2 = 10,  //!< extra flag
+
+// extra_flag3 = 13,  //!< extra flag
+// extra_flag4 = 14,  //!< extra flag
 
 /** template function to set a flag in an object containing a flags field
 @tparam FlagContainer an object with a .flags field
