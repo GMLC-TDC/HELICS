@@ -15,7 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <spdlog/spdlog.h>
 #include <string>
 
-bool hasIndexCode(const std::string& type_name)
+bool hasIndexCode(std::string_view type_name)
 {
     if (std::isdigit(type_name.back()) != 0) {
         if (*(type_name.end() - 2) == '_') {  // this check ignores the setup mode
@@ -25,19 +25,19 @@ bool hasIndexCode(const std::string& type_name)
     return false;
 }
 
-int getIndexCode(const std::string& type_name)
+int getIndexCode(std::string_view type_name)
 {
     return static_cast<int>(type_name.back() - '0');
 }
 
-auto StartBrokerImp(const std::string& CoreType_name, const std::string& initialization_string)
+auto StartBrokerImp(std::string_view CoreType_name, const std::string& initialization_string)
 {
     helics::CoreType type;
     if (hasIndexCode(CoreType_name)) {
         std::string new_type(CoreType_name.begin(), CoreType_name.end() - 2);
         type = helics::core::coreTypeFromString(new_type);
     } else {
-        type = helics::core::coreTypeFromString(CoreType_name);
+        type = helics::core::coreTypeFromString(std::string(CoreType_name));
     }
     std::shared_ptr<helics::Broker> broker;
     switch (type) {
@@ -98,14 +98,14 @@ void FederateTestFixture::FullDisconnect()
     helics::cleanupHelicsLibrary();
 }
 
-std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(const std::string& CoreType_name,
+std::shared_ptr<helics::Broker> FederateTestFixture::AddBroker(std::string_view CoreType_name,
                                                                int count)
 {
     return AddBroker(CoreType_name, std::string("-f ") + std::to_string(count));
 }
 
 std::shared_ptr<helics::Broker>
-    FederateTestFixture::AddBroker(const std::string& CoreType_name,
+    FederateTestFixture::AddBroker(std::string_view CoreType_name,
                                    const std::string& initialization_string)
 {
     std::shared_ptr<helics::Broker> broker;

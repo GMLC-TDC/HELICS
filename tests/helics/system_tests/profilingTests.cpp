@@ -11,8 +11,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
-#include "helics/external/filesystem.hpp"
 
+#include <filesystem>
+#include <fstream>
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>
@@ -265,11 +266,11 @@ TEST(profiling_tests, save_file)
     Fed->enterExecutingMode();
     Fed->finalize();
     helics::cleanupHelicsLibrary();
-    if (!ghc::filesystem::exists("save_profile.txt")) {
+    if (!std::filesystem::exists("save_profile.txt")) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         helics::cleanupHelicsLibrary();
     }
-    ASSERT_TRUE(ghc::filesystem::exists("save_profile.txt"));
+    ASSERT_TRUE(std::filesystem::exists("save_profile.txt"));
 
     std::vector<std::string> mlog;
     std::ifstream in("save_profile.txt");
@@ -311,7 +312,7 @@ TEST(profiling_tests, save_file)
         current = st;
     }
     EXPECT_TRUE(increasing);
-    ghc::filesystem::remove("save_profile.txt");
+    std::filesystem::remove("save_profile.txt");
 }
 
 TEST(profiling_tests, broker_file_save)
@@ -326,11 +327,11 @@ TEST(profiling_tests, broker_file_save)
     Fed->finalize();
 
     helics::cleanupHelicsLibrary();
-    if (!ghc::filesystem::exists("save_profile2.txt")) {
+    if (!std::filesystem::exists("save_profile2.txt")) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         helics::cleanupHelicsLibrary();
     }
-    ASSERT_TRUE(ghc::filesystem::exists("save_profile2.txt"));
+    ASSERT_TRUE(std::filesystem::exists("save_profile2.txt"));
 
     std::vector<std::string> mlog;
     std::ifstream in("save_profile2.txt");
@@ -372,7 +373,7 @@ TEST(profiling_tests, broker_file_save)
         current = st;
     }
     EXPECT_TRUE(increasing);
-    ghc::filesystem::remove("save_profile2.txt");
+    std::filesystem::remove("save_profile2.txt");
 }
 
 TEST(profiling_tests, config)

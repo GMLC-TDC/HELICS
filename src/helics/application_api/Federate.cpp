@@ -987,7 +987,7 @@ static Filter& generateFilter(Federate* fed,
                       make_filter(operation, fed, name);
 }
 
-const std::string emptyStr;
+static constexpr std::string_view emptyStr;
 
 template<class Inp>
 static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
@@ -1011,7 +1011,7 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     if (!info.empty()) {
         filt.setInfo(info);
     }
-    loadTags(data, [&filt](const std::string& tagname, const std::string& tagvalue) {
+    loadTags(data, [&filt](std::string_view tagname, std::string_view tagvalue) {
         filt.setTag(tagname, tagvalue);
     });
     auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
@@ -1131,7 +1131,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             }
         }
     }
-    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+    loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
 }
@@ -1269,7 +1269,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             }
         }
     }
-    loadTags(doc, [this](const std::string& tagname, const std::string& tagvalue) {
+    loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
 }
@@ -1540,117 +1540,87 @@ Interface::Interface(Federate* federate, InterfaceHandle id, std::string_view ac
 
 const std::string& Interface::getName() const
 {
-    return (cr != nullptr) ? (cr->getHandleName(handle)) : emptyStr;
+    return cr->getHandleName(handle);
 }
 
 const std::string& Interface::getTarget() const
 {
-    return (cr != nullptr) ? cr->getSourceTargets(handle) : emptyStr;
+    return cr->getSourceTargets(handle);
 }
 
 void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
-    if (cr != nullptr) {
-        cr->addSourceTarget(handle, newTarget, hint);
-    } else {
-        throw(InvalidFunctionCall(
-            "add source target cannot be called on uninitialized federate or after finalize call"));
-    }
+    cr->addSourceTarget(handle, newTarget, hint);
 }
 
 void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
 {
-    if (cr != nullptr) {
-        cr->addDestinationTarget(handle, newTarget, hint);
-    } else {
-        throw(InvalidFunctionCall(
-            "add destination target cannot be called on a closed or uninitialized interface"));
-    }
+    cr->addDestinationTarget(handle, newTarget, hint);
 }
 
 void Interface::removeTarget(std::string_view targetToRemove)
 {
-    if (cr != nullptr) {
-        cr->removeTarget(handle, targetToRemove);
-    } else {
-        throw(InvalidFunctionCall(
-            "remove target cannot be called on a closed or uninitialized interface"));
-    }
+    cr->removeTarget(handle, targetToRemove);
 }
 
 const std::string& Interface::getInfo() const
 {
-    return (cr != nullptr) ? cr->getInterfaceInfo(handle) : emptyStr;
+    return cr->getInterfaceInfo(handle);
 }
 
 void Interface::setInfo(std::string_view info)
 {
-    if (cr != nullptr) {
-        cr->setInterfaceInfo(handle, info);
-    } else {
-        throw(
-            InvalidFunctionCall("cannot call set info on uninitialized or disconnected interface"));
-    }
+    cr->setInterfaceInfo(handle, info);
 }
 
 const std::string& Interface::getTag(std::string_view tag) const
 {
-    return (cr != nullptr) ? cr->getInterfaceTag(handle, tag) : emptyStr;
+    return cr->getInterfaceTag(handle, tag);
 }
 
 void Interface::setTag(std::string_view tag, std::string_view value)
 {
-    if (cr != nullptr) {
-        cr->setInterfaceTag(handle, tag, value);
-    } else {
-        throw(
-            InvalidFunctionCall("cannot call set tag on uninitialized or disconnected interface"));
-    }
+    cr->setInterfaceTag(handle, tag, value);
 }
 
 void Interface::setOption(int32_t option, int32_t value)
 {
-    if (cr != nullptr) {
-        cr->setHandleOption(handle, option, value);
-    } else {
-        throw(InvalidFunctionCall(
-            "setInterfaceOption cannot be called on uninitialized federate or after finalize call"));
-    }
+    cr->setHandleOption(handle, option, value);
 }
 
 int32_t Interface::getOption(int32_t option) const
 {
-    return (cr != nullptr) ? cr->getHandleOption(handle, option) : 0;
+    return cr->getHandleOption(handle, option);
 }
 
 const std::string& Interface::getInjectionType() const
 {
-    return (cr != nullptr) ? (cr->getInjectionType(handle)) : emptyStr;
+    return cr->getInjectionType(handle);
 }
 
 const std::string& Interface::getExtractionType() const
 {
-    return (cr != nullptr) ? (cr->getExtractionType(handle)) : emptyStr;
+    return cr->getExtractionType(handle);
 }
 
 const std::string& Interface::getInjectionUnits() const
 {
-    return (cr != nullptr) ? (cr->getInjectionUnits(handle)) : emptyStr;
+    return cr->getInjectionUnits(handle);
 }
 
 const std::string& Interface::getExtractionUnits() const
 {
-    return (cr != nullptr) ? (cr->getExtractionUnits(handle)) : emptyStr;
+    return cr->getExtractionUnits(handle);
 }
 
 const std::string& Interface::getSourceTargets() const
 {
-    return (cr != nullptr) ? (cr->getSourceTargets(handle)) : emptyStr;
+    return cr->getSourceTargets(handle);
 }
 
 const std::string& Interface::getDestinationTargets() const
 {
-    return (cr != nullptr) ? (cr->getDestinationTargets(handle)) : emptyStr;
+    return cr->getDestinationTargets(handle);
 }
 
 const std::string& Interface::getDisplayName() const
@@ -1660,15 +1630,13 @@ const std::string& Interface::getDisplayName() const
 
 void Interface::close()
 {
-    if (cr != nullptr) {
-        cr->closeHandle(handle);
-        cr = nullptr;
-    }
+    cr->closeHandle(handle);
+    cr = CoreFactory::getEmptyCorePtr();
 }
 
 void Interface::disconnectFromCore()
 {
-    cr = nullptr;
+    cr = CoreFactory::getEmptyCorePtr();
 }
 
 }  // namespace helics

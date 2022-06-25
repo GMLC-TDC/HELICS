@@ -647,9 +647,9 @@ TEST_F(filter, message_filter_function_two_stage_brokerApp_filter_link)
     EXPECT_TRUE(res);
 }
 #ifdef HELICS_ENABLE_ZMQ_CORE
-static const std::string rerouteType("zmq");
+static constexpr std::string_view rerouteType("zmq");
 #else
-static const std::string rerouteType("test");
+static constexpr std::string_view rerouteType("test");
 #endif
 
 TEST_F(filter, reroute_separate)

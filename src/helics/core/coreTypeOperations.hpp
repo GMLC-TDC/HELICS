@@ -24,7 +24,7 @@ namespace core {
 @return a value of the helics::CoreType enumeration
 helics::CoreType::UNRECOGNIZED if the type is not valid
 */
-    CoreType coreTypeFromString(std::string type) noexcept;
+    CoreType coreTypeFromString(std::string_view type) noexcept;
 
     /**
      * Returns true if core/broker type specified is available in current compilation.

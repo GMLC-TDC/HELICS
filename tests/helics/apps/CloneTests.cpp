@@ -4,22 +4,14 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "gtest/gtest.h"
-
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
-
 #include "helics/application_api/Filters.hpp"
 #include "helics/application_api/Publications.hpp"
 #include "helics/apps/Clone.hpp"
 #include "helics/apps/Player.hpp"
 
+#include "gtest/gtest.h"
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <thread>
 
@@ -95,7 +87,7 @@ TEST(clone_tests, simple_clone_test_pub2)
     EXPECT_EQ(icnt, 2);
     c1.saveFile("pubtest2.json");
 
-    ASSERT_TRUE(ghc::filesystem::exists("pubtest2.json"));
+    ASSERT_TRUE(std::filesystem::exists("pubtest2.json"));
 
     auto fi2 = helics::loadFederateInfo("pubtest2.json");
     fi2.coreName = "clone_core3";
@@ -109,7 +101,7 @@ TEST(clone_tests, simple_clone_test_pub2)
     EXPECT_EQ(p1.pointCount(), 3U);
     EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
-    ghc::filesystem::remove("pubtest2.json");
+    std::filesystem::remove("pubtest2.json");
 }
 
 TEST(clone_tests, simple_clone_test_message)
@@ -159,7 +151,7 @@ TEST(clone_tests, simple_clone_test_message)
     EXPECT_EQ(p1.messageCount(), 2U);
     EXPECT_EQ(p1.endpointCount(), 3U);
     p1.finalize();
-    ghc::filesystem::remove("eptsave.json");
+    std::filesystem::remove("eptsave.json");
 }
 
 TEST(clone_tests, simple_clone_test_combo)
@@ -239,7 +231,7 @@ TEST(clone_tests, simple_clone_test_combo)
     EXPECT_EQ(static_cast<int>(p1.pointCount()), pcnt);
     EXPECT_EQ(p1.publicationCount(), 2U);
     p1.finalize();
-    ghc::filesystem::remove("combsave.json");
+    std::filesystem::remove("combsave.json");
 }
 
 TEST(clone_tests, simple_clone_test_sub)
@@ -295,7 +287,7 @@ TEST(clone_tests, simple_clone_test_sub)
     c1.finalize();
     c1.saveFile("subtest.json");
 
-    ASSERT_TRUE(ghc::filesystem::exists("subtest.json"));
+    ASSERT_TRUE(std::filesystem::exists("subtest.json"));
 
     // now test the file loading
     auto fi2 = helics::loadFederateInfo("subtest.json");
@@ -313,7 +305,7 @@ TEST(clone_tests, simple_clone_test_sub)
     // this depends on some processing occurring
     EXPECT_EQ(p1.accessUnderlyingFederate().getInputCount(), 2);
     p1.finalize();
-    ghc::filesystem::remove("subtest.json");
+    std::filesystem::remove("subtest.json");
 }
 
 TEST(clone_tests, clone_test_help)

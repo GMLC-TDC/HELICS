@@ -23,7 +23,7 @@ HELICS_CXX_EXPORT std::string to_string(CoreType type);
 @return a value of the helics::CoreType enumeration
 helics::CoreType::unrecognized if the type is not valid
 */
-HELICS_CXX_EXPORT CoreType coreTypeFromString(std::string type) noexcept;
+HELICS_CXX_EXPORT CoreType coreTypeFromString(std::string_view type) noexcept;
 
 /**
  * Returns true if core/broker type specified is available in current compilation.

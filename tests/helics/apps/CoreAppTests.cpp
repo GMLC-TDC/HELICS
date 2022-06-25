@@ -9,14 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 using ::testing::HasSubstr;
 
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
-
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
@@ -25,6 +17,7 @@ using ::testing::HasSubstr;
 #include "helics/core/core-exceptions.hpp"
 
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <thread>
 
@@ -230,16 +223,16 @@ TEST(CoreAppTests, file_logging_p2)
     Fed->finalize();
 
     Fed.reset();
-    EXPECT_TRUE(ghc::filesystem::exists(lfilename));
+    EXPECT_TRUE(std::filesystem::exists(lfilename));
     app.waitForDisconnect();
     app.reset();
     helics::cleanupHelicsLibrary();
     std::error_code ec;
-    bool res = ghc::filesystem::remove(lfilename, ec);
+    bool res = std::filesystem::remove(lfilename, ec);
     int ii = 0;
     while (!res) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
-        res = ghc::filesystem::remove(lfilename, ec);
+        res = std::filesystem::remove(lfilename, ec);
         ++ii;
         if (ii > 15) {
             break;

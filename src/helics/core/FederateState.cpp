@@ -42,6 +42,7 @@ class MessageTimer {};
 #endif
 
 #include "../common/fmt_format.h"
+// NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
 #define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)
@@ -2345,8 +2346,6 @@ void FederateState::setTag(std::string_view tag, std::string_view value)
     unlock();
 }
 
-static const std::string emptyStr;
-
 const std::string& FederateState::getTag(std::string_view tag) const
 {
     spinlock();
@@ -2357,6 +2356,6 @@ const std::string& FederateState::getTag(std::string_view tag) const
         }
     }
     unlock();
-    return emptyStr;
+    return gHelicsEmptyStr;
 }
 }  // namespace helics

@@ -21,9 +21,9 @@ static constexpr int InputValidationIdentifier = 0x3456'E052;
 /** random integer for validation purposes of publications */
 static constexpr int PublicationValidationIdentifier = 0x97B1'00A5;
 
-static constexpr const char* invalidInputString = "The given input object does not point to a valid object";
+static constexpr char invalidInputString[] = "The given input object does not point to a valid object";
 
-static constexpr const char* invalidPublicationString = "The given publication object does not point to a valid object";
+static constexpr char invalidPublicationString[] = "The given publication object does not point to a valid object";
 
 static helics::InputObject* verifyInput(HelicsInput inp, HelicsError* err)
 {

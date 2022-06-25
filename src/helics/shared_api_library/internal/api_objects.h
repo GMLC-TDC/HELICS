@@ -186,7 +186,7 @@ inline void assignError(HelicsError* err, int error_code, const char* string)
 }
 
 extern const std::string gHelicsEmptyStr;
-extern const std::string gHelicsNullStringArgument;
+constexpr char gHelicsNullStringArgument[] = "The supplied string argument is null and therefore invalid";
 #define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gHelicsEmptyStr
 
 #define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gHelicsEmptyStr)
@@ -194,7 +194,7 @@ extern const std::string gHelicsNullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                            \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument);                                                    \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
