@@ -1888,6 +1888,15 @@ void CommonCore::linkEndpoints(std::string_view source, std::string_view dest)
     addActionMessage(std::move(M));
 }
 
+
+void CommonCore::addAlias(std::string_view interfaceKey, std::string_view alias)
+{
+    ActionMessage M(CMD_ADD_ALIAS);
+    M.name(interfaceKey);
+    M.setStringData(alias);
+    addActionMessage(std::move(M));
+}
+
 void CommonCore::dataLink(std::string_view source, std::string_view target)
 {
     ActionMessage M(CMD_DATA_LINK);
@@ -3527,6 +3536,9 @@ void CommonCore::processCommand(ActionMessage&& command)
                 }
             }
         } break;
+        case CMD_ADD_ALIAS: {
+
+        }
         case CMD_REG_INPUT:
         case CMD_REG_ENDPOINT:
         case CMD_REG_PUB:
@@ -4331,7 +4343,80 @@ void CommonCore::checkDependencies()
         routeMessage(adddep, fedid);
     }
 }
+void CommonCore::processLinkingCommand(ActionMessage& cmd)
+{
+    switch (cmd.action()) {
+        case CMD_DATA_LINK: {
+            auto* pub = loopHandles.getPublication(cmd.name());
+            if (pub != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_INPUT);
+                cmd.setSource(pub->handle);
+                cmd.clearStringData();
+                checkForNamedInterface(cmd);
+            } else {
+                auto* input = loopHandles.getInput(cmd.getString(targetStringLoc));
+                if (input == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    cmd.setSource(input->handle);
+                    cmd.clearStringData();
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = loopHandles.getEndpoint(cmd.name());
+            if (ept != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                cmd.setSource(ept->handle);
+                setActionFlag(cmd, destination_target);
+                cmd.clearStringData();
+                checkForNamedInterface(cmd);
+            } else {
+                auto* target = loopHandles.getEndpoint(cmd.getString(targetStringLoc));
+                if (target == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    cmd.setSource(target->handle);
+                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    cmd.clearStringData();
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_FILTER_LINK: {
+            auto* filt = loopHandles.getFilter(cmd.name());
+            if (filt != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(cmd, clone_flag);
+                }
+                checkForNamedInterface(cmd);
+            } else {
+                auto* ept = loopHandles.getEndpoint(cmd.getString(targetStringLoc));
+                if (ept == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    cmd.setSource(ept->handle);
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_ADD_ALIAS: {
 
+        } break;
+        default:
+            break;
+    }
+}
 void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {

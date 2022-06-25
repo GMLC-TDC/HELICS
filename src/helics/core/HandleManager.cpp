@@ -364,6 +364,10 @@ LocalFederateId HandleManager::getLocalFedID(InterfaceHandle handle) const
     return (isValidIndex(index, handles)) ? handles[index].local_fed_id : LocalFederateId{};
 }
 
+void HandleManager::addAlias(std::string_view interfaceName, std::string_view alias) {
+
+}
+
 void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index)
 {
     if (!handle.key.empty()) {

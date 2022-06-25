@@ -196,6 +196,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual void addDependency(LocalFederateId federateID,
                                std::string_view federateName) override final;
     virtual void linkEndpoints(std::string_view source, std::string_view dest) override final;
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(std::string_view source, std::string_view target) override final;
     virtual void addSourceFilterToEndpoint(std::string_view filter,
@@ -409,6 +410,8 @@ class CommonCore: public Core, public BrokerBase {
     void processQueryCommand(ActionMessage& cmd);
     /** handle logging and error related commands*/
     void processLogAndErrorCommand(ActionMessage& cmd);
+    /** handle data linking related commands*/
+    void processLinkingCommand(ActionMessage& cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication(ActionMessage& cmd);

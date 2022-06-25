@@ -352,6 +352,7 @@ void EmptyCore::makeConnections(const std::string& /*file*/) {}
 
 void EmptyCore::linkEndpoints(std::string_view /*source*/, std::string_view /*dest*/) {}
 
+void EmptyCore::addAlias(std::string_view /*interfaceKey*/, std::string_view /*alias*/) {}
 void EmptyCore::dataLink(std::string_view /*source*/, std::string_view /*target*/) {}
 
 void EmptyCore::addSourceFilterToEndpoint(std::string_view /*filter*/,

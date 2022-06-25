@@ -129,6 +129,7 @@ class EmptyCore: public Core {
     virtual InterfaceHandle getTranslator(std::string_view name) const override;
     virtual void addDependency(LocalFederateId federateID, std::string_view federateName) override;
     virtual void linkEndpoints(std::string_view source, std::string_view dest) override;
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override;
     virtual void makeConnections(const std::string& file) override;
     virtual void dataLink(std::string_view source, std::string_view target) override;
     virtual void addSourceFilterToEndpoint(std::string_view filter,
