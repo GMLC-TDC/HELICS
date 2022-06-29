@@ -401,8 +401,6 @@ void HandleManager::addAlias(std::string_view interfaceName, std::string_view al
     addEndpointAlias(interfaceName, *aliasName);
     addFilterAlias(interfaceName, *aliasName);
 
-   
-
 }
 
 void HandleManager::addPublicationAlias(std::string_view interfaceName, std::string_view alias)

@@ -131,7 +131,11 @@ class Broker {
     @param target the name of the source target*/
     virtual void addDestinationFilterToEndpoint(std::string_view filter,
                                                 std::string_view target) = 0;
-
+    /** make an alias for an interface which is a second string allowed for use when connecting
+    @param interfaceKey the name of the original interface
+    @param alias the second name by which is can be referred
+    */
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) = 0;
     /** update a time barrier with a new time*/
     virtual void setTimeBarrier(Time barrierTime) = 0;
 

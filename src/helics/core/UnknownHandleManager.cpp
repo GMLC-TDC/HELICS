@@ -208,6 +208,23 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
     return false;
 }
 
+void UnknownHandleManager::processUnknowns(
+    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
+{
+    for (const auto& upub : unknown_publications) {
+        cfunc(upub.first, 'p', upub.second.first);
+    }
+    for (const auto& uept : unknown_endpoints) {
+        cfunc(uept.first, 'e', uept.second.first);
+    }
+    for (const auto& uinp : unknown_inputs) {
+       cfunc(uinp.first, 'i', uinp.second.first);
+    }
+    for (const auto& ufilt : unknown_filters) {
+        cfunc(ufilt.first, 'f', ufilt.second.first);
+    }
+}
+
 void UnknownHandleManager::processNonOptionalUnknowns(
     const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
 {
