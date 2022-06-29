@@ -457,7 +457,8 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(std::string_view valueName, std::string_view value);
-
+    /** add a global alias for an interface */
+    void addAlias(std::string_view interfaceName, std::string_view alias);
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
   specific name of a federate, core, or broker
@@ -546,7 +547,7 @@ received
     Translator& registerGlobalTranslator(std::int32_t translatorType,
                                          std::string_view translatorName,
                                          std::string_view endpointType = std::string_view{},
-                                         std::string_view units = std::string_view());
+                                         std::string_view units = std::string_view{});
 
     /** define a translator interface
     @details a translator acts as a bridge between value and message interfaces
@@ -567,7 +568,7 @@ received
     */
     Translator& registerGlobalTranslator(std::string_view translatorName,
                                          std::string_view endpointType = std::string_view{},
-                                         std::string_view units = std::string_view())
+                                         std::string_view units = std::string_view{})
     {
         return registerGlobalTranslator(0, translatorName, endpointType, units);
     }
@@ -802,7 +803,8 @@ class HELICS_CXX_EXPORT Interface {
                               InterfaceType hint = InterfaceType::UNKNOWN);
     /** remove a named interface from the target lists*/
     void removeTarget(std::string_view targetToRemove);
-
+    /** add an alternate global name for an interface*/
+    void addAlias(std::string_view alias);
     /** get the interface information field of the input*/
     const std::string& getInfo() const;
     /** set the interface information field of the input*/

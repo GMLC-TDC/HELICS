@@ -145,6 +145,19 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
             }
         }
     }
+    auto aliases = toml::find_or(doc, "aliases", uVal);
+    if (!aliases.is_uninitialized()) {
+        if (aliases.is_array()) {
+            for (auto& val : aliases.as_array()) {
+                brk->addAlias(val.as_array()[0].as_string().str,
+                               val.as_array()[1].as_string().str);
+            }
+        } else {
+            for (const auto& val : aliases.as_table()) {
+                brk->addAlias(val.first, val.second.as_string().str);
+            }
+        }
+    }
 }
 
 template<class brkX>
@@ -263,6 +276,20 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
             }
         }
     }
+
+     if (doc.isMember("aliases")) {
+        if (doc["aliases"].isArray()) {
+            for (auto& val : doc["aliases"]) {
+                brk->addAlias(val[0].asString(), val[1].asString());
+            }
+        } else {
+            auto members = doc["aliases"].getMemberNames();
+            for (auto& val : members) {
+                brk->setGlobal(val, doc["aliases"][val].asString());
+            }
+        }
+    }
+
     if constexpr (std::is_base_of<Core, brkX>::value) {
         loadTags(doc, [brk](std::string_view tagname, std::string_view tagvalue) {
             brk->setFederateTag(gLocalCoreId, tagname, tagvalue);

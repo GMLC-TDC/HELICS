@@ -99,6 +99,8 @@ class HELICS_CXX_EXPORT CoreApp {
     void addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint);
     /** add a destination Filter to an endpoint*/
     void addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint);
+    /** add an alias for an interface*/
+    void addAlias(std::string_view interfaceName, std::string_view alias);
     /** make connections from a core using a file*/
     void makeConnections(const std::string& file);
     /** get the identifier of the core*/

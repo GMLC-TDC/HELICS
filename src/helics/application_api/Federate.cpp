@@ -1384,6 +1384,11 @@ void Federate::setGlobal(std::string_view valueName, std::string_view value)
     coreObject->setGlobal(valueName, value);
 }
 
+void Federate::addAlias(std::string_view interfaceName, std::string_view alias)
+{
+    coreObject->addAlias(interfaceName, alias);
+}
+
 void Federate::sendCommand(std::string_view target,
                            std::string_view commandStr,
                            HelicsSequencingModes mode)
@@ -1511,6 +1516,11 @@ Translator& Federate::getTranslator(std::string_view translatorName)
     return trans;
 }
 
+void Federate::setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op)
+{
+    coreObject->setTranslatorOperator(trans.getHandle(), std::move(op));
+}
+
 int Federate::getTranslatorCount() const
 {
     return cManager->getTranslatorCount();
@@ -1561,6 +1571,11 @@ void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType h
 void Interface::removeTarget(std::string_view targetToRemove)
 {
     cr->removeTarget(handle, targetToRemove);
+}
+
+void Interface::addAlias(std::string_view alias)
+{
+    cr->addAlias(getName(),alias);
 }
 
 const std::string& Interface::getInfo() const
