@@ -362,18 +362,14 @@ class CommonCore: public Core, public BrokerBase {
     GlobalFederateId keyFed{};
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
     /** map for external routes  <global federate id, route id> */
-    std::map<GlobalFederateId, route_id>
-        routing_table;  
+    std::map<GlobalFederateId, route_id> routing_table;
     /** FIFO queue for transmissions to the root that need to be delayed for a certain time */
-    gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue;  
+    gmlc::containers::SimpleQueue<ActionMessage> delayTransmitQueue;
     /** external map for all known external endpoints with names and route */
-    std::unordered_map<std::string, route_id>
-        knownExternalEndpoints;  
+    std::unordered_map<std::string, route_id> knownExternalEndpoints;
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     /** class to handle timeouts and disconnection notices */
-    std::unique_ptr<TimeoutMonitor>
-        timeoutMon;  
+    std::unique_ptr<TimeoutMonitor> timeoutMon;
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages();
     /** respond to delayed message with an error*/
@@ -447,7 +443,7 @@ class CommonCore: public Core, public BrokerBase {
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
     /// counter for the number of times the entry to initialization Mode was explicitly delayed
-    std::atomic<int16_t> delayInitCounter{0};  
+    std::atomic<int16_t> delayInitCounter{0};
     bool filterTiming{false};  //!< if there are filters needing a time connection
     /** threadsafe local federate information list for external functions */
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;
@@ -459,7 +455,7 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<int32_t> messageCounter{54};
     ordered_guarded<HandleManager> handles;  //!< local handle information;
     /// copy of handles to use in the primary processing loop without thread protection
-    HandleManager loopHandles;  
+    HandleManager loopHandles;
     /// sets of ongoing time blocks from filtering
     std::vector<std::pair<GlobalFederateId, int32_t>> timeBlocks;
     TranslatorFederate* translatorFed{nullptr};
@@ -467,8 +463,7 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<GlobalFederateId> translatorFedID;
 
     /** delayedTimingMessages from ongoing Filter actions */
-    std::map<int32_t, std::vector<ActionMessage>>
-        delayedTimingMessages;  
+    std::map<int32_t, std::vector<ActionMessage>> delayedTimingMessages;
 
     /// counter for queries start at 1 so the default value isn't used
     std::atomic<int> queryCounter{1};

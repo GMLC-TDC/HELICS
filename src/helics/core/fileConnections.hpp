@@ -149,8 +149,7 @@ void makeConnectionsToml(brkX* brk, const std::string& file)
     if (!aliases.is_uninitialized()) {
         if (aliases.is_array()) {
             for (auto& val : aliases.as_array()) {
-                brk->addAlias(val.as_array()[0].as_string().str,
-                               val.as_array()[1].as_string().str);
+                brk->addAlias(val.as_array()[0].as_string().str, val.as_array()[1].as_string().str);
             }
         } else {
             for (const auto& val : aliases.as_table()) {
@@ -277,7 +276,7 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
         }
     }
 
-     if (doc.isMember("aliases")) {
+    if (doc.isMember("aliases")) {
         if (doc["aliases"].isArray()) {
             for (auto& val : doc["aliases"]) {
                 brk->addAlias(val[0].asString(), val[1].asString());

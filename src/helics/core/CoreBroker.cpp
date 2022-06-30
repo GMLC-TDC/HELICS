@@ -207,7 +207,8 @@ void CoreBroker::addDestinationFilterToEndpoint(std::string_view filter, std::st
     addActionMessage(std::move(M));
 }
 
-void CoreBroker::addAlias(std::string_view interfaceKey, std::string_view alias) {
+void CoreBroker::addAlias(std::string_view interfaceKey, std::string_view alias)
+{
     ActionMessage M(CMD_ADD_ALIAS);
     M.name(interfaceKey);
     M.setStringData(alias);
@@ -1886,7 +1887,7 @@ void CoreBroker::addPublication(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyPublicationTargets(pub,pub.key);
+        FindandNotifyPublicationTargets(pub, pub.key);
     }
 }
 void CoreBroker::addInput(ActionMessage& m)
@@ -1911,7 +1912,7 @@ void CoreBroker::addInput(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyInputTargets(inp,inp.key);
+        FindandNotifyInputTargets(inp, inp.key);
     }
 }
 
@@ -1951,7 +1952,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyEndpointTargets(ept,ept.key);
+        FindandNotifyEndpointTargets(ept, ept.key);
     }
 }
 void CoreBroker::addFilter(ActionMessage& m)
@@ -1977,7 +1978,7 @@ void CoreBroker::addFilter(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyFilterTargets(filt,filt.key);
+        FindandNotifyFilterTargets(filt, filt.key);
     }
 }
 
@@ -2016,9 +2017,9 @@ void CoreBroker::addTranslator(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyInputTargets(trans,trans.key);
-        FindandNotifyPublicationTargets(trans,trans.key);
-        FindandNotifyEndpointTargets(trans,trans.key);
+        FindandNotifyInputTargets(trans, trans.key);
+        FindandNotifyPublicationTargets(trans, trans.key);
+        FindandNotifyEndpointTargets(trans, trans.key);
     }
 }
 
@@ -2476,30 +2477,30 @@ void CoreBroker::executeInitializationOperations()
                     break;
             }
         });
-            if (!foundAliasHandles[0].empty()) {
+        if (!foundAliasHandles[0].empty()) {
             for (const auto& target : foundAliasHandles[0]) {
                 auto* p = handles.getPublication(target);
                 FindandNotifyPublicationTargets(*p, target);
             }
+        }
+        if (!foundAliasHandles[1].empty()) {
+            for (const auto& target : foundAliasHandles[1]) {
+                auto* p = handles.getInput(target);
+                FindandNotifyInputTargets(*p, target);
             }
-            if (!foundAliasHandles[1].empty()) {
-                for (const auto& target : foundAliasHandles[1]) {
-                    auto* p = handles.getInput(target);
-                    FindandNotifyInputTargets(*p, target);
-                }
+        }
+        if (!foundAliasHandles[2].empty()) {
+            for (const auto& target : foundAliasHandles[2]) {
+                auto* p = handles.getEndpoint(target);
+                FindandNotifyEndpointTargets(*p, target);
             }
-            if (!foundAliasHandles[2].empty()) {
-                for (const auto& target : foundAliasHandles[2]) {
-                    auto* p = handles.getEndpoint(target);
-                    FindandNotifyEndpointTargets(*p, target);
-                }
+        }
+        if (!foundAliasHandles[3].empty()) {
+            for (const auto& target : foundAliasHandles[3]) {
+                auto* p = handles.getFilter(target);
+                FindandNotifyFilterTargets(*p, target);
             }
-            if (!foundAliasHandles[3].empty()) {
-                for (const auto& target : foundAliasHandles[3]) {
-                    auto* p = handles.getFilter(target);
-                    FindandNotifyFilterTargets(*p, target);
-                }
-            }
+        }
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);

@@ -20,18 +20,15 @@ static constexpr InterfaceHandle i4(4);
 static constexpr InterfaceHandle i5(5);
 static constexpr InterfaceHandle i6(6);
 
-
 TEST(handleManager, creationEndpoint)
 {
     HandleManager h1;
-    auto bi1=h1.addHandle(fed2, i1, InterfaceType::ENDPOINT, "key1", "type1", "");
+    auto bi1 = h1.addHandle(fed2, i1, InterfaceType::ENDPOINT, "key1", "type1", "");
     EXPECT_EQ(bi1.key, "key1");
     EXPECT_EQ(bi1.getFederateId(), fed2);
     EXPECT_EQ(bi1.getInterfaceHandle(), i1);
     EXPECT_EQ(bi1.type, "type1");
     EXPECT_EQ(bi1.handleType, InterfaceType::ENDPOINT);
-
-
 }
 
 TEST(handleManager, creationPublication)
@@ -44,7 +41,6 @@ TEST(handleManager, creationPublication)
     EXPECT_EQ(bi1.handleType, InterfaceType::PUBLICATION);
     EXPECT_EQ(bi1.units, "V");
 }
-
 
 TEST(handleManager, creationInput)
 {
@@ -71,7 +67,7 @@ TEST(handleManager, creationFilter)
 TEST(handleManager, creationTranslator)
 {
     HandleManager h1;
-    auto bi1 = h1.addHandle(fed2, i2,InterfaceType::TRANSLATOR, "key1", "type1", "type2");
+    auto bi1 = h1.addHandle(fed2, i2, InterfaceType::TRANSLATOR, "key1", "type1", "type2");
     EXPECT_EQ(bi1.key, "key1");
     EXPECT_EQ(bi1.getFederateId(), fed2);
     EXPECT_EQ(bi1.getInterfaceHandle(), i2);
@@ -81,7 +77,8 @@ TEST(handleManager, creationTranslator)
     EXPECT_EQ(bi1.units, "type2");
 }
 
-static HandleManager generateExampleHandleManager() {
+static HandleManager generateExampleHandleManager()
+{
     HandleManager h1;
     h1.addHandle(fed2, i1, InterfaceType::PUBLICATION, "p1", "double", "V");
     h1.addHandle(fed2, i2, InterfaceType::PUBLICATION, "p2", "double", "V");
@@ -97,7 +94,8 @@ static HandleManager generateExampleHandleManager() {
     return h1;
 }
 
-TEST(handleManager, finding) {
+TEST(handleManager, finding)
+{
     auto h1 = generateExampleHandleManager();
 
     EXPECT_EQ(h1.size(), 10U);
@@ -108,7 +106,7 @@ TEST(handleManager, finding) {
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "p1");
 
-    const auto *in1 = h1.getInput("in1");
+    const auto* in1 = h1.getInput("in1");
     EXPECT_NE(in1, nullptr);
 
     const auto* f1 = h1.getFilter("f1");
@@ -117,7 +115,6 @@ TEST(handleManager, finding) {
     const auto* tr1 = h1.getTranslator("t1");
     EXPECT_NE(tr1, nullptr);
 }
-
 
 TEST(handleManager, notfinding)
 {
@@ -138,7 +135,6 @@ TEST(handleManager, notfinding)
     const auto* tr1 = h1.getFilter("t1");
     EXPECT_EQ(tr1, nullptr);
 }
-
 
 TEST(handleManager, constFinding)
 {
@@ -161,7 +157,6 @@ TEST(handleManager, constFinding)
     const auto* tr1 = h1.getTranslator("t1");
     EXPECT_NE(tr1, nullptr);
 }
-
 
 TEST(handleManager, constNotfinding)
 {
@@ -198,15 +193,14 @@ TEST(handleManager, translatorfinding)
     EXPECT_EQ(p1, in1);
 }
 
-
-
-TEST(handleManager, iterators) {
+TEST(handleManager, iterators)
+{
     auto h1 = generateExampleHandleManager();
-    auto itbegin=h1.begin();
+    auto itbegin = h1.begin();
     auto itend = h1.end();
-    EXPECT_NE(itbegin, itend); 
+    EXPECT_NE(itbegin, itend);
     int cnt{0};
-    for (auto it=itbegin;it!=itend;++it) {
+    for (auto it = itbegin; it != itend; ++it) {
         EXPECT_EQ(&(*it), h1.getHandleInfo(cnt));
         EXPECT_EQ(it->handle, h1[cnt].handle);
         ++cnt;
@@ -227,11 +221,10 @@ TEST(handleManager, constIterators)
     }
 }
 
-
 TEST(handleManager, getByHandle)
 {
     auto h1 = generateExampleHandleManager();
-    auto &bi1 = h1.addHandle(fed2, InterfaceType::FILTER, "key1", "type1", "type2");
+    auto& bi1 = h1.addHandle(fed2, InterfaceType::FILTER, "key1", "type1", "type2");
 
     auto* bi2 = h1.getHandleInfo(bi1.getInterfaceHandle());
     EXPECT_EQ(&bi1, bi2);
@@ -254,7 +247,8 @@ TEST(handleManager, constGetByHandle)
     EXPECT_EQ(t2->key, "p1");
 }
 
-TEST(handleManager, alias1) {
+TEST(handleManager, alias1)
+{
     auto h1 = generateExampleHandleManager();
     h1.addAlias("p1", "pub1");
 
@@ -264,11 +258,11 @@ TEST(handleManager, alias1) {
 
     h1.addAlias("in1", "input1");
 
-   p1 = h1.getInput("input1");
+    p1 = h1.getInput("input1");
 
     EXPECT_EQ(p1->key, "in1");
 
-     h1.addAlias("e1", "end1");
+    h1.addAlias("e1", "end1");
 
     p1 = h1.getEndpoint("end1");
 
@@ -291,9 +285,7 @@ TEST(handleManager, alias1) {
     p1 = h1.getPublication("translator1");
 
     EXPECT_EQ(p1->key, "t1");
-
 }
-
 
 TEST(handleManager, multipleAlias)
 {
@@ -321,16 +313,13 @@ TEST(handleManager, multipleAlias)
     p1 = h1.getPublication("publisher1");
 
     EXPECT_EQ(p1->key, "p1");
-
 }
 
-//convenience function for simplifying adding a handle
+// convenience function for simplifying adding a handle
 static auto addTestHandle(HandleManager& hm, std::string_view name, InterfaceType type)
 {
     return hm.addHandle(fed2, type, name, "type1", "");
-
 }
-
 
 TEST(handleManager, futureAlias)
 {
@@ -339,11 +328,10 @@ TEST(handleManager, futureAlias)
 
     addTestHandle(h1, "pub1", InterfaceType::PUBLICATION);
 
-    const auto *p1 = h1.getPublication("publisher");
+    const auto* p1 = h1.getPublication("publisher");
 
     EXPECT_EQ(p1->key, "pub1");
 }
-
 
 TEST(handleManager, multiFutureAlias)
 {
@@ -362,12 +350,10 @@ TEST(handleManager, multiFutureAlias)
 
     EXPECT_EQ(p1->key, "if");
 
-     p1 = h1.getPublication("iff");
+    p1 = h1.getPublication("iff");
 
     EXPECT_EQ(p1->key, "if");
 }
-
-
 
 TEST(handleManager, multiTypeFutureAlias)
 {
@@ -379,12 +365,11 @@ TEST(handleManager, multiTypeFutureAlias)
     addTestHandle(h1, "if", InterfaceType::ENDPOINT);
     addTestHandle(h1, "if", InterfaceType::FILTER);
 
-
     const auto* p1 = h1.getPublication("ifonly");
 
     EXPECT_EQ(p1->key, "if");
 
-   p1 = h1.getPublication("ifonly");
+    p1 = h1.getPublication("ifonly");
     EXPECT_EQ(p1->key, "if");
 
     p1 = h1.getInput("ifonly");
@@ -419,14 +404,14 @@ TEST(handleManager, translatorAlias)
 
     p1 = h1.getTranslator("ifonly");
     EXPECT_EQ(p1->key, "if");
-
 }
 
-TEST(handleManager, duplicateAliasPub) {
+TEST(handleManager, duplicateAliasPub)
+{
     auto h1 = generateExampleHandleManager();
     h1.addAlias("p1", "pub");
-    //trying to define 2 interfaces to a single alias
-    EXPECT_THROW(h1.addAlias("p2", "pub"),std::runtime_error);
+    // trying to define 2 interfaces to a single alias
+    EXPECT_THROW(h1.addAlias("p2", "pub"), std::runtime_error);
 }
 
 TEST(handleManager, duplicateAliasTranslator)
@@ -502,9 +487,8 @@ TEST(handleManager, duplicateAliasDelayed)
     h1.addAlias("p1", "pub");
     h1.addAlias("p4", "pub");
     // trying to define 2 interfaces to a single alias delayed
-    EXPECT_THROW(addTestHandle(h1,"p4",InterfaceType::PUBLICATION), std::runtime_error);
+    EXPECT_THROW(addTestHandle(h1, "p4", InterfaceType::PUBLICATION), std::runtime_error);
 }
-
 
 TEST(handleManager, duplicateAliasDifferentInterfaceType)
 {
@@ -517,20 +501,20 @@ TEST(handleManager, duplicateAliasDifferentInterfaceType)
 
 TEST(handleManager, aliasReciprocity)
 {
-    //aliases should be reciprocal
+    // aliases should be reciprocal
     auto h1 = generateExampleHandleManager();
     h1.addAlias("matthew", "matt");
-    // defining an interface with the name of an alias is allowed as long as the original doesn't exist,
-    // this will create an alias to original interfaceName.  
+    // defining an interface with the name of an alias is allowed as long as the original doesn't
+    // exist, this will create an alias to original interfaceName.
     EXPECT_NO_THROW(addTestHandle(h1, "matt", InterfaceType::ENDPOINT));
 
     const auto* ep = h1.getEndpoint("matthew");
-    ASSERT_NE(ep,nullptr);
+    ASSERT_NE(ep, nullptr);
     EXPECT_EQ(ep->key, "matt");
 }
 
-
-TEST(handleManager, aliasCascadeExisting) {
+TEST(handleManager, aliasCascadeExisting)
+{
     auto h1 = generateExampleHandleManager();
     h1.addAlias("p1", "pub");
     h1.addAlias("pub", "publisher");
@@ -543,7 +527,6 @@ TEST(handleManager, aliasCascadeExisting) {
     ASSERT_NE(p2, nullptr);
     EXPECT_EQ(p1->key, "p1");
 }
-
 
 TEST(handleManager, aliasCascadeFuture)
 {
@@ -560,7 +543,6 @@ TEST(handleManager, aliasCascadeFuture)
     ASSERT_NE(p2, nullptr);
     EXPECT_EQ(p2->key, "pub1");
 }
-
 
 TEST(handleManager, aliasCascadeFutureMany)
 {
@@ -595,7 +577,6 @@ TEST(handleManager, aliasCascadeFutureMany)
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 }
-
 
 TEST(handleManager, aliasCascadeFutureManyOther)
 {

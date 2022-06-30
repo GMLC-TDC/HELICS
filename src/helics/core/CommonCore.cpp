@@ -1888,7 +1888,6 @@ void CommonCore::linkEndpoints(std::string_view source, std::string_view dest)
     addActionMessage(std::move(M));
 }
 
-
 void CommonCore::addAlias(std::string_view interfaceKey, std::string_view alias)
 {
     ActionMessage M(CMD_ADD_ALIAS);

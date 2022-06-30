@@ -122,7 +122,7 @@ across different compilers*/
             cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
         cmd_filter_link = cmd_info_basis + 709,  //!< command to add a target to a filter
         cmd_endpoint_link = cmd_info_basis + 711,  //!< command to link endpoints
-        cmd_add_alias = cmd_info_basis + 715, //!< command to add an alias for an interface
+        cmd_add_alias = cmd_info_basis + 715,  //!< command to add an alias for an interface
 
         cmd_fed_configure_time =
             202,  //!< command to update the configuration of a federate a time parameter

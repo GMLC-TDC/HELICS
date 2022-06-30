@@ -1516,7 +1516,8 @@ Translator& Federate::getTranslator(std::string_view translatorName)
     return trans;
 }
 
-void Federate::setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op)
+void Federate::setTranslatorOperator(const Translator& trans,
+                                     std::shared_ptr<TranslatorOperator> op)
 {
     coreObject->setTranslatorOperator(trans.getHandle(), std::move(op));
 }
@@ -1575,7 +1576,7 @@ void Interface::removeTarget(std::string_view targetToRemove)
 
 void Interface::addAlias(std::string_view alias)
 {
-    cr->addAlias(getName(),alias);
+    cr->addAlias(getName(), alias);
 }
 
 const std::string& Interface::getInfo() const

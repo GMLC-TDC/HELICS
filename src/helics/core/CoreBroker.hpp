@@ -320,6 +320,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual void addDestinationFilterToEndpoint(std::string_view filter,
                                                 std::string_view endpoint) override final;
     virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override final;
+
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
 
@@ -330,7 +331,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** find any existing publishers for a subscription*/
-    void FindandNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string &key);
+    void FindandNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
     void FindandNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);

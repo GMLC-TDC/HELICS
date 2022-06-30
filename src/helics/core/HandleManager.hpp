@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <utility>
 #include <unordered_set>
+#include <utility>
 
 namespace helics {
 
@@ -39,8 +39,9 @@ class HandleManager {
     std::unordered_map<std::string_view, InterfaceHandle> filters;  //!< map of all local endpoints
     std::unordered_map<std::string_view, InterfaceHandle> translators;  //!< map of all translators
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
-    std::unordered_multimap<std::string_view,std::string> aliases;  //!< set of all valid aliases <interface_name,alias>
-    std::unordered_set<std::string> alias_names; //!< set of actual alias strings
+    std::unordered_multimap<std::string_view, std::string>
+        aliases;  //!< set of all valid aliases <interface_name,alias>
+    std::unordered_set<std::string> alias_names;  //!< set of actual alias strings
   public:
     /** default constructor*/
     HandleManager() = default;
