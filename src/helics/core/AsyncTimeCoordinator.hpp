@@ -20,14 +20,14 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-/** class implementing a time coordinate that explicity allowed asynchronous operation of the federates.  That is the federates are not time synchronized
-and are allowed to operate ahead of others potential uses are
-1). The use of an external time coordination mechanism.
-2). A purely command driven system
-3).  All federates are operated in real time mode
-4).  You don't care about the data and just want to see how fast all the federates go on their own.
+/** class implementing a time coordinate that explicitly allowed asynchronous operation of the
+federates.  That is the federates are not time synchronized and are allowed to operate ahead of
+others potential uses are 1). The use of an external time coordination mechanism. 2). A purely
+command driven system 3).  All federates are operated in real time mode 4).  You don't care about
+the data and just want to see how fast all the federates go on their own.
 
-This time coordinator does only mimimal time keeping for entry to execution mode and allows asynchronous operation of the federation
+This time coordinator does only minimal time keeping for entry to execution mode and allows
+asynchronous operation of the federation
  */
 class AsyncTimeCoordinator: public BaseTimeCoordinator {
   private:
