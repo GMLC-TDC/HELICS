@@ -40,7 +40,7 @@ class HandleManager {
     std::unordered_map<std::string_view, InterfaceHandle> translators;  //!< map of all translators
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
     /// set of all valid aliases <interface_name,aliases>
-    std::unordered_map<std::string_view, std::vector<std::string_view>> aliases;  
+    std::unordered_map<std::string_view, std::vector<std::string_view>> aliases;
     std::unordered_set<std::string> alias_names;  //!< set of actual alias strings
   public:
     /** default constructor*/
@@ -138,7 +138,7 @@ class HandleManager {
     // alias must be a stable string_view here
     void addFilterAlias(std::string_view interfaceName, std::string_view alias);
     /// @brief actually add the alias names to the data structures
-    /// @param interfaceName 
+    /// @param interfaceName
     /// @param alias
     /// @return true if there are multiple interacting aliases
     bool addAliasName(std::string_view interfaceName, std::string_view alias);
