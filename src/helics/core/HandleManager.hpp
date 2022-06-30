@@ -15,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <vector>
 
 namespace helics {
 
