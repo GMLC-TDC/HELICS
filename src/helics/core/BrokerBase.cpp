@@ -152,7 +152,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         globalTime,
         "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
     hApp->add_flag(
-        "--async",
+        "--asynctime",
         asyncTime,
         "specify that the federation should use the asynchronous time coordinator (only minimal time management is handled in HELICS and federates are allowed to operate independently)");
     hApp->add_option_function<std::string>(

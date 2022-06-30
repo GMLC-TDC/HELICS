@@ -710,7 +710,7 @@ TEST_F(timing, dual_fast_sender_tests_ci_skip)  // ci_skip
 
 TEST_F(timing, async_timing)
 {
-    extraBrokerArgs = "--async";
+    extraBrokerArgs = "--asynctime";
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
@@ -747,7 +747,7 @@ TEST_F(timing, async_timing)
 
 TEST_F(timing, async_timing_message)
 {
-    extraBrokerArgs = "--async";
+    extraBrokerArgs = "--asynctime";
     SetupTest<helics::MessageFederate>("test", 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
