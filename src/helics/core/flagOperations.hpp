@@ -93,9 +93,15 @@ enum ConnectionFlags : uint16_t {
 enum MessageFlags : uint16_t {
     /// flag indicating that the message requires processing for filters yet
     filter_processing_required_flag = 7,
+    /// custom message flag 1
+    user_custom_message_flag1 = 10,
     /// flag indicating the message is for destination processing
     destination_processing_flag = 11,
     /// flag indicating the message is empty
+    /// custom message flag 2
+    user_custom_message_flag2 = 13,
+    /// custom message flag 3
+    user_custom_message_flag3 = 14,
     empty_flag = 15,
 };
 

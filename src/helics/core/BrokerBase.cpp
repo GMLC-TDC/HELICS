@@ -154,7 +154,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_flag(
         "--async",
         asyncTime,
-        "specify that the federation should not synchronize time (time management is done outside of helics or not relevant");
+        "specify that the federation should use the asynchronous time coordinator (only minimal time management is handled in HELICS and federates are allowed to operate independently)");
     hApp->add_option_function<std::string>(
             "--timing",
             [this](const std::string& arg) {
