@@ -553,7 +553,7 @@ TEST(handleManager, aliasCascadeFutureMany)
     h1.addAlias("publisher1", "publisher2");
     h1.addAlias("publisher2", "publisher3");
 
-    addTestHandle(h1, "pub1", InterfaceType::PUBLICATION);
+    EXPECT_NO_THROW(addTestHandle(h1, "pub1", InterfaceType::PUBLICATION));
     const auto* p1 = h1.getPublication("publisher");
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
@@ -587,7 +587,7 @@ TEST(handleManager, aliasCascadeFutureManyOther)
     h1.addAlias("publisher1", "publisher2");
     h1.addAlias("publisher2", "publisher3");
 
-    addTestHandle(h1, "publisher1", InterfaceType::PUBLICATION);
+    EXPECT_NO_THROW(addTestHandle(h1, "publisher1", InterfaceType::PUBLICATION));
     const auto* p1 = h1.getPublication("pub1");
     ASSERT_NE(p1, nullptr);
 

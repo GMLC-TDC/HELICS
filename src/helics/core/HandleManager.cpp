@@ -476,7 +476,7 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                 for (auto it = aliasRange.first; it != aliasRange.second; ++it) {
                     placed = endpoints.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed.second) {
-                        throw std::runtime_error("duplicate endpoint key found");
+                        throw std::runtime_error("duplicate endpoint alias key found");
                     }
                 }
                 break;
@@ -489,7 +489,7 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                 for (auto it = aliasRange.first; it != aliasRange.second; ++it) {
                     placed = publications.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed.second) {
-                        throw std::runtime_error("duplicate publication key found");
+                        throw std::runtime_error("duplicate publication alias key found");
                     }
                 }
                 break;
@@ -502,7 +502,7 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                 for (auto it = aliasRange.first; it != aliasRange.second; ++it) {
                     placed = filters.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed.second) {
-                        throw std::runtime_error("duplicate filter key found");
+                        throw std::runtime_error("duplicate filter alias key found");
                     }
                 }
                 break;
@@ -515,7 +515,7 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                 for (auto it = aliasRange.first; it != aliasRange.second; ++it) {
                     placed = inputs.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed.second) {
-                        throw std::runtime_error("duplicate input key found");
+                        throw std::runtime_error("duplicate input alias key found");
                     }
                 }
                 break;
@@ -536,15 +536,15 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                 for (auto it = aliasRange.first; it != aliasRange.second; ++it) {
                     placed1 = endpoints.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed1.second) {
-                        throw std::runtime_error("duplicate endpoint key found");
+                        throw std::runtime_error("duplicate endpoint alias key found");
                     }
                     placed2 = inputs.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed2.second) {
-                        throw std::runtime_error("duplicate input key found");
+                        throw std::runtime_error("duplicate input alias key found");
                     }
                     placed3 = publications.try_emplace(it->second, InterfaceHandle(index));
                     if (!placed3.second) {
-                        throw std::runtime_error("duplicate publication key found");
+                        throw std::runtime_error("duplicate publication alias key found");
                     }
                 }
                 break;
