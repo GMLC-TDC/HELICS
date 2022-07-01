@@ -177,10 +177,10 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
     if (isValidIndex(index, handles)) {
         switch (option) {
             case HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE:
-                rvalue = checkActionFlag(handles[index], extra_flag1);
+                rvalue = checkActionFlag(handles[index], only_update_on_change_flag);
                 break;
             case HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE:
-                rvalue = checkActionFlag(handles[index], extra_flag2);
+                rvalue = checkActionFlag(handles[index], only_transmit_on_change_flag);
                 break;
             case HELICS_HANDLE_OPTION_CONNECTION_REQUIRED:
                 rvalue = checkActionFlag(handles[index], required_flag);
@@ -189,7 +189,7 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
                 rvalue = checkActionFlag(handles[index], optional_flag);
                 break;
             case HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY:
-                rvalue = checkActionFlag(handles[index], extra_flag4);
+                rvalue = checkActionFlag(handles[index], single_connection_flag);
                 break;
             default:
                 break;

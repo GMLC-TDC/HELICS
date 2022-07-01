@@ -253,8 +253,11 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             if (no_ping) {
                 setActionFlag(brokerReply, slow_responding_flag);
             }
-            if (globalTime) {
-                setActionFlag(brokerReply, indicator_flag);
+            if (globalTime || asyncTime) {
+                setActionFlag(brokerReply, global_timing_flag);
+                if (asyncTime) {
+                    setActionFlag(brokerReply, async_timing_flag);
+                }
             }
             transmit(brk->route, brokerReply);
             return;
@@ -430,8 +433,11 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         if (no_ping) {
             setActionFlag(brokerReply, slow_responding_flag);
         }
-        if (globalTime) {
-            setActionFlag(brokerReply, indicator_flag);
+        if (globalTime || asyncTime) {
+            setActionFlag(brokerReply, global_timing_flag);
+            if (asyncTime) {
+                setActionFlag(brokerReply, async_timing_flag);
+            }
         }
         transmit(route, brokerReply);
         LOG_CONNECTIONS(global_broker_id_local,
@@ -537,8 +543,11 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
-        if (globalTime) {
-            setActionFlag(fedReply, indicator_flag);
+        if (globalTime || asyncTime) {
+            setActionFlag(fedReply, global_timing_flag);
+            if (asyncTime) {
+                setActionFlag(fedReply, async_timing_flag);
+            }
             if (!checkActionFlag(command, non_counting_flag)) {
                 timeCoord->addDependency(global_fedid);
                 timeCoord->addDependent(global_fedid);
@@ -1921,7 +1930,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 
     if (!isRootc) {
         transmit(parent_route_id, m);
-        if (!hasTimeDependency && !globalTime) {
+        if (!hasTimeDependency && !globalTime && !asyncTime) {
             if (timeCoord->addDependency(higher_broker_id)) {
                 hasTimeDependency = true;
                 ActionMessage add(CMD_ADD_INTERDEPENDENCY,
@@ -1990,7 +1999,7 @@ void CoreBroker::addTranslator(ActionMessage& m)
         transmit(parent_route_id, m);
         if (!hasFilters) {
             hasFilters = true;
-            if (!globalTime) {
+            if (!globalTime && !asyncTime) {
                 if (timeCoord->addDependent(higher_broker_id)) {
                     hasTimeDependency = true;
                     ActionMessage add(CMD_ADD_DEPENDENCY, global_broker_id_local, higher_broker_id);

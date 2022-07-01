@@ -39,6 +39,10 @@ class LogManager;
 
 constexpr Time startupTime = Time::minVal();
 constexpr Time initialTime{-1000000.0};
+
+/// @brief enumeration of possible time coordination methods
+enum class TimeSynchronizationMethod : uint8_t { DISTRIBUTED = 0, GLOBAL = 1, ASYNC = 2 };
+
 /** class managing the information about a single federate*/
 class FederateState {
   public:
@@ -112,7 +116,8 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
-    bool usingGlobalTime{false};  // indicator that the federation is using global time
+    /// the time keeping method in use
+    TimeSynchronizationMethod timeMethod{TimeSynchronizationMethod::DISTRIBUTED};
     /** counter for the number of times time or execution mode has been granted */
     std::uint32_t mGrantCount{0};  // this is intended to allow wrapping
     /** message timer object for real time operations and timeouts */

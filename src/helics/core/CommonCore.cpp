@@ -3047,8 +3047,11 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (checkActionFlag(command, slow_responding_flag)) {
                     timeoutMon->disableParentPing();
                 }
-                if (checkActionFlag(command, indicator_flag)) {
+                if (checkActionFlag(command, global_timing_flag)) {
                     globalTime = true;
+                    if (checkActionFlag(command, async_timing_flag)) {
+                        asyncTime = true;
+                    }
                 }
                 timeoutMon->reset();
                 if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
@@ -3842,20 +3845,22 @@ void CommonCore::connectFilterTiming()
 
     auto fid = filterFedID.load();
     if (globalTime) {
-        ActionMessage ad(CMD_ADD_DEPENDENT);
-        setActionFlag(ad, parent_flag);
-        ad.dest_id = fid;
-        ad.source_id = gRootBrokerID;
-        filterFed->handleMessage(ad);
+        if (!asyncTime) {
+            ActionMessage ad(CMD_ADD_DEPENDENT);
+            setActionFlag(ad, parent_flag);
+            ad.dest_id = fid;
+            ad.source_id = gRootBrokerID;
+            filterFed->handleMessage(ad);
 
-        ad.setAction(CMD_ADD_DEPENDENCY);
-        filterFed->handleMessage(ad);
-        clearActionFlag(ad, parent_flag);
-        setActionFlag(ad, child_flag);
-        ad.swapSourceDest();
-        transmit(parent_route_id, ad);
-        ad.setAction(CMD_ADD_DEPENDENT);
-        transmit(parent_route_id, ad);
+            ad.setAction(CMD_ADD_DEPENDENCY);
+            filterFed->handleMessage(ad);
+            clearActionFlag(ad, parent_flag);
+            setActionFlag(ad, child_flag);
+            ad.swapSourceDest();
+            transmit(parent_route_id, ad);
+            ad.setAction(CMD_ADD_DEPENDENT);
+            transmit(parent_route_id, ad);
+        }
     } else {
         if (timeCoord->addDependent(higher_broker_id)) {
             ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
