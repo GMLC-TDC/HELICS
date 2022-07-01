@@ -275,6 +275,7 @@ class HELICS_CXX_EXPORT ValueFederate:
                                     units);
     }
 
+    using Federate::addAlias;
     /** add a shortcut for locating an input
     @details primarily for use in looking up an id from a different location
     creates a local shortcut for referring to a input which may not have another name

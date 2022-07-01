@@ -1131,6 +1131,20 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             }
         }
     }
+
+    if (doc.isMember("aliases")) {
+        if (doc["aliases"].isArray()) {
+            for (auto& val : doc["aliases"]) {
+                setGlobal(val[0].asString(), val[1].asString());
+            }
+        } else {
+            auto members = doc["aliases"].getMemberNames();
+            for (auto& val : members) {
+                setGlobal(val, doc["aliases"][val].asString());
+            }
+        }
+    }
+
     loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
@@ -1258,6 +1272,20 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
     }
     if (isMember(doc, "globals")) {
         auto globals = toml::find(doc, "globals");
+        if (globals.is_array()) {
+            for (auto& val : globals.as_array()) {
+                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                          static_cast<std::string_view>(val.as_array()[1].as_string()));
+            }
+        } else {
+            for (const auto& val : globals.as_table()) {
+                setGlobal(val.first, static_cast<std::string_view>(val.second.as_string()));
+            }
+        }
+    }
+
+    if (isMember(doc, "aliases")) {
+        auto globals = toml::find(doc, "aliases");
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
                 setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),

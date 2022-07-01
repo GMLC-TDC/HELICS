@@ -1104,6 +1104,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DATA_LINK:
         case CMD_ENDPOINT_LINK:
         case CMD_FILTER_LINK:
+        case CMD_ADD_ALIAS:
             linkInterfaces(command);
             break;
         case CMD_DISCONNECT_NAME:
@@ -2461,16 +2462,16 @@ void CoreBroker::executeInitializationOperations()
                         foundAliasHandles[1].emplace_back(target);
                     }
                 } break;
-                case 'f': {
-                    const auto* p = handles.getInput(target);
-                    if (p != nullptr) {
-                        foundAliasHandles[3].emplace_back(target);
-                    }
-                } break;
                 case 'e': {
                     const auto* p = handles.getEndpoint(target);
                     if (p != nullptr) {
                         foundAliasHandles[2].emplace_back(target);
+                    }
+                } break;
+                case 'f': {
+                    const auto* p = handles.getFilter(target);
+                    if (p != nullptr) {
+                        foundAliasHandles[3].emplace_back(target);
                     }
                 } break;
                 default:
