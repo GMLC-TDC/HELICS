@@ -168,7 +168,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                 }
             },
             "specify the timing method to use in the broker")
-        ->check(CLI::IsMember({"async", "global", "distributed"}));
+        ->check(CLI::IsMember({"async", "global", "distributed", "default"}));
     hApp->add_flag("--observer",
                    observer,
                    "specify that the broker/core should be added as an observer only");
