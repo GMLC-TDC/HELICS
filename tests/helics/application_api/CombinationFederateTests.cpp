@@ -308,7 +308,7 @@ TEST_P(combofed_file_load_tests, test_file_load)
     auto& id = cFed.getEndpoint("ept1");
     EXPECT_EQ(id.getExtractionType(), "genmessage");
 
-    EXPECT_EQ(cFed.getInputCount(), 2);
+    EXPECT_EQ(cFed.getInputCount(), 3);
     EXPECT_EQ(cFed.getPublicationCount(), 2);
 
     EXPECT_TRUE(!cFed.getPublication(1).getInfo().empty());
