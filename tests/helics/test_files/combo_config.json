@@ -68,6 +68,6 @@
       "info": "{\"publication_info\":{\"object\": \"tpxm\",\"property\": \"measured_real_power\"},\"subscription_info\":{\"object\":\"house1\",\"property\":\"cooling_setpoint\"}}"
     }
   ],
-  
-  "aliases":["combo_fed/double_pub","dpub"]
+
+  "aliases": ["combo_fed/double_pub", "dpub"]
 }
