@@ -152,7 +152,7 @@ TEST_F(valuefed_tests, single_transfer_publisher_alias2)
 
     auto& subid = vFed1->registerSubscription("publisher");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    
+
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
     pubid.publish("string1");

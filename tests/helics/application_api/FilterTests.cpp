@@ -557,7 +557,6 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
     EXPECT_TRUE(res);
 }
 
-
 TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
 {
     auto broker = AddBroker("test", 3);

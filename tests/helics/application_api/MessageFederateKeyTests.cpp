@@ -229,7 +229,6 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-
 TEST_F(mfed_tests, send_receive_2fed_extra_alias)
 {
     SetupTest<helics::MessageFederate>("test_7", 2);
