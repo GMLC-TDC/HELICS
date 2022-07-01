@@ -64,5 +64,5 @@ alias="pubshortcut"  #a naming shortcut for the publication for later retrieval
 key="dpub" # the key of the publication
  type="double" # the type associated with a publication (optional)
  connection_required=true #set to true to make helics issue a warning if the publication is not found
- 
+
  aliases=[["comboFed/pub2","dpub"]]

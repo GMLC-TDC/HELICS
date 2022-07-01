@@ -1289,7 +1289,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         if (globals.is_array()) {
             for (auto& val : globals.as_array()) {
                 addAlias(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                          static_cast<std::string_view>(val.as_array()[1].as_string()));
+                         static_cast<std::string_view>(val.as_array()[1].as_string()));
             }
         } else {
             for (const auto& val : globals.as_table()) {
