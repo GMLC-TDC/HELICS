@@ -284,7 +284,7 @@ void makeConnectionsJson(brkX* brk, const std::string& file)
         } else {
             auto members = doc["aliases"].getMemberNames();
             for (auto& val : members) {
-                brk->setGlobal(val, doc["aliases"][val].asString());
+                brk->addAlias(val, doc["aliases"][val].asString());
             }
         }
     }

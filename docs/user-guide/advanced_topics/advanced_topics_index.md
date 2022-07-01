@@ -23,6 +23,7 @@
     timeouts
     commandInterface
     iteration
+    aliases
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the
@@ -54,3 +55,4 @@ The Advanced Topics will cover:
 - [**Dynamic Federations**](./dynamic_federations.md) - Sometimes it is useful to have a federate that is not ready at the beginning of co-simulation. This is a dynamic federation. There are various levels of this (not all are available yet) and this document discusses some aspects of dynamic co-simulation.
 - [**Timeouts**](./timeouts.md) - HELICS includes a number of timeouts to prevent failed operations from continuing indefinitely, the various timeout options are discussed in this document.
 - [**Command Interface**](./commandInterface.md) - HELICS v3 introduced the command interface as a method of asynchronously communicating between federates.
+- [**Aliases*](./aliases.md) - HELICS 3.3 introduced the notion of aliases.  Aliases allow a mapping of an interface key to a different string
