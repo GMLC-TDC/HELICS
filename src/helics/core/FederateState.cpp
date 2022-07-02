@@ -183,9 +183,6 @@ int32_t FederateState::getCurrentIteration() const
 
 bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len)
 {
-    if (!only_transmit_on_change) {
-        return true;
-    }
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);

@@ -21,6 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <unordered_map>
 #include <utility>
+#include <charconv>
 
 namespace helics {
 FederateInfo::FederateInfo()
@@ -236,6 +237,8 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"strictinputtypechecking", HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING},
     {"strictInputTypeChecking", HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING},
     {"connections", HELICS_HANDLE_OPTION_CONNECTIONS},
+    {"timerestricted",HELICS_HANDLE_OPTION_TIME_RESTRICTED},
+    {"timeRestricted", HELICS_HANDLE_OPTION_TIME_RESTRICTED},
     {"clear_priority_list", HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST},
     {"clearPriorityList", HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST},
     {"clearprioritylist", HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST},
@@ -333,12 +336,16 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
                 }
                 continue;
             }
-            try {
-                auto val = std::stoi(flg);
+
+            int val{};
+            auto [ptr, ec] = std::from_chars(flg.data(), flg.data() + flg.size(), val);
+
+            if (ec == std::errc()) {
                 fi.setFlagOption(std::abs(val), (val > 0));
-            }
-            catch (const std::invalid_argument&) {
-                std::cerr << "unrecognized flag " << flg << std::endl;
+            } else if (ec == std::errc::invalid_argument) {
+                std::cerr << "unrecognized flag " << std::quoted(flg) << std::endl;
+            } else if (ec == std::errc::result_out_of_range) {
+                std::cerr << "unrecognized flag numerical value out of range " << std::quoted(flg) << std::endl;
             }
         }
     }

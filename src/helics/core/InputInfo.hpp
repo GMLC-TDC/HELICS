@@ -75,10 +75,12 @@ class InputInfo {
         false};  //!< indicator that the handle need to have strict type matching
     bool ignore_unit_mismatch{false};  //!< ignore unit mismatches
     int32_t required_connnections{0};  //!< an exact number of connections required
-    std::vector<std::pair<helics::Time, unsigned int>>
-        current_data_time;  //!< the most recent published data times
-    std::vector<std::shared_ptr<const SmallBuffer>>
-        current_data;  //!< the most recent published data
+    /// @brief the minimum time between updates
+    Time minTimeGap{timeZero};
+    /// the most recent published data times
+    std::vector<std::pair<helics::Time, unsigned int>> current_data_time;  
+    /// the most recent published data
+    std::vector<std::shared_ptr<const SmallBuffer>> current_data;  
     std::vector<GlobalHandle> input_sources;  //!< the sources of the input signals
     std::vector<Time> deactivated;  //!< indicator that the source has been deactivated
     std::vector<sourceInformation> source_info;  //!< the name,type,units of the sources

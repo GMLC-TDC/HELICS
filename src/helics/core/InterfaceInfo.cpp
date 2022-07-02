@@ -155,6 +155,9 @@ bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t
         case defs::Options::CLEAR_PRIORITY_LIST:
             ipt->priority_sources.clear();
             break;
+        case defs::Options::TIME_RESTRICTED:
+            ipt->minTimeGap = Time(value, time_units::ms);
+            break;
         default:
             return false;
             break;
@@ -190,6 +193,9 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
             break;
         case defs::Options::CONNECTIONS:
             pub->required_connections = value;
+            break;
+        case defs::Options::TIME_RESTRICTED:
+            pub->minTimeGap = Time(value, time_units::ms);
             break;
         default:
             return false;
@@ -255,6 +261,8 @@ int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) cons
         case defs::Options::CLEAR_PRIORITY_LIST:
             flagval = ipt->priority_sources.empty();
             break;
+        case defs::Options::TIME_RESTRICTED:
+            return static_cast<std::int32_t>(ipt->minTimeGap.to_ms().count());
         default:
             break;
     }
@@ -289,6 +297,8 @@ int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option
             break;
         case defs::Options::CONNECTIONS:
             return static_cast<int32_t>(pub->subscribers.size());
+        case defs::Options::TIME_RESTRICTED:
+            return static_cast<std::int32_t>(pub->minTimeGap.to_ms().count());
         default:
             break;
     }

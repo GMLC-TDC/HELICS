@@ -350,7 +350,9 @@ typedef enum { /* NOLINT */
                HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST = 512,
                /** specify the required number of connections or get the actual number of
                   connections*/
-               HELICS_HANDLE_OPTION_CONNECTIONS = 522
+               HELICS_HANDLE_OPTION_CONNECTIONS = 522,
+               /** specify that the interface only sends or receives data at specified intervals*/
+               HELICS_HANDLE_OPTION_TIME_RESTRICTED = 557
 } HelicsHandleOptions;
 
 /** enumeration of the predefined filter types*/
