@@ -40,7 +40,7 @@ class PublicationInfo {
     int32_t required_connections{0};  //!< the number of required connections 0 is no requirement
     Time minTimeGap{timeZero}; //!< a time restriction on amount of publishing
     /** check the value if the value should be published or not*/
-    bool CheckSetValue(const char* dataToCheck, uint64_t len);
+    bool CheckSetValue(const char* dataToCheck, uint64_t len, Time currentTime, bool forceChangeCheck);
     /** add a new subscriber to the publication
 @return true if the subscriber was added false if duplicate
 */

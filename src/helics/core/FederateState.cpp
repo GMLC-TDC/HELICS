@@ -186,7 +186,7 @@ bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, u
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);
-    auto res = pub->CheckSetValue(data, len);
+    auto res = pub->CheckSetValue(data, len,time_granted,only_transmit_on_change);
     return res;
 }
 

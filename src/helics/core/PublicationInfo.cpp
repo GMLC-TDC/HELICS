@@ -11,13 +11,24 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 
 namespace helics {
-bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len)
+bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len, Time currentTime, bool forceChangeCheck)
 {
-    if ((len != data.length()) || (std::string_view(data) != std::string_view(dataToCheck, len))) {
-        data.assign(dataToCheck, len);
-        return true;
+    if (minTimeGap>timeZero) {
+        if (currentTime-lastPublishTime<minTimeGap) {
+            return false;
+        }
     }
-    return false;
+    if (only_update_on_change||forceChangeCheck) {
+        if (len != data.length() ||
+            std::string_view(data) != std::string_view(dataToCheck, len)) {
+            data.assign(dataToCheck, len);
+        } else {
+            return false;
+        }
+    } else if (buffer_data) {
+        data.assign(dataToCheck, len);
+    }
+    return true;
 }
 
 bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber)
