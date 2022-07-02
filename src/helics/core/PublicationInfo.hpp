@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #include "basic_CoreTypes.hpp"
+#include "helicsTime.hpp"
 
 #include <cstdint>
 #include <string>
@@ -31,6 +32,7 @@ class PublicationInfo {
     const std::string type;  //!< the type of the publication data
     const std::string units;  //!< the units of the publication data
     SmallBuffer data;  //!< the most recent publication data
+    Time lastPublishTime{timeZero};  //!< the time of the last publication
     Time lastPublishTime{timeZero};  //!< the time of the last publication
     bool has_update{false};  //!< indicator that the publication has updates
     bool only_update_on_change{false};
