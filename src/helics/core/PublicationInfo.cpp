@@ -28,6 +28,7 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck, uint64_t len, Time 
     } else if (buffer_data) {
         data.assign(dataToCheck, len);
     }
+    lastPublishTime = currentTime;
     return true;
 }
 

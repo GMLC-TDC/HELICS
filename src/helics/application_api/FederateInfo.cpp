@@ -17,11 +17,22 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <iostream>
-#include <map>
 #include <set>
-#include <unordered_map>
 #include <utility>
 #include <charconv>
+#include "frozen/unordered_map.h"
+#include "frozen/string.h"
+
+namespace frozen {
+template<>
+struct elsa<std::string_view> {
+    constexpr std::size_t operator()(std::string_view value) const { return hash_string(value); }
+    constexpr std::size_t operator()(std::string_view value, std::size_t seed) const
+    {
+        return hash_string(value, seed);
+    }
+};
+}  // namespace frozen
 
 namespace helics {
 FederateInfo::FederateInfo()
@@ -50,7 +61,9 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static const std::unordered_map<std::string, int> propStringsTranslations{
+
+
+static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -116,7 +129,7 @@ static const std::unordered_map<std::string, int> propStringsTranslations{
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static const std::unordered_map<std::string, int> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
@@ -143,7 +156,6 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"forwardCompute", HELICS_FLAG_FORWARD_COMPUTE},
     {"real_time", HELICS_FLAG_REALTIME},
     {"realtime", HELICS_FLAG_REALTIME},
-    {"real_time", HELICS_FLAG_REALTIME},
     {"realTime", HELICS_FLAG_REALTIME},
     {"json", HELICS_FLAG_USE_JSON_SERIALIZATION},
     {"use_json_serialization", HELICS_FLAG_USE_JSON_SERIALIZATION},
@@ -151,8 +163,8 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"restrictive_time_policy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"restrictiveTimePolicy", HELICS_FLAG_RESTRICTIVE_TIME_POLICY},
     {"ignore_time_mismatch", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
-    {"ignoretimeMismatch", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
-    {"ignore_time_mismatch", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
+    {"ignoreTimeMismatch", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
+    {"ignoretimemismatch", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
     {"strict_input_type_checking", HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING},
     {"strict_config_checking", HELICS_FLAG_STRICT_CONFIG_CHECKING},
     {"strictconfigchecking", HELICS_FLAG_STRICT_CONFIG_CHECKING},
@@ -162,20 +174,10 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"ignore_unit_mismatch", HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH},
     {"ignoreunitmismatch", HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH},
     {"ignoreUnitMismatch", HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH},
-    {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
-    {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
-    {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
-    {"optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
-    {"uninterruptible", HELICS_FLAG_UNINTERRUPTIBLE},
-    {"interruptible", HELICS_FLAG_INTERRUPTIBLE},
-    {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
-    {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
-    {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
-    {"required",
-     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},  // LIKELY TO BE DEPRECATED In the future
     {"connectionoptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connection_optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"connectionOptional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
+    {"optional", HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL},
     {"wait_for_current_time_update", HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE},
     {"waitforcurrenttimeupdate", HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE},
     {"waitForCurrentTimeUpdate", HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE},
@@ -188,7 +190,6 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"ignore_time_mismatch_warnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
     {"ignoretimemismatchwarnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
     {"ignoreTimeMismatchWarnings", HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS},
-    {"rollback", HELICS_FLAG_ROLLBACK},
     {"single_thread_federate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singlethreadfederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singleThreadFederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
@@ -201,11 +202,20 @@ static const std::unordered_map<std::string, int> flagStringsTranslations{
     {"event_triggered", HELICS_FLAG_EVENT_TRIGGERED},
     {"eventtriggered", HELICS_FLAG_EVENT_TRIGGERED},
     {"eventTriggered", HELICS_FLAG_EVENT_TRIGGERED},
+    {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
+    {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
+    {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
+    {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
+     {"required",
+     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},  // LIKELY TO BE DEPRECATED In the future
+    {"rollback", HELICS_FLAG_ROLLBACK},
     {"terminate_on_error", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateOnError", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR}};
 
-static const std::unordered_map<std::string, int> optionStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsTranslations{
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferdata", HELICS_HANDLE_OPTION_BUFFER_DATA},
     {"bufferData", HELICS_HANDLE_OPTION_BUFFER_DATA},
@@ -249,7 +259,7 @@ static const std::unordered_map<std::string, int> optionStringsTranslations{
     {"multiinputhandlingmethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD},
     {"multiInputHandlingMethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD}};
 
-static const std::map<std::string, int> option_value_map{
+static constexpr frozen::unordered_map<std::string_view, int,28> option_value_map{
     {"0", 0},
     {"1", 1},
     {"-", 0},
@@ -280,7 +290,8 @@ static const std::map<std::string, int> option_value_map{
     {"vectorize", HELICS_MULTI_INPUT_VECTORIZE_OPERATION},
     {"diff", HELICS_MULTI_INPUT_DIFF_OPERATION}};
 
-static const std::map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
+//this one is used in a few places that can't use std::string
+static const std::unordered_map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
                                                       {"error", HELICS_LOG_LEVEL_ERROR},
                                                       {"warning", HELICS_LOG_LEVEL_WARNING},
@@ -767,7 +778,7 @@ void FederateInfo::loadInfoFromJson(const std::string& jsonString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        fileops::callIfMember(doc, prop.first, timeCall);
+        fileops::callIfMember(doc, std::string(prop.first), timeCall);
     }
 
     processOptions(
@@ -813,7 +824,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        fileops::callIfMember(doc, prop.first, timeCall);
+        fileops::callIfMember(doc, std::string(prop.first.data(),prop.first.size()), timeCall);
     }
 
     processOptions(

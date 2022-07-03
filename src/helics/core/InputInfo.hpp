@@ -63,16 +63,19 @@ class InputInfo {
     const std::string key;  //!< the identifier for the input
     const std::string type;  //! the nominal type of data for the input
     const std::string units;  //!< the units of the controlInput
-    bool required{
-        false};  //!< flag indicating that the subscription requires a matching publication
+    /// flag indicating that the subscription requires a matching publication
+    bool required{false};  
     bool optional{false};  //!< flag indicating that any targets are optional
     bool has_target{false};  //!< flag indicating that the input has a source
+    /// flag indicating that the data should only be updated on change
     bool only_update_on_change{
-        false};  //!< flag indicating that the data should only be updated on change
+        false};
+    /// indicator that this handle should not be used for interrupting
     bool not_interruptible{
-        false};  //!< indicator that this handle should not be used for interrupting
+        false};
+    /// indicator that the handle need to have strict type matching
     bool strict_type_matching{
-        false};  //!< indicator that the handle need to have strict type matching
+        false};  
     bool ignore_unit_mismatch{false};  //!< ignore unit mismatches
     int32_t required_connnections{0};  //!< an exact number of connections required
     /// @brief the minimum time between updates

@@ -42,6 +42,18 @@ struct fmt::formatter<std::complex<double>> {
     }
 };
 
+
+namespace frozen {
+template<>
+struct elsa<std::string_view> {
+    constexpr std::size_t operator()(std::string_view value) const { return hash_string(value); }
+    constexpr std::size_t operator()(std::string_view value, std::size_t seed) const
+    {
+        return hash_string(value, seed);
+    }
+};
+}  // namespace frozen
+
 namespace helics {
 
 const std::string& typeNameStringRef(DataType type)
@@ -112,7 +124,7 @@ std::string helicsComplexString(std::complex<double> val)
     return helicsComplexString(val.real(), val.imag());
 }
 /** map of an assortment of type string that can be converted to a known type*/
-static constexpr frozen::unordered_map<frozen::string, DataType, 64> typeMap{
+static constexpr frozen::unordered_map<std::string_view, DataType, 64> typeMap{
     {"double", DataType::HELICS_DOUBLE},
     {"string", DataType::HELICS_STRING},
     {"binary", DataType::HELICS_BOOL},
@@ -222,7 +234,7 @@ DataType getTypeFromString(std::string_view typeName)
     if (!typeName.empty() && typeName.front() == '[') {
         return DataType::HELICS_MULTI;
     }
-    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    const auto* res = typeMap.find(typeName);
     if (res != typeMap.end()) {
         return res->second;
     }
@@ -232,7 +244,7 @@ DataType getTypeFromString(std::string_view typeName)
         return dres->second;
     }
     makeLowerCase(strName);
-    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    res = typeMap.find(strName);
     if (res != typeMap.end()) {
         return res->second;
     }
@@ -248,7 +260,7 @@ std::string_view getCleanedTypeName(std::string_view typeName)
     if (!typeName.empty() && typeName.front() == '[') {
         return typeName;
     }
-    const auto* res = typeMap.find(frozen::string(typeName.data(), typeName.size()));
+    const auto* res = typeMap.find(typeName);
     if (res != typeMap.end()) {
         return typeName;
     }
@@ -258,7 +270,7 @@ std::string_view getCleanedTypeName(std::string_view typeName)
         return typeNameStringRef(dres->second);
     }
     makeLowerCase(strName);
-    res = typeMap.find(frozen::string(strName.data(), strName.size()));
+    res = typeMap.find(strName);
     if (res != typeMap.end()) {
         return typeName;
     }
@@ -626,13 +638,13 @@ void helicsGetComplexVector(std::string_view val, std::vector<std::complex<doubl
 
 bool helicsBoolValue(std::string_view val)
 {
-    static constexpr const frozen::unordered_map<frozen::string, bool, 37> knownStrings{
+    static constexpr const frozen::unordered_map<std::string_view, bool, 37> knownStrings{
 
         {"0", false},
         {"00", false},
-        {frozen::string("\0", 1), false},
+        {std::string_view("\0", 1), false},
         {"0000", false},
-        {frozen::string("\0\0\0\0\0\0\0\0", 8), false},
+        {std::string_view("\0\0\0\0\0\0\0\0", 8), false},
         {"1", true},
         {"false", false},
         {"true", true},
@@ -667,7 +679,7 @@ bool helicsBoolValue(std::string_view val)
         {"", false}};
     // all known false strings are captured in known strings so if it isn't in there it evaluates to
     // true
-    const auto* res = knownStrings.find(frozen::string(val.data(), val.size()));
+    const auto* res = knownStrings.find(val);
     if (res != knownStrings.end()) {
         return res->second;
     }
