@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
+#include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
 #include <sstream>
@@ -19,28 +20,72 @@ namespace helics {
 void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       std::string_view key,
                                       std::string_view type,
-                                      std::string_view units)
+                                      std::string_view units,
+                                      std::uint16_t flags)
 {
     publications.lock()->insert(
         std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
+    if (checkActionFlag(flags, required_flag)) {
+        setPublicationProperty(handle, defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        setPublicationProperty(handle, defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, buffer_data_flag)) {
+        setPublicationProperty(handle, defs::Options::BUFFER_DATA, 1);
+    }
+    if (checkActionFlag(flags, only_transmit_on_change_flag)) {
+        setPublicationProperty(handle, defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE, 1);
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        setPublicationProperty(handle, defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::createInput(InterfaceHandle handle,
                                 std::string_view key,
                                 std::string_view type,
-                                std::string_view units)
+                                std::string_view units,
+                                std::uint16_t flags)
 {
     auto ciHandle = inputs.lock();
     ciHandle->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
+
+    if (checkActionFlag(flags, required_flag)) {
+        setInputProperty(handle, defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        setInputProperty(handle, defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, only_update_on_change_flag)) {
+        setInputProperty(handle, defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE, 1);
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        setInputProperty(handle, defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::createEndpoint(InterfaceHandle handle,
                                    std::string_view endpointName,
-                                   std::string_view type)
+                                   std::string_view type,
+                                   std::uint16_t flags)
 {
     endpoints.lock()->insert(
         std::string(endpointName), handle, GlobalHandle{global_id, handle}, endpointName, type);
+    if (checkActionFlag(flags, required_flag)) {
+        setEndpointProperty(handle, defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        setEndpointProperty(handle, defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, targeted_flag)) {
+        auto* ept = getEndpoint(handle);
+        ept->targetedEndpoint = true;
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        setEndpointProperty(handle, defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
@@ -217,6 +262,15 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
             break;
         case defs::Options::CONNECTION_OPTIONAL:
             ept->required = !bvalue;
+            break;
+             case defs::Options::SINGLE_CONNECTION_ONLY:
+            ept->required_connections = bvalue ? 1 : 0;
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            ept->required_connections = !bvalue ? 0 : 1;
+            break;
+            case defs::Options::CONNECTIONS:
+            ept->required_connections = value;
             break;
         default:
             return false;

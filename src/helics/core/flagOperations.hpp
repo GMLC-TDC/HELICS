@@ -37,6 +37,8 @@ enum TimingFlags : uint16_t {
 
 /// @brief flags used on handles
 enum InterfaceFlags : uint16_t {
+     /// indicator that the target is a destination target
+    buffer_data_flag = 0,
     /// indicator that the target is a destination target
     buffer_data_flag = 0,
     /// indicator that the target is a destination target
