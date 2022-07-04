@@ -442,6 +442,9 @@ class FederateState {
 
     /** route a message either forward to parent or add to queue*/
     void routeMessage(const ActionMessage& msg);
+
+    /** move a message either to parent or add to queue*/
+    void routeMessage(ActionMessage&& msg);
     /** create an interface*/
     void createInterface(InterfaceType htype,
                          InterfaceHandle handle,

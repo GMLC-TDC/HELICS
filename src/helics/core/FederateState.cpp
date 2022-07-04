@@ -290,6 +290,21 @@ void FederateState::routeMessage(const ActionMessage& msg)
     }
 }
 
+void FederateState::routeMessage(ActionMessage&& msg)
+{
+    if (parent_ != nullptr) {
+        if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
+            LOG_ERROR("sending time request in invalid state");
+        }
+        if (msg.action() == CMD_TIME_GRANT) {
+            requestingMode.store(false);
+        }
+        parent_->addActionMessage(std::move(msg));
+    } else {
+        queue.push(std::move(msg));
+    }
+}
+
 void FederateState::addAction(const ActionMessage& action)
 {
     if (action.action() != CMD_IGNORE) {
@@ -314,21 +329,12 @@ void FederateState::createInterface(InterfaceType htype,
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
-        case InterfaceType::PUBLICATION: {
-            interfaceInformation.createPublication(handle, key, type, units);
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setPublicationProperty(handle,
-                                                            defs::Options::CONNECTION_REQUIRED,
-                                                            1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setPublicationProperty(handle,
-                                                            defs::Options::CONNECTION_OPTIONAL,
-                                                            1);
-            }
-        } break;
-        case InterfaceType::INPUT: {
-            interfaceInformation.createInput(handle, key, type, units);
+        case InterfaceType::PUBLICATION: 
+            interfaceInformation.createPublication(handle, key, type, units,flags);
+           
+         break;
+        case InterfaceType::INPUT:
+            interfaceInformation.createInput(handle, key, type, units,flags);
             if (strict_input_type_checking) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::Options::STRICT_TYPE_CHECKING,
@@ -339,34 +345,11 @@ void FederateState::createInterface(InterfaceType htype,
                                                       defs::Options::IGNORE_UNIT_MISMATCH,
                                                       1);
             }
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setInputProperty(handle,
-                                                      defs::Options::CONNECTION_REQUIRED,
-                                                      1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setInputProperty(handle,
-                                                      defs::Options::CONNECTION_OPTIONAL,
-                                                      1);
-            }
-        } break;
-        case InterfaceType::ENDPOINT: {
-            interfaceInformation.createEndpoint(handle, key, type);
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setEndpointProperty(handle,
-                                                         defs::Options::CONNECTION_REQUIRED,
-                                                         1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setEndpointProperty(handle,
-                                                         defs::Options::CONNECTION_OPTIONAL,
-                                                         1);
-            }
-            if (checkActionFlag(flags, targeted_flag)) {
-                auto* ept = interfaceInformation.getEndpoint(handle);
-                ept->targetedEndpoint = true;
-            }
-        } break;
+         break;
+        case InterfaceType::ENDPOINT:
+            interfaceInformation.createEndpoint(handle, key, type,flags);
+            
+         break;
         default:
             break;
     }
@@ -1428,6 +1411,17 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         addDependent(cmd.source_id);
                     }
                 }
+                if (getState() > FederateStates::CREATED) {
+                    if (pubI->buffer_data && pubI->lastPublishTime>Time::minVal()) {
+                        ActionMessage mv(CMD_PUB);
+                        mv.setSource(pubI->id);
+                        mv.setDestination(cmd.getSource());
+                        mv.counter = static_cast<uint16_t>(getCurrentIteration());
+                        mv.payload=pubI->data;
+                        mv.actionTime = pubI->lastPublishTime;
+                        routeMessage(std::move(mv));
+                    }
+                }
             }
         } break;
         case CMD_ADD_ENDPOINT: {
@@ -1536,7 +1530,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             queryResp.counter = cmd.counter;
 
             queryResp.payload = processQueryActual(cmd.payload.to_string());
-            routeMessage(queryResp);
+            routeMessage(std::move(queryResp));
         } break;
     }
     return MessageProcessingResult::CONTINUE_PROCESSING;
@@ -2089,7 +2083,7 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(response);
+            parent_->addActionMessage(std::move(response));
         }
     } else if (res[0] == "command_status") {
         if (parent_ != nullptr) {
@@ -2100,7 +2094,7 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(response);
+            parent_->addActionMessage(std::move(response));
         }
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
