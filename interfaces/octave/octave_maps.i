@@ -38,7 +38,7 @@ static octave_value throwHelicsOctaveError(HelicsError *err) {
  octave_value type(Helics_ErrorType(err));
   std::string r(err->message);
   r += " (" + type.string_value() + ")";
-  error(r.c_str());
+  error("%s",r.c_str());
   return octave_value(r);
 }
 
