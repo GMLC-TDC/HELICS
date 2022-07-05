@@ -27,12 +27,12 @@ In general, all operations are allowed unless they create a situation which woul
 
 Multiple aliases are allowed including aliases of aliases.
 
-## file configuration.
+## file configuration
 
 In addition to the API calls aliases can be specified in federation and connection configuration files in either TOML or JSON. The keyword is "aliases" followed by an array of string pairs. Which is the exact same structure as specifying "globals"
 
 ```TOML
- aliases=[["comboFed/pub2","dpub"]]
+ aliases=[["comboFed/pub2","dpub"],["cfed_agasagadsag","c2"]]
 ```
 
 ```JSON
