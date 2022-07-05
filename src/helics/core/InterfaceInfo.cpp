@@ -466,6 +466,11 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
         }
     }
     phandle.unlock();
+    auto ehandle = endpoints.lock();
+    for (const auto& ept : ehandle) {
+        ept->checkInterfacesForIssues(issues);
+    }
+    ehandle.unlock();
     return issues;
 }
 
