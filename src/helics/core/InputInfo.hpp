@@ -98,8 +98,9 @@ class InputInfo {
     const std::shared_ptr<const SmallBuffer>& getData(int index) const;
     /** get a the most recent data point*/
     const std::shared_ptr<const SmallBuffer>& getData(uint32_t* inputIndex) const;
-    /** add a data block into the queue*/
-    void addData(GlobalHandle source_id,
+    /** add a data block into the queue
+    @return true if the data was accepted and added to queues*/
+    [[nodiscard]] bool addData(GlobalHandle source_id,
                  Time valueTime,
                  unsigned int iteration,
                  std::shared_ptr<const SmallBuffer> data);

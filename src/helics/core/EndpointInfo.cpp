@@ -255,6 +255,10 @@ const std::string& EndpointInfo::getDestinationTargets() const
 
 void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::string>> &issues)
 {
+    if (!targetedEndpoint)
+    {
+        return;
+    }
     if (required) {
             if (sourceInformation.empty() && targetInformation.empty()) {
                 issues.emplace_back(helics::defs::Errors::CONNECTION_FAILURE,

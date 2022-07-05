@@ -1304,17 +1304,20 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     }
                 }
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
-                    subI->addData(src,
-                                  valueTime,
-                                  cmd.counter,
-                                  std::make_shared<const SmallBuffer>(std::move(cmd.payload)));
-                    if (!subI->not_interruptible) {
-                        timeCoord->updateValueTime(valueTime, !timeGranted_mode);
-                        LOG_TRACE(timeCoord->printTimeStatus());
+                    if (subI->addData(src,
+                        valueTime,
+                        cmd.counter,
+                        std::make_shared<const SmallBuffer>(std::move(cmd.payload))))
+                    {
+
+                        if (!subI->not_interruptible) {
+                            timeCoord->updateValueTime(valueTime, !timeGranted_mode);
+                            LOG_TRACE(timeCoord->printTimeStatus());
+                        }
+                        LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
+                            prettyPrintString(cmd),
+                            subI->getSourceName(src)));
                     }
-                    LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
-                                         prettyPrintString(cmd),
-                                         subI->getSourceName(src)));
                 }
             }
             if (state <= FederateStates::EXECUTING) {

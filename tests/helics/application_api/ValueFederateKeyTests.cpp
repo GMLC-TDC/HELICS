@@ -1266,3 +1266,121 @@ TEST_F(valuefed_tests, empty_get_complex)
 
     vFed1->finalize();
 }
+
+
+TEST_F(valuefed_tests, publish_time_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    pubid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED,10000);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii)
+    {
+        if (subid.isUpdated())
+        {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(ii);
+        vFed1->requestNextStep();
+    }
+   
+    vFed1->finalize();
+    EXPECT_LE(returned.size(),21);
+    EXPECT_GE(returned.size(),19);
+}
+
+TEST_F(valuefed_tests, input_time_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    subid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED,10000);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii)
+    {
+        if (subid.isUpdated())
+        {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(ii);
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(),21);
+    EXPECT_GE(returned.size(),19);
+}
+
+
+TEST_F(valuefed_tests, publish_change_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    pubid.setOption(HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii)
+    {
+        if (subid.isUpdated())
+        {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(static_cast<int>(ii/10));
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(),21);
+    EXPECT_GE(returned.size(),19);
+}
+
+TEST_F(valuefed_tests, input_change_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    subid.setOption(HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE,true);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii)
+    {
+        if (subid.isUpdated())
+        {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(static_cast<int>(ii/10));
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(),21);
+    EXPECT_GE(returned.size(),19);
+}

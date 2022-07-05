@@ -310,7 +310,7 @@ TEST(InfoClass_tests, inputinfo_test)
     EXPECT_TRUE(!ret_data);
 
     auto hello_data = std::make_shared<helics::SmallBuffer>("hello world");
-    subI.addData(testHandle, helics::timeZero, 0, hello_data);
+    EXPECT_TRUE(subI.addData(testHandle, helics::timeZero, 0, hello_data));
     subI.updateTimeInclusive(helics::timeZero);
     ret_data = subI.getData(0);
 
@@ -319,14 +319,14 @@ TEST(InfoClass_tests, inputinfo_test)
 
     auto time_one_data = std::make_shared<helics::SmallBuffer>("time one");
     auto time_one_repeat_data = std::make_shared<helics::SmallBuffer>("time one repeat");
-    subI.addData(testHandle, 1, 0, time_one_data);
-    subI.addData(testHandle, 1, 0, time_one_repeat_data);
+    EXPECT_TRUE(subI.addData(testHandle, 1, 0, time_one_data));
+    EXPECT_TRUE(subI.addData(testHandle, 1, 0, time_one_repeat_data));
 
     subI.updateTimeInclusive(1.0);
     ret_data = subI.getData(0);
     EXPECT_EQ(ret_data->to_string(), "time one repeat");
-    subI.addData(testHandle, 2, 0, time_one_data);
-    subI.addData(testHandle, 2, 1, time_one_repeat_data);
+    EXPECT_TRUE(subI.addData(testHandle, 2, 0, time_one_data));
+    EXPECT_TRUE(subI.addData(testHandle, 2, 1, time_one_repeat_data));
 
     subI.updateTimeNextIteration(2.0);
     ret_data = subI.getData(0);

@@ -80,7 +80,7 @@ static auto recordComparison = [](const InputInfo::dataRecord& rec1,
         ((rec1.time == rec2.time) ? (rec1.iteration < rec2.iteration) : false);
 };
 
-void InputInfo::addData(GlobalHandle source_id,
+bool InputInfo::addData(GlobalHandle source_id,
                         Time valueTime,
                         unsigned int iteration,
                         std::shared_ptr<const SmallBuffer> data)
@@ -90,16 +90,47 @@ void InputInfo::addData(GlobalHandle source_id,
     for (index = 0; index < static_cast<int>(input_sources.size()); ++index) {
         if (input_sources[index] == source_id) {
             if (valueTime > deactivated[index]) {
-                return;
+                return false;
             }
             found = true;
             break;
         }
     }
     if (!found) {
-        return;
+        return false;
     }
-    if ((data_queues[index].empty()) || (valueTime > data_queues[index].back().time)) {
+    if (data_queues[index].empty()) {
+        if (current_data[index])
+        {
+            if (minTimeGap > timeZero) {
+                if ((valueTime - current_data_time[index].first) < minTimeGap) {
+                    return false;
+                }
+            }
+            if (only_update_on_change) {
+                if (*current_data[index] == *data) {
+                    return false;
+                }
+            }
+        }
+        data_queues[index].emplace_back(valueTime, iteration, std::move(data));
+    }
+
+    else if (valueTime > data_queues[index].back().time) {
+        if (minTimeGap > timeZero)
+        {
+            if ((valueTime - data_queues[index].back().time) < minTimeGap)
+            {
+                return false;
+            }
+        }
+        if (only_update_on_change)
+        {
+            if (*data_queues[index].back().data == *data)
+            {
+                return false;
+            }
+        }
         data_queues[index].emplace_back(valueTime, iteration, std::move(data));
     } else {
         dataRecord newRecord(valueTime, iteration, std::move(data));
@@ -107,8 +138,27 @@ void InputInfo::addData(GlobalHandle source_id,
                                   data_queues[index].end(),
                                   newRecord,
                                   recordComparison);
+        if (m != data_queues[index].begin())
+        {
+            auto prev=--m;
+            if (minTimeGap > timeZero)
+            {
+                if ((valueTime - prev->time) < minTimeGap)
+                {
+                    return false;
+                }
+            }
+            if (only_update_on_change)
+            {
+                if (*prev->data== *data)
+                {
+                    return false;
+                }
+            }
+        }
         data_queues[index].insert(m, std::move(newRecord));
     }
+    return true;
 }
 
 bool InputInfo::addSource(GlobalHandle newSource,
