@@ -22,13 +22,13 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck,
         }
     }
     if (only_update_on_change || forceChangeCheck) {
-        if (len != data.length() || std::string_view(data) != std::string_view(dataToCheck, len)) {
+        if (std::string_view(dataToCheck, len) != data.to_string()) {
             data.assign(dataToCheck, len);
         } else {
             return false;
         }
     } else if (buffer_data) {
-        data.assign(dataToCheck,len);
+        data.assign(dataToCheck, len);
     }
     lastPublishTime = currentTime;
     return true;
