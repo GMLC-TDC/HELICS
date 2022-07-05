@@ -100,8 +100,7 @@ bool InputInfo::addData(GlobalHandle source_id,
         return false;
     }
     if (data_queues[index].empty()) {
-        if (current_data[index])
-        {
+        if (current_data[index]) {
             if (minTimeGap > timeZero) {
                 if ((valueTime - current_data_time[index].first) < minTimeGap) {
                     return false;
@@ -117,17 +116,13 @@ bool InputInfo::addData(GlobalHandle source_id,
     }
 
     else if (valueTime > data_queues[index].back().time) {
-        if (minTimeGap > timeZero)
-        {
-            if ((valueTime - data_queues[index].back().time) < minTimeGap)
-            {
+        if (minTimeGap > timeZero) {
+            if ((valueTime - data_queues[index].back().time) < minTimeGap) {
                 return false;
             }
         }
-        if (only_update_on_change)
-        {
-            if (*data_queues[index].back().data == *data)
-            {
+        if (only_update_on_change) {
+            if (*data_queues[index].back().data == *data) {
                 return false;
             }
         }
@@ -138,20 +133,15 @@ bool InputInfo::addData(GlobalHandle source_id,
                                   data_queues[index].end(),
                                   newRecord,
                                   recordComparison);
-        if (m != data_queues[index].begin())
-        {
-            auto prev=--m;
-            if (minTimeGap > timeZero)
-            {
-                if ((valueTime - prev->time) < minTimeGap)
-                {
+        if (m != data_queues[index].begin()) {
+            auto prev = --m;
+            if (minTimeGap > timeZero) {
+                if ((valueTime - prev->time) < minTimeGap) {
                     return false;
                 }
             }
-            if (only_update_on_change)
-            {
-                if (*prev->data== *data)
-                {
+            if (only_update_on_change) {
+                if (*prev->data == *data) {
                     return false;
                 }
             }

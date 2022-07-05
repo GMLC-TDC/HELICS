@@ -186,7 +186,7 @@ bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, u
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);
-    auto res = pub->CheckSetValue(data, len,time_granted,only_transmit_on_change);
+    auto res = pub->CheckSetValue(data, len, time_granted, only_transmit_on_change);
     return res;
 }
 
@@ -329,12 +329,12 @@ void FederateState::createInterface(InterfaceType htype,
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
-        case InterfaceType::PUBLICATION: 
-            interfaceInformation.createPublication(handle, key, type, units,flags);
-           
-         break;
+        case InterfaceType::PUBLICATION:
+            interfaceInformation.createPublication(handle, key, type, units, flags);
+
+            break;
         case InterfaceType::INPUT:
-            interfaceInformation.createInput(handle, key, type, units,flags);
+            interfaceInformation.createInput(handle, key, type, units, flags);
             if (strict_input_type_checking) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::Options::STRICT_TYPE_CHECKING,
@@ -345,11 +345,11 @@ void FederateState::createInterface(InterfaceType htype,
                                                       defs::Options::IGNORE_UNIT_MISMATCH,
                                                       1);
             }
-         break;
+            break;
         case InterfaceType::ENDPOINT:
-            interfaceInformation.createEndpoint(handle, key, type,flags);
-            
-         break;
+            interfaceInformation.createEndpoint(handle, key, type, flags);
+
+            break;
         default:
             break;
     }
@@ -1305,18 +1305,17 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
                 if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
                     if (subI->addData(src,
-                        valueTime,
-                        cmd.counter,
-                        std::make_shared<const SmallBuffer>(std::move(cmd.payload))))
-                    {
-
+                                      valueTime,
+                                      cmd.counter,
+                                      std::make_shared<const SmallBuffer>(
+                                          std::move(cmd.payload)))) {
                         if (!subI->not_interruptible) {
                             timeCoord->updateValueTime(valueTime, !timeGranted_mode);
                             LOG_TRACE(timeCoord->printTimeStatus());
                         }
                         LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
-                            prettyPrintString(cmd),
-                            subI->getSourceName(src)));
+                                             prettyPrintString(cmd),
+                                             subI->getSourceName(src)));
                     }
                 }
             }
@@ -1415,12 +1414,12 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     }
                 }
                 if (getState() > FederateStates::CREATED) {
-                    if (pubI->buffer_data && pubI->lastPublishTime>Time::minVal()) {
+                    if (pubI->buffer_data && pubI->lastPublishTime > Time::minVal()) {
                         ActionMessage mv(CMD_PUB);
                         mv.setSource(pubI->id);
                         mv.setDestination(cmd.getSource());
                         mv.counter = static_cast<uint16_t>(getCurrentIteration());
-                        mv.payload=pubI->data;
+                        mv.payload = pubI->data;
                         mv.actionTime = pubI->lastPublishTime;
                         routeMessage(std::move(mv));
                     }

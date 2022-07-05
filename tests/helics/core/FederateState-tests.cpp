@@ -63,10 +63,10 @@ TEST_F(federateStateTests, constructor)
 TEST_F(federateStateTests, create_input)
 {
     using namespace helics;
-    fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units",0);
-    fs->interfaces().createInput(InterfaceHandle(1), "second", "type", "units",0);
-    fs->interfaces().createInput(InterfaceHandle(3), "last", "type", "units",0);
-    fs->interfaces().createInput(InterfaceHandle(2), "cut-in-line", "type", "units",0);
+    fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units", 0);
+    fs->interfaces().createInput(InterfaceHandle(1), "second", "type", "units", 0);
+    fs->interfaces().createInput(InterfaceHandle(3), "last", "type", "units", 0);
+    fs->interfaces().createInput(InterfaceHandle(2), "cut-in-line", "type", "units", 0);
 
     helics::InputInfo* info;
 
@@ -101,10 +101,11 @@ TEST_F(federateStateTests, create_input)
 
 TEST_F(federateStateTests, create_publication)
 {
-    fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units",0);
-    fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units",0);
-    fs->interfaces().createPublication(helics::InterfaceHandle(3), "last", "type", "units",0);
-    fs->interfaces().createPublication(helics::InterfaceHandle(2), "cut-in-line", "type", "units",0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units", 0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units", 0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(3), "last", "type", "units", 0);
+    fs->interfaces().createPublication(
+        helics::InterfaceHandle(2), "cut-in-line", "type", "units", 0);
 
     helics::PublicationInfo* info;
 
@@ -140,10 +141,10 @@ TEST_F(federateStateTests, create_publication)
 TEST_F(federateStateTests, create_endpoint)
 {
     using namespace helics;
-    fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type",0);
-    fs->interfaces().createEndpoint(InterfaceHandle(1), "second", "type",0);
-    fs->interfaces().createEndpoint(InterfaceHandle(3), "last", "type",0);
-    fs->interfaces().createEndpoint(InterfaceHandle(2), "cut-in-line", "type",0);
+    fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type", 0);
+    fs->interfaces().createEndpoint(InterfaceHandle(1), "second", "type", 0);
+    fs->interfaces().createEndpoint(InterfaceHandle(3), "last", "type", 0);
+    fs->interfaces().createEndpoint(InterfaceHandle(2), "cut-in-line", "type", 0);
 
     EndpointInfo* info;
 

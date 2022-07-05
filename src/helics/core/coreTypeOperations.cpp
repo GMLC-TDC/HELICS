@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <unordered_map>
 
-
 namespace frozen {
 template<>
 struct elsa<std::string_view> {
@@ -271,10 +270,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
 }
 
 static constexpr frozen::set<std::string_view, 5> global_match_strings{"any",
-                                                                     "all",
-                                                                     "data",
-                                                                     "string",
-                                                                     "block"};
+                                                                       "all",
+                                                                       "data",
+                                                                       "string",
+                                                                       "block"};
 
 bool matchingTypes(std::string_view type1, std::string_view type2)
 {

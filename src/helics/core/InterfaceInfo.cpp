@@ -263,13 +263,13 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
         case defs::Options::CONNECTION_OPTIONAL:
             ept->required = !bvalue;
             break;
-             case defs::Options::SINGLE_CONNECTION_ONLY:
+        case defs::Options::SINGLE_CONNECTION_ONLY:
             ept->required_connections = bvalue ? 1 : 0;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             ept->required_connections = !bvalue ? 0 : 1;
             break;
-            case defs::Options::CONNECTIONS:
+        case defs::Options::CONNECTIONS:
             ept->required_connections = value;
             break;
         default:

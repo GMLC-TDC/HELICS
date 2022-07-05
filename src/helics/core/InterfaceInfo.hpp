@@ -43,16 +43,16 @@ class InterfaceInfo {
                            std::string_view key,
                            std::string_view type,
                            std::string_view units,
-        std::uint16_t flags);
+                           std::uint16_t flags);
     void createInput(InterfaceHandle handle,
                      std::string_view key,
                      std::string_view type,
                      std::string_view units,
-        std::uint16_t flags);
+                     std::uint16_t flags);
     void createEndpoint(InterfaceHandle handle,
                         std::string_view endpointName,
                         std::string_view type,
-        std::uint16_t flags);
+                        std::uint16_t flags);
 
     auto getEndpoints() { return endpoints.lock(); }
     auto getPublications() { return publications.lock(); }

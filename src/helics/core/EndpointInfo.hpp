@@ -103,6 +103,6 @@ class EndpointInfo {
     const std::string& getDestinationTargets() const;
 
     /** check the interfaces for specific issues*/
-    void checkInterfacesForIssues(std::vector<std::pair<int, std::string>> &issues);
+    void checkInterfacesForIssues(std::vector<std::pair<int, std::string>>& issues);
 };
 }  // namespace helics

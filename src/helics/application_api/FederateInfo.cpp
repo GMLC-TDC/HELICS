@@ -14,14 +14,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
 #include "../core/helicsVersion.hpp"
+#include "frozen/string.h"
+#include "frozen/unordered_map.h"
 #include "gmlc/utilities/stringOps.h"
 
+#include <charconv>
 #include <iostream>
 #include <set>
 #include <utility>
-#include <charconv>
-#include "frozen/unordered_map.h"
-#include "frozen/string.h"
 
 namespace frozen {
 template<>
@@ -60,8 +60,6 @@ FederateInfo::FederateInfo(const std::string& args)
 {
     loadInfoFromArgsIgnoreOutput(args);
 }
-
-
 
 static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
@@ -208,7 +206,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTra
     {"connection_required", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionrequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
     {"connectionRequired", HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},
-     {"required",
+    {"required",
      HELICS_HANDLE_OPTION_CONNECTION_REQUIRED},  // LIKELY TO BE DEPRECATED In the future
     {"rollback", HELICS_FLAG_ROLLBACK},
     {"terminate_on_error", HELICS_FLAG_TERMINATE_ON_ERROR},
@@ -247,7 +245,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsT
     {"strictinputtypechecking", HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING},
     {"strictInputTypeChecking", HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING},
     {"connections", HELICS_HANDLE_OPTION_CONNECTIONS},
-    {"timerestricted",HELICS_HANDLE_OPTION_TIME_RESTRICTED},
+    {"timerestricted", HELICS_HANDLE_OPTION_TIME_RESTRICTED},
     {"timeRestricted", HELICS_HANDLE_OPTION_TIME_RESTRICTED},
     {"clear_priority_list", HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST},
     {"clearPriorityList", HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST},
@@ -259,7 +257,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsT
     {"multiinputhandlingmethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD},
     {"multiInputHandlingMethod", HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD}};
 
-static constexpr frozen::unordered_map<std::string_view, int,28> option_value_map{
+static constexpr frozen::unordered_map<std::string_view, int, 28> option_value_map{
     {"0", 0},
     {"1", 1},
     {"-", 0},
@@ -290,24 +288,25 @@ static constexpr frozen::unordered_map<std::string_view, int,28> option_value_ma
     {"vectorize", HELICS_MULTI_INPUT_VECTORIZE_OPERATION},
     {"diff", HELICS_MULTI_INPUT_DIFF_OPERATION}};
 
-//this one is used in a few places that can't use std::string
-static const std::unordered_map<std::string, int> log_level_map{{"none", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
-                                                      {"error", HELICS_LOG_LEVEL_ERROR},
-                                                      {"warning", HELICS_LOG_LEVEL_WARNING},
-                                                      {"summary", HELICS_LOG_LEVEL_SUMMARY},
-                                                      {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
-                                                      /** connections+ interface definitions*/
-                                                      {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
-                                                      /** interfaces + timing message*/
-                                                      {"timing", HELICS_LOG_LEVEL_TIMING},
-                                                      {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
-                                                      /** timing+ data transfer notices*/
-                                                      {"data", HELICS_LOG_LEVEL_DATA},
-                                                      /** same as data for now*/
-                                                      {"debug", HELICS_LOG_LEVEL_DEBUG},
-                                                      /** all internal messages*/
-                                                      {"trace", HELICS_LOG_LEVEL_TRACE}};
+// this one is used in a few places that can't use std::string
+static const std::unordered_map<std::string, int> log_level_map{
+    {"none", HELICS_LOG_LEVEL_NO_PRINT},
+    {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
+    {"error", HELICS_LOG_LEVEL_ERROR},
+    {"warning", HELICS_LOG_LEVEL_WARNING},
+    {"summary", HELICS_LOG_LEVEL_SUMMARY},
+    {"connections", HELICS_LOG_LEVEL_CONNECTIONS},
+    /** connections+ interface definitions*/
+    {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
+    /** interfaces + timing message*/
+    {"timing", HELICS_LOG_LEVEL_TIMING},
+    {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
+    /** timing+ data transfer notices*/
+    {"data", HELICS_LOG_LEVEL_DATA},
+    /** same as data for now*/
+    {"debug", HELICS_LOG_LEVEL_DEBUG},
+    /** all internal messages*/
+    {"trace", HELICS_LOG_LEVEL_TRACE}};
 
 static void loadFlags(FederateInfo& fi, const std::string& flags)
 {
@@ -356,7 +355,8 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
             } else if (ec == std::errc::invalid_argument) {
                 std::cerr << "unrecognized flag " << std::quoted(flg) << std::endl;
             } else if (ec == std::errc::result_out_of_range) {
-                std::cerr << "unrecognized flag numerical value out of range " << std::quoted(flg) << std::endl;
+                std::cerr << "unrecognized flag numerical value out of range " << std::quoted(flg)
+                          << std::endl;
             }
         }
     }
@@ -824,7 +824,7 @@ void FederateInfo::loadInfoFromToml(const std::string& tomlString, bool runArgPa
         if (prop.second > 200) {
             continue;
         }
-        fileops::callIfMember(doc, std::string(prop.first.data(),prop.first.size()), timeCall);
+        fileops::callIfMember(doc, std::string(prop.first.data(), prop.first.size()), timeCall);
     }
 
     processOptions(

@@ -42,7 +42,6 @@ struct fmt::formatter<std::complex<double>> {
     }
 };
 
-
 namespace frozen {
 template<>
 struct elsa<std::string_view> {
