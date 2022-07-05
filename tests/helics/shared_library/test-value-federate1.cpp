@@ -45,7 +45,6 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
     NoFree = true;
 }
 
-
 TEST_F(vfed_single_tests, publisher_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -329,7 +328,6 @@ TEST_F(vfed_single_tests, default_value_tests)
     helicsFederateFinalize(vFed1, &err);
 }
 
-
 TEST_F(vfed_single_tests, publication_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -367,7 +365,6 @@ TEST_F(vfed_single_tests, publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
 }
-
 
 TEST_P(vfed_type_tests, single_transfer)
 {
