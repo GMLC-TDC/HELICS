@@ -7,12 +7,15 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 
 #include "../common/JsonGeneration.hpp"
+#include "helics_definitions.hpp"
 //#include "core/core-data.hpp"
+#include "../common/fmt_format.h"
 
 #include <algorithm>
 #include <cstring>
 #include <memory>
 #include <utility>
+#include <set>
 
 namespace helics {
 
@@ -247,6 +250,63 @@ const std::string& EndpointInfo::getDestinationTargets() const
         }
     }
     return destinationTargets;
+}
+
+
+void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::string>> &issues)
+{
+    if (required) {
+            if (sourceInformation.empty() && targetInformation.empty()) {
+                issues.emplace_back(helics::defs::Errors::CONNECTION_FAILURE,
+                                    fmt::format("Endpoint {} is required but has no connections",
+                                                key));
+            }
+        }
+        if (required_connections > 0) {
+            auto max_connections=(std::max)(targetInformation.size(),sourceInformation.size());
+            auto sum_connections=targetInformation.size()+sourceInformation.size();
+
+            if (max_connections > static_cast<size_t>(required_connections)) {
+                if (required_connections == 1) {
+                    issues.emplace_back(
+                        helics::defs::Errors::CONNECTION_FAILURE,
+                        fmt::format(
+                            "Endpoint {} is single source only but has more than one connection",
+                            key));
+                } else {
+                    issues.emplace_back(
+                        helics::defs::Errors::CONNECTION_FAILURE,
+                        fmt::format("Endpoint {} requires {} connections but has at least {}",
+                                    key,
+                                    required_connections,
+                                    max_connections));
+                }
+            }
+            else
+            {
+                if (sum_connections != required_connections)
+                {
+                    std::set<GlobalHandle> handles;
+                    for (const auto& src : sourceInformation)
+                    {
+                        handles.emplace(src.id);
+                    }
+                    for (const auto& trg : targetInformation)
+                    {
+                         handles.emplace(trg.id);
+                    }
+                    if (handles.size() != required_connections)
+                    {
+                        issues.emplace_back(
+                        helics::defs::Errors::CONNECTION_FAILURE,
+                        fmt::format("Endpoint {} requires {} connections but has only {}",
+                                    key,
+                                    required_connections,
+                                    handles.size()));
+                    }
+                }
+            }
+        }
 }
 
 }  // namespace helics

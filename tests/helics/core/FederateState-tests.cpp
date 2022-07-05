@@ -24,7 +24,7 @@ struct federateStateTests: public ::testing::Test {
     std::unique_ptr<helics::FederateState> fs;
 };
 
-TEST_F(federateStateTests, constructor_test)
+TEST_F(federateStateTests, constructor)
 {
     // Check setting of name, initial state, and info by the constructor
     EXPECT_EQ(fs->getIdentifier(), "fed_name");
@@ -60,13 +60,13 @@ TEST_F(federateStateTests, constructor_test)
     EXPECT_EQ(fs->getIntegerProperty(helics::defs::Properties::MAX_ITERATIONS), 50);
 }
 
-TEST_F(federateStateTests, create_input_test)
+TEST_F(federateStateTests, create_input)
 {
     using namespace helics;
-    fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units");
-    fs->interfaces().createInput(InterfaceHandle(1), "second", "type", "units");
-    fs->interfaces().createInput(InterfaceHandle(3), "last", "type", "units");
-    fs->interfaces().createInput(InterfaceHandle(2), "cut-in-line", "type", "units");
+    fs->interfaces().createInput(InterfaceHandle(0), "first!", "type", "units",0);
+    fs->interfaces().createInput(InterfaceHandle(1), "second", "type", "units",0);
+    fs->interfaces().createInput(InterfaceHandle(3), "last", "type", "units",0);
+    fs->interfaces().createInput(InterfaceHandle(2), "cut-in-line", "type", "units",0);
 
     helics::InputInfo* info;
 
@@ -99,12 +99,12 @@ TEST_F(federateStateTests, create_input_test)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, create_publication_test)
+TEST_F(federateStateTests, create_publication)
 {
-    fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units");
-    fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units");
-    fs->interfaces().createPublication(helics::InterfaceHandle(3), "last", "type", "units");
-    fs->interfaces().createPublication(helics::InterfaceHandle(2), "cut-in-line", "type", "units");
+    fs->interfaces().createPublication(helics::InterfaceHandle(0), "first!", "type", "units",0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(1), "second", "type", "units",0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(3), "last", "type", "units",0);
+    fs->interfaces().createPublication(helics::InterfaceHandle(2), "cut-in-line", "type", "units",0);
 
     helics::PublicationInfo* info;
 
@@ -137,13 +137,13 @@ TEST_F(federateStateTests, create_publication_test)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, create_endpoint_test)
+TEST_F(federateStateTests, create_endpoint)
 {
     using namespace helics;
-    fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type");
-    fs->interfaces().createEndpoint(InterfaceHandle(1), "second", "type");
-    fs->interfaces().createEndpoint(InterfaceHandle(3), "last", "type");
-    fs->interfaces().createEndpoint(InterfaceHandle(2), "cut-in-line", "type");
+    fs->interfaces().createEndpoint(InterfaceHandle(0), "first!", "type",0);
+    fs->interfaces().createEndpoint(InterfaceHandle(1), "second", "type",0);
+    fs->interfaces().createEndpoint(InterfaceHandle(3), "last", "type",0);
+    fs->interfaces().createEndpoint(InterfaceHandle(2), "cut-in-line", "type",0);
 
     EndpointInfo* info;
 
@@ -176,7 +176,7 @@ TEST_F(federateStateTests, create_endpoint_test)
     EXPECT_EQ(info->key, "last");
 }
 
-TEST_F(federateStateTests, basic_processmessage_test)
+TEST_F(federateStateTests, basic_processmessage)
 {
     using namespace helics;
     ActionMessage cmd;
@@ -273,12 +273,12 @@ TEST_F(federateStateTests, basic_processmessage_test)
     */
 }
 
-TEST_F(federateStateTests, pubsub_test)
+TEST_F(federateStateTests, pubsub)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }
 
-TEST_F(federateStateTests, message_test)
+TEST_F(federateStateTests, message)
 {
     // auto fs_process = std::async(std::launch::async, [&]() { return fs->processQueue(); });
 }
