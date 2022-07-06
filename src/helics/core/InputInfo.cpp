@@ -113,9 +113,7 @@ bool InputInfo::addData(GlobalHandle source_id,
             }
         }
         data_queues[index].emplace_back(valueTime, iteration, std::move(data));
-    }
-
-    else if (valueTime > data_queues[index].back().time) {
+    } else if (valueTime > data_queues[index].back().time) {
         if (minTimeGap > timeZero) {
             if ((valueTime - data_queues[index].back().time) < minTimeGap) {
                 return false;

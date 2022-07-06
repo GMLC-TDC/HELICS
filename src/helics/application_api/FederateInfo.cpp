@@ -22,6 +22,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <set>
 #include <utility>
+#include <unordered_map>
 
 namespace frozen {
 template<>

@@ -275,6 +275,18 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
     return interfaces().getInput(handle)->getAllData();
 }
 
+std::pair<SmallBuffer, Time> FederateState::getPublishedValue(InterfaceHandle handle)
+{
+    auto* pub = interfaces().getPublication(handle);
+    if (pub != nullptr)
+    {
+
+        return { pub->data, pub->lastPublishTime };
+    }
+    return { SmallBuffer{},Time::minVal() };
+
+}
+
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {
@@ -1414,7 +1426,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     }
                 }
                 if (getState() > FederateStates::CREATED) {
-                    if (pubI->buffer_data && pubI->lastPublishTime > Time::minVal()) {
+                    if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
                         ActionMessage mv(CMD_PUB);
                         mv.setSource(pubI->id);
                         mv.setDestination(cmd.getSource());
