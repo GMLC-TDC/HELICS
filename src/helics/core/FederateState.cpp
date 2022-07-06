@@ -278,13 +278,10 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
 std::pair<SmallBuffer, Time> FederateState::getPublishedValue(InterfaceHandle handle)
 {
     auto* pub = interfaces().getPublication(handle);
-    if (pub != nullptr)
-    {
-
-        return { pub->data, pub->lastPublishTime };
+    if (pub != nullptr) {
+        return {pub->data, pub->lastPublishTime};
     }
-    return { SmallBuffer{},Time::minVal() };
-
+    return {SmallBuffer{}, Time::minVal()};
 }
 
 void FederateState::routeMessage(const ActionMessage& msg)

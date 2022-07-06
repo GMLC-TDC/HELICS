@@ -203,7 +203,6 @@ TEST_F(dynFed, observer_subscriber_value)
     vFed2->finalize();
 }
 
-
 /** now make sure we can get the values properly*/
 TEST_F(dynFed, observer_subscriber_value_with_buffer)
 {
@@ -233,8 +232,8 @@ TEST_F(dynFed, observer_subscriber_value_with_buffer)
 
     auto bname = brokers[0]->getIdentifier();
     auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
-        "coredyn",
-        std::string("--observer --broker=") + bname);
+                                            "coredyn",
+                                            std::string("--observer --broker=") + bname);
 
     EXPECT_TRUE(cdyn->connect());
     fi.coreName = "coredyn";
@@ -254,7 +253,7 @@ TEST_F(dynFed, observer_subscriber_value_with_buffer)
     fobs->query("root", "global_flush");
 
     EXPECT_NO_THROW(fobs->enterInitializingMode());
-    
+
     EXPECT_NO_THROW(fobs->enterExecutingMode());
     EXPECT_DOUBLE_EQ(obsSubs.getValue<double>(), 0.27);
     res = vFed1->requestTime(3.0);

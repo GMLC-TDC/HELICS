@@ -4087,10 +4087,10 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
             auto* handle = loopHandles.getHandleInfo(command.dest_handle.baseValue());
             if (handle != nullptr) {
                 setAsUsed(handle);
-                if (command.action() == CMD_ADD_SUBSCRIBER && fed->getState() > FederateStates::CREATED) {
-                    auto lastData=fed->getPublishedValue(command.dest_handle);
-                    if (lastData.second > Time::minVal() && !lastData.first.empty())
-                    {
+                if (command.action() == CMD_ADD_SUBSCRIBER &&
+                    fed->getState() > FederateStates::CREATED) {
+                    auto lastData = fed->getPublishedValue(command.dest_handle);
+                    if (lastData.second > Time::minVal() && !lastData.first.empty()) {
                         ActionMessage mv(CMD_PUB);
                         mv.setSource(handle->handle);
                         mv.setDestination(command.getSource());
@@ -4100,7 +4100,6 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
                     }
                 }
             }
-            
         }
     }
 }

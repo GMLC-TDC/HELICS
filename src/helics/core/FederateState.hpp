@@ -200,7 +200,7 @@ class FederateState {
     const std::vector<std::shared_ptr<const SmallBuffer>>& getAllValues(InterfaceHandle handle);
 
     /** getPublishedValue */
-    std::pair<SmallBuffer,Time> getPublishedValue(InterfaceHandle handle);
+    std::pair<SmallBuffer, Time> getPublishedValue(InterfaceHandle handle);
     /** set the CommonCore object that is managing this Federate*/
     void setParent(CommonCore* coreObject) { parent_ = coreObject; }
     /** update the info structure
