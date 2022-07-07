@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PublicationInfo.hpp"
+
 #include "helics_definitions.hpp"
 #include "helics_definitions.hpp"
 

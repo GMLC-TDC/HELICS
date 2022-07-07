@@ -24,8 +24,7 @@ void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       std::uint16_t flags)
 {
     auto cpHandle = publications.lock();
-    cpHandle->insert(
-        std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
+    cpHandle->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
     if (checkActionFlag(flags, required_flag)) {
         cpHandle->back()->setProperty(defs::Options::CONNECTION_REQUIRED, 1);
     }
@@ -166,7 +165,7 @@ bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t
     if (ipt == nullptr) {
         return false;
     }
-    ipt->setProperty(option,value);
+    ipt->setProperty(option, value);
     return true;
 }
 
@@ -176,7 +175,7 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     if (pub == nullptr) {
         return false;
     }
-    pub->setProperty(option,value);
+    pub->setProperty(option, value);
     return true;
 }
 
@@ -186,7 +185,7 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
     if (ept == nullptr) {
         return false;
     }
-    ept->setProperty(option,value);
+    ept->setProperty(option, value);
     ept->setProperty(option, value);
     return true;
 }
