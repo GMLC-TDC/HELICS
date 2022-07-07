@@ -131,7 +131,8 @@ class Broker {
     @param target the name of the source target*/
     virtual void addDestinationFilterToEndpoint(std::string_view filter,
                                                 std::string_view target) = 0;
-    /** make an alias for an interface, which is a second string that may be used for making connections
+    /** make an alias for an interface, which is a second string that may be used for making
+    connections
     @param interfaceKey the name of the original interface
     @param alias the second name by which it can be used
     */
