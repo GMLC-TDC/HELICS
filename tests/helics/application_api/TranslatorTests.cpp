@@ -250,7 +250,6 @@ TEST_F(translator, translator_connections4_alias)
     mFed2->finalizeAsync();
 
     mFed1->finalize();
-    // std::cout << "fFed returned\n";
     mFed2->finalizeComplete();
 
     FullDisconnect();
@@ -309,7 +308,6 @@ TEST_F(translator, translator_connections5_alias)
     mFed2->finalizeAsync();
 
     mFed1->finalize();
-    // std::cout << "fFed returned\n";
     mFed2->finalizeComplete();
 
     FullDisconnect();

@@ -525,7 +525,7 @@ TEST(handleManager, aliasCascadeExisting)
 
     const auto* p2 = h1.getPublication("pub");
     ASSERT_NE(p2, nullptr);
-    EXPECT_EQ(p1->key, "p1");
+    EXPECT_EQ(p2->key, "p1");
 }
 
 TEST(handleManager, aliasCascadeFuture)

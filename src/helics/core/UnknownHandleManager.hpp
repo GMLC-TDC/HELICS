@@ -110,8 +110,8 @@ class UnknownHandleManager {
         const std::function<void(const std::string& name, char type, GlobalHandle)>& cfunc) const;
 
     /** run a callback for each Unknown
-    @param cfunc a callback function with the signature of the name of the required interface a
-    character with the type 'p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint and
+    @param cfunc a callback function with the signature of the name of the required interface, a
+    character with the type ('p' for publication, 'i' for input, 'f' for filter, 'e' for endpoint), and
     the global handle.
     */
     void processUnknowns(
