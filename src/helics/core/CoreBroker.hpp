@@ -331,11 +331,11 @@ class CoreBroker: public Broker, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** find any existing publishers for a subscription*/
-    void FindandNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
-    void FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void FindAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void FindAndNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
-    void FindandNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
-    void FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void FindAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void FindAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/

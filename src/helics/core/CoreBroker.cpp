@@ -1888,7 +1888,7 @@ void CoreBroker::addPublication(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyPublicationTargets(pub, pub.key);
+        FindAndNotifyPublicationTargets(pub, pub.key);
     }
 }
 void CoreBroker::addInput(ActionMessage& m)
@@ -1913,7 +1913,7 @@ void CoreBroker::addInput(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyInputTargets(inp, inp.key);
+        FindAndNotifyInputTargets(inp, inp.key);
     }
 }
 
@@ -1953,7 +1953,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyEndpointTargets(ept, ept.key);
+        FindAndNotifyEndpointTargets(ept, ept.key);
     }
 }
 void CoreBroker::addFilter(ActionMessage& m)
@@ -1979,7 +1979,7 @@ void CoreBroker::addFilter(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyFilterTargets(filt, filt.key);
+        FindAndNotifyFilterTargets(filt, filt.key);
     }
 }
 
@@ -2018,9 +2018,9 @@ void CoreBroker::addTranslator(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyInputTargets(trans, trans.key);
-        FindandNotifyPublicationTargets(trans, trans.key);
-        FindandNotifyEndpointTargets(trans, trans.key);
+        FindAndNotifyInputTargets(trans, trans.key);
+        FindAndNotifyPublicationTargets(trans, trans.key);
+        FindAndNotifyEndpointTargets(trans, trans.key);
     }
 }
 
@@ -2481,25 +2481,25 @@ void CoreBroker::executeInitializationOperations()
         if (!foundAliasHandles[0].empty()) {
             for (const auto& target : foundAliasHandles[0]) {
                 auto* p = handles.getPublication(target);
-                FindandNotifyPublicationTargets(*p, target);
+                FindAndNotifyPublicationTargets(*p, target);
             }
         }
         if (!foundAliasHandles[1].empty()) {
             for (const auto& target : foundAliasHandles[1]) {
                 auto* p = handles.getInput(target);
-                FindandNotifyInputTargets(*p, target);
+                FindAndNotifyInputTargets(*p, target);
             }
         }
         if (!foundAliasHandles[2].empty()) {
             for (const auto& target : foundAliasHandles[2]) {
                 auto* p = handles.getEndpoint(target);
-                FindandNotifyEndpointTargets(*p, target);
+                FindAndNotifyEndpointTargets(*p, target);
             }
         }
         if (!foundAliasHandles[3].empty()) {
             for (const auto& target : foundAliasHandles[3]) {
                 auto* p = handles.getFilter(target);
-                FindandNotifyFilterTargets(*p, target);
+                FindAndNotifyFilterTargets(*p, target);
             }
         }
         if (unknownHandles.hasNonOptionalUnknowns()) {
@@ -2606,7 +2606,7 @@ void CoreBroker::executeInitializationOperations()
     logFlush();
 }
 
-void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key)
+void CoreBroker::FindAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
     auto Handles = unknownHandles.checkForInputs(key);
     for (auto& target : Handles) {
@@ -2636,7 +2636,7 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo, const st
     }
 }
 
-void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo,
+void CoreBroker::FindAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
                                                  const std::string& key)
 {
     auto subHandles = unknownHandles.checkForPublications(key);
@@ -2671,7 +2671,7 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo,
     }
 }
 
-void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key)
+void CoreBroker::FindAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
     auto Handles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : Handles) {
@@ -2718,7 +2718,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
     }
 }
 
-void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key)
+void CoreBroker::FindAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
     auto Handles = unknownHandles.checkForFilters(key);
     for (const auto& target : Handles) {

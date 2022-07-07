@@ -421,9 +421,9 @@ void HandleManager::addEndpointAlias(std::string_view interfaceName, std::string
             throw std::runtime_error("endpoint name already exists");
         }
     } else {
-        fnd = publications.find(alias);
-        if (fnd != publications.end()) {
-            publications.emplace(interfaceName, fnd->second.baseValue());
+        fnd = endpoints.find(alias);
+        if (fnd != endpoints.end()) {
+            endpoints.emplace(interfaceName, fnd->second.baseValue());
         }
     }
 }
