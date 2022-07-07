@@ -307,23 +307,23 @@ void EndpointInfo::setProperty(int32_t option, int32_t value)
 {
     bool bvalue = (value != 0);
     switch (option) {
-    case defs::Options::CONNECTION_REQUIRED:
-        required = bvalue;
-        break;
-    case defs::Options::CONNECTION_OPTIONAL:
-        required = !bvalue;
-        break;
-    case defs::Options::SINGLE_CONNECTION_ONLY:
-        required_connections = bvalue ? 1 : 0;
-        break;
-    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-        required_connections = !bvalue ? 0 : 1;
-        break;
-    case defs::Options::CONNECTIONS:
-        required_connections = value;
-        break;
-    default:
-        break;
+        case defs::Options::CONNECTION_REQUIRED:
+            required = bvalue;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            required = !bvalue;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            required_connections = bvalue ? 1 : 0;
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            required_connections = !bvalue ? 0 : 1;
+            break;
+        case defs::Options::CONNECTIONS:
+            required_connections = value;
+            break;
+        default:
+            break;
     }
 }
 
@@ -331,22 +331,22 @@ int32_t EndpointInfo::getProperty(int32_t option) const
 {
     bool flagval = false;
     switch (option) {
-    case defs::Options::CONNECTION_REQUIRED:
-        flagval = required;
-        break;
-    case defs::Options::CONNECTION_OPTIONAL:
-        flagval = !required;
-        break;
-    case defs::Options::SINGLE_CONNECTION_ONLY:
-        flagval=(required_connections ==1);
-        break;
-    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-        flagval=(required_connections !=1);
-        break;
-    case defs::Options::CONNECTIONS:
-        return static_cast<int32_t>(targetInformation.size());
-    default:
-        break;
+        case defs::Options::CONNECTION_REQUIRED:
+            flagval = required;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            flagval = !required;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            flagval = (required_connections == 1);
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            flagval = (required_connections != 1);
+            break;
+        case defs::Options::CONNECTIONS:
+            return static_cast<int32_t>(targetInformation.size());
+        default:
+            break;
     }
     return flagval ? 1 : 0;
 }

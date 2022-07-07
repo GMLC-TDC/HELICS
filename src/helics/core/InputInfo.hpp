@@ -142,6 +142,7 @@ class InputInfo {
 
     void setProperty(int32_t option, int32_t value);
     int32_t getProperty(int32_t option) const;
+
   private:
     bool updateData(dataRecord&& update, int index);
     mutable std::string inputUnits;

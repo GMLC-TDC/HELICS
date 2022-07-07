@@ -1224,10 +1224,12 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_single_type,
-                         ::testing::ValuesIn(CoreTypes_single),testNamer);
+                         ::testing::ValuesIn(CoreTypes_single),
+                         testNamer);
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_all_type_tests,
-                         ::testing::ValuesIn(CoreTypes_all),testNamer);
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);
 
 TEST_F(valuefed_tests, empty_get_default)
 {

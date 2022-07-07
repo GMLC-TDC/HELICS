@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "helics_definitions.hpp"
-
 #include "units/units.hpp"
 
 #include <algorithm>
@@ -446,44 +445,44 @@ void InputInfo::setProperty(int32_t option, int32_t value)
 {
     bool bvalue = (value != 0);
     switch (option) {
-    case defs::Options::IGNORE_INTERRUPTS:
-        not_interruptible = bvalue;
-        break;
-    case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
-        only_update_on_change = bvalue;
-        break;
-    case defs::Options::CONNECTION_REQUIRED:
-        required = bvalue;
-        break;
-    case defs::Options::CONNECTION_OPTIONAL:
-        required = !bvalue;
-        break;
-    case defs::Options::SINGLE_CONNECTION_ONLY:
-        required_connnections = bvalue ? 1 : 0;
-        break;
-    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-        required_connnections = bvalue ? 0 : 1;
-        break;
-    case defs::Options::STRICT_TYPE_CHECKING:
-        strict_type_matching = bvalue;
-        break;
-    case defs::Options::IGNORE_UNIT_MISMATCH:
-        ignore_unit_mismatch = bvalue;
-        break;
-    case defs::Options::CONNECTIONS:
-        required_connnections = value;
-        break;
-    case defs::Options::INPUT_PRIORITY_LOCATION:
-        priority_sources.push_back(value);
-        break;
-    case defs::Options::CLEAR_PRIORITY_LIST:
-        priority_sources.clear();
-        break;
-    case defs::Options::TIME_RESTRICTED:
-        minTimeGap = Time(value, time_units::ms);
-        break;
-    default:
-        break;
+        case defs::Options::IGNORE_INTERRUPTS:
+            not_interruptible = bvalue;
+            break;
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
+            only_update_on_change = bvalue;
+            break;
+        case defs::Options::CONNECTION_REQUIRED:
+            required = bvalue;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            required = !bvalue;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            required_connnections = bvalue ? 1 : 0;
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            required_connnections = bvalue ? 0 : 1;
+            break;
+        case defs::Options::STRICT_TYPE_CHECKING:
+            strict_type_matching = bvalue;
+            break;
+        case defs::Options::IGNORE_UNIT_MISMATCH:
+            ignore_unit_mismatch = bvalue;
+            break;
+        case defs::Options::CONNECTIONS:
+            required_connnections = value;
+            break;
+        case defs::Options::INPUT_PRIORITY_LOCATION:
+            priority_sources.push_back(value);
+            break;
+        case defs::Options::CLEAR_PRIORITY_LIST:
+            priority_sources.clear();
+            break;
+        case defs::Options::TIME_RESTRICTED:
+            minTimeGap = Time(value, time_units::ms);
+            break;
+        default:
+            break;
     }
 }
 
@@ -491,38 +490,38 @@ int32_t InputInfo::getProperty(int32_t option) const
 {
     bool flagval = false;
     switch (option) {
-    case defs::Options::IGNORE_INTERRUPTS:
-        flagval = not_interruptible;
-        break;
-    case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
-        flagval = only_update_on_change;
-        break;
-    case defs::Options::CONNECTION_REQUIRED:
-        flagval = required;
-        break;
-    case defs::Options::CONNECTION_OPTIONAL:
-        flagval = !required;
-        break;
-    case defs::Options::SINGLE_CONNECTION_ONLY:
-        flagval = (required_connnections == 1);
-        break;
-    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-        flagval = (required_connnections != 1);
-        break;
-    case defs::Options::STRICT_TYPE_CHECKING:
-        flagval = strict_type_matching;
-        break;
-    case defs::Options::CONNECTIONS:
-        return static_cast<int32_t>(input_sources.size());
-    case defs::Options::INPUT_PRIORITY_LOCATION:
-        return priority_sources.empty() ? -1 : priority_sources.back();
-    case defs::Options::CLEAR_PRIORITY_LIST:
-        flagval = priority_sources.empty();
-        break;
-    case defs::Options::TIME_RESTRICTED:
-        return static_cast<std::int32_t>(minTimeGap.to_ms().count());
-    default:
-        break;
+        case defs::Options::IGNORE_INTERRUPTS:
+            flagval = not_interruptible;
+            break;
+        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
+            flagval = only_update_on_change;
+            break;
+        case defs::Options::CONNECTION_REQUIRED:
+            flagval = required;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            flagval = !required;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            flagval = (required_connnections == 1);
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            flagval = (required_connnections != 1);
+            break;
+        case defs::Options::STRICT_TYPE_CHECKING:
+            flagval = strict_type_matching;
+            break;
+        case defs::Options::CONNECTIONS:
+            return static_cast<int32_t>(input_sources.size());
+        case defs::Options::INPUT_PRIORITY_LOCATION:
+            return priority_sources.empty() ? -1 : priority_sources.back();
+        case defs::Options::CLEAR_PRIORITY_LIST:
+            flagval = priority_sources.empty();
+            break;
+        case defs::Options::TIME_RESTRICTED:
+            return static_cast<std::int32_t>(minTimeGap.to_ms().count());
+        default:
+            break;
     }
     return flagval ? 1 : 0;
 }
