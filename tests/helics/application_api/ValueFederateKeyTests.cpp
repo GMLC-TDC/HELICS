@@ -37,6 +37,10 @@ class valuefed_all_type_tests:
 
 class valuefed_tests: public ::testing::Test, public FederateTestFixture {};
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -1220,10 +1224,10 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_single_type,
-                         ::testing::ValuesIn(CoreTypes_single));
+                         ::testing::ValuesIn(CoreTypes_single),testNamer);
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_all_type_tests,
-                         ::testing::ValuesIn(CoreTypes_all));
+                         ::testing::ValuesIn(CoreTypes_all),testNamer);
 
 TEST_F(valuefed_tests, empty_get_default)
 {

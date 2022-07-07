@@ -104,5 +104,8 @@ class EndpointInfo {
 
     /** check the interfaces for specific issues*/
     void checkInterfacesForIssues(std::vector<std::pair<int, std::string>>& issues);
+
+    void setProperty(int32_t option, int32_t value);
+    int32_t getProperty(int32_t option) const;
 };
 }  // namespace helics

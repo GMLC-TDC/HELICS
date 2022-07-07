@@ -50,5 +50,8 @@ class PublicationInfo {
 
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);
+
+    void setProperty(int32_t option, int32_t value);
+    int32_t getProperty(int32_t option) const;
 };
 }  // namespace helics

@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "PublicationInfo.hpp"
-
+#include "helics_definitions.hpp"
 #include <algorithm>
 #include <string_view>
 
@@ -51,4 +51,69 @@ void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
                       subscribers.end());
 }
 
+
+void PublicationInfo::setProperty(int32_t option, int32_t value)
+{
+    bool bvalue = (value != 0);
+    switch (option) {
+    case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
+        only_update_on_change = bvalue;
+        break;
+    case defs::Options::CONNECTION_REQUIRED:
+        required = bvalue;
+        break;
+    case defs::Options::CONNECTION_OPTIONAL:
+        required = !bvalue;
+        break;
+    case defs::Options::SINGLE_CONNECTION_ONLY:
+        required_connections = bvalue ? 1 : 0;
+        break;
+    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+        required_connections = !bvalue ? 0 : 1;
+        break;
+    case defs::Options::BUFFER_DATA:
+        buffer_data = bvalue;
+        break;
+    case defs::Options::CONNECTIONS:
+        required_connections = value;
+        break;
+    case defs::Options::TIME_RESTRICTED:
+        minTimeGap = Time(value, time_units::ms);
+        break;
+    default:
+        break;
+    }
+}
+
+int32_t PublicationInfo::getProperty(int32_t option) const
+{
+    bool flagval = false;
+    switch (option) {
+    case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
+        flagval = only_update_on_change;
+        break;
+    case defs::Options::CONNECTION_REQUIRED:
+        flagval = required;
+        break;
+    case defs::Options::CONNECTION_OPTIONAL:
+        flagval = !required;
+        break;
+    case defs::Options::SINGLE_CONNECTION_ONLY:
+        flagval = (required_connections == 1);
+        break;
+    case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+        flagval = required_connections != 1;
+        break;
+    case defs::Options::BUFFER_DATA:
+        flagval = buffer_data;
+        break;
+    case defs::Options::CONNECTIONS:
+        return static_cast<int32_t>(subscribers.size());
+    case defs::Options::TIME_RESTRICTED:
+        return static_cast<std::int32_t>(minTimeGap.to_ms().count());
+    default:
+        break;
+    }
+    return flagval ? 1 : 0;
+}
 }  // namespace helics
