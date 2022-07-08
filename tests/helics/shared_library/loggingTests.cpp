@@ -205,17 +205,18 @@ TEST(logging_tests, broker_logging)
 
 TEST(logging_tests, broker_logging_file)
 {
-    const char* lfile = "logb.txt";
-    std::cout << "test starting remove file" << std::endl;
+    const std::string lfile{ "logb.txt" };
+    std::cout << "test check removal" << std::endl;
     if (std::filesystem::exists(lfile))
     {
+        std::cout << "starting removal" << std::endl;
         std::filesystem::remove(lfile);
     }
     std::cout << "file removed starting broker" << std::endl;
     auto err = helicsErrorInitialize();
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
     std::cout << "broker started setting log file" << std::endl;
-    helicsBrokerSetLogFile(broker, lfile, &err);
+    helicsBrokerSetLogFile(broker, lfile.c_str(), &err);
     std::cout << "logfile set now disconnecting" << std::endl;
     helicsBrokerDisconnect(broker, &err);
     std::cout << "disconnected now closing" << std::endl;
@@ -229,7 +230,7 @@ TEST(logging_tests, broker_logging_file)
 
 TEST(logging_tests, core_logging_file)
 {
-    const char* lfile = "logc.txt";
+    const std::string lfile{ "logc.txt" };
     if (std::filesystem::exists(lfile))
     {
         std::filesystem::remove(lfile);
@@ -237,7 +238,7 @@ TEST(logging_tests, core_logging_file)
     auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
 
     auto err = helicsErrorInitialize();
-    helicsCoreSetLogFile(core, lfile, &err);
+    helicsCoreSetLogFile(core, lfile.c_str(), &err);
     helicsCoreDisconnect(core, &err);
     helicsCloseLibrary();
     ASSERT_TRUE(std::filesystem::exists(lfile));
@@ -246,7 +247,7 @@ TEST(logging_tests, core_logging_file)
 
 TEST(logging_tests, fed_logging_file)
 {
-    const char* lfile = "logf.txt";
+    const std::string lfile{ "logf.txt" };
     if (std::filesystem::exists(lfile))
     {
         std::filesystem::remove(lfile);
@@ -257,9 +258,9 @@ TEST(logging_tests, fed_logging_file)
     auto fi = helicsCreateFederateInfo();
     helicsFederateInfoSetCoreName(fi, "clogf", nullptr);
     auto fed = helicsCreateValueFederate("f1", fi, nullptr);
-    helicsFederateSetLogFile(fed, lfile, nullptr);
+    helicsFederateSetLogFile(fed, lfile.c_str(), nullptr);
 
-    helicsCoreSetLogFile(core, lfile, &err);
+    helicsCoreSetLogFile(core, lfile.c_str(), &err);
     helicsCoreDisconnect(core, &err);
     helicsFederateFinalize(fed, &err);
 
