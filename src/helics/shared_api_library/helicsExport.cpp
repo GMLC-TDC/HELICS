@@ -978,7 +978,6 @@ void helicsCloseLibrary(void)
     helics::BrokerFactory::cleanUpBrokers(std::chrono::milliseconds(2000));
 
     // helics::LoggerManager::closeLogger();
-    
 }
 
 void helicsAbort(int errorCode, const char* message)
