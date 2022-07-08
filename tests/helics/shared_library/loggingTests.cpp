@@ -207,8 +207,7 @@ TEST(logging_tests, broker_logging_file)
 {
     const std::string lfile{ "logb.txt" };
     std::cout << "test check removal" << std::endl;
-    if (std::filesystem::exists(lfile))
-    {
+    if (std::filesystem::exists(lfile)) {
         std::cout << "starting removal" << std::endl;
         std::filesystem::remove(lfile);
     }
@@ -231,8 +230,7 @@ TEST(logging_tests, broker_logging_file)
 TEST(logging_tests, core_logging_file)
 {
     const std::string lfile{ "logc.txt" };
-    if (std::filesystem::exists(lfile))
-    {
+    if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
     auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
@@ -248,8 +246,7 @@ TEST(logging_tests, core_logging_file)
 TEST(logging_tests, fed_logging_file)
 {
     const std::string lfile{ "logf.txt" };
-    if (std::filesystem::exists(lfile))
-    {
+    if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
     auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
