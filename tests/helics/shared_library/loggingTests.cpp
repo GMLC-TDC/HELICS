@@ -213,14 +213,14 @@ TEST(logging_tests, broker_logging_file)
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
     std::cout<<"broker started setting log file"<<std::endl;
     helicsBrokerSetLogFile(broker, lfile, &err);
-    std::cout<<"logfile set now disconnecting"<<std::endl;
+    std::cout << "logfile set now disconnecting" << std::endl;
     helicsBrokerDisconnect(broker, &err);
-    std::cout<<"disconneced now closing"<<std::endl;
+    std::cout << "disconnected now closing" << std::endl;
     helicsCloseLibrary();
-    std::cout<<"closed now deleting file"<<std::endl;
+    std::cout << "closed now deleting file" << std::endl;
     EXPECT_TRUE(std::filesystem::exists(lfile));
     std::filesystem::remove(lfile);
-    std::cout<<"file deleted"<<std::endl;
+    std::cout << "file deleted" << std::endl;
     EXPECT_EQ(err.error_code, 0);
 }
 
