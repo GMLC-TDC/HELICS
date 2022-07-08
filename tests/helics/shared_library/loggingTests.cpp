@@ -207,7 +207,10 @@ TEST(logging_tests, broker_logging_file)
 {
     const char* lfile = "logb.txt";
     std::cout<<"test starting remove file"<<std::endl;
-    std::filesystem::remove(lfile);
+    if (std::filesystem::exists(lfile))
+    {
+        std::filesystem::remove(lfile);
+    }
     std::cout<<"file removed starting broker"<<std::endl;
     auto err = helicsErrorInitialize();
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
@@ -218,7 +221,7 @@ TEST(logging_tests, broker_logging_file)
     std::cout << "disconnected now closing" << std::endl;
     helicsCloseLibrary();
     std::cout << "closed now deleting file" << std::endl;
-    EXPECT_TRUE(std::filesystem::exists(lfile));
+    ASSERT_TRUE(std::filesystem::exists(lfile));
     std::filesystem::remove(lfile);
     std::cout << "file deleted" << std::endl;
     EXPECT_EQ(err.error_code, 0);
@@ -227,21 +230,27 @@ TEST(logging_tests, broker_logging_file)
 TEST(logging_tests, core_logging_file)
 {
     const char* lfile = "logc.txt";
-    std::filesystem::remove(lfile);
+    if (std::filesystem::exists(lfile))
+    {
+        std::filesystem::remove(lfile);
+    }
     auto core = helicsCreateCore("inproc", "clog", "--autobroker --log_level=trace", nullptr);
 
     auto err = helicsErrorInitialize();
     helicsCoreSetLogFile(core, lfile, &err);
     helicsCoreDisconnect(core, &err);
     helicsCloseLibrary();
-    EXPECT_TRUE(std::filesystem::exists(lfile));
+    ASSERT_TRUE(std::filesystem::exists(lfile));
     std::filesystem::remove(lfile);
 }
 
 TEST(logging_tests, fed_logging_file)
 {
     const char* lfile = "logf.txt";
-    std::filesystem::remove(lfile);
+    if (std::filesystem::exists(lfile))
+    {
+        std::filesystem::remove(lfile);
+    }
     auto core = helicsCreateCore("inproc", "clogf", "--autobroker --log_level=trace", nullptr);
 
     auto err = helicsErrorInitialize();
@@ -257,6 +266,6 @@ TEST(logging_tests, fed_logging_file)
     helicsFederateSetLogFile(fed, "emptyfile.txt", nullptr);
     helicsFederateInfoFree(fi);
     helicsCloseLibrary();
-    EXPECT_TRUE(std::filesystem::exists(lfile));
+    ASSERT_TRUE(std::filesystem::exists(lfile));
     std::filesystem::remove(lfile);
 }
