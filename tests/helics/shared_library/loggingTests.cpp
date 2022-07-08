@@ -206,15 +206,15 @@ TEST(logging_tests, broker_logging)
 TEST(logging_tests, broker_logging_file)
 {
     const char* lfile = "logb.txt";
-    std::cout<<"test starting remove file"<<std::endl;
+    std::cout << "test starting remove file" << std::endl;
     if (std::filesystem::exists(lfile))
     {
         std::filesystem::remove(lfile);
     }
-    std::cout<<"file removed starting broker"<<std::endl;
+    std::cout << "file removed starting broker" << std::endl;
     auto err = helicsErrorInitialize();
     auto broker = helicsCreateBroker("inproc", "blog", "--log_level=trace", &err);
-    std::cout<<"broker started setting log file"<<std::endl;
+    std::cout << "broker started setting log file" << std::endl;
     helicsBrokerSetLogFile(broker, lfile, &err);
     std::cout << "logfile set now disconnecting" << std::endl;
     helicsBrokerDisconnect(broker, &err);
