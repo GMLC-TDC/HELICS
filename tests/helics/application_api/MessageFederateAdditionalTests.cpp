@@ -172,35 +172,35 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
         rxend = ept.getHandle();
         timeRx = rtime;
     };
-
+    std::cout<<"setting callback"<<std::endl;
     ep2.setCallback(mend);
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
-
+    std::cout<<"t1"<<std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     ep1.sendTo(data, "ep2");
-
+    std::cout<<"t2"<<std::endl;
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
-
+    std::cout<<"t3"<<std::endl;
     auto res = ep2.hasMessage();
     EXPECT_TRUE(res);
     res = ep1.hasMessage();
     EXPECT_TRUE(!res);
-
+    std::cout<<"t4"<<std::endl;
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
     auto M = ep2.getMessage();
     ASSERT_TRUE(M);
     ASSERT_EQ(M->data.size(), data.size());
-
+    std::cout<<"t5"<<std::endl;
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
-
+    std::cout<<"t6"<<std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
