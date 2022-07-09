@@ -194,14 +194,14 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
             auto cb = (*eptDat)[localEndpointIndex]->callback.load();
             if (cb) {
                 // need to be copied otherwise there is a potential race condition on lock removal
-                eptDat.unlock();
                 epts.unlock();
+                eptDat.unlock();
                 cb(currentEpt, CurrentTime);
                 eptDat = eptData.lock();
                 epts = local_endpoints.lock();
             } else if (mcall) {
-                eptDat.unlock();
                 epts.unlock();
+                eptDat.unlock();
                 mcall(currentEpt, CurrentTime);
                 eptDat = eptData.lock();
                 epts = local_endpoints.lock();
