@@ -219,7 +219,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     ep2.setCallback(mend);
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-
+    std::cout << "eexec1" << std::endl;
     mFed1->enterExecutingMode();
     std::cout << "eexec" << std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
@@ -264,6 +264,7 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     mFed2->setMessageNotificationCallback(epid2,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
+    std::cout<<"t1"<<std::endl;
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
