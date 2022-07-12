@@ -172,32 +172,35 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
         rxend = ept.getHandle();
         timeRx = rtime;
     };
-    std::cout << "setting callback" << std::endl;
+
     ep2.setCallback(mend);
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
+
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
     ep1.sendTo(data, "ep2");
+
     auto time = mFed1->requestTime(1.0);
     EXPECT_EQ(time, 1.0);
-    std::cout << "t3" << std::endl;
+
     auto res = ep2.hasMessage();
     EXPECT_TRUE(res);
     res = ep1.hasMessage();
     EXPECT_TRUE(!res);
-    std::cout << "t4" << std::endl;
+
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
     auto M = ep2.getMessage();
     ASSERT_TRUE(M);
     ASSERT_EQ(M->data.size(), data.size());
+
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
-    std::cout << "t6" << std::endl;
+
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
@@ -219,9 +222,9 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     ep2.setCallback(mend);
 
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
-    std::cout << "eexec1" << std::endl;
+
     mFed1->enterExecutingMode();
-    std::cout << "eexec" << std::endl;
+
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
@@ -242,7 +245,6 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     ASSERT_EQ(M->data.size(), data.size());
 
     EXPECT_EQ(M->data[245], data[245]);
-    std::cout << "finalize" << std::endl;
     mFed1->finalize();
 
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
@@ -264,7 +266,6 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     mFed2->setMessageNotificationCallback(epid2,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
-    std::cout << "t1" << std::endl;
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);

@@ -1091,7 +1091,7 @@ TEST_F(filter, callbacks)
     helicsFilterSetCustomCallback(f2, filterFunc1, nullptr, &err);
     EXPECT_NE(err.error_code, 0);
     helicsErrorClear(&err);
-    std::cout << "callbacks set" << std::endl;
+
     CE(helicsFederateEnterExecutingModeAsync(fFed, &err));
     CE(helicsFederateEnterExecutingMode(mFed, &err));
     CE(helicsFederateEnterExecutingModeComplete(fFed, &err));
@@ -1124,7 +1124,7 @@ TEST_F(filter, callbacks)
     EXPECT_STREQ(helicsMessageGetDestination(m2), "port2");
     EXPECT_EQ(helicsMessageGetByteCount(m2), static_cast<int64_t>(data.size()));
     EXPECT_EQ(helicsMessageGetTime(m2), 2.5);
-    std::cout << "t2" << std::endl;
+
     CE(helicsFederateRequestTime(mFed, 3.0, &err));
     CE(helicsFederateRequestTimeComplete(fFed, &err));
     CE(helicsFederateFinalizeAsync(mFed, &err));
