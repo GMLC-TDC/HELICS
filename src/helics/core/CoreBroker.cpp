@@ -207,6 +207,14 @@ void CoreBroker::addDestinationFilterToEndpoint(std::string_view filter, std::st
     addActionMessage(std::move(M));
 }
 
+void CoreBroker::addAlias(std::string_view interfaceKey, std::string_view alias)
+{
+    ActionMessage M(CMD_ADD_ALIAS);
+    M.name(interfaceKey);
+    M.setStringData(alias);
+    addActionMessage(std::move(M));
+}
+
 route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 {
     const auto& endpointName = mess.getString(targetStringLoc);
@@ -1096,6 +1104,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DATA_LINK:
         case CMD_ENDPOINT_LINK:
         case CMD_FILTER_LINK:
+        case CMD_ADD_ALIAS:
             linkInterfaces(command);
             break;
         case CMD_DISCONNECT_NAME:
@@ -1879,7 +1888,7 @@ void CoreBroker::addPublication(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyPublicationTargets(pub);
+        findAndNotifyPublicationTargets(pub, pub.key);
     }
 }
 void CoreBroker::addInput(ActionMessage& m)
@@ -1904,7 +1913,7 @@ void CoreBroker::addInput(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyInputTargets(inp);
+        findAndNotifyInputTargets(inp, inp.key);
     }
 }
 
@@ -1944,7 +1953,7 @@ void CoreBroker::addEndpoint(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyEndpointTargets(ept);
+        findAndNotifyEndpointTargets(ept, ept.key);
     }
 }
 void CoreBroker::addFilter(ActionMessage& m)
@@ -1970,7 +1979,7 @@ void CoreBroker::addFilter(ActionMessage& m)
     if (!isRootc) {
         transmit(parent_route_id, m);
     } else {
-        FindandNotifyFilterTargets(filt);
+        findAndNotifyFilterTargets(filt, filt.key);
     }
 }
 
@@ -2009,9 +2018,9 @@ void CoreBroker::addTranslator(ActionMessage& m)
             }
         }
     } else {
-        FindandNotifyInputTargets(trans);
-        FindandNotifyPublicationTargets(trans);
-        FindandNotifyEndpointTargets(trans);
+        findAndNotifyInputTargets(trans, trans.key);
+        findAndNotifyPublicationTargets(trans, trans.key);
+        findAndNotifyEndpointTargets(trans, trans.key);
     }
 }
 
@@ -2099,6 +2108,12 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 }
             }
         } break;
+        case CMD_ADD_ALIAS:
+            handles.addAlias(command.payload.to_string(), command.getString(targetStringLoc));
+            if (!isRootc) {
+                routeMessage(std::move(command), parent_broker_id);
+            }
+            break;
         default:
             break;
     }
@@ -2426,9 +2441,67 @@ void CoreBroker::executeInitializationOperations()
     }
     checkDependencies();
     if (!mTimeMonitorFederate.empty()) {
-        loadTimeMonitor(true, std::string{});
+        loadTimeMonitor(true, std::string_view{});
     }
     if (unknownHandles.hasUnknowns()) {
+        std::vector<std::vector<std::string>> foundAliasHandles;
+        foundAliasHandles.resize(4);
+        unknownHandles.processUnknowns([this, &foundAliasHandles](const std::string& target,
+                                                                  char type,
+                                                                  GlobalHandle /*handle*/) {
+            switch (type) {
+                case 'p': {
+                    const auto* p = handles.getPublication(target);
+                    if (p != nullptr) {
+                        foundAliasHandles[0].emplace_back(target);
+                    }
+                } break;
+                case 'i': {
+                    const auto* p = handles.getInput(target);
+                    if (p != nullptr) {
+                        foundAliasHandles[1].emplace_back(target);
+                    }
+                } break;
+                case 'e': {
+                    const auto* p = handles.getEndpoint(target);
+                    if (p != nullptr) {
+                        foundAliasHandles[2].emplace_back(target);
+                    }
+                } break;
+                case 'f': {
+                    const auto* p = handles.getFilter(target);
+                    if (p != nullptr) {
+                        foundAliasHandles[3].emplace_back(target);
+                    }
+                } break;
+                default:
+                    break;
+            }
+        });
+        if (!foundAliasHandles[0].empty()) {
+            for (const auto& target : foundAliasHandles[0]) {
+                auto* p = handles.getPublication(target);
+                findAndNotifyPublicationTargets(*p, target);
+            }
+        }
+        if (!foundAliasHandles[1].empty()) {
+            for (const auto& target : foundAliasHandles[1]) {
+                auto* p = handles.getInput(target);
+                findAndNotifyInputTargets(*p, target);
+            }
+        }
+        if (!foundAliasHandles[2].empty()) {
+            for (const auto& target : foundAliasHandles[2]) {
+                auto* p = handles.getEndpoint(target);
+                findAndNotifyEndpointTargets(*p, target);
+            }
+        }
+        if (!foundAliasHandles[3].empty()) {
+            for (const auto& target : foundAliasHandles[3]) {
+                auto* p = handles.getFilter(target);
+                findAndNotifyFilterTargets(*p, target);
+            }
+        }
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
@@ -2533,16 +2606,16 @@ void CoreBroker::executeInitializationOperations()
     logFlush();
 }
 
-void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
+void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
-    auto Handles = unknownHandles.checkForInputs(handleInfo.key);
+    auto Handles = unknownHandles.checkForInputs(key);
     for (auto& target : Handles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
 
         m.setDestination(target.first);
         m.setSource(handleInfo.handle);
-        m.payload = handleInfo.key;
+        m.payload = key;
         m.flags = handleInfo.flags;
         transmit(getRoute(m.dest_id), m);
 
@@ -2559,13 +2632,14 @@ void CoreBroker::FindandNotifyInputTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), std::move(m));
     }
     if (!Handles.empty()) {
-        unknownHandles.clearInput(handleInfo.key);
+        unknownHandles.clearInput(key);
     }
 }
 
-void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
+void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
+                                                 const std::string& key)
 {
-    auto subHandles = unknownHandles.checkForPublications(handleInfo.key);
+    auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
         // notify the publication about its subscriber
         ActionMessage m(CMD_ADD_SUBSCRIBER);
@@ -2579,13 +2653,13 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
         m.setAction(CMD_ADD_PUBLISHER);
         m.setDestination(sub.first);
         m.setSource(handleInfo.handle);
-        m.payload = handleInfo.key;
+        m.payload = key;
         m.flags = handleInfo.flags;
         m.setStringData(handleInfo.type, handleInfo.units);
         transmit(getRoute(m.dest_id), std::move(m));
     }
 
-    auto Pubtargets = unknownHandles.checkForLinks(handleInfo.key);
+    auto Pubtargets = unknownHandles.checkForLinks(key);
     for (const auto& sub : Pubtargets) {
         ActionMessage m(CMD_ADD_NAMED_INPUT);
         m.name(sub);
@@ -2593,20 +2667,20 @@ void CoreBroker::FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo)
         checkForNamedInterface(m);
     }
     if (!(subHandles.empty() && Pubtargets.empty())) {
-        unknownHandles.clearPublication(handleInfo.key);
+        unknownHandles.clearPublication(key);
     }
 }
 
-void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
+void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
-    auto Handles = unknownHandles.checkForEndpoints(handleInfo.key);
+    auto Handles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : Handles) {
         // notify the filter or endpoint about its target
         ActionMessage m(CMD_ADD_ENDPOINT);
         m.setSource(handleInfo.handle);
         m.setDestination(target.first);
         m.flags = target.second;
-        m.name(handleInfo.key);
+        m.name(key);
         if (!handleInfo.type.empty()) {
             m.setString(typeStringLoc, handleInfo.type);
         }
@@ -2629,7 +2703,7 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
         m.swapSourceDest();
         transmit(getRoute(m.dest_id), m);
     }
-    auto EptTargets = unknownHandles.checkForEndpointLinks(handleInfo.key);
+    auto EptTargets = unknownHandles.checkForEndpointLinks(key);
     for (const auto& ept : EptTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name(ept);
@@ -2640,13 +2714,13 @@ void CoreBroker::FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo)
     }
 
     if (!Handles.empty()) {
-        unknownHandles.clearEndpoint(handleInfo.key);
+        unknownHandles.clearEndpoint(key);
     }
 }
 
-void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
+void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key)
 {
-    auto Handles = unknownHandles.checkForFilters(handleInfo.key);
+    auto Handles = unknownHandles.checkForFilters(key);
     for (const auto& target : Handles) {
         // notify the endpoint about a filter
         ActionMessage m(CMD_ADD_FILTER);
@@ -2668,7 +2742,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         transmit(getRoute(m.dest_id), m);
     }
 
-    auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(handleInfo.key);
+    auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(key);
     for (const auto& target : FiltDestTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name(target);
@@ -2681,7 +2755,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         checkForNamedInterface(m);
     }
 
-    auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets(handleInfo.key);
+    auto FiltSourceTargets = unknownHandles.checkForFilterSourceTargets(key);
     for (const auto& target : FiltSourceTargets) {
         ActionMessage m(CMD_ADD_NAMED_ENDPOINT);
         m.name(target);
@@ -2693,7 +2767,7 @@ void CoreBroker::FindandNotifyFilterTargets(BasicHandleInfo& handleInfo)
         checkForNamedInterface(m);
     }
     if (!(Handles.empty() && FiltDestTargets.empty() && FiltSourceTargets.empty())) {
-        unknownHandles.clearFilter(handleInfo.key);
+        unknownHandles.clearFilter(key);
     }
 }
 

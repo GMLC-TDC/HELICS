@@ -1131,6 +1131,20 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             }
         }
     }
+
+    if (doc.isMember("aliases")) {
+        if (doc["aliases"].isArray()) {
+            for (auto& val : doc["aliases"]) {
+                addAlias(val[0].asString(), val[1].asString());
+            }
+        } else {
+            auto members = doc["aliases"].getMemberNames();
+            for (auto& val : members) {
+                addAlias(val, doc["aliases"][val].asString());
+            }
+        }
+    }
+
     loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
@@ -1269,6 +1283,20 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             }
         }
     }
+
+    if (isMember(doc, "aliases")) {
+        auto globals = toml::find(doc, "aliases");
+        if (globals.is_array()) {
+            for (auto& val : globals.as_array()) {
+                addAlias(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                         static_cast<std::string_view>(val.as_array()[1].as_string()));
+            }
+        } else {
+            for (const auto& val : globals.as_table()) {
+                addAlias(val.first, static_cast<std::string_view>(val.second.as_string()));
+            }
+        }
+    }
     loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
@@ -1382,6 +1410,11 @@ bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
 void Federate::setGlobal(std::string_view valueName, std::string_view value)
 {
     coreObject->setGlobal(valueName, value);
+}
+
+void Federate::addAlias(std::string_view interfaceName, std::string_view alias)
+{
+    coreObject->addAlias(interfaceName, alias);
 }
 
 void Federate::sendCommand(std::string_view target,
@@ -1511,6 +1544,12 @@ Translator& Federate::getTranslator(std::string_view translatorName)
     return trans;
 }
 
+void Federate::setTranslatorOperator(const Translator& trans,
+                                     std::shared_ptr<TranslatorOperator> op)
+{
+    coreObject->setTranslatorOperator(trans.getHandle(), std::move(op));
+}
+
 int Federate::getTranslatorCount() const
 {
     return cManager->getTranslatorCount();
@@ -1561,6 +1600,11 @@ void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType h
 void Interface::removeTarget(std::string_view targetToRemove)
 {
     cr->removeTarget(handle, targetToRemove);
+}
+
+void Interface::addAlias(std::string_view alias)
+{
+    cr->addAlias(getName(), alias);
 }
 
 const std::string& Interface::getInfo() const

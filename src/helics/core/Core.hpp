@@ -602,6 +602,13 @@ class Core {
      */
     virtual void linkEndpoints(std::string_view source, std::string_view dest) = 0;
 
+    /** add an interface alias
+    This allows an interface to be referred to by multiple keys
+    @param interfaceKey the name of the interface to generate an alias for
+    @param alias the additional identification string
+    */
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) = 0;
+
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
     virtual void makeConnections(const std::string& file) = 0;

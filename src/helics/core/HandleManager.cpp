@@ -6,6 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "HandleManager.hpp"
 
+#include <algorithm>
+
 namespace helics {
 BasicHandleInfo& HandleManager::addHandle(GlobalFederateId fed_id,
                                           InterfaceType what,
@@ -364,27 +366,233 @@ LocalFederateId HandleManager::getLocalFedID(InterfaceHandle handle) const
     return (isValidIndex(index, handles)) ? handles[index].local_fed_id : LocalFederateId{};
 }
 
+void HandleManager::addAlias(std::string_view interfaceName, std::string_view alias)
+{
+    // interfaceName needs to be stable to emplace here so we create a stable string in the aliases
+    // map
+    auto [aliasName, existing1] = alias_names.emplace(alias);
+    auto [iName, existing2] = alias_names.emplace(interfaceName);
+    const std::string& aliasStableName = *aliasName;
+    const std::string& interfaceStableName = *iName;
+
+    bool cascade = addAliasName(interfaceStableName, aliasStableName);
+
+    if (cascade) {
+        auto& aliasRange = aliases[interfaceStableName];
+        for (auto& I : aliasRange) {
+            if (I != alias) {
+                addPublicationAlias(I, interfaceStableName);
+                addInputAlias(I, interfaceStableName);
+                addEndpointAlias(I, interfaceStableName);
+                addFilterAlias(I, interfaceStableName);
+            }
+        }
+    }
+
+    // add aliases for existing interfaces
+    addPublicationAlias(interfaceName, *aliasName);
+    addInputAlias(interfaceName, *aliasName);
+    addEndpointAlias(interfaceName, *aliasName);
+    addFilterAlias(interfaceName, *aliasName);
+}
+
+void HandleManager::addPublicationAlias(std::string_view interfaceName, std::string_view alias)
+{
+    auto fnd = publications.find(interfaceName);
+    if (fnd != publications.end()) {
+        auto res = publications.try_emplace(alias, fnd->second.baseValue());
+        if (!res.second && res.first->second != fnd->second) {
+            throw std::runtime_error("publication name already exists");
+        }
+    } else {
+        fnd = publications.find(alias);
+        if (fnd != publications.end()) {
+            publications.emplace(interfaceName, fnd->second.baseValue());
+        }
+    }
+}
+
+void HandleManager::addEndpointAlias(std::string_view interfaceName, std::string_view alias)
+{
+    auto fnd = endpoints.find(interfaceName);
+    if (fnd != endpoints.end()) {
+        auto res = endpoints.try_emplace(alias, fnd->second.baseValue());
+        if (!res.second && res.first->second != fnd->second) {
+            throw std::runtime_error("endpoint name already exists");
+        }
+    } else {
+        fnd = endpoints.find(alias);
+        if (fnd != endpoints.end()) {
+            endpoints.emplace(interfaceName, fnd->second.baseValue());
+        }
+    }
+}
+
+void HandleManager::addFilterAlias(std::string_view interfaceName, std::string_view alias)
+{
+    auto fnd = filters.find(interfaceName);
+    if (fnd != filters.end()) {
+        auto res = filters.try_emplace(alias, fnd->second.baseValue());
+        if (!res.second && res.first->second != fnd->second) {
+            throw std::runtime_error("filter name already exists");
+        }
+    } else {
+        fnd = filters.find(alias);
+        if (fnd != filters.end()) {
+            filters.emplace(interfaceName, fnd->second.baseValue());
+        }
+    }
+}
+
+void HandleManager::addInputAlias(std::string_view interfaceName, std::string_view alias)
+{
+    auto fnd = inputs.find(interfaceName);
+    if (fnd != inputs.end()) {
+        auto res = inputs.try_emplace(alias, fnd->second.baseValue());
+        if (!res.second && res.first->second != fnd->second) {
+            throw std::runtime_error("input name already exists");
+        }
+    } else {
+        fnd = inputs.find(alias);
+        if (fnd != inputs.end()) {
+            inputs.emplace(interfaceName, fnd->second.baseValue());
+        }
+    }
+}
+
+bool HandleManager::addAliasName(std::string_view interfaceName, std::string_view alias)
+{
+    if (interfaceName == alias) {
+        return false;
+    }
+    bool cascading{false};
+    auto iN = aliases.find(interfaceName);
+    if (iN == aliases.end()) {
+        aliases[interfaceName].emplace_back(alias);
+        cascading = addAliasName(alias, interfaceName);
+    } else {
+        auto& v = aliases[interfaceName];
+        auto it = std::lower_bound(v.begin(), v.end(), alias);
+        if (it == v.end() || *it != alias) {
+            v.insert(it, alias);
+            cascading = true;
+            for (auto& otherAlias : v) {
+                addAliasName(otherAlias, alias);
+            }
+            addAliasName(alias, interfaceName);
+        }
+    }
+
+    return cascading;
+}
+
 void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index)
 {
     if (!handle.key.empty()) {
+        auto aliasRange = aliases.find(handle.key);
+
         switch (handle.handleType) {
-            case InterfaceType::ENDPOINT:
-                endpoints.emplace(handle.key, InterfaceHandle(index));
+            case InterfaceType::ENDPOINT: {
+                auto placed = endpoints.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed.second) {
+                    throw std::runtime_error("duplicate endpoint key found");
+                }
+                if (aliasRange != aliases.end()) {
+                    for (auto& alias : aliasRange->second) {
+                        placed = endpoints.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed.second) {
+                            throw std::runtime_error(std::string("duplicate endpoint alias key (") +
+                                                     std::string(alias) + ") found");
+                        }
+                    }
+                }
+
                 break;
-            case InterfaceType::PUBLICATION:
-                publications.emplace(handle.key, InterfaceHandle(index));
+            }
+            case InterfaceType::PUBLICATION: {
+                auto placed = publications.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed.second) {
+                    throw std::runtime_error("duplicate publication key found");
+                }
+                if (aliasRange != aliases.end()) {
+                    for (auto& alias : aliasRange->second) {
+                        placed = publications.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed.second) {
+                            throw std::runtime_error(
+                                std::string("duplicate publication alias key (") +
+                                std::string(alias) + ") found");
+                        }
+                    }
+                }
                 break;
-            case InterfaceType::FILTER:
-                filters.emplace(handle.key, InterfaceHandle(index));
+            }
+            case InterfaceType::FILTER: {
+                auto placed = filters.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed.second) {
+                    throw std::runtime_error("duplicate filter key found");
+                }
+                if (aliasRange != aliases.end()) {
+                    for (auto& alias : aliasRange->second) {
+                        placed = filters.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed.second) {
+                            throw std::runtime_error(std::string("duplicate filter alias key (") +
+                                                     std::string(alias) + ") found");
+                        }
+                    }
+                }
                 break;
-            case InterfaceType::INPUT:
-                inputs.emplace(handle.key, InterfaceHandle(index));
+            }
+            case InterfaceType::INPUT: {
+                auto placed = inputs.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed.second) {
+                    throw std::runtime_error("duplicate input key found");
+                }
+                if (aliasRange != aliases.end()) {
+                    for (auto& alias : aliasRange->second) {
+                        placed = inputs.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed.second) {
+                            throw std::runtime_error(std::string("duplicate input alias key (") +
+                                                     std::string(alias) + ") found");
+                        }
+                    }
+                }
                 break;
-            case InterfaceType::TRANSLATOR:
-                publications.emplace(handle.key, InterfaceHandle(index));
-                endpoints.emplace(handle.key, InterfaceHandle(index));
-                inputs.emplace(handle.key, InterfaceHandle(index));
+            }
+            case InterfaceType::TRANSLATOR: {
+                auto placed1 = publications.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed1.second) {
+                    throw std::runtime_error("duplicate publication key found");
+                }
+                auto placed2 = endpoints.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed2.second) {
+                    throw std::runtime_error("duplicate endpoint key found");
+                }
+                auto placed3 = inputs.try_emplace(handle.key, InterfaceHandle(index));
+                if (!placed3.second) {
+                    throw std::runtime_error("duplicate input key found");
+                }
+                if (aliasRange != aliases.end()) {
+                    for (auto& alias : aliasRange->second) {
+                        placed1 = endpoints.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed1.second) {
+                            throw std::runtime_error(std::string("duplicate endpoint alias key (") +
+                                                     std::string(alias) + ") found");
+                        }
+                        placed2 = inputs.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed2.second) {
+                            throw std::runtime_error(std::string("duplicate input alias key (") +
+                                                     std::string(alias) + ") found");
+                        }
+                        placed3 = publications.try_emplace(alias, InterfaceHandle(index));
+                        if (!placed3.second) {
+                            throw std::runtime_error(
+                                std::string("duplicate publication alias key (") +
+                                std::string(alias) + ") found");
+                        }
+                    }
+                }
                 break;
+            }
             default:
                 break;
         }

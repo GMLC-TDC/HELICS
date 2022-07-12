@@ -229,6 +229,61 @@ TEST_F(mfed_tests, send_receive_2fed_extra)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
+TEST_F(mfed_tests, send_receive_2fed_extra_alias)
+{
+    SetupTest<helics::MessageFederate>("test_7", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto epid = mFed1->registerEndpoint("ep1");
+    auto epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
+
+    mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    mFed2->addAlias("ep2", "endpoint2");
+    mFed1->addAlias("fed0/ep1", "magic");
+    auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
+    mFed2->enterExecutingMode();
+    f1finish.wait();
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    helics::SmallBuffer data(500, 'a');
+    helics::SmallBuffer data2(400, 'b');
+
+    epid.sendTo(data, "endpoint2");
+    epid2.sendTo(data2, "magic");
+    // move the time to 1.0
+    auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
+    auto gtime = mFed2->requestTime(1.0);
+
+    EXPECT_EQ(gtime, 1.0);
+    EXPECT_EQ(f1time.get(), 1.0);
+
+    auto res = mFed1->hasMessage();
+    EXPECT_TRUE(res);
+    res = mFed1->hasMessage(epid);
+    EXPECT_TRUE(res);
+    res = mFed2->hasMessage(epid2);
+    EXPECT_TRUE(res);
+
+    auto M1 = mFed1->getMessage(epid);
+    ASSERT_TRUE(M1);
+    ASSERT_EQ(M1->data.size(), data2.size());
+
+    EXPECT_EQ(M1->data[245], data2[245]);
+
+    auto M2 = mFed2->getMessage(epid2);
+    ASSERT_TRUE(M2);
+    ASSERT_EQ(M2->data.size(), data.size());
+
+    EXPECT_EQ(M2->data[245], data[245]);
+    mFed1->finalizeAsync();
+    mFed2->finalize();
+    mFed1->finalizeComplete();
+    EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+    EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
+}
+
 TEST_P(mfed_type_tests, send_receive_2fed_obj)
 {
     using namespace helics;

@@ -193,6 +193,13 @@ void CoreApp::addDestinationFilterToEndpoint(std::string_view filter, std::strin
     }
 }
 
+void CoreApp::addAlias(std::string_view interfaceName, std::string_view alias)
+{
+    if (core) {
+        core->addAlias(interfaceName, alias);
+    }
+}
+
 void CoreApp::makeConnections(const std::string& file)
 {
     if (core) {

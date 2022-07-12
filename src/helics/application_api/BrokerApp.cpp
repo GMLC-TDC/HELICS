@@ -198,6 +198,13 @@ void BrokerApp::addDestinationFilterToEndpoint(std::string_view filter, std::str
     }
 }
 
+void BrokerApp::addAlias(std::string_view interfaceName, std::string_view alias)
+{
+    if (broker) {
+        broker->addAlias(interfaceName, alias);
+    }
+}
+
 void BrokerApp::makeConnections(const std::string& file)
 {
     if (broker) {
