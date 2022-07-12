@@ -264,6 +264,12 @@ int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer 
     }
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
 int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
 {
     auto* ptr = getBuffer(data);
@@ -278,6 +284,10 @@ int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsData
         return 0;
     }
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 int helicsDataBufferType(HelicsDataBuffer data)
 {
@@ -503,6 +513,12 @@ void helicsDataBufferToVector(HelicsDataBuffer data, double values[], int maxlen
     }
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
 void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int maxlen, int* actualSize)
 {
     if ((values == nullptr) || (maxlen <= 0)) {
@@ -529,6 +545,10 @@ void helicsDataBufferToComplexVector(HelicsDataBuffer data, double values[], int
         *actualSize = length;
     }
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 void helicsDataBufferToNamedPoint(HelicsDataBuffer data, char* outputString, int maxStringLength, int* actualLength, double* val)
 {

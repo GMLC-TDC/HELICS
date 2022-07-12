@@ -120,7 +120,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
@@ -168,7 +168,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
@@ -214,7 +214,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
