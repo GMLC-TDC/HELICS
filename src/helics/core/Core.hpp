@@ -754,6 +754,13 @@ class Core {
     virtual void setTranslatorOperator(InterfaceHandle translator,
                                        std::shared_ptr<TranslatorOperator> callback) = 0;
 
+    /** set the callback Federate operators
+    @param translator  the handle of the translator
+    @param callback pointer to the operator class executing the federate
+    */
+    virtual void setFederateOperator(LocalFederateId fed,
+        std::shared_ptr<FederateOperator> callback) = 0;
+
     /** define a logging function to use for logging message and notices from the federation and
     individual federate
     @param federateID  the identifier for the individual federate or 0 for the Core Logger

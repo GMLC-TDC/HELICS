@@ -2416,6 +2416,31 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     actionQueue.push(transOpUpdate);
 }
 
+
+void CommonCore::setFederateOperator(LocalFederateId federateID,
+    std::shared_ptr<FederateOperator> callbacks)
+{
+    static std::shared_ptr<FederateOperator> nullFederate =
+        std::make_shared<NullFederateOperator>();
+
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("FederateID is not valid (setLoggingCallback)"));
+    }
+
+    ActionMessage fedOpUpdate(CMD_CORE_CONFIGURE);
+    fedOpUpdate.messageID = UPDATE_FEDERATE_OPERATOR;
+    if (!callbacks) {
+        callbacks = nullFederate;
+    }
+    auto ii = getNextAirlockIndex();
+    dataAirlocks[ii].load(std::move(callbacks));
+   fedOpUpdate.counter = ii;
+    fedOpUpdate.source_id = fed->global_id.load();
+    actionQueue.push(fedOpUpdate);
+}
+
+
 void CommonCore::setIdentifier(std::string_view name)
 {
     if (getBrokerState() == BrokerState::CREATED) {
