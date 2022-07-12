@@ -205,7 +205,7 @@ TEST(logging_tests, broker_logging)
 
 TEST(logging_tests, broker_logging_file)
 {
-    const std::string lfile{ "logb.txt" };
+    const std::string lfile{"logb.txt"};
     std::cout << "test check removal" << std::endl;
     if (std::filesystem::exists(lfile)) {
         std::cout << "starting removal" << std::endl;
@@ -229,7 +229,7 @@ TEST(logging_tests, broker_logging_file)
 
 TEST(logging_tests, core_logging_file)
 {
-    const std::string lfile{ "logc.txt" };
+    const std::string lfile{"logc.txt"};
     if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
@@ -245,7 +245,7 @@ TEST(logging_tests, core_logging_file)
 
 TEST(logging_tests, fed_logging_file)
 {
-    const std::string lfile{ "logf.txt" };
+    const std::string lfile{"logf.txt"};
     if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
