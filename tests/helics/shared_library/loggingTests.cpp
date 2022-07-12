@@ -206,7 +206,7 @@ TEST(logging_tests, broker_logging)
 TEST(logging_tests, broker_logging_file)
 {
     const std::string lfile{"logb.txt"};
-   
+
     if (std::filesystem::exists(lfile)) {
         std::filesystem::remove(lfile);
     }
