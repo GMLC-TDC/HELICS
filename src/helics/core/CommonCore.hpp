@@ -232,6 +232,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void
         setTranslatorOperator(InterfaceHandle translator,
                               std::shared_ptr<TranslatorOperator> callbacks) override final;
+    virtual void setFederateOperator(LocalFederateId federateID,
+        std::shared_ptr<FederateOperator> callback) override;
     /** set the local identification for the core*/
     void setIdentifier(std::string_view name);
     /** get the local identifier for the core*/

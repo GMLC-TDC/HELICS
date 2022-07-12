@@ -58,8 +58,7 @@ int main(int argc, char* argv[])  // NOLINT
             "helics-broker <broker args ..> starts a broker with the given args and waits for it to "
             "complete\n")
         ->footer([]() {
-            helics::BrokerApp app{"-?"};
-            (void)(app);
+            [[maybe_unused]] helics::BrokerApp app{"-?"};
             return std::string{};
         });
     cmdLine.allow_extras();
