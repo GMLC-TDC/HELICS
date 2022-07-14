@@ -632,9 +632,12 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     // Returns a bad request response
     auto const bad_request = [&req](beast::string_view why) {
         http::response<http::string_body> res{http::status::bad_request, req.version()};
-        res.set(http::field::server, "HELICS_WEB_SERVER" HELICS_VERSION_STRING);
+        res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
+
+        res.set(http::field::access_control_allow_origin, "*");
+
         res.body() = std::string(why);
         res.prepare_payload();
         return res;
@@ -646,6 +649,9 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
         res.keep_alive(req.keep_alive());
+
+        res.set(http::field::access_control_allow_origin, "*");
+
         res.body() = std::string(why);
         res.prepare_payload();
         return res;
@@ -657,6 +663,11 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, content_type);
         res.keep_alive(req.keep_alive());
+
+        res.set(http::field::access_control_allow_origin, "*");
+        res.set(http::field::access_control_allow_methods, "*");
+        res.set(http::field::access_control_allow_headers, "*");
+
         if (req.method() != http::verb::head) {
             res.body() = resp;
             res.prepare_payload();
@@ -681,6 +692,8 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
         case http::verb::delete_:
             command = cmd::remove;
             break;
+        case http::verb::options:
+            return send(response_ok("{\"success\":true}", "application/json"));
         default:
             return send(bad_request("Unknown HTTP-method"));
     }
