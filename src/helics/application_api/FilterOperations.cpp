@@ -46,7 +46,7 @@ void DelayFilterOperation::setString(std::string_view property, std::string_view
 {
     if (property == "delay") {
         try {
-            delay = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
+            delay = gmlc::utilities::loadTimeFromString<helics::Time>(val);
         }
         catch (const std::invalid_argument&) {
             throw(helics::InvalidParameter(std::string(val) + " is not a valid time string"));
@@ -209,11 +209,11 @@ void RandomDelayFilterOperation::setString(std::string_view property, std::strin
         }
     } else if ((property == "param1") || (property == "mean") || (property == "min") ||
                (property == "alpha")) {
-        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
+        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(val);
         rdelayGen->param1.store(static_cast<double>(tm));
     } else if ((property == "param2") || (property == "stddev") || (property == "max") ||
                (property == "beta")) {
-        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(val));
+        auto tm = gmlc::utilities::loadTimeFromString<helics::Time>(val);
         rdelayGen->param2.store(static_cast<double>(tm));
     }
 }
