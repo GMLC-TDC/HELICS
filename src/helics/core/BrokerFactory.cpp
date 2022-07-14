@@ -314,7 +314,7 @@ void addAssociatedBrokerType(std::string_view name, CoreType type)
     addExtraTypes(sname, type);
 }
 
-static const std::string helpStr{"--help"};
+static constexpr std::string_view helpStr{"--help"};
 
 void displayHelp(CoreType type)
 {

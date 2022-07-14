@@ -6,14 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "gtest/gtest.h"
 
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
-
 #ifndef DISABLE_SYSTEM_CALL_TESTS
 #    include "exeTestHelper.h"
 #endif
@@ -23,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Recorder.hpp"
 
 #include <cstdio>
+#include <filesystem>
 #include <future>
 #include <thread>
 
@@ -620,17 +613,17 @@ TEST(recorder_tests, recorder_test_saveFile1)
     fut.get();
     EXPECT_EQ(rec1.messageCount(), 2U);
 
-    auto filename = ghc::filesystem::temp_directory_path() / "savefile.txt";
+    auto filename = std::filesystem::temp_directory_path() / "savefile.txt";
     rec1.saveFile(filename.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename));
+    EXPECT_TRUE(std::filesystem::exists(filename));
 
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile.json";
+    auto filename2 = std::filesystem::temp_directory_path() / "savefile.json";
     rec1.saveFile(filename2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename2));
-    ghc::filesystem::remove(filename);
-    ghc::filesystem::remove(filename2);
+    EXPECT_TRUE(std::filesystem::exists(filename2));
+    std::filesystem::remove(filename);
+    std::filesystem::remove(filename2);
 }
 
 TEST(recorder_tests, recorder_test_saveFile2)
@@ -666,17 +659,17 @@ TEST(recorder_tests, recorder_test_saveFile2)
 
     auto m2 = rec1.getMessage(4);
     EXPECT_TRUE(!m2);
-    auto filename = ghc::filesystem::temp_directory_path() / "savefile.txt";
+    auto filename = std::filesystem::temp_directory_path() / "savefile.txt";
     rec1.saveFile(filename.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename));
+    EXPECT_TRUE(std::filesystem::exists(filename));
 
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile.json";
+    auto filename2 = std::filesystem::temp_directory_path() / "savefile.json";
     rec1.saveFile(filename2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename2));
-    ghc::filesystem::remove(filename);
-    ghc::filesystem::remove(filename2);
+    EXPECT_TRUE(std::filesystem::exists(filename2));
+    std::filesystem::remove(filename);
+    std::filesystem::remove(filename2);
 }
 
 TEST(recorder_tests, recorder_test_saveFile3)
@@ -740,17 +733,17 @@ TEST(recorder_tests, recorder_test_saveFile3)
     EXPECT_EQ(rec1.messageCount(), 2U);
     EXPECT_EQ(rec1.pointCount(), 3U);
 
-    auto filename = ghc::filesystem::temp_directory_path() / "savefile.txt";
+    auto filename = std::filesystem::temp_directory_path() / "savefile.txt";
     rec1.saveFile(filename.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename));
+    EXPECT_TRUE(std::filesystem::exists(filename));
 
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile.json";
+    auto filename2 = std::filesystem::temp_directory_path() / "savefile.json";
     rec1.saveFile(filename2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(filename2));
-    ghc::filesystem::remove(filename);
-    ghc::filesystem::remove(filename2);
+    EXPECT_TRUE(std::filesystem::exists(filename2));
+    std::filesystem::remove(filename);
+    std::filesystem::remove(filename2);
 }
 
 TEST(recorder_tests, recorder_test_help)

@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.23)
+cmake_minimum_required(VERSION 3.11...3.23)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
@@ -15,14 +15,14 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.2.1)
+project(HELICS VERSION 3.3.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2022-06-16")
+set(HELICS_DATE "2022-06-18")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -510,7 +510,7 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(helics_base INTERFACE rt)
 endif()
 
-target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
+target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=1")
 target_compile_definitions(helics_base INTERFACE "USE_STD_OPTIONAL=1")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
@@ -587,8 +587,6 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
-# TODO(PT): this should be removed when we require a compiler with the filesystem header defined
-target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)

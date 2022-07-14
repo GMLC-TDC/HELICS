@@ -110,6 +110,7 @@ Input& ValueFederateManager::registerInput(std::string_view key,
 void ValueFederateManager::addAlias(const Input& inp, std::string_view shortcutName)
 {
     if (inp.isValid()) {
+        coreObject->addAlias(inp.getName(), shortcutName);
         auto inpHandle = inputs.lock();
         inpHandle->addSearchTerm(shortcutName, inp.handle);
         targetIDs.lock()->emplace(shortcutName, inp.handle);
@@ -121,6 +122,7 @@ void ValueFederateManager::addAlias(const Input& inp, std::string_view shortcutN
 void ValueFederateManager::addAlias(const Publication& pub, std::string_view shortcutName)
 {
     if (pub.isValid()) {
+        coreObject->addAlias(pub.getName(), shortcutName);
         auto pubHandle = publications.lock();
         pubHandle->addSearchTerm(shortcutName, pub.handle);
     } else {
@@ -401,7 +403,7 @@ std::vector<int> ValueFederateManager::queryUpdates()
     }
     return updates;
 }
-
+// NOLINTNEXTLINE
 static const std::string emptyStr;
 
 const std::string& ValueFederateManager::getTarget(const Input& inp) const

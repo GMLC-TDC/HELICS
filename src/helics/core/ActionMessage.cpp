@@ -144,6 +144,7 @@ void ActionMessage::setAction(action_message_def::action_t newAction)
     messageAction = newAction;
 }
 
+// NOLINTNEXTLINE
 static const std::string emptyStr;
 const std::string& ActionMessage::getString(int index) const
 {
@@ -566,7 +567,7 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
     if (bytesUsed == 0U) {
         if (from_json_string(
                 std::string_view(reinterpret_cast<const char*>(bytes) + 4, message_size - 4))) {
-            bytesUsed = message_size + 4;
+            bytesUsed = static_cast<std::size_t>(message_size) + 4;
         }
     }
     return (bytesUsed > 0) ? message_size + 2 : 0;

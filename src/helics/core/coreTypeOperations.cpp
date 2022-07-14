@@ -112,22 +112,23 @@ static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
     {"test1", CoreType::TEST},
     {"multi", CoreType::MULTI}};
 
-CoreType coreTypeFromString(std::string type) noexcept
+CoreType coreTypeFromString(std::string_view type) noexcept
 {
     if (type.empty()) {
         return CoreType::DEFAULT;
     }
-    auto fnd = coreTypes.find(frozen::string(type));
+    const auto* fnd = coreTypes.find(frozen::string(type));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
-    fnd = coreTypes.find(frozen::string(type));
+    std::string type2{type};
+    std::transform(type2.cbegin(), type2.cend(), type2.begin(), ::tolower);
+    fnd = coreTypes.find(frozen::string(type2));
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    if ((type.front() == '=') || (type.front() == '-')) {
-        return coreTypeFromString(type.substr(1));
+    if ((type2.front() == '=') || (type2.front() == '-')) {
+        return coreTypeFromString(type2.substr(1));
     }
     if (type.compare(0, 4, "zmq2") == 0) {
         return CoreType::ZMQ_SS;
@@ -236,7 +237,8 @@ bool isCoreTypeAvailable(CoreType type) noexcept
         case CoreType::TCP_SS:
             available = tcp_availability;
             break;
-        case CoreType::DEFAULT:  // default should always be available
+        case CoreType::DEFAULT:  // default and empty should always be available
+        case CoreType::EMPTY:
             available = true;
             break;
         case CoreType::INPROC:
@@ -244,11 +246,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
             break;
         case CoreType::HTTP:
         case CoreType::WEBSOCKET:
-        case CoreType::NULLCORE:
-            available = false;
+            return false;  // these are not yet built
             break;
-        case CoreType::EMPTY:
-            available = true;
+        case CoreType::NULLCORE:
+            available = false;  // nullcore is never available
             break;
         default:
             break;
@@ -274,7 +275,7 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
     if ((type1.compare(0, 3, "def") == 0) || (type2.compare(0, 3, "def") == 0)) {
         return true;
     }
-    auto res = global_match_strings.find(type1);
+    const auto* res = global_match_strings.find(type1);
     if (res != global_match_strings.end()) {
         return true;
     }

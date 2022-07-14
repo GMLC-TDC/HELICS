@@ -46,7 +46,7 @@ class HELICS_CXX_EXPORT Translator: public Interface {
     /** construct from handle and core*/
     Translator(Core* core, std::string_view translatorName, InterfaceHandle ihandle);
     /** construct through a core object*/
-    explicit Translator(Core* cr, std::string_view translatorName = emptyString);
+    explicit Translator(Core* core, std::string_view translatorName = emptyString);
     /** virtual destructor*/
     virtual ~Translator() = default;
 

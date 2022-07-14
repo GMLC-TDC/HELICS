@@ -50,12 +50,12 @@ std::string getName(const toml::value& element);
 
 /** get a string value or use the default if it is not a member*/
 inline std::string
-    getOrDefault(const toml::value& element, const std::string& key, const std::string& defVal)
+    getOrDefault(const toml::value& element, const std::string& key, std::string_view defVal)
 {
     if (element.contains(key)) {
         return tomlAsString(element.at(key));
     }
-    return defVal;
+    return std::string(defVal);
 }
 /** get a double value or use the default if it is not a member*/
 inline double getOrDefault(const toml::value& element, const std::string& key, double defVal)

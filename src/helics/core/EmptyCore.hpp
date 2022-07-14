@@ -129,6 +129,7 @@ class EmptyCore: public Core {
     virtual InterfaceHandle getTranslator(std::string_view name) const override;
     virtual void addDependency(LocalFederateId federateID, std::string_view federateName) override;
     virtual void linkEndpoints(std::string_view source, std::string_view dest) override;
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override;
     virtual void makeConnections(const std::string& file) override;
     virtual void dataLink(std::string_view source, std::string_view target) override;
     virtual void addSourceFilterToEndpoint(std::string_view filter,
@@ -209,6 +210,9 @@ class EmptyCore: public Core {
         setFederateTag(LocalFederateId fid, std::string_view tag, std::string_view value) override;
     virtual const std::string& getFederateTag(LocalFederateId fid,
                                               std::string_view tag) const override;
+
+  private:
+    static const std::string emptyString;
 };
 
 }  // namespace helics

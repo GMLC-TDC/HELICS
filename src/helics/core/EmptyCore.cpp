@@ -14,6 +14,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+// NOLINTNEXTLINE
+const std::string EmptyCore::emptyString{};
+
 // timeoutMon is a unique_ptr
 EmptyCore::EmptyCore() noexcept {}
 
@@ -35,14 +38,12 @@ bool EmptyCore::isConnected() const
 
 const std::string& EmptyCore::getIdentifier() const
 {
-    static const std::string nullStr;
-    return nullStr;
+    return emptyString;
 }
 
 const std::string& EmptyCore::getAddress() const
 {
-    static const std::string nullStr;
-    return nullStr;
+    return emptyString;
 }
 
 void EmptyCore::disconnect() {}
@@ -115,7 +116,7 @@ const std::string& EmptyCore::getFederateName(LocalFederateId /*federateID*/) co
     throw(InvalidIdentifier("federateID not valid (federateName)"));
 }
 
-static const std::string unknownString("#unknown");
+// static const std::string unknownString("#unknown");
 
 LocalFederateId EmptyCore::getFederateId(std::string_view /*name*/) const
 {
@@ -183,8 +184,6 @@ bool EmptyCore::getFlagOption(LocalFederateId /*federateID*/, int32_t /*flag*/) 
     return false;
 }
 
-static const std::string emptyString;
-
 InterfaceHandle EmptyCore::registerInput(LocalFederateId /*federateID*/,
                                          std::string_view /*key*/,
                                          std::string_view /*type*/,
@@ -219,31 +218,29 @@ InterfaceHandle EmptyCore::getPublication(LocalFederateId /*federateID*/,
     return {};
 }
 
-const std::string emptyStr;
-
 const std::string& EmptyCore::getHandleName(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 const std::string& EmptyCore::getInjectionUnits(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }  // namespace helics
 
 const std::string& EmptyCore::getExtractionUnits(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 const std::string& EmptyCore::getInjectionType(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 const std::string& EmptyCore::getExtractionType(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 void EmptyCore::setHandleOption(InterfaceHandle /*handle*/,
@@ -265,22 +262,24 @@ void EmptyCore::addDestinationTarget(InterfaceHandle /*handle*/,
                                      std::string_view /*dest*/,
                                      InterfaceType /*hint*/)
 {
+    throw(InvalidFunctionCall("core is not connected unable to add targets"));
 }
 
 void EmptyCore::addSourceTarget(InterfaceHandle /*handle*/,
                                 std::string_view /*targetName*/,
                                 InterfaceType /*hint*/)
 {
+    throw(InvalidFunctionCall("core is not connected unable to add targets"));
 }
 
 const std::string& EmptyCore::getDestinationTargets(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 const std::string& EmptyCore::getSourceTargets(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 void EmptyCore::setValue(InterfaceHandle /*handle*/, const char* /*data*/, uint64_t /*len*/) {}
@@ -353,6 +352,7 @@ void EmptyCore::makeConnections(const std::string& /*file*/) {}
 
 void EmptyCore::linkEndpoints(std::string_view /*source*/, std::string_view /*dest*/) {}
 
+void EmptyCore::addAlias(std::string_view /*interfaceKey*/, std::string_view /*alias*/) {}
 void EmptyCore::dataLink(std::string_view /*source*/, std::string_view /*target*/) {}
 
 void EmptyCore::addSourceFilterToEndpoint(std::string_view /*filter*/,
@@ -503,7 +503,7 @@ void EmptyCore::sendCommand(std::string_view /*target*/,
 
 const std::string& EmptyCore::getInterfaceInfo(InterfaceHandle /*handle*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string_view /*info*/) {}
@@ -511,7 +511,7 @@ void EmptyCore::setInterfaceInfo(helics::InterfaceHandle /*handle*/, std::string
 const std::string& EmptyCore::getInterfaceTag(InterfaceHandle /*handle*/,
                                               std::string_view /*tag*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 void EmptyCore::setInterfaceTag(InterfaceHandle /*handle*/,
@@ -523,7 +523,7 @@ void EmptyCore::setInterfaceTag(InterfaceHandle /*handle*/,
 const std::string& EmptyCore::getFederateTag(LocalFederateId /*fid*/,
                                              std::string_view /*tag*/) const
 {
-    return emptyStr;
+    return emptyString;
 }
 
 void EmptyCore::setFederateTag(LocalFederateId /*fid*/,

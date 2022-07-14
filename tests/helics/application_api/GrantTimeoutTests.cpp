@@ -12,8 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
-#include "helics/external/filesystem.hpp"
 
+#include <filesystem>
 #include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gtest/gtest.h>

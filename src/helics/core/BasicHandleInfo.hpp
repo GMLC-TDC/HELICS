@@ -9,22 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "basic_CoreTypes.hpp"
 #include "flagOperations.hpp"
 
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace helics {
-
-/** define extra flag definitions*/
-enum handle_flag_definitions {
-    mapped_flag = extra_flag1,
-    /// indicator that an endpoint or message has a source filter
-    has_source_filter_flag = extra_flag2,
-    /// indicator that an endpoint or message has a destination filter
-    has_dest_filter_flag = extra_flag3,
-    /// indicator that the endpoint or filter has a destination filter that alters the message
-    has_non_cloning_dest_filter_flag = extra_flag4
-};
 
 /** class defining and capturing basic information about a handle*/
 class BasicHandleInfo {
@@ -49,8 +39,8 @@ class BasicHandleInfo {
     LocalFederateId local_fed_id{};  //!< the local federate id of the handle
     const InterfaceType handleType{InterfaceType::UNKNOWN};  //!< the type of the handle
     bool used{false};  //!< indicator that the handle is being used to link with another federate
-    uint16_t flags{
-        0};  //!< flags corresponding to the flags used in ActionMessages +some extra ones
+    /// flags corresponding to the flags used in ActionMessages +some extra ones
+    uint16_t flags{0};
 
     const std::string key;  //!< the name of the handle
     const std::string type;  //!< the type of data used by the handle
@@ -75,5 +65,6 @@ class BasicHandleInfo {
 
   private:
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
+    static const std::string emptyString;
 };
 }  // namespace helics

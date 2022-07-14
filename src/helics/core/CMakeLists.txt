@@ -23,6 +23,7 @@ set(SRC_FILES
     BaseTimeCoordinator.cpp
     ForwardingTimeCoordinator.cpp
     GlobalTimeCoordinator.cpp
+    AsyncTimeCoordinator.cpp
     TimeDependencies.cpp
     HandleManager.cpp
     FilterInfo.cpp
@@ -69,6 +70,7 @@ set(INCLUDE_FILES
     BaseTimeCoordinator.hpp
     ForwardingTimeCoordinator.hpp
     GlobalTimeCoordinator.hpp
+    AsyncTimeCoordinator.hpp
     loggingHelper.hpp
     GlobalFederateId.hpp
     basic_CoreTypes.hpp

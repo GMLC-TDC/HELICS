@@ -4,7 +4,7 @@ XCODE_MACOS_PLATFORM_PATH="/Applications/Xcode.app/Contents/Developer/Platforms/
 XCODE_MACOS_SDK_PATH="${XCODE_MACOS_PLATFORM_PATH}/Developer/SDKs"
 
 if [[ -z "${MACOS_SDK_VER}" ]]; then
-    MACOS_SDK_VER=10.14
+    MACOS_SDK_VER=10.15
 fi
 
 # Download macOS SDK

@@ -51,8 +51,8 @@ add_executable(
                              ../coreTypeLists.hpp
 )
 
-target_link_libraries(shared-library-tests helics_test_base helics)
-target_link_libraries(shared-library-tests-cpp helics_test_base helicsCpp98)
+target_link_libraries(shared-library-tests helics_test_base helics build_flags_target)
+target_link_libraries(shared-library-tests-cpp helics_test_base helicsCpp98 build_flags_target)
 
 set_target_properties(shared-library-tests shared-library-tests-cpp PROPERTIES FOLDER tests)
 

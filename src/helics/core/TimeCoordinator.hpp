@@ -254,4 +254,5 @@ class TimeCoordinator: public BaseTimeCoordinator {
 
     virtual Time getNextTime() const override;
 };
+
 }  // namespace helics

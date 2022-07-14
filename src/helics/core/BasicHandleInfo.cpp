@@ -9,6 +9,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
+// NOLINTNEXTLINE
+const std::string BasicHandleInfo::emptyString{};
+
 void BasicHandleInfo::setTag(std::string_view tag, std::string_view value)
 {
     for (auto& tg : tags) {
@@ -20,8 +23,6 @@ void BasicHandleInfo::setTag(std::string_view tag, std::string_view value)
     tags.emplace_back(tag, value);
 }
 
-static const std::string emptyStr;
-
 const std::string& BasicHandleInfo::getTag(std::string_view tag) const
 {
     for (const auto& tg : tags) {
@@ -29,7 +30,7 @@ const std::string& BasicHandleInfo::getTag(std::string_view tag) const
             return tg.second;
         }
     }
-    return emptyStr;
+    return emptyString;
 }
 
 }  // namespace helics
