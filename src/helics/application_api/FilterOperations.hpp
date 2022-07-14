@@ -67,18 +67,18 @@ class DelayFilterOperation: public FilterOperations {
     virtual std::shared_ptr<FilterOperator> getOperator() override;
 };
 
-class randomDelayGenerator;
+class RandomDelayGenerator;
 
 /** filter for generating a random delay time for a message*/
 class RandomDelayFilterOperation: public FilterOperations {
   private:
     std::shared_ptr<MessageTimeOperator> td;  //!< pointer to the time operator
-    std::unique_ptr<randomDelayGenerator> rdelayGen;  //!< pointer to the random number generator
+    std::unique_ptr<RandomDelayGenerator> rdelayGen;  //!< pointer to the random number generator
 
   public:
     /** default constructor*/
     RandomDelayFilterOperation();
-    // the destructor is defined mainly to prevent the need to define the randomDelayGenerator
+    // the destructor is defined mainly to prevent the need to define the RandomDelayGenerator
     // object here
     /** destructor*/
     ~RandomDelayFilterOperation();

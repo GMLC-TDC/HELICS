@@ -60,110 +60,110 @@ std::shared_ptr<FilterOperator> DelayFilterOperation::getOperator()
 }
 
 /** enumeration of possible random number generator distributions */
-enum class random_dists_t : int {
-    constant,
-    uniform,
-    bernoulli,
-    binomial,
-    geometric,
-    poisson,
-    exponential,
-    gamma,
-    weibull,
-    extreme_value,
-    normal,
-    lognormal,
-    chi_squared,
-    cauchy,
-    fisher_f,
-    student_t
+enum class RandomDistributions : int {
+    CONSTANT,
+    UNIFORM,
+    BERNOULLI,
+    BINOMIAL,
+    GEOMETRIC,
+    POISSON,
+    EXPONENTIAL,
+    GAMMA,
+    WEIBULL,
+    EXTREME_VALUE,
+    NORMAL,
+    LOGNORMAL,
+    CHI_SQUARED,
+    CAUCHY,
+    FISHER_F,
+    STUDENT_T
 };
 
-static const std::map<std::string_view, random_dists_t> distMap{
-    {"constant", random_dists_t::constant},
-    {"uniform", random_dists_t::uniform},
-    {"bernoulli", random_dists_t::bernoulli},
-    {"binomial", random_dists_t::binomial},
-    {"geometric", random_dists_t::geometric},
-    {"poisson", random_dists_t::poisson},
-    {"exponential", random_dists_t::exponential},
-    {"gamma", random_dists_t::gamma},
-    {"weibull", random_dists_t::weibull},
-    {"extreme_value", random_dists_t::extreme_value},
-    {"normal", random_dists_t::normal},
-    {"lognormal", random_dists_t::lognormal},
-    {"chi_squared", random_dists_t::chi_squared},
-    {"cauchy", random_dists_t::cauchy},
-    {"fisher_f", random_dists_t::fisher_f},
-    {"student_t", random_dists_t::student_t}};
+static const std::map<std::string_view, RandomDistributions> distMap{
+    {"constant", RandomDistributions::CONSTANT},
+    {"uniform", RandomDistributions::UNIFORM},
+    {"bernoulli", RandomDistributions::BERNOULLI},
+    {"binomial", RandomDistributions::BINOMIAL},
+    {"geometric", RandomDistributions::GEOMETRIC},
+    {"poisson", RandomDistributions::POISSON},
+    {"exponential", RandomDistributions::EXPONENTIAL},
+    {"gamma", RandomDistributions::GAMMA},
+    {"weibull", RandomDistributions::WEIBULL},
+    {"extreme_value", RandomDistributions::EXTREME_VALUE},
+    {"normal", RandomDistributions::NORMAL},
+    {"lognormal", RandomDistributions::LOGNORMAL},
+    {"chi_squared", RandomDistributions::CHI_SQUARED},
+    {"cauchy", RandomDistributions::CAUCHY},
+    {"fisher_f", RandomDistributions::FISHER_F},
+    {"student_t", RandomDistributions::STUDENT_T}};
 
-double randDouble(random_dists_t dist, double p1, double p2)
+double randDouble(RandomDistributions dist, double p1, double p2)
 {
     static thread_local std::mt19937 generator(
         std::random_device{}() +
         static_cast<unsigned int>(std::hash<std::thread::id>{}(std::this_thread::get_id())));
 
     switch (dist) {
-        case random_dists_t::constant:
+        case RandomDistributions::CONSTANT:
         default:
             return p1;
-        case random_dists_t::uniform: {
+        case RandomDistributions::UNIFORM: {
             std::uniform_real_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::normal: {
+        case RandomDistributions::NORMAL: {
             std::normal_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::lognormal: {
+        case RandomDistributions::LOGNORMAL: {
             std::lognormal_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::cauchy: {
+        case RandomDistributions::CAUCHY: {
             std::cauchy_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::chi_squared: {
+        case RandomDistributions::CHI_SQUARED: {
             std::chi_squared_distribution<double> distribution(p1);
             return distribution(generator);
         }
-        case random_dists_t::exponential: {
+        case RandomDistributions::EXPONENTIAL: {
             std::exponential_distribution<double> distribution(p1);
             return distribution(generator);
         }
-        case random_dists_t::extreme_value: {
+        case RandomDistributions::EXTREME_VALUE: {
             std::extreme_value_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::fisher_f: {
+        case RandomDistributions::FISHER_F: {
             std::fisher_f_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::weibull: {
+        case RandomDistributions::WEIBULL: {
             std::weibull_distribution<double> distribution(p1, p2);
             return distribution(generator);
         }
-        case random_dists_t::student_t: {
+        case RandomDistributions::STUDENT_T: {
             std::student_t_distribution<double> distribution(p1);
             return distribution(generator);
         }
-        case random_dists_t::geometric: {  // integer multiples of some period
+        case RandomDistributions::GEOMETRIC: {  // integer multiples of some period
             std::geometric_distribution<int> distribution(p1);
             return distribution(generator) * p2;
         }
-        case random_dists_t::poisson: {  // integer multiples of some period
+        case RandomDistributions::POISSON: {  // integer multiples of some period
             std::poisson_distribution<int> distribution(p1);
             return distribution(generator) * p2;
         }
-        case random_dists_t::bernoulli: {
+        case RandomDistributions::BERNOULLI: {
             std::bernoulli_distribution distribution(p1);
             return distribution(generator) ? p2 : 0.0;
         }
-        case random_dists_t::binomial: {
+        case RandomDistributions::BINOMIAL: {
             std::binomial_distribution<int> distribution(static_cast<int>(p1), p2);
             return static_cast<double>(distribution(generator));
         }
-        case random_dists_t::gamma: {
+        case RandomDistributions::GAMMA: {
             std::gamma_distribution<double> distribution(p1, p2);
             return distribution(generator);
         } break;
@@ -173,19 +173,19 @@ double randDouble(random_dists_t dist, double p1, double p2)
 }
 
 /** class wrapping the distribution generation functions and parameters*/
-class randomDelayGenerator {
+class RandomDelayGenerator {
   public:
-    std::atomic<random_dists_t> dist{random_dists_t::uniform};  //!< the distribution
+    std::atomic<RandomDistributions> dist{RandomDistributions::UNIFORM};  //!< the distribution
     std::atomic<double> param1{0.0};  //!< parameter 1 typically mean or min
     std::atomic<double> param2{0.0};  //!< parameter 2 typically stddev or max
 
-    double generate() { return randDouble(dist.load(), param1.load(), param2.load()); }
+    double generate() const { return randDouble(dist.load(), param1.load(), param2.load()); }
 };
 
 RandomDelayFilterOperation::RandomDelayFilterOperation():
     td(std::make_shared<MessageTimeOperator>(
         [this](Time messageTime) { return messageTime + rdelayGen->generate(); })),
-    rdelayGen(std::make_unique<randomDelayGenerator>())
+    rdelayGen(std::make_unique<RandomDelayGenerator>())
 {
 }
 RandomDelayFilterOperation::~RandomDelayFilterOperation() = default;
@@ -224,8 +224,8 @@ std::shared_ptr<FilterOperator> RandomDelayFilterOperation::getOperator()
 }
 
 RandomDropFilterOperation::RandomDropFilterOperation():
-    tcond(std::make_shared<MessageConditionalOperator>([this](const Message*) {
-        return (randDouble(random_dists_t::bernoulli, (1.0 - dropProb), 1.0) > 0.1);
+    tcond(std::make_shared<MessageConditionalOperator>([this](const Message* /*unused*/) {
+        return (randDouble(RandomDistributions::BERNOULLI, (1.0 - dropProb), 1.0) > 0.1);
     }))
 {
 }
@@ -303,7 +303,7 @@ std::string RerouteFilterOperation::rerouteOperation(const std::string& src,
         return newDestGeneration(src, dest, newDest.load());
     }
 
-    for (auto& sr : *cond) {
+    for (const auto& sr : *cond) {
         std::regex reg(sr);
         if (std::regex_search(dest, reg, std::regex_constants::match_any)) {
             return newDestGeneration(src, dest, newDest.load());
@@ -329,8 +329,10 @@ std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
     return std::static_pointer_cast<FilterOperator>(op);
 }
 
+//NOLINTNEXTLINE
 bool FirewallFilterOperation::allowPassed(const Message* /*mess*/) const
 {
+    /* TODO (PT) this has not been completed yet*/
     return true;
 }
 
@@ -384,7 +386,7 @@ std::vector<std::unique_ptr<Message>> CloneFilterOperation::sendMessage(const Me
 {
     std::vector<std::unique_ptr<Message>> messages;
     auto lock = deliveryAddresses.lock_shared();
-    for (auto& add : *lock) {
+    for (const auto& add : *lock) {
         messages.push_back(std::make_unique<Message>(*mess));
         messages.back()->original_dest = messages.back()->dest;
         messages.back()->dest = add;
