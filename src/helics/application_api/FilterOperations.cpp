@@ -329,7 +329,7 @@ std::shared_ptr<FilterOperator> FirewallFilterOperation::getOperator()
     return std::static_pointer_cast<FilterOperator>(op);
 }
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 bool FirewallFilterOperation::allowPassed(const Message* /*mess*/) const
 {
     /* TODO (PT) this has not been completed yet*/
