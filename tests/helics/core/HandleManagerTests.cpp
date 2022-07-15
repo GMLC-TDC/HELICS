@@ -18,7 +18,6 @@ static constexpr InterfaceHandle i2(2);
 static constexpr InterfaceHandle i3(3);
 static constexpr InterfaceHandle i4(4);
 static constexpr InterfaceHandle i5(5);
-static constexpr InterfaceHandle i6(6);
 
 TEST(handleManager, creationEndpoint)
 {
@@ -83,7 +82,7 @@ static HandleManager generateExampleHandleManager()
     h1.addHandle(fed2, i1, InterfaceType::PUBLICATION, "p1", "double", "V");
     h1.addHandle(fed2, i2, InterfaceType::PUBLICATION, "p2", "double", "V");
     h1.addHandle(fed2, i3, InterfaceType::INPUT, "in1", "double", "V");
-    h1.addHandle(fed2, i5, InterfaceType::ENDPOINT, "e1", "t1", "");
+    h1.addHandle(fed2, i4, InterfaceType::ENDPOINT, "e1", "t1", "");
     h1.addHandle(fed2, i5, InterfaceType::TRANSLATOR, "t1", "type", "V");
     h1.addHandle(fed3, i1, InterfaceType::FILTER, "f1", "type1", "type2");
 
