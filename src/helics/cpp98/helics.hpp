@@ -5,8 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef _HELICS_CPP98_API_
-#define _HELICS_CPP98_API_
+#ifndef HELICS_CPP98_HPP_
+#define HELICS_CPP98_HPP_
 #pragma once
 
 #include "CombinationFederate.hpp"

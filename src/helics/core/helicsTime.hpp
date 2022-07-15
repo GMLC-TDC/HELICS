@@ -5,8 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#ifndef _HELICS_TIME_HEADER_
-#    define _HELICS_TIME_HEADER_
+#ifndef HELICS_TIME_HEADER_
+#    define HELICS_TIME_HEADER_
 #    include "../utilities/timeRepresentation.hpp"
 #    include "CoreTypes.hpp"
 #    include "helics/helics-config.h"
@@ -53,4 +53,4 @@ struct iteration_time {
 
 }  // namespace helics
 
-#endif  //_HELICS_TIME_HEADER_
+#endif  // HELICS_TIME_HEADER_

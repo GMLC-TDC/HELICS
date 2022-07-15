@@ -6,8 +6,8 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 /*defines left in this code as it is used in the shared library*/
-#ifndef _HELICS_ENUMS_
-#define _HELICS_ENUMS_
+#ifndef HELICS_ENUMS_H_
+#define HELICS_ENUMS_H_
 #pragma once
 
 /** @file
