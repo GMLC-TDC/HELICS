@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 
-TEST(InfoClass_tests, basichandleinfo_test)
+TEST(InfoClass_tests, basichandleinfo)
 {
     // All default values
     helics::BasicHandleInfo defHnd;
@@ -91,7 +91,7 @@ TEST(InfoClass_tests, basichandleinfo_test)
     EXPECT_EQ(dstFiltHnd.type_out, "type_out");
 }
 
-TEST(InfoClass_tests, endpointinfo_test)
+TEST(InfoClass_tests, endpointinfo)
 {
     // Mostly testing ordering of message sorting and maxTime function arguments
 
@@ -238,7 +238,7 @@ TEST(InfoClass_tests, endpointinfo_test)
     EXPECT_TRUE(endPI.getMessage(maxT) == nullptr);
 }
 
-TEST(InfoClass_tests, filterinfo_test)
+TEST(InfoClass_tests, filterinfo)
 {
     // Mostly testing ordering of message sorting and maxTime function arguments
 
@@ -285,7 +285,7 @@ TEST(InfoClass_tests, filterinfo_test)
     EXPECT_EQ(filtI.dest_filter, true);
 }
 
-TEST(InfoClass_tests, inputinfo_test)
+TEST(InfoClass_tests, inputinfo)
 {
     // SubscriptionInfo is still a WPI, nothing moves data from the queue to current_data
 
@@ -304,7 +304,7 @@ TEST(InfoClass_tests, inputinfo_test)
     EXPECT_EQ(subI.required, false);
 
     helics::GlobalHandle testHandle(helics::GlobalFederateId(5), helics::InterfaceHandle(45));
-    subI.addSource(testHandle, "", "double", std::string());
+    subI.addSource(testHandle, "", "double", std::string_view{});
     // No data available, shouldn't get a data_block back
     ret_data = subI.getData(0);
     EXPECT_TRUE(!ret_data);

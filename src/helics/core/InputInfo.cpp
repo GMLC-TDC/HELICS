@@ -133,7 +133,8 @@ bool InputInfo::addData(GlobalHandle source_id,
                                   newRecord,
                                   recordComparison);
         if (m != data_queues[index].begin()) {
-            auto prev = --m;
+            auto prev = m;
+            --prev;
             if (minTimeGap > timeZero) {
                 if ((valueTime - prev->time) < minTimeGap) {
                     return false;
