@@ -192,7 +192,7 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-      
+
   clang14_cxx23:
     docker:
       - image: helics/buildenv:clang14-builder
