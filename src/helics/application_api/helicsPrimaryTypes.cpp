@@ -890,7 +890,7 @@ void valueExtract(const data_view& dv, DataType baseType, Time& val)
                 if ((index == std::string::npos) || (index == data.size())) {
                     val.setBaseTimeCode(ul);
                 } else {
-                    val = gmlc::utilities::loadTimeFromString<helics::Time>(std::string(data));
+                    val = gmlc::utilities::loadTimeFromString<helics::Time>(data);
                 }
             }
             catch (...) {
