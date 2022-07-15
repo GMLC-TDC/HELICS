@@ -113,7 +113,7 @@ jobs:
           imageName: 'windows-2022'
           langArch: 'x64'
           vsArch: 'x64'
-          extraFlags: ''
+          extraFlags: '-DCMAKE_CXX_STANDARD=20'
 
     pool:
       vmImage: $(imageName)

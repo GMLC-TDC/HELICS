@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -37,7 +37,7 @@ else()
     set(JSONCPP_DISABLE_CCACHE ON CACHE INTERNAL "")
 
     if(NOT CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_STANDARD 17) # Supported values are ``11``, ``14``, and ``17``.
+        set(CMAKE_CXX_STANDARD 17) # Supported values are ``17``, ``20``, and ``23``.
     endif()
 
     if(BUILD_SHARED_LIBS)

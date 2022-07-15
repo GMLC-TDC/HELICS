@@ -433,6 +433,7 @@ endif()
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
+set(toml11_INSTALL OFF CACHE INTERNAL "")
 add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
