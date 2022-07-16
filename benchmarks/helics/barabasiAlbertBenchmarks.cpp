@@ -43,7 +43,7 @@ class Node {
     void setName(std::string nm) { name = std::move(nm); }  // set node name
     void setNumLinks(int x) { num_links = x; }  // set number of links connected to node
     std::string getName() { return name; }  // get node name
-    int getNumLinks() const { return num_links; }  // get number of links connected to node
+    [[nodiscard]] int getNumLinks() const { return num_links; }  // get number of links connected to node
     std::vector<std::string> getTargets()
     {
         return targets;
