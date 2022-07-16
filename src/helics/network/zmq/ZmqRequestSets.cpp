@@ -17,7 +17,7 @@ namespace zeromq {
     ZmqRequestSets::ZmqRequestSets(): ctx(ZmqContextManager::getContextPointer()) {}
     void ZmqRequestSets::addRoutes(int routeNumber, const std::string& routeInfo)
     {
-        auto zsock = std::make_unique<zmq::socket_t>(ctx->getContext(), ZMQ_REQ);
+        auto zsock = std::make_unique<zmq::socket_t>(ctx->getBaseContext(), ZMQ_REQ);
         try {
             zsock->connect(routeInfo);
         }

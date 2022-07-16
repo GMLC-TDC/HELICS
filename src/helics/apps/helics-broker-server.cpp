@@ -114,10 +114,10 @@ void terminalFunction(std::vector<std::string> args)
             return;
         }
         brokerServer->forceTerminate();
-        while (brokerServer->hasActiveBrokers()) {
+        while (helics::apps::BrokerServer::hasActiveBrokers()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        if (!brokerServer->hasActiveBrokers()) {
+        if (!helics::apps::BrokerServer::hasActiveBrokers()) {
             std::cout << "Broker servers have terminated\n";
         }
     };

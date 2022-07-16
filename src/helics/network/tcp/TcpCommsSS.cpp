@@ -291,6 +291,7 @@ void TcpCommsSS::queue_tx_function()
                                          gmlc::networking::makePortAddress(brokerTargetAddress,
                                                                            brokerPort))) {
                                         brokerConnection = std::move(conn);
+                                        break;
                                     }
                                 }
                                 if (conn) {

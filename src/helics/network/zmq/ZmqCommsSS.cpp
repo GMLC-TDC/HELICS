@@ -325,8 +325,8 @@ void ZmqCommsSS::queue_tx_function()
     if (PortNumber < 0) {
         PortNumber = getDefaultBrokerPort();
     }
-    zmq::socket_t brokerSocket(ctx->getContext(), ZMQ_ROUTER);
-    zmq::socket_t brokerConnection(ctx->getContext(), ZMQ_DEALER);
+    zmq::socket_t brokerSocket(ctx->getBaseContext(), ZMQ_ROUTER);
+    zmq::socket_t brokerConnection(ctx->getBaseContext(), ZMQ_DEALER);
     auto res = initializeBrokerConnections(brokerSocket, brokerConnection);
     if (res < 0) {
         setTxStatus(ConnectionStatus::ERRORED);
@@ -451,7 +451,7 @@ void ZmqCommsSS::queue_tx_function()
                 }
                 if (status == 5) {
                     brokerConnection.close();
-                    brokerConnection = zmq::socket_t(ctx->getContext(), ZMQ_DEALER);
+                    brokerConnection = zmq::socket_t(ctx->getBaseContext(), ZMQ_DEALER);
                     initializeConnectionToBroker(brokerConnection);
                     loadPoller(
                         poller, sockets, brokerSocket, brokerConnection, serverMode, hasBroker);

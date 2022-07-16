@@ -121,9 +121,9 @@ int ZmqComms::replyToIncomingMessage(zmq::message_t& msg, zmq::socket_t& sock)
 void ZmqComms::queue_rx_function()
 {
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    zmq::socket_t pullSocket(ctx->getBaseContext(), ZMQ_PULL);
     pullSocket.setsockopt(ZMQ_LINGER, 200);
-    zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
+    zmq::socket_t controlSocket(ctx->getBaseContext(), ZMQ_PAIR);
     std::string controlsockString =
         std::string("inproc://") + name + '_' + getRandomID() + "_control";
     try {
@@ -136,7 +136,7 @@ void ZmqComms::queue_rx_function()
     }
     controlSocket.setsockopt(ZMQ_LINGER, 200);
 
-    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    zmq::socket_t repSocket(ctx->getBaseContext(), ZMQ_REP);
     if (serverMode) {
         repSocket.setsockopt(ZMQ_LINGER, 500);
     }
@@ -175,7 +175,7 @@ void ZmqComms::queue_rx_function()
         if (!bindsuccess) {
             if (forceConnection) {
                 logWarning("attempting to override existing broker and force network connection");
-                zmq::socket_t brokerReqTerm(ctx->getContext(), ZMQ_REQ);
+                zmq::socket_t brokerReqTerm(ctx->getBaseContext(), ZMQ_REQ);
                 brokerReqTerm.setsockopt(ZMQ_LINGER, 50);
                 try {
                     repSocket.close();
@@ -204,7 +204,7 @@ void ZmqComms::queue_rx_function()
                     int cnt = 0;
                     while (notConnected) {
                         ++cnt;
-                        repSocket = zmq::socket_t(ctx->getContext(), ZMQ_REP);
+                        repSocket = zmq::socket_t(ctx->getBaseContext(), ZMQ_REP);
                         if (serverMode) {
                             repSocket.setsockopt(ZMQ_LINGER, 500);
                         }
@@ -330,7 +330,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
             brokerPort = getDefaultBrokerPort();
         }
 
-        zmq::socket_t brokerReq(ctx->getContext(), ZMQ_REQ);
+        zmq::socket_t brokerReq(ctx->getBaseContext(), ZMQ_REQ);
         brokerReq.setsockopt(ZMQ_LINGER, 50);
         try {
             brokerReq.connect(makePortAddress(brokerTargetAddress, brokerPort + 1));
@@ -397,7 +397,7 @@ int ZmqComms::initializeBrokerConnections(zmq::socket_t& controlSocket)
                         }
                         // try to reestablish the connection
                         brokerReq.close();
-                        brokerReq = zmq::socket_t(ctx->getContext(), ZMQ_REQ);
+                        brokerReq = zmq::socket_t(ctx->getBaseContext(), ZMQ_REQ);
                         brokerReq.setsockopt(ZMQ_LINGER, 50);
                         try {
                             brokerReq.connect(makePortAddress(brokerTargetAddress, brokerPort + 1));
@@ -500,7 +500,7 @@ void ZmqComms::queue_tx_function()
     }
     auto ctx = ZmqContextManager::getContextPointer();
     // Setup the control socket for comms with the receiver
-    zmq::socket_t controlSocket(ctx->getContext(), ZMQ_PAIR);
+    zmq::socket_t controlSocket(ctx->getBaseContext(), ZMQ_PAIR);
     controlSocket.setsockopt(ZMQ_LINGER, 200);
     std::string controlsockString =
         std::string("inproc://") + name + '_' + getRandomID() + "_control";
@@ -519,7 +519,7 @@ void ZmqComms::queue_tx_function()
         return;
     }
 
-    zmq::socket_t brokerPushSocket(ctx->getContext(), ZMQ_PUSH);
+    zmq::socket_t brokerPushSocket(ctx->getBaseContext(), ZMQ_PUSH);
     brokerPushSocket.setsockopt(ZMQ_LINGER, 200);
     std::map<route_id, zmq::socket_t> routes;  // for all the other possible routes
     // ZmqRequestSets priority_routes;  //!< object to handle the management of the priority
@@ -546,7 +546,7 @@ void ZmqComms::queue_tx_function()
                         break;
                     case NEW_BROKER_INFORMATION:
                         brokerPushSocket.close();
-                        brokerPushSocket = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
+                        brokerPushSocket = zmq::socket_t(ctx->getBaseContext(), ZMQ_PUSH);
                         brokerPushSocket.setsockopt(ZMQ_LINGER, 200);
                         brokerTargetAddress = cmd.payload.to_string();
                         brokerPort = cmd.getExtraData();
@@ -557,7 +557,7 @@ void ZmqComms::queue_tx_function()
                             auto interfaceAndPort = gmlc::networking::extractInterfaceAndPort(
                                 std::string(cmd.payload.to_string()));
 
-                            auto zsock = zmq::socket_t(ctx->getContext(), ZMQ_PUSH);
+                            auto zsock = zmq::socket_t(ctx->getBaseContext(), ZMQ_PUSH);
                             zsock.setsockopt(ZMQ_LINGER, 100);
                             zsock.connect(
                                 makePortAddress(interfaceAndPort.first, interfaceAndPort.second));
@@ -661,7 +661,7 @@ void ZmqComms::closeReceiver()
             if (!disconnecting) {
                 // try connecting with the receivers push socket
                 auto ctx = ZmqContextManager::getContextPointer();
-                zmq::socket_t pushSocket(ctx->getContext(), ZMQ_PUSH);
+                zmq::socket_t pushSocket(ctx->getBaseContext(), ZMQ_PUSH);
                 pushSocket.setsockopt(ZMQ_LINGER, 200);
                 if (localTargetAddress == "tcp://*") {
                     pushSocket.connect(makePortAddress("tcp://127.0.0.1", PortNumber));
