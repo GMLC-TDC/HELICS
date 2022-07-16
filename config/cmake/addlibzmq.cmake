@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2019-2021, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2019-2022, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -25,7 +25,6 @@ set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.4)
 
 string(TOLOWER "libzmq" lcName)
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     include(FetchContent)
 
     mark_as_advanced(FETCHCONTENT_BASE_DIR)
@@ -49,26 +48,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
 
     hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
     hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_LIBZMQ)
-else() # CMake <3.11
-
-    # create the directory first
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
-
-    include(GitUtils)
-    git_clone(
-        PROJECT_NAME
-        ${lcName}
-        GIT_URL
-        https://github.com/zeromq/libzmq.git
-        GIT_TAG
-        ${${PROJECT_NAME}_LIBZMQ_VERSION}
-        DIRECTORY
-        ${PROJECT_BINARY_DIR}/_deps
-    )
-
-    set(${lcName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${lcName}-build)
-
-endif()
 
 # Set custom variables, policies, etc. ...
 
@@ -113,6 +92,30 @@ set(BUILD_SHARED
     CACHE INTERNAL ""
 )
 set(ENABLE_CPACK
+    OFF
+    CACHE INTERNAL ""
+)
+set(ENABLE_WS
+    OFF
+    CACHE INTERNAL ""
+)
+
+set(ENABLE_PRECOMPILED
+    OFF
+    CACHE INTERNAL ""
+)
+
+set(ENABLE_CLANG
+    ON
+    CACHE INTERNAL ""
+)
+
+set(ENABLE_TSAN
+    OFF
+    CACHE INTERNAL ""
+)
+
+set(ENABLE_TSAN
     OFF
     CACHE INTERNAL ""
 )
