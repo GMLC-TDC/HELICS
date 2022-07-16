@@ -473,10 +473,7 @@
                       "minLength": 1
                     }
                   },
-                  "required": [
-                    "status",
-                    "error"
-                  ],
+                  "required": ["status", "error"],
                   "x-examples": {
                     "example-1": {
                       "status": 400,
@@ -763,9 +760,7 @@
                       "type": "boolean"
                     }
                   },
-                  "required": [
-                    "success"
-                  ],
+                  "required": ["success"],
                   "x-examples": {
                     "example-1": {
                       "success": true
