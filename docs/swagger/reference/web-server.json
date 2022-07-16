@@ -40,11 +40,11 @@
     },
     "/{broker_id}": {
       "post": {
-        "summary": "Create New User",
+        "summary": "Create New Broker",
         "operationId": "post-broker",
         "responses": {
           "200": {
-            "description": "User Created",
+            "description": "Broker Created",
             "content": {
               "application/json": {
                 "schema": {
@@ -72,7 +72,7 @@
               "examples": {}
             }
           },
-          "description": "Post the necessary fields for the API to create a new user."
+          "description": "Post the necessary fields for the API to create a new broker."
         },
         "description": "Create a new broker",
         "parameters": [
