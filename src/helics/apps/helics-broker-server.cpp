@@ -20,7 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** function to run the online terminal program*/
 void terminalFunction(std::vector<std::string> args);
 
-//NOLINTNEXTLINE(bugprone-exception-escape)
+// NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char* argv[])
 {
     int ret{0};
