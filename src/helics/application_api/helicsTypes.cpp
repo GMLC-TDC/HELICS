@@ -31,7 +31,7 @@ template<>
 struct fmt::formatter<std::complex<double>> {
     // Formats std::complex
 
-    constexpr auto parse(format_parse_context& ctx) {
+    static constexpr auto parse(format_parse_context& ctx) {
         return ctx.end();
     }
 
