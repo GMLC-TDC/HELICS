@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <utility>
 
-namespace helics {
-namespace zeromq {
+namespace helics::zeromq {
     ZmqRequestSets::ZmqRequestSets(): ctx(ZmqContextManager::getContextPointer()) {}
     void ZmqRequestSets::addRoutes(int routeNumber, const std::string& routeInfo)
     {
@@ -84,6 +83,7 @@ namespace zeromq {
         zmq::message_t msg;
         // scan the active_routes
         for (size_t ii = 0; ii < active_routes.size(); ++ii) {
+            //NOLINTNEXTLINE
             if ((active_routes[ii].revents & ZMQ_POLLIN) > 0) {
                 routes[active_messages[ii].route]->recv(msg);
                 active_routes[ii].events = 0;
@@ -164,4 +164,3 @@ private:
     std::queue<ActionMessage> Responses;
     */
 }  // namespace zeromq
-}  // namespace helics
