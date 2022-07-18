@@ -43,10 +43,10 @@ Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::s
         if (loc) {
             auto& ref = eptHandle->back();
             auto datHandle = eptData.lock();
-            auto &edat=datHandle->emplace_back();
+            auto& edat = datHandle->emplace_back();
 
             // non-owning pointer
-            ref.dataReference=&edat;
+            ref.dataReference = &edat;
             datHandle.unlock();
             ref.referenceIndex = static_cast<int>(*loc);
 
@@ -68,10 +68,10 @@ Endpoint& MessageFederateManager::registerTargetedEndpoint(std::string_view name
         if (loc) {
             auto& ref = eptHandle->back();
             auto datHandle = eptData.lock();
-            auto &edat=datHandle->emplace_back();
+            auto& edat = datHandle->emplace_back();
 
             // non-owning pointer
-            ref.dataReference=&edat;
+            ref.dataReference = &edat;
             datHandle.unlock();
             ref.referenceIndex = static_cast<int>(*loc);
 
@@ -174,10 +174,10 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         if (fid != epts->end()) {  // assign the data
 
             Endpoint& currentEpt = *fid;
-            auto *eData=static_cast<EndpointData*>(fid->dataReference);
-            
+            auto* eData = static_cast<EndpointData*>(fid->dataReference);
+
             eData->messages.emplace(std::move(message));
-            
+
             if (eData->callback) {
                 // need to be copied otherwise there is a potential race condition on lock removal
                 epts.unlock();
@@ -185,7 +185,7 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
                 epts = local_endpoints.lock();
             } else if (mcall) {
                 epts.unlock();
-                mcall(currentEpt, CurrentTime);         
+                mcall(currentEpt, CurrentTime);
                 epts = local_endpoints.lock();
             }
         }

@@ -94,7 +94,7 @@ Input& ValueFederateManager::registerInput(std::string_view key,
     if (active) {
         auto& ref = inpHandle->back();
         auto datHandle = inputData.lock();
-        auto &idat=datHandle->emplace_back(key, type, units);
+        auto& idat = datHandle->emplace_back(key, type, units);
 
         // non-owning pointer
         ref.dataReference = &idat;

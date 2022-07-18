@@ -14,11 +14,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/containers/DualStringMappedVector.hpp"
 #include "helicsTypes.hpp"
 
+#include <deque>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <deque>
 
 namespace helics {
 /** forward declaration of Core*/
