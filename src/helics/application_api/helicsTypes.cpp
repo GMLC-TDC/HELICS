@@ -29,15 +29,16 @@ using namespace gmlc::utilities;  // NOLINT
 
 template<>
 struct fmt::formatter<std::complex<double>> {
-    // Formats the point p using the parsed format specification (presentation)
-    // stored in this formatter.
+    // Formats std::complex
+
     static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
 
     template<typename FormatContext>
-    auto format(const std::complex<double>& p, FormatContext& ctx)
+    auto format(const std::complex<double>& p, FormatContext& ctx) const
     {
         // ctx.out() is an output iterator to write to.
-        return format_to(ctx.out(), "[{},{}]", p.real(), p.imag());
+        // return format(ctx.out(), "[{},{}]",p.real(), p.imag());
+        return fmt::vformat_to(ctx.out(), "[{},{}]", fmt::make_format_args(p.real(), p.imag()));
     }
 };
 

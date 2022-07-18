@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 /** function to run the online terminal program*/
 void terminalFunction(std::vector<std::string> args);
 
+// NOLINTNEXTLINE(bugprone-exception-escape)
 int main(int argc, char* argv[])
 {
     int ret{0};
@@ -114,10 +115,10 @@ void terminalFunction(std::vector<std::string> args)
             return;
         }
         brokerServer->forceTerminate();
-        while (brokerServer->hasActiveBrokers()) {
+        while (helics::apps::BrokerServer::hasActiveBrokers()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        if (!brokerServer->hasActiveBrokers()) {
+        if (!helics::apps::BrokerServer::hasActiveBrokers()) {
             std::cout << "Broker servers have terminated\n";
         }
     };

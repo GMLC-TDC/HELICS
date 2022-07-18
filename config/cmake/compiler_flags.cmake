@@ -133,6 +133,13 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
                 compile_flags_target
                 INTERFACE -Wdocumentation -Wno-documentation-deprecated-sync
             )
+       if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 13.0)
+       message(STATUS "clang>13")
+            target_compile_options(
+                compile_flags_target
+                INTERFACE -Wreserved-identifier -Wunused-but-set-parameter -Wunused-but-set-variable
+            )
+        endif ()
     endif()
 endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 

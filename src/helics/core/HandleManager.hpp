@@ -139,8 +139,8 @@ class HandleManager {
     // alias must be a stable string_view here
     void addFilterAlias(std::string_view interfaceName, std::string_view alias);
     /// @brief actually add the alias names to the data structures
-    /// @param interfaceName
-    /// @param alias
+    /// @param interfaceName the name of the interface to create an alias for
+    /// @param alias the new name used to refer to an interface
     /// @return true if there are multiple interacting aliases
     bool addAliasName(std::string_view interfaceName, std::string_view alias);
 };

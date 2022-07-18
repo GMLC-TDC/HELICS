@@ -604,7 +604,7 @@ HELICS_EXPORT void helicsFederateProtect(const char* fedName, HelicsError* err);
  later otherwise it will be destroyed
  * when the library is closed
  *
- * @param fed the name of an existing federate that should not be protected
+ * @param fedName the name of an existing federate that should not be protected
  *
  * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
  */
@@ -614,7 +614,7 @@ HELICS_EXPORT void helicsFederateUnProtect(const char* fedName, HelicsError* err
  * checks if an existing federate is protected
  *
  *
- * @param fed the name of an existing federate to check the protection status
+ * @param fedName the name of an existing federate to check the protection status
  *
  * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
  */
