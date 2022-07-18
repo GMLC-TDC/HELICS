@@ -18,6 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <string>
 #include <vector>
+#include <deque>
 
 namespace helics {
 /** forward declaration of Core*/
@@ -39,7 +40,7 @@ struct publication_info {
     }
 };
 /** structure used to contain information about a subscription*/
-struct input_info {
+struct InputData {
     InterfaceHandle coreID;  //!< Handle from the core
     InputId id;  //!< the id used as the identifier
     data_view lastData;  //!< the last published data from a target
@@ -53,7 +54,7 @@ struct input_info {
 
     std::function<void(Input&, Time)> callback;  //!< callback to trigger on update
     bool hasUpdate = false;  //!< indicator that there was an update
-    input_info(std::string_view n_name, std::string_view n_type, std::string_view n_units):
+    InputData(std::string_view n_name, std::string_view n_type, std::string_view n_units):
         name(n_name), type(n_type), units(n_units)
     {
     }
@@ -215,7 +216,7 @@ class ValueFederateManager {
     /// the global callback function
     atomic_guarded<std::function<void(Input&, Time)>> allCallback;
     /// the storage for the message queues and other unique Endpoint information
-    shared_guarded<std::vector<std::unique_ptr<input_info>>> inputData;
+    shared_guarded<std::deque<InputData>> inputData;
     /// container for the target identifications
     shared_guarded<std::multimap<std::string, InterfaceHandle>> targetIDs;
     /// container for the specified input targets
