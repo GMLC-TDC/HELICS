@@ -41,7 +41,7 @@ As of HELICS v3, the only supported language bindings that are included with the
 
 ## HELICS runner
 
-Previously a separate executable, `helics_cli` was used to provide functionality to launch a HELICS-based co-simulation by calling a JSON configuration such as 
+Previously a separate executable, `helics_cli` was used to provide functionality to launch a HELICS-based co-simulation by calling a JSON configuration such as
 
 ```shell
 helics run --path=<path to HELICS runner JSON>

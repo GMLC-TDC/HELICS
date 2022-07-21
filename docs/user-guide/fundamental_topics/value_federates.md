@@ -99,7 +99,6 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
     - logging
 4.  [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
 
-
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
 ![Ex. 1a message topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Message_topology.png)
