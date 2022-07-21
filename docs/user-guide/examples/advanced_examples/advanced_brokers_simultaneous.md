@@ -90,7 +90,7 @@ The Advanced Default example uses a random number generator to determine things 
 
 ## Execution and Results
 
-To run the co-simulations simultaneously, all that is required is having `helics_cli` launch each individually. The trailing `&` in the shell commands below background the command and return another shell prompt to the user.
+To run the co-simulations simultaneously, all that is required is having the HELICS runner launch each individually. The trailing `&` in the shell commands below background the command and return another shell prompt to the user.
 
 `$ helics run --path=./federation_1/federation_1_runner.json &`
 `$ helics run --path=./federation_2/federation_2_runner.json &`

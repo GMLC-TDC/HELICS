@@ -8,7 +8,7 @@ The Base Example tutorial is organized as follows:
 - [Default Setup](#default-setup)
   - [Messages + Communication: pub sub](#messages-communication-pub-sub)
   - [Simulator Integration: External JSON](#simulator-integration-external-json)
-  - [Co-simulation Execution: `helics_cli`](#co-simulation-execution-helics-cli)
+  - [Co-simulation Execution:](#co-simulation-execution-helics-cli)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
@@ -21,11 +21,11 @@ The files include:
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Default Setup
 
-The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. We recommend launching the co-simulation with [`helics_cli`](../../fundamental_topics/helics_cli.md). This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSON files and how to launch the co-simulation with `helics_cli`.
+The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSON files and how to launch the co-simulation with the HELICS runner.
 
 ### Messages + Communication: pub/sub
 
@@ -106,14 +106,14 @@ fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
 
 Recall that federate registration and configuration is typically done **before** entering execution mode.
 
-### Co-simulation Execution: `helics_cli`
+### Co-simulation Execution
 
 At this point in setting up the Base Example co-simulation, we have:
 
 1. Placed the necessary HELICS components in each federate program
 2. Written the configuration JSON files for each federate
 
-It's now time to launch the co-simulation with `helics_cli` ([install helics_cli here!](https://github.com/GMLC-TDC/helics-cli)). This is accomplished by creating a **runner** JSON file. `helics_cli` allows the user to launch multiple simulations in one command line, which otherwise would have required multiple terminals.
+It's now time to launch the co-simulation with the HELICS runner. This is accomplished by creating a **runner** JSON file. The HELICS runner allows the user to launch multiple simulations in one command line, which otherwise would have required multiple terminals.
 
 The runner JSON for the Base Example is called `fundamental_default_runner.json`:
 
@@ -149,7 +149,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 2. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
 3. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
 
-The final step is to launch our Base Example with `helics_cli` from the command line:
+The final step is to launch our Base Example with the HELICS runner from the command line:
 
 ```shell
 helics run --path=fundamental_default_runner.json

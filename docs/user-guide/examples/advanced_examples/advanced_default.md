@@ -21,7 +21,7 @@ The files include:
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
 - Python program and configuration JSON for Controller federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Co-simulation Setup
 
@@ -33,7 +33,7 @@ As you may or may not have read in the [User Guide](../../fundamental_topics/mes
 
 ### Co-simulation Execution and Results
 
-As in the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), `helics_cli` is used to launch the co-simulation:
+As in the [Fundamental Base Example](../fundamental_examples/fundamental_default.md), the HELICS runner is used to launch the co-simulation:
 
 ```shell
 > helics run --path=advanced_default_runner.json

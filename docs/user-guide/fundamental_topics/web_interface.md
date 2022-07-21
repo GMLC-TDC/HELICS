@@ -6,7 +6,7 @@ Using the webserver that HELICS provides to access data about a cosimulation (wi
 
 ## Launching Web Interface
 
-The web interface requires the use of [helics_cli](helics_cli.md) to run the co-simulation and is created by the following command:
+The web interface requires the use of [helics_cli](helics_run.md) to run the co-simulation and is created by the following command:
 
 ```sh
 $ helics_cli server

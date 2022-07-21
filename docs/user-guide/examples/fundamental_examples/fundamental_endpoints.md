@@ -23,7 +23,7 @@ The files include:
 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Federate Communication with Endpoints
 

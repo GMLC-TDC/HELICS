@@ -98,7 +98,7 @@ To demonstrate how a to build a co-simulation, an example of a simple integrated
     - time
     - logging
 4.  [PyPower](https://pypi.org/project/PYPOWER/) - `pip install pypower`
-5.  [helics_cli](https://github.com/GMLC-TDC/helics-cli) - `pip install git+git://github.com/GMLC-TDC/helics-cli.git@main`
+
 
 This example has a very simple message topology (with only one message being sent by either federate at each time step) and uses only a single broker. Diagrams of the message and broker topology can be found below:
 
@@ -112,9 +112,9 @@ This example has a very simple message topology (with only one message being sen
 
 In this particular case, the Python script executing the transmission model also creates the broker; this is a choice of convenience and could have been created by any other federates. This simulation is run for 24 hours.
 
-### Running co-simulations via helics_cli
+### Running co-simulations via `helics run ...`
 
-To run this simulation, the HELICS team has also developed an application called `helics_cli` (command line interface) which, among other uses, creates a standardized means of launching co-simulations. The application can be downloaded from the [helics_cli repository](https://github.com/GMLC-TDC/helics-cli). Discussion of how to configure `helics_cli` for a given simulation is discussed in the [section on helics_cli](./helics_cli.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
+To run this simulation, the HELICS team has also developed a standardized means of launching co-simulations. Discussion of how to configure a JSON for use in launching a HELICS-based co-simulation is discussed in the [over here](./helics_run.md) but for all these examples, the configuration has already been done. In this case, that configuration is in the examples folder as "cosim_runner_1a.json" and looks like this:
 
 ```json
 {
@@ -144,11 +144,11 @@ Briefly, it's easy to guess what a few of these parameters do:
 
 With a properly written configuration file, launching the co-simulation becomes very straightforward:
 
-`helics run --path <path to helics_cli configuration file>`
+`helics run --path <path to HELICS runner JSON configuration file>`
 
 ### Experiment and Results
 
-To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use helics_cli in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation.
+To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use `helics run ...` in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation.
 
 The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
 
