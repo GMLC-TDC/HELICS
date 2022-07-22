@@ -39,12 +39,12 @@ As of HELICS v3, the only supported language bindings that are included with the
 
 [Build from source](./build_from_source.md)
 
-## helics-cli Installation
+## HELICS runner
 
-[helics-cli](https://github.com/GMLC-TDC/helics-cli) is a supporting tool that provides a simple and standardized way of launching HELICS-based co-simulations. This tool is used for [all the examples in this User Guide](../examples/examples_index.md) and thus its installation is highly recommended. (helics-cli also provides access to the [web interface for monitoring and debugging co-simulations](../fundamental_topics/web_interface.md), another good reason to install it.)
+Previously a separate executable, `helics_cli` was used to provide functionality to launch a HELICS-based co-simulation by calling a JSON configuration such as
 
-Installation of helics-cli is straightforward:
-
-```shell session
-pip install git+git://github.com/GMLC-TDC/helics-cli.git@main
+```shell
+helics run --path=<path to HELICS runner JSON>
 ```
+
+This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install helics` as described above) to gain the runner and web interface functionality.

@@ -31,7 +31,7 @@ In this example, we won't be doing anything like that but, for demonstration pur
 
 ### HELICS Components
 
-To configure a multibroker, the broker configuration line is slightly extended from a traditional federation. From the helics_cli runner configuration file `multi_broker_runner.json`
+To configure a multibroker, the broker configuration line is slightly extended from a traditional federation. From the HELICS runner configuration file `multi_broker_runner.json`
 
 ```json
 "exec": "helics_broker -f 3 --coreType=multi --config=multi_broker_config.json --name=root_broker",
@@ -92,7 +92,7 @@ ControllerConfig.json
 
 ## Execution and Results
 
-Unlike the other advanced broker examples, this one can be run with a single helics_cli command:
+Unlike the other advanced broker examples, this one can be run with a single HELICS runner command:
 
 ```shell-session
 $ helics run --path=./multi_broker_runner.json

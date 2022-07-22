@@ -11,7 +11,7 @@
     timing_configuration
     stages
     logging
-    helics_cli
+    helics_run
     web_interface
     simulator_integration
 
@@ -36,6 +36,6 @@ The topics considered "fundamental" to building a co-simualtion with HELICS are:
   - [Timing Exercise answers](./timing_exercise_answers.md)
 - [**Stages of the Co-simulation**](./stages.md)
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
-- [**Execution with `helics_cli`**](./helics_cli.md) - The HELICS team has developed `helics_cli` as a standardized means of running HELICS co-simulations.
+- [**Execution with `helics run ...`**](./helics_run.md) - The HELICS team has developed a standardized means of running HELICS co-simulations.
 - [**Simulation Management**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 - [**Simulator Integration**](./simulator_integration.md) - A guide for integrating HELICS into simulators.

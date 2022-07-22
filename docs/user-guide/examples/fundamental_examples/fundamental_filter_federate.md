@@ -22,7 +22,7 @@ All files necessary to run the Federate Integration Example can be found in the 
 - Python program and configuration JSON for Controller federate
 - Python program and configuration JSON for Filter federate
 - (Bonus Python program where the Filter Federate does no filtering and forwards on all received messages)
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Filter Federate
 
@@ -91,7 +91,7 @@ Though these operations are just a sample of what any filter federate could do, 
 
 ### Co-simulation execution
 
-Execution of this co-simulation is done as before with `helics_cli`:
+Execution of this co-simulation is done as before with the `helics_run` command:
 
 ```shell
 helics run --path=./fundamental_filter_runner.json

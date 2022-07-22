@@ -27,7 +27,7 @@ The necessary files are:
 
 - Python program for Battery federate ([Battery.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/Battery.py))
 - Python program for Charger federate ([Charger.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/Charger.py))
-- Python program to generate `helics_cli` JSON files and execute ([advanced_orchestration.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/advanced_orchestration.py))
+- Python program to generate HELICS runner JSON files and execute ([advanced_orchestration.py](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_orchestration/advanced_orchestration.py))
 
 ## What is this co-simulation doing?
 
@@ -138,7 +138,7 @@ plot = 0
 run = 1
 ```
 
-This means that we are generating 30 JSON files with unique seeds, we are using the current operating directory as the head for the output path, we are simulating 10 EVs in the co-simulation for one day, we are not running individual plots for each simulation, and we are executing the JSON files with `helics_cli` after they have been created.
+This means that we are generating 30 JSON files with unique seeds, we are using the current operating directory as the head for the output path, we are simulating 10 EVs in the co-simulation for one day, we are not running individual plots for each simulation, and we are executing the JSON files with the HELICS runner after they have been created.
 
 If we wanted to run a Monte Carlo co-sim with different parameters, this would be:
 
@@ -146,9 +146,9 @@ If we wanted to run a Monte Carlo co-sim with different parameters, this would b
 $ python advanced_orchestration.py 10 . 100 24*7 0 0
 ```
 
-This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSON files with `helics_cli` (meaning that `helics_cli` will not be called automatically -- the user will need to manually execute `helics_cli` for each JSON file).
+This execution would create 10 JSON files with unique seeds, set the current directory as the head for the output path, simulate 100 EVs for a week, not generate plots with each simulation, and not execute the JSON files with the HELICS runner (meaning the user will need to manually run each JSON file).
 
-You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to execute `helics_cli` for the generated runner JSON files using the helper script, subdirectories are created for the `helics_cli` runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
+You may decide to adapt `advanced_orchestration.py` to suite your needs within the Merlin environment, in which case you would only need the helper script to create the JSON files. If you elect to use the HELICS runner for the generated runner JSON files using the helper script, subdirectories are created for the HELICS runner JSON files and for the csv results. Results for the default simulation are in the repo and can be used for confirming accurate execution.
 
 ```python
 out_json = output_path + "/cli_runner_scripts"
@@ -195,10 +195,7 @@ This is a time series density plot. Each simulation is a green line, and the blu
 ### Merlin Orchestration Execution
 
 In this specification we will be using the
-[helics_cli](https://github.com/GMLC-TDC/helics-cli) to execute each
-co-simulation run since this is a Monte Carlo simulation. This means
-that `helics_cli` will be executed multiple times with different
-`helics_cli` runner files.
+HELICS runner to execute each co-simulation run since this is a Monte Carlo simulation. This means that the HELICS runner will be called multiple times with different JSON runner files.
 
 #### Co-simulation Reproduction
 
@@ -221,16 +218,13 @@ args = parser.parse_args()
 np.random.seed(args.seed)
 ```
 
-#### `helics_cli` in Merlin
+#### HELICS runner in Merlin
 
-Since we are using the `helics_cli` to manage and execute all the
-federates, we need to create these runner files for `helics_cli`.
+Since we are using the HELICS runner to manage and execute all the
+federates, we need to create these runner JSON files.
 There is a provided python script called `make_samples_merlin.py` (see the
 `simple` subfolder in the code for the example) that will generate the
-runner file and a csv file that will be used in the study step. `helics_cli`
-will start each of these federates. In the Merlin spec, Merlin will be
-instructed to execute the `helics_cli` with all the generated `helics_cli`
-runner files.
+runner file and a csv file that will be used in the study step. The HELICS runner command will start each of these federates. In the Merlin spec, Merlin will be instructed to start each run using the JSON HELICS runner files.
 
 #### Merlin Specification
 
@@ -256,13 +250,12 @@ Merlin will have its own subdirectory in `./UQ_EV_Study`.
 
 Remember this step is for Merlin to setup all the files and data it
 needs to execute its jobs. In the Monte Carlo co-simulation there is
-a python script we created that will generated the `helics_cli` runner
-files that Merlin will use when it executes the `helics_cli`. The
+a python script we created that will generated the HELICS runner
+files that Merlin will use when it executes a specific run. The
 `make_samples_merlin.py` script (located under the `simple` subfolder of
 the advanced orchestration example code) will also output a csv file that
 Merlin will use. The csv file contains all the names of the runner files.
-Merlin will go down this list of file names and execute the `helics_cli`
-for each file name.
+Merlin will go down this list of file names and launch each co-simulation using the HELICS runner JSON file.
 
 ```yaml
 merlin:
@@ -277,7 +270,7 @@ merlin:
 ```
 
 The samples the get generated should look something like below. This
-is the runner file that `helics_cli` will use to start the
+is the runner file that the HELICS runner will use to start the
 co-simulation.
 
 ```json
@@ -317,7 +310,7 @@ Once the samples have been created, we copy the 2 federates to the
 We have made it to the study step. This step will execute all 10 Monte
 Carlo co-simulations. There are 2 steps in the study step. The first
 step is the `start_parallel_sims` step. This step will use the
-`helics_cli` to execute each co-simulation. The second step, `cleanup`
+HELICS runner to execute each co-simulation. The second step, `cleanup`
 depends on the first step. Once `start_parallel_sims` is complete the
 `cleanup` step will remove any temporary data that is no longer
 needed.

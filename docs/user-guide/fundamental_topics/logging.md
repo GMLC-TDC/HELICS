@@ -139,7 +139,7 @@ With the API:
 h.helicsFederateSetLogFile(fed, "logfile.txt")
 ```
 
-Within the `helics_cli` runner JSON:
+Within the HELICS runner JSON:
 
 ```json
 {
