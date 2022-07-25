@@ -121,12 +121,15 @@ HelicsPublication
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_TIME)) {
+    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_CHAR)) {
         if (type == HELICS_DATA_TYPE_RAW) {
             return helicsFederateRegisterTypePublication(fed, key, "raw", units, err);
         }
-        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
-        return nullptr;
+        if (type != HELICS_DATA_TYPE_JSON)
+        {
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
+            return nullptr;
+        }
     }
     try {
         auto pub = std::make_unique<helics::PublicationObject>();
@@ -216,11 +219,11 @@ HelicsInput helicsFederateRegisterInput(HelicsFederate fed, const char* key, Hel
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_TIME)) {
+    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_CHAR)) {
         if (type == HELICS_DATA_TYPE_RAW) {
             return helicsFederateRegisterTypeInput(fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY) {
+        if (type != HELICS_DATA_TYPE_ANY && type != HELICS_DATA_TYPE_JSON) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
             return nullptr;
         }
@@ -267,11 +270,11 @@ HelicsInput
     if (!fedObj) {
         return nullptr;
     }
-    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_TIME)) {
+    if ((type < HELICS_DATA_TYPE_STRING) || (type > HELICS_DATA_TYPE_CHAR)) {
         if (type == HELICS_DATA_TYPE_RAW) {
             return helicsFederateRegisterGlobalTypeInput(fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY) {
+        if (type != HELICS_DATA_TYPE_ANY && type !=HELICS_DATA_TYPE_JSON) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
             return nullptr;
         }

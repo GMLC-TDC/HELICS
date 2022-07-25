@@ -430,7 +430,8 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
         case MultiInputHandlingMethod::VECTORIZE_OPERATION:
             switch (targetType) {
                 case DataType::HELICS_STRING:
-                    type = targetType;
+                case DataType::HELICS_CHAR:
+                    type = DataType::HELICS_STRING;
                     break;
                 case DataType::HELICS_COMPLEX:
                 case DataType::HELICS_COMPLEX_VECTOR:
@@ -813,7 +814,7 @@ char Input::getValueChar()
         }
 
         if ((injectionType == DataType::HELICS_STRING) || (injectionType == DataType::HELICS_ANY) ||
-            (injectionType == DataType::HELICS_CUSTOM)) {
+            (injectionType == DataType::HELICS_CHAR) ||(injectionType == DataType::HELICS_CUSTOM)) {
             std::string out;
             valueExtract(dv, injectionType, out);
             if (changeDetectionEnabled) {

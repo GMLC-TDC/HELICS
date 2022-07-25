@@ -245,6 +245,7 @@ std::enable_if_t<std::is_arithmetic<X>::value && (!std::is_same<X, char>::value)
             break;
         }
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             const auto v = ValueConverter<std::string_view>::interpret(dv);
             if (v.find_first_of(".eE[]") == std::string_view::npos) {
