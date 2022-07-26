@@ -550,6 +550,7 @@ typedef enum {
  * enumeration of possible federate states
  */
 typedef enum {
+    HELICS_STATE_UNKNOWN = -1, /*! used when no information is available about the federate state*/
     HELICS_STATE_STARTUP = 0, /*!< when created the federate is in startup state */
     HELICS_STATE_INITIALIZATION = 1, /*!< entered after the enterInitializingMode call has returned */
     HELICS_STATE_EXECUTION = 2, /*!< entered after the enterExectuationState call has returned */
@@ -1761,14 +1762,15 @@ HELICS_EXPORT void helicsFederateEnterExecutingModeIterativeAsync(HelicsFederate
 HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
- * Get the current state of a federate.
- *
- * @param fed The federate to query.
- *
- * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- *
- * @return State the resulting state if void return HELICS_OK.
- */
+* Get the current state of a federate.
+*
+* @param fed The federate to query.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function. The err object will
+* be removed in a future release as it is not necessary for use the function will not error, invalid federate return HELICS_STATE_UNKOWN
+*
+* @return State the resulting state if the federate is invalid will return HELICS_STATE_UNKNOWN
+*/
 HELICS_EXPORT HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err);
 
 /**

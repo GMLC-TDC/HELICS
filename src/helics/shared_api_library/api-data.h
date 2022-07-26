@@ -137,6 +137,7 @@ typedef enum {
  * enumeration of possible federate states
  */
 typedef enum {
+    HELICS_STATE_UNKNOWN = -1, /*! used when no information is available about the federate state*/
     HELICS_STATE_STARTUP = 0, /*!< when created the federate is in startup state */
     HELICS_STATE_INITIALIZATION = 1, /*!< entered after the enterInitializingMode call has returned */
     HELICS_STATE_EXECUTION = 2, /*!< entered after the enterExectuationState call has returned */
