@@ -125,8 +125,7 @@ HelicsPublication
         if (type == HELICS_DATA_TYPE_RAW) {
             return helicsFederateRegisterTypePublication(fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_JSON)
-        {
+        if (type != HELICS_DATA_TYPE_JSON) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
             return nullptr;
         }
@@ -274,7 +273,7 @@ HelicsInput
         if (type == HELICS_DATA_TYPE_RAW) {
             return helicsFederateRegisterGlobalTypeInput(fed, key, "raw", units, err);
         }
-        if (type != HELICS_DATA_TYPE_ANY && type !=HELICS_DATA_TYPE_JSON) {
+        if (type != HELICS_DATA_TYPE_ANY && type != HELICS_DATA_TYPE_JSON) {
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, unknownTypeCode);
             return nullptr;
         }

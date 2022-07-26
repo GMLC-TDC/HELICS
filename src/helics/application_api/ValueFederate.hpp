@@ -177,7 +177,7 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     Input& registerInput(std::string_view name,
                          std::string_view type,
-        std::string_view units = std::string_view{});
+                         std::string_view units = std::string_view{});
 
     /** register a globally named input
     @details call is only valid in startup mode
@@ -243,7 +243,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param target the name of the publication to subscribe to
     @param units the units associated with the desired output
     */
-    Input& registerSubscription(std::string_view target, std::string_view units = std::string_view{});
+    Input& registerSubscription(std::string_view target,
+                                std::string_view units = std::string_view{});
 
     /** register a subscription
     @details register a subscription for a 1D array of values

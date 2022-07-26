@@ -916,7 +916,7 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
             return ValueConverter<std::string_view>::convert((vectorNorm(vals, size) != 0.0) ? "1" :
                                                                                                "0");
         case DataType::HELICS_STRING:
-        case DataType::HELICS_CHAR:{
+        case DataType::HELICS_CHAR: {
             std::vector<std::complex<double>> CD;
             CD.reserve(size);
             for (size_t ii = 0; ii < size; ++ii) {

@@ -36,7 +36,6 @@ Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::s
 {
     auto handle = coreObject->registerEndpoint(fedID, name, type);
     if (handle.isValid()) {
-
         auto eptHandle = local_endpoints.lock();
         auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {

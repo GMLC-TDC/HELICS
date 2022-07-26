@@ -90,7 +90,7 @@ typedef enum { /* NOLINT */
                HELICS_DATA_TYPE_JSON = 30,
                /** the data type can change*/
                HELICS_DATA_TYPE_MULTI = 33,
-               
+
                /** open type that can be anything*/
                HELICS_DATA_TYPE_ANY = 25262
 } HelicsDataTypes;

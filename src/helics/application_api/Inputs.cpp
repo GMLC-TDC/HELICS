@@ -814,7 +814,8 @@ char Input::getValueChar()
         }
 
         if ((injectionType == DataType::HELICS_STRING) || (injectionType == DataType::HELICS_ANY) ||
-            (injectionType == DataType::HELICS_CHAR) ||(injectionType == DataType::HELICS_CUSTOM)) {
+            (injectionType == DataType::HELICS_CHAR) ||
+            (injectionType == DataType::HELICS_CUSTOM)) {
             std::string out;
             valueExtract(dv, injectionType, out);
             if (changeDetectionEnabled) {
