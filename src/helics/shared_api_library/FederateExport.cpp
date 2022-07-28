@@ -1109,35 +1109,20 @@ void helicsFederateProcessCommunications(HelicsFederate fed, HelicsTime period, 
     }
 }
 
-static const std::map<helics::Federate::Modes, HelicsFederateState> modeEnumConversions{
-    {helics::Federate::Modes::ERROR_STATE, HelicsFederateState::HELICS_STATE_ERROR},
-    {helics::Federate::Modes::STARTUP, HelicsFederateState::HELICS_STATE_STARTUP},
-    {helics::Federate::Modes::EXECUTING, HelicsFederateState::HELICS_STATE_EXECUTION},
-    {helics::Federate::Modes::FINALIZE, HelicsFederateState::HELICS_STATE_FINALIZE},
-    {helics::Federate::Modes::PENDING_EXEC, HelicsFederateState::HELICS_STATE_PENDING_EXEC},
-    {helics::Federate::Modes::PENDING_INIT, HelicsFederateState::HELICS_STATE_PENDING_INIT},
-    {helics::Federate::Modes::PENDING_ITERATIVE_TIME, HelicsFederateState::HELICS_STATE_PENDING_ITERATIVE_TIME},
-    {helics::Federate::Modes::PENDING_TIME, HelicsFederateState::HELICS_STATE_PENDING_TIME},
-    {helics::Federate::Modes::INITIALIZING, HelicsFederateState::HELICS_STATE_INITIALIZATION},
-    {helics::Federate::Modes::PENDING_FINALIZE, HelicsFederateState::HELICS_STATE_PENDING_FINALIZE},
-    {helics::Federate::Modes::FINISHED, HelicsFederateState::HELICS_STATE_FINISHED}};
+static HelicsFederateState stateConversion(helics::Federate::Modes mode)
+{
+    return static_cast<HelicsFederateState>(static_cast<int32_t>(static_cast<std::underlying_type<helics::Federate::Modes>::type>(mode)));
+}
 
 HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
     if (fedObj == nullptr) {
-        return HELICS_STATE_ERROR;
+        return HELICS_STATE_UNKNOWN;
     }
-    try {
-        auto FedMode = fedObj->getCurrentMode();
-        return modeEnumConversions.at(FedMode);
-    }
-    // LCOV_EXCL_START
-    catch (...) {
-        helicsErrorHandler(err);
-        return HELICS_STATE_ERROR;
-    }
-    // LCOV_EXCL_STOP
+
+    auto fedMode = fedObj->getCurrentMode();
+    return stateConversion(fedMode);
 }
 
 void helicsFederateSetTimeRequestEntryCallback(
@@ -1181,7 +1166,7 @@ void helicsFederateSetStateChangeCallback(HelicsFederate fed,
             fedptr->setModeUpdateCallback({});
         } else {
             fedptr->setModeUpdateCallback([stateChange, userdata](helics::Federate::Modes newMode, helics::Federate::Modes oldMode) {
-                stateChange(modeEnumConversions.at(newMode), modeEnumConversions.at(oldMode), userdata);
+                stateChange(stateConversion(newMode), stateConversion(oldMode), userdata);
             });
         }
     }

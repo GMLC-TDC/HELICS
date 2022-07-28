@@ -255,6 +255,7 @@ typedef enum {
 } HelicsIterationResult;
 
 typedef enum {
+    HELICS_STATE_UNKNOWN = -1,
     HELICS_STATE_STARTUP = 0,
     HELICS_STATE_INITIALIZATION = 1,
     HELICS_STATE_EXECUTION = 2,
