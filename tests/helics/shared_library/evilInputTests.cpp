@@ -1382,12 +1382,12 @@ TEST(evil_federate_test, helicsFederateGetState)
     err.error_code = 45;
     auto res1 = helicsFederateGetState(nullptr, &err);
     EXPECT_EQ(err.error_code, 45);
-    EXPECT_EQ(res1, HELICS_STATE_ERROR);
+    EXPECT_EQ(res1, HELICS_STATE_UNKNOWN);
     helicsErrorClear(&err);
     auto res2 = helicsFederateGetState(nullptr, nullptr);
-    EXPECT_EQ(res2, HELICS_STATE_ERROR);
+    EXPECT_EQ(res2, HELICS_STATE_UNKNOWN);
     auto res3 = helicsFederateGetState(evil_federate, &err);
-    EXPECT_EQ(res3, HELICS_STATE_ERROR);
+    EXPECT_EQ(res3, HELICS_STATE_UNKNOWN);
 }
 
 TEST(evil_federate_test, helicsFederateGetCore)

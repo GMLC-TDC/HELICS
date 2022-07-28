@@ -700,7 +700,7 @@ received
     /** get the underlying federateID for the core*/
     auto getID() const noexcept { return fedID; }
     /** get the current state of the federate*/
-    Modes getCurrentMode() const { return currentMode.load(); }
+    Modes getCurrentMode() const noexcept { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
     Time getCurrentTime() const { return currentTime; }
