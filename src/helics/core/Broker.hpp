@@ -29,7 +29,7 @@ class Broker {
      */
     virtual void disconnect() = 0;
 
-    /** check if the broker is connected*/
+    /** check if the broker is CONNECTED*/
     virtual bool isConnected() const = 0;
     /** set the broker to be a root broker
     @details only valid before the initialization function is called*/
@@ -67,7 +67,7 @@ class Broker {
     /** set the broker logging file*/
     virtual void setLogFile(std::string_view lfile) = 0;
 
-    /** waits in the current thread until the broker is disconnected
+    /** waits in the current thread until the broker is DISCONNECTED
     @param msToWait  the timeout to wait for disconnect
     @return true if the disconnect was successful false if it timed out
      */
@@ -144,9 +144,9 @@ class Broker {
     virtual void clearTimeBarrier() = 0;
 
     /**
-    * generate a global error and halt the federation
-    @param errorCode the code to use for the error
-    @param errorString the error message to associate with the error
+    * generate a global ERROR_STATE and halt the federation
+    @param errorCode the code to use for the ERROR_STATE
+    @param errorString the ERROR_STATE message to associate with the ERROR_STATE
     */
     virtual void globalError(int32_t errorCode, std::string_view errorString) = 0;
 };

@@ -36,7 +36,7 @@ namespace helics {
 
 constexpr char universalKey[] = "**";
 
-const std::string& state_string(connection_state state)
+const std::string& state_string(ConnectionState state)
 {
     static const std::string c1{"connected"};
     static const std::string init{"init_requested"};
@@ -44,16 +44,16 @@ const std::string& state_string(connection_state state)
     static const std::string estate{"error"};
     static const std::string dis{"disconnected"};
     switch (state) {
-        case connection_state::operating:
+        case ConnectionState::OPERATING:
             return operating;
-        case connection_state::init_requested:
+        case ConnectionState::INIT_REQUESTED:
             return init;
-        case connection_state::connected:
+        case ConnectionState::CONNECTED:
             return c1;
-        case connection_state::request_disconnect:
-        case connection_state::disconnected:
+        case ConnectionState::REQUEST_DISCONNECT:
+        case ConnectionState::DISCONNECTED:
             return dis;
-        case connection_state::error:
+        case ConnectionState::ERROR_STATE:
         default:
             return estate;
     }
@@ -327,7 +327,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             }
             return;
         }
-        // can't add a non observer federate in operating mode
+        // can't add a non observer federate in OPERATING mode
     } else {
         route_id newroute;
         bool route_created = false;
@@ -492,7 +492,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             return;
         }
     } else {
-        // we are in an error state and terminating
+        // we are in an ERROR_STATE and terminating
         ActionMessage badInit(CMD_FED_ACK);
         setActionFlag(badInit, error_flag);
         badInit.source_id = global_broker_id_local;
@@ -701,9 +701,9 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
         case CMD_PRIORITY_DISCONNECT: {
             auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
             if (brk != nullptr) {
-                brk->state = connection_state::disconnected;
+                brk->state = ConnectionState::DISCONNECTED;
             }
-            if (getAllConnectionState() >= connection_state::disconnected) {
+            if (getAllConnectionState() >= ConnectionState::DISCONNECTED) {
                 if (!isRootc) {
                     ActionMessage dis(CMD_PRIORITY_DISCONNECT);
                     dis.source_id = global_broker_id_local;
@@ -825,7 +825,7 @@ void CoreBroker::labelAsDisconnected(GlobalBrokerId brkid)
 {
     auto disconnect_procedure = [brkid](auto& obj) {
         if (obj.parent == brkid) {
-            obj.state = connection_state::disconnected;
+            obj.state = ConnectionState::DISCONNECTED;
         }
     };
     mBrokers.apply(disconnect_procedure);
@@ -933,17 +933,17 @@ void CoreBroker::sendDisconnect(action_message_def::action_t disconnectType)
     ActionMessage bye(disconnectType);
     bye.source_id = global_broker_id_local;
     mBrokers.apply([this, &bye](auto& brk) {
-        if (brk.state < connection_state::disconnected) {
+        if (brk.state < ConnectionState::DISCONNECTED) {
             if (brk.parent == global_broker_id_local) {
                 this->routeMessage(bye, brk.global_id);
-                brk.state = connection_state::disconnected;
+                brk.state = ConnectionState::DISCONNECTED;
                 brk._sent_disconnect_ack = true;
             }
             if (hasTimeDependency) {
                 timeCoord->removeDependency(brk.global_id);
                 timeCoord->removeDependent(brk.global_id);
             }
-        } else if (brk.state == connection_state::disconnected) {
+        } else if (brk.state == ConnectionState::DISCONNECTED) {
             if (brk._sent_disconnect_ack == false) {
                 ActionMessage dis((brk._core) ? CMD_DISCONNECT_CORE_ACK :
                                                 CMD_DISCONNECT_BROKER_ACK);
@@ -1031,10 +1031,10 @@ void CoreBroker::processCommand(ActionMessage&& command)
                 bool partDisconnected{false};
                 bool ignore{false};
                 for (const auto& brk : mBrokers) {
-                    if (brk.state == connection_state::disconnected) {
+                    if (brk.state == ConnectionState::DISCONNECTED) {
                         partDisconnected = true;
                     }
-                    if (brk.state == connection_state::disconnected &&
+                    if (brk.state == ConnectionState::DISCONNECTED &&
                         brk.global_id == command.source_id) {
                         // the broker in question is already disconnected, ignore this
                         ignore = true;
@@ -1178,7 +1178,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_DISCONNECT_FED: {
             auto fed = mFederates.find(command.source_id);
             if (fed != mFederates.end()) {
-                fed->state = connection_state::disconnected;
+                fed->state = ConnectionState::DISCONNECTED;
             }
             if (!isRootc) {
                 transmit(parent_route_id, command);
@@ -1190,7 +1190,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         } break;
         case CMD_STOP:
             if ((getAllConnectionState() <
-                 connection_state::disconnected)) {  // only send a disconnect message if we
+                 ConnectionState::DISCONNECTED)) {  // only send a disconnect message if we
                                                      // haven't done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
@@ -1448,7 +1448,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             if (brk == nullptr) {
                 break;
             }
-            brk->state = connection_state::init_requested;
+            brk->state = ConnectionState::INIT_REQUESTED;
             if (brk->_observer && getBrokerState() >= BrokerState::OPERATING) {
                 if (isRootc) {
                     ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, cmd.source_id);
@@ -1487,7 +1487,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             }
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
             if (brk != nullptr) {
-                brk->state = connection_state::connected;
+                brk->state = ConnectionState::CONNECTED;
             }
         } break;
         case CMD_INIT_GRANT:
@@ -1587,7 +1587,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto* pub = handles.getPublication(command.name());
             if (pub != nullptr) {
                 auto fed = mFederates.find(pub->getFederateId());
-                if (fed->state < connection_state::error) {
+                if (fed->state < ConnectionState::ERROR_STATE) {
                     command.setAction(CMD_ADD_SUBSCRIBER);
                     command.setDestination(pub->handle);
                     command.payload.clear();
@@ -1612,7 +1612,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto* inp = handles.getInput(command.name());
             if (inp != nullptr) {
                 auto fed = mFederates.find(inp->getFederateId());
-                if (fed->state < connection_state::error) {
+                if (fed->state < ConnectionState::ERROR_STATE) {
                     command.setAction(CMD_ADD_PUBLISHER);
                     command.setDestination(inp->handle);
                     auto* pub = handles.findHandle(command.getSource());
@@ -1660,7 +1660,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             auto* ept = handles.getEndpoint(command.name());
             if (ept != nullptr) {
                 auto fed = mFederates.find(ept->getFederateId());
-                if (fed->state < connection_state::error) {
+                if (fed->state < ConnectionState::ERROR_STATE) {
                     if (command.counter == static_cast<uint16_t>(InterfaceType::ENDPOINT)) {
                         command.setAction(CMD_ADD_ENDPOINT);
                         toggleActionFlag(command, destination_target);
@@ -2427,7 +2427,7 @@ void CoreBroker::routeMessage(ActionMessage&& cmd)
 void CoreBroker::broadcast(ActionMessage& cmd)
 {
     for (const auto& broker : mBrokers) {
-        if ((!broker._nonLocal) && (broker.state < connection_state::disconnected)) {
+        if ((!broker._nonLocal) && (broker.state < ConnectionState::DISCONNECTED)) {
             cmd.dest_id = broker.global_id;
             transmit(broker.route, cmd);
         }
@@ -2803,10 +2803,10 @@ void CoreBroker::processError(ActionMessage& command)
     if (brk == nullptr) {
         auto fed = mFederates.find(command.source_id);
         if (fed != mFederates.end()) {
-            fed->state = connection_state::error;
+            fed->state = ConnectionState::ERROR_STATE;
         }
     } else {
-        brk->state = connection_state::error;
+        brk->state = ConnectionState::ERROR_STATE;
     }
 
     switch (command.action()) {
@@ -2883,7 +2883,7 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                     disconnectBroker(*brk);
                 }
 
-                if ((getAllConnectionState() >= connection_state::disconnected)) {
+                if ((getAllConnectionState() >= ConnectionState::DISCONNECTED)) {
                     timeCoord->disconnect();
                     if (!isRootc) {
                         ActionMessage dis(CMD_DISCONNECT);
@@ -2989,13 +2989,13 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
     for (size_t ii = 0; ii < mBrokers.size(); ++ii) {  // NOLINT
         auto& brk = mBrokers[ii];
         if (brk.global_id == brkid) {
-            if (brk.state != connection_state::error) {
-                brk.state = connection_state::disconnected;
+            if (brk.state != ConnectionState::ERROR_STATE) {
+                brk.state = ConnectionState::DISCONNECTED;
             }
         }
         if (brk.parent == brkid) {
-            if (brk.state != connection_state::error) {
-                brk.state = connection_state::disconnected;
+            if (brk.state != ConnectionState::ERROR_STATE) {
+                brk.state = ConnectionState::DISCONNECTED;
                 markAsDisconnected(brk.global_id);
             }
         }
@@ -3004,8 +3004,8 @@ void CoreBroker::markAsDisconnected(GlobalBrokerId brkid)
         auto& fed = mFederates[ii];
 
         if (fed.parent == brkid) {
-            if (fed.state != connection_state::error) {
-                fed.state = connection_state::disconnected;
+            if (fed.state != ConnectionState::ERROR_STATE) {
+                fed.state = ConnectionState::DISCONNECTED;
             }
         }
     }
@@ -3529,9 +3529,9 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
     for (const auto& broker : mBrokers) {
         if (broker.parent == global_broker_id_local) {
             switch (broker.state) {
-                case connection_state::connected:
-                case connection_state::init_requested:
-                case connection_state::operating: {
+                case ConnectionState::CONNECTED:
+                case ConnectionState::INIT_REQUESTED:
+                case ConnectionState::OPERATING: {
                     int brkindex;
                     if (broker._core) {
                         if (!hasCores) {
@@ -3552,9 +3552,9 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
                     queryReq.dest_id = broker.global_id;
                     transmit(broker.route, queryReq);
                 } break;
-                case connection_state::error:
-                case connection_state::disconnected:
-                case connection_state::request_disconnect:
+                case ConnectionState::ERROR_STATE:
+                case ConnectionState::DISCONNECTED:
+                case ConnectionState::REQUEST_DISCONNECT:
                     if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
                         brkstate["state"] = state_string(broker.state);
@@ -3648,7 +3648,7 @@ static std::string checkFedQuery(const BasicFedInfo& fed, std::string_view query
         response = "true";
     } else if (query == "isconnected") {
         response =
-            (fed.state >= connection_state::connected && fed.state <= connection_state::operating) ?
+            (fed.state >= ConnectionState::CONNECTED && fed.state <= ConnectionState::OPERATING) ?
             "true" :
             "false";
     } else if (query == "state") {
@@ -3656,7 +3656,7 @@ static std::string checkFedQuery(const BasicFedInfo& fed, std::string_view query
         response.append(state_string(fed.state));
         response.push_back('"');
     } else if (query == "isinit") {
-        if (fed.state >= connection_state::operating) {
+        if (fed.state >= ConnectionState::OPERATING) {
             response = "true";
             // if it is false we need to actually go check the federate directly
         }
@@ -3671,13 +3671,13 @@ static std::string checkBrokerQuery(const BasicBrokerInfo& brk, std::string_view
         response = "true";
     } else if (query == "isconnected") {
         response =
-            (brk.state >= connection_state::connected && brk.state <= connection_state::operating) ?
+            (brk.state >= ConnectionState::CONNECTED && brk.state <= ConnectionState::OPERATING) ?
             "true" :
             "false";
     } else if (query == "state") {
         response = state_string(brk.state);
     } else if (query == "isinit") {
-        if (brk.state >= connection_state::operating) {
+        if (brk.state >= ConnectionState::OPERATING) {
             response = "true";
             // if it is false we need to actually go check the federate directly
         }
@@ -3793,15 +3793,15 @@ void CoreBroker::processQuery(ActionMessage& m)
             route = fed->route;
             m.dest_id = fed->parent;
             response = checkFedQuery(*fed, m.payload.to_string());
-            if (response.empty() && fed->state >= connection_state::error) {
+            if (response.empty() && fed->state >= ConnectionState::ERROR_STATE) {
                 route = parent_route_id;
                 switch (fed->state) {
-                    case connection_state::error:
+                    case ConnectionState::ERROR_STATE:
                         response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
                                                              "federate is in error state");
                         break;
-                    case connection_state::disconnected:
-                    case connection_state::request_disconnect:
+                    case ConnectionState::DISCONNECTED:
+                    case ConnectionState::REQUEST_DISCONNECT:
                         response = generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
                                                              "federate is disconnected");
                         break;
@@ -3815,16 +3815,16 @@ void CoreBroker::processQuery(ActionMessage& m)
                 route = broker->route;
                 m.dest_id = broker->global_id;
                 response = checkBrokerQuery(*broker, m.payload.to_string());
-                if (response.empty() && broker->state >= connection_state::error) {
+                if (response.empty() && broker->state >= ConnectionState::ERROR_STATE) {
                     route = parent_route_id;
                     switch (broker->state) {
-                        case connection_state::error:
+                        case ConnectionState::ERROR_STATE:
                             response =
                                 generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
                                                           "target broker is in error state");
                             break;
-                        case connection_state::disconnected:
-                        case connection_state::request_disconnect:
+                        case ConnectionState::DISCONNECTED:
+                        case ConnectionState::REQUEST_DISCONNECT:
                             response =
                                 generateJsonErrorResponse(JsonErrorCodes::SERVICE_UNAVAILABLE,
                                                           "federate is disconnected");
@@ -4128,9 +4128,9 @@ void CoreBroker::checkDependencies()
     }
 }
 
-connection_state CoreBroker::getAllConnectionState() const
+ConnectionState CoreBroker::getAllConnectionState() const
 {
-    connection_state res = connection_state::disconnected;
+    ConnectionState res = ConnectionState::DISCONNECTED;
     int cnt{0};
     for (const auto& brk : mBrokers) {
         if (brk._nonLocal) {
@@ -4141,7 +4141,7 @@ connection_state CoreBroker::getAllConnectionState() const
             res = brk.state;
         }
     }
-    return (cnt > 0) ? res : connection_state::connected;
+    return (cnt > 0) ? res : ConnectionState::CONNECTED;
 }
 
 int CoreBroker::getCountableFederates() const
@@ -4175,14 +4175,14 @@ bool CoreBroker::allInitReady() const
             return false;
         }
     }
-    bool initReady = (getAllConnectionState() >= connection_state::init_requested);
+    bool initReady = (getAllConnectionState() >= ConnectionState::INIT_REQUESTED);
     if (initReady) {
         // now do a more formal count of federates as there may be non-counting ones
         return (getCountableFederates() >= minFederateCount);
     }
     return false;
     // return std::all_of(mBrokers.begin(), mBrokers.end(), [](const auto& brk) {
-    //   return ((brk._nonLocal) || (brk.state==connection_state::init_requested));
+    //   return ((brk._nonLocal) || (brk.state==ConnectionState::INIT_REQUESTED));
     //});
 }
 
