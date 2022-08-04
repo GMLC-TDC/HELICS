@@ -191,7 +191,7 @@ class CoreBroker: public Broker, public BrokerBase {
     bool verifyBrokerKey(ActionMessage& mess) const;
     /** verify the broker key contained in a string
     @return false if the keys do not match*/
-    bool verifyBrokerKey(const std::string& key) const;
+    bool verifyBrokerKey(std::string_view key) const;
 
   public:
     /** connect the core to its broker
@@ -219,7 +219,7 @@ class CoreBroker: public Broker, public BrokerBase {
     virtual bool isOpenToNewFederates() const override;
 
     virtual void
-        setLoggingCallback(const std::function<void(int, std::string_view, std::string_view)>&
+        setLoggingCallback(std::function<void(int, std::string_view, std::string_view)>
                                logFunction) override final;
 
     virtual bool waitForDisconnect(

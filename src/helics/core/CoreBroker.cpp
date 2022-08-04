@@ -115,14 +115,14 @@ const BasicBrokerInfo* CoreBroker::getBrokerById(GlobalBrokerId brokerid) const
 }
 
 void CoreBroker::setLoggingCallback(
-    const std::function<void(int, std::string_view, std::string_view)>& logFunction)
+    std::function<void(int, std::string_view, std::string_view)> logFunction)
 {
     ActionMessage loggerUpdate(CMD_BROKER_CONFIGURE);
     loggerUpdate.messageID = UPDATE_LOGGING_CALLBACK;
     loggerUpdate.source_id = global_id.load();
     if (logFunction) {
         auto ii = getNextAirlockIndex();
-        dataAirlocks[ii].load(logFunction);
+        dataAirlocks[ii].load(std::move(logFunction));
         loggerUpdate.counter = ii;
     } else {
         setActionFlag(loggerUpdate, empty_flag);
@@ -160,7 +160,7 @@ bool CoreBroker::verifyBrokerKey(ActionMessage& mess) const
 }
 /** verify the broker key contained in a string
 @return false if the keys do not match*/
-bool CoreBroker::verifyBrokerKey(const std::string& key) const
+bool CoreBroker::verifyBrokerKey(std::string_view key) const
 {
     return (key == brokerKey || brokerKey == universalKey);
 }

@@ -62,7 +62,7 @@ class Broker {
     the source name and a string with the message
     */
     virtual void setLoggingCallback(
-        const std::function<void(int, std::string_view, std::string_view)>& logFunction) = 0;
+        std::function<void(int, std::string_view, std::string_view)> logFunction) = 0;
 
     /** set the broker logging file*/
     virtual void setLogFile(std::string_view lfile) = 0;

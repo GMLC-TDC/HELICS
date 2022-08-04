@@ -218,9 +218,9 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
         rxend = ept.getHandle();
         timeRx = rtime;
     };
-
+    std::cout<<"settingCallback"<<std::endl;
     ep2.setCallback(mend);
-
+    std::cout<<"finished setting Callback"<<std::endl;
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
