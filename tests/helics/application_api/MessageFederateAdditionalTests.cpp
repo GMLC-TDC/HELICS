@@ -260,12 +260,14 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     auto& epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
+    std::cout<<"settingCallback"<<std::endl;
     mFed1->setMessageNotificationCallback(epid,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
+    std::cout<<"finished setting Callback"<<std::endl;
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
