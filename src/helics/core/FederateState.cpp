@@ -1069,7 +1069,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
         if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd.action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
-        if (ret_code == MessageProcessingResult::ITERATING && ctime != time_granted)
+        if (ret_code == MessageProcessingResult::ITERATING && ctime != time_granted && getState()>=FederateStates::EXECUTING)
         {
             throw("something screwy happened");
         }
