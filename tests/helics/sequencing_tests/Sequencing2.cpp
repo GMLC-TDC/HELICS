@@ -201,6 +201,7 @@ TEST_P(sequence_wait, wait_for_current_time_flag)
         pub1.publish(3.5);
         auto tm1 = vFed1->requestTime(3.0);
         EXPECT_EQ(tm1, 3.0);
+        pub1.publish(9.3);
         vFed1->finalize();
     };
 
@@ -234,7 +235,7 @@ TEST_P(sequence_wait, wait_for_current_time_flag)
 
         vFed2->finalize();
     };
-   // auto delay = helics::delayMessages(vFed1.get(), GetParam(), 500);
+    auto delay = helics::delayMessages(vFed3.get(), GetParam(), 500);
     auto t1 = std::thread(act1);
     auto t2 = std::thread(act2);
 
@@ -259,7 +260,7 @@ TEST_P(sequence_wait, wait_for_current_time_flag)
     vFed3->finalize();
     t1.join();
     t2.join();
- //    delay.get();
+    delay.get();
 }
 
-INSTANTIATE_TEST_SUITE_P(sequencing_test, sequence_wait, ::testing::Range(0, 3), testNamer);
+INSTANTIATE_TEST_SUITE_P(sequencing_test, sequence_wait, ::testing::Range(0, 40), testNamer);
