@@ -552,7 +552,7 @@ class CommonCore: public Core, public BrokerBase {
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/
-    void sendDisconnect(action_message_def::action_t disconnectType=CMD_STOP);
+    void sendDisconnect(action_message_def::action_t disconnectType = CMD_STOP);
     /** broadcast a message to all federates*/
     void broadcastToFederates(ActionMessage& cmd);
     /** generate a counter for when to reset object*/

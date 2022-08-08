@@ -4530,15 +4530,15 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     // only send a disconnect message
                     // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
-                    cmd.source_id=global_broker_id_local;
+                    cmd.source_id = global_broker_id_local;
                     broadcastToFederates(cmd);
                     sendDisconnect();
                 }
             } else if (getBrokerState() == BrokerState::ERRORED) {
                 // we are disconnecting in an error state
                 LOG_ERROR(global_broker_id_local,
-                    getIdentifier(),
-                    "received timeout disconnect in error state");
+                          getIdentifier(),
+                          "received timeout disconnect in error state");
                 sendDisconnect();
             }
             addActionMessage(CMD_STOP);
@@ -4551,7 +4551,6 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                                  // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
                     sendDisconnect();
-                    
                 }
             }
             if (filterThread.load() == std::this_thread::get_id()) {
@@ -5045,7 +5044,7 @@ void CommonCore::sendDisconnect(action_message_def::action_t disconnectType)
     bye.source_id = global_broker_id_local;
     for (auto fed : loopFederates) {
         if (fed->getState() != FederateStates::FINISHED) {
-            bye.dest_id=fed->global_id;
+            bye.dest_id = fed->global_id;
             fed->addAction(bye);
         }
         if (hasTimeDependency) {

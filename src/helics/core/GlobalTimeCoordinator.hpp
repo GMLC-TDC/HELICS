@@ -22,13 +22,14 @@ namespace helics {
 
 /** class implementing a global time coordination in a non distributed fashion
  */
-    class GlobalTimeCoordinator : public BaseTimeCoordinator {
-    private:
-        // the variables for time coordination
-        Time currentMinTime{ Time::minVal() };
-        TimeState currentTimeState{ TimeState::initialized };
-        Time nextEvent{ Time::maxVal() };
-        int execChecks{ 0 };
+class GlobalTimeCoordinator: public BaseTimeCoordinator {
+  private:
+    // the variables for time coordination
+    Time currentMinTime{Time::minVal()};
+    TimeState currentTimeState{TimeState::initialized};
+    Time nextEvent{Time::maxVal()};
+    int execChecks{0};
+
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
 

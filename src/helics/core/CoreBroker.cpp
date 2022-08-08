@@ -1191,7 +1191,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_STOP:
             if ((getAllConnectionState() <
                  ConnectionState::DISCONNECTED)) {  // only send a disconnect message if we
-                                                     // haven't done so already
+                                                    // haven't done so already
                 timeCoord->disconnect();
                 if (!isRootc) {
                     ActionMessage m(CMD_DISCONNECT);

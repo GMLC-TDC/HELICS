@@ -683,7 +683,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
 
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
-        
+
         // now fill the event vector so external systems know what has been updated
         switch (iterate) {
             case IterationRequest::FORCE_ITERATION:
@@ -1044,7 +1044,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     if (profilerActive) {
         generateProfilingMessage(true);
     }
-    auto ctime=time_granted;
+    auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
@@ -1054,12 +1054,9 @@ MessageProcessingResult FederateState::processQueue() noexcept
             delayQueues[cmd.source_id].push_back(cmd);
             continue;
         }
-        if (ctime == 3.0 && cmd.action() == CMD_TIME_REQUEST)
-        {
+        if (ctime == 3.0 && cmd.action() == CMD_TIME_REQUEST) {
             ret_code = processActionMessage(cmd);
-        }
-        else
-        {
+        } else {
             //    messLog.push_back(cmd);
             ret_code = processActionMessage(cmd);
         }
@@ -1069,12 +1066,12 @@ MessageProcessingResult FederateState::processQueue() noexcept
         if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd.action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
-        if (ret_code == MessageProcessingResult::ITERATING && ctime != time_granted && getState()>=FederateStates::EXECUTING)
-        {
+        if (ret_code == MessageProcessingResult::ITERATING && ctime != time_granted &&
+            getState() >= FederateStates::EXECUTING) {
             throw("something screwy happened");
         }
     }
-    
+
     if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
         if (!initError && !error_cmd) {
             if (parent_ != nullptr) {

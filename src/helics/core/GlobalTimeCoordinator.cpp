@@ -111,7 +111,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.actionTime = trigTime;
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
-               
+
                 ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
@@ -157,7 +157,7 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["nextEvent"] = static_cast<double>(nextEvent);
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
-    base["execChecks"]=execChecks;
+    base["execChecks"] = execChecks;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 

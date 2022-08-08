@@ -218,13 +218,13 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
         rxend = ept.getHandle();
         timeRx = rtime;
     };
-    std::cout<<"settingCallback"<<std::endl;
+    std::cout << "settingCallback" << std::endl;
     ep2.setCallback(mend);
-    std::cout<<"finished setting Callback"<<std::endl;
+    std::cout << "finished setting Callback" << std::endl;
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
-    std::cout<<"check0"<<std::endl;
+    std::cout << "check0" << std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
@@ -237,7 +237,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_TRUE(res);
     res = ep1.hasMessage();
     EXPECT_TRUE(!res);
-    std::cout<<"check1"<<std::endl;
+    std::cout << "check1" << std::endl;
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
     auto M = ep2.getMessage();
@@ -246,7 +246,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
-    std::cout<<"check2"<<std::endl;
+    std::cout << "check2" << std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
@@ -260,14 +260,14 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     auto& epid2 = mFed2->registerGlobalEndpoint("ep2", "random");
     std::atomic<int> e1cnt{0};
     std::atomic<int> e2cnt{0};
-    std::cout<<"settingCallback"<<std::endl;
+    std::cout << "settingCallback" << std::endl;
     mFed1->setMessageNotificationCallback(epid,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e1cnt; });
     mFed2->setMessageNotificationCallback(epid2,
                                           [&](const helics::Endpoint& /*unused*/,
                                               helics::Time /*unused*/) { ++e2cnt; });
-    std::cout<<"finished setting Callback"<<std::endl;
+    std::cout << "finished setting Callback" << std::endl;
     // mFed1->getCorePointer()->setLoggingLevel(0, 5);
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -275,7 +275,7 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     mFed1->enterExecutingModeAsync();
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
-    std::cout<<"check0"<<std::endl;
+    std::cout << "check0" << std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
@@ -293,7 +293,7 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 
     EXPECT_EQ(gtime, 1.0);
     EXPECT_EQ(mFed1->requestTimeComplete(), 1.0);
-    std::cout<<"check1"<<std::endl;
+    std::cout << "check1" << std::endl;
     EXPECT_TRUE(!mFed1->hasMessage());
 
     EXPECT_TRUE(!mFed1->hasMessage(epid));
@@ -324,14 +324,14 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_EQ(M4->dest, "ep2");
     EXPECT_EQ(M4->original_source, "fed0/ep1");
     EXPECT_EQ(M4->time, 0.0);
-    std::cout<<"check2"<<std::endl;
+    std::cout << "check2" << std::endl;
     EXPECT_EQ(e1cnt, 0);
     EXPECT_EQ(e2cnt, 4);
     mFed1->finalizeAsync();
     mFed2->disconnect();
     mFed1->finalizeComplete();
     mFed1->disconnect();
-    std::cout<<"check3"<<std::endl;
+    std::cout << "check3" << std::endl;
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }

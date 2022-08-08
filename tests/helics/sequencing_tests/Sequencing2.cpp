@@ -175,7 +175,6 @@ INSTANTIATE_TEST_SUITE_P(sequencing_test, sequencing_reroute, ::testing::Range(1
 
 class sequence_wait: public ::testing::TestWithParam<int>, public FederateTestFixture {};
 
-
 TEST_P(sequence_wait, wait_for_current_time_flag)
 {
     extraBrokerArgs = " --debugging ";
@@ -244,7 +243,7 @@ TEST_P(sequence_wait, wait_for_current_time_flag)
     EXPECT_EQ(tm3, 1.0);
     double val3 = sub3.getValue<double>();
     EXPECT_DOUBLE_EQ(val3,
-        3.5);  // should have gotten the update from the wait_for_current_time_flag
+                     3.5);  // should have gotten the update from the wait_for_current_time_flag
 
     tm3 = vFed3->requestTime(2.0);
     EXPECT_EQ(tm3, 2.0);

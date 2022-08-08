@@ -271,7 +271,7 @@ void generateJsonOutputTimeData(Json::Value& output, const TimeData& dep, bool i
     output["granted_iteration"] = dep.grantedIteration;
     output["sequenceCounter"] = dep.sequenceCounter;
     output["interrupted"] = dep.interrupted;
-    output["delayed"]=dep.delayedTiming;
+    output["delayed"] = dep.delayedTiming;
     if (includeAggregates) {
         output["minde_alt"] = static_cast<double>(dep.minDe);
         output["minfedActual"] = dep.minFedActual.baseValue();
