@@ -111,9 +111,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.actionTime = trigTime;
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
-                if (trigTime <= timeZero) {
-                    std::cerr << "negative trigger time" << std::endl;
-                }
+               
                 ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
@@ -159,6 +157,7 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["nextEvent"] = static_cast<double>(nextEvent);
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
+    base["execChecks"]=execChecks;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -172,7 +171,7 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
-
+    ++execChecks;
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {
@@ -258,6 +257,9 @@ void GlobalTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
         for (const auto& dep : dependencies) {
             if (dep.dependent) {
                 if (dep.fedID == skipFed) {
+                    continue;
+                }
+                if (!dep.dependent) {
                     continue;
                 }
                 if (msg.action() == CMD_EXEC_REQUEST) {
