@@ -86,17 +86,10 @@ fi
 if [[ "$CXX_STANDARD" ]]; then
     OPTION_FLAGS_ARR+=("-DCMAKE_CXX_STANDARD=${CXX_STANDARD}")
 fi
-
-# Travis related options
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-    OPTION_FLAGS_ARR+=("-DHELICS_DISABLE_SYSTEM_CALL_TESTS=ON")
-fi
 export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[*]}
 
 # Set any HELICS flags for finding dependencies
-if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-    export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
-fi
+# relic from Travis CI: export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
 
 # Setup the flags for controlling test execution
 TEST_FLAGS_ARR=("$TEST_TYPE")

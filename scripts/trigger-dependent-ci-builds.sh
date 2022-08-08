@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#BUILD_MESSAGE="Test ${TRAVIS_REPO_SLUG} ${TRAVIS_COMMIT_RANGE}"
-
 # Trigger HELICS-FMI build
 #body='{
 #"request": {
@@ -10,14 +8,6 @@
 #body+='",
 #"branch":"master"
 #}}'
-
-#curl -s -X POST \
-#    -H "Content-Type: application/json" \
-#    -H "Accept: application/json" \
-#    -H "Travis-API-Version: 3" \
-#    -H "Authorization: token ${HELICSBOT_TRAVIS_ORG_TOKEN}" \
-#    -d "$body" \
-#    https://api.travis-ci.org/repo/GMLC-TDC%2FHELICS-FMI/requests
 
 # Takes 2 arguments, a Azure org/project slug and pipeline/build definition id
 trigger_azure_build() {
@@ -31,7 +21,7 @@ trigger_azure_build() {
     body+='"parameters": "{'${BUILD_PARAMS}'}",'
     body+='
     "reason": "individualCI",
-    "sourceBranch": "refs/heads/'${TRAVIS_BRANCH}'"
+    "sourceBranch": "refs/heads/'${GITHUB_REF_NAME}'"
     }'
 
     curl -s -X POST \
