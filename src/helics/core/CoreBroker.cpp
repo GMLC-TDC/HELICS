@@ -36,7 +36,7 @@ namespace helics {
 
 constexpr char universalKey[] = "**";
 
-const std::string& state_string(ConnectionState state)
+const std::string& stateString(ConnectionState state)
 {
     static const std::string c1{"connected"};
     static const std::string init{"init_requested"};
@@ -3324,7 +3324,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             Json::Value fedstate;
             fedstate["attributes"] = Json::objectValue;
             fedstate["attributes"]["name"] = fed.name;
-            fedstate["state"] = state_string(fed.state);
+            fedstate["state"] = stateString(fed.state);
             fedstate["attributes"]["id"] = fed.global_id.baseValue();
             fedstate["attributes"]["parent"] = fed.parent.baseValue();
             base["federates"].append(std::move(fedstate));
@@ -3333,7 +3333,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
         base["brokers"] = Json::arrayValue;
         for (const auto& brk : mBrokers) {
             Json::Value brkstate;
-            brkstate["state"] = state_string(brk.state);
+            brkstate["state"] = stateString(brk.state);
             brkstate["attributes"] = Json::objectValue;
             brkstate["attributes"]["name"] = brk.name;
             brkstate["attributes"]["id"] = brk.global_id.baseValue();
@@ -3557,7 +3557,7 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
                 case ConnectionState::REQUEST_DISCONNECT:
                     if (index == GLOBAL_STATE) {
                         Json::Value brkstate;
-                        brkstate["state"] = state_string(broker.state);
+                        brkstate["state"] = stateString(broker.state);
                         brkstate["attributes"] = Json::objectValue;
                         brkstate["attributes"]["name"] = broker.name;
                         brkstate["attributes"]["id"] = broker.global_id.baseValue();
@@ -3653,7 +3653,7 @@ static std::string checkFedQuery(const BasicFedInfo& fed, std::string_view query
             "false";
     } else if (query == "state") {
         response.push_back('"');
-        response.append(state_string(fed.state));
+        response.append(stateString(fed.state));
         response.push_back('"');
     } else if (query == "isinit") {
         if (fed.state >= ConnectionState::OPERATING) {
@@ -3675,7 +3675,7 @@ static std::string checkBrokerQuery(const BasicBrokerInfo& brk, std::string_view
             "true" :
             "false";
     } else if (query == "state") {
-        response = state_string(brk.state);
+        response = stateString(brk.state);
     } else if (query == "isinit") {
         if (brk.state >= ConnectionState::OPERATING) {
             response = "true";
