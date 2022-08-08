@@ -45,7 +45,7 @@ repos:
       - id: prettier
         exclude: ^(docs/user-guide/examples/user_guide_examples)
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.6
+    rev: 3.0.0
     hooks:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
