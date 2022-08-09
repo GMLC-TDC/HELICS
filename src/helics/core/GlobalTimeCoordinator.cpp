@@ -174,12 +174,16 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId triggerFed)
 {
+    if (!checkingExec)
+    {
+        throw("wierd");
+    }
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     ++execChecks;
     lastExec = triggerFed;
     // remove once debugging complete
     if (execChecks == 1) {
-        for (auto& dep : dependencies) {
+        for (const auto& dep : dependencies) {
             if (dep.mTimeState >= TimeState::exec_requested) {
                 ++execCounter;
             }
@@ -190,7 +194,7 @@ MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId t
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
-            for (auto& dep : dependencies) {
+            for (const auto& dep : dependencies) {
                 if (dep.dependency) {
                     if (dep.minFed != mSourceId) {
                         allowed = false;
