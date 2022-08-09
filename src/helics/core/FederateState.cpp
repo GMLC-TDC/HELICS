@@ -1055,7 +1055,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
             continue;
         }
         ret_code = processActionMessage(cmd);
-        
+
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }

@@ -158,8 +158,8 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
     base["execChecks"] = execChecks;
-    base["executing"]=executionMode;
-    base["lastExec"]=lastExec.baseValue();
+    base["executing"] = executionMode;
+    base["lastExec"] = lastExec.baseValue();
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -174,7 +174,7 @@ MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId t
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     ++execChecks;
-    lastExec=triggerFed;
+    lastExec = triggerFed;
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {
