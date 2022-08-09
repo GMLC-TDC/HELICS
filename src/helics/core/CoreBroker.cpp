@@ -1210,7 +1210,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 timeCoord->processTimeMessage(command);
                 if (!enteredExecutionMode) {
-                    auto res = timeCoord->checkExecEntry();
+                    auto res = timeCoord->checkExecEntry(command.source_id);
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
                         LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
@@ -1257,7 +1257,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     if (enteredExecutionMode) {
                         timeCoord->updateTimeFactors();
                     } else {
-                        auto res = timeCoord->checkExecEntry();
+                        auto res = timeCoord->checkExecEntry(command.source_id);
                         if (res == MessageProcessingResult::NEXT_STEP) {
                             enteredExecutionMode = true;
                             LOG_TIMING(global_broker_id_local,

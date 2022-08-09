@@ -28,7 +28,10 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     Time currentMinTime{Time::minVal()};
     TimeState currentTimeState{TimeState::initialized};
     Time nextEvent{Time::maxVal()};
+    //everything after this for debugging
     int execChecks{0};
+    int execCounter{0};
+    int depCount{ 0 };
     GlobalFederateId lastExec{0};
 
   protected:
