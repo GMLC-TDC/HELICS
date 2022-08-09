@@ -23,7 +23,7 @@ namespace helics {
 static Time findNextTriggerEvent(const TimeDependencies& deps)
 {
     Time me{Time::maxVal()};
-    for (auto& dep : deps) {
+    for (const auto& dep : deps) {
         if (!dep.nonGranting) {
             if (dep.Te < me) {
                 me = dep.Te;
@@ -37,7 +37,7 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
 {
     Time me{Time::maxVal()};
     bool triggered{false};
-    for (auto& dep : deps) {
+    for (const auto& dep : deps) {
         if (dep.next > nextEvent) {
             if (dep.Te < me) {
                 me = dep.Te;
@@ -158,6 +158,8 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
     base["execChecks"] = execChecks;
+    base["executing"]=executionMode;
+    base["lastExec"]=lastExec.baseValue();
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -168,10 +170,11 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
                        static_cast<double>(nextEvent));
 }
 
-MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
+MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId triggerFed)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     ++execChecks;
+    lastExec=triggerFed;
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {

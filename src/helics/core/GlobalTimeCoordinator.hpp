@@ -29,6 +29,7 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     TimeState currentTimeState{TimeState::initialized};
     Time nextEvent{Time::maxVal()};
     int execChecks{0};
+    GlobalFederateId lastExec{0};
 
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating

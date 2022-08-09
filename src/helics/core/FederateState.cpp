@@ -1054,12 +1054,8 @@ MessageProcessingResult FederateState::processQueue() noexcept
             delayQueues[cmd.source_id].push_back(cmd);
             continue;
         }
-        if (ctime == 3.0 && cmd.action() == CMD_TIME_REQUEST) {
-            ret_code = processActionMessage(cmd);
-        } else {
-            //    messLog.push_back(cmd);
-            ret_code = processActionMessage(cmd);
-        }
+        ret_code = processActionMessage(cmd);
+        
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }
