@@ -206,7 +206,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 {
-    debugDiagnostic=true;
+    debugDiagnostic = true;
     SetupTest<helics::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
@@ -248,7 +248,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
 TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 {
-    debugDiagnostic=true;
+    debugDiagnostic = true;
     SetupTest<helics::MessageFederate>(GetParam(), 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
