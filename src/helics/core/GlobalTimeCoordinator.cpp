@@ -158,8 +158,8 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
     base["execChecks"] = execChecks;
-    base["execCounter"]=execCounter;
-    base["depCount"]=depCount;
+    base["execCounter"] = execCounter;
+    base["depCount"] = depCount;
     base["executing"] = executionMode;
     base["lastExec"] = lastExec.baseValue();
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
@@ -177,12 +177,10 @@ MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId t
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     ++execChecks;
     lastExec = triggerFed;
-    //remove once debugging complete
-    if (execChecks == 1)
-    {
+    // remove once debugging complete
+    if (execChecks == 1) {
         for (auto& dep : dependencies) {
-            if (dep.mTimeState >= TimeState::exec_requested)
-            {
+            if (dep.mTimeState >= TimeState::exec_requested) {
                 ++execCounter;
             }
             ++depCount;
