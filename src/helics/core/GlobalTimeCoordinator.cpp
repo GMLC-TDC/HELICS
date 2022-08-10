@@ -171,14 +171,14 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     if (!checkingExec) {
-        
-        if (sendMessageFunction)
-        {
+        if (sendMessageFunction) {
             ActionMessage logcmd(CMD_LOG);
-            logcmd.messageID=HELICS_LOG_LEVEL_WARNING;
-            logcmd.dest_id=mSourceId;
-            logcmd.source_id=mSourceId;
-            logcmd.setString(0,"calling check Exec entry without first calling enterExec this is probably a bug");
+            logcmd.messageID = HELICS_LOG_LEVEL_WARNING;
+            logcmd.dest_id = mSourceId;
+            logcmd.source_id = mSourceId;
+            logcmd.setString(
+                0,
+                "calling check Exec entry without first calling enterExec this is probably a bug");
             sendMessageFunction(logcmd);
         }
         return MessageProcessingResult::CONTINUE_PROCESSING;
