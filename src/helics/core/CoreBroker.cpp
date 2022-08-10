@@ -2859,8 +2859,7 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                 // deal with the time implications of the message
                 if (hasTimeDependency) {
                     if (!enteredExecutionMode) {
-                        if (getBrokerState() >= BrokerState::OPERATING)
-                        {
+                        if (getBrokerState() >= BrokerState::OPERATING) {
                             if (timeCoord->processTimeMessage(command)) {
                                 auto res = timeCoord->checkExecEntry();
                                 if (res == MessageProcessingResult::NEXT_STEP) {
