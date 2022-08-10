@@ -178,7 +178,7 @@ MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /
             logcmd.source_id = mSourceId;
             logcmd.setString(
                 0,
-                "calling check Exec entry without first calling enterExec this is probably a bug");
+                "calling checkExecEntry without first calling enterExec this is probably a bug");
             sendMessageFunction(logcmd);
         }
         return MessageProcessingResult::CONTINUE_PROCESSING;
