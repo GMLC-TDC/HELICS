@@ -1208,19 +1208,22 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_EXEC_REQUEST:
         case CMD_EXEC_GRANT:
             if (command.dest_id == global_broker_id_local) {
-                timeCoord->processTimeMessage(command);
-                if (!enteredExecutionMode) {
-                    if (getBrokerState() < BrokerState::OPERATING) {
-                        throw(45);
-                    }
-                    auto res = timeCoord->checkExecEntry(command.source_id);
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
-                        LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
-                    } else {
-                        timeCoord->updateTimeFactors();
+                if (timeCoord->processTimeMessage(command))
+                {
+                    if (!enteredExecutionMode) {
+                        if (getBrokerState() >= BrokerState::OPERATING)
+                        {
+                            auto res = timeCoord->checkExecEntry(command.source_id);
+                            if (res == MessageProcessingResult::NEXT_STEP) {
+                                enteredExecutionMode = true;
+                                LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
+                            } else {
+                                timeCoord->updateTimeFactors();
+                            }
+                        }
                     }
                 }
+                
             } else if (command.source_id == global_broker_id_local) {
                 if (command.dest_id.isValid()) {
                     transmit(getRoute(command.dest_id), command);
@@ -1260,15 +1263,14 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     if (enteredExecutionMode) {
                         timeCoord->updateTimeFactors();
                     } else {
-                        if (getBrokerState() < BrokerState::OPERATING) {
-                            throw("I don't know what is going on");
-                        }
-                        auto res = timeCoord->checkExecEntry(command.source_id);
-                        if (res == MessageProcessingResult::NEXT_STEP) {
-                            enteredExecutionMode = true;
-                            LOG_TIMING(global_broker_id_local,
-                                       getIdentifier(),
-                                       "entering Exec Mode");
+                        if (getBrokerState() >= BrokerState::OPERATING) {
+                            auto res = timeCoord->checkExecEntry(command.source_id);
+                            if (res == MessageProcessingResult::NEXT_STEP) {
+                                enteredExecutionMode = true;
+                                LOG_TIMING(global_broker_id_local,
+                                    getIdentifier(),
+                                    "entering Exec Mode");
+                            }
                         }
                     }
                 }
