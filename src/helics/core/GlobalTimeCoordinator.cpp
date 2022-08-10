@@ -157,11 +157,7 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["nextEvent"] = static_cast<double>(nextEvent);
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
-    base["execChecks"] = execChecks;
-    base["execCounter"] = execCounter;
-    base["depCount"] = depCount;
     base["executing"] = executionMode;
-    base["lastExec"] = lastExec.baseValue();
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -172,23 +168,22 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
                        static_cast<double>(nextEvent));
 }
 
-MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId triggerFed)
+MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     if (!checkingExec) {
-        throw("weird");
+        
+        if (sendMessageFunction)
+        {
+            ActionMessage logcmd(CMD_LOG);
+            logcmd.messageID=HELICS_LOG_LEVEL_WARNING;
+            logcmd.dest_id=mSourceId;
+            logcmd.source_id=mSourceId;
+            logcmd.setString(0,"calling check Exec entry without first calling enterExec this is probably a bug");
+            sendMessageFunction(logcmd);
+        }
+        return MessageProcessingResult::CONTINUE_PROCESSING;
     }
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
-    ++execChecks;
-    lastExec = triggerFed;
-    // remove once debugging complete
-    if (execChecks == 1) {
-        for (const auto& dep : dependencies) {
-            if (dep.mTimeState >= TimeState::exec_requested) {
-                ++execCounter;
-            }
-            ++depCount;
-        }
-    }
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {
