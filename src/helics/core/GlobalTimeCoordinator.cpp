@@ -174,9 +174,8 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId triggerFed)
 {
-    if (!checkingExec)
-    {
-        throw("wierd");
+    if (!checkingExec) {
+        throw("weird");
     }
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
     ++execChecks;
