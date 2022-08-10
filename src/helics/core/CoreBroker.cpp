@@ -1210,6 +1210,10 @@ void CoreBroker::processCommand(ActionMessage&& command)
             if (command.dest_id == global_broker_id_local) {
                 timeCoord->processTimeMessage(command);
                 if (!enteredExecutionMode) {
+                    if (getBrokerState() < BrokerState::OPERATING)
+                    {
+                        throw(45);
+                    }
                     auto res = timeCoord->checkExecEntry(command.source_id);
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
@@ -1257,6 +1261,10 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     if (enteredExecutionMode) {
                         timeCoord->updateTimeFactors();
                     } else {
+                        if (getBrokerState() < BrokerState::OPERATING)
+                        {
+                            throw("I don't know what is going on");
+                        }
                         auto res = timeCoord->checkExecEntry(command.source_id);
                         if (res == MessageProcessingResult::NEXT_STEP) {
                             enteredExecutionMode = true;
@@ -2851,6 +2859,10 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                 // deal with the time implications of the message
                 if (hasTimeDependency) {
                     if (!enteredExecutionMode) {
+                        if (getBrokerState() < BrokerState::OPERATING)
+                        {
+                            throw(45.7);
+                        }
                         timeCoord->processTimeMessage(command);
                         auto res = timeCoord->checkExecEntry();
                         if (res == MessageProcessingResult::NEXT_STEP) {
