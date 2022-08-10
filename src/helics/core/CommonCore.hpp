@@ -52,7 +52,7 @@ enum class InterfaceType : char;
 enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
 /** function to print string for the state*/
-const std::string& state_string(OperatingState state);
+const std::string& stateString(OperatingState state);
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
@@ -552,7 +552,7 @@ class CommonCore: public Core, public BrokerBase {
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/
-    void sendDisconnect();
+    void sendDisconnect(action_message_def::action_t disconnectType = CMD_STOP);
     /** broadcast a message to all federates*/
     void broadcastToFederates(ActionMessage& cmd);
     /** generate a counter for when to reset object*/

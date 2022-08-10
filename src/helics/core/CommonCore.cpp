@@ -53,7 +53,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-const std::string& state_string(OperatingState state)
+const std::string& stateString(OperatingState state)
 {
     static const std::string c1{"connected"};
     static const std::string estate{"error"};
@@ -2768,7 +2768,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
     if (queryStr == "current_state") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
-            val["state"] = state_string(fed.state);
+            val["state"] = stateString(fed.state);
         });
         base["state"] = brokerStateName(getBrokerState());
 
@@ -4468,16 +4468,10 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                                  // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
                 }
             } else if (getBrokerState() ==
                        BrokerState::ERRORED) {  // we are disconnecting in an error state
                 sendDisconnect();
-                ActionMessage m(CMD_DISCONNECT);
-                m.source_id = global_broker_id_local;
-                transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
             // we can't just fall through since this may have generated other messages that need to
@@ -4536,21 +4530,16 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     // only send a disconnect message
                     // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
+                    cmd.source_id = global_broker_id_local;
+                    broadcastToFederates(cmd);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
-                    for (const auto& fed : loopFederates) {
-                        m.dest_id = fed->global_id;
-                        fed.fed->addAction(m);
-                    }
                 }
             } else if (getBrokerState() == BrokerState::ERRORED) {
                 // we are disconnecting in an error state
+                LOG_ERROR(global_broker_id_local,
+                          getIdentifier(),
+                          "received timeout disconnect in error state");
                 sendDisconnect();
-                ActionMessage m(CMD_DISCONNECT);
-                m.source_id = global_broker_id_local;
-                transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
             break;
@@ -4562,9 +4551,6 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                                  // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
                 }
             }
             if (filterThread.load() == std::this_thread::get_id()) {
@@ -5050,14 +5036,15 @@ void CommonCore::checkInFlightQueriesForDisconnect()
     }
 }
 
-void CommonCore::sendDisconnect()
+void CommonCore::sendDisconnect(action_message_def::action_t disconnectType)
 {
     LOG_CONNECTIONS(global_broker_id_local, identifier, "sending disconnect");
     checkInFlightQueriesForDisconnect();
-    ActionMessage bye(CMD_STOP);
+    ActionMessage bye(disconnectType);
     bye.source_id = global_broker_id_local;
     for (auto fed : loopFederates) {
         if (fed->getState() != FederateStates::FINISHED) {
+            bye.dest_id = fed->global_id;
             fed->addAction(bye);
         }
         if (hasTimeDependency) {
@@ -5071,6 +5058,9 @@ void CommonCore::sendDisconnect()
     if (filterFed != nullptr) {
         filterFed->handleMessage(bye);
     }
+    ActionMessage m(CMD_DISCONNECT);
+    m.source_id = global_broker_id_local;
+    transmit(parent_route_id, m);
 }
 
 bool CommonCore::checkForLocalPublication(ActionMessage& cmd)
