@@ -183,6 +183,9 @@ redoc = [
     }
 ]
 
+# mermaid config
+# default js file priority is 500
+mermaid_js_priority = 300
 
 # -- Options for HTML output ----------------------------------------------
 
