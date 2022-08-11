@@ -397,6 +397,8 @@ int helicsDataBufferStringSize(HelicsDataBuffer data)
     switch (helics::detail::detectType(ptr->data())) {
         case helics::DataType::HELICS_STRING:
             return static_cast<int>(helics::detail::getDataSize(ptr->data())) + 1;
+        case helics::DataType::HELICS_CHAR:
+            return 1;
         default: {
             std::string v;
             helics::valueExtract(helics::data_view(*ptr), helics::detail::detectType(ptr->data()), v);
