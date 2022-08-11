@@ -499,6 +499,27 @@ TEST_F(error_tests, mismatched_units_terminate_on_error)
     EXPECT_TRUE(broker->waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
+TEST_F(error_tests, missing_required_ept)
+{
+    auto broker = AddBroker("test", 2);
+
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto fed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    fed1->registerGlobalTargetedEndpoint("t1", "");
+    auto& e2 = fed2->registerGlobalTargetedEndpoint("abcd", "");
+    e2.setOption(helics::defs::Options::CONNECTION_REQUIRED);
+
+    fed1->enterInitializingModeAsync();
+    EXPECT_THROW(fed2->enterInitializingMode(), helics::ConnectionFailure);
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
 class error_tests_type: public ::testing::TestWithParam<const char*>, public FederateTestFixture {};
 
 /** test simple creation and destruction*/

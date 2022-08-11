@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/fmt_format.h"
+#include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
 #include <sstream>
@@ -19,28 +20,72 @@ namespace helics {
 void InterfaceInfo::createPublication(InterfaceHandle handle,
                                       std::string_view key,
                                       std::string_view type,
-                                      std::string_view units)
+                                      std::string_view units,
+                                      std::uint16_t flags)
 {
-    publications.lock()->insert(
-        std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
+    auto cpHandle = publications.lock();
+    cpHandle->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
+    if (checkActionFlag(flags, required_flag)) {
+        cpHandle->back()->setProperty(defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        cpHandle->back()->setProperty(defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, buffer_data_flag)) {
+        cpHandle->back()->setProperty(defs::Options::BUFFER_DATA, 1);
+    }
+    if (checkActionFlag(flags, only_transmit_on_change_flag)) {
+        cpHandle->back()->setProperty(defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE, 1);
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        cpHandle->back()->setProperty(defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::createInput(InterfaceHandle handle,
                                 std::string_view key,
                                 std::string_view type,
-                                std::string_view units)
+                                std::string_view units,
+                                std::uint16_t flags)
 {
     auto ciHandle = inputs.lock();
     ciHandle->insert(std::string(key), handle, GlobalHandle{global_id, handle}, key, type, units);
     ciHandle->back()->only_update_on_change = only_update_on_change;
+
+    if (checkActionFlag(flags, required_flag)) {
+        ciHandle->back()->setProperty(defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        ciHandle->back()->setProperty(defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, only_update_on_change_flag)) {
+        ciHandle->back()->setProperty(defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE, 1);
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        ciHandle->back()->setProperty(defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::createEndpoint(InterfaceHandle handle,
                                    std::string_view endpointName,
-                                   std::string_view type)
+                                   std::string_view type,
+                                   std::uint16_t flags)
 {
-    endpoints.lock()->insert(
+    auto ceHandle = endpoints.lock();
+    ceHandle->insert(
         std::string(endpointName), handle, GlobalHandle{global_id, handle}, endpointName, type);
+    if (checkActionFlag(flags, required_flag)) {
+        ceHandle->back()->setProperty(defs::Options::CONNECTION_REQUIRED, 1);
+    }
+    if (checkActionFlag(flags, optional_flag)) {
+        ceHandle->back()->setProperty(defs::Options::CONNECTION_OPTIONAL, 1);
+    }
+    if (checkActionFlag(flags, targeted_flag)) {
+        ceHandle->back()->targetedEndpoint = true;
+    }
+    if (checkActionFlag(flags, single_connection_flag)) {
+        ceHandle->back()->setProperty(defs::Options::SINGLE_CONNECTION_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
@@ -120,45 +165,7 @@ bool InterfaceInfo::setInputProperty(InterfaceHandle id, int32_t option, int32_t
     if (ipt == nullptr) {
         return false;
     }
-    bool bvalue = (value != 0);
-    switch (option) {
-        case defs::Options::IGNORE_INTERRUPTS:
-            ipt->not_interruptible = bvalue;
-            break;
-        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
-            ipt->only_update_on_change = bvalue;
-            break;
-        case defs::Options::CONNECTION_REQUIRED:
-            ipt->required = bvalue;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            ipt->required = !bvalue;
-            break;
-        case defs::Options::SINGLE_CONNECTION_ONLY:
-            ipt->required_connnections = bvalue ? 1 : 0;
-            break;
-        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            ipt->required_connnections = bvalue ? 0 : 1;
-            break;
-        case defs::Options::STRICT_TYPE_CHECKING:
-            ipt->strict_type_matching = bvalue;
-            break;
-        case defs::Options::IGNORE_UNIT_MISMATCH:
-            ipt->ignore_unit_mismatch = bvalue;
-            break;
-        case defs::Options::CONNECTIONS:
-            ipt->required_connnections = value;
-            break;
-        case defs::Options::INPUT_PRIORITY_LOCATION:
-            ipt->priority_sources.push_back(value);
-            break;
-        case defs::Options::CLEAR_PRIORITY_LIST:
-            ipt->priority_sources.clear();
-            break;
-        default:
-            return false;
-            break;
-    }
+    ipt->setProperty(option, value);
     return true;
 }
 
@@ -168,33 +175,7 @@ bool InterfaceInfo::setPublicationProperty(InterfaceHandle id, int32_t option, i
     if (pub == nullptr) {
         return false;
     }
-    bool bvalue = (value != 0);
-    switch (option) {
-        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
-            pub->only_update_on_change = bvalue;
-            break;
-        case defs::Options::CONNECTION_REQUIRED:
-            pub->required = bvalue;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            pub->required = !bvalue;
-            break;
-        case defs::Options::SINGLE_CONNECTION_ONLY:
-            pub->required_connections = bvalue ? 1 : 0;
-            break;
-        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            pub->required_connections = !bvalue ? 0 : 1;
-            break;
-        case defs::Options::BUFFER_DATA:
-            pub->buffer_data = bvalue;
-            break;
-        case defs::Options::CONNECTIONS:
-            pub->required_connections = value;
-            break;
-        default:
-            return false;
-            break;
-    }
+    pub->setProperty(option, value);
     return true;
 }
 
@@ -204,18 +185,8 @@ bool InterfaceInfo::setEndpointProperty(InterfaceHandle id, int32_t option, int3
     if (ept == nullptr) {
         return false;
     }
-    bool bvalue = (value != 0);
-    switch (option) {
-        case defs::Options::CONNECTION_REQUIRED:
-            ept->required = bvalue;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            ept->required = !bvalue;
-            break;
-        default:
-            return false;
-            break;
-    }
+    ept->setProperty(option, value);
+    ept->setProperty(option, value);
     return true;
 }
 
@@ -225,40 +196,7 @@ int32_t InterfaceInfo::getInputProperty(InterfaceHandle id, int32_t option) cons
     if (ipt == nullptr) {
         return 0;
     }
-    bool flagval = false;
-    switch (option) {
-        case defs::Options::IGNORE_INTERRUPTS:
-            flagval = ipt->not_interruptible;
-            break;
-        case defs::Options::HANDLE_ONLY_UPDATE_ON_CHANGE:
-            flagval = ipt->only_update_on_change;
-            break;
-        case defs::Options::CONNECTION_REQUIRED:
-            flagval = ipt->required;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            flagval = !ipt->required;
-            break;
-        case defs::Options::SINGLE_CONNECTION_ONLY:
-            flagval = (ipt->required_connnections == 1);
-            break;
-        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            flagval = (ipt->required_connnections != 1);
-            break;
-        case defs::Options::STRICT_TYPE_CHECKING:
-            flagval = ipt->strict_type_matching;
-            break;
-        case defs::Options::CONNECTIONS:
-            return static_cast<int32_t>(ipt->input_sources.size());
-        case defs::Options::INPUT_PRIORITY_LOCATION:
-            return ipt->priority_sources.empty() ? -1 : ipt->priority_sources.back();
-        case defs::Options::CLEAR_PRIORITY_LIST:
-            flagval = ipt->priority_sources.empty();
-            break;
-        default:
-            break;
-    }
-    return flagval ? 1 : 0;
+    return ipt->getProperty(option);
 }
 
 int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option) const
@@ -267,32 +205,7 @@ int32_t InterfaceInfo::getPublicationProperty(InterfaceHandle id, int32_t option
     if (pub == nullptr) {
         return 0;
     }
-    bool flagval = false;
-    switch (option) {
-        case defs::Options::HANDLE_ONLY_TRANSMIT_ON_CHANGE:
-            flagval = pub->only_update_on_change;
-            break;
-        case defs::Options::CONNECTION_REQUIRED:
-            flagval = pub->required;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            flagval = !pub->required;
-            break;
-        case defs::Options::SINGLE_CONNECTION_ONLY:
-            flagval = (pub->required_connections == 1);
-            break;
-        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            flagval = pub->required_connections != 1;
-            break;
-        case defs::Options::BUFFER_DATA:
-            flagval = pub->buffer_data;
-            break;
-        case defs::Options::CONNECTIONS:
-            return static_cast<int32_t>(pub->subscribers.size());
-        default:
-            break;
-    }
-    return flagval ? 1 : 0;
+    return pub->getProperty(option);
 }
 
 int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle id, int32_t option) const
@@ -301,18 +214,7 @@ int32_t InterfaceInfo::getEndpointProperty(InterfaceHandle id, int32_t option) c
     if (ept == nullptr) {
         return 0;
     }
-    bool flagval = false;
-    switch (option) {
-        case defs::Options::CONNECTION_REQUIRED:
-            flagval = ept->required;
-            break;
-        case defs::Options::CONNECTION_OPTIONAL:
-            flagval = !ept->required;
-            break;
-        default:
-            break;
-    }
-    return flagval ? 1 : 0;
+    return ept->getProperty(option);
 }
 
 std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues()
@@ -401,6 +303,11 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
         }
     }
     phandle.unlock();
+    auto ehandle = endpoints.lock();
+    for (const auto& ept : ehandle) {
+        ept->checkInterfacesForIssues(issues);
+    }
+    ehandle.unlock();
     return issues;
 }
 

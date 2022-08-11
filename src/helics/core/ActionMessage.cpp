@@ -698,7 +698,7 @@ std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd)
 static constexpr char unknownStr[] = "unknown";
 
 // Map to translate the action to a description
-static constexpr frozen::unordered_map<action_message_def::action_t, frozen::string, 96>
+static constexpr frozen::unordered_map<action_message_def::action_t, std::string_view, 96>
     actionStrings = {
         // priority commands
         {action_message_def::action_t::cmd_priority_disconnect, "priority_disconnect"},
@@ -815,7 +815,7 @@ const char* actionMessageType(action_message_def::action_t action)
 }
 
 // set of strings to translate error codes to something sensible
-static constexpr frozen::unordered_map<int, frozen::string, 8> errorStrings = {
+static constexpr frozen::unordered_map<int, std::string_view, 8> errorStrings = {
     {connection_error_code, "connection error result"},
     {lost_server_connection_code, "lost connection with server"},
     {already_init_error_code, "already in initialization mode"},
