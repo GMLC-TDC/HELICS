@@ -19,7 +19,7 @@ As of HELICS v3, the only supported language bindings that are included with the
 
 ```{mermaid}
 %%{init: {'theme': 'neutral'}}%%
-graph TD
+graph LR
     Start(Do you want to install a <br/> standard HELICS version?) -->|Yes| languageChoice(What language are <br/> you using?)
     Start -->|No| C[Build from source for the <br> particular branch or <br/> configuration that you need.]
     languageChoice -->|Python| python[Use pip: <br><br> pip install helics]
