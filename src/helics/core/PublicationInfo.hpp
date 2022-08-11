@@ -33,7 +33,6 @@ class PublicationInfo {
     const std::string units;  //!< the units of the publication data
     SmallBuffer data;  //!< the most recent publication data
     Time lastPublishTime{timeZero};  //!< the time of the last publication
-    Time lastPublishTime{timeZero};  //!< the time of the last publication
     bool has_update{false};  //!< indicator that the publication has updates
     bool only_update_on_change{false};
     bool required{false};  //!< indicator that it is required to be output someplace
