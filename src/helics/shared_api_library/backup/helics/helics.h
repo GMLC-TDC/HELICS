@@ -108,18 +108,18 @@ typedef enum { /* NOLINT */
                HELICS_DATA_TYPE_BOOLEAN = 7,
                /** time data type*/
                HELICS_DATA_TYPE_TIME = 8,
+               /** data type for a single character*/
+               HELICS_DATA_TYPE_CHAR = 9,
                /** raw data type*/
                HELICS_DATA_TYPE_RAW = 25,
                /** type converts to a valid json string*/
                HELICS_DATA_TYPE_JSON = 30,
                /** the data type can change*/
                HELICS_DATA_TYPE_MULTI = 33,
+
                /** open type that can be anything*/
                HELICS_DATA_TYPE_ANY = 25262
 } HelicsDataTypes;
-
-/** single character data type  this is intentionally the same as string*/
-#define HELICS_DATA_TYPE_CHAR HELICS_DATA_TYPE_STRING
 
 /** enumeration of possible federate flags*/
 typedef enum { /* NOLINT */

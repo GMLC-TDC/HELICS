@@ -575,6 +575,7 @@ defV readJsonValue(const data_view& dv)
                 result = jv["value"].asInt64();
                 break;
             case DataType::HELICS_STRING:
+            case DataType::HELICS_CHAR:
                 result = jv["value"].asString();
                 break;
             case DataType::HELICS_NAMED_POINT:
@@ -605,6 +606,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::string& val)
             break;
         }
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default:
             val = ValueConverter<std::string_view>::interpret(dv);
             break;
@@ -646,6 +648,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::vector<double>& v
             val.push_back(static_cast<double>(tm));
         } break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             helicsGetVector(ValueConverter<std::string_view>::interpret(dv), val);
             break;
@@ -706,6 +709,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::vector<std::compl
             val.emplace_back(static_cast<double>(tm), 0.0);
         } break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             helicsGetComplexVector(ValueConverter<std::string_view>::interpret(dv), val);
             break;
@@ -762,6 +766,7 @@ void valueExtract(const data_view& dv, DataType baseType, std::complex<double>& 
             val = std::complex<double>(static_cast<double>(tm), 0.0);
         } break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             val = helicsGetComplex(ValueConverter<std::string_view>::interpret(dv));
             break;
@@ -821,6 +826,7 @@ void valueExtract(const data_view& dv, DataType baseType, NamedPoint& val)
             val.value = static_cast<double>(tm);
         } break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             val = helicsGetNamedPoint(ValueConverter<std::string_view>::interpret(dv));
             break;
@@ -882,6 +888,7 @@ void valueExtract(const data_view& dv, DataType baseType, Time& val)
             break;
         }
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             size_t index;
             try {
@@ -944,6 +951,7 @@ void valueExtract(const data_view& dv, DataType baseType, bool& val)
             break;
         }
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default:
             val = helicsBoolValue(ValueConverter<std::string_view>::interpret(dv));
             break;
@@ -1007,6 +1015,7 @@ void valueExtract(const data_view& dv, DataType baseType, char& val)
             break;
         }
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             auto sv = ValueConverter<std::string_view>::interpret(dv);
             if (sv.size() == 1) {
@@ -1093,6 +1102,7 @@ void valueExtract(const data_view& dv, DataType baseType, defV& val)
             val = ValueConverter<int64_t>::interpret(dv);
             break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default:
             val = std::string(ValueConverter<std::string_view>::interpret(dv));
             break;
@@ -1148,6 +1158,7 @@ void valueConvert(defV& val, DataType newType)
         case DataType::HELICS_JSON:
             break;
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
         default: {
             if (index == string_loc) {
                 return;

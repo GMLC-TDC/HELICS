@@ -108,6 +108,7 @@ void Publication::publish(char val)
             break;
         case DataType::HELICS_STRING:
         case DataType::HELICS_NAMED_POINT:
+        case DataType::HELICS_CHAR:
             publishString({&val, 1});
             break;
         default:
