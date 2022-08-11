@@ -17,25 +17,7 @@ The first step to using HELICS is to install it. Since there are several ways to
 
 As of HELICS v3, the only supported language bindings that are included with the core HELICS library downloads are C and C++98, in addition to C++17 when building from source. If you end up needing to build from source AND use one of the supported language bindings you'll need to follow the instructions for installing HELICS for said language. This would also be the case if you were needing to run a co-simulation that used tools that provided their HELICS implementation in a variety of languages. Generally speaking, as long as all supported languages are on similar versions, each one can use it own installed version of HELICS without any trouble. The supported languages also have ways of being pointed towards a specific HELICS installation (rather than the one they install for themselves) if that is preferred or necessary for a particular use case.
 
-```{mermaid}
-graph TD
-    A(Do you want to install a <br/> standard HELICS version?) -->|Yes| B(What language are <br/> you using?)
-    A -->|No| C[Build from source for the <br/> particular branch or <br/> configuration that you need.]
-    B --> D(Python)
-    B --> E(C/C++)
-    B --> F(Julia)
-    B --> G(Octave/Java/ <br/> MATLAB/C#)
-    B --> H(Nim)
-    D --> I[Use pip: <br/> pip install helics]
-    E --> J(Are you using a <br/> Windows OS?)
-    F --> K[Use pkg: <br/> pkg> add HELICS]
-    G --> L[Download the pre-compiled <br/> libraries and add them <br/> to your system path, then <br/> build the extension with <br/> SWIG]
-    H --> M[Use nimble: <br/> nimble install <br/> https://github.com/GMLC- <br/> TDC/helics.nim#head]
-    J -->|Yes| N[Download the pre- <br/> compiled libraries and <br/> add them to your <br/> system path]
-    J -->|No| O(Will you be using HELICS <br/> on an HPC System and/or <br/> would you like to use the <br/> spack package installer?)
-    O -->|No| N
-    O -->|Yes| P[Use spack: <br/> spack install helics]
-```
+![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/install_decision_tree.svg)
 
 ### Build from source
 [Build from source](./build_from_source.md)
