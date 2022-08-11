@@ -114,7 +114,6 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
     "sphinxcontrib.rsvgconverter",
-    "nbsphinx",
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
     "sphinxcontrib.redoc",
@@ -184,8 +183,9 @@ redoc = [
 ]
 
 # mermaid config
-# default js file priority is 500
-mermaid_js_priority = 300
+# default js file priority is 500; require.js used by nbsphinx causes issues
+# when it gets loaded first
+mermaid_js_priority = 499
 
 # -- Options for HTML output ----------------------------------------------
 
