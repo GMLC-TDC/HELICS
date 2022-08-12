@@ -20,19 +20,26 @@ As of HELICS v3, the only supported language bindings that are included with the
 ```{mermaid}
 %%{init: {'theme': 'neutral'}}%%
 graph LR
-    Start(Do you want to install a <br/> standard HELICS version?) -->|Yes| languageChoice(What language are <br/> you using?)
-    Start -->|No| C[Build from source for the <br> particular branch or <br/> configuration that you need.]
-    languageChoice -->|Python| python[Use pip: <br><br> pip install helics]
-    languageChoice -->|MATLAB| matlab[Follow instructions in <br> the matHELICS repository]
-    languageChoice -->|julia| julia[Use pkg: <br><br> pck> add helics]
-    languageChoice -->|Java| java[Build from source with the <br> Java CMAKE option set <br><br>HELICS_BUILD_JAVA_INTERFACE=ON]
-    languageChoice -->|nim| nim[Use nimble: <br><br> nimble install <br> https://github.com/GMLC-TDC/helics.nim#head]
-    languageChoice -->|C#| csharp[Build from source with the <br> Java CMAKE option set <br><br>HELICS_BUILD_CSHARP_INTERFACE=ON]
-    languageChoice -->|C/C++| usingWindows[Are you using Windows OS?]
-    usingWindows --> |Yes| precompiled[Download pre-compiled libraries]
-    usingWindows --> |No| hpc[Will you be using HELICS on an HPC?]
-    hpc --> |Yes| spack[use spack]
-    hpc --> |No| precompiled
+    Start(Do you want to install a <br/> standard HELICS version?) -->|Yes| languageChoice
+    Start -->|No| C
+    subgraph Source Build
+        C[Build from source for the <br> particular branch or <br/> configuration that you need.]
+    end
+    subgraph Package Manager/Precompiled
+        languageChoice(What language are <br/> you using?)
+        languageChoice -->|Python| python[Use pip: <br><br> pip install helics]
+        languageChoice -->|MATLAB| matlab[Follow instructions in <br> the matHELICS repository]
+        languageChoice -->|julia| julia[Use pkg: <br><br> pck> add helics]
+        languageChoice -->|Java| java[Build from source with the <br> Java CMAKE option set <br><br>HELICS_BUILD_JAVA_INTERFACE=ON]
+        languageChoice -->|nim| nim[Use nimble: <br><br> nimble install <br> https://github.com/GMLC-TDC/helics.nim#head]
+        languageChoice -->|C#| csharp[Build from source with the <br> C# CMAKE option set <br><br>HELICS_BUILD_CSHARP_INTERFACE=ON]
+        languageChoice -->|C/C++| hpc
+        subgraph &nbsp;
+            hpc[Will you be using HELICS on an HPC?]
+            hpc --> |Yes| spack[use spack]
+            hpc --> |No| precompiled
+        end
+    end
     click python "https://python.helics.org/installation/" "pyhelics installation guide"
     click matlab "https://github.com/GMLC-TDC/matHELICS/blob/main/README.md" "matHELICS installation guide"
     click julia "https://github.com/GMLC-TDC/HELICS.jl/blob/master/README.md" "HELICS.jl installation guide"
@@ -81,3 +88,6 @@ Installation of helics-cli is straightforward:
 ```shell session
 pip install git+git://github.com/GMLC-TDC/helics-cli.git@main
 ```
+
+
+
