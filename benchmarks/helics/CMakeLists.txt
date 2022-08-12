@@ -21,6 +21,7 @@ set(HELICS_BENCHMARKS
     timingBenchmarks
     wattsStrogatzBenchmarks
     barabasiAlbertBenchmarks
+    TcpFederate
 )
 
 set(HELICS_MULTINODE_BENCHMARKS
