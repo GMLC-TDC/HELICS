@@ -7,16 +7,16 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #pragma once
 
-
 #include "gmlc/networking/AsioContextManager.h"
 #include "gmlc/networking/TcpHelperClasses.h"
 #include "helics/network/networkDefaults.hpp"
 #include "helics/network/tcp/TcpBroker.h"
 #include "helics/network/tcp/TcpComms.h"
 #include "helics/network/tcp/TcpCore.h"
+
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
 
 using namespace std::literals::chrono_literals;
 using asio::ip::tcp;
@@ -32,30 +32,31 @@ int singleMessage(int msg_size)
 
     auto contextp = AsioContextManager::getContextPointer();
 
-    auto server = gmlc::networking::TcpServer::create(contextp->getBaseContext(), localhost, helics::network::DEFAULT_TCP_PORT);
+    auto server = gmlc::networking::TcpServer::create(contextp->getBaseContext(),
+                                                      localhost,
+                                                      helics::network::DEFAULT_TCP_PORT);
 
-    while (!server->isReady()) {};
+    while (!server->isReady()) {
+    };
 
     auto contextloop = contextp->startContextLoop();
 
     size_t data_recv_size;
     server->setDataCall(
-        [&](const gmlc::networking::TcpConnection::pointer&,
-            const char* data,
-            size_t data_size) {
-                data_recv_size = data_size;
-                count++;
-                std::cout << "received msg: " << data << '\n';
-                return data_size;
-        }
-    );
+        [&](const gmlc::networking::TcpConnection::pointer&, const char* data, size_t data_size) {
+            data_recv_size = data_size;
+            count++;
+            std::cout << "received msg: " << data << '\n';
+            return data_size;
+        });
 
     server->start();
 
-
-    auto connection = gmlc::networking::TcpConnection::create(contextp->getBaseContext(), localhost, "24160", 1024);
+    auto connection = gmlc::networking::TcpConnection::create(contextp->getBaseContext(),
+                                                              localhost,
+                                                              "24160",
+                                                              1024);
     auto connected = connection->waitUntilConnected(1000ms);
-
 
     std::this_thread::sleep_for(200ms);
     std::string txstring(msg_size, '1');
@@ -65,8 +66,6 @@ int singleMessage(int msg_size)
     connection->close();
     server->close();
     return 0;
-
-
 }
 
 int singleConnection(int n)
@@ -78,55 +77,54 @@ int singleConnection(int n)
 
     auto contextp = AsioContextManager::getContextPointer();
 
-    auto server = gmlc::networking::TcpServer::create(contextp->getBaseContext(), localhost, helics::network::DEFAULT_TCP_PORT);
+    auto server = gmlc::networking::TcpServer::create(contextp->getBaseContext(),
+                                                      localhost,
+                                                      helics::network::DEFAULT_TCP_PORT);
 
-    while (!server->isReady()) {};
+    while (!server->isReady()) {
+    };
 
     auto contextloop = contextp->startContextLoop();
 
     size_t data_recv_size;
     server->setDataCall(
-        [&](const gmlc::networking::TcpConnection::pointer&,
-            const char* data,
-            size_t data_size) {
-                data_recv_size = data_size;
-                count++;
-                return data_size;
-            }
-    );
-    
+        [&](const gmlc::networking::TcpConnection::pointer&, const char* data, size_t data_size) {
+            data_recv_size = data_size;
+            count++;
+            return data_size;
+        });
+
     server->start();
- 
 
-    auto connection = gmlc::networking::TcpConnection::create(contextp->getBaseContext(), localhost, "24160", 1024);
+    auto connection = gmlc::networking::TcpConnection::create(contextp->getBaseContext(),
+                                                              localhost,
+                                                              "24160",
+                                                              1024);
     auto connected = connection->waitUntilConnected(1000ms);
-
 
     std::this_thread::sleep_for(200ms);
 
-    for (int i = 1; i <= n; i++)
-    {
-        //send messages the size of i
+    for (int i = 1; i <= n; i++) {
+        // send messages the size of i
         std::string txstring(i, '1');
         connection->send(txstring);
         std::this_thread::sleep_for(100ms);
-
     }
     std::cout << "num msgs received: " << count;
 
     connection->close();
     server->close();
     return 0;
-
 }
 
-int main() {
+int main()
+{
     int msg_size = 1000;
     int num_messages = 1000;
 
-    //send a single message of a certain size
-    //singleMessage(msg_size);
+    // send a single message of a certain size
+    // singleMessage(msg_size);
 
-    //send increasing larger messages up to size num_messages
+    // send increasing larger messages up to size num_messages
     singleConnection(num_messages);
 }
