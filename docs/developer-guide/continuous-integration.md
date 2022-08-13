@@ -11,7 +11,7 @@ GitHub Actions, Appveyor, Circle-CI, Azure and Drone.
 
 Azure pipelines is currently running the majority of CI tests.
 
-The main tests for pull requests and pushes targetting the main and develop branches are:
+The main tests for pull requests and pushes targeting the main and develop branches are:
 
 - Default Ubuntu 20.04 build and test using GCC with MPI and encryption support enabled
 - GCC 8 build and test running on Linux with MPI and encryption support enabled
@@ -25,6 +25,7 @@ The main tests for pull requests and pushes targetting the main and develop bran
 - MSVC2022 64 bit build and test using the C++20 standard
 
 There are also a few tests run daily:
+
 - Ubuntu 20.04 build using default package versions that runs the larger "daily" CI tests
 - Ubuntu 20.04 build using default package versions that uses ZeroMQ as a subproject instead of installing it with a package manager
 - MSVC2022 64 bit build and test using Boost 1.74
