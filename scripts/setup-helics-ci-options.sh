@@ -89,7 +89,7 @@ fi
 export HELICS_OPTION_FLAGS=${OPTION_FLAGS_ARR[*]}
 
 # Set any HELICS flags for finding dependencies
-# relic from Travis CI: export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
+# example (from back when Travis CI was used): export HELICS_DEPENDENCY_FLAGS+="-DBOOST_INSTALL_PATH=${CI_DEPENDENCY_DIR}/boost"
 
 # Setup the flags for controlling test execution
 TEST_FLAGS_ARR=("$TEST_TYPE")

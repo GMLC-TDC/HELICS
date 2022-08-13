@@ -1,37 +1,7 @@
 # Description of the different continuous integration test setups running on the CI servers
 
 There are 5 CI servers that are running along with a couple additional checks
-Travis, Appveyor, Circle-CI, Azure and Drone.
-
-## Travis-CI Tests
-
-Travis-ci runs many of the primary checks In 3 different stages
-
-### Push Tests
-
-Push tests run on all pushes to any branch in the main repository, there are 4 tests that run regularly
-
-- GCC 6: Test the GCC 6.0 compiler and the CI labeled Tests BOOST 1.61, SWIG, MPI
-- Clang 5: Test the clang compiler and run the CI labeled Tests, along with Java interface generation and Tests Using C++17
-- GCC 4.9: Test the oldest supported compiler in GCC, Test the included interface files(SWIG OFF) for Java, and test a packaging build. The main tests are disabled, BOOST 1.61
-- XCode 10.2: Test a recent XCode compiler with the Shared API library tests
-
-### PR tests and develop branch Tests
-
-Pull request tests run on every pull request to develop or main. In addition to the previous 4 tests 2 additional tests are run.
-
-- Clang 3.6: which is the oldest fully supported clang compiler, with boost 1.58 (Build only)
-- XCode 10.2
-
-### Daily Builds on develop
-
-On the develop branch a few additional tests are run on a daily basis. These will run an extended set of tests or things like valgrind or clang-sanitizers. The previous tests are run with an extended set of tests and a few additional tests are run
-
-- gcc 6.0 valgrind, interface disabled
-- gcc 6.0 Code Coverage, MPI, interfaces disabled
-- gcc 6.0 ZMQ subproject cmake 3.11
-- Mingw test building on the Mingw platform
-- Xcode 9.4 which is the oldest fully supported Xcode version (not for PRs to develop)
+GitHub Actions, Appveyor, Circle-CI, Azure and Drone.
 
 ## Appveyor tests
 
@@ -39,13 +9,25 @@ On the develop branch a few additional tests are run on a daily basis. These wil
 
 ## Azure tests
 
-PRs and commits to the main and develop branches that pass the tests on Travis will trigger builds on Azure for several other HELICS related repositories (such as HELICS-Examples). The result of the builds for those repositories will be reported as a comment on the PR (if any) that triggered the build.
+Azure pipelines is currently running the majority of CI tests.
 
-On the Primary HELICS repository there are 3 Azure builds:
+The main tests for pull requests and pushes targetting the main and develop branches are:
 
-- MSVC2019 32bit Build and test
-- MSVC2019 64bit Build and test
-- MSVC2022 64bit Build and test
+- Default Ubuntu 20.04 build and test using GCC with MPI and encryption support enabled
+- GCC 8 build and test running on Linux with MPI and encryption support enabled
+- Clang 13 build and test running on Linux
+- Clang 7 build and test running on Linux
+- XCode 10.2: Test a recent XCode compiler with the Shared API library tests
+- XCode build and test using the newest version of macOS that is available for CI builds
+- XCode build and test using the oldest version of macOS still supported by Apple
+- MSVC2019 32 bit build and test without the webserver component
+- MSVC2019 64 bit build and test
+- MSVC2022 64 bit build and test using the C++20 standard
+
+There are also a few tests run daily:
+- Ubuntu 20.04 build using default package versions that runs the larger "daily" CI tests
+- Ubuntu 20.04 build using default package versions that uses ZeroMQ as a subproject instead of installing it with a package manager
+- MSVC2022 64 bit build and test using Boost 1.74
 
 ## Circle CI
 
@@ -62,13 +44,25 @@ All PR's and branches trigger a set of builds using Docker images on Circle-CI.
 
 Circle ci also runs a benchmark test that runs every couple days. Eventually this will form the basis of benchmark regression test.
 
+## GitHub Actions
+
+GitHub Actions is used for various release related builds, and some special CI configurations that don't need to run often.
+
+- Static analyzers
+- Building pre-compiled packages for releases
+- Building Docker images
+- Daily build of benchmark binaries
+- Daily build of the release artifacts using code in the develop branch
+- Daily MSYS2 CI builds using both MinGW and MSYS makefiles
+- Daily code coverage build and test
+
 ## Drone
 
 - 64 bit and 32 bit builds on ARM processors
 
 ## Cirrus CI
 
-- FreeBSD 12.1 build
+- FreeBSD 12.2 build
 
 ## Read the docs
 
