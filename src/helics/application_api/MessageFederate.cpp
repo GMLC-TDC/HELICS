@@ -142,7 +142,9 @@ void MessageFederate::registerMessageInterfaces(const std::string& configString)
     }
 }
 
-static const std::string emptyStr;
+// NOLINTNEXTLINE
+static constexpr std::string_view emptyStr;
+
 template<class Inp>
 static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
 {
@@ -166,15 +168,13 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     if (!info.empty()) {
         ept.setInfo(info);
     }
-    loadTags(data, [&ept](const std::string& tagname, const std::string& tagvalue) {
+    loadTags(data, [&ept](std::string_view tagname, std::string_view tagvalue) {
         ept.setTag(tagname, tagvalue);
     });
-    addTargets(data, "subscriptions", [&ept](const std::string& sub) { ept.subscribe(sub); });
-    addTargets(data, "filters", [&ept](const std::string& filt) { ept.addSourceFilter(filt); });
-    addTargets(data, "sourceFilters", [&ept](const std::string& filt) {
-        ept.addSourceFilter(filt);
-    });
-    addTargets(data, "destFilters", [&ept](const std::string& filt) {
+    addTargets(data, "subscriptions", [&ept](std::string_view sub) { ept.subscribe(sub); });
+    addTargets(data, "filters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
+    addTargets(data, "sourceFilters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
+    addTargets(data, "destFilters", [&ept](std::string_view filt) {
         ept.addDestinationFilter(filt);
     });
 

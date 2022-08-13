@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/fmt_format.h"
 #include "../common/logging.hpp"
+#include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
 #include "GlobalTimeCoordinator.hpp"
 #include "LogManager.hpp"
@@ -150,6 +151,24 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         "--globaltime",
         globalTime,
         "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
+    hApp->add_flag(
+        "--asynctime",
+        asyncTime,
+        "specify that the federation should use the asynchronous time coordinator (only minimal time management is handled in HELICS and federates are allowed to operate independently)");
+    hApp->add_option_function<std::string>(
+            "--timing",
+            [this](const std::string& arg) {
+                if (arg == "async") {
+                    asyncTime = true;
+                } else if (arg == "global") {
+                    globalTime = true;
+                } else {
+                    asyncTime = false;
+                    globalTime = false;
+                }
+            },
+            "specify the timing method to use in the broker")
+        ->check(CLI::IsMember({"async", "global", "distributed", "default"}));
     hApp->add_flag("--observer",
                    observer,
                    "specify that the broker/core should be added as an observer only");
@@ -295,7 +314,10 @@ void BrokerBase::configureBase()
             uuid_like = true;
         }
     }
-    if (globalTime) {
+    if (asyncTime) {
+        timeCoord = std::make_unique<AsyncTimeCoordinator>();
+        hasTimeDependency = true;
+    } else if (globalTime) {
         timeCoord = std::make_unique<GlobalTimeCoordinator>();
         hasTimeDependency = true;
     } else {

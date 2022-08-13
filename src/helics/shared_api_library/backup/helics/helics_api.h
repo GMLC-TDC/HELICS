@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <stdlib.h>
 
 typedef enum {
+
     HELICS_CORE_TYPE_DEFAULT = 0,
     HELICS_CORE_TYPE_ZMQ = 1,
     HELICS_CORE_TYPE_MPI = 2,
@@ -38,15 +39,15 @@ typedef enum {
     HELICS_DATA_TYPE_NAMED_POINT = 6,
     HELICS_DATA_TYPE_BOOLEAN = 7,
     HELICS_DATA_TYPE_TIME = 8,
+    HELICS_DATA_TYPE_CHAR = 9,
     HELICS_DATA_TYPE_RAW = 25,
     HELICS_DATA_TYPE_JSON = 30,
     HELICS_DATA_TYPE_MULTI = 33,
     HELICS_DATA_TYPE_ANY = 25262
 } HelicsDataTypes;
 
-#define HELICS_DATA_TYPE_CHAR HELICS_DATA_TYPE_STRING
-
 typedef enum {
+
     HELICS_FLAG_OBSERVER = 0,
     HELICS_FLAG_UNINTERRUPTIBLE = 1,
     HELICS_FLAG_INTERRUPTIBLE = 2,
@@ -66,9 +67,15 @@ typedef enum {
     HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
 } HelicsFederateFlags;
 
-typedef enum { HELICS_FLAG_DELAY_INIT_ENTRY = 45, HELICS_FLAG_ENABLE_INIT_ENTRY = 47, HELICS_FLAG_IGNORE = 999 } HelicsCoreFlags;
+typedef enum {
+
+    HELICS_FLAG_DELAY_INIT_ENTRY = 45,
+    HELICS_FLAG_ENABLE_INIT_ENTRY = 47,
+    HELICS_FLAG_IGNORE = 999
+} HelicsCoreFlags;
 
 typedef enum {
+
     HELICS_FLAG_SLOW_RESPONDING = 29,
     HELICS_FLAG_DEBUGGING = 31,
     HELICS_FLAG_TERMINATE_ON_ERROR = 72,
@@ -79,6 +86,7 @@ typedef enum {
 } HelicsFlags;
 
 typedef enum {
+
     HELICS_LOG_LEVEL_DUMPLOG = -10,
     HELICS_LOG_LEVEL_NO_PRINT = -4,
     HELICS_LOG_LEVEL_ERROR = 0,
@@ -94,6 +102,7 @@ typedef enum {
 } HelicsLogLevels;
 
 typedef enum {
+
     HELICS_ERROR_FATAL = -404,
     HELICS_ERROR_EXTERNAL_TYPE = -203,
     HELICS_ERROR_OTHER = -101,
@@ -117,6 +126,7 @@ typedef enum {
 const int HELICS_INVALID_OPTION_INDEX = -101;
 
 typedef enum {
+
     HELICS_PROPERTY_TIME_DELTA = 137,
     HELICS_PROPERTY_TIME_PERIOD = 140,
     HELICS_PROPERTY_TIME_OFFSET = 141,
@@ -136,6 +146,7 @@ typedef enum {
 const int HELICS_INVALID_PROPERTY_VALUE = -972;
 
 typedef enum {
+
     HELICS_MULTI_INPUT_NO_OP = 0,
     HELICS_MULTI_INPUT_VECTORIZE_OPERATION = 1,
     HELICS_MULTI_INPUT_AND_OPERATION = 2,
@@ -148,6 +159,7 @@ typedef enum {
 } HelicsMultiInputModes;
 
 typedef enum {
+
     HELICS_HANDLE_OPTION_CONNECTION_REQUIRED = 397,
     HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL = 402,
     HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY = 407,
@@ -165,6 +177,7 @@ typedef enum {
 } HelicsHandleOptions;
 
 typedef enum {
+
     HELICS_FILTER_TYPE_CUSTOM = 0,
     HELICS_FILTER_TYPE_DELAY = 1,
     HELICS_FILTER_TYPE_RANDOM_DELAY = 2,
@@ -175,12 +188,14 @@ typedef enum {
 } HelicsFilterTypes;
 
 typedef enum {
+
     HELICS_TRANSLATOR_TYPE_CUSTOM = 0,
     HELICS_TRANSLATOR_TYPE_JSON = 11,
     HELICS_TRANSLATOR_TYPE_BINARY = 12
 } HelicsTranslatorTypes;
 
 typedef enum {
+
     HELICS_SEQUENCING_MODE_FAST = 0,
     HELICS_SEQUENCING_MODE_ORDERED = 1,
     HELICS_SEQUENCING_MODE_DEFAULT = 2
@@ -240,6 +255,7 @@ typedef enum {
 } HelicsIterationResult;
 
 typedef enum {
+    HELICS_STATE_UNKNOWN = -1,
     HELICS_STATE_STARTUP = 0,
     HELICS_STATE_INITIALIZATION = 1,
     HELICS_STATE_EXECUTION = 2,

@@ -4,16 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "gtest/gtest.h"
-
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
-
 #include "helics/application_api/BrokerApp.hpp"
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/ValueFederate.hpp"
@@ -22,7 +12,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 
+#include "gtest/gtest.h"
 #include <cstdio>
+#include <filesystem>
 #include <future>
 
 static const bool amb = helics::allowMultiBroker();

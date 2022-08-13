@@ -42,6 +42,7 @@ class MessageTimer {};
 #endif
 
 #include "../common/fmt_format.h"
+// NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
 #define LOG_WARNING(message) logMessage(HELICS_LOG_LEVEL_WARNING, gHelicsEmptyStr, message)
@@ -182,13 +183,10 @@ int32_t FederateState::getCurrentIteration() const
 
 bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len)
 {
-    if (!only_transmit_on_change) {
-        return true;
-    }
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);
-    auto res = pub->CheckSetValue(data, len);
+    auto res = pub->CheckSetValue(data, len, time_granted, only_transmit_on_change);
     return res;
 }
 
@@ -277,6 +275,15 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
     return interfaces().getInput(handle)->getAllData();
 }
 
+std::pair<SmallBuffer, Time> FederateState::getPublishedValue(InterfaceHandle handle)
+{
+    auto* pub = interfaces().getPublication(handle);
+    if (pub != nullptr) {
+        return {pub->data, pub->lastPublishTime};
+    }
+    return {SmallBuffer{}, Time::minVal()};
+}
+
 void FederateState::routeMessage(const ActionMessage& msg)
 {
     if (parent_ != nullptr) {
@@ -289,6 +296,21 @@ void FederateState::routeMessage(const ActionMessage& msg)
         parent_->addActionMessage(msg);
     } else {
         queue.push(msg);
+    }
+}
+
+void FederateState::routeMessage(ActionMessage&& msg)
+{
+    if (parent_ != nullptr) {
+        if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
+            LOG_ERROR("sending time request in invalid state");
+        }
+        if (msg.action() == CMD_TIME_GRANT) {
+            requestingMode.store(false);
+        }
+        parent_->addActionMessage(std::move(msg));
+    } else {
+        queue.push(std::move(msg));
     }
 }
 
@@ -316,21 +338,12 @@ void FederateState::createInterface(InterfaceType htype,
     std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
-        case InterfaceType::PUBLICATION: {
-            interfaceInformation.createPublication(handle, key, type, units);
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setPublicationProperty(handle,
-                                                            defs::Options::CONNECTION_REQUIRED,
-                                                            1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setPublicationProperty(handle,
-                                                            defs::Options::CONNECTION_OPTIONAL,
-                                                            1);
-            }
-        } break;
-        case InterfaceType::INPUT: {
-            interfaceInformation.createInput(handle, key, type, units);
+        case InterfaceType::PUBLICATION:
+            interfaceInformation.createPublication(handle, key, type, units, flags);
+
+            break;
+        case InterfaceType::INPUT:
+            interfaceInformation.createInput(handle, key, type, units, flags);
             if (strict_input_type_checking) {
                 interfaceInformation.setInputProperty(handle,
                                                       defs::Options::STRICT_TYPE_CHECKING,
@@ -341,34 +354,11 @@ void FederateState::createInterface(InterfaceType htype,
                                                       defs::Options::IGNORE_UNIT_MISMATCH,
                                                       1);
             }
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setInputProperty(handle,
-                                                      defs::Options::CONNECTION_REQUIRED,
-                                                      1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setInputProperty(handle,
-                                                      defs::Options::CONNECTION_OPTIONAL,
-                                                      1);
-            }
-        } break;
-        case InterfaceType::ENDPOINT: {
-            interfaceInformation.createEndpoint(handle, key, type);
-            if (checkActionFlag(flags, required_flag)) {
-                interfaceInformation.setEndpointProperty(handle,
-                                                         defs::Options::CONNECTION_REQUIRED,
-                                                         1);
-            }
-            if (checkActionFlag(flags, optional_flag)) {
-                interfaceInformation.setEndpointProperty(handle,
-                                                         defs::Options::CONNECTION_OPTIONAL,
-                                                         1);
-            }
-            if (checkActionFlag(flags, targeted_flag)) {
-                auto* ept = interfaceInformation.getEndpoint(handle);
-                ept->targetedEndpoint = true;
-            }
-        } break;
+            break;
+        case InterfaceType::ENDPOINT:
+            interfaceInformation.createEndpoint(handle, key, type, flags);
+
+            break;
         default:
             break;
     }
@@ -682,6 +672,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
 
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
+
         // now fill the event vector so external systems know what has been updated
         switch (iterate) {
             case IterationRequest::FORCE_ITERATION:
@@ -1042,6 +1033,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     if (profilerActive) {
         generateProfilingMessage(true);
     }
+    auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
@@ -1051,8 +1043,8 @@ MessageProcessingResult FederateState::processQueue() noexcept
             delayQueues[cmd.source_id].push_back(cmd);
             continue;
         }
-        //    messLog.push_back(cmd);
         ret_code = processActionMessage(cmd);
+
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd.source_id)].push_back(cmd);
         }
@@ -1060,6 +1052,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
             error_cmd = true;
         }
     }
+
     if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
         if (!initError && !error_cmd) {
             if (parent_ != nullptr) {
@@ -1261,7 +1254,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                 }
                 LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                if (cmd.actionTime < time_granted) {
+                if (cmd.actionTime < time_granted &&
+                    timeMethod != TimeSynchronizationMethod::ASYNC) {
                     LOG_WARNING(
                         fmt::format("received message {} at time({}) earlier than granted time({})",
                                     prettyPrintString(cmd),
@@ -1288,7 +1282,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
                     }
                     LOG_DATA(fmt::format("receive_message {}", prettyPrintString(cmd)));
-                    if (cmd.actionTime < time_granted) {
+                    if (cmd.actionTime < time_granted &&
+                        timeMethod != TimeSynchronizationMethod::ASYNC) {
                         LOG_WARNING(fmt::format(
                             "received message {} at time({}) earlier than granted time({})",
                             prettyPrintString(cmd),
@@ -1311,18 +1306,26 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 break;
             }
             for (auto& src : subI->input_sources) {
-                if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
-                    subI->addData(src,
-                                  cmd.actionTime,
-                                  cmd.counter,
-                                  std::make_shared<const SmallBuffer>(std::move(cmd.payload)));
-                    if (!subI->not_interruptible) {
-                        timeCoord->updateValueTime(cmd.actionTime, !timeGranted_mode);
-                        LOG_TRACE(timeCoord->printTimeStatus());
+                auto valueTime = cmd.actionTime;
+                if (timeMethod == TimeSynchronizationMethod::ASYNC) {
+                    if (valueTime < time_granted) {
+                        valueTime = time_granted;
                     }
-                    LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
-                                         prettyPrintString(cmd),
-                                         subI->getSourceName(src)));
+                }
+                if ((cmd.source_id == src.fed_id) && (cmd.source_handle == src.handle)) {
+                    if (subI->addData(src,
+                                      valueTime,
+                                      cmd.counter,
+                                      std::make_shared<const SmallBuffer>(
+                                          std::move(cmd.payload)))) {
+                        if (!subI->not_interruptible) {
+                            timeCoord->updateValueTime(valueTime, !timeGranted_mode);
+                            LOG_TRACE(timeCoord->printTimeStatus());
+                        }
+                        LOG_DATA(fmt::format("receive PUBLICATION {} from {}",
+                                             prettyPrintString(cmd),
+                                             subI->getSourceName(src)));
+                    }
                 }
             }
             if (state <= FederateStates::EXECUTING) {
@@ -1397,7 +1400,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                     cmd.name(),
                                     cmd.getString(typeStringLoc),
                                     cmd.getString(unitStringLoc))) {
-                    if (!usingGlobalTime) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }
@@ -1405,7 +1408,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto* eptI = interfaceInformation.getEndpoint(cmd.dest_handle);
                 if (eptI != nullptr) {
                     eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
-                    if (!usingGlobalTime) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependency(cmd.source_id);
                     }
                 }
@@ -1415,8 +1418,19 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
                 if (pubI->addSubscriber(cmd.getSource())) {
-                    if (!usingGlobalTime) {
+                    if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependent(cmd.source_id);
+                    }
+                }
+                if (getState() > FederateStates::CREATED) {
+                    if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
+                        ActionMessage mv(CMD_PUB);
+                        mv.setSource(pubI->id);
+                        mv.setDestination(cmd.getSource());
+                        mv.counter = static_cast<uint16_t>(getCurrentIteration());
+                        mv.payload = pubI->data;
+                        mv.actionTime = pubI->lastPublishTime;
+                        routeMessage(std::move(mv));
                     }
                 }
             }
@@ -1427,12 +1441,16 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 if (checkActionFlag(cmd, destination_target)) {
                     eptI->addDestination(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
-                        addDependent(cmd.source_id);
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependent(cmd.source_id);
+                        }
                     }
                 } else {
                     eptI->addSource(cmd.getSource(), cmd.name(), cmd.getString(typeStringLoc));
                     if (eptI->targetedEndpoint) {
-                        addDependency(cmd.source_id);
+                        if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
+                            addDependency(cmd.source_id);
+                        }
                     }
                 }
             }
@@ -1474,11 +1492,15 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     errorString = commandErrorString(cmd.messageID);
                     return MessageProcessingResult::ERROR_RESULT;
                 }
-                if (checkActionFlag(cmd, indicator_flag)) {
-                    usingGlobalTime = true;
-                    addDependent(gRootBrokerID);
-                    addDependency(gRootBrokerID);
-                    timeCoord->setAsParent(gRootBrokerID);
+                if (checkActionFlag(cmd, global_timing_flag)) {
+                    if (checkActionFlag(cmd, async_timing_flag)) {
+                        timeMethod = TimeSynchronizationMethod::ASYNC;
+                    } else {
+                        timeMethod = TimeSynchronizationMethod::GLOBAL;
+                        addDependent(gRootBrokerID);
+                        addDependency(gRootBrokerID);
+                        timeCoord->setAsParent(gRootBrokerID);
+                    }
                     timeCoord->globalTime = true;
                 }
                 global_id = cmd.dest_id;
@@ -1519,7 +1541,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
             queryResp.counter = cmd.counter;
 
             queryResp.payload = processQueryActual(cmd.payload.to_string());
-            routeMessage(queryResp);
+            routeMessage(std::move(queryResp));
         } break;
     }
     return MessageProcessingResult::CONTINUE_PROCESSING;
@@ -2072,7 +2094,7 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(response);
+            parent_->addActionMessage(std::move(response));
         }
     } else if (res[0] == "command_status") {
         if (parent_ != nullptr) {
@@ -2083,7 +2105,7 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(response);
+            parent_->addActionMessage(std::move(response));
         }
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
@@ -2345,8 +2367,6 @@ void FederateState::setTag(std::string_view tag, std::string_view value)
     unlock();
 }
 
-static const std::string emptyStr;
-
 const std::string& FederateState::getTag(std::string_view tag) const
 {
     spinlock();
@@ -2357,6 +2377,6 @@ const std::string& FederateState::getTag(std::string_view tag) const
         }
     }
     unlock();
-    return emptyStr;
+    return gHelicsEmptyStr;
 }
 }  // namespace helics

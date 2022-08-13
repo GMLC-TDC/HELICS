@@ -88,6 +88,8 @@ class BrokerBase {
     bool observer{false};
     /// flag indicating that the broker should use a global time coordinator
     bool globalTime{false};
+    /// flag indicating the use of async time keeping
+    bool asyncTime{false};
 
   private:
     /// flag indicating that the main processing loop is running

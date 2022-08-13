@@ -37,6 +37,10 @@ class valuefed_all_type_tests:
 
 class valuefed_tests: public ::testing::Test, public FederateTestFixture {};
 
+static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
+    return std::string(parameter.param);
+};
+
 TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
 {
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -94,6 +98,90 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     vFed1->finalize();
 
     EXPECT_TRUE(vFed1->getCurrentMode() == Federate::Modes::FINALIZE);
+}
+
+TEST_F(valuefed_tests, single_transfer_publisher_alias)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    ASSERT_TRUE(vFed1);
+    // register the publications
+    helics::Publication pubid(helics::InterfaceVisibility::LOCAL,
+                              vFed1.get(),
+                              "pub1",
+                              helics::DataType::HELICS_STRING);
+
+    auto& subid = vFed1->registerSubscription("publisher");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    vFed1->addAlias(pubid.getName(), "publisher");
+    vFed1->enterExecutingMode();
+    // publish string1 at time=0.0;
+    pubid.publish("string1");
+    auto gtime = vFed1->requestTime(1.0);
+
+    EXPECT_EQ(gtime, 1.0);
+    std::string s;
+    // get the value
+    subid.getValue(s);
+    // make sure the string is what we expect
+    EXPECT_EQ(s, "string1");
+    // publish a second string
+    pubid.publish("string2");
+    // make sure the value is still what we expect
+    subid.getValue(s);
+
+    EXPECT_EQ(s, "string1");
+    // advance time
+    gtime = vFed1->requestTime(2.0);
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+    subid.getValue(s);
+
+    EXPECT_EQ(s, "string2");
+    vFed1->finalize();
+}
+
+TEST_F(valuefed_tests, single_transfer_publisher_alias2)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    ASSERT_TRUE(vFed1);
+    // register the publications
+    vFed1->addAlias("pub1", "publisher");
+
+    helics::Publication pubid(helics::InterfaceVisibility::GLOBAL,
+                              vFed1.get(),
+                              "pub1",
+                              helics::DataType::HELICS_STRING);
+
+    auto& subid = vFed1->registerSubscription("publisher");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+
+    vFed1->enterExecutingMode();
+    // publish string1 at time=0.0;
+    pubid.publish("string1");
+    auto gtime = vFed1->requestTime(1.0);
+
+    EXPECT_EQ(gtime, 1.0);
+    std::string s;
+    // get the value
+    subid.getValue(s);
+    // make sure the string is what we expect
+    EXPECT_EQ(s, "string1");
+    // publish a second string
+    pubid.publish("string2");
+    // make sure the value is still what we expect
+    subid.getValue(s);
+
+    EXPECT_EQ(s, "string1");
+    // advance time
+    gtime = vFed1->requestTime(2.0);
+    // make sure the value was updated
+    EXPECT_EQ(gtime, 2.0);
+    subid.getValue(s);
+
+    EXPECT_EQ(s, "string2");
+    vFed1->finalize();
 }
 
 TEST_P(valuefed_single_type, single_transfer_publisher)
@@ -1136,10 +1224,12 @@ TEST_P(valuefed_single_type, dual_transfer_remove_target_input)
 
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_single_type,
-                         ::testing::ValuesIn(CoreTypes_single));
+                         ::testing::ValuesIn(CoreTypes_single),
+                         testNamer);
 INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          valuefed_all_type_tests,
-                         ::testing::ValuesIn(CoreTypes_all));
+                         ::testing::ValuesIn(CoreTypes_all),
+                         testNamer);
 
 TEST_F(valuefed_tests, empty_get_default)
 {
@@ -1181,4 +1271,112 @@ TEST_F(valuefed_tests, empty_get_complex)
     EXPECT_EQ(val1, helics::invalidDouble);
 
     vFed1->finalize();
+}
+
+TEST_F(valuefed_tests, publish_time_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    pubid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii) {
+        if (subid.isUpdated()) {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(ii);
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(), 21);
+    EXPECT_GE(returned.size(), 19);
+}
+
+TEST_F(valuefed_tests, input_time_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    subid.setOption(HELICS_HANDLE_OPTION_TIME_RESTRICTED, 10000);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii) {
+        if (subid.isUpdated()) {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(ii);
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(), 21);
+    EXPECT_GE(returned.size(), 19);
+}
+
+TEST_F(valuefed_tests, publish_change_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    pubid.setOption(HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii) {
+        if (subid.isUpdated()) {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(static_cast<int>(ii / 10));
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(), 21);
+    EXPECT_GE(returned.size(), 19);
+}
+
+TEST_F(valuefed_tests, input_change_restrict)
+{
+    SetupTest<helics::ValueFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    // register the publications
+    auto& pubid = vFed1->registerGlobalPublication<int>("pub1");
+
+    auto& subid = vFed1->registerSubscription("pub1");
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    subid.setOption(HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE, true);
+
+    vFed1->enterExecutingMode();
+    std::vector<int> returned;
+    for (auto ii = 0; ii < 200; ++ii) {
+        if (subid.isUpdated()) {
+            returned.push_back(subid.getValue<int>());
+        }
+        pubid.publish(static_cast<int>(ii / 10));
+        vFed1->requestNextStep();
+    }
+
+    vFed1->finalize();
+    EXPECT_LE(returned.size(), 21);
+    EXPECT_GE(returned.size(), 19);
 }

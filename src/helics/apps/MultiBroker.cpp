@@ -245,7 +245,7 @@ void MultiBroker::transmit(route_id rid, const ActionMessage& cmd)
                 if (rtable.second == 0) {
                     masterComm->transmit(rid, cmd);
                 } else {
-                    comms[rtable.second - 1]->transmit(rid, cmd);
+                    comms[static_cast<std::int64_t>(rtable.second) - 1]->transmit(rid, cmd);
                 }
                 return;
             }

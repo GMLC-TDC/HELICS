@@ -77,9 +77,9 @@ MessageConditionalOperator::MessageConditionalOperator(
 }
 
 void MessageConditionalOperator::setConditionFunction(
-    std::function<bool(const Message*)> userConditionalFunction)
+    std::function<bool(const Message*)> userConditionFunction)
 {
-    evalFunction = std::move(userConditionalFunction);
+    evalFunction = std::move(userConditionFunction);
 }
 
 std::unique_ptr<Message> MessageConditionalOperator::process(std::unique_ptr<Message> message)
@@ -151,17 +151,17 @@ std::unique_ptr<Message> FirewallOperator::process(std::unique_ptr<Message> mess
                 break;
             case operations::set_flag1:
                 if (res) {
-                    setActionFlag(*message, extra_flag1);
+                    setActionFlag(*message, user_custom_message_flag1);
                 }
                 break;
             case operations::set_flag2:
                 if (res) {
-                    setActionFlag(*message, extra_flag2);
+                    setActionFlag(*message, user_custom_message_flag2);
                 }
                 break;
             case operations::set_flag3:
                 if (res) {
-                    setActionFlag(*message, extra_flag3);
+                    setActionFlag(*message, user_custom_message_flag3);
                 }
                 break;
             case operations::none:

@@ -13,7 +13,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
+#include <vector>
+
 namespace helics {
 
 /** class for managing a coordinating the different types of handles used in helics
@@ -37,6 +40,9 @@ class HandleManager {
     std::unordered_map<std::string_view, InterfaceHandle> filters;  //!< map of all local endpoints
     std::unordered_map<std::string_view, InterfaceHandle> translators;  //!< map of all translators
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
+    /// set of all valid aliases <interface_name,aliases>
+    std::unordered_map<std::string_view, std::vector<std::string_view>> aliases;
+    std::unordered_set<std::string> alias_names;  //!< set of actual alias strings
   public:
     /** default constructor*/
     HandleManager() = default;
@@ -63,9 +69,9 @@ class HandleManager {
     BasicHandleInfo* getHandleInfo(int32_t index);
     /** get a const handle by index*/
     const BasicHandleInfo* getHandleInfo(int32_t index) const;
-    /** get a handle by index*/
+    /** get a handle by local interface handle*/
     BasicHandleInfo* getHandleInfo(InterfaceHandle handle);
-    /** get a const handle by index*/
+    /** get a const handle by local interface handle*/
     const BasicHandleInfo* getHandleInfo(InterfaceHandle handle) const;
     /** find a handle from both the federate and local id*/
     BasicHandleInfo* findHandle(GlobalHandle id);
@@ -110,6 +116,11 @@ class HandleManager {
 
     BasicHandleInfo& operator[](size_t index) { return handles[index]; }
     const BasicHandleInfo& operator[](size_t index) const { return handles[index]; }
+    /** add an alias for an interface*
+    @param interfaceName the name of the interface to add an alias for
+    @param alias the new name by which an interface can be referenced
+    @throws std::runtime_error if an alias is duplicated */
+    void addAlias(std::string_view interfaceName, std::string_view alias);
     auto begin() { return handles.begin(); }
     auto end() { return handles.end(); }
     auto begin() const { return handles.begin(); }
@@ -119,6 +130,19 @@ class HandleManager {
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
     std::string generateName(InterfaceType what) const;
+    // alias must be a stable string_view here
+    void addPublicationAlias(std::string_view interfaceName, std::string_view alias);
+    // alias must be a stable string_view here
+    void addInputAlias(std::string_view interfaceName, std::string_view alias);
+    // alias must be a stable string_view here
+    void addEndpointAlias(std::string_view interfaceName, std::string_view alias);
+    // alias must be a stable string_view here
+    void addFilterAlias(std::string_view interfaceName, std::string_view alias);
+    /// @brief actually add the alias names to the data structures
+    /// @param interfaceName the name of the interface to create an alias for
+    /// @param alias the new name used to refer to an interface
+    /// @return true if there are multiple interacting aliases
+    bool addAliasName(std::string_view interfaceName, std::string_view alias);
 };
 
 }  // namespace helics

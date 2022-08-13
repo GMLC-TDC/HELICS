@@ -161,6 +161,12 @@ TEST(data, toFromVector)
     helicsDataBufferFree(buff);
 }
 
+#if defined(__GNUC__)
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wstrict-aliasing"
+// std::complex is explicitly allowed to alias like this in the standard
+#endif
+
 TEST(data, toFromComplexVector)
 {
     auto buff = helicsCreateDataBuffer(500);
@@ -194,6 +200,10 @@ TEST(data, toFromComplexVector)
     EXPECT_EQ(v1[4].imag(), v2[9]);
     helicsDataBufferFree(buff);
 }
+
+#if defined(__GNUC__)
+#    pragma GCC diagnostic pop
+#endif
 
 TEST(data, toFromNamedPoint)
 {

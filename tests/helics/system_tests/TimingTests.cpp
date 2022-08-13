@@ -707,3 +707,78 @@ TEST_F(timing, dual_fast_sender_tests_ci_skip)  // ci_skip
 }
 
 #endif
+
+TEST_F(timing, async_timing)
+{
+    extraBrokerArgs = "--asynctime";
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
+    vFed2->registerSubscription("pub1");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+
+    auto res = vFed1->requestTime(1.0);
+    EXPECT_EQ(res, 1.0);
+    pub.publish(0.27);
+    res = vFed2->requestTime(0.5);
+    EXPECT_EQ(res, 0.5);
+    res = vFed2->requestTime(2.0);
+    EXPECT_GE(res, 1.0);  // the result should show up at the next available time point
+    // vFed2 should be able to grant in advance of fed1 using the async timing
+    res = vFed2->requestTime(2.0);
+    EXPECT_GE(res, 2.0);
+    res = vFed1->requestTime(1.5);
+    EXPECT_EQ(res, 1.5);
+    pub.publish(0.44);
+    vFed1->query("root", "global_flush");
+    vFed1->requestTime(2.0);
+    res = vFed2->requestTime(5.0);
+    EXPECT_LT(res, 4.0);
+
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(timing, async_timing_message)
+{
+    extraBrokerArgs = "--asynctime";
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
+    mFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+    mFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+
+    auto& pub = mFed1->registerGlobalTargetedEndpoint("pub1");
+    auto& sub = mFed2->registerTargetedEndpoint("pubr");
+    sub.addSourceEndpoint("pub1");
+    mFed1->enterExecutingModeAsync();
+    mFed2->enterExecutingMode();
+    mFed1->enterExecutingModeComplete();
+
+    auto res = mFed1->requestTime(1.0);
+    EXPECT_EQ(res, 1.0);
+    pub.send("test message");
+    res = mFed2->requestTime(0.5);
+    EXPECT_EQ(res, 0.5);
+    res = mFed2->requestTime(2.0);
+    EXPECT_GE(res, 1.0);  // the result should show up at the next available time point
+    // vFed2 should be able to grant in advance of fed1 using the async timing
+    res = mFed2->requestTime(2.0);
+    EXPECT_GE(res, 2.0);
+    res = mFed1->requestTime(1.5);
+    EXPECT_EQ(res, 1.5);
+    pub.send("test 2");
+    mFed1->query("root", "global_flush");
+    mFed1->requestTime(2.0);
+    res = mFed2->requestTime(5.0);
+    EXPECT_LT(res, 4.0);
+
+    mFed1->finalize();
+    mFed2->finalize();
+}

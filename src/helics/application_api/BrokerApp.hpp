@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT BrokerApp {
     @param ctype the type of broker to create
     @param argString a merged string with all the arguments
     */
-    explicit BrokerApp(CoreType ctype, std::string_view argString = std::string{});
+    explicit BrokerApp(CoreType ctype, std::string_view argString = std::string_view{});
     /** construct from command line arguments parsed as a single string
     @param ctype the type of broker to create
     @param brokerName the name of the broker
@@ -99,6 +99,8 @@ class HELICS_CXX_EXPORT BrokerApp {
     void addSourceFilterToEndpoint(std::string_view filter, std::string_view endpoint);
     /** add a destination Filter to an endpoint*/
     void addDestinationFilterToEndpoint(std::string_view filter, std::string_view endpoint);
+    /** add an alias for an interface*/
+    void addAlias(std::string_view interfaceName, std::string_view alias);
     /** make connections between interfaces with a file*/
     void makeConnections(const std::string& file);
     /** get the identifier of the broker*/

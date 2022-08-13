@@ -93,12 +93,13 @@ Input& ValueFederateManager::registerInput(std::string_view key,
     }
     if (active) {
         auto& ref = inpHandle->back();
-        auto edat = std::make_unique<input_info>(key, type, units);
-        // non-owning pointer
-        ref.dataReference = edat.get();
         auto datHandle = inputData.lock();
-        datHandle->push_back(std::move(edat));
-        ref.referenceIndex = static_cast<int>(datHandle->size() - 1);
+        auto& idat = datHandle->emplace_back(key, type, units);
+
+        // non-owning pointer
+        ref.dataReference = &idat;
+        datHandle.unlock();
+        ref.referenceIndex = static_cast<int>(*active);
         if (useJsonSerialization) {
             ref.targetType = DataType::HELICS_JSON;
         }
@@ -110,6 +111,7 @@ Input& ValueFederateManager::registerInput(std::string_view key,
 void ValueFederateManager::addAlias(const Input& inp, std::string_view shortcutName)
 {
     if (inp.isValid()) {
+        coreObject->addAlias(inp.getName(), shortcutName);
         auto inpHandle = inputs.lock();
         inpHandle->addSearchTerm(shortcutName, inp.handle);
         targetIDs.lock()->emplace(shortcutName, inp.handle);
@@ -121,6 +123,7 @@ void ValueFederateManager::addAlias(const Input& inp, std::string_view shortcutN
 void ValueFederateManager::addAlias(const Publication& pub, std::string_view shortcutName)
 {
     if (pub.isValid()) {
+        coreObject->addAlias(pub.getName(), shortcutName);
         auto pubHandle = publications.lock();
         pubHandle->addSearchTerm(shortcutName, pub.handle);
     } else {
@@ -177,7 +180,7 @@ void ValueFederateManager::removeTarget(const Input& inp, std::string_view targe
 void ValueFederateManager::setDefaultValue(const Input& inp, const data_view& block)
 {
     if (inp.isValid()) {
-        auto* info = static_cast<input_info*>(inp.dataReference);
+        auto* info = static_cast<InputData*>(inp.dataReference);
 
         /** copy the data first since we are not entirely sure of the lifetime of the data_view*/
         info->lastData = data_view(std::make_shared<SmallBuffer>(block.data(), block.size()));
@@ -196,7 +199,7 @@ void ValueFederateManager::getUpdateFromCore(InterfaceHandle updatedHandle)
     auto fid = inpHandle->find(updatedHandle);
     if (fid != inpHandle->end()) {  // assign the data
 
-        auto* info = static_cast<input_info*>(fid->dataReference);
+        auto* info = static_cast<InputData*>(fid->dataReference);
         info->lastData = data_view(std::move(data));
         info->lastUpdate = CurrentTime;
     }
@@ -204,7 +207,7 @@ void ValueFederateManager::getUpdateFromCore(InterfaceHandle updatedHandle)
 
 data_view ValueFederateManager::getValue(const Input& inp)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (iData != nullptr) {
         iData->lastQuery = CurrentTime;
         iData->hasUpdate = false;
@@ -226,7 +229,7 @@ void ValueFederateManager::publish(const Publication& pub, const data_view& bloc
 
 bool ValueFederateManager::hasUpdate(const Input& inp)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->hasUpdate;
     }
@@ -235,7 +238,7 @@ bool ValueFederateManager::hasUpdate(const Input& inp)
 
 Time ValueFederateManager::getLastUpdateTime(const Input& inp)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (iData != nullptr) {
         return iData->lastUpdate;
     }
@@ -244,7 +247,7 @@ Time ValueFederateManager::getLastUpdateTime(const Input& inp)
 
 bool ValueFederateManager::getUpdateFromCore(Input& inp)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (inp.getMultiInputMode() != MultiInputHandlingMethod::NO_OP) {
         const auto& dataV = coreObject->getAllValues(inp.handle);
         iData->hasUpdate = false;
@@ -270,7 +273,7 @@ void ValueFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         /** find the id*/
         auto fid = inpHandle->find(handle);
         if (fid != inpHandle->end()) {  // assign the data
-            auto* iData = static_cast<input_info*>(fid->dataReference);
+            auto* iData = static_cast<InputData*>(fid->dataReference);
             iData->lastUpdate = CurrentTime;
 
             bool updated = getUpdateFromCore(*fid);
@@ -401,7 +404,7 @@ std::vector<int> ValueFederateManager::queryUpdates()
     }
     return updates;
 }
-
+// NOLINTNEXTLINE
 static const std::string emptyStr;
 
 const std::string& ValueFederateManager::getTarget(const Input& inp) const
@@ -542,7 +545,7 @@ void ValueFederateManager::clearUpdates()
 
 void ValueFederateManager::clearUpdate(const Input& inp)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (iData != nullptr) {
         iData->hasUpdate = false;
     }
@@ -556,7 +559,7 @@ void ValueFederateManager::setInputNotificationCallback(std::function<void(Input
 void ValueFederateManager::setInputNotificationCallback(const Input& inp,
                                                         std::function<void(Input&, Time)> callback)
 {
-    auto* iData = static_cast<input_info*>(inp.dataReference);
+    auto* iData = static_cast<InputData*>(inp.dataReference);
     if (iData != nullptr) {
         iData->callback = std::move(callback);
     } else {

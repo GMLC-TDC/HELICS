@@ -68,7 +68,7 @@ class NetworkBrokerData {
     /** generate a command line argument parser for the network broker data
      @param localAddress a predefined string containing the desired local only address
     */
-    std::shared_ptr<helicsCLI11App> commandLineParser(const std::string& localAddress,
+    std::shared_ptr<helicsCLI11App> commandLineParser(std::string_view localAddress,
                                                       bool enableConfig = true);
     /** set the desired interface type
      */
@@ -76,7 +76,7 @@ class NetworkBrokerData {
 
   private:
     /** do some checking on the brokerAddress*/
-    void checkAndUpdateBrokerAddress(const std::string& localAddress);
+    void checkAndUpdateBrokerAddress(std::string_view localAddress);
     gmlc::networking::InterfaceTypes allowedType{gmlc::networking::InterfaceTypes::IP};
 };
 

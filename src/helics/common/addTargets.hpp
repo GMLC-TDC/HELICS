@@ -22,10 +22,10 @@ void addTargets(const toml::value& section, std::string targetName, Callable cal
         if (targets.is_array()) {
             auto& targetArray = targets.as_array();
             for (const auto& target : targetArray) {
-                callback(target.as_string());
+                callback(static_cast<const std::string&>(target.as_string()));
             }
         } else {
-            callback(targets.as_string());
+            callback(static_cast<const std::string&>(targets.as_string()));
         }
     }
     if (targetName.back() == 's') {
@@ -71,9 +71,9 @@ void processOptions(const Json::Value& section,
                     const std::function<void(int, int)>& optionAction);
 
 void loadTags(const Json::Value& section,
-              const std::function<void(const std::string&, const std::string&)>& tagAction);
+              const std::function<void(std::string_view, std::string_view)>& tagAction);
 
 void loadTags(const toml::value& section,
-              const std::function<void(const std::string&, const std::string&)>& tagAction);
+              const std::function<void(std::string_view, std::string_view)>& tagAction);
 
 }  // namespace helics

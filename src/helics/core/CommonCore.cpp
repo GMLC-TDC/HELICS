@@ -53,7 +53,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-const std::string& state_string(OperatingState state)
+const std::string& stateString(OperatingState state)
 {
     static const std::string c1{"connected"};
     static const std::string estate{"error"};
@@ -724,6 +724,7 @@ const std::string& CommonCore::getFederateName(LocalFederateId federateID) const
     return fed->getIdentifier();
 }
 
+// NOLINTNEXTLINE
 static const std::string unknownString("#unknown");
 
 const std::string& CommonCore::getFederateNameNoThrow(GlobalFederateId federateID) const noexcept
@@ -1067,8 +1068,8 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
         return hndl;
     });
 }
-
-static const std::string emptyString;
+// NOLINTNEXTLINE
+static const std::string gEmptyString;
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
                                           std::string_view key,
@@ -1164,15 +1165,13 @@ InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, std::stri
     return pub->getInterfaceHandle();
 }
 
-const std::string emptyStr;
-
 const std::string& CommonCore::getHandleName(InterfaceHandle handle) const
 {
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         return handleInfo->key;
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
@@ -1191,10 +1190,10 @@ const std::string& CommonCore::getInjectionUnits(InterfaceHandle handle) const
             case InterfaceType::PUBLICATION:
                 return handleInfo->units;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }  // namespace helics
 
 const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
@@ -1209,7 +1208,7 @@ const std::string& CommonCore::getExtractionUnits(InterfaceHandle handle) const
                 break;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getInjectionType(InterfaceHandle handle) const
@@ -1230,10 +1229,10 @@ const std::string& CommonCore::getInjectionType(InterfaceHandle handle) const
             case InterfaceType::FILTER:
                 return handleInfo->type_in;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getExtractionType(InterfaceHandle handle) const
@@ -1248,10 +1247,10 @@ const std::string& CommonCore::getExtractionType(InterfaceHandle handle) const
             case InterfaceType::FILTER:
                 return handleInfo->type_out;
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setHandleOption(InterfaceHandle handle, int32_t option, int32_t option_value)
@@ -1502,7 +1501,7 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
                 break;
             }
             case InterfaceType::PUBLICATION:
-                return emptyStr;
+                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1513,10 +1512,10 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
             }
             case InterfaceType::FILTER:
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
@@ -1533,7 +1532,7 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
                 break;
             }
             case InterfaceType::PUBLICATION:
-                return emptyStr;
+                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1546,10 +1545,10 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
                 break;
             }
             default:
-                return emptyStr;
+                return gEmptyString;
         }
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setValue(InterfaceHandle handle, const char* data, uint64_t len)
@@ -1679,7 +1678,7 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
 
     auto id = handle.getInterfaceHandle();
     fed->createInterface(
-        InterfaceType::ENDPOINT, id, name, type, emptyStr, fed->getInterfaceFlags());
+        InterfaceType::ENDPOINT, id, name, type, gEmptyString, fed->getInterfaceFlags());
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -1709,7 +1708,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, emptyStr, flags);
+    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, gEmptyString, flags);
     ActionMessage m(CMD_REG_ENDPOINT);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -1886,6 +1885,14 @@ void CommonCore::linkEndpoints(std::string_view source, std::string_view dest)
     ActionMessage M(CMD_ENDPOINT_LINK);
     M.name(source);
     M.setStringData(dest);
+    addActionMessage(std::move(M));
+}
+
+void CommonCore::addAlias(std::string_view interfaceKey, std::string_view alias)
+{
+    ActionMessage M(CMD_ADD_ALIAS);
+    M.name(interfaceKey);
+    M.setStringData(alias);
     addActionMessage(std::move(M));
 }
 
@@ -2761,7 +2768,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
     if (queryStr == "current_state") {
         Json::Value base;
         loadBasicJsonInfo(base, [](Json::Value& val, const FedInfo& fed) {
-            val["state"] = state_string(fed.state);
+            val["state"] = stateString(fed.state);
         });
         base["state"] = brokerStateName(getBrokerState());
 
@@ -3048,8 +3055,11 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 if (checkActionFlag(command, slow_responding_flag)) {
                     timeoutMon->disableParentPing();
                 }
-                if (checkActionFlag(command, indicator_flag)) {
+                if (checkActionFlag(command, global_timing_flag)) {
                     globalTime = true;
+                    if (checkActionFlag(command, async_timing_flag)) {
+                        asyncTime = true;
+                    }
                 }
                 timeoutMon->reset();
                 if (delayInitCounter < 0 && minFederateCount == 0 && minChildCount == 0) {
@@ -3461,70 +3471,12 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_GLOBAL_ERROR:
             processLogAndErrorCommand(command);
             break;
-        case CMD_DATA_LINK: {
-            auto* pub = loopHandles.getPublication(command.name());
-            if (pub != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_INPUT);
-                command.setSource(pub->handle);
-                command.clearStringData();
-                checkForNamedInterface(command);
-            } else {
-                auto* input = loopHandles.getInput(command.getString(targetStringLoc));
-                if (input == nullptr) {
-                    routeMessage(command);
-                } else {
-                    command.setAction(CMD_ADD_NAMED_PUBLICATION);
-                    command.setSource(input->handle);
-                    command.clearStringData();
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_ENDPOINT_LINK: {
-            auto* ept = loopHandles.getEndpoint(command.name());
-            if (ept != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                command.setSource(ept->handle);
-                setActionFlag(command, destination_target);
-                command.clearStringData();
-                checkForNamedInterface(command);
-            } else {
-                auto* target = loopHandles.getEndpoint(command.getString(targetStringLoc));
-                if (target == nullptr) {
-                    routeMessage(command);
-                } else {
-                    command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    command.setSource(target->handle);
-                    command.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
-                    command.clearStringData();
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
-        case CMD_FILTER_LINK: {
-            auto* filt = loopHandles.getFilter(command.name());
-            if (filt != nullptr) {
-                command.name(command.getString(targetStringLoc));
-                command.setAction(CMD_ADD_NAMED_ENDPOINT);
-                command.setSource(filt->handle);
-                if (checkActionFlag(*filt, clone_flag)) {
-                    setActionFlag(command, clone_flag);
-                }
-                checkForNamedInterface(command);
-            } else {
-                auto* ept = loopHandles.getEndpoint(command.getString(targetStringLoc));
-                if (ept == nullptr) {
-                    routeMessage(command);
-                } else {
-                    command.setAction(CMD_ADD_NAMED_FILTER);
-                    command.setSource(ept->handle);
-                    checkForNamedInterface(command);
-                }
-            }
-        } break;
+        case CMD_DATA_LINK:
+        case CMD_ENDPOINT_LINK:
+        case CMD_FILTER_LINK:
+        case CMD_ADD_ALIAS:
+            processLinkingCommand(command);
+            break;
         case CMD_REG_INPUT:
         case CMD_REG_ENDPOINT:
         case CMD_REG_PUB:
@@ -3843,20 +3795,22 @@ void CommonCore::connectFilterTiming()
 
     auto fid = filterFedID.load();
     if (globalTime) {
-        ActionMessage ad(CMD_ADD_DEPENDENT);
-        setActionFlag(ad, parent_flag);
-        ad.dest_id = fid;
-        ad.source_id = gRootBrokerID;
-        filterFed->handleMessage(ad);
+        if (!asyncTime) {
+            ActionMessage ad(CMD_ADD_DEPENDENT);
+            setActionFlag(ad, parent_flag);
+            ad.dest_id = fid;
+            ad.source_id = gRootBrokerID;
+            filterFed->handleMessage(ad);
 
-        ad.setAction(CMD_ADD_DEPENDENCY);
-        filterFed->handleMessage(ad);
-        clearActionFlag(ad, parent_flag);
-        setActionFlag(ad, child_flag);
-        ad.swapSourceDest();
-        transmit(parent_route_id, ad);
-        ad.setAction(CMD_ADD_DEPENDENT);
-        transmit(parent_route_id, ad);
+            ad.setAction(CMD_ADD_DEPENDENCY);
+            filterFed->handleMessage(ad);
+            clearActionFlag(ad, parent_flag);
+            setActionFlag(ad, child_flag);
+            ad.swapSourceDest();
+            transmit(parent_route_id, ad);
+            ad.setAction(CMD_ADD_DEPENDENT);
+            transmit(parent_route_id, ad);
+        }
     } else {
         if (timeCoord->addDependent(higher_broker_id)) {
             ActionMessage add(CMD_ADD_INTERDEPENDENCY, global_broker_id_local, higher_broker_id);
@@ -4133,6 +4087,18 @@ void CommonCore::addTargetToInterface(ActionMessage& command)
             auto* handle = loopHandles.getHandleInfo(command.dest_handle.baseValue());
             if (handle != nullptr) {
                 setAsUsed(handle);
+                if (command.action() == CMD_ADD_SUBSCRIBER &&
+                    fed->getState() > FederateStates::CREATED) {
+                    auto lastData = fed->getPublishedValue(command.dest_handle);
+                    if (lastData.second > Time::minVal() && !lastData.first.empty()) {
+                        ActionMessage mv(CMD_PUB);
+                        mv.setSource(handle->handle);
+                        mv.setDestination(command.getSource());
+                        mv.payload = std::move(lastData.first);
+                        mv.actionTime = lastData.second;
+                        routeMessage(std::move(mv));
+                    }
+                }
             }
         }
     }
@@ -4327,7 +4293,81 @@ void CommonCore::checkDependencies()
         routeMessage(adddep, fedid);
     }
 }
-
+void CommonCore::processLinkingCommand(ActionMessage& cmd)
+{
+    switch (cmd.action()) {
+        case CMD_DATA_LINK: {
+            auto* pub = loopHandles.getPublication(cmd.name());
+            if (pub != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_INPUT);
+                cmd.setSource(pub->handle);
+                cmd.clearStringData();
+                checkForNamedInterface(cmd);
+            } else {
+                auto* input = loopHandles.getInput(cmd.getString(targetStringLoc));
+                if (input == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    cmd.setSource(input->handle);
+                    cmd.clearStringData();
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_ENDPOINT_LINK: {
+            auto* ept = loopHandles.getEndpoint(cmd.name());
+            if (ept != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                cmd.setSource(ept->handle);
+                setActionFlag(cmd, destination_target);
+                cmd.clearStringData();
+                checkForNamedInterface(cmd);
+            } else {
+                auto* target = loopHandles.getEndpoint(cmd.getString(targetStringLoc));
+                if (target == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    cmd.setSource(target->handle);
+                    cmd.counter = static_cast<uint16_t>(InterfaceType::ENDPOINT);
+                    cmd.clearStringData();
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_FILTER_LINK: {
+            auto* filt = loopHandles.getFilter(cmd.name());
+            if (filt != nullptr) {
+                cmd.name(cmd.getString(targetStringLoc));
+                cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                cmd.setSource(filt->handle);
+                if (checkActionFlag(*filt, clone_flag)) {
+                    setActionFlag(cmd, clone_flag);
+                }
+                checkForNamedInterface(cmd);
+            } else {
+                auto* ept = loopHandles.getEndpoint(cmd.getString(targetStringLoc));
+                if (ept == nullptr) {
+                    routeMessage(cmd);
+                } else {
+                    cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    cmd.setSource(ept->handle);
+                    checkForNamedInterface(cmd);
+                }
+            }
+        } break;
+        case CMD_ADD_ALIAS: {
+            loopHandles.addAlias(cmd.payload.to_string(), cmd.getString(targetStringLoc));
+            routeMessage(std::move(cmd), parent_broker_id);
+        } break;
+        default:
+            break;
+    }
+}
 void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
@@ -4440,16 +4480,10 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                                  // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
                 }
             } else if (getBrokerState() ==
                        BrokerState::ERRORED) {  // we are disconnecting in an error state
                 sendDisconnect();
-                ActionMessage m(CMD_DISCONNECT);
-                m.source_id = global_broker_id_local;
-                transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
             // we can't just fall through since this may have generated other messages that need to
@@ -4508,21 +4542,16 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     // only send a disconnect message
                     // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
+                    cmd.source_id = global_broker_id_local;
+                    broadcastToFederates(cmd);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
-                    for (const auto& fed : loopFederates) {
-                        m.dest_id = fed->global_id;
-                        fed.fed->addAction(m);
-                    }
                 }
             } else if (getBrokerState() == BrokerState::ERRORED) {
                 // we are disconnecting in an error state
+                LOG_ERROR(global_broker_id_local,
+                          getIdentifier(),
+                          "received timeout disconnect in error state");
                 sendDisconnect();
-                ActionMessage m(CMD_DISCONNECT);
-                m.source_id = global_broker_id_local;
-                transmit(parent_route_id, m);
             }
             addActionMessage(CMD_STOP);
             break;
@@ -4534,9 +4563,6 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                                                  // if we haven't done so already
                     setBrokerState(BrokerState::TERMINATING);
                     sendDisconnect();
-                    ActionMessage m(CMD_DISCONNECT);
-                    m.source_id = global_broker_id_local;
-                    transmit(parent_route_id, m);
                 }
             }
             if (filterThread.load() == std::this_thread::get_id()) {
@@ -5022,14 +5048,15 @@ void CommonCore::checkInFlightQueriesForDisconnect()
     }
 }
 
-void CommonCore::sendDisconnect()
+void CommonCore::sendDisconnect(action_message_def::action_t disconnectType)
 {
     LOG_CONNECTIONS(global_broker_id_local, identifier, "sending disconnect");
     checkInFlightQueriesForDisconnect();
-    ActionMessage bye(CMD_STOP);
+    ActionMessage bye(disconnectType);
     bye.source_id = global_broker_id_local;
     for (auto fed : loopFederates) {
         if (fed->getState() != FederateStates::FINISHED) {
+            bye.dest_id = fed->global_id;
             fed->addAction(bye);
         }
         if (hasTimeDependency) {
@@ -5043,6 +5070,9 @@ void CommonCore::sendDisconnect()
     if (filterFed != nullptr) {
         filterFed->handleMessage(bye);
     }
+    ActionMessage m(CMD_DISCONNECT);
+    m.source_id = global_broker_id_local;
+    transmit(parent_route_id, m);
 }
 
 bool CommonCore::checkForLocalPublication(ActionMessage& cmd)
@@ -5215,7 +5245,7 @@ const std::string& CommonCore::getInterfaceInfo(InterfaceHandle handle) const
     if (handleInfo != nullptr) {
         return handleInfo->getTag("local_info_");
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setInterfaceInfo(helics::InterfaceHandle handle, std::string_view info)
@@ -5230,7 +5260,7 @@ const std::string& CommonCore::getInterfaceTag(InterfaceHandle handle, std::stri
     if (handleInfo != nullptr) {
         return handleInfo->getTag(tag);
     }
-    return emptyStr;
+    return gEmptyString;
 }
 
 void CommonCore::setInterfaceTag(helics::InterfaceHandle handle,

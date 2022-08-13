@@ -5,19 +5,18 @@ trigger:
 pr:
   - main
   - develop
-  - helics2
 
 jobs:
   - job: Linux
     strategy:
       matrix:
         ubuntuDefault:
-          containerImage: 'helics/buildenv:ubuntu18.04-default-builder'
+          containerImage: 'helics/buildenv:ubuntu20.04-default-builder'
           test_config: 'ci'
           use_mpi: 'true'
           encrypted: 'true'
-        gcc11:
-          containerImage: 'helics/buildenv:gcc11-builder'
+        gcc8:
+          containerImage: 'helics/buildenv:gcc8-builder'
           test_config: 'ci'
           use_mpi: 'true'
           encrypted: 'true'
@@ -26,8 +25,8 @@ jobs:
           test_config: 'ci'
           use_mpi: ''
           encrypted: ''
-        clang5:
-          containerImage: 'helics/buildenv:clang5-builder'
+        clang7:
+          containerImage: 'helics/buildenv:clang7-builder'
           test_config: 'ci'
           use_mpi: ''
           encrypted: ''
@@ -35,7 +34,7 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     container: $[ variables['containerImage'] ]
-    timeoutInMinutes: 90
+    timeoutInMinutes: 60
 
     steps:
       - bash: |
@@ -67,10 +66,10 @@ jobs:
         XCode-oldest:
           test_config: 'ci'
           vmImage: 'macOS-10.15'
-          xcode_path: '/Applications/Xcode_10.3.app'
+          xcode_path: '/Applications/Xcode_11.2.1.app'
     pool:
       vmImage: $[ variables['vmImage'] ]
-    timeoutInMinutes: 90
+    timeoutInMinutes: 60
 
     steps:
       - bash: sudo xcode-select --switch "${XCODE_PATH}/Contents/Developer"
@@ -114,7 +113,7 @@ jobs:
           imageName: 'windows-2022'
           langArch: 'x64'
           vsArch: 'x64'
-          extraFlags: ''
+          extraFlags: '-DCMAKE_CXX_STANDARD=20'
 
     pool:
       vmImage: $(imageName)

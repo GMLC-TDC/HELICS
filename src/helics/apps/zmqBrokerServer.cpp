@@ -70,7 +70,7 @@ void zmqBrokerServer::stopServer()
         return;
     }
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t reqSocket(ctx->getContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
+    zmq::socket_t reqSocket(ctx->getBaseContext(), (zmq_enabled_) ? ZMQ_REQ : ZMQ_DEALER);
     reqSocket.setsockopt(ZMQ_LINGER, 300);
     int port = (mZmqPort != 0) ? mZmqPort :
                                  ((zmq_enabled_) ? getDefaultPort(HELICS_CORE_TYPE_ZMQ) + 1 :
@@ -198,7 +198,7 @@ void zmqBrokerServer::mainLoop()
     auto ctx = ZmqContextManager::getContextPointer();
 
     if (zmq_enabled_) {
-        auto sdata = loadZMQsocket(ctx->getContext());
+        auto sdata = loadZMQsocket(ctx->getBaseContext());
         sockets.push_back(std::move(sdata.first));
         data.push_back(generateServerData(sdata.second + 3, 2));
         handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {
@@ -210,7 +210,7 @@ void zmqBrokerServer::mainLoop()
     }
 
     if (zmqss_enabled_) {
-        auto sdata = loadZMQSSsocket(ctx->getContext());
+        auto sdata = loadZMQSSsocket(ctx->getBaseContext());
         sockets.push_back(std::move(sdata.first));
         data.push_back(generateServerData(sdata.second + 4, 1));
         handleMessage.emplace_back([this](zmq::socket_t* skt, portData& pdata) {

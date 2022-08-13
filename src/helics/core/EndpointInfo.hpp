@@ -55,6 +55,7 @@ class EndpointInfo {
     bool hasFilter{false};  //!< indicator that the message has a filter
     bool required{false};
     bool targetedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
+    int32_t required_connections{0};  //!< an exact number of connections required
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
     /** get the number of messages in the queue up to the specified time*/
@@ -100,5 +101,11 @@ class EndpointInfo {
     const std::string& getSourceTargets() const;
     /** get a string with the names of the destination endpoints*/
     const std::string& getDestinationTargets() const;
+
+    /** check the interfaces for specific issues*/
+    void checkInterfacesForIssues(std::vector<std::pair<int, std::string>>& issues);
+
+    void setProperty(int32_t option, int32_t value);
+    int32_t getProperty(int32_t option) const;
 };
 }  // namespace helics

@@ -13,15 +13,9 @@
 #include "exeTestHelper.h"
 
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <future>
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
 #include <streambuf>
 
 int exeTestRunner::counter = 1;
@@ -53,52 +47,52 @@ exeTestRunner::exeTestRunner(const std::string& baseLocation,
 
 bool exeTestRunner::findFileLocation(const std::string& baseLocation, const std::string& target)
 {
-    ghc::filesystem::path sourcePath(baseLocation);
+    std::filesystem::path sourcePath(baseLocation);
 
     auto tryPath1 = sourcePath / target;
-    if (ghc::filesystem::exists(tryPath1)) {
+    if (std::filesystem::exists(tryPath1)) {
         exeString = tryPath1.string();
         return true;
     }
 
     auto tryPath2 = sourcePath / (target + ".exe");
-    if (ghc::filesystem::exists(tryPath2)) {
+    if (std::filesystem::exists(tryPath2)) {
         exeString = tryPath2.string();
         return true;
     }
 #ifndef NDEBUG
     auto tryPathD1 = sourcePath / "Debug" / target;
-    if (ghc::filesystem::exists(tryPathD1)) {
+    if (std::filesystem::exists(tryPathD1)) {
         exeString = tryPathD1.string();
         return true;
     }
 
     auto tryPathD2 = sourcePath / "Debug" / (target + ".exe");
-    if (ghc::filesystem::exists(tryPathD2)) {
+    if (std::filesystem::exists(tryPathD2)) {
         exeString = tryPathD2.string();
         return true;
     }
 #endif
     auto tryPathR1 = sourcePath / "Release" / target;
-    if (ghc::filesystem::exists(tryPathR1)) {
+    if (std::filesystem::exists(tryPathR1)) {
         exeString = tryPathR1.string();
         return true;
     }
 
     auto tryPathR2 = sourcePath / "Release" / (target + ".exe");
-    if (ghc::filesystem::exists(tryPathR2)) {
+    if (std::filesystem::exists(tryPathR2)) {
         exeString = tryPathR2.string();
         return true;
     }
 
-    ghc::filesystem::path tryPatht1 = target;
-    if (ghc::filesystem::exists(tryPatht1)) {
+    std::filesystem::path tryPatht1 = target;
+    if (std::filesystem::exists(tryPatht1)) {
         exeString = tryPatht1.string();
         return true;
     }
 
-    ghc::filesystem::path tryPatht2 = (target + ".exe");
-    if (ghc::filesystem::exists(tryPatht2)) {
+    std::filesystem::path tryPatht2 = (target + ".exe");
+    if (std::filesystem::exists(tryPatht2)) {
         exeString = tryPatht2.string();
         return true;
     }

@@ -4,16 +4,6 @@ Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
-#include "gtest/gtest.h"
-
-#ifdef _MSC_VER
-#    pragma warning(push, 0)
-#    include "helics/external/filesystem.hpp"
-#    pragma warning(pop)
-#else
-#    include "helics/external/filesystem.hpp"
-#endif
-
 #include "exeTestHelper.h"
 #include "helics/application_api/CombinationFederate.hpp"
 #include "helics/application_api/Publications.hpp"
@@ -22,10 +12,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/apps/Recorder.hpp"
 #include "helics/core/BrokerFactory.hpp"
 
+#include "gtest/gtest.h"
 #include <cstdio>
+#include <filesystem>
 #include <future>
 
-static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
+static void generateFiles(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore2";
@@ -95,11 +87,11 @@ static void generateFiles(const ghc::filesystem::path& f1, const ghc::filesystem
     EXPECT_EQ(std::get<0>(rec1.getValue(2)), 2.0);
     rec1.saveFile(f1.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f1));
+    EXPECT_TRUE(std::filesystem::exists(f1));
 
     rec1.saveFile(f2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f2));
+    EXPECT_TRUE(std::filesystem::exists(f2));
 }
 
 static void useFile(const std::string& corename, const std::string& file)
@@ -119,13 +111,13 @@ static void useFile(const std::string& corename, const std::string& file)
     EXPECT_EQ(play1.endpointCount(), 2U);
 
     play1.finalize();
-    ghc::filesystem::remove(file);
+    std::filesystem::remove(file);
 }
 
-static const std::string Message1("this is a test message\n and a \"secondMessage\"");
+static constexpr std::string_view Message1("this is a test message\n and a \"secondMessage\"");
 static const std::string Message2(55, 17);
 
-static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
+static void generateFiles2(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore2b";
@@ -195,11 +187,11 @@ static void generateFiles2(const ghc::filesystem::path& f1, const ghc::filesyste
     EXPECT_EQ(std::get<0>(rec1.getValue(2)), 2.0);
     rec1.saveFile(f1.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f1));
+    EXPECT_TRUE(std::filesystem::exists(f1));
 
     rec1.saveFile(f2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f2));
+    EXPECT_TRUE(std::filesystem::exists(f2));
 }
 
 static void useFile2(const std::string& corename, const std::string& file)
@@ -223,19 +215,19 @@ static void useFile2(const std::string& corename, const std::string& file)
     }
 
     play1.finalize();
-    ghc::filesystem::remove(file);
+    std::filesystem::remove(file);
 }
 
 // this is the same as another test in test recorders
 TEST(combo_tests, save_load_file1)
 {
-    auto filename1 = ghc::filesystem::temp_directory_path() / "savefile.txt";
+    auto filename1 = std::filesystem::temp_directory_path() / "savefile.txt";
 
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile.json";
+    auto filename2 = std::filesystem::temp_directory_path() / "savefile.json";
 
     generateFiles(filename1, filename2);
-    ASSERT_TRUE(ghc::filesystem::exists(filename1));
-    ASSERT_TRUE(ghc::filesystem::exists(filename2));
+    ASSERT_TRUE(std::filesystem::exists(filename1));
+    ASSERT_TRUE(std::filesystem::exists(filename2));
 
     useFile("ccore4", filename1.string());
     useFile("ccore5", filename2.string());
@@ -244,19 +236,19 @@ TEST(combo_tests, save_load_file1)
 // this is the same as another test in test recorders
 TEST(combo_tests, save_load_file2)
 {
-    auto filename1 = ghc::filesystem::temp_directory_path() / "savefile2.txt";
+    auto filename1 = std::filesystem::temp_directory_path() / "savefile2.txt";
 
-    auto filename2 = ghc::filesystem::temp_directory_path() / "savefile2.json";
+    auto filename2 = std::filesystem::temp_directory_path() / "savefile2.json";
 
     generateFiles2(filename1, filename2);
-    ASSERT_TRUE(ghc::filesystem::exists(filename1));
-    ASSERT_TRUE(ghc::filesystem::exists(filename2));
+    ASSERT_TRUE(std::filesystem::exists(filename1));
+    ASSERT_TRUE(std::filesystem::exists(filename2));
 
     useFile2("ccore4b", filename1.string());
     useFile2("ccore5b", filename2.string());
 }
 
-static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::filesystem::path& f2)
+static void generateFiles_binary(const std::filesystem::path& f1, const std::filesystem::path& f2)
 {
     helics::FederateInfo fi(helics::CoreType::TEST);
     fi.coreName = "ccore3";
@@ -327,11 +319,11 @@ static void generateFiles_binary(const ghc::filesystem::path& f1, const ghc::fil
     }
     rec1.saveFile(f1.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f1));
+    EXPECT_TRUE(std::filesystem::exists(f1));
 
     rec1.saveFile(f2.string());
 
-    EXPECT_TRUE(ghc::filesystem::exists(f2));
+    EXPECT_TRUE(std::filesystem::exists(f2));
 }
 
 static void useFileBinary(const std::string& corename, const std::string& file)
@@ -365,20 +357,20 @@ static void useFileBinary(const std::string& corename, const std::string& file)
     }
     EXPECT_EQ(b2.mess.data.to_string(), n6.to_string());
     play1.finalize();
-    ghc::filesystem::remove(file);
+    std::filesystem::remove(file);
 }
 
 TEST(combo_tests, save_load_file_binary)
 {
-    auto tpath = ghc::filesystem::temp_directory_path();
+    auto tpath = std::filesystem::temp_directory_path();
 
     auto filename1 = tpath / "savefile_binary.txt";
     auto filename2 = tpath / "savefile_binary.json";
 
     generateFiles_binary(filename1, filename2);
-    ASSERT_TRUE(ghc::filesystem::exists(filename1));
+    ASSERT_TRUE(std::filesystem::exists(filename1));
 
-    ASSERT_TRUE(ghc::filesystem::exists(filename2));
+    ASSERT_TRUE(std::filesystem::exists(filename2));
 
     useFileBinary("ccore6", filename1.string());
     useFileBinary("ccore7", filename2.string());

@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id, void* data):
-    Interface(mFed, id, name), fed(mFed), dataReference(data)
+Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id):
+    Interface(mFed, id, name), fed(mFed)
 {
 }
 
@@ -37,9 +37,8 @@ Endpoint::Endpoint(InterfaceVisibility locality,
 
 void Endpoint::send(const char* data, size_t data_size) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         cr->send(handle, data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -49,9 +48,8 @@ void Endpoint::send(const char* data, size_t data_size) const
 
 void Endpoint::sendTo(const char* data, size_t data_size, std::string_view dest) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         if (dest.empty()) {
             dest = defDest;
         }
@@ -64,9 +62,8 @@ void Endpoint::sendTo(const char* data, size_t data_size, std::string_view dest)
 
 void Endpoint::sendAt(const char* data, size_t data_size, Time sendTime) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         cr->sendAt(handle, data, data_size, sendTime);
     } else {
         throw(InvalidFunctionCall(
@@ -79,9 +76,8 @@ void Endpoint::sendToAt(const char* data,
                         std::string_view dest,
                         Time sendTime) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         if (dest.empty()) {
             dest = defDest;
         }
@@ -97,9 +93,8 @@ void Endpoint::sendToAt(const char* data,
 */
 void Endpoint::send(const void* data, size_t data_size) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         cr->send(handle, data, data_size);
     } else {
         throw(InvalidFunctionCall(
@@ -110,9 +105,8 @@ void Endpoint::send(const void* data, size_t data_size) const
 /** send a pointer to a message object*/
 void Endpoint::send(std::unique_ptr<Message> mess) const
 {
-    if ((cr != nullptr) &&
-        ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
-         (fed->getCurrentMode() == Federate::Modes::INITIALIZING))) {
+    if ((fed->getCurrentMode() == Federate::Modes::EXECUTING) ||
+        (fed->getCurrentMode() == Federate::Modes::INITIALIZING)) {
         if (mess->dest.empty()) {
             mess->dest = defDest;
         }
@@ -122,8 +116,6 @@ void Endpoint::send(std::unique_ptr<Message> mess) const
             "messages not allowed outside of execution and initialization mode"));
     }
 }
-
-static const std::string emptyStr;
 
 void Endpoint::setDefaultDestination(std::string_view target)
 {
@@ -135,15 +127,12 @@ void Endpoint::setDefaultDestination(std::string_view target)
 
 const std::string& Endpoint::getDefaultDestination() const
 {
-    return (!defDest.empty()) ? defDest :
-                                ((cr != nullptr) ? cr->getDestinationTargets(handle) : emptyStr);
+    return (!defDest.empty()) ? defDest : cr->getDestinationTargets(handle);
 }
 
 void Endpoint::subscribe(std::string_view key)
 {
-    if (cr != nullptr) {
-        cr->addSourceTarget(handle, key, helics::InterfaceType::PUBLICATION);
-    }
+    cr->addSourceTarget(handle, key, helics::InterfaceType::PUBLICATION);
 }
 
 std::unique_ptr<Message> Endpoint::getMessage() const
@@ -173,28 +162,20 @@ void Endpoint::setCallback(const std::function<void(const Endpoint&, Time)>& cal
 /** add a named filter to an endpoint for all messages coming from the endpoint*/
 void Endpoint::addSourceFilter(std::string_view filterName)
 {
-    if (cr != nullptr) {
-        cr->addSourceTarget(handle, filterName, InterfaceType::FILTER);
-    }
+    cr->addSourceTarget(handle, filterName, InterfaceType::FILTER);
 }
 /** add a named filter to an endpoint for all messages going to the endpoint*/
 void Endpoint::addDestinationFilter(std::string_view filterName)
 {
-    if (cr != nullptr) {
-        cr->addDestinationTarget(handle, filterName, InterfaceType::FILTER);
-    }
+    cr->addDestinationTarget(handle, filterName, InterfaceType::FILTER);
 }
 
 void Endpoint::addSourceEndpoint(std::string_view endpointName)
 {
-    if (cr != nullptr) {
-        cr->addSourceTarget(handle, endpointName, InterfaceType::ENDPOINT);
-    }
+    cr->addSourceTarget(handle, endpointName, InterfaceType::ENDPOINT);
 }
 void Endpoint::addDestinationEndpoint(std::string_view endpointName)
 {
-    if (cr != nullptr) {
-        cr->addDestinationTarget(handle, endpointName, InterfaceType::ENDPOINT);
-    }
+    cr->addDestinationTarget(handle, endpointName, InterfaceType::ENDPOINT);
 }
 }  // namespace helics

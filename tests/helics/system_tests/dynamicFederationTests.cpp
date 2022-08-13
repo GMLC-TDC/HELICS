@@ -202,3 +202,78 @@ TEST_F(dynFed, observer_subscriber_value)
     vFed1->finalize();
     vFed2->finalize();
 }
+
+/** now make sure we can get the values properly*/
+TEST_F(dynFed, observer_subscriber_value_with_buffer)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
+    pub.setOption(HELICS_HANDLE_OPTION_BUFFER_DATA);
+    auto& sub = vFed2->registerSubscription("pub1");
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    pub.publish(0.27);
+    auto res = vFed1->requestTime(2.0);
+    EXPECT_EQ(res, 2.0);
+
+    res = vFed2->requestTime(2.0);
+    EXPECT_EQ(res, 0.5);  // the result should show up at the next available time point
+    res = vFed2->requestTime(2.0);
+    EXPECT_EQ(res, 2.0);
+
+    helics::FederateInfo fi(helics::CoreType::TEST);
+    fi.observer = true;
+
+    auto bname = brokers[0]->getIdentifier();
+    auto cdyn = helics::CoreFactory::create(helics::CoreType::TEST,
+                                            "coredyn",
+                                            std::string("--observer --broker=") + bname);
+
+    EXPECT_TRUE(cdyn->connect());
+    fi.coreName = "coredyn";
+    // now we try to join the federation with an observer
+    std::shared_ptr<helics::ValueFederate> fobs;
+    EXPECT_NO_THROW(fobs = std::make_shared<helics::ValueFederate>("fedObs", fi));
+
+    if (!fobs) {
+        cdyn->disconnect();
+
+        vFed1->finalize();
+        vFed2->finalize();
+        ASSERT_TRUE(fobs);
+        return;
+    }
+    auto& obsSubs = fobs->registerSubscription("pub1");
+    fobs->query("root", "global_flush");
+
+    EXPECT_NO_THROW(fobs->enterInitializingMode());
+
+    EXPECT_NO_THROW(fobs->enterExecutingMode());
+    EXPECT_DOUBLE_EQ(obsSubs.getValue<double>(), 0.27);
+    res = vFed1->requestTime(3.0);
+    EXPECT_EQ(res, 3.0);
+    pub.publish(0.8987);
+    res = vFed1->requestTime(4.0);
+    EXPECT_EQ(res, 4.0);
+
+    res = vFed2->requestTime(4.0);
+    EXPECT_EQ(res, 3.0);
+
+    EXPECT_DOUBLE_EQ(sub.getValue<double>(), 0.8987);
+
+    res = fobs->requestTime(4.0);
+    EXPECT_EQ(res, 4.0);
+    EXPECT_DOUBLE_EQ(obsSubs.getValue<double>(), 0.8987);
+
+    fobs->finalize();
+    cdyn->disconnect();
+
+    vFed1->finalize();
+    vFed2->finalize();
+}

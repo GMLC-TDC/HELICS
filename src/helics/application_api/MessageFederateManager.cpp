@@ -36,25 +36,17 @@ Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::s
 {
     auto handle = coreObject->registerEndpoint(fedID, name, type);
     if (handle.isValid()) {
-        auto edat = std::make_unique<EndpointData>();
-
         auto eptHandle = local_endpoints.lock();
-        auto loc = eptHandle->insert(name, handle, mFed, name, handle, edat.get());
+        auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {
             auto& ref = eptHandle->back();
-            ref.referenceIndex = static_cast<int>(*loc);
-            eptHandle.unlock();
-
-            //** now insert the data into the appropriate location in the data array
             auto datHandle = eptData.lock();
-            if (datHandle->size() == loc) {
-                datHandle->push_back(std::move(edat));
-            } else if (datHandle->size() < loc) {
-                datHandle->resize(*loc + 1);
-                (*datHandle)[*loc] = std::move(edat);
-            } else {
-                (*datHandle)[*loc] = std::move(edat);
-            }
+            auto& edat = datHandle->emplace_back();
+
+            // non-owning pointer
+            ref.dataReference = &edat;
+            datHandle.unlock();
+            ref.referenceIndex = static_cast<int>(*loc);
 
             return ref;
         }
@@ -67,36 +59,28 @@ Endpoint& MessageFederateManager::registerTargetedEndpoint(std::string_view name
 {
     auto handle = coreObject->registerTargetedEndpoint(fedID, name, type);
     if (handle.isValid()) {
-        auto edat = std::make_unique<EndpointData>();
-
         auto eptHandle = local_endpoints.lock();
-        auto loc = eptHandle->insert(name, handle, mFed, name, handle, edat.get());
+        auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {
             auto& ref = eptHandle->back();
-            ref.referenceIndex = static_cast<int>(*loc);
-            eptHandle.unlock();
-
-            //** now insert the data into the appropriate location in the data array
             auto datHandle = eptData.lock();
-            if (datHandle->size() == loc) {
-                datHandle->push_back(std::move(edat));
-            } else if (datHandle->size() < loc) {
-                datHandle->resize(*loc + 1);
-                (*datHandle)[*loc] = std::move(edat);
-            } else {
-                (*datHandle)[*loc] = std::move(edat);
-            }
+            auto& edat = datHandle->emplace_back();
+
+            // non-owning pointer
+            ref.dataReference = &edat;
+            datHandle.unlock();
+            ref.referenceIndex = static_cast<int>(*loc);
 
             return ref;
         }
     }
-    throw(RegistrationFailure("Unable to register Endpoint"));
+    throw(RegistrationFailure("Unable to register Targeted Endpoint"));
 }
 bool MessageFederateManager::hasMessage() const
 {
     auto eptDat = eptData.lock_shared();
     for (const auto& mq : eptDat) {
-        if (!mq->messages.empty()) {
+        if (!mq.messages.empty()) {
             return true;
         }
     }
@@ -133,7 +117,7 @@ uint64_t MessageFederateManager::pendingMessageCount() const
     auto eptDat = eptData.lock_shared();
     uint64_t sz = 0;
     for (const auto& mq : eptDat) {
-        sz += mq->messages.size();
+        sz += mq.messages.size();
     }
     return sz;
 }
@@ -155,8 +139,8 @@ std::unique_ptr<Message> MessageFederateManager::getMessage()
     // just start with the first endpoint and check until a queue isn't empty
     auto eptDat = eptData.lock();
     for (auto& edat : eptDat) {
-        if (!edat->messages.empty()) {
-            auto ms = edat->messages.pop();
+        if (!edat.messages.empty()) {
+            auto ms = edat.messages.pop();
             if (ms) {
                 return std::move(*ms);
             }
@@ -172,9 +156,6 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
     if (epCount == 0) {
         return;
     }
-    // lock the data updates
-    auto eptDat = eptData.lock();
-
     InterfaceHandle endpoint_id;
     auto epts = local_endpoints.lock();
     auto mcall = allCallback.load();
@@ -189,21 +170,18 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         if (fid != epts->end()) {  // assign the data
 
             Endpoint& currentEpt = *fid;
-            auto localEndpointIndex = fid->referenceIndex;
-            (*eptDat)[localEndpointIndex]->messages.emplace(std::move(message));
-            auto cb = (*eptDat)[localEndpointIndex]->callback.load();
-            if (cb) {
+            auto* eData = static_cast<EndpointData*>(fid->dataReference);
+
+            eData->messages.emplace(std::move(message));
+
+            if (eData->callback) {
                 // need to be copied otherwise there is a potential race condition on lock removal
-                eptDat.unlock();
                 epts.unlock();
-                cb(currentEpt, CurrentTime);
-                eptDat = eptData.lock();
+                eData->callback(currentEpt, CurrentTime);
                 epts = local_endpoints.lock();
             } else if (mcall) {
-                eptDat.unlock();
                 epts.unlock();
                 mcall(currentEpt, CurrentTime);
-                eptDat = eptData.lock();
                 epts = local_endpoints.lock();
             }
         }

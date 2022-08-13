@@ -16,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedObjects.hpp"
 #include "gmlc/concurrency/TriggerVariable.hpp"
 #include "gmlc/containers/AirLock.hpp"
-//#include "gmlc/containers/DualMappedPointerVector.hpp"
 #include "gmlc/containers/DualStringMappedVector.hpp"
 #include "gmlc/containers/MappedPointerVector.hpp"
 #include "gmlc/containers/SimpleQueue.hpp"
@@ -53,7 +52,7 @@ enum class InterfaceType : char;
 enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
 /** function to print string for the state*/
-const std::string& state_string(OperatingState state);
+const std::string& stateString(OperatingState state);
 
 /** helper class for containing some wrapper around a federate for the core*/
 class FedInfo {
@@ -196,6 +195,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual void addDependency(LocalFederateId federateID,
                                std::string_view federateName) override final;
     virtual void linkEndpoints(std::string_view source, std::string_view dest) override final;
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override final;
     virtual void makeConnections(const std::string& file) override final;
     virtual void dataLink(std::string_view source, std::string_view target) override final;
     virtual void addSourceFilterToEndpoint(std::string_view filter,
@@ -361,17 +361,15 @@ class CommonCore: public Core, public BrokerBase {
     std::atomic<double> simTime{BrokerBase::mInvalidSimulationTime};
     GlobalFederateId keyFed{};
     std::string prevIdentifier;  //!< storage for the case of requiring a renaming
-    std::map<GlobalFederateId, route_id>
-        routing_table;  //!< map for external routes  <global federate id, route id>
-    gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed
-                             //!< for a certain time
-    std::unordered_map<std::string, route_id>
-        knownExternalEndpoints;  //!< external map for all known external endpoints with names and
-                                 //!< route
+    /** map for external routes  <global federate id, route id> */
+    std::map<GlobalFederateId, route_id> routing_table;
+    /** FIFO queue for transmissions to the root that need to be delayed for a certain time */
+    gmlc::containers::SimpleQueue<ActionMessage> delayTransmitQueue;
+    /** external map for all known external endpoints with names and route */
+    std::unordered_map<std::string, route_id> knownExternalEndpoints;
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
-    std::unique_ptr<TimeoutMonitor>
-        timeoutMon;  //!< class to handle timeouts and disconnection notices
+    /** class to handle timeouts and disconnection notices */
+    std::unique_ptr<TimeoutMonitor> timeoutMon;
     /** actually transmit messages that were delayed until the core was actually registered*/
     void transmitDelayedMessages();
     /** respond to delayed message with an error*/
@@ -409,6 +407,8 @@ class CommonCore: public Core, public BrokerBase {
     void processQueryCommand(ActionMessage& cmd);
     /** handle logging and error related commands*/
     void processLogAndErrorCommand(ActionMessage& cmd);
+    /** handle data linking related commands*/
+    void processLinkingCommand(ActionMessage& cmd);
     /** check if a newly registered subscription has a local publication
     if it does return true*/
     bool checkForLocalPublication(ActionMessage& cmd);
@@ -442,8 +442,8 @@ class CommonCore: public Core, public BrokerBase {
 
   private:
     int32_t _global_federation_size = 0;  //!< total size of the federation
-    std::atomic<int16_t> delayInitCounter{0};  //!< counter for the number of times the entry to
-                                               //!< initialization Mode was explicitly delayed
+    /// counter for the number of times the entry to initialization Mode was explicitly delayed
+    std::atomic<int16_t> delayInitCounter{0};
     bool filterTiming{false};  //!< if there are filters needing a time connection
     /** threadsafe local federate information list for external functions */
     shared_guarded<gmlc::containers::MappedPointerVector<FederateState, std::string>> federates;
@@ -454,15 +454,16 @@ class CommonCore: public Core, public BrokerBase {
      * number bigger than 1 to prevent confusion */
     std::atomic<int32_t> messageCounter{54};
     ordered_guarded<HandleManager> handles;  //!< local handle information;
-    HandleManager loopHandles;  //!< copy of handles to use in the primary processing loop without
-                                //!< thread protection
+    /// copy of handles to use in the primary processing loop without thread protection
+    HandleManager loopHandles;
     /// sets of ongoing time blocks from filtering
     std::vector<std::pair<GlobalFederateId, int32_t>> timeBlocks;
     TranslatorFederate* translatorFed{nullptr};
     std::atomic<std::thread::id> translatorThread{std::thread::id{}};
     std::atomic<GlobalFederateId> translatorFedID;
-    std::map<int32_t, std::vector<ActionMessage>>
-        delayedTimingMessages;  //!< delayedTimingMessages from ongoing Filter actions
+
+    /** delayedTimingMessages from ongoing Filter actions */
+    std::map<int32_t, std::vector<ActionMessage>> delayedTimingMessages;
 
     /// counter for queries start at 1 so the default value isn't used
     std::atomic<int> queryCounter{1};
@@ -551,7 +552,7 @@ class CommonCore: public Core, public BrokerBase {
     /** check for a disconnect and take actions if the object can disconnect*/
     bool checkAndProcessDisconnect();
     /** send a disconnect message to time dependencies and child federates*/
-    void sendDisconnect();
+    void sendDisconnect(action_message_def::action_t disconnectType = CMD_STOP);
     /** broadcast a message to all federates*/
     void broadcastToFederates(ActionMessage& cmd);
     /** generate a counter for when to reset object*/

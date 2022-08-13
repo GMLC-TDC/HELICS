@@ -38,13 +38,13 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 
 /** enumeration of possible states of a remote federate or broker*/
-enum class connection_state : std::uint8_t {
-    connected = 0,
-    init_requested = 1,
-    operating = 2,
-    error = 40,
-    request_disconnect = 48,
-    disconnected = 50
+enum class ConnectionState : std::uint8_t {
+    CONNECTED = 0,
+    INIT_REQUESTED = 1,
+    OPERATING = 2,
+    ERROR_STATE = 40,
+    REQUEST_DISCONNECT = 48,
+    DISCONNECTED = 50
 };
 
 /** class defining the common information for a federate*/
@@ -54,7 +54,7 @@ class BasicFedInfo {
     GlobalFederateId global_id;  //!< the identification code for the federate
     route_id route;  //!< the routing information for data to be sent to the federate
     GlobalBrokerId parent;  //!< the id of the parent broker/core
-    connection_state state{connection_state::connected};
+    ConnectionState state{ConnectionState::CONNECTED};
     bool nonCounting{false};  // indicator the federate shouldn't count toward limits or total
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
@@ -67,12 +67,10 @@ class BasicBrokerInfo {
     GlobalBrokerId global_id;  //!< the global identifier for the broker
     route_id route;  //!< the identifier for the route to take to the broker
     GlobalBrokerId parent;  //!< the id of the parent broker/core
-
-    connection_state state{
-        connection_state::connected};  //!< specify the current status of the broker
-
-    bool _hasTimeDependency{
-        false};  //!< flag indicating that a broker has general endpoints it is coordinating
+    /// specify the current status of the broker
+    ConnectionState state{ConnectionState::CONNECTED};
+    /** flag indicating that a broker has general endpoints it is coordinating */
+    bool _hasTimeDependency{false};
     bool _core{false};  //!< if set to true the broker is a core, false is a broker
     bool _nonLocal{false};  //!< indicator that the broker has a subbroker as a parent.
     bool _route_key{false};  //!< indicator that the broker has a unique route id
@@ -100,26 +98,27 @@ class CoreBroker: public Broker, public BrokerBase {
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
     int routeCount = 1;  //!< counter for creating new routes;
+    /// container for all federates
     gmlc::containers::
         DualStringMappedVector<BasicFedInfo, GlobalFederateId, reference_stability::unstable>
-            mFederates;  //!< container for all federates
+            mFederates;
+    /// container for all the broker information
     gmlc::containers::
         DualStringMappedVector<BasicBrokerInfo, GlobalBrokerId, reference_stability::unstable>
-            mBrokers;  //!< container for all the broker information
+            mBrokers;
     /// the previous identifier in case a rename is required
     std::string mPreviousLocalBrokerIdentifier;
 
     HandleManager handles;  //!< structure for managing handles and search operations on handles
     UnknownHandleManager unknownHandles;  //!< structure containing unknown targeted handles
-    std::vector<std::pair<std::string, GlobalFederateId>>
-        delayedDependencies;  //!< set of dependencies that need to be created on init
-    std::unordered_map<GlobalFederateId, LocalFederateId>
-        global_id_translation;  //!< map to translate global ids to local ones
-    std::unordered_map<GlobalFederateId, route_id>
-        routing_table;  //!< map for external routes  <global federate id, route id>
-    std::unordered_map<std::string, route_id>
-        knownExternalEndpoints;  //!< external map for all known external endpoints with names and
-                                 //!< route
+    /// set of dependencies that need to be created on init
+    std::vector<std::pair<std::string, GlobalFederateId>> delayedDependencies;
+    /// map to translate global ids to local ones
+    std::unordered_map<GlobalFederateId, LocalFederateId> global_id_translation;
+    /// map for external routes  <global federate id, route id>
+    std::unordered_map<GlobalFederateId, route_id> routing_table;
+    /// external map for all known external endpoints with names and route
+    std::unordered_map<std::string, route_id> knownExternalEndpoints;
     std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
@@ -132,17 +131,17 @@ class CoreBroker: public Broker, public BrokerBase {
 
     std::vector<ActionMessage> earlyMessages;  //!< list of messages that came before connection
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
-    std::unique_ptr<TimeoutMonitor>
-        timeoutMon;  //!< class to handle timeouts and disconnection notices
+    /// class to handle timeouts and disconnection notices
+    std::unique_ptr<TimeoutMonitor> timeoutMon;
     std::atomic<uint16_t> nextAirLock{0};  //!< the index of the next airlock to use
-    std::array<gmlc::containers::AirLock<std::any>, 3>
-        dataAirlocks;  //!< airlocks for updating filter operators and other functions
+    /// airlocks for updating filter operators and other functions
+    std::array<gmlc::containers::AirLock<std::any>, 3> dataAirlocks;
     // variables for a time logging federate
     std::string
         mTimeMonitorFederate;  //!< name of the federate to use for logging time and time markers
     GlobalFederateId mTimeMonitorFederateId{};  //!< id of the timing federate
-    GlobalFederateId
-        mTimeMonitorLocalFederateId{};  //!< local id for a special receiving destination
+    /// local id for a special receiving destination
+    GlobalFederateId mTimeMonitorLocalFederateId{};
     Time mTimeMonitorPeriod{timeZero};  //!< period to display the time logging
     Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
     Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
@@ -161,10 +160,8 @@ class CoreBroker: public Broker, public BrokerBase {
 
     /** process configure commands for the broker*/
     void processBrokerConfigureCommands(ActionMessage& cmd);
-
-    gmlc::containers::SimpleQueue<ActionMessage>
-        delayTransmitQueue;  //!< FIFO queue for transmissions to the root that need to be delayed
-                             //!< for a certain time
+    /// FIFO queue for transmissions to the root that need to be delayed for a certain time
+    gmlc::containers::SimpleQueue<ActionMessage> delayTransmitQueue;
     /* function to transmit the delayed messages*/
     void transmitDelayedMessages();
     /**function for routing a message,  it will override the destination id with the specified
@@ -194,7 +191,7 @@ class CoreBroker: public Broker, public BrokerBase {
     bool verifyBrokerKey(ActionMessage& mess) const;
     /** verify the broker key contained in a string
     @return false if the keys do not match*/
-    bool verifyBrokerKey(const std::string& key) const;
+    bool verifyBrokerKey(std::string_view key) const;
 
   public:
     /** connect the core to its broker
@@ -221,9 +218,8 @@ class CoreBroker: public Broker, public BrokerBase {
 
     virtual bool isOpenToNewFederates() const override;
 
-    virtual void
-        setLoggingCallback(const std::function<void(int, std::string_view, std::string_view)>&
-                               logFunction) override final;
+    virtual void setLoggingCallback(
+        std::function<void(int, std::string_view, std::string_view)> logFunction) override final;
 
     virtual bool waitForDisconnect(
         std::chrono::milliseconds msToWait = std::chrono::milliseconds(0)) const override final;
@@ -293,7 +289,7 @@ class CoreBroker: public Broker, public BrokerBase {
     */
     bool allInitReady() const;
     /** get a value for the summary connection status of all the connected systems*/
-    connection_state getAllConnectionState() const;
+    ConnectionState getAllConnectionState() const;
 
     /** set the local identification string for the broker*/
     void setIdentifier(std::string_view name);
@@ -319,6 +315,7 @@ class CoreBroker: public Broker, public BrokerBase {
 
     virtual void addDestinationFilterToEndpoint(std::string_view filter,
                                                 std::string_view endpoint) override final;
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) override final;
 
   protected:
     virtual std::shared_ptr<helicsCLI11App> generateCLI() override;
@@ -330,11 +327,11 @@ class CoreBroker: public Broker, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** find any existing publishers for a subscription*/
-    void FindandNotifyInputTargets(BasicHandleInfo& handleInfo);
-    void FindandNotifyPublicationTargets(BasicHandleInfo& handleInfo);
+    void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
-    void FindandNotifyFilterTargets(BasicHandleInfo& handleInfo);
-    void FindandNotifyEndpointTargets(BasicHandleInfo& handleInfo);
+    void findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
+    void findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/

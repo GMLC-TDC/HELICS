@@ -189,7 +189,7 @@ void ValueFederate::registerValueInterfaces(const std::string& configString)
         registerValueInterfacesJson(configString);
     }
 }
-static const std::string emptyStr;
+static constexpr std::string_view emptyStr;
 
 template<class Inp, class Obj>
 static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
@@ -211,7 +211,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
         [](const std::string& value) { return getOptionValue(value); },
         [&objUpdate](int32_t option, int32_t value) { objUpdate.setOption(option, value); });
 
-    fileops::callIfMember(data, "alias", [&objUpdate, fed](const std::string& val) {
+    fileops::callIfMember(data, "alias", [&objUpdate, fed](std::string_view val) {
         fed->addAlias(objUpdate, val);
     });
 
@@ -223,10 +223,10 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
     if (!info.empty()) {
         objUpdate.setInfo(info);
     }
-    loadTags(data, [&objUpdate](const std::string& tagname, const std::string& tagvalue) {
+    loadTags(data, [&objUpdate](std::string_view tagname, std::string_view tagvalue) {
         objUpdate.setTag(tagname, tagvalue);
     });
-    addTargets(data, "targets", [&objUpdate](const std::string& target) {
+    addTargets(data, "targets", [&objUpdate](std::string_view target) {
         objUpdate.addTarget(target);
     });
 }
