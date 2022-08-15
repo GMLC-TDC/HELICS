@@ -141,12 +141,6 @@ Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for
     <td><b>helics2</b></td>
   </tr>
   <tr>
-  <td>Travis CI</td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=main" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics2" alt="Build Status" /></a></td>
-  </tr>
-  <tr>
   <td>Azure</td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=main"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=main" alt="Build Status" /></a></td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
