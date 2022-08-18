@@ -377,10 +377,11 @@ Once the charging mode switches to constant voltage and the current decreases th
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true)
 
 ## Impact of Iteration
+
 It is useful to think about _why_ iteration would be necessary in a simulation in the first place.
 In a world governed by differential equations, iteration essentially smooths out timescales below the range of interest.
 It allows us to assume that quicker dynamics have already settled to their steady state.
-Power systems engineers might be quite familiar with this concept. 
+Power systems engineers might be quite familiar with this concept.
 The power flow, which assumes steady state of voltage and current dependencies, requires iteration because of the use of constant power loads.
 Dynamic simulations (in their simplest form), however, do not iterate, because all loads are converted to impedances.
 More advanced dynamic simulations do iterate because they are attempting to account for the impact of electromagnetic phenomena (e.g. power electronics control loops) that have already settled.
@@ -393,12 +394,12 @@ That is $\Delta t_{\text{control}} \ll \Delta t$.
 To illustrate this, a second copy of the iteration is available in the repository (`Battery_noitermain.py`, `Charger_noitermain.py`, and `advanced_iteration_runner_noitermain.json`) with the iteration turn off (except for initialization) using the flag `iterative_mode = False`.
 A comparison of the two runs is presented below:
 
-|With Iteration | Without Iteration |
-|:---------------:|:-------------------:|
-|![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_current.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_current.png?raw=true)|
-|![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_SOCs.png?raw=true)|![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_SOCs.png?raw=true)|
-|![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true)| ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_voltage.png?raw=true)|
-|![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_power.png?raw=true)|
+|                                                                With Iteration                                                                |                                                                  Without Iteration                                                                  |
+| :------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_current.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_current.png?raw=true) |
+|  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_SOCs.png?raw=true)   |  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_SOCs.png?raw=true)   |
+| ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_voltage.png?raw=true) |
+|  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true)  |  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_power.png?raw=true)  |
 
 Without iteration the "voltage hunting" that happens during the constant-current charging phase takes place over hours instead of _instantaneously_ as is the case _with_ iteration.
 During the constant voltage phase the two runs are identical, since there is no longer an interdependence between the federates.
