@@ -12,6 +12,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
+    class CallbackFederateOperator;
+
 /** class defining a federate that can use both the value and message interfaces */
 class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
   public:
@@ -65,6 +67,25 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     CallbackFederate(const CallbackFederate& fed) = delete;
     /** copy assignment deleted*/
     CallbackFederate& operator=(const CallbackFederate& fed) = delete;
-    
+    void setInitializeCallback(std::function<IterationRequest()> initializeCallback){initializationOperation=std::move(initializeCallback); }
+    void setNextTimeIterativeCallback(std::function<std::pair<Time,IterationRequest>(iteration_time)> nextTimeCallback){nextTimeOperation1=std::move(nextTimeCallback);}
+    void setNextTimeCallback(std::function<Time(Time)> nextTimeCallback){nextTimeOperation2=std::move(nextTimeCallback);nextTimeOperation1=nullptr;}
+    void clearNextTimeCallback(){nextTimeOperation1=nullptr; nextTimeOperation2=nullptr;}
+private:
+    void loadOperator();
+    //pointer for the 
+    std::shared_ptr<CallbackFederateOperator> op;
+    friend CallbackFederateOperator;
+
+    std::function<IterationRequest()> initializationOperation;
+    std::function<std::pair<Time,IterationRequest>(iteration_time)> nextTimeOperation1;
+    std::function<Time(Time)> nextTimeOperation2;
+    /** callback operations*/
+    IterationRequest initializeOperationsCallback();
+
+    std::pair<Time, IterationRequest> operateCallback(iteration_time newTime);
+
+    void finalizeCallback();
+    void errorHandlerCallback(int errorCode, std::string_view errorString);
 };
 }  // namespace helics

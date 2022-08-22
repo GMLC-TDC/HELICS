@@ -177,9 +177,12 @@ public:
     @return a pair of values with a new request time and the iteration results
     */
    virtual std::pair<Time,IterationRequest> operate(iteration_time newTime)=0;
-
+   /*NOTE: the following two functions will be called only once and they will be the last call in the federate lifecycle*/
    /** operate any final operations on the federate*/
     virtual void finalize(){};
+    /** run any operations for handling an error*/
+    virtual void error_handler([[maybe_unused]] int error_code, [[maybe_unused]] std::string_view errorString) {
+    };
 };
 
 /** class defining a federate that does nothing*/

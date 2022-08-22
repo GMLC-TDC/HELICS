@@ -18,6 +18,7 @@ set(application_api_test_sources
     TranslatorTests.cpp
     testFixtures.cpp
     PrimaryTypeConversionTests.cpp
+    CallbackFederateTests.cpp
     FilterAdditionalTests.cpp
     ValueConverterTests.cpp
     application-api-tests.cpp

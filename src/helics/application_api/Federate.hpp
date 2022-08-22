@@ -83,6 +83,8 @@ class HELICS_CXX_EXPORT Federate {
     bool useJsonSerialization{false};
     /** set to true for observer mode, no outgoing synchronized communications*/
     bool observerMode{false};
+    /** allow to retrigger time requests from callbacks (user specified)*/
+    bool retriggerTimeRequest{false};
 
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
@@ -98,7 +100,10 @@ class HELICS_CXX_EXPORT Federate {
     std::function<void(Time, bool)> timeUpdateCallback;
     std::function<void(Modes, Modes)> modeUpdateCallback;
     std::function<void(Time, bool)> timeRequestReturnCallback;
-
+    std::function<void(bool)> initializingEntryCallback;
+    std::function<void()> executingEntryCallback;
+    std::function<void()> cosimulationTerminationCallback;
+    std::function<void(int,std::string_view)> errorHandlerCallback;
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -328,6 +333,21 @@ class HELICS_CXX_EXPORT Federate {
     void setLoggingCallback(
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
+    /** register a callback function to call when the system enters initializingMode
+    @details this callback will execute in the calling thread just prior to returning control to the caller
+    @param callback the function to call; the function signature is void(bool) where the
+     boolean is set to true if the iterating
+    to true if the request is possibly iterating
+    */
+    void setInitializingEntryCallback(std::function<void(bool)> callback);
+
+    /** register a callback function to call when the system enters executingMode
+    @details this callback will execute once in the calling thread just prior to calling timeUpdateCallback for the first time
+    and
+    @param callback the function to call; the function signature is void(void) 
+    */
+    void setExecutingEntryCallback(std::function<void()> callback);
+
     /** register a callback function to call when a timeRequest function is called
     @details this callback is executed prior to any blocking operation on any valid timeRequest
     method it will execute in the calling thread
@@ -365,6 +385,19 @@ class HELICS_CXX_EXPORT Federate {
   true if the request is an iteration
   */
     void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
+
+    /** register a callback function to call when the cosimulation is completed for this federate
+    @details this callback will execute once when time has reached max value or when finalize is called
+    and
+    @param callback the function to call; the function signature is void(void) 
+    */
+    void setCosimulationTerminatedCallback(std::function<void()> callback);
+
+    /** register a callback function that executes when an error is generated
+   @details if set this function will execute instead of throwing an exception in some cases( NOTE: this is currently only used for callback federates)
+    @param callback the function to call; the function signature is void(int errorCode, std::string_view errorString)
+    */
+    void setErrorHandlerCallback(std::function<void(int,std::string_view)> errorHandlerCallback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -666,6 +699,12 @@ received
     int getTranslatorCount() const;
 
   protected:
+      /** function to run required operations for entering initializingMode*/
+      void enteringInitializingMode();
+
+      /** function to run required operations for entering executing Mode*/
+      void enteringExecutingMode(IterationResult res);
+
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
     /** function to deal with any operations that need to occur on the transition from startup to
@@ -682,7 +721,8 @@ received
     /** generate a string with the local variant of the name with the specified suffix
     @param[in] addition the suffix to append to the current object name*/
     std::string localNameGenerator(std::string_view addition) const;
-
+    /** process an error */
+    void handleError(int errorCode, std::string_view errorString, bool noThrow);
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
@@ -703,7 +743,7 @@ received
     Modes getCurrentMode() const noexcept { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
-    Time getCurrentTime() const { return currentTime; }
+    Time getCurrentTime() const noexcept{ return currentTime; }
     /** get the federate name*/
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/

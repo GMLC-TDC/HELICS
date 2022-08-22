@@ -156,6 +156,7 @@ class Core {
      * Change the federate state to the Initializing state.
      *
      * May only be invoked in Created state otherwise an error is thrown
+     * for callback federates this call passes full control to the core
      */
     virtual void enterInitializingMode(LocalFederateId federateID) = 0;
 

@@ -118,7 +118,7 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
         setOptionFlag(prop.first, prop.second);
     }
     mLogManager->setTransmitCallback(
-        [this](ActionMessage&& m) { parent_->addActionMessage(std::move(m)); });
+        [this](ActionMessage&& m) { mParent->addActionMessage(std::move(m)); });
     maxLogLevel = mLogManager->getMaxLevel();
 }
 
@@ -195,8 +195,8 @@ void FederateState::generateConfig(Json::Value& base) const
     base["only_transmit_on_change"] = only_transmit_on_change;
     base["realtime"] = realtime;
     base["observer"] = observer;
-    base["source_only"] = source_only;
-    base["strict_input_type_checking"] = source_only;
+    base["source_only"] = mSourceOnly;
+    base["strict_input_type_checking"] = strict_input_type_checking;
     base["slow_responding"] = slow_responding;
     if (rt_lag > timeZero) {
         base["rt_lag"] = static_cast<double>(rt_lag);
@@ -286,31 +286,31 @@ std::pair<SmallBuffer, Time> FederateState::getPublishedValue(InterfaceHandle ha
 
 void FederateState::routeMessage(const ActionMessage& msg)
 {
-    if (parent_ != nullptr) {
+    if (mParent != nullptr) {
         if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
             LOG_ERROR("sending time request in invalid state");
         }
         if (msg.action() == CMD_TIME_GRANT) {
             requestingMode.store(false);
         }
-        parent_->addActionMessage(msg);
+        mParent->addActionMessage(msg);
     } else {
-        queue.push(msg);
+        addAction(msg);
     }
 }
 
 void FederateState::routeMessage(ActionMessage&& msg)
 {
-    if (parent_ != nullptr) {
+    if (mParent != nullptr) {
         if (msg.action() == CMD_TIME_REQUEST && !requestingMode) {
             LOG_ERROR("sending time request in invalid state");
         }
         if (msg.action() == CMD_TIME_GRANT) {
             requestingMode.store(false);
         }
-        parent_->addActionMessage(std::move(msg));
+        mParent->addActionMessage(std::move(msg));
     } else {
-        queue.push(std::move(msg));
+        addAction(std::move(msg));
     }
 }
 
@@ -318,14 +318,24 @@ void FederateState::addAction(const ActionMessage& action)
 {
     if (action.action() != CMD_IGNORE) {
         queue.push(action);
+        if (mCallbackBased)
+        {
+            callbackProcessing();
+        }
     }
+    
 }
 
 void FederateState::addAction(ActionMessage&& action)
 {
     if (action.action() != CMD_IGNORE) {
         queue.push(std::move(action));
+        if (mCallbackBased)
+        {
+            callbackProcessing();
+        }
     }
+   
 }
 
 void FederateState::createInterface(InterfaceType htype,
@@ -989,10 +999,10 @@ void FederateState::generateProfilingMarker()
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
     } else {
-        if (parent_ != nullptr) {
+        if (mParent != nullptr) {
             ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
             prof.payload = message;
-            parent_->addActionMessage(std::move(prof));
+            mParent->addActionMessage(std::move(prof));
         }
     }
 }
@@ -1013,11 +1023,99 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     if (mLocalProfileCapture) {
         logMessage(HELICS_LOG_LEVEL_PROFILING, name, message);
     } else {
-        if (parent_ != nullptr) {
+        if (mParent != nullptr) {
             ActionMessage prof(CMD_PROFILER_DATA, global_id.load(), parent_broker_id);
             prof.payload = message;
-            parent_->addActionMessage(std::move(prof));
+            mParent->addActionMessage(std::move(prof));
         }
+    }
+}
+
+void FederateState::callbackReturnResult(FederateStates lastState,MessageProcessingResult result, FederateStates newState) noexcept
+{
+    switch (lastState)
+    {
+    case FederateStates::CREATED:
+        break;
+    case FederateStates::INITIALIZING:
+        break;
+    case FederateStates::EXECUTING:
+        break;
+    case FederateStates::TERMINATING:
+        break;
+    case FederateStates::FINISHED:
+        break;
+    default:
+        break;
+    }
+}
+
+void FederateState::callbackProcessing() noexcept
+{
+    if (state == FederateStates::FINISHED) {
+        return;
+    }
+    auto initError = (state == FederateStates::ERRORED);
+    bool error_cmd{false};
+
+    
+    if (!init_requested)
+    {
+        //don't run callback processing before the user calls enterInit
+        return;
+    }
+    auto cState=state.load();
+    auto ctime = time_granted;
+    // process the delay Queue first
+    auto ret_code = processDelayQueue();
+
+    while (!(returnableResult(ret_code))) {
+        auto cmd = queue.try_pop();
+        if (!cmd)
+        {
+            break;
+        }
+        if (messageShouldBeDelayed(*cmd)) {
+            delayQueues[cmd->source_id].push_back(*cmd);
+            continue;
+        }
+        ret_code = processActionMessage(*cmd);
+
+        if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
+            delayQueues[static_cast<GlobalFederateId>(cmd->source_id)].push_back(*cmd);
+        }
+        if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd->action() == CMD_GLOBAL_ERROR) {
+            error_cmd = true;
+        }
+    }
+
+    if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
+        if (!initError && !error_cmd) {
+            if (mParent != nullptr) {
+                ActionMessage gError(CMD_LOCAL_ERROR);
+                if (terminate_on_error) {
+                    gError.setAction(CMD_GLOBAL_ERROR);
+                } else {
+                    timeCoord->localError();
+                }
+                gError.source_id = global_id.load();
+                gError.dest_id = parent_broker_id;
+                gError.messageID = errorCode;
+                gError.payload = errorString;
+                if (fedCallbacks)
+                {
+                    fedCallbacks->error_handler(errorCode,errorString);
+                }
+                mParent->addActionMessage(std::move(gError));
+            }
+        }
+    }
+    if (initError) {
+        ret_code = MessageProcessingResult::ERROR_RESULT;
+    }
+    if (returnableResult(ret_code))
+    {
+        callbackReturnResult(cState, ret_code,state.load());
     }
 }
 
@@ -1055,7 +1153,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
 
     if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
         if (!initError && !error_cmd) {
-            if (parent_ != nullptr) {
+            if (mParent != nullptr) {
                 ActionMessage gError(CMD_LOCAL_ERROR);
                 if (terminate_on_error) {
                     gError.setAction(CMD_GLOBAL_ERROR);
@@ -1067,7 +1165,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
                 gError.messageID = errorCode;
                 gError.payload = errorString;
 
-                parent_->addActionMessage(std::move(gError));
+                mParent->addActionMessage(std::move(gError));
             }
         }
     }
@@ -1782,7 +1880,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             break;
         case defs::Flags::SOURCE_ONLY:
             if (state == FederateStates::CREATED) {
-                source_only = value;
+                mSourceOnly = value;
                 if (value) {
                     observer = false;
                 }
@@ -1792,8 +1890,13 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             if (state == FederateStates::CREATED) {
                 observer = value;
                 if (value) {
-                    source_only = false;
+                    mSourceOnly = false;
                 }
+            }
+            break;
+        case defs::Flags::CALLBACK_FEDERATE:
+            if (state == FederateStates::CREATED) {
+               mCallbackBased = value;
             }
             break;
         case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:
@@ -1857,8 +1960,10 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return realtime;
         case defs::Flags::OBSERVER:
             return observer;
+        case defs::Flags::CALLBACK_FEDERATE:
+            return mCallbackBased;
         case defs::Flags::SOURCE_ONLY:
-            return source_only;
+            return mSourceOnly;
         case defs::Flags::SLOW_RESPONDING:
         case defs::Flags::DEBUGGING:
             return slow_responding;
@@ -1999,7 +2104,7 @@ Time FederateState::nextMessageTime() const
 void FederateState::setCoreObject(CommonCore* parent)
 {
     spinlock();
-    parent_ = parent;
+    mParent = parent;
     unlock();
 }
 
@@ -2079,14 +2184,14 @@ void FederateState::sendCommand(ActionMessage& command)
     }
 
     if (res[0] == "terminate") {
-        if (parent_ != nullptr) {
+        if (mParent != nullptr) {
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
-            parent_->addActionMessage(bye);
+            mParent->addActionMessage(bye);
         }
     } else if (res[0] == "echo") {
-        if (parent_ != nullptr) {
+        if (mParent != nullptr) {
             ActionMessage response(command.action());
             response.payload = "echo_reply";
             response.dest_id = command.source_id;
@@ -2094,10 +2199,10 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(std::move(response));
+            mParent->addActionMessage(std::move(response));
         }
     } else if (res[0] == "command_status") {
-        if (parent_ != nullptr) {
+        if (mParent != nullptr) {
             ActionMessage response(command.action());
             response.payload = fmt::format("\"{} unprocessed commands\"", commandQueue.size());
             response.dest_id = command.source_id;
@@ -2105,7 +2210,7 @@ void FederateState::sendCommand(ActionMessage& command)
             response.setString(targetStringLoc, command.getString(sourceStringLoc));
             response.setString(sourceStringLoc, getIdentifier());
 
-            parent_->addActionMessage(std::move(response));
+            mParent->addActionMessage(std::move(response));
         }
     } else if (res[0] == "logbuffer") {
         if (res.size() > 1) {
@@ -2152,8 +2257,8 @@ std::pair<std::string, std::string> FederateState::getCommand()
 {
     auto val = commandQueue.try_pop();
     while (val && val->first == "notify") {
-        if (parent_ != nullptr) {
-            parent_->sendCommand(val->second,
+        if (mParent != nullptr) {
+            mParent->sendCommand(val->second,
                                  "notify_response",
                                  name,
                                  HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
@@ -2167,8 +2272,8 @@ std::pair<std::string, std::string> FederateState::waitCommand()
 {
     auto val = commandQueue.pop();
     if (val.first == "notify") {
-        if (parent_ != nullptr) {
-            parent_->sendCommand(val.second,
+        if (mParent != nullptr) {
+            mParent->sendCommand(val.second,
                                  "notify_response",
                                  name,
                                  HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
@@ -2184,7 +2289,7 @@ std::string FederateState::processQueryActual(std::string_view query) const
         Json::Value att = Json::objectValue;
         att["name"] = getIdentifier();
         att["id"] = global_id.load().baseValue();
-        att["parent"] = parent_->getGlobalId().baseValue();
+        att["parent"] = mParent->getGlobalId().baseValue();
         base["attributes"] = att;
     };
 

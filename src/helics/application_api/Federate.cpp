@@ -228,9 +228,7 @@ void Federate::enterInitializingMode()
         case Modes::STARTUP:
             try {
                 coreObject->enterInitializingMode(fedID);
-                updateFederateMode(Modes::INITIALIZING);
-                currentTime = coreObject->getCurrentTime(fedID);
-                startupToInitializeStateTransition();
+                enteringInitializingMode();
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -245,6 +243,18 @@ void Federate::enterInitializingMode()
         default:
             throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
+}
+
+void Federate::enteringInitializingMode()
+{
+    
+        updateFederateMode(Modes::INITIALIZING);
+        currentTime = coreObject->getCurrentTime(fedID);
+        startupToInitializeStateTransition();
+        if (initializingEntryCallback)
+        {
+            initializingEntryCallback(false);
+        }
 }
 
 void Federate::enterInitializingModeAsync()
@@ -294,14 +304,12 @@ void Federate::enterInitializingModeComplete()
             auto asyncInfo = asyncCallInfo->lock();
             try {
                 asyncInfo->initFuture.get();
+                enteringInitializingMode();
             }
             catch (const std::exception&) {
                 updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
-            updateFederateMode(Modes::INITIALIZING);
-            currentTime = coreObject->getCurrentTime(fedID);
-            startupToInitializeStateTransition();
         } break;
         case Modes::INITIALIZING:
             break;
@@ -325,34 +333,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             [[fallthrough]];
         case Modes::INITIALIZING: {
             res = coreObject->enterExecutingMode(fedID, iterate);
-            switch (res) {
-                case IterationResult::NEXT_STEP:
-                    updateFederateMode(Modes::EXECUTING);
-                    if (observerMode) {
-                        currentTime = coreObject->getCurrentTime(fedID);
-                    } else {
-                        currentTime = timeZero;
-                    }
-                    if (timeUpdateCallback) {
-                        timeUpdateCallback(currentTime, false);
-                    }
-                    initializeToExecuteStateTransition(res);
-                    if (timeRequestReturnCallback) {
-                        timeRequestReturnCallback(currentTime, false);
-                    }
-                    break;
-                case IterationResult::ITERATING:
-                    updateFederateMode(Modes::INITIALIZING);
-                    currentTime = initializationTime;
-                    initializeToExecuteStateTransition(res);
-                    break;
-                case IterationResult::ERROR_RESULT:
-                    updateFederateMode(Modes::ERROR_STATE);
-                    break;
-                case IterationResult::HALTED:
-                    updateFederateMode(Modes::FINISHED);
-                    break;
-            }
+           enteringExecutingMode(res);
             break;
         }
         case Modes::PENDING_EXEC:
@@ -373,6 +354,51 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             break;
     }
     return res;
+}
+
+void Federate::enteringExecutingMode(IterationResult res)
+{
+
+    switch (res) {
+    case IterationResult::NEXT_STEP:
+        updateFederateMode(Modes::EXECUTING);
+        if (observerMode) {
+            currentTime = coreObject->getCurrentTime(fedID);
+        } else {
+            currentTime = timeZero;
+        }
+        if (timeUpdateCallback) {
+            timeUpdateCallback(currentTime, false);
+        }
+        initializeToExecuteStateTransition(res);
+        if (timeRequestReturnCallback) {
+            timeRequestReturnCallback(currentTime, false);
+        }
+        break;
+    case IterationResult::ITERATING:
+        updateFederateMode(Modes::INITIALIZING);
+        currentTime = initializationTime;
+        initializeToExecuteStateTransition(res);
+        break;
+    case IterationResult::ERROR_RESULT:
+        updateFederateMode(Modes::ERROR_STATE);
+        break;
+    case IterationResult::HALTED:
+        updateFederateMode(Modes::FINISHED);
+        break;
+    }
+}
+
+void Federate::handleError(int errorCode, std::string_view errorString, bool noThrow)
+{
+    if (errorHandlerCallback)
+    {
+        errorHandlerCallback(errorCode,errorString);
+    }
+    else if (!noThrow)
+    {
+        throw FederateError(errorCode,errorString);
+    }
 }
 
 void Federate::enterExecutingModeAsync(IterationRequest iterate)
@@ -419,37 +445,7 @@ IterationResult Federate::enterExecutingModeComplete()
             auto asyncInfo = asyncCallInfo->lock();
             try {
                 auto res = asyncInfo->execFuture.get();
-                switch (res) {
-                    case IterationResult::NEXT_STEP:
-                        updateFederateMode(Modes::EXECUTING);
-                        if (observerMode) {
-                            currentTime = coreObject->getCurrentTime(fedID);
-                        } else {
-                            currentTime = timeZero;
-                        }
-                        if (timeUpdateCallback) {
-                            timeUpdateCallback(currentTime, false);
-                        }
-                        initializeToExecuteStateTransition(IterationResult::NEXT_STEP);
-                        if (timeRequestReturnCallback) {
-                            timeRequestReturnCallback(currentTime, false);
-                        }
-                        break;
-                    case IterationResult::ITERATING:
-                        updateFederateMode(Modes::INITIALIZING);
-                        currentTime = initializationTime;
-                        initializeToExecuteStateTransition(IterationResult::ITERATING);
-                        break;
-                    case IterationResult::ERROR_RESULT:
-                        // LCOV_EXCL_START
-                        updateFederateMode(Modes::ERROR_STATE);
-                        break;
-                        // LCOV_EXCL_STOP
-                    case IterationResult::HALTED:
-                        updateFederateMode(Modes::FINISHED);
-                        break;
-                }
-
+                enteringExecutingMode(res);
                 return res;
             }
             catch (const std::exception&) {
@@ -503,6 +499,24 @@ void Federate::setLoggingCallback(
     coreObject->setLoggingCallback(fedID, logFunction);
 }
 
+void Federate::setInitializingEntryCallback(std::function<void(bool)> callback)
+{
+    if (currentMode == Modes::PENDING_INIT) {
+        throw(InvalidFunctionCall(
+            "cannot update initializing entry callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    initializingEntryCallback = std::move(callback);
+}
+
+void Federate::setExecutingEntryCallback(std::function<void()> callback)
+{
+    if (currentMode == Modes::PENDING_EXEC || currentMode == Modes::PENDING_INIT) {
+        throw(InvalidFunctionCall(
+            "cannot update executing entry callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    executingEntryCallback = std::move(callback);
+}
+
 void Federate::setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback)
 {
     if (currentMode == Modes::PENDING_ITERATIVE_TIME || currentMode == Modes::PENDING_TIME) {
@@ -541,10 +555,29 @@ void Federate::setTimeRequestReturnCallback(std::function<void(Time, bool)> call
     timeRequestReturnCallback = std::move(callback);
 }
 
+void Federate::setCosimulationTerminatedCallback(std::function<void()> callback)
+{
+    if (currentMode == Modes::FINALIZE || currentMode == Modes::PENDING_FINALIZE) {
+        throw(InvalidFunctionCall(
+            "cannot update cosimulation termination callback during an async operation"));  // LCOV_EXCL_LINE
+    }
+    cosimulationTerminationCallback = std::move(callback);
+}
+
+void Federate::setErrorHandlerCallback(std::function<void(int, std::string_view)> callback)
+{
+    errorHandlerCallback=std::move(callback);
+}
+
 void Federate::setFlagOption(int flag, bool flagValue)
 {
     if (flag == HELICS_FLAG_OBSERVER && currentMode < Modes::INITIALIZING) {
         observerMode = flagValue;
+    }
+    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST)
+    {
+        retriggerTimeRequest=flagValue;
+        return;
     }
     coreObject->setFlagOption(fedID, flag, flagValue);
 }
@@ -553,6 +586,10 @@ bool Federate::getFlagOption(int flag) const
 {
     if (flag == HELICS_FLAG_USE_JSON_SERIALIZATION) {
         return useJsonSerialization;
+    }
+    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST)
+    {
+        return retriggerTimeRequest;
     }
     return coreObject->getFlagOption(fedID, flag);
 }
@@ -713,16 +750,20 @@ Time Federate::requestTime(Time nextInternalTimeStep)
     switch (currentMode) {
         case Modes::EXECUTING:
             try {
-                if (timeRequestEntryCallback) {
-                    timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
-                }
-                auto newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
+                Time newTime;
+                do {
+                    if (timeRequestEntryCallback) {
+                        timeRequestEntryCallback(currentTime, nextInternalTimeStep, false);
+                    }
+                    newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
 
-                updateSimulationTime(newTime, currentTime, false);
+                    updateSimulationTime(newTime, currentTime, false);
 
-                if (timeRequestReturnCallback) {
-                    timeRequestReturnCallback(newTime, false);
-                }
+                    if (timeRequestReturnCallback) {
+                        timeRequestReturnCallback(newTime, false);
+                    }
+                }while(retriggerTimeRequest && newTime<Time::maxVal());
+
                 return newTime;
             }
             catch (const FunctionExecutionFailure&) {
@@ -874,12 +915,15 @@ void Federate::updateFederateMode(Modes newMode)
 {
     Modes oldMode = currentMode.load();
     currentMode.store(newMode);
-    if (modeUpdateCallback && newMode != oldMode) {
-        if (newMode == Modes::PENDING_EXEC || newMode == Modes::PENDING_INIT ||
-            newMode == Modes::PENDING_ITERATIVE_TIME || newMode == Modes::PENDING_TIME ||
-            newMode == Modes::PENDING_FINALIZE) {
-            return;
-        }
+    if (newMode == oldMode) {
+        return;
+    }
+    if (newMode == Modes::PENDING_EXEC || newMode == Modes::PENDING_INIT ||
+        newMode == Modes::PENDING_ITERATIVE_TIME || newMode == Modes::PENDING_TIME ||
+        newMode == Modes::PENDING_FINALIZE) {
+        return;
+    }
+    if (modeUpdateCallback) {
         switch (oldMode) {
             case Modes::PENDING_INIT:
                 modeUpdateCallback(newMode, Modes::STARTUP);
@@ -906,6 +950,20 @@ void Federate::updateFederateMode(Modes newMode)
             case Modes::STARTUP:
                 modeUpdateCallback(newMode, oldMode);
                 break;
+        }
+    }
+    if (executingEntryCallback)
+    {
+        if (newMode == Modes::EXECUTING && (oldMode==Modes::INITIALIZING || oldMode==Modes::PENDING_EXEC))
+        {
+            executingEntryCallback();
+        }
+    }
+    if (cosimulationTerminationCallback)
+    {
+        if (newMode == Modes::FINALIZE || newMode==Modes::ERROR_STATE)
+        {
+            cosimulationTerminationCallback();
         }
     }
 }
