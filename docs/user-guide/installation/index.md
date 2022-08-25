@@ -51,33 +51,40 @@ graph LR
 ```
 
 ### Build from source
+
 [Build from source](./build_from_source.md)
 
 ### matHELICS install
+
 Installation instructions are available in the [matHELICS repository README](https://github.com/GMLC-TDC/matHELICS/blob/main/README.md)
 
 ### Julia install
+
 [`pkg> add HELICS`](https://github.com/GMLC-TDC/HELICS.jl/blob/master/README.md)
 
 ### pip install
+
 [`pip install helics`](https://python.helics.org/)
 
 ### jHELICS
+
 [Build from source](./build_from_source.md) with the [CMAKE option](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) `HELICS_BUILD_JAVA_INTERFACE=ON`
 
 ### nimble install
+
 [`nimble install https://github.com/GMLC-TDC/helics.nim#head`](https://github.com/GMLC-TDC/helics.nim)
 
 ### C# install
+
 [Build from source](./build_from_source.md) with the [CMAKE option](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) `HELICS_BUILD_CSHARP_INTERFACE=ON`
 
 ### Download pre-compiled
+
 [Download the pre-compiled libraries and add them to your system path](./installing_the_pre_compiled_libraries.md)
 
 ### spack install
+
 [`spack install helics`](./spack.md)
-
-
 
 ## helics-cli Installation
 
@@ -88,6 +95,3 @@ Installation of helics-cli is straightforward:
 ```shell session
 pip install git+git://github.com/GMLC-TDC/helics-cli.git@main
 ```
-
-
-

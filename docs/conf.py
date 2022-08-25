@@ -117,7 +117,7 @@ extensions = [
     "IPython.sphinxext.ipython_console_highlighting",
     "breathe",
     "sphinxcontrib.redoc",
-    "sphinxcontrib.mermaid"
+    "sphinxcontrib.mermaid",
 ]
 
 myst_enable_extensions = [
