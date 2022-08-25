@@ -100,7 +100,7 @@ static octave_value throwHelicsOctaveError(HelicsError *err) {
         $1=arg.real();
         $2=arg.imag();
     }
-    else if ($input.is_float_type())
+    else if ($input.isfloat())
     {
         $2=0.0;
         $1=$input.double_value();
@@ -114,7 +114,7 @@ static octave_value throwHelicsOctaveError(HelicsError *err) {
 //typemap for the input arguments
 %typemap(in) (int argc, const char *const *argv) {
   /* Check if is a list */
-  if ($input.is_cellstr()) {
+  if ($input.iscellstr()) {
     Cell cellargs=octave_value_extract<Cell>($input);
     $2 = (char **) malloc((cellargs.numel()+1)*sizeof(char *));
     for (int ii=0;ii<cellargs.numel();++ii)

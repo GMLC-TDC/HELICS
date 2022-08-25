@@ -57,6 +57,9 @@ auto StartBrokerImp(std::string_view CoreType_name, const std::string& initializ
 
 FederateTestFixture::~FederateTestFixture()
 {
+    if (debugDiagnostic) {
+        std::cout << "ffed" << std::endl;
+    }
     for (auto& fed : federates) {
         if (fed &&
             (!((fed->getCurrentMode() == helics::Federate::Modes::FINALIZE) ||
@@ -64,7 +67,9 @@ FederateTestFixture::~FederateTestFixture()
             fed->finalize();
         }
     }
-    federates.clear();
+    if (debugDiagnostic) {
+        std::cout << "fbroker" << std::endl;
+    }
     for (auto& broker : brokers) {
         if (ctype.compare(0, 3, "tcp") == 0) {
             broker->waitForDisconnect(std::chrono::milliseconds(2000));
@@ -77,8 +82,22 @@ FederateTestFixture::~FederateTestFixture()
             broker->disconnect();
         }
     }
+    if (debugDiagnostic) {
+        std::cout << "clearing" << std::endl;
+    }
+
     brokers.clear();
+    if (debugDiagnostic) {
+        std::cout << "fed clearing" << std::endl;
+    }
+    federates.clear();
+    if (debugDiagnostic) {
+        std::cout << "cleanup" << std::endl;
+    }
     helics::cleanupHelicsLibrary();
+    if (debugDiagnostic) {
+        std::cout << "finished" << std::endl;
+    }
 }
 
 void FederateTestFixture::FullDisconnect()

@@ -106,9 +106,10 @@ else
             ;;
         esac
 
-    # If no argument was given, but we are running in Travis, check the branch name for tests to run
-    elif [[ "$TRAVIS" == "true" ]]; then
-        case "${TRAVIS_BRANCH}" in
+    # If no argument was given, but we are running on GHA that defines the CI environment variable,
+    # check the branch ref for tests to run
+    elif [[ "$CI" == "true" ]]; then
+        case "${GITHUB_REF}" in
         *coveragetest*)
             TEST_CONFIG="Coverage"
             ;;

@@ -481,6 +481,17 @@ if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
     target_link_libraries(helics_base INTERFACE atomic)
 endif()
 
+# Add to list of enabled vcpkg features based on core type
+if(HELICS_ENABLE_ZMQ_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
+endif()
+if(HELICS_ENABLE_IPC_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "ipc")
+endif()
+if(HELICS_ENABLE_MPI_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "mpi")
+endif()
+
 # -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
@@ -720,6 +731,7 @@ set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurr
 set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
 
 if(HELICS_ENABLE_ENCRYPTION)
+    list(APPEND VCPKG_MANIFEST_FEATURES "encryption")
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
 else()
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")

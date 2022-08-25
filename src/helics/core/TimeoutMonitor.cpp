@@ -191,7 +191,7 @@ void TimeoutMonitor::pingSub(CoreBroker* brk)
             connections[cindex].disablePing = brkr._disable_ping;
         }
 
-        if (brkr.state < connection_state::error) {
+        if (brkr.state < ConnectionState::ERROR_STATE) {
             if (connections[cindex].disablePing) {
                 continue;
             }

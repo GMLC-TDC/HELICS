@@ -15,7 +15,6 @@
 - `HELICS_WITH_CMAKE_PACKAGE` : \[Default=ON\] Generate a `HELICSConfig.cmake` file on install for loading into other libraries
 - `HELICS_BUILD_OCTAVE_INTERACE` : \[Default=OFF\] Build the HELICS Octave Interface
 - `HELICS_BUILD_JAVA_INTERACE` : \[Default=OFF\] Build the HELICS Java Interface
-- `HELICS_BUILD_MATLAB_INTERACE` : \[Default=OFF\] Build the HELICS Matlab Interface
 - `HELICS_BUILD_CSHARP_INTERACE` : \[Default=OFF\] Build the HELICS C# Interface
 - `CMAKE_CXX_STANDARD` : Specify the C++ standard to use in building, HELICS 3.0 requires 17 or higher which will be used if nothing is specified.
 - `HELICS_INSTALL` :\[Default=ON\] If set to off HELICS will not generate any install instructions
@@ -58,6 +57,7 @@ Options effect the connection of libraries used in HELICS and how they are linke
 - `HELICS_ENABLE_GIT_HOOKS`: install a git hook to check clang format before a push
 - `Boost_NO_BOOST_CMAKE`: \[Default=OFF\] This is an option related to the Boost find module, but is occasionally needed if a specific version of boost is desired and there is a system copy of BoostConfig.cmake. So if an incorrect version of boost is being found even when `BOOST_ROOT` is being specified this option might need to be set to `ON`.
 - `HELICS_BUILD_CONFIGURATION`: A string containing a specialized build configuration if any. The only platform this is currently used on is for building on a Raspberry PI system, in which case this should be set to "PI".
+- `HELICS_DISABLE_C_SHARED_LIB`: \[Default=OFF\] Turns off building of the HELICS C shared library. May be used for building apps that only use the (modern) C++ shared library. Using the C++98 wrapper requires the C shared library.
 
 #### ZeroMQ related Options
 

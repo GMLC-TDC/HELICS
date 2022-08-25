@@ -216,7 +216,7 @@ TEST(type_conversion, namedType)
 {
     EXPECT_TRUE(helicsGetDataType("int") == HELICS_DATA_TYPE_INT);
     EXPECT_TRUE(helicsGetDataType("INT") == HELICS_DATA_TYPE_INT);
-    EXPECT_TRUE(helicsGetDataType("char") == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType("char") == HELICS_DATA_TYPE_CHAR);
     EXPECT_TRUE(helicsGetDataType(typeid(int).name()) == HELICS_DATA_TYPE_INT);
     EXPECT_TRUE(helicsGetDataType(typeid(float).name()) == HELICS_DATA_TYPE_DOUBLE);
     EXPECT_TRUE(helicsGetDataType(typeid(std::string).name()) == HELICS_DATA_TYPE_STRING);
@@ -225,7 +225,7 @@ TEST(type_conversion, namedType)
     EXPECT_TRUE(helicsGetDataType(typeid(double).name()) == HELICS_DATA_TYPE_DOUBLE);
     EXPECT_TRUE(helicsGetDataType(typeid(bool).name()) == HELICS_DATA_TYPE_BOOLEAN);
     EXPECT_TRUE(helicsGetDataType(typeid(int64_t).name()) == HELICS_DATA_TYPE_INT);
-    EXPECT_TRUE(helicsGetDataType(typeid(char).name()) == HELICS_DATA_TYPE_STRING);
+    EXPECT_TRUE(helicsGetDataType(typeid(char).name()) == HELICS_DATA_TYPE_CHAR);
     EXPECT_TRUE(helicsGetDataType(typeid(std::complex<double>).name()) == HELICS_DATA_TYPE_COMPLEX);
     EXPECT_TRUE(helicsGetDataType("COMPLEX") == HELICS_DATA_TYPE_COMPLEX);
     EXPECT_TRUE(helicsGetDataType("map") == HELICS_DATA_TYPE_RAW);

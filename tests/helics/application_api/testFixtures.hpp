@@ -219,6 +219,7 @@ struct FederateTestFixture {
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
     std::string ctype;
+    bool debugDiagnostic{false};
 };
 
 /** set an environment variable to a specific value */

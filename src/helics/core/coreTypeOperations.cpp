@@ -19,6 +19,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <unordered_map>
 
+namespace frozen {
+template<>
+struct elsa<std::string_view> {
+    constexpr std::size_t operator()(std::string_view value) const { return hash_string(value); }
+    constexpr std::size_t operator()(std::string_view value, std::size_t seed) const
+    {
+        return hash_string(value, seed);
+    }
+};
+}  // namespace frozen
+
 namespace helics::core {
 std::string to_string(CoreType type)
 {
@@ -57,7 +68,7 @@ std::string to_string(CoreType type)
     }
 }
 
-static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
+static constexpr frozen::unordered_map<std::string_view, CoreType, 53> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -117,13 +128,13 @@ CoreType coreTypeFromString(std::string_view type) noexcept
     if (type.empty()) {
         return CoreType::DEFAULT;
     }
-    const auto* fnd = coreTypes.find(frozen::string(type));
+    const auto* fnd = coreTypes.find(type);
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
     std::string type2{type};
     std::transform(type2.cbegin(), type2.cend(), type2.begin(), ::tolower);
-    fnd = coreTypes.find(frozen::string(type2));
+    fnd = coreTypes.find(type2);
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
@@ -258,11 +269,11 @@ bool isCoreTypeAvailable(CoreType type) noexcept
     return available;
 }
 
-static constexpr frozen::set<frozen::string, 5> global_match_strings{"any",
-                                                                     "all",
-                                                                     "data",
-                                                                     "string",
-                                                                     "block"};
+static constexpr frozen::set<std::string_view, 5> global_match_strings{"any",
+                                                                       "all",
+                                                                       "data",
+                                                                       "string",
+                                                                       "block"};
 
 bool matchingTypes(std::string_view type1, std::string_view type2)
 {

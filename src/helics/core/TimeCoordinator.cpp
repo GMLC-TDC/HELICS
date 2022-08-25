@@ -554,6 +554,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
             if (time_allow > time_exec) {
                 iteration = 0;
                 sequenceCounter = 0;
+                hasIterationData = false;
                 updateTimeGrant();
                 return MessageProcessingResult::NEXT_STEP;
             }
@@ -563,6 +564,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                         // this is the non interrupted case
                         iteration = 0;
                         sequenceCounter = 0;
+                        hasIterationData = false;
                         updateTimeGrant();
                         return MessageProcessingResult::NEXT_STEP;
                     }
@@ -573,6 +575,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                 if (dependencies.checkIfReadyForTimeGrant(false, time_exec, delayMode)) {
                     iteration = 0;
                     sequenceCounter = 0;
+                    hasIterationData = false;
                     updateTimeGrant();
                     return MessageProcessingResult::NEXT_STEP;
                 }
