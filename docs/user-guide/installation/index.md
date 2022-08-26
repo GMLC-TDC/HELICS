@@ -21,9 +21,9 @@ As of HELICS v3, the only supported language bindings that are included with the
 %%{init: {'theme': 'neutral'}}%%
 graph LR
     Start(Do you want to install a <br/> standard HELICS version?) -->|Yes| languageChoice
-    Start -->|No| C
+    Start -->|No| build
     subgraph Source Build
-        C[Build from source for the <br> particular branch or <br/> configuration that you need.]
+        build[Build from source for the <br> particular branch or <br/> configuration that you need.]
     end
     subgraph Package Manager/Precompiled
         languageChoice(What language are <br/> you using?)
@@ -40,6 +40,7 @@ graph LR
             hpc --> |No| precompiled
         end
     end
+    click build "https://docs.helics.org/en/latest/user-guide/installation/build_from_source.html" "build from source"
     click python "https://python.helics.org/installation/" "pyhelics installation guide"
     click matlab "https://github.com/GMLC-TDC/matHELICS/blob/main/README.md" "matHELICS installation guide"
     click julia "https://github.com/GMLC-TDC/HELICS.jl/blob/master/README.md" "HELICS.jl installation guide"
