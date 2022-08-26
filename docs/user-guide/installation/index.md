@@ -68,7 +68,7 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 ### jHELICS
 
-[Build from source](./build_from_source.md) with the [CMAKE option](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) `HELICS_BUILD_JAVA_INTERFACE=ON`
+[Build from source](./build_from_source.md) with the [CMAKE option](./helics_cmake_options.md) `HELICS_BUILD_JAVA_INTERFACE=ON`
 
 ### nimble install
 
