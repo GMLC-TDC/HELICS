@@ -30,7 +30,7 @@ As of HELICS v3, the only supported language bindings that are included with the
         'flowchart': {
             'useMaxWidth': true
         }
-        
+
     }
 }%%
 graph LR
