@@ -77,7 +77,7 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 ### C# install
 
-[Build from source](./build_from_source.md) with the [CMAKE option](https://docs.helics.org/en/latest/user-guide/installation/helics_cmake_options.html) `HELICS_BUILD_CSHARP_INTERFACE=ON`
+[Build from source](./build_from_source.md) with the [CMAKE option](./helics_cmake_options.md) `HELICS_BUILD_CSHARP_INTERFACE=ON`
 
 ### Download pre-compiled
 
