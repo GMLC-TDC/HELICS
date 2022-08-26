@@ -51,6 +51,7 @@ pip install swig
 ```
 
 Depending on your build environment on Windows, using [Chocolatey](https://chocolatey.org/) to install swig might make it easier for the HELICS build scripts to automatically locate swig:
+
 ```shell
 choco install swig
 ```
