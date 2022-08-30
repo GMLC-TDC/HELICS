@@ -337,6 +337,8 @@ class FederateState {
     /** run the processing but don't block assuming a callback based federate*/
     void callbackProcessing() noexcept;
     void callbackReturnResult(FederateStates lastState,  MessageProcessingResult result, FederateStates newState) noexcept;
+    void initCallbackProcessing() noexcept;
+    void execCallbackProcessing(MessageProcessingResult result) noexcept;
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }

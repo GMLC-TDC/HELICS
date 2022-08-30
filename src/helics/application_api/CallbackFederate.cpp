@@ -87,34 +87,93 @@ void CallbackFederate::loadOperator()
     op=std::make_shared<CallbackFederateOperator>(this);
     coreObject->setFederateOperator(getID(),op);
     coreObject->setFlagOption(getID(),HELICS_FLAG_CALLBACK_FEDERATE,true);
+    mEventTriggered=coreObject->getFlagOption(getID(),HELICS_FLAG_EVENT_TRIGGERED);
+    setAsyncCheck([this](){return (getCurrentMode()>=Modes::FINALIZE);});
 }
 
 /** callback operations*/
 IterationRequest CallbackFederate::initializeOperationsCallback()
 {
-    enteringInitializingMode();
+    if (currentMode.load() == Modes::STARTUP)
+    {
+        enteringInitializingMode(IterationResult::NEXT_STEP);
+    }
+    else
+    {
+        enteringExecutingMode(IterationResult::ITERATING);
+    }
+
     return (initializationOperation)?initializationOperation():IterationRequest::NO_ITERATIONS;
 }
 
 std::pair<Time, IterationRequest> CallbackFederate::operateCallback(iteration_time newTime)
 {
-    
-    if (nextTimeOperation1)
+    if (newTime.grantedTime == timeZero && newTime.state == IterationResult::NEXT_STEP)
     {
-        return nextTimeOperation1(newTime);
+        enteringExecutingMode(newTime.state);
     }
-    if (nextTimeOperation2)
+    else
     {
-        return std::make_pair(nextTimeOperation2(newTime.grantedTime),IterationRequest::NO_ITERATIONS);
+        postTimeRequestOperations(newTime.grantedTime,newTime.state==IterationResult::ITERATING);
     }
     // time zero here is equivalent to the next allowable time
-    return std::make_pair(timeZero,IterationRequest::NO_ITERATIONS);
+    auto rval=std::make_pair((mEventTriggered)?Time::maxVal():timeZero,IterationRequest::NO_ITERATIONS);
+
+    if (newTime.grantedTime >= mFinalTime)
+    {
+        rval=std::make_pair(Time::maxVal(),IterationRequest::HALT_OPERATIONS);
+    }
+    else if (nextTimeOperation1)
+    {
+        rval=nextTimeOperation1(newTime);
+    }
+    else if (nextTimeOperation2)
+    {
+        rval=std::make_pair(nextTimeOperation2(newTime.grantedTime),IterationRequest::NO_ITERATIONS);
+    }
+    if (rval.second <= IterationRequest::ITERATE_IF_NEEDED)
+    {
+        preTimeRequestOperations(rval.first,rval.second!=IterationRequest::NO_ITERATIONS);
+    }
+    
+    return rval;
+}
+
+
+void CallbackFederate::setProperty(int32_t property, Time val)
+{
+    if (property == HELICS_PROPERTY_TIME_MAXTIME)
+    {
+        mFinalTime=val;
+        return;
+    }
+    Federate::setProperty(property,val);
+}
+
+void CallbackFederate::setFlagOption(int32_t property, bool val)
+{
+    if (property == HELICS_FLAG_EVENT_TRIGGERED)
+    {
+        mEventTriggered=val;
+        //this does need to fallthrough
+    }
+    Federate::setFlagOption(property,val);
+}
+
+Time CallbackFederate::getTimeProperty(int32_t property)
+{
+    if (property == HELICS_PROPERTY_TIME_MAXTIME)
+    {
+        return mFinalTime;
+    }
+    return Federate::getTimeProperty(property);
 }
 
 void CallbackFederate::finalizeCallback()
 {
-    
+    finalizeOperations();
 }
+
 void CallbackFederate::errorHandlerCallback(int errorCode, std::string_view errorString)
 {
     handleError(errorCode,errorString,true);

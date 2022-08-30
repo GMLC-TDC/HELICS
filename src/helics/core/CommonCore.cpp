@@ -2461,7 +2461,7 @@ void CommonCore::setFederateOperator(LocalFederateId federateID,
 
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
-        throw(InvalidIdentifier("FederateID is not valid (setLoggingCallback)"));
+        throw(InvalidIdentifier("FederateID is not valid (setFederateOperator)"));
     }
 
     ActionMessage fedOpUpdate(CMD_CORE_CONFIGURE);
@@ -4773,11 +4773,13 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
                     try {
-                        auto M = std::any_cast<
-                            std::function<void(int, std::string_view, std::string_view)>>(
-                                std::move(*op));
-                        M(0, identifier, "logging callback activated");
-                        setLoggerFunction(std::move(M));
+                        
+                        auto* fed = getFederateCore(cmd.source_id);
+                        if (fed != nullptr)
+                        {
+                            auto FO = std::any_cast<std::shared_ptr<FederateOperator>>(std::move(*op));
+                            fed->setCallbackOperator(std::move(FO));
+                        }
                     }
                     catch (const std::bad_any_cast&) {
                         // This shouldn't really happen unless someone is being malicious so just

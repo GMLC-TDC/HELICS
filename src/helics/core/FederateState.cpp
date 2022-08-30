@@ -1031,15 +1031,104 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     }
 }
 
+void FederateState::initCallbackProcessing() noexcept
+{
+    auto initIter=fedCallbacks->initializeOperations();
+    switch (initIter)
+    {
+    case IterationRequest::NO_ITERATIONS:
+    case IterationRequest::ITERATE_IF_NEEDED:
+    case IterationRequest::FORCE_ITERATION:
+    default:
+    {
+        ActionMessage exec(CMD_EXEC_REQUEST);
+        exec.source_id = global_id.load();
+        setIterationFlags(exec, initIter);
+        setActionFlag(exec, indicator_flag);
+        queue.push(exec);
+    }
+    break;
+    case IterationRequest::HALT_OPERATIONS:
+    {
+        ActionMessage bye(CMD_DISCONNECT);
+        bye.source_id = global_id.load();
+        bye.dest_id = bye.source_id;
+        queue.push(bye);
+    }
+    break;
+    case IterationRequest::ERROR_CONDITION:
+        break;
+    }
+}
+
+void FederateState::execCallbackProcessing(MessageProcessingResult result) noexcept
+{
+    // this is the only valid transition that hasn't been dealt with yet
+    auto execIter = fedCallbacks->operate({timeZero, IterationResult::NEXT_STEP});
+    switch (execIter.second)
+    {
+    case IterationRequest::NO_ITERATIONS:
+    case IterationRequest::ITERATE_IF_NEEDED:
+    case IterationRequest::FORCE_ITERATION:
+    default:
+    {
+        //TODO(PT)
+    }
+    break;
+    case IterationRequest::HALT_OPERATIONS:
+    {
+        ActionMessage bye(CMD_DISCONNECT);
+        bye.source_id = global_id.load();
+        bye.dest_id = bye.source_id;
+        queue.push(bye);
+    }
+    break;
+    case IterationRequest::ERROR_CONDITION:
+        break;
+  }
+}
+
 void FederateState::callbackReturnResult(FederateStates lastState,MessageProcessingResult result, FederateStates newState) noexcept
 {
+    //handle some general new states
+    if (lastState != newState)
+    {
+        switch (newState)
+        {
+        case FederateStates::TERMINATING:
+            break;
+        case FederateStates::FINISHED:
+            fedCallbacks->finalize();
+            return;
+        case FederateStates::ERRORED:
+            fedCallbacks->error_handler(lastErrorCode(),lastErrorString());
+            return;
+        default:
+            break;
+        }
+    }
     switch (lastState)
     {
     case FederateStates::CREATED:
+        // this is the only valid transition that hasn't been dealt with yet
+        initCallbackProcessing();
         break;
     case FederateStates::INITIALIZING:
+    {
+        if (newState == FederateStates::INITIALIZING)
+        {
+            initCallbackProcessing();
+        }
+        else
+        {
+            execCallbackProcessing(result);
+        }
+        
+    }
+    break;
         break;
     case FederateStates::EXECUTING:
+        execCallbackProcessing(result);
         break;
     case FederateStates::TERMINATING:
         break;
@@ -1068,15 +1157,17 @@ void FederateState::callbackProcessing() noexcept
     auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
-
-    while (!(returnableResult(ret_code))) {
-        auto cmd = queue.try_pop();
-        if (!cmd)
-        {
-            break;
-        }
+    while (returnableResult(ret_code))
+    {
+        callbackReturnResult(cState, ret_code,state.load());
+        cState=state.load();
+        ret_code = processDelayQueue();
+    }
+    auto cmd = queue.try_pop();
+    while (cmd) {
         if (messageShouldBeDelayed(*cmd)) {
             delayQueues[cmd->source_id].push_back(*cmd);
+            cmd = queue.try_pop();
             continue;
         }
         ret_code = processActionMessage(*cmd);
@@ -1087,36 +1178,37 @@ void FederateState::callbackProcessing() noexcept
         if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd->action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
-    }
-
-    if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
-        if (!initError && !error_cmd) {
-            if (mParent != nullptr) {
-                ActionMessage gError(CMD_LOCAL_ERROR);
-                if (terminate_on_error) {
-                    gError.setAction(CMD_GLOBAL_ERROR);
-                } else {
-                    timeCoord->localError();
+        if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
+            if (!initError && !error_cmd) {
+                if (mParent != nullptr) {
+                    ActionMessage gError(CMD_LOCAL_ERROR);
+                    if (terminate_on_error) {
+                        gError.setAction(CMD_GLOBAL_ERROR);
+                    } else {
+                        timeCoord->localError();
+                    }
+                    gError.source_id = global_id.load();
+                    gError.dest_id = parent_broker_id;
+                    gError.messageID = errorCode;
+                    gError.payload = errorString;
+                    if (fedCallbacks)
+                    {
+                        fedCallbacks->error_handler(errorCode,errorString);
+                    }
+                    mParent->addActionMessage(std::move(gError));
                 }
-                gError.source_id = global_id.load();
-                gError.dest_id = parent_broker_id;
-                gError.messageID = errorCode;
-                gError.payload = errorString;
-                if (fedCallbacks)
-                {
-                    fedCallbacks->error_handler(errorCode,errorString);
-                }
-                mParent->addActionMessage(std::move(gError));
             }
         }
-    }
-    if (initError) {
-        ret_code = MessageProcessingResult::ERROR_RESULT;
-    }
-    if (returnableResult(ret_code))
-    {
-        callbackReturnResult(cState, ret_code,state.load());
-    }
+        if (initError) {
+            ret_code = MessageProcessingResult::ERROR_RESULT;
+        }
+        if (returnableResult(ret_code))
+        {
+            callbackReturnResult(cState, ret_code,state.load());
+            cState=state.load();
+        }
+        cmd = queue.try_pop();
+    }   
 }
 
 MessageProcessingResult FederateState::processQueue() noexcept

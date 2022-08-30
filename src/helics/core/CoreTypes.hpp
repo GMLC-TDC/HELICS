@@ -92,7 +92,9 @@ enum class IterationResult : signed char {
 enum class IterationRequest : signed char {
     NO_ITERATIONS = 0,  //!< indicator that the iterations have completed
     FORCE_ITERATION = 1,  //!< force an iteration whether it is needed or not
-    ITERATE_IF_NEEDED = 2  //!< indicator that the iterations need to continue
+    ITERATE_IF_NEEDED = 2,  //!< indicator that the iterations need to continue
+    HALT_OPERATIONS = 3,   //!< indicator that the federate should halt
+    ERROR_CONDITION = 7    //!< indicator that the federate has errored and co-simulation should stop
 };
 
 /** define the type of the handle*/

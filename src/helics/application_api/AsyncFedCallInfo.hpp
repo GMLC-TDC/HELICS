@@ -24,5 +24,6 @@ class AsyncFedCallInfo {
     std::atomic<int> queryCounter{0};  //!< counter for the number of queries
     std::map<int, std::future<std::string>>
         inFlightQueries;  //!< the queries that are actually in flight at a given time
+    std::function<bool()> asyncCheck; //!< external function for checking async completion
 };
 }  // namespace helics

@@ -275,6 +275,8 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
                /** the property controlling output delay for a federate*/
                HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+               /** specify the maximum time of a federate (callback federates only*/
+               HELICS_PROPERTY_TIME_MAXTIME = 152,
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
                HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,

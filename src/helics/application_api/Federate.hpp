@@ -90,10 +90,11 @@ class HELICS_CXX_EXPORT Federate {
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
-    Time currentTime = Time::minVal();  //!< the current simulation time
+    Time mCurrentTime = Time::minVal();  //!< the current simulation time
   private:
+      /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
-        asyncCallInfo;  //!< pointer to a class defining the async call information
+        asyncCallInfo;  
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
@@ -242,7 +243,7 @@ class HELICS_CXX_EXPORT Federate {
     /** request a time advancement by a certain amount
     @param timeDelta the amount of time to advance
     @return the granted time step*/
-    Time requestTimeAdvance(Time timeDelta) { return requestTime(currentTime + timeDelta); }
+    Time requestTimeAdvance(Time timeDelta) { return requestTime(mCurrentTime + timeDelta); }
 
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
@@ -291,13 +292,13 @@ class HELICS_CXX_EXPORT Federate {
     @param option the option to set
     @param timeValue the value to be set
     */
-    void setProperty(int32_t option, double timeValue);
+    virtual void setProperty(int32_t option, double timeValue);
 
     /** set a time option for the federate
     @param option the option to set
     @param timeValue the value to be set
     */
-    void setProperty(int32_t option, Time timeValue);
+    virtual void setProperty(int32_t option, Time timeValue);
 
     /** set a flag for the federate
     @param flag an index into the flag /ref flag-definitions.h
@@ -308,12 +309,12 @@ class HELICS_CXX_EXPORT Federate {
     @param option an index of the option to set
     @param optionValue an integer option value for an integer based property
     */
-    void setProperty(int32_t option, int32_t optionValue);
+    virtual void setProperty(int32_t option, int32_t optionValue);
 
     /** get the value of a time option for the federate
     @param option the option to get
     */
-    Time getTimeProperty(int32_t option) const;
+    virtual Time getTimeProperty(int32_t option) const;
 
     /** get the value of a flag option
     @param flag an index into the flag /ref flag-definitions.h
@@ -322,7 +323,7 @@ class HELICS_CXX_EXPORT Federate {
     /**  get an integer option for the federate
     @param option  the option to inquire see /ref defs
     */
-    int getIntegerProperty(int32_t option) const;
+    virtual int getIntegerProperty(int32_t option) const;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate
@@ -700,11 +701,14 @@ received
 
   protected:
       /** function to run required operations for entering initializingMode*/
-      void enteringInitializingMode();
+      void enteringInitializingMode(IterationResult iterating);
 
       /** function to run required operations for entering executing Mode*/
       void enteringExecutingMode(IterationResult res);
-
+      /** function tor run required operations when finalizing*/
+      void finalizeOperations();
+      void preTimeRequestOperations(Time nextStep, bool iterating);
+      void postTimeRequestOperations(Time newTime, bool iterating);
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
     /** function to deal with any operations that need to occur on the transition from startup to
@@ -723,6 +727,7 @@ received
     std::string localNameGenerator(std::string_view addition) const;
     /** process an error */
     void handleError(int errorCode, std::string_view errorString, bool noThrow);
+    void setAsyncCheck(std::function<bool()> asyncCheck);
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
@@ -743,7 +748,7 @@ received
     Modes getCurrentMode() const noexcept { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
-    Time getCurrentTime() const noexcept{ return currentTime; }
+    Time getCurrentTime() const noexcept{ return mCurrentTime; }
     /** get the federate name*/
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/
