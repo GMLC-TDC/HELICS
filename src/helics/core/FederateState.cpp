@@ -1031,7 +1031,7 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     }
 }
 
-void FederateState::initCallbackProcessing() noexcept
+void FederateState::initCallbackProcessing()
 {
     auto initIter=fedCallbacks->initializeOperations();
     switch (initIter)
@@ -1057,14 +1057,20 @@ void FederateState::initCallbackProcessing() noexcept
     }
     break;
     case IterationRequest::ERROR_CONDITION:
+        ActionMessage bye(CMD_LOCAL_ERROR);
+        bye.source_id = global_id.load();
+        bye.dest_id = bye.source_id;
+        bye.messageID = HELICS_USER_EXCEPTION;
+        bye.payload = "Callback federate unspecified error condition in initialize callback";
+        queue.push(bye);
         break;
     }
 }
 
-void FederateState::execCallbackProcessing(MessageProcessingResult result) noexcept
+void FederateState::execCallbackProcessing(IterationResult result)
 {
-    // this is the only valid transition that hasn't been dealt with yet
-    auto execIter = fedCallbacks->operate({timeZero, IterationResult::NEXT_STEP});
+    
+    auto execIter = fedCallbacks->operate({grantedTime(), result});
     switch (execIter.second)
     {
     case IterationRequest::NO_ITERATIONS:
@@ -1072,7 +1078,13 @@ void FederateState::execCallbackProcessing(MessageProcessingResult result) noexc
     case IterationRequest::FORCE_ITERATION:
     default:
     {
-        //TODO(PT)
+        ActionMessage treq(CMD_TIME_REQUEST);
+        treq.source_id = global_id.load();
+        treq.actionTime = execIter.first;
+        setIterationFlags(treq, execIter.second);
+        setActionFlag(treq, indicator_flag);
+        queue.push(treq);
+        LOG_TRACE(timeCoord->printTimeStatus());
     }
     break;
     case IterationRequest::HALT_OPERATIONS:
@@ -1084,58 +1096,96 @@ void FederateState::execCallbackProcessing(MessageProcessingResult result) noexc
     }
     break;
     case IterationRequest::ERROR_CONDITION:
+        ActionMessage bye(CMD_LOCAL_ERROR);
+        bye.source_id = global_id.load();
+        bye.dest_id = bye.source_id;
+        bye.messageID = HELICS_USER_EXCEPTION;
+        bye.payload = "Callback federate unspecified error condition in operate callback";
+        queue.push(bye);
         break;
   }
 }
 
 void FederateState::callbackReturnResult(FederateStates lastState,MessageProcessingResult result, FederateStates newState) noexcept
 {
-    //handle some general new states
-    if (lastState != newState)
+    try
     {
-        switch (newState)
+
+        //handle some general new states
+        if (lastState != newState)
         {
-        case FederateStates::TERMINATING:
+            switch (newState)
+            {
+            case FederateStates::TERMINATING:
+                break;
+            case FederateStates::FINISHED:
+                fedCallbacks->finalize();
+                return;
+            case FederateStates::ERRORED:
+                fedCallbacks->error_handler(lastErrorCode(), lastErrorString());
+                return;
+            default:
+                break;
+            }
+        }
+        switch (result)
+        {
+        case MessageProcessingResult::ITERATING:
+        case MessageProcessingResult::NEXT_STEP:
+            //these are the only 2 results that warrent further processing
             break;
-        case FederateStates::FINISHED:
-            fedCallbacks->finalize();
+        default:
             return;
-        case FederateStates::ERRORED:
-            fedCallbacks->error_handler(lastErrorCode(),lastErrorString());
-            return;
+        }
+        switch (lastState)
+        {
+        case FederateStates::CREATED:
+            // this is the only valid transition that hasn't been dealt with yet
+            initCallbackProcessing();
+            break;
+        case FederateStates::INITIALIZING:
+        {
+            if (newState == FederateStates::INITIALIZING)
+            {
+                initCallbackProcessing();
+            }
+            else
+            {
+                execCallbackProcessing(IterationResult::NEXT_STEP);
+            }
+        }
+        break;
+        break;
+        case FederateStates::EXECUTING:
+            execCallbackProcessing(result == MessageProcessingResult::ITERATING ? IterationResult::ITERATING : IterationResult::NEXT_STEP);
+            break;
         default:
             break;
         }
     }
-    switch (lastState)
+    catch (const std::exception& e)
     {
-    case FederateStates::CREATED:
-        // this is the only valid transition that hasn't been dealt with yet
-        initCallbackProcessing();
-        break;
-    case FederateStates::INITIALIZING:
-    {
-        if (newState == FederateStates::INITIALIZING)
+        if (newState != FederateStates::ERRORED && newState!=FederateStates::FINISHED)
         {
-            initCallbackProcessing();
+            ActionMessage bye(CMD_LOCAL_ERROR);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            bye.messageID = HELICS_USER_EXCEPTION;
+            bye.payload = e.what();
+            queue.push(bye);
         }
-        else
-        {
-            execCallbackProcessing(result);
-        }
-        
     }
-    break;
-        break;
-    case FederateStates::EXECUTING:
-        execCallbackProcessing(result);
-        break;
-    case FederateStates::TERMINATING:
-        break;
-    case FederateStates::FINISHED:
-        break;
-    default:
-        break;
+    catch (...)
+    {
+        if (newState != FederateStates::ERRORED && newState!=FederateStates::FINISHED)
+        {
+            ActionMessage bye(CMD_LOCAL_ERROR);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            bye.messageID = HELICS_USER_EXCEPTION;
+            bye.payload = "unrecognized exception thrown in federate callback";
+            queue.push(bye);
+        }
     }
 }
 
@@ -1191,10 +1241,6 @@ void FederateState::callbackProcessing() noexcept
                     gError.dest_id = parent_broker_id;
                     gError.messageID = errorCode;
                     gError.payload = errorString;
-                    if (fedCallbacks)
-                    {
-                        fedCallbacks->error_handler(errorCode,errorString);
-                    }
                     mParent->addActionMessage(std::move(gError));
                 }
             }

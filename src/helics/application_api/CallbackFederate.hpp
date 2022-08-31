@@ -72,6 +72,7 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     void setNextTimeCallback(std::function<Time(Time)> nextTimeCallback){nextTimeOperation2=std::move(nextTimeCallback);nextTimeOperation1=nullptr;}
     void clearNextTimeCallback(){nextTimeOperation1=nullptr; nextTimeOperation2=nullptr;}
     using Federate::setProperty;
+    virtual void setProperty(int32_t property, double val) override;
     virtual void setProperty(int32_t property, Time val) override;
     virtual void setFlagOption(int32_t property,bool val) override;
     virtual Time getTimeProperty(int32_t property);

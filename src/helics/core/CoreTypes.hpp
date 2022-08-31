@@ -68,8 +68,9 @@ enum class MessageProcessingResult : std::int8_t {
     NEXT_STEP = 0,  //!< indicator that the iterations have completed
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
+    /// indicator that there was a return request but no other conditions or issues
     USER_RETURN =
-        5,  //!< indicator that there was a return request but no other conditions or issues
+        5,  
     ERROR_RESULT = 7,  //!< indicator that an error has occurred
     REPROCESS_MESSAGE = 8,  // indicator that the message needs to be processed again
     BUSY = 10,  // indicator that processing could not be done since the resource was busy

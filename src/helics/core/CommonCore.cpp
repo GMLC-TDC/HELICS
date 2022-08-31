@@ -391,6 +391,10 @@ void CommonCore::globalError(LocalFederateId federateID,
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
+    if (fed->isCallbackFederate())
+    {
+        setActionFlag(m,indicator_flag);
+    }
     addActionMessage(m);
     if (fed->isCallbackFederate())
     {
@@ -425,6 +429,10 @@ void CommonCore::localError(LocalFederateId federateID, int errorCode, std::stri
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
+    if (fed->isCallbackFederate())
+    {
+        setActionFlag(m,indicator_flag);
+    }
     addActionMessage(m);
     if (fed->isCallbackFederate())
     {
@@ -4469,7 +4477,15 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
                                  cmd.payload.to_string());
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed != loopFederates.end()) {
-                        fed->state = OperatingState::ERROR_STATE;
+                        if (checkActionFlag(cmd, indicator_flag))
+                        {
+                            fed->fed->addAction(cmd);
+                        }
+                        else
+                        {
+                            fed->state = OperatingState::ERROR_STATE;
+                        }
+                        
                     } else if (cmd.source_id == filterFedID) {
                         filterFed->handleMessage(cmd);
                         // filterFed->

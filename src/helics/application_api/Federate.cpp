@@ -396,6 +396,8 @@ void Federate::enteringExecutingMode(IterationResult res)
 
 void Federate::handleError(int errorCode, std::string_view errorString, bool noThrow)
 {
+    updateFederateMode(Modes::ERROR_STATE);
+
     if (errorHandlerCallback)
     {
         errorHandlerCallback(errorCode,errorString);

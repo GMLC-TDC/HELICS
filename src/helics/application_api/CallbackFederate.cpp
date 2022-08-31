@@ -139,6 +139,15 @@ std::pair<Time, IterationRequest> CallbackFederate::operateCallback(iteration_ti
     return rval;
 }
 
+void CallbackFederate::setProperty(int32_t property, double val)
+{
+    if (property == HELICS_PROPERTY_TIME_MAXTIME)
+    {
+        mFinalTime=val;
+        return;
+    }
+    Federate::setProperty(property,val);
+}
 
 void CallbackFederate::setProperty(int32_t property, Time val)
 {
