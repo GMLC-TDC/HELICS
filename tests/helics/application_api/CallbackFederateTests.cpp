@@ -266,7 +266,7 @@ TEST_F(callbackFed, timeSteps2Fed)
         v1.push_back(s1.getValue<double>());
     });
     vFed2->setTimeRequestReturnCallback([&](auto time, bool) {
-        p2.publish(18.7 + static_cast<double>(time));
+        p2.publish(23.7 + static_cast<double>(time));
         v2.push_back(s1.getValue<double>());
     });
 
@@ -287,4 +287,65 @@ TEST_F(callbackFed, timeSteps2Fed)
     EXPECT_EQ(res2, 10);
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
     EXPECT_TRUE(vFed2->isAsyncOperationCompleted());
+    ASSERT_EQ(v1.size(),4);
+    EXPECT_DOUBLE_EQ(v1[0],0.3);
+    EXPECT_DOUBLE_EQ(v1[1],19.7);
+    EXPECT_DOUBLE_EQ(v1[2],20.7);
+    EXPECT_DOUBLE_EQ(v1[3],21.7);
+
+    ASSERT_EQ(v2.size(),4);
+    EXPECT_DOUBLE_EQ(v2[0],0.4);
+    EXPECT_DOUBLE_EQ(v2[1],23.7);
+    EXPECT_DOUBLE_EQ(v2[2],24.7);
+    EXPECT_DOUBLE_EQ(v2[3],25.7);
+}
+
+TEST_F(callbackFed, 100Fed)
+{
+    const int fedCount{100};
+    SetupTest<helics::CallbackFederate>("test", fedCount);
+    std::vector<double> vals(100);
+    for (int ii = 0; ii < fedCount; ++ii)
+    {
+        auto fed=GetFederateAs<helics::CallbackFederate>(ii);
+        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 120.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+        fed->registerPublication<double>("p1");
+        auto &s1=fed->registerSubscription(std::string("fed")+std::to_string((ii<99)?ii+1:0)+"/p1");
+        s1.setDefault(0.7);
+
+        fed->setTimeRequestReturnCallback([fed,ii,&vals](auto time, bool) {
+            fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
+            vals[ii]=fed->getInput(0).getValue<double>();
+            });
+        fed->enterInitializingMode();
+    }
+    brokers.front()->waitForDisconnect();
+    EXPECT_TRUE(GetFederateAs<helics::CallbackFederate>(1)->isAsyncOperationCompleted());
+    
+}
+
+
+TEST_F(callbackFed, 1000Fed_ci_skip)
+{
+    constexpr int fedCount{1000};
+    SetupTest<helics::CallbackFederate>("test", fedCount);
+    std::vector<double> vals(fedCount);
+    for (int ii = 0; ii < fedCount; ++ii)
+    {
+        auto fed=GetFederateAs<helics::CallbackFederate>(ii);
+        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 120.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
+        fed->registerPublication<double>("p1");
+        auto &s1=fed->registerSubscription(std::string("fed")+std::to_string((ii<(fedCount-1))?ii+1:0)+"/p1");
+        s1.setDefault(0.7);
+
+        fed->setTimeRequestReturnCallback([fed,ii,&vals](auto time, bool) {
+            fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
+            vals[ii]=fed->getInput(0).getValue<double>();
+            });
+        fed->enterInitializingMode();
+    }
+    brokers.front()->waitForDisconnect();
+    EXPECT_TRUE(GetFederateAs<helics::CallbackFederate>(1)->isAsyncOperationCompleted());
 }

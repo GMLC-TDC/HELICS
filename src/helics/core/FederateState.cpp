@@ -1037,15 +1037,16 @@ void FederateState::initCallbackProcessing()
         default: {
             ActionMessage exec(CMD_EXEC_REQUEST);
             exec.source_id = global_id.load();
+            exec.dest_id=global_id.load();
             setIterationFlags(exec, initIter);
             setActionFlag(exec, indicator_flag);
-            queue.push(exec);
+            mParent->addActionMessage(exec);
         } break;
         case IterationRequest::HALT_OPERATIONS: {
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
-            queue.push(bye);
+            mParent->addActionMessage(bye);
         } break;
         case IterationRequest::ERROR_CONDITION:
             ActionMessage bye(CMD_LOCAL_ERROR);
@@ -1053,7 +1054,7 @@ void FederateState::initCallbackProcessing()
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
             bye.payload = "Callback federate unspecified error condition in initialize callback";
-            queue.push(bye);
+            mParent->addActionMessage(bye);
             break;
     }
 }
@@ -1068,17 +1069,17 @@ void FederateState::execCallbackProcessing(IterationResult result)
         default: {
             ActionMessage treq(CMD_TIME_REQUEST);
             treq.source_id = global_id.load();
+            treq.dest_id=treq.source_id;
             treq.actionTime = execIter.first;
             setIterationFlags(treq, execIter.second);
             setActionFlag(treq, indicator_flag);
-            queue.push(treq);
-            LOG_TRACE(timeCoord->printTimeStatus());
+            mParent->addActionMessage(treq);
         } break;
         case IterationRequest::HALT_OPERATIONS: {
             ActionMessage bye(CMD_DISCONNECT);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
-            queue.push(bye);
+            mParent->addActionMessage(bye);
         } break;
         case IterationRequest::ERROR_CONDITION:
             ActionMessage bye(CMD_LOCAL_ERROR);
@@ -1086,7 +1087,7 @@ void FederateState::execCallbackProcessing(IterationResult result)
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
             bye.payload = "Callback federate unspecified error condition in operate callback";
-            queue.push(bye);
+            mParent->addActionMessage(bye);
             break;
     }
 }
@@ -1148,7 +1149,7 @@ void FederateState::callbackReturnResult(FederateStates lastState,
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
             bye.payload = e.what();
-            queue.push(bye);
+            mParent->addActionMessage(bye);
         }
     }
     catch (...) {
@@ -1158,7 +1159,7 @@ void FederateState::callbackReturnResult(FederateStates lastState,
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
             bye.payload = "unrecognized exception thrown in federate callback";
-            queue.push(bye);
+            mParent->addActionMessage(bye);
         }
     }
 }
