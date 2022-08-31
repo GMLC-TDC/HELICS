@@ -570,7 +570,6 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
  */
 HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
 
-
 /**
 * Create a callback federate from a federate info object.
 *
@@ -601,7 +600,6 @@ HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, H
 * @return An opaque combination federate object.
 */
 HELICS_EXPORT HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, HelicsError* err);
-
 
 /**
  * Create a new reference to an existing federate.

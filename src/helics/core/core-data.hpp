@@ -162,10 +162,9 @@ class NullTranslatorOperator final: public TranslatorOperator {
     }
 };
 
-class FederateOperator
-{
-public:
-    FederateOperator()=default;
+class FederateOperator {
+  public:
+    FederateOperator() = default;
     /**virtual destructor*/
     virtual ~FederateOperator() = default;
     /** perform any initialization operations
@@ -176,24 +175,29 @@ public:
     @param newTime the current time grant of the federate
     @return a pair of values with a new request time and the iteration results
     */
-   virtual std::pair<Time,IterationRequest> operate(iteration_time newTime)=0;
-   /*NOTE: the following two functions will be called only once and they will be the last call in the federate lifecycle*/
-   /** operate any final operations on the federate*/
+    virtual std::pair<Time, IterationRequest> operate(iteration_time newTime) = 0;
+    /*NOTE: the following two functions will be called only once and they will be the last call in
+     * the federate lifecycle*/
+    /** operate any final operations on the federate*/
     virtual void finalize(){};
     /** run any operations for handling an error*/
-    virtual void error_handler([[maybe_unused]] int error_code, [[maybe_unused]] std::string_view errorString) {
-    };
+    virtual void error_handler([[maybe_unused]] int error_code,
+                               [[maybe_unused]] std::string_view errorString){};
 };
 
 /** class defining a federate that does nothing*/
-class NullFederateOperator final:public FederateOperator
-{
-public:
-    NullFederateOperator()=default;
-    virtual IterationRequest initializeOperations() override { return IterationRequest::NO_ITERATIONS;};
+class NullFederateOperator final: public FederateOperator {
+  public:
+    NullFederateOperator() = default;
+    virtual IterationRequest initializeOperations() override
+    {
+        return IterationRequest::NO_ITERATIONS;
+    };
 
-    virtual std::pair<Time, IterationRequest> operate([[maybe_unused]] iteration_time newTime) override {
-        return { Time::maxVal(),IterationRequest::NO_ITERATIONS };
+    virtual std::pair<Time, IterationRequest>
+        operate([[maybe_unused]] iteration_time newTime) override
+    {
+        return {Time::maxVal(), IterationRequest::NO_ITERATIONS};
     }
 };
 

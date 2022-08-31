@@ -247,17 +247,14 @@ void Federate::enterInitializingMode()
 
 void Federate::enteringInitializingMode(IterationResult iterating)
 {
-    
-        updateFederateMode(Modes::INITIALIZING);
-        mCurrentTime = coreObject->getCurrentTime(fedID);
-        if (iterating == IterationResult::NEXT_STEP)
-        {
-            startupToInitializeStateTransition();
-        }
-        if (initializingEntryCallback)
-        {
-            initializingEntryCallback(iterating!=IterationResult::NEXT_STEP);
-        }
+    updateFederateMode(Modes::INITIALIZING);
+    mCurrentTime = coreObject->getCurrentTime(fedID);
+    if (iterating == IterationResult::NEXT_STEP) {
+        startupToInitializeStateTransition();
+    }
+    if (initializingEntryCallback) {
+        initializingEntryCallback(iterating != IterationResult::NEXT_STEP);
+    }
 }
 
 void Federate::enterInitializingModeAsync()
@@ -296,7 +293,7 @@ bool Federate::isAsyncOperationCompleted() const
         case Modes::PENDING_FINALIZE:
             return (asyncInfo->finalizeFuture.wait_for(wait_delay) == ready);
         default:
-            return (asyncInfo->asyncCheck())?asyncInfo->asyncCheck():false;
+            return (asyncInfo->asyncCheck()) ? asyncInfo->asyncCheck() : false;
     }
 }
 
@@ -336,7 +333,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             [[fallthrough]];
         case Modes::INITIALIZING: {
             res = coreObject->enterExecutingMode(fedID, iterate);
-           enteringExecutingMode(res);
+            enteringExecutingMode(res);
             break;
         }
         case Modes::PENDING_EXEC:
@@ -361,36 +358,35 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
 
 void Federate::enteringExecutingMode(IterationResult res)
 {
-
     switch (res) {
-    case IterationResult::NEXT_STEP:
-        updateFederateMode(Modes::EXECUTING);
-        if (observerMode) {
-            mCurrentTime = coreObject->getCurrentTime(fedID);
-        } else {
-            mCurrentTime = timeZero;
-        }
-        if (timeUpdateCallback) {
-            timeUpdateCallback(mCurrentTime, false);
-        }
-        initializeToExecuteStateTransition(res);
-        if (timeRequestReturnCallback) {
-            timeRequestReturnCallback(mCurrentTime, false);
-        }
-        break;
-    case IterationResult::ITERATING:
-        mCurrentTime = initializationTime;
+        case IterationResult::NEXT_STEP:
+            updateFederateMode(Modes::EXECUTING);
+            if (observerMode) {
+                mCurrentTime = coreObject->getCurrentTime(fedID);
+            } else {
+                mCurrentTime = timeZero;
+            }
+            if (timeUpdateCallback) {
+                timeUpdateCallback(mCurrentTime, false);
+            }
+            initializeToExecuteStateTransition(res);
+            if (timeRequestReturnCallback) {
+                timeRequestReturnCallback(mCurrentTime, false);
+            }
+            break;
+        case IterationResult::ITERATING:
+            mCurrentTime = initializationTime;
 
-        enteringInitializingMode(res);
+            enteringInitializingMode(res);
 
-        initializeToExecuteStateTransition(res);
-        break;
-    case IterationResult::ERROR_RESULT:
-        updateFederateMode(Modes::ERROR_STATE);
-        break;
-    case IterationResult::HALTED:
-        updateFederateMode(Modes::FINISHED);
-        break;
+            initializeToExecuteStateTransition(res);
+            break;
+        case IterationResult::ERROR_RESULT:
+            updateFederateMode(Modes::ERROR_STATE);
+            break;
+        case IterationResult::HALTED:
+            updateFederateMode(Modes::FINISHED);
+            break;
     }
 }
 
@@ -398,13 +394,10 @@ void Federate::handleError(int errorCode, std::string_view errorString, bool noT
 {
     updateFederateMode(Modes::ERROR_STATE);
 
-    if (errorHandlerCallback)
-    {
-        errorHandlerCallback(errorCode,errorString);
-    }
-    else if (!noThrow)
-    {
-        throw FederateError(errorCode,errorString);
+    if (errorHandlerCallback) {
+        errorHandlerCallback(errorCode, errorString);
+    } else if (!noThrow) {
+        throw FederateError(errorCode, errorString);
     }
 }
 
@@ -468,7 +461,7 @@ IterationResult Federate::enterExecutingModeComplete()
 void Federate::setAsyncCheck(std::function<bool()> asyncCheck)
 {
     auto asyncInfo = asyncCallInfo->lock();
-    asyncInfo->asyncCheck=asyncCheck;
+    asyncInfo->asyncCheck = asyncCheck;
 }
 
 void Federate::setTag(std::string_view tag, std::string_view value)
@@ -579,7 +572,7 @@ void Federate::setCosimulationTerminatedCallback(std::function<void()> callback)
 
 void Federate::setErrorHandlerCallback(std::function<void(int, std::string_view)> callback)
 {
-    errorHandlerCallback=std::move(callback);
+    errorHandlerCallback = std::move(callback);
 }
 
 void Federate::setFlagOption(int flag, bool flagValue)
@@ -587,9 +580,8 @@ void Federate::setFlagOption(int flag, bool flagValue)
     if (flag == HELICS_FLAG_OBSERVER && currentMode < Modes::INITIALIZING) {
         observerMode = flagValue;
     }
-    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST)
-    {
-        retriggerTimeRequest=flagValue;
+    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST) {
+        retriggerTimeRequest = flagValue;
         return;
     }
     coreObject->setFlagOption(fedID, flag, flagValue);
@@ -600,8 +592,7 @@ bool Federate::getFlagOption(int flag) const
     if (flag == HELICS_FLAG_USE_JSON_SERIALIZATION) {
         return useJsonSerialization;
     }
-    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST)
-    {
+    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST) {
         return retriggerTimeRequest;
     }
     return coreObject->getFlagOption(fedID, flag);
@@ -691,10 +682,9 @@ void Federate::finalizeComplete()
     }
 }
 
-
 void Federate::finalizeOperations()
 {
-    //this should not contain virtual calls
+    // this should not contain virtual calls
     if (cManager) {
         cManager->closeAllConnectors();
     }
@@ -771,10 +761,10 @@ Time Federate::requestTime(Time nextInternalTimeStep)
             try {
                 Time newTime;
                 do {
-                    preTimeRequestOperations(nextInternalTimeStep,false);
+                    preTimeRequestOperations(nextInternalTimeStep, false);
                     newTime = coreObject->timeRequest(fedID, nextInternalTimeStep);
-                    postTimeRequestOperations(newTime,false);
-                }while(retriggerTimeRequest && newTime<Time::maxVal());
+                    postTimeRequestOperations(newTime, false);
+                } while (retriggerTimeRequest && newTime < Time::maxVal());
 
                 return newTime;
             }
@@ -792,7 +782,6 @@ Time Federate::requestTime(Time nextInternalTimeStep)
 
     throw(InvalidFunctionCall("cannot call request time in present state"));
 }
-
 
 void Federate::preTimeRequestOperations(Time nextStep, bool iterating)
 {
@@ -812,15 +801,14 @@ void Federate::postTimeRequestOperations(Time newTime, bool iterating)
 iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, IterationRequest iterate)
 {
     if (currentMode == Modes::EXECUTING) {
-        preTimeRequestOperations(nextInternalTimeStep,
-                                     iterate != IterationRequest::NO_ITERATIONS);
+        preTimeRequestOperations(nextInternalTimeStep, iterate != IterationRequest::NO_ITERATIONS);
         auto iterativeTime = coreObject->requestTimeIterative(fedID, nextInternalTimeStep, iterate);
         switch (iterativeTime.state) {
             case IterationResult::NEXT_STEP:
-                postTimeRequestOperations(iterativeTime.grantedTime,false);
+                postTimeRequestOperations(iterativeTime.grantedTime, false);
                 break;
             case IterationResult::ITERATING:
-                postTimeRequestOperations(iterativeTime.grantedTime,true);
+                postTimeRequestOperations(iterativeTime.grantedTime, true);
                 break;
             case IterationResult::HALTED:
                 updateFederateMode(Modes::FINISHED);
@@ -844,7 +832,7 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_TIME)) {
-        preTimeRequestOperations(nextInternalTimeStep,false);
+        preTimeRequestOperations(nextInternalTimeStep, false);
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep]() {
@@ -859,8 +847,7 @@ void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationReq
 {
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_ITERATIVE_TIME)) {
-        preTimeRequestOperations(nextInternalTimeStep,
-                                     iterate != IterationRequest::NO_ITERATIONS);
+        preTimeRequestOperations(nextInternalTimeStep, iterate != IterationRequest::NO_ITERATIONS);
         auto asyncInfo = asyncCallInfo->lock();
         asyncInfo->timeRequestIterativeFuture =
             std::async(std::launch::async, [this, nextInternalTimeStep, iterate]() {
@@ -878,7 +865,7 @@ Time Federate::requestTimeComplete()
         auto asyncInfo = asyncCallInfo->lock();
         auto newTime = asyncInfo->timeRequestFuture.get();
         asyncInfo.unlock();  // remove the lock;
-        postTimeRequestOperations(newTime,false);
+        postTimeRequestOperations(newTime, false);
         return newTime;
     }
     throw(InvalidFunctionCall(
@@ -957,17 +944,14 @@ void Federate::updateFederateMode(Modes newMode)
                 break;
         }
     }
-    if (executingEntryCallback)
-    {
-        if (newMode == Modes::EXECUTING && (oldMode==Modes::INITIALIZING || oldMode==Modes::PENDING_EXEC))
-        {
+    if (executingEntryCallback) {
+        if (newMode == Modes::EXECUTING &&
+            (oldMode == Modes::INITIALIZING || oldMode == Modes::PENDING_EXEC)) {
             executingEntryCallback();
         }
     }
-    if (cosimulationTerminationCallback)
-    {
-        if (newMode == Modes::FINALIZE || newMode==Modes::ERROR_STATE)
-        {
+    if (cosimulationTerminationCallback) {
+        if (newMode == Modes::FINALIZE || newMode == Modes::ERROR_STATE) {
             cosimulationTerminationCallback();
         }
     }

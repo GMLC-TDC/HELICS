@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
-    class CallbackFederateOperator;
+class CallbackFederateOperator;
 
 /** class defining a federate that can use both the value and message interfaces */
 class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
@@ -32,8 +32,8 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     @param fi  a federate information structure
     */
     CallbackFederate(std::string_view fedName,
-                        const std::shared_ptr<Core>& core,
-                        const FederateInfo& fi = FederateInfo{});
+                     const std::shared_ptr<Core>& core,
+                     const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate information structure and using the given CoreApp
     @param fedName the name of the federate, may be left empty to use a default or one found in fi
@@ -41,8 +41,8 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     @param fi  a federate information structure
     */
     CallbackFederate(std::string_view fedName,
-                        CoreApp& core,
-                        const FederateInfo& fi = FederateInfo{});
+                     CoreApp& core,
+                     const FederateInfo& fi = FederateInfo{});
 
     /**constructor taking a federate name and a file with the required information
     @param fedName the name of the federate, can be empty to use the name from the configString
@@ -67,24 +67,40 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     CallbackFederate(const CallbackFederate& fed) = delete;
     /** copy assignment deleted*/
     CallbackFederate& operator=(const CallbackFederate& fed) = delete;
-    void setInitializeCallback(std::function<IterationRequest()> initializeCallback){initializationOperation=std::move(initializeCallback); }
-    void setNextTimeIterativeCallback(std::function<std::pair<Time,IterationRequest>(iteration_time)> nextTimeCallback){nextTimeOperation1=std::move(nextTimeCallback);}
-    void setNextTimeCallback(std::function<Time(Time)> nextTimeCallback){nextTimeOperation2=std::move(nextTimeCallback);nextTimeOperation1=nullptr;}
-    void clearNextTimeCallback(){nextTimeOperation1=nullptr; nextTimeOperation2=nullptr;}
+    void setInitializeCallback(std::function<IterationRequest()> initializeCallback)
+    {
+        initializationOperation = std::move(initializeCallback);
+    }
+    void setNextTimeIterativeCallback(
+        std::function<std::pair<Time, IterationRequest>(iteration_time)> nextTimeCallback)
+    {
+        nextTimeOperation1 = std::move(nextTimeCallback);
+    }
+    void setNextTimeCallback(std::function<Time(Time)> nextTimeCallback)
+    {
+        nextTimeOperation2 = std::move(nextTimeCallback);
+        nextTimeOperation1 = nullptr;
+    }
+    void clearNextTimeCallback()
+    {
+        nextTimeOperation1 = nullptr;
+        nextTimeOperation2 = nullptr;
+    }
     using Federate::setProperty;
     virtual void setProperty(int32_t property, double val) override;
     virtual void setProperty(int32_t property, Time val) override;
-    virtual void setFlagOption(int32_t property,bool val) override;
+    virtual void setFlagOption(int32_t property, bool val) override;
     virtual Time getTimeProperty(int32_t property);
-private:
+
+  private:
     void loadOperator();
-    //pointer for the 
+    // pointer for the
     std::shared_ptr<CallbackFederateOperator> op;
     friend CallbackFederateOperator;
     Time mFinalTime{Time::maxVal()};
     bool mEventTriggered{false};
     std::function<IterationRequest()> initializationOperation;
-    std::function<std::pair<Time,IterationRequest>(iteration_time)> nextTimeOperation1;
+    std::function<std::pair<Time, IterationRequest>(iteration_time)> nextTimeOperation1;
     std::function<Time(Time)> nextTimeOperation2;
     /** callback operations*/
     IterationRequest initializeOperationsCallback();

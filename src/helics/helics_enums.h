@@ -141,9 +141,11 @@ typedef enum { /* NOLINT */
                /** specify that that federate should capture the profiling data to the local
                   federate logging system*/
                HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96,
-               /** specify that the federate is a callback based federate using callbacks for execution*/
+               /** specify that the federate is a callback based federate using callbacks for
+                  execution*/
                HELICS_FLAG_CALLBACK_FEDERATE = 103,
-               /** specify that a federate should automatically call timeRequest on completion of current request*/
+               /** specify that a federate should automatically call timeRequest on completion of
+                  current request*/
                HELICS_FLAG_AUTOMATED_TIMEREQUEST = 106
 } HelicsFederateFlags;
 

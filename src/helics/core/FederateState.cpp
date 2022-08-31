@@ -318,24 +318,20 @@ void FederateState::addAction(const ActionMessage& action)
 {
     if (action.action() != CMD_IGNORE) {
         queue.push(action);
-        if (mCallbackBased)
-        {
+        if (mCallbackBased) {
             callbackProcessing();
         }
     }
-    
 }
 
 void FederateState::addAction(ActionMessage&& action)
 {
     if (action.action() != CMD_IGNORE) {
         queue.push(std::move(action));
-        if (mCallbackBased)
-        {
+        if (mCallbackBased) {
             callbackProcessing();
         }
     }
-   
 }
 
 void FederateState::createInterface(InterfaceType htype,
@@ -1033,140 +1029,120 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
 
 void FederateState::initCallbackProcessing()
 {
-    auto initIter=fedCallbacks->initializeOperations();
-    switch (initIter)
-    {
-    case IterationRequest::NO_ITERATIONS:
-    case IterationRequest::ITERATE_IF_NEEDED:
-    case IterationRequest::FORCE_ITERATION:
-    default:
-    {
-        ActionMessage exec(CMD_EXEC_REQUEST);
-        exec.source_id = global_id.load();
-        setIterationFlags(exec, initIter);
-        setActionFlag(exec, indicator_flag);
-        queue.push(exec);
-    }
-    break;
-    case IterationRequest::HALT_OPERATIONS:
-    {
-        ActionMessage bye(CMD_DISCONNECT);
-        bye.source_id = global_id.load();
-        bye.dest_id = bye.source_id;
-        queue.push(bye);
-    }
-    break;
-    case IterationRequest::ERROR_CONDITION:
-        ActionMessage bye(CMD_LOCAL_ERROR);
-        bye.source_id = global_id.load();
-        bye.dest_id = bye.source_id;
-        bye.messageID = HELICS_USER_EXCEPTION;
-        bye.payload = "Callback federate unspecified error condition in initialize callback";
-        queue.push(bye);
-        break;
+    auto initIter = fedCallbacks->initializeOperations();
+    switch (initIter) {
+        case IterationRequest::NO_ITERATIONS:
+        case IterationRequest::ITERATE_IF_NEEDED:
+        case IterationRequest::FORCE_ITERATION:
+        default: {
+            ActionMessage exec(CMD_EXEC_REQUEST);
+            exec.source_id = global_id.load();
+            setIterationFlags(exec, initIter);
+            setActionFlag(exec, indicator_flag);
+            queue.push(exec);
+        } break;
+        case IterationRequest::HALT_OPERATIONS: {
+            ActionMessage bye(CMD_DISCONNECT);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            queue.push(bye);
+        } break;
+        case IterationRequest::ERROR_CONDITION:
+            ActionMessage bye(CMD_LOCAL_ERROR);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            bye.messageID = HELICS_USER_EXCEPTION;
+            bye.payload = "Callback federate unspecified error condition in initialize callback";
+            queue.push(bye);
+            break;
     }
 }
 
 void FederateState::execCallbackProcessing(IterationResult result)
 {
-    
     auto execIter = fedCallbacks->operate({grantedTime(), result});
-    switch (execIter.second)
-    {
-    case IterationRequest::NO_ITERATIONS:
-    case IterationRequest::ITERATE_IF_NEEDED:
-    case IterationRequest::FORCE_ITERATION:
-    default:
-    {
-        ActionMessage treq(CMD_TIME_REQUEST);
-        treq.source_id = global_id.load();
-        treq.actionTime = execIter.first;
-        setIterationFlags(treq, execIter.second);
-        setActionFlag(treq, indicator_flag);
-        queue.push(treq);
-        LOG_TRACE(timeCoord->printTimeStatus());
+    switch (execIter.second) {
+        case IterationRequest::NO_ITERATIONS:
+        case IterationRequest::ITERATE_IF_NEEDED:
+        case IterationRequest::FORCE_ITERATION:
+        default: {
+            ActionMessage treq(CMD_TIME_REQUEST);
+            treq.source_id = global_id.load();
+            treq.actionTime = execIter.first;
+            setIterationFlags(treq, execIter.second);
+            setActionFlag(treq, indicator_flag);
+            queue.push(treq);
+            LOG_TRACE(timeCoord->printTimeStatus());
+        } break;
+        case IterationRequest::HALT_OPERATIONS: {
+            ActionMessage bye(CMD_DISCONNECT);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            queue.push(bye);
+        } break;
+        case IterationRequest::ERROR_CONDITION:
+            ActionMessage bye(CMD_LOCAL_ERROR);
+            bye.source_id = global_id.load();
+            bye.dest_id = bye.source_id;
+            bye.messageID = HELICS_USER_EXCEPTION;
+            bye.payload = "Callback federate unspecified error condition in operate callback";
+            queue.push(bye);
+            break;
     }
-    break;
-    case IterationRequest::HALT_OPERATIONS:
-    {
-        ActionMessage bye(CMD_DISCONNECT);
-        bye.source_id = global_id.load();
-        bye.dest_id = bye.source_id;
-        queue.push(bye);
-    }
-    break;
-    case IterationRequest::ERROR_CONDITION:
-        ActionMessage bye(CMD_LOCAL_ERROR);
-        bye.source_id = global_id.load();
-        bye.dest_id = bye.source_id;
-        bye.messageID = HELICS_USER_EXCEPTION;
-        bye.payload = "Callback federate unspecified error condition in operate callback";
-        queue.push(bye);
-        break;
-  }
 }
 
-void FederateState::callbackReturnResult(FederateStates lastState,MessageProcessingResult result, FederateStates newState) noexcept
+void FederateState::callbackReturnResult(FederateStates lastState,
+                                         MessageProcessingResult result,
+                                         FederateStates newState) noexcept
 {
-    try
-    {
-
-        //handle some general new states
-        if (lastState != newState)
-        {
-            switch (newState)
-            {
-            case FederateStates::TERMINATING:
+    try {
+        // handle some general new states
+        if (lastState != newState) {
+            switch (newState) {
+                case FederateStates::TERMINATING:
+                    break;
+                case FederateStates::FINISHED:
+                    fedCallbacks->finalize();
+                    return;
+                case FederateStates::ERRORED:
+                    fedCallbacks->error_handler(lastErrorCode(), lastErrorString());
+                    return;
+                default:
+                    break;
+            }
+        }
+        switch (result) {
+            case MessageProcessingResult::ITERATING:
+            case MessageProcessingResult::NEXT_STEP:
+                // these are the only 2 results that warrant further processing
                 break;
-            case FederateStates::FINISHED:
-                fedCallbacks->finalize();
+            default:
                 return;
-            case FederateStates::ERRORED:
-                fedCallbacks->error_handler(lastErrorCode(), lastErrorString());
-                return;
+        }
+        switch (lastState) {
+            case FederateStates::CREATED:
+                // this is the only valid transition that hasn't been dealt with yet
+                initCallbackProcessing();
+                break;
+            case FederateStates::INITIALIZING: {
+                if (newState == FederateStates::INITIALIZING) {
+                    initCallbackProcessing();
+                } else {
+                    execCallbackProcessing(IterationResult::NEXT_STEP);
+                }
+            } break;
+                break;
+            case FederateStates::EXECUTING:
+                execCallbackProcessing(result == MessageProcessingResult::ITERATING ?
+                                           IterationResult::ITERATING :
+                                           IterationResult::NEXT_STEP);
+                break;
             default:
                 break;
-            }
-        }
-        switch (result)
-        {
-        case MessageProcessingResult::ITERATING:
-        case MessageProcessingResult::NEXT_STEP:
-            //these are the only 2 results that warrent further processing
-            break;
-        default:
-            return;
-        }
-        switch (lastState)
-        {
-        case FederateStates::CREATED:
-            // this is the only valid transition that hasn't been dealt with yet
-            initCallbackProcessing();
-            break;
-        case FederateStates::INITIALIZING:
-        {
-            if (newState == FederateStates::INITIALIZING)
-            {
-                initCallbackProcessing();
-            }
-            else
-            {
-                execCallbackProcessing(IterationResult::NEXT_STEP);
-            }
-        }
-        break;
-        break;
-        case FederateStates::EXECUTING:
-            execCallbackProcessing(result == MessageProcessingResult::ITERATING ? IterationResult::ITERATING : IterationResult::NEXT_STEP);
-            break;
-        default:
-            break;
         }
     }
-    catch (const std::exception& e)
-    {
-        if (newState != FederateStates::ERRORED && newState!=FederateStates::FINISHED)
-        {
+    catch (const std::exception& e) {
+        if (newState != FederateStates::ERRORED && newState != FederateStates::FINISHED) {
             ActionMessage bye(CMD_LOCAL_ERROR);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
@@ -1175,10 +1151,8 @@ void FederateState::callbackReturnResult(FederateStates lastState,MessageProcess
             queue.push(bye);
         }
     }
-    catch (...)
-    {
-        if (newState != FederateStates::ERRORED && newState!=FederateStates::FINISHED)
-        {
+    catch (...) {
+        if (newState != FederateStates::ERRORED && newState != FederateStates::FINISHED) {
             ActionMessage bye(CMD_LOCAL_ERROR);
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
@@ -1197,20 +1171,17 @@ void FederateState::callbackProcessing() noexcept
     auto initError = (state == FederateStates::ERRORED);
     bool error_cmd{false};
 
-    
-    if (!init_requested)
-    {
-        //don't run callback processing before the user calls enterInit
+    if (!init_requested) {
+        // don't run callback processing before the user calls enterInit
         return;
     }
-    auto cState=state.load();
+    auto cState = state.load();
     auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
-    while (returnableResult(ret_code))
-    {
-        callbackReturnResult(cState, ret_code,state.load());
-        cState=state.load();
+    while (returnableResult(ret_code)) {
+        callbackReturnResult(cState, ret_code, state.load());
+        cState = state.load();
         ret_code = processDelayQueue();
     }
     auto cmd = queue.try_pop();
@@ -1225,7 +1196,8 @@ void FederateState::callbackProcessing() noexcept
         if (ret_code == MessageProcessingResult::DELAY_MESSAGE) {
             delayQueues[static_cast<GlobalFederateId>(cmd->source_id)].push_back(*cmd);
         }
-        if (ret_code == MessageProcessingResult::ERROR_RESULT && cmd->action() == CMD_GLOBAL_ERROR) {
+        if (ret_code == MessageProcessingResult::ERROR_RESULT &&
+            cmd->action() == CMD_GLOBAL_ERROR) {
             error_cmd = true;
         }
         if (ret_code == MessageProcessingResult::ERROR_RESULT && state == FederateStates::ERRORED) {
@@ -1248,13 +1220,12 @@ void FederateState::callbackProcessing() noexcept
         if (initError) {
             ret_code = MessageProcessingResult::ERROR_RESULT;
         }
-        if (returnableResult(ret_code))
-        {
-            callbackReturnResult(cState, ret_code,state.load());
-            cState=state.load();
+        if (returnableResult(ret_code)) {
+            callbackReturnResult(cState, ret_code, state.load());
+            cState = state.load();
         }
         cmd = queue.try_pop();
-    }   
+    }
 }
 
 MessageProcessingResult FederateState::processQueue() noexcept
@@ -2034,7 +2005,7 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             break;
         case defs::Flags::CALLBACK_FEDERATE:
             if (state == FederateStates::CREATED) {
-               mCallbackBased = value;
+                mCallbackBased = value;
             }
             break;
         case defs::Flags::IGNORE_TIME_MISMATCH_WARNINGS:

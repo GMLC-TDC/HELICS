@@ -163,7 +163,7 @@ class EmptyCore: public Core {
     virtual void setTranslatorOperator(InterfaceHandle translator,
                                        std::shared_ptr<TranslatorOperator> callback) override;
     virtual void setFederateOperator(LocalFederateId federateID,
-        std::shared_ptr<FederateOperator> callback) override;
+                                     std::shared_ptr<FederateOperator> callback) override;
     /** get the local identifier for the core*/
     virtual const std::string& getIdentifier() const override;
     virtual const std::string& getAddress() const override;

@@ -760,7 +760,7 @@ class Core {
     @param callback pointer to the operator class executing the federate
     */
     virtual void setFederateOperator(LocalFederateId fed,
-        std::shared_ptr<FederateOperator> callback) = 0;
+                                     std::shared_ptr<FederateOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

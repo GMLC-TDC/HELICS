@@ -65,15 +65,14 @@ class FederateState {
     LocalFederateId local_id;  //!< id code for the local federate descriptor
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
   private:
-      //!< the current state of the federate
-    std::atomic<FederateStates> state{
-        FederateStates::CREATED};  
+    //!< the current state of the federate
+    std::atomic<FederateStates> state{FederateStates::CREATED};
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
     bool mSourceOnly{false};  //!< flag indicating the federate is a source_only
-    bool mCallbackBased{false}; //!< flag indicating the federate is a callback federate
+    bool mCallbackBased{false};  //!< flag indicating the federate is a callback federate
     /// flag indicating that inputs should have strict type checking
     bool strict_input_type_checking{false};
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
@@ -140,7 +139,7 @@ class FederateState {
 
     /** a callback for additional queries */
     std::function<std::string(std::string_view)> queryCallback;
-    std::shared_ptr<FederateOperator> fedCallbacks; //!< storage for a callback federate
+    std::shared_ptr<FederateOperator> fedCallbacks;  //!< storage for a callback federate
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     std::atomic<bool> queueProcessing{false};
     /** find the next Value Event*/
@@ -278,7 +277,8 @@ class FederateState {
     /** get the number of tags associated with an interface*/
     auto tagCount() const { return tags.size(); }
     /** return true if the federate is callback based*/
-    bool isCallbackFederate() const {return mCallbackBased;}
+    bool isCallbackFederate() const { return mCallbackBased; }
+
   private:
     /** process the federate queue until returnable event
     @details processQueue will process messages until one of 3 things occur
@@ -336,9 +336,12 @@ class FederateState {
 
     /** run the processing but don't block assuming a callback based federate*/
     void callbackProcessing() noexcept;
-    void callbackReturnResult(FederateStates lastState,  MessageProcessingResult result, FederateStates newState) noexcept;
+    void callbackReturnResult(FederateStates lastState,
+                              MessageProcessingResult result,
+                              FederateStates newState) noexcept;
     void initCallbackProcessing();
     void execCallbackProcessing(IterationResult result);
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }
@@ -428,8 +431,11 @@ class FederateState {
     void setLogger(std::function<void(int, std::string_view, std::string_view)> logFunction);
 
     /** set the federate callback operator
-    */
-    void setCallbackOperator(std::shared_ptr<FederateOperator> fed){ fedCallbacks=std::move(fed);}
+     */
+    void setCallbackOperator(std::shared_ptr<FederateOperator> fed)
+    {
+        fedCallbacks = std::move(fed);
+    }
 
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)

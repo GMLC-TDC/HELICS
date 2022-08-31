@@ -391,13 +391,11 @@ void CommonCore::globalError(LocalFederateId federateID,
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
-    if (fed->isCallbackFederate())
-    {
-        setActionFlag(m,indicator_flag);
+    if (fed->isCallbackFederate()) {
+        setActionFlag(m, indicator_flag);
     }
     addActionMessage(m);
-    if (fed->isCallbackFederate())
-    {
+    if (fed->isCallbackFederate()) {
         return;
     }
     fed->addAction(m);
@@ -429,13 +427,11 @@ void CommonCore::localError(LocalFederateId federateID, int errorCode, std::stri
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
-    if (fed->isCallbackFederate())
-    {
-        setActionFlag(m,indicator_flag);
+    if (fed->isCallbackFederate()) {
+        setActionFlag(m, indicator_flag);
     }
     addActionMessage(m);
-    if (fed->isCallbackFederate())
-    {
+    if (fed->isCallbackFederate()) {
         return;
     }
     fed->addAction(m);
@@ -475,7 +471,7 @@ void CommonCore::finalize(LocalFederateId federateID)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid finalize"));
     }
-    
+
     auto cbrokerState = getBrokerState();
     switch (cbrokerState) {
         case BrokerState::TERMINATED:
@@ -495,19 +491,14 @@ void CommonCore::finalize(LocalFederateId federateID)
             addActionMessage(bye);
         } break;
     }
-    if (fed->isCallbackFederate())
-    {
-        if (fed->getState() == FederateStates::CREATED)
-        {
+    if (fed->isCallbackFederate()) {
+        if (fed->getState() == FederateStates::CREATED) {
             fed->finalize();
         }
-        //else just let the normal callback operation take place
-    }
-    else
-    {
+        // else just let the normal callback operation take place
+    } else {
         fed->finalize();
     }
-    
 }
 
 bool CommonCore::allInitReady() const
@@ -599,14 +590,12 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
 
     bool exp = false;
     // only enter this loop once per federate
-    if (fed->init_requested.compare_exchange_strong(
-            exp, true)) {  
+    if (fed->init_requested.compare_exchange_strong(exp, true)) {
         ActionMessage m(CMD_INIT);
         m.source_id = fed->global_id.load();
         addActionMessage(m);
 
-        if (!fed->isCallbackFederate())
-        {
+        if (!fed->isCallbackFederate()) {
             auto check = fed->enterInitializingMode();
             if (check != IterationResult::NEXT_STEP) {
                 fed->init_requested = false;
@@ -633,8 +622,7 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     if (FederateStates::INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
-    if (fed->isCallbackFederate())
-    {
+    if (fed->isCallbackFederate()) {
         throw(InvalidFunctionCall("this operation is not permitted for callback based federates"));
     }
     // do an exec check on the fed to process previously received messages so it can't get in a
@@ -801,9 +789,9 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequest"));
     }
-    if (fed->isCallbackFederate())
-    {
-        throw(InvalidFunctionCall("Time request operation is not permitted for callback based federates"));
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "Time request operation is not permitted for callback based federates"));
     }
     auto cBrokerState = getBrokerState();
     switch (cBrokerState) {
@@ -855,9 +843,9 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequestIterative"));
     }
-    if (fed->isCallbackFederate())
-    {
-        throw(InvalidFunctionCall("Time request iterative operation is not permitted for callback based federates"));
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "Time request iterative operation is not permitted for callback based federates"));
     }
     switch (fed->getState()) {
         case FederateStates::EXECUTING:
@@ -914,9 +902,9 @@ void CommonCore::processCommunications(LocalFederateId federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (processCommunications)"));
     }
-    if (fed->isCallbackFederate())
-    {
-        throw(InvalidFunctionCall("process Comms operation is not permitted for callback based federates"));
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "process Comms operation is not permitted for callback based federates"));
     }
     switch (fed->getState()) {
         case FederateStates::FINISHED:
@@ -2460,9 +2448,8 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     actionQueue.push(transOpUpdate);
 }
 
-
 void CommonCore::setFederateOperator(LocalFederateId federateID,
-    std::shared_ptr<FederateOperator> callbacks)
+                                     std::shared_ptr<FederateOperator> callbacks)
 {
     static std::shared_ptr<FederateOperator> nullFederate =
         std::make_shared<NullFederateOperator>();
@@ -2479,11 +2466,10 @@ void CommonCore::setFederateOperator(LocalFederateId federateID,
     }
     auto ii = getNextAirlockIndex();
     dataAirlocks[ii].load(std::move(callbacks));
-   fedOpUpdate.counter = ii;
+    fedOpUpdate.counter = ii;
     fedOpUpdate.source_id = fed->global_id.load();
     actionQueue.push(fedOpUpdate);
 }
-
 
 void CommonCore::setIdentifier(std::string_view name)
 {
@@ -4477,15 +4463,12 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
                                  cmd.payload.to_string());
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed != loopFederates.end()) {
-                        if (checkActionFlag(cmd, indicator_flag))
-                        {
+                        if (checkActionFlag(cmd, indicator_flag)) {
                             fed->fed->addAction(cmd);
-                        }
-                        else
-                        {
+                        } else {
                             fed->state = OperatingState::ERROR_STATE;
                         }
-                        
+
                     } else if (cmd.source_id == filterFedID) {
                         filterFed->handleMessage(cmd);
                         // filterFed->
@@ -4789,11 +4772,10 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                 auto op = dataAirlocks[cmd.counter].try_unload();
                 if (op) {
                     try {
-                        
                         auto* fed = getFederateCore(cmd.source_id);
-                        if (fed != nullptr)
-                        {
-                            auto FO = std::any_cast<std::shared_ptr<FederateOperator>>(std::move(*op));
+                        if (fed != nullptr) {
+                            auto FO =
+                                std::any_cast<std::shared_ptr<FederateOperator>>(std::move(*op));
                             fed->setCallbackOperator(std::move(FO));
                         }
                     }

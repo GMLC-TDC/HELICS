@@ -69,8 +69,7 @@ enum class MessageProcessingResult : std::int8_t {
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
     /// indicator that there was a return request but no other conditions or issues
-    USER_RETURN =
-        5,  
+    USER_RETURN = 5,
     ERROR_RESULT = 7,  //!< indicator that an error has occurred
     REPROCESS_MESSAGE = 8,  // indicator that the message needs to be processed again
     BUSY = 10,  // indicator that processing could not be done since the resource was busy
@@ -94,8 +93,8 @@ enum class IterationRequest : signed char {
     NO_ITERATIONS = 0,  //!< indicator that the iterations have completed
     FORCE_ITERATION = 1,  //!< force an iteration whether it is needed or not
     ITERATE_IF_NEEDED = 2,  //!< indicator that the iterations need to continue
-    HALT_OPERATIONS = 3,   //!< indicator that the federate should halt
-    ERROR_CONDITION = 7    //!< indicator that the federate has errored and co-simulation should stop
+    HALT_OPERATIONS = 3,  //!< indicator that the federate should halt
+    ERROR_CONDITION = 7  //!< indicator that the federate has errored and co-simulation should stop
 };
 
 /** define the type of the handle*/

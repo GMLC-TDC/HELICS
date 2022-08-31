@@ -92,9 +92,8 @@ class HELICS_CXX_EXPORT Federate {
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time mCurrentTime = Time::minVal();  //!< the current simulation time
   private:
-      /// pointer to a class defining the async call information
-    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
-        asyncCallInfo;  
+    /// pointer to a class defining the async call information
+    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
@@ -104,7 +103,8 @@ class HELICS_CXX_EXPORT Federate {
     std::function<void(bool)> initializingEntryCallback;
     std::function<void()> executingEntryCallback;
     std::function<void()> cosimulationTerminationCallback;
-    std::function<void(int,std::string_view)> errorHandlerCallback;
+    std::function<void(int, std::string_view)> errorHandlerCallback;
+
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
@@ -335,7 +335,8 @@ class HELICS_CXX_EXPORT Federate {
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
 
     /** register a callback function to call when the system enters initializingMode
-    @details this callback will execute in the calling thread just prior to returning control to the caller
+    @details this callback will execute in the calling thread just prior to returning control to the
+    caller
     @param callback the function to call; the function signature is void(bool) where the
      boolean is set to true if the iterating
     to true if the request is possibly iterating
@@ -343,9 +344,9 @@ class HELICS_CXX_EXPORT Federate {
     void setInitializingEntryCallback(std::function<void(bool)> callback);
 
     /** register a callback function to call when the system enters executingMode
-    @details this callback will execute once in the calling thread just prior to calling timeUpdateCallback for the first time
-    and
-    @param callback the function to call; the function signature is void(void) 
+    @details this callback will execute once in the calling thread just prior to calling
+    timeUpdateCallback for the first time and
+    @param callback the function to call; the function signature is void(void)
     */
     void setExecutingEntryCallback(std::function<void()> callback);
 
@@ -388,17 +389,19 @@ class HELICS_CXX_EXPORT Federate {
     void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
 
     /** register a callback function to call when the cosimulation is completed for this federate
-    @details this callback will execute once when time has reached max value or when finalize is called
-    and
-    @param callback the function to call; the function signature is void(void) 
+    @details this callback will execute once when time has reached max value or when finalize is
+    called and
+    @param callback the function to call; the function signature is void(void)
     */
     void setCosimulationTerminatedCallback(std::function<void()> callback);
 
     /** register a callback function that executes when an error is generated
-   @details if set this function will execute instead of throwing an exception in some cases( NOTE: this is currently only used for callback federates)
-    @param callback the function to call; the function signature is void(int errorCode, std::string_view errorString)
+   @details if set this function will execute instead of throwing an exception in some cases( NOTE:
+   this is currently only used for callback federates)
+    @param callback the function to call; the function signature is void(int errorCode,
+   std::string_view errorString)
     */
-    void setErrorHandlerCallback(std::function<void(int,std::string_view)> errorHandlerCallback);
+    void setErrorHandlerCallback(std::function<void(int, std::string_view)> errorHandlerCallback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -700,15 +703,15 @@ received
     int getTranslatorCount() const;
 
   protected:
-      /** function to run required operations for entering initializingMode*/
-      void enteringInitializingMode(IterationResult iterating);
+    /** function to run required operations for entering initializingMode*/
+    void enteringInitializingMode(IterationResult iterating);
 
-      /** function to run required operations for entering executing Mode*/
-      void enteringExecutingMode(IterationResult res);
-      /** function tor run required operations when finalizing*/
-      void finalizeOperations();
-      void preTimeRequestOperations(Time nextStep, bool iterating);
-      void postTimeRequestOperations(Time newTime, bool iterating);
+    /** function to run required operations for entering executing Mode*/
+    void enteringExecutingMode(IterationResult res);
+    /** function tor run required operations when finalizing*/
+    void finalizeOperations();
+    void preTimeRequestOperations(Time nextStep, bool iterating);
+    void postTimeRequestOperations(Time newTime, bool iterating);
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
     /** function to deal with any operations that need to occur on the transition from startup to
@@ -728,6 +731,7 @@ received
     /** process an error */
     void handleError(int errorCode, std::string_view errorString, bool noThrow);
     void setAsyncCheck(std::function<bool()> asyncCheck);
+
   public:
     /** register a set of interfaces defined in a file
     @details call is only valid in startup mode
@@ -748,7 +752,7 @@ received
     Modes getCurrentMode() const noexcept { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
-    Time getCurrentTime() const noexcept{ return mCurrentTime; }
+    Time getCurrentTime() const noexcept { return mCurrentTime; }
     /** get the federate name*/
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/
