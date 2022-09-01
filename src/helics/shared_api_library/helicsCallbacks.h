@@ -365,23 +365,6 @@ HELICS_EXPORT void helicsCallbackFederateInitializeCallback(HelicsFederate fed,
                                                             void* userdata,
                                                             HelicsError* err);
 
-/**
-* Set callback for error handling
-*
-* @details This callback will be when a federate error is encountered
-*
-* @param fed The federate to set the callback for.
-* @param errorHandler A callback with signature void(int errorCode, const char *errorString, void *userdata);
-*
-* @param userdata A pointer to user data that is passed to the function when executing.
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-
-*/
-HELICS_EXPORT void helicsFederateErrorHandlerCallback(HelicsFederate fed,
-                                                      void (*errorHandler)(int errorCode, const char* errorString, void* userdata),
-                                                      void* userdata,
-                                                      HelicsError* err);
 
 /**
  * Set the data for a query callback.

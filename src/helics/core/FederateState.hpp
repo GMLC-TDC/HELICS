@@ -116,6 +116,7 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
+    IterationRequest lastIterationRequest{IterationRequest::NO_ITERATIONS};
     /// the time keeping method in use
     TimeSynchronizationMethod timeMethod{TimeSynchronizationMethod::DISTRIBUTED};
     /** counter for the number of times time or execution mode has been granted */
@@ -341,7 +342,10 @@ class FederateState {
                               FederateStates newState) noexcept;
     void initCallbackProcessing();
     void execCallbackProcessing(IterationResult result);
-
+    /** update the data and time after being granted Exec entry*/
+    void updateDataforExecEntry(MessageProcessingResult result, IterationRequest iterate);
+    /** update the data and time after being granted time request*/
+    void updateDataforTimeReturn(MessageProcessingResult result,Time nextTime, IterationRequest iterate);
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }

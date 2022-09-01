@@ -24,6 +24,8 @@
     commandInterface
     iteration
     aliases
+    callbacks
+    CallbackFederates
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the
@@ -56,3 +58,5 @@ The Advanced Topics will cover:
 - [**Timeouts**](./timeouts.md) - HELICS includes a number of timeouts to prevent failed operations from continuing indefinitely, the various timeout options are discussed in this document.
 - [**Command Interface**](./commandInterface.md) - HELICS v3 introduced the command interface as a method of asynchronously communicating between federates.
 - [\*_Aliases_](./aliases.md) - HELICS 3.3 introduced the notion of aliases. Aliases allow a mapping of an interface key to a different string.
+- [\*_Callbacks_](./callbacks.md) - Over time a numnber of callbacks have been added for various operations and stages of the life cycle of a federate.  This document describes the different callbacks available. 
+- [\*_Callbacks Federates_](./CallbackFederate.md) - HELICS 3.3 introduced a beta test for callback federates which allow a federate to operate purely inline with a core based solely on callbacks.  This can allow much higher number of federates on a give system than was previously possible.  
