@@ -509,7 +509,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
         }
 
         auto ret = processQueue();
-       updateDataforExecEntry(ret,iterate);
+        updateDataforExecEntry(ret, iterate);
         unlock();
 #ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (ret == MessageProcessingResult::NEXT_STEP)) {
@@ -561,7 +561,6 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
     return ret;
 }
 
-
 void FederateState::updateDataforExecEntry(MessageProcessingResult result, IterationRequest iterate)
 {
     ++mGrantCount;
@@ -574,25 +573,25 @@ void FederateState::updateDataforExecEntry(MessageProcessingResult result, Itera
     }
     if (result != MessageProcessingResult::ERROR_RESULT) {
         switch (iterate) {
-        case IterationRequest::FORCE_ITERATION:
-            fillEventVectorNextIteration(time_granted);
-            break;
-        case IterationRequest::ITERATE_IF_NEEDED:
-            if (result == MessageProcessingResult::NEXT_STEP) {
-                fillEventVectorUpTo(time_granted);
-            } else {
+            case IterationRequest::FORCE_ITERATION:
                 fillEventVectorNextIteration(time_granted);
-            }
-            break;
-        case IterationRequest::NO_ITERATIONS:
-            if (wait_for_current_time) {
-                fillEventVectorInclusive(time_granted);
-            } else {
-                fillEventVectorUpTo(time_granted);
-            }
-            break;
-        default:
-            break;
+                break;
+            case IterationRequest::ITERATE_IF_NEEDED:
+                if (result == MessageProcessingResult::NEXT_STEP) {
+                    fillEventVectorUpTo(time_granted);
+                } else {
+                    fillEventVectorNextIteration(time_granted);
+                }
+                break;
+            case IterationRequest::NO_ITERATIONS:
+                if (wait_for_current_time) {
+                    fillEventVectorInclusive(time_granted);
+                } else {
+                    fillEventVectorUpTo(time_granted);
+                }
+                break;
+            default:
+                break;
         }
     }
 }
@@ -674,8 +673,8 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
 #endif
         auto ret = processQueue();
-       updateDataforTimeReturn(ret,nextTime,iterate);
-       iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
+        updateDataforTimeReturn(ret, nextTime, iterate);
+        iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
 #ifndef HELICS_DISABLE_ASIO
         if (realtime) {
             if (rt_lag < Time::maxVal()) {
@@ -730,8 +729,9 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
     return {time_granted, ret};
 }
 
-
-void FederateState::updateDataforTimeReturn(MessageProcessingResult result,Time nextTime, IterationRequest iterate)
+void FederateState::updateDataforTimeReturn(MessageProcessingResult result,
+                                            Time nextTime,
+                                            IterationRequest iterate)
 {
     ++mGrantCount;
     if (result == MessageProcessingResult::HALTED) {
@@ -746,24 +746,24 @@ void FederateState::updateDataforTimeReturn(MessageProcessingResult result,Time 
 
     // now fill the event vector so external systems know what has been updated
     switch (iterate) {
-    case IterationRequest::FORCE_ITERATION:
-        fillEventVectorNextIteration(time_granted);
-        break;
-    case IterationRequest::ITERATE_IF_NEEDED:
-        if (time_granted < nextTime || wait_for_current_time) {
+        case IterationRequest::FORCE_ITERATION:
             fillEventVectorNextIteration(time_granted);
-        } else {
-            fillEventVectorUpTo(time_granted);
-        }
-        break;
-    case IterationRequest::NO_ITERATIONS:
-        if (time_granted < nextTime || wait_for_current_time) {
-            fillEventVectorInclusive(time_granted);
-        } else {
-            fillEventVectorUpTo(time_granted);
-        }
+            break;
+        case IterationRequest::ITERATE_IF_NEEDED:
+            if (time_granted < nextTime || wait_for_current_time) {
+                fillEventVectorNextIteration(time_granted);
+            } else {
+                fillEventVectorUpTo(time_granted);
+            }
+            break;
+        case IterationRequest::NO_ITERATIONS:
+            if (time_granted < nextTime || wait_for_current_time) {
+                fillEventVectorInclusive(time_granted);
+            } else {
+                fillEventVectorUpTo(time_granted);
+            }
 
-        break;
+            break;
     }
 }
 
@@ -1050,7 +1050,7 @@ void FederateState::initCallbackProcessing()
         default: {
             ActionMessage exec(CMD_EXEC_REQUEST);
             exec.source_id = global_id.load();
-            exec.dest_id=global_id.load();
+            exec.dest_id = global_id.load();
             setIterationFlags(exec, initIter);
             setActionFlag(exec, indicator_flag);
             mParent->addActionMessage(exec);
@@ -1070,7 +1070,7 @@ void FederateState::initCallbackProcessing()
             mParent->addActionMessage(bye);
             break;
     }
-    lastIterationRequest=initIter;
+    lastIterationRequest = initIter;
 }
 
 void FederateState::execCallbackProcessing(IterationResult result)
@@ -1083,7 +1083,7 @@ void FederateState::execCallbackProcessing(IterationResult result)
         default: {
             ActionMessage treq(CMD_TIME_REQUEST);
             treq.source_id = global_id.load();
-            treq.dest_id=treq.source_id;
+            treq.dest_id = treq.source_id;
             treq.actionTime = execIter.first;
             setIterationFlags(treq, execIter.second);
             setActionFlag(treq, indicator_flag);
@@ -1104,7 +1104,7 @@ void FederateState::execCallbackProcessing(IterationResult result)
             mParent->addActionMessage(bye);
             break;
     }
-    lastIterationRequest=execIter.second;
+    lastIterationRequest = execIter.second;
 }
 
 void FederateState::callbackReturnResult(FederateStates lastState,
@@ -1142,16 +1142,18 @@ void FederateState::callbackReturnResult(FederateStates lastState,
                 break;
             case FederateStates::INITIALIZING: {
                 if (newState == FederateStates::INITIALIZING) {
-                    updateDataforExecEntry(result,lastIterationRequest);
+                    updateDataforExecEntry(result, lastIterationRequest);
                     initCallbackProcessing();
                 } else {
-                    updateDataforExecEntry(result,lastIterationRequest);
+                    updateDataforExecEntry(result, lastIterationRequest);
                     execCallbackProcessing(IterationResult::NEXT_STEP);
                 }
             } break;
                 break;
             case FederateStates::EXECUTING:
-                updateDataforTimeReturn(result,timeCoord->getRequestedTime(),lastIterationRequest);
+                updateDataforTimeReturn(result,
+                                        timeCoord->getRequestedTime(),
+                                        lastIterationRequest);
                 execCallbackProcessing(result == MessageProcessingResult::ITERATING ?
                                            IterationResult::ITERATING :
                                            IterationResult::NEXT_STEP);

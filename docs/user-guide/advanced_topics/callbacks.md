@@ -1,8 +1,8 @@
 # Callbacks
 
-Federates have a number of callbacks that can be specified that trigger under different stages of the cosimulation operation or conditions.  These callbacks can be used to simplify the managments of a federate or enable new capabilities to be integrated with HELICS.  This document is a listing and description of the callbacks available on Value, Message, and Combination Federates.  Callbacks are specific user code that is executed inline with other HELICS operations.
+Federates have a number of callbacks that can be specified that trigger under different stages of the cosimulation operation or conditions. These callbacks can be used to simplify the managments of a federate or enable new capabilities to be integrated with HELICS. This document is a listing and description of the callbacks available on Value, Message, and Combination Federates. Callbacks are specific user code that is executed inline with other HELICS operations.
 
-In C++ the callbacks generally take a std::function object which can be structured as a lambda or direct object.  In C and language API's the callback is structured as a function pointer, and pass through a userData object into the callback.  HELICS does not do anything with the userData other than pass it through.  
+In C++ the callbacks generally take a std::function object which can be structured as a lambda or direct object. In C and language API's the callback is structured as a function pointer, and pass through a userData object into the callback. HELICS does not do anything with the userData other than pass it through.
 
 ## Specific purpose callbacks
 
@@ -26,11 +26,11 @@ void
 
 ```
 
-The main arguments to the callback are a loglevel integer code corresponding to log levels in HELICS.  A string identifier, and a log message.  
+The main arguments to the callback are a loglevel integer code corresponding to log levels in HELICS. A string identifier, and a log message.
 
 ### Query Callback
 
-The query callback allows a federate to respond to custom queries.  If a federate receives a query that it does not know the answer two it executes the query callback if supplied.  In C++ the return function is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer. 
+The query callback allows a federate to respond to custom queries. If a federate receives a query that it does not know the answer two it executes the query callback if supplied. In C++ the return function is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer.
 
 ```C++
 void setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction);
@@ -47,7 +47,7 @@ void
 
 ### Error Handler Callback
 
-The error handler callback will be executed when an error is encountered and includes arguments for an integer error code and an error message. 
+The error handler callback will be executed when an error is encountered and includes arguments for an integer error code and an error message.
 
 ```C++
 void setErrorHandlerCallback(std::function<void(int, std::string_view)> errorHandlerCallback);
@@ -61,14 +61,14 @@ void helicsFederateErrorHandlerCallback(HelicsFederate fed,
 
 ```
 
-
 ## LifeCycle Callbacks
 
 Life Cycle callbacks occur at specific stages or transitions in a co-simulation
 
 ### Initializing Mode Entry
 
-The InitializingEntry callback is executed when moving into initalizing mode.  The boolean parameter indicates whether this is iterative.  It is set to false the first time this callback is executed (when moving from CREATED mode) and true if returning to this mode from an enterExecutingModeIterative Call.  
+The InitializingEntry callback is executed when moving into initializing mode. The boolean parameter indicates whether this is iterative. It is set to false the first time this callback is executed (when moving from CREATED mode) and true if returning to this mode from an enterExecutingModeIterative Call.
+
 ```C++
 void setInitializingEntryCallback(std::function<void(bool)> callback);
 ```
@@ -82,7 +82,8 @@ void helicsFederateInitializingEntryCallback(HelicsFederate fed,
 
 ### Executing Entry
 
-This callback is executed exactly once, when moving from INITIALIZING to EXECUTING mode and has no parameters. 
+This callback is executed exactly once, when moving from INITIALIZING to EXECUTING mode and has no parameters.
+
 ```C++
 void setExecutingEntryCallback(std::function<void()> callback);
 ```
@@ -94,7 +95,7 @@ void
 
 ### Time Request Entry
 
-This callback is executed on a time Request call, prior to calling the blocking Core API call.  The arguments are the current Time of the federate, the requested time, and whether an iterative call is being made.  
+This callback is executed on a time Request call, prior to calling the blocking Core API call. The arguments are the current Time of the federate, the requested time, and whether an iterative call is being made.
 
 ```C++
 void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
@@ -110,7 +111,7 @@ void helicsFederateSetTimeRequestEntryCallback(
 
 ### Time Update
 
-The time update callback is executed after the Core API returns from a timeRequest, and prior to any value based callbacks executing or have been updated.  The arguments are the new time and the boolean argument will be set to true if this is an iterative time. 
+The time update callback is executed after the Core API returns from a timeRequest, and prior to any value based callbacks executing or have been updated. The arguments are the new time and the boolean argument will be set to true if this is an iterative time.
 
 ```C++
 void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
@@ -123,10 +124,9 @@ void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
                                                        HelicsError* err);
 ```
 
-
 ### Time Request Return
 
-The Time request return callback will execute as the last operation prior to return from a time request.  It executes after all value based callbacks, and like the Time update contains arguments for the new time and an indicator if the time is iterative.  
+The Time request return callback will execute as the last operation prior to return from a time request. It executes after all value based callbacks, and like the Time update contains arguments for the new time and an indicator if the time is iterative.
 
 ```C++
 void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
@@ -142,7 +142,7 @@ void
 
 ### Mode update
 
-The mode update callback executes whenever the Mode of the federate changes. It will execute prior to timeUpdateCallback when both would be called.  
+The mode update callback executes whenever the Mode of the federate changes. It will execute prior to timeUpdateCallback when both would be called.
 The arguments are the old and new Modes.
 
 ```C++
@@ -157,11 +157,11 @@ The arguments are the old and new Modes.
                                          HelicsError* err);
 ```
 
-NOTE:  notice the different names between the C and C++ API's, this discrepency is noted and will be corrected in a future release, likely a potential HELICS 4.0 but for now retains the consistency internal to the individual API's.
+NOTE: notice the different names between the C and C++ API's, this discrepancy is noted and will be corrected in a future release, likely a potential HELICS 4.0 but for now retains the consistency internal to the individual API's.
 
 ### Termination
 
-This callback will execute exactly once when the finalize or error state is reached.  
+This callback will execute exactly once when the finalize or error state is reached.
 
 ```C++
 void setCosimulationTerminatedCallback(std::function<void()> callback);
@@ -176,7 +176,7 @@ void helicsFederateCosimulationTerminationCallback(HelicsFederate fed,
 
 ## Value Federate Callbacks
 
-These callback will execute when an input is update and can be general for all inputs or specifc to a single one.  This callback is not currently avaialable in the C API.
+These callback will execute when an input is update and can be general for all inputs or specific to a single one. This callback is not currently available in the C API.
 
 ```C++
     void setInputNotificationCallback(std::function<void(Input&, Time)> callback);
@@ -184,10 +184,9 @@ These callback will execute when an input is update and can be general for all i
     void setInputNotificationCallback(Input& inp, std::function<void(Input&, Time)> callback);
 ```
 
-
 ## Message Federate Callbacks
 
-These callback will execute when an endpoint is updated and can be general for all endpoints or specifc to a single one. This callback is not currently avaialable in the C API.
+These callback will execute when an endpoint is updated and can be general for all endpoints or specific to a single one. This callback is not currently available in the C API.
 
 ```C++
 void setMessageNotificationCallback(const std::function<void(Endpoint&, Time)>& callback);

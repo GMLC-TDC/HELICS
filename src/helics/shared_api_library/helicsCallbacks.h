@@ -365,7 +365,6 @@ HELICS_EXPORT void helicsCallbackFederateInitializeCallback(HelicsFederate fed,
                                                             void* userdata,
                                                             HelicsError* err);
 
-
 /**
  * Set the data for a query callback.
  *

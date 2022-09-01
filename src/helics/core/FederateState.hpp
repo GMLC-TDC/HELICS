@@ -345,7 +345,10 @@ class FederateState {
     /** update the data and time after being granted Exec entry*/
     void updateDataforExecEntry(MessageProcessingResult result, IterationRequest iterate);
     /** update the data and time after being granted time request*/
-    void updateDataforTimeReturn(MessageProcessingResult result,Time nextTime, IterationRequest iterate);
+    void updateDataforTimeReturn(MessageProcessingResult result,
+                                 Time nextTime,
+                                 IterationRequest iterate);
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }
