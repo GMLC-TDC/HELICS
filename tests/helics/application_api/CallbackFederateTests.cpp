@@ -14,6 +14,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
+#include <stdexcept>
 
 #include <future>
 #include <gtest/gtest.h>
@@ -159,7 +160,7 @@ TEST_F(callbackFed, initException)
     SetupTest<helics::CallbackFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     vFed1->setInitializeCallback(
-        []() -> helics::IterationRequest { throw std::exception("ETEST"); });
+        []() -> helics::IterationRequest { throw std::runtime_error("ETEST"); });
 
     auto v = std::make_shared<std::promise<std::string>>();
     auto vfut = v->get_future();
@@ -222,7 +223,7 @@ TEST_F(callbackFed, timeStepException)
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
-            throw std::exception("ETEST");
+            throw std::runtime_error("ETEST");
         }
 
         return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);

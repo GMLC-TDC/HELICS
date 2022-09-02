@@ -90,7 +90,7 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
     virtual void setProperty(int32_t property, double val) override;
     virtual void setProperty(int32_t property, Time val) override;
     virtual void setFlagOption(int32_t property, bool val) override;
-    virtual Time getTimeProperty(int32_t property);
+    virtual Time getTimeProperty(int32_t property) const override;
 
   private:
     void loadOperator();

@@ -694,6 +694,8 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
             }
 
             break;
+          default:
+                break;
     }
 
     switch (ret) {
@@ -1124,6 +1126,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
                     }
                 }
             }
+            break;
+        default:
             break;
     }
     if (!dynamicJoining) {

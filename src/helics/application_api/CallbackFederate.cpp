@@ -154,7 +154,7 @@ void CallbackFederate::setFlagOption(int32_t property, bool val)
     Federate::setFlagOption(property, val);
 }
 
-Time CallbackFederate::getTimeProperty(int32_t property)
+Time CallbackFederate::getTimeProperty(int32_t property) const
 {
     if (property == HELICS_PROPERTY_TIME_MAXTIME) {
         return mFinalTime;

@@ -762,7 +762,8 @@ void FederateState::updateDataforTimeReturn(MessageProcessingResult result,
             } else {
                 fillEventVectorUpTo(time_granted);
             }
-
+            break;
+        default:
             break;
     }
 }
