@@ -14,10 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/CoreFactory.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "testFixtures.hpp"
-#include <stdexcept>
 
 #include <future>
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 class callbackFed: public ::testing::Test, public FederateTestFixture {};
 
