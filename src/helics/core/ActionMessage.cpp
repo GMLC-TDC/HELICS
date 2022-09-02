@@ -947,7 +947,7 @@ void setIterationFlags(ActionMessage& command, IterationRequest iterate)
         default:
             break;
         case IterationRequest::ERROR_CONDITION:
-            setActionFlag(command,error_flag);
+            setActionFlag(command, error_flag);
             break;
     }
 }

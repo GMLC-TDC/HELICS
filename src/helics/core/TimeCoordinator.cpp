@@ -694,8 +694,8 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
             }
 
             break;
-          default:
-                break;
+        default:
+            break;
     }
 
     switch (ret) {
