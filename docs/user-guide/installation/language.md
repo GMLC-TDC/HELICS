@@ -31,7 +31,7 @@ make install
 add the octave folder in the install directory to the octave path
 
 ```bash
->>helics
+>> helics
 >> helicsGetVersion()
 ans = 3.x.x (20XX-XX-XX)
 ```
@@ -43,3 +43,15 @@ Octave 4.2 will require swig 3.0.12, Octave 4.4 and 5.0 and higher will require 
 ## HELICS with C Sharp
 
 C\# is supported through SWIG. This requires swig being installed and generating the CMake for HELICS with HELICS_BUILD_CSHARP_INTERFACE=ON. If in Visual studio this will generate the appropriate files for C# usage.
+
+A suitable version of swig can be installed on macOS, Windows, or Linux using:
+
+```bash
+pip install swig
+```
+
+Depending on your build environment on Windows, using [Chocolatey](https://chocolatey.org/) to install swig might make it easier for the HELICS build scripts to automatically locate swig:
+
+```shell
+choco install swig
+```

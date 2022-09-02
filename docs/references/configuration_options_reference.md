@@ -803,7 +803,7 @@ These options are valid for subscriptions, inputs, and/or publications (generica
 
 ### `type` [null]
 
-HELICS supports data types and data type conversion ([as best it can](https://www.youtube.com/watch?v=mZOAn-3aATY)).
+HELICS supports data types and data type conversion ([as best it can](../developer-guide/typeConversions.md)).
 
 ---
 
@@ -861,7 +861,7 @@ _API:_ `helicsFederateInfoSetFlagOption`
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING` [414]
 
-When an interface requests a target it tries to find a match in the federation. If it cannot find a match at the time the federation is initialized, then the default is to generate a warning. This will not halt the federation but will display a log message. If the `connections_optional` flag is set on a federate all subsequent `addTarget` calls on any interface will not generate any message if the target is not available.x
+Generally, HELICS does [data type conversions where supported](../developer-guide/typeConversions.md) on connected value handles. That is, if a publication is specified as an `int` and the subscription is specified as a `double` HELICS will convert the value behind the scenes. Some of these conversions, though, may not be expected; for example, how is HELICS going to convert a complex value to a double? To ensure that no surprises take place in the data type conversion, setting this flag tells HELICS to require the sending and receiving handles to match in datatype. If they do not, an error is thrown and the co-simulation halts.
 
 ---
 
