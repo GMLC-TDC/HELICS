@@ -168,7 +168,8 @@ class FederateOperator {
     /**virtual destructor*/
     virtual ~FederateOperator() = default;
     /** perform any initialization operations
-    @return an iteration request if the federate desires to iterate on the enterExecutingMode operation*/
+    @return an iteration request if the federate desires to iterate on the enterExecutingMode
+    operation*/
     virtual IterationRequest initializeOperations() = 0;
 
     /** operate a federate timestep
@@ -179,10 +180,12 @@ class FederateOperator {
     /*NOTE: the following two functions will be called only once and they will be the last call in
      * the federate lifecycle*/
     /** operate any final operations on the federate*/
-    virtual void finalize(){}
+    virtual void finalize() {}
     /** run any operations for handling an error*/
     virtual void error_handler([[maybe_unused]] int error_code,
-                               [[maybe_unused]] std::string_view errorString){}
+                               [[maybe_unused]] std::string_view errorString)
+    {
+    }
 };
 
 /** class defining a federate that does nothing*/
