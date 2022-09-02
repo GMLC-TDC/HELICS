@@ -1,8 +1,8 @@
 # Callbacks
 
-Federates have a number of callbacks that can be specified that trigger under different stages of the cosimulation operation or conditions. These callbacks can be used to simplify the managments of a federate or enable new capabilities to be integrated with HELICS. This document is a listing and description of the callbacks available on Value, Message, and Combination Federates. Callbacks are specific user code that is executed inline with other HELICS operations.
+Federates have a number of callbacks that can be specified that trigger under different stages of the cosimulation operation or conditions. These callbacks can be used to simplify the managments of a federate or enable new capabilities to be integrated with HELICS. This document is a listing and description of the callbacks available on Value, Message, and Combination Federates. Callbacks are user-specified code that is executed inline with other HELICS operations.
 
-In C++ the callbacks generally take a std::function object which can be structured as a lambda or direct object. In C and language API's the callback is structured as a function pointer, and pass through a userData object into the callback. HELICS does not do anything with the userData other than pass it through.
+In C++, callbacks generally take a std::function object which can be structured as a lambda or direct object. In C and language API's the callback is structured as a function pointer, and pass through a userData object into the callback. HELICS does not manipulate the userData and simply passes it through.
 
 ## Specific purpose callbacks
 
@@ -30,7 +30,7 @@ The main arguments to the callback are a loglevel integer code corresponding to 
 
 ### Query Callback
 
-The query callback allows a federate to respond to custom queries. If a federate receives a query that it does not know the answer two it executes the query callback if supplied. In C++ the return function is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer.
+The query callback allows a federate to respond to custom queries. If a federate receives a query that it does not know the answer to, it executes the query callback if supplied. In C++ the return function is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer.
 
 ```C++
 void setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction);
@@ -95,7 +95,7 @@ void
 
 ### Time Request Entry
 
-This callback is executed on a time Request call, prior to calling the blocking Core API call. The arguments are the current Time of the federate, the requested time, and whether an iterative call is being made.
+This callback is executed on a time Request call, prior to calling the blocking Core API call. The arguments are the current time of the federate, the requested time, and whether an iterative call is being made.
 
 ```C++
 void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
