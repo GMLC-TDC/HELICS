@@ -6,7 +6,6 @@ Starting in HELICS v3.3 Callback federates were added as way to entirely inline 
 
 Callback federates allow the potential for a large number of small federates to execute in a core, up to 131,072 in each core. Trying this with normal federates rapidly exceeds the thread capacity of a typical system, so in the cases where the federate can be defined in terms of callbacks and has only a few simple connections and minimal computation the callback federate will be much more efficient. Since all callback federates execute serially internally to the core, the callback federate is not appropriate for federates with significant computation load as it will block the execution of the other callback federates.
 
-
 ## Additional Callbacks
 
 The Callback Federate adds a few additional callbacks necessary for operation.
