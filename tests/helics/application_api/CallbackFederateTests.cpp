@@ -83,7 +83,6 @@ TEST_F(callbackFed, timeSteps)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    helics::Time mTime = 3.0;
     vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
     vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
 
@@ -115,7 +114,6 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    helics::Time mTime = 3.0;
     vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
@@ -183,7 +181,6 @@ TEST_F(callbackFed, timeStepError)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    helics::Time mTime = 3.0;
     vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
     vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
 
@@ -217,7 +214,6 @@ TEST_F(callbackFed, timeStepException)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    helics::Time mTime = 3.0;
     vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
     vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
 

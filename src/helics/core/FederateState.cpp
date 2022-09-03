@@ -1202,7 +1202,6 @@ void FederateState::callbackProcessing() noexcept
         return;
     }
     auto cState = state.load();
-    auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
     while (returnableResult(ret_code)) {
@@ -1266,7 +1265,6 @@ MessageProcessingResult FederateState::processQueue() noexcept
     if (profilerActive) {
         generateProfilingMessage(true);
     }
-    auto ctime = time_granted;
     // process the delay Queue first
     auto ret_code = processDelayQueue();
 
