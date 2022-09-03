@@ -898,7 +898,13 @@ HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsErr
     if (fedObj == nullptr) {
         return HELICS_FALSE;
     }
-    return (fedObj->isAsyncOperationCompleted()) ? HELICS_TRUE : HELICS_FALSE;
+    try {
+        return (fedObj->isAsyncOperationCompleted()) ? HELICS_TRUE : HELICS_FALSE;
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+        return HELICS_FALSE;
+    }
 }
 
 void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err)
@@ -941,6 +947,11 @@ static helics::IterationRequest getIterationRequest(HelicsIterationRequest itera
 
         case HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED:
             return helics::IterationRequest::ITERATE_IF_NEEDED;
+        case HELICS_ITERATION_REQUEST_HALT_OPERATIONS:
+            return helics::IterationRequest::HALT_OPERATIONS; // LCOV_EXCL_LINE
+        case HELICS_ITERATION_REQUEST_ERROR:
+            return helics::IterationRequest::ERROR_CONDITION; // LCOV_EXCL_LINE
+
     }
 }
 

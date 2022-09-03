@@ -293,7 +293,7 @@ bool Federate::isAsyncOperationCompleted() const
         case Modes::PENDING_FINALIZE:
             return (asyncInfo->finalizeFuture.wait_for(wait_delay) == ready);
         default:
-            return (asyncInfo->asyncCheck()) ? asyncInfo->asyncCheck() : false;
+            return (asyncInfo->asyncCheck) ? asyncInfo->asyncCheck() : false;
     }
 }
 
