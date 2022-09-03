@@ -25,6 +25,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
+#include "gmlc/networking/interfaceOperations.hpp"
+#include "gmlc/networking/addressOperations.hpp"
 #include "../utilities/timeStringOps.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
 #include "indexPage.hpp"
@@ -945,17 +947,23 @@ void WebServer::processArgs(std::string_view args)
 {
     CLI::App parser("http web server parser");
     parser.allow_extras();
-    parser.add_option("--http_port", httpPort_, "specify the http port to use")
+    parser.add_option("--http_port", mHttpPort, "specify the http port to use")
         ->envname("HELICS_HTTP_PORT");
     parser.add_option("--http_interface",
-                      httpAddress_,
-                      "specify the interface to use for connecting an http server");
+                      mHttpAddress,
+                      "specify the interface to use for connecting an http server")->envname("HELICS_HTTP_ADDRESS");
 
-    parser.add_option("--websocket_port", websocketPort_, "specify the websocket port to use")
+    parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
     parser.add_option("--websocket_interface",
-                      websocketAddress_,
-                      "specify the interface to use for connecting a web server");
+                      mWebsocketAddress,
+                      "specify the interface to use for connecting a web server")->envname("HELICS_WEBSOCKET_ADDRESS");
+
+    parser
+        .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
+            mInterfaceNetwork,
+            "specify external interface to use, default is --local")
+        ->disable_flag_override()->envname("HELICS_WEBSERVER_INTERFACE");
 
     try {
         parser.parse(std::string(args));
@@ -1003,30 +1011,82 @@ void WebServer::stopServer()
 
 void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {
-    if (http_enabled_) {
+    if (mHttpEnabled) {
         if (config->isMember("http")) {
             auto V = (*config)["http"];
-            helics::fileops::replaceIfMember(V, "interface", httpAddress_);
-            helics::fileops::replaceIfMember(V, "port", httpPort_);
+            helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
+            helics::fileops::replaceIfMember(V, "port", mHttpPort);
+            bool external=helics::fileops::getOrDefault(V,"external",false);
+            helics::fileops::replaceIfMember(V,"all",external);
+            if (external)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
+            }
+
+            bool ipv4=helics::fileops::getOrDefault(V,"ipv4",false);
+
+            if (ipv4)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+            }
+            bool ipv6=helics::fileops::getOrDefault(V,"ipv6",false);
+            if (ipv6)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+            }
         }
-        auto const address = net::ip::make_address(httpAddress_);
+        mHttpAddress=gmlc::networking::generateMatchingInterfaceAddress(
+            mHttpAddress,
+            static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+        gmlc::networking::removeProtocol(mHttpAddress);
+        if (mHttpAddress == "*")
+        {
+            mHttpAddress="0.0.0.0";
+        }
+        auto const address = net::ip::make_address(mHttpAddress);
         // Create and launch a listening port
         std::make_shared<Listener>(context->ioc,
-                                   tcp::endpoint{address, static_cast<std::uint16_t>(httpPort_)})
+                                   tcp::endpoint{address, static_cast<std::uint16_t>(mHttpPort)})
             ->run();
     }
 
-    if (websocket_enabled_) {
+    if (mWebsocketEnabled) {
         if (config->isMember("websocket")) {
             auto V = (*config)["websocket"];
-            helics::fileops::replaceIfMember(V, "interface", websocketAddress_);
-            helics::fileops::replaceIfMember(V, "port", websocketPort_);
+            helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
+            helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
+            bool external=helics::fileops::getOrDefault(V,"external",false);
+            helics::fileops::replaceIfMember(V,"all",external);
+            if (external)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
+            }
+
+            bool ipv4=helics::fileops::getOrDefault(V,"ipv4",false);
+
+            if (ipv4)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+            }
+            bool ipv6=helics::fileops::getOrDefault(V,"ipv6",false);
+            if (ipv6)
+            {
+                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+            }
         }
-        auto const address = net::ip::make_address(websocketAddress_);
+        mWebsocketAddress=gmlc::networking::generateMatchingInterfaceAddress(
+            mWebsocketAddress,
+            static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+        gmlc::networking::removeProtocol(mWebsocketAddress);
+        if (mWebsocketAddress == "*")
+        {
+            mWebsocketAddress="0.0.0.0";
+        }
+        auto const address = net::ip::make_address(mWebsocketAddress);
         // Create and launch a listening port
         std::make_shared<Listener>(context->ioc,
                                    tcp::endpoint{address,
-                                                 static_cast<std::uint16_t>(websocketPort_)},
+                                                 static_cast<std::uint16_t>(mWebsocketPort)},
                                    true)
             ->run();
     }

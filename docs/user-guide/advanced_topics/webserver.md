@@ -15,7 +15,7 @@ helics_broker_server --http --zmq --duration 30minutes
 
 The `--duration` is optional and the default is 30 minutes but any time can be specified.
 
-The web server is configured by default on the localhost address port 80.
+The web server is configured by default on the localhost address port 43542 to prevent interference with the helics runner or other tools running on standard ports.
 If you want to configure this it can be done through a configuration file.
 The format is json.
 
@@ -45,6 +45,13 @@ $ helics_broker_server --web --zmq --http_server_args="--http_port=80"
 ```
 
 Arguments are passed to servers using an option in the form `--<server>_server_args`, and in that arg field `--<server>_port` and `--<server>_interface` are valid arguments. Valid server names are `http`, `websocket`, `zmq`, 'tcp', and `udp`, and eventually `mpi`. The http web server also acknowledges `HELICS_HTTP_PORT` as an environment variable. The websocket server acknowledges `HELICS_WEBSOCKET_PORT` for the port numbers of the respective servers.
+
+By default the webserver only runs on the localhost this can be modified by specifying the external address directly or by declaring `--external` in the arguments
+
+
+```shell-session
+$ helics_broker_server --web --zmq --http_server_args="--http_port=8080 --external"
+```
 
 ## REST API
 

@@ -6,8 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-namespace helics {
-namespace webserver {
+namespace helics::webserver {
 
     static constexpr const char* style =
         R"raw(<style>
@@ -559,11 +558,11 @@ table td {
         >HELICS Documentation</a
       ><br>
 
-<a href="https://docs.helics.org/en/latest/user-guide/webserver.html"
+<a href="https://docs.helics.org/en/latest/advanced_topics/webserver.html"
         >Using the web server</a
       ><br>
 
-<a href="https://docs.helics.org/en/latest/user-guide/queries.html"
+<a href="https://docs.helics.org/en/latest/user-guide/advanced_topics/queries.html"
         >Available queries</a
       ><br>
     </h2>
@@ -572,4 +571,3 @@ table td {
 )raw";
 
 }  // namespace webserver
-}  // namespace helics
