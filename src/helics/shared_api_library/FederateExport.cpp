@@ -948,10 +948,9 @@ static helics::IterationRequest getIterationRequest(HelicsIterationRequest itera
         case HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED:
             return helics::IterationRequest::ITERATE_IF_NEEDED;
         case HELICS_ITERATION_REQUEST_HALT_OPERATIONS:
-            return helics::IterationRequest::HALT_OPERATIONS; // LCOV_EXCL_LINE
+            return helics::IterationRequest::HALT_OPERATIONS;  // LCOV_EXCL_LINE
         case HELICS_ITERATION_REQUEST_ERROR:
-            return helics::IterationRequest::ERROR_CONDITION; // LCOV_EXCL_LINE
-
+            return helics::IterationRequest::ERROR_CONDITION;  // LCOV_EXCL_LINE
     }
 }
 

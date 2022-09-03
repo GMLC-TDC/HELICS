@@ -1119,14 +1119,12 @@ void FederateState::callbackReturnResult(FederateStates lastState,
                 case FederateStates::TERMINATING:
                     break;
                 case FederateStates::FINISHED:
-                    if (lastState != FederateStates::ERRORED)
-                    {
+                    if (lastState != FederateStates::ERRORED) {
                         fedCallbacks->finalize();
                     }
                     return;
                 case FederateStates::ERRORED:
-                    if (lastState != FederateStates::FINISHED)
-                    {
+                    if (lastState != FederateStates::FINISHED) {
                         fedCallbacks->error_handler(lastErrorCode(), lastErrorString());
                     }
                     return;
