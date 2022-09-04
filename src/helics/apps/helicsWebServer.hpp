@@ -19,7 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
 
-    
     class IocWrapper;
 
     /** a virtual class to use as a base for broker servers of various types*/

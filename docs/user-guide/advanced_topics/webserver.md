@@ -48,7 +48,6 @@ Arguments are passed to servers using an option in the form `--<server>_server_a
 
 By default the webserver only runs on the localhost this can be modified by specifying the external address directly or by declaring `--external` in the arguments
 
-
 ```shell-session
 $ helics_broker_server --web --zmq --http_server_args="--http_port=8080 --external"
 ```

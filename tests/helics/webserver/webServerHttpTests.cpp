@@ -382,10 +382,10 @@ TEST_F(httpTest, coreBody)
 TEST_F(httpTest, post)
 {
     std::string init = "type=" CORE2;
-    auto result=sendCommand(http::verb::post, "brk3", init);
+    auto result = sendCommand(http::verb::post, "brk3", init);
     auto val = loadJson(result);
-    EXPECT_EQ(val["broker"],"brk3");
-    EXPECT_EQ(val["type"],helics::core::to_string(helics::core::coreTypeFromString(CORE2)));
+    EXPECT_EQ(val["broker"], "brk3");
+    EXPECT_EQ(val["type"], helics::core::to_string(helics::core::coreTypeFromString(CORE2)));
     result = sendGet("brokers");
     EXPECT_FALSE(result.empty());
     val = loadJson(result);
