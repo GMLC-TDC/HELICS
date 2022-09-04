@@ -53,13 +53,19 @@ int main(int argc, char* argv[])  // NOLINT
 
 #ifdef HELICS_ENABLE_WEBSERVER
     cmdLine.add_flag("--http,--web",
-        http_server,
-        "start a webserver to respond to http rest api requests");
-    cmdLine.add_flag("--websocket", websocket_server, "start a websocket to respond to api requests");
-    cmdLine.add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")->envname("HELICS_HTTP_ARGS");
-    cmdLine.add_option("--websocket_server_args",
-        mWebSocketArgs,
-        "command line arguments for the websocket server")->envname("HELICS_WEBSOCKET_ARGS");
+                     http_server,
+                     "start a webserver to respond to http rest api requests");
+    cmdLine.add_flag("--websocket",
+                     websocket_server,
+                     "start a websocket to respond to api requests");
+    cmdLine
+        .add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")
+        ->envname("HELICS_HTTP_ARGS");
+    cmdLine
+        .add_option("--websocket_server_args",
+                    mWebSocketArgs,
+                    "command line arguments for the websocket server")
+        ->envname("HELICS_WEBSOCKET_ARGS");
 #endif
 
     cmdLine
