@@ -391,10 +391,13 @@ std::pair<return_val, std::string>
                 return {return_val::bad_request, "unable to create broker"};
                 // return send(bad_request("unable to create broker"));
             }
+            Json::Value retJson;
+            retJson["broker"]=brokerName;
             if (useUuid) {
-                return {return_val::ok, std::string(R"({"broker_uuid":")") + brokerName + "\"}"};
+                retJson["broker_uuid"]=brokerName;
             }
-            return {return_val::ok, emptyString};
+            retJson["type"]=helics::core::to_string(ctype);
+            return {return_val::ok, helics::fileops::generateJsonString(retJson)};
         }
         case cmd::remove:
             if (!brkr) {

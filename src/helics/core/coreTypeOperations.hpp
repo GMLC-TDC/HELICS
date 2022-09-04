@@ -14,11 +14,10 @@ SPDX-License-Identifier: BSD-3-Clause
 @details function definitions for operations on core types
 */
 
-namespace helics {
-namespace core {
+namespace helics::core {
+    
     /**generate a string based on the core type*/
     std::string to_string(CoreType type);
-
     /** generate a core type value from a std::string
 @param type a string describing the desired core type
 @return a value of the helics::CoreType enumeration
@@ -38,4 +37,3 @@ helics::CoreType::UNRECOGNIZED if the type is not valid
 */
     bool matchingTypes(std::string_view type1, std::string_view type2);
 }  // namespace core
-}  // namespace helics
