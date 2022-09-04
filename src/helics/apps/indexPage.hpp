@@ -8,8 +8,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics::webserver {
 
-    static constexpr const char* style =
-        R"raw(<style>
+static constexpr const char* style =
+    R"raw(<style>
 html {
   font-size: 100%;
   overflow-y: scroll;
@@ -337,20 +337,20 @@ table td {
     </style>
     )raw";
 
-    static const char* indexPage1 =
-        R"raw(<html>
+static const char* indexPage1 =
+    R"raw(<html>
   <head>
     <meta charset="utf-8" />
     <title>HELICS web server interface</title>
     )raw";
 
-    static const char* indexPage2 =
-        R"raw(</head>
+static const char* indexPage2 =
+    R"raw(</head>
 
   <body>
     )raw";
 
-    static constexpr const char* svg1 = R"raw(<svg version = "1.1" id = "Layer_1" xmlns =
+static constexpr const char* svg1 = R"raw(<svg version = "1.1" id = "Layer_1" xmlns =
                                     "http://www.w3.org/2000/svg" xmlns:
     xlink = "http://www.w3.org/1999/xlink" x = "0px" y = "0px"
      viewBox="0 0 432 140.1" style="enable-background:new 0 0 432 140.1;" xml:space="preserve" width="20%">
@@ -498,7 +498,7 @@ table td {
             c-0.3,0.2-0.6,0.4-0.8,0.7c-0.2,0.3-0.4,0.6-0.4,1c-0.1,0.4-0.1,0.8-0.1,1.2v4.4h-2.7V112H411.7z"/>
     </g>)raw";
 
-    static constexpr const char* svg2 = R"raw(
+static constexpr const char* svg2 = R"raw(
 <g>
         <linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="30.5941" y1="54.4356" x2="30.5941" y2="127.221">
             <stop  offset="0.1127" style="stop-color:#235075"/>
@@ -550,7 +550,7 @@ table td {
 </g>
 </svg>)raw";
 
-    static constexpr const char* indexPage3 = R"raw(<br>
+static constexpr const char* indexPage3 = R"raw(<br>
     <h1>Web server interface</h1>
     <h2>
       <a href="https://github.com/GMLC-TDC/HELICS">HELICS Source repository</a><br>
@@ -570,4 +570,4 @@ table td {
 </html>
 )raw";
 
-}  // namespace webserver
+}  // namespace helics::webserver

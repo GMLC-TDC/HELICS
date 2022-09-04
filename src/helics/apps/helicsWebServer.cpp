@@ -25,9 +25,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/coreTypeOperations.hpp"
-#include "gmlc/networking/interfaceOperations.hpp"
-#include "gmlc/networking/addressOperations.hpp"
 #include "../utilities/timeStringOps.hpp"
+#include "gmlc/networking/addressOperations.hpp"
+#include "gmlc/networking/interfaceOperations.hpp"
 #include "helics/external/CLI11/CLI11.hpp"
 #include "indexPage.hpp"
 
@@ -392,11 +392,11 @@ std::pair<return_val, std::string>
                 // return send(bad_request("unable to create broker"));
             }
             Json::Value retJson;
-            retJson["broker"]=brokerName;
+            retJson["broker"] = brokerName;
             if (useUuid) {
-                retJson["broker_uuid"]=brokerName;
+                retJson["broker_uuid"] = brokerName;
             }
-            retJson["type"]=helics::core::to_string(ctype);
+            retJson["type"] = helics::core::to_string(ctype);
             return {return_val::ok, helics::fileops::generateJsonString(retJson)};
         }
         case cmd::remove:
@@ -952,21 +952,26 @@ void WebServer::processArgs(std::string_view args)
     parser.allow_extras();
     parser.add_option("--http_port", mHttpPort, "specify the http port to use")
         ->envname("HELICS_HTTP_PORT");
-    parser.add_option("--http_interface",
-                      mHttpAddress,
-                      "specify the interface to use for connecting an http server")->envname("HELICS_HTTP_ADDRESS");
+    parser
+        .add_option("--http_interface",
+                    mHttpAddress,
+                    "specify the interface to use for connecting an http server")
+        ->envname("HELICS_HTTP_ADDRESS");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
-    parser.add_option("--websocket_interface",
-                      mWebsocketAddress,
-                      "specify the interface to use for connecting a web server")->envname("HELICS_WEBSOCKET_ADDRESS");
+    parser
+        .add_option("--websocket_interface",
+                    mWebsocketAddress,
+                    "specify the interface to use for connecting a web server")
+        ->envname("HELICS_WEBSOCKET_ADDRESS");
 
     parser
         .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
-            mInterfaceNetwork,
-            "specify external interface to use, default is --local")
-        ->disable_flag_override()->envname("HELICS_WEBSERVER_INTERFACE");
+                  mInterfaceNetwork,
+                  "specify external interface to use, default is --local")
+        ->disable_flag_override()
+        ->envname("HELICS_WEBSERVER_INTERFACE");
 
     try {
         parser.parse(std::string(args));
@@ -1019,32 +1024,27 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
             auto V = (*config)["http"];
             helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
             helics::fileops::replaceIfMember(V, "port", mHttpPort);
-            bool external=helics::fileops::getOrDefault(V,"external",false);
-            helics::fileops::replaceIfMember(V,"all",external);
-            if (external)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
+            bool external = helics::fileops::getOrDefault(V, "external", false);
+            helics::fileops::replaceIfMember(V, "all", external);
+            if (external) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
 
-            bool ipv4=helics::fileops::getOrDefault(V,"ipv4",false);
+            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
 
-            if (ipv4)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+            if (ipv4) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6=helics::fileops::getOrDefault(V,"ipv6",false);
-            if (ipv6)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            if (ipv6) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
             }
         }
-        mHttpAddress=gmlc::networking::generateMatchingInterfaceAddress(
-            mHttpAddress,
-            static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+        mHttpAddress = gmlc::networking::generateMatchingInterfaceAddress(
+            mHttpAddress, static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
         gmlc::networking::removeProtocol(mHttpAddress);
-        if (mHttpAddress == "*")
-        {
-            mHttpAddress="0.0.0.0";
+        if (mHttpAddress == "*") {
+            mHttpAddress = "0.0.0.0";
         }
         auto const address = net::ip::make_address(mHttpAddress);
         // Create and launch a listening port
@@ -1058,32 +1058,27 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
             auto V = (*config)["websocket"];
             helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
             helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
-            bool external=helics::fileops::getOrDefault(V,"external",false);
-            helics::fileops::replaceIfMember(V,"all",external);
-            if (external)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
+            bool external = helics::fileops::getOrDefault(V, "external", false);
+            helics::fileops::replaceIfMember(V, "all", external);
+            if (external) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
 
-            bool ipv4=helics::fileops::getOrDefault(V,"ipv4",false);
+            bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
 
-            if (ipv4)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+            if (ipv4) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
-            bool ipv6=helics::fileops::getOrDefault(V,"ipv6",false);
-            if (ipv6)
-            {
-                mInterfaceNetwork=static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+            bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
+            if (ipv6) {
+                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
             }
         }
-        mWebsocketAddress=gmlc::networking::generateMatchingInterfaceAddress(
-            mWebsocketAddress,
-            static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+        mWebsocketAddress = gmlc::networking::generateMatchingInterfaceAddress(
+            mWebsocketAddress, static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
         gmlc::networking::removeProtocol(mWebsocketAddress);
-        if (mWebsocketAddress == "*")
-        {
-            mWebsocketAddress="0.0.0.0";
+        if (mWebsocketAddress == "*") {
+            mWebsocketAddress = "0.0.0.0";
         }
         auto const address = net::ip::make_address(mWebsocketAddress);
         // Create and launch a listening port
