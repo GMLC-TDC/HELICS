@@ -53,7 +53,7 @@ If you would like to contribute to the HELICS project see [CONTRIBUTING](CONTRIB
 
 - [Beroset](https://github.com/beroset)
 - [Nitin Barthwal](https://github.com/nitin-barthwal)
-- [Parth Bansal](https://github.com/parthb83)
+- [Path Bansal](https://github.com/parthb83)
 - [Gaurav Kumar](https://github.com/slashgk)
 
 ## Used Libraries or Code

@@ -185,7 +185,7 @@ This call takes in the federate object, a string containing the publication key 
 pub = h.helicsPublicationSetOption(pub, 454, True)
 ```
 
-Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntatically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revist the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
+Once the federate is created, you also have the option to set the federate information at that point, which - while functionally identical to setting the federate info in either the federate config file or in the federate info object - provides integrators with additional flexibility, which can be useful particularly if some settings need to be changed dynamically during the cosimulation. The API calls are syntactically very similar to the API calls for setting up the federate info object, except instead they target the federate itself. For example, to revisit the above example where the only_transmit_on_change on change flag is set to true in the federate info object, if operating on an existing federate, that call would be:
 
 ```python
 h.helicsFederateSetFlagOption(fi, 6, True)
