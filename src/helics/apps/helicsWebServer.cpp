@@ -432,9 +432,11 @@ std::pair<RequestReturnVal, std::string>
                 }
             }
             if (fields.find("command_str") != fields.end()) {
-                brkr->sendCommand(std::string_view(target.data(),target.size()), fields.at("command_str"));
+                brkr->sendCommand(std::string_view(target.data(), target.size()),
+                                  fields.at("command_str"));
             } else if (!query.empty()) {
-                brkr->sendCommand(std::string_view(target.data(),target.size()), std::string_view(query.data(),query.size()));
+                brkr->sendCommand(std::string_view(target.data(), target.size()),
+                                  std::string_view(query.data(), query.size()));
             } else {
                 return {RequestReturnVal::BAD_REQUEST, "no valid command string"};
             }
@@ -925,13 +927,13 @@ class Listener: public std::enable_shared_from_this<Listener> {
         if (ec) {
             return fail(ec, "helics accept connections");
         }
-            if (websocket) {
-                // Create the session and run it
-                std::make_shared<WebSocketsession>(std::move(socket))->run();
-            } else {
-                // Create the session and run it
-                std::make_shared<HttpSession>(std::move(socket))->run();
-            }
+        if (websocket) {
+            // Create the session and run it
+            std::make_shared<WebSocketsession>(std::move(socket))->run();
+        } else {
+            // Create the session and run it
+            std::make_shared<HttpSession>(std::move(socket))->run();
+        }
 
         // Accept another connection
         do_accept();
