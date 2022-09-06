@@ -273,7 +273,7 @@ class CommonCore: public Core, public BrokerBase {
      * may need a helper class of some sort*/
     virtual void processDisconnect(bool skipUnregister = false) override final;
 
-    /** check to make sure there are no inflight queries that need to be resolved before
+    /** check to make sure there are no in-flight queries that need to be resolved before
      * disconnect*/
     void checkInFlightQueriesForDisconnect();
 
