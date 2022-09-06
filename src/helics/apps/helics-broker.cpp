@@ -142,9 +142,7 @@ void terminalFunction(std::vector<std::string> args)
         while (broker->isConnected()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        if (!broker->isConnected()) {
-            std::cout << "Broker has terminated\n";
-        }
+        std::cout << "Broker has terminated\n";
     };
 
     auto restartBroker = [&broker, &args](const std::vector<std::string>& broker_args, bool force) {

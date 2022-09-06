@@ -139,7 +139,7 @@ static void BMtoStringJson(benchmark::State& state)
     std::string load;
     load.reserve(500);
     for (auto _ : state) {
-        load = testMessage1.to_json_string();
+        load.assign(testMessage1.to_json_string());
     }
 }
 // Register the function as a benchmark
@@ -175,7 +175,7 @@ static void BMtoStringTimeJson(benchmark::State& state)
     ActionMessage obj(CMD_TIME_REQUEST);
     std::string load;
     for (auto _ : state) {
-        load = obj.to_json_string();
+        load.assign(obj.to_json_string());
     }
 }
 // Register the function as a benchmark
@@ -198,7 +198,7 @@ static void BMpacketizeJson(benchmark::State& state)
 {
     std::string load;
     for (auto _ : state) {
-        load = testMessage1.packetize_json();
+        load.assign(testMessage1.packetize_json());
     }
 }
 // Register the function as a benchmark
@@ -225,7 +225,7 @@ static void BMpacketizeStringsJson(benchmark::State& state)
     }
     std::string load;
     for (auto _ : state) {
-        load = obj.packetize_json();
+        load.assign(obj.packetize_json());
     }
 }
 // Register the function as a benchmark
