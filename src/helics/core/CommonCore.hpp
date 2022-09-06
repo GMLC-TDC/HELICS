@@ -48,7 +48,7 @@ class FilterFederate;
 class TranslatorFederate;
 class TimeoutMonitor;
 enum class InterfaceType : char;
-enum class QueryReuse: std::uint8_t;
+enum class QueryReuse : std::uint8_t;
 /** enumeration of possible operating conditions for a federate*/
 enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
@@ -427,7 +427,7 @@ class CommonCore: public Core, public BrokerBase {
     */
     void initializeMapBuilder(std::string_view request,
                               std::uint16_t index,
-        QueryReuse reuse,
+                              QueryReuse reuse,
                               bool force_ordering) const;
     /** generate results for core queries*/
     std::string coreQuery(std::string_view queryStr, bool force_ordering) const;

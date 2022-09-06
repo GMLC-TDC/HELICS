@@ -74,6 +74,7 @@ The following queries are defined directly in HELICS. Federates may specify a ca
 |                           | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
 +---------------------------+------------------------------------------------------------------------------------------------+
 ```
+
 `*` argument is optional
 
 ### Future

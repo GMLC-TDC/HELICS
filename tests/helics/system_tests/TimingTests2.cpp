@@ -729,9 +729,9 @@ TEST_F(timing2, time_barrier_update)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
     /** test the barriers query*/
-    auto qres=brokers[0]->query("root","barriers");
-    EXPECT_NE(qres.find("\"time\": 2.0"),std::string::npos);
-    EXPECT_NE(qres.find("barriers"),std::string::npos);
+    auto qres = brokers[0]->query("root", "barriers");
+    EXPECT_NE(qres.find("\"time\": 2.0"), std::string::npos);
+    EXPECT_NE(qres.find("barriers"), std::string::npos);
 
     brokers[0]->setTimeBarrier(4.0);
     rtime = vFed1->requestTimeComplete();

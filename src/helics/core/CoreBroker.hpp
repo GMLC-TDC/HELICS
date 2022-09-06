@@ -48,7 +48,7 @@ enum class ConnectionState : std::uint8_t {
 };
 
 /// forward declaration of QueryReuse
-enum class QueryReuse: std::uint8_t;
+enum class QueryReuse : std::uint8_t;
 
 /** class defining the common information for a federate*/
 class BasicFedInfo {
@@ -128,7 +128,8 @@ class CoreBroker: public Broker, public BrokerBase {
     bool force_connection{false};
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
-    std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, QueryReuse>> mapBuilders;
+    std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, QueryReuse>>
+        mapBuilders;
     /// timeout manager for queries
     std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
 
