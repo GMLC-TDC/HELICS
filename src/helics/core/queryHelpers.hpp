@@ -19,7 +19,7 @@ class GlobalFederateId;
 class FederateState;
 class InterfaceInfo;
 
-// enumeration of subqueries that cascade and need multiple levels of processing
+/// enumeration of subqueries that cascade and need multiple levels of processing
 enum Subqueries : std::uint16_t {
     GENERAL_QUERY = 0,
     FEDERATE_MAP = 1,
@@ -30,7 +30,14 @@ enum Subqueries : std::uint16_t {
     GLOBAL_STATE = 6,
     GLOBAL_TIME_DEBUGGING = 7,
     GLOBAL_FLUSH = 8,
-    GLOBAL_STATUS = 9
+    GLOBAL_STATUS = 9,
+    BARRIERS = 11
+};
+
+/// Enumeration is query result is reusable
+enum class QueryReuse : std::uint8_t {
+    ENABLED=0,
+    DISABLED=1
 };
 
 }  // namespace helics

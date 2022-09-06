@@ -144,6 +144,7 @@ class TimeCoordinator: public BaseTimeCoordinator {
     {
         return *dependent_federates.lock_shared();
     }
+    const auto &getBarriers() const {return timeBlocks;}
     /** get the current iteration counter for an iterative call
     @details this will work properly even when a federate is processing
     */

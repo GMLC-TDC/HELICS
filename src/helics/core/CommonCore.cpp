@@ -2426,14 +2426,15 @@ void CommonCore::setIdentifier(std::string_view name)
     }
 }
 
-static const std::map<std::string_view, std::pair<std::uint16_t, bool>> mapIndex{
-    {"global_time", {CURRENT_TIME_MAP, true}},
-    {"global_status", {GLOBAL_STATUS, false}},
-    {"dependency_graph", {DEPENDENCY_GRAPH, false}},
-    {"data_flow_graph", {DATA_FLOW_GRAPH, false}},
-    {"global_state", {GLOBAL_STATE, true}},
-    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, true}},
-    {"global_flush", {GLOBAL_FLUSH, true}},
+static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
+    {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+    {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+    {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+    {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+    {"barriers",{BARRIERS,QueryReuse::DISABLED} },
+    {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+    {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}
 };
 
 void CommonCore::setQueryCallback(LocalFederateId federateID,
@@ -2520,6 +2521,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "address",
                                             "queries",
                                             "address",
+"barriers",
                                             "federates",
                                             "inputs",
                                             "input_details",
@@ -2589,13 +2591,13 @@ void CommonCore::loadBasicJsonInfo(
 
 void CommonCore::initializeMapBuilder(std::string_view request,
                                       std::uint16_t index,
-                                      bool reset,
+                                      QueryReuse reuse,
                                       bool force_ordering) const
 {
     if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(static_cast<size_t>(index) + 1);
     }
-    std::get<2>(mapBuilders[index]) = reset;
+    std::get<2>(mapBuilders[index]) = reuse;
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
@@ -2784,7 +2786,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
     auto mi = mapIndex.find(queryStr);
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
-        if (isValidIndex(index, mapBuilders) && !mi->second.second) {
+        if (isValidIndex(index, mapBuilders) && mi->second.second==QueryReuse::ENABLED) {
             auto& builder = std::get<0>(mapBuilders[index]);
             if (builder.isCompleted()) {
                 auto center = generateMapObjectCounter();
@@ -2800,7 +2802,7 @@ std::string CommonCore::coreQuery(std::string_view queryStr, bool force_ordering
 
         initializeMapBuilder(queryStr, index, mi->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
-            if (!mi->second.second) {
+            if (mi->second.second==QueryReuse::ENABLED) {
                 auto center = generateMapObjectCounter();
                 std::get<0>(mapBuilders[index]).setCounterCode(center);
             }
@@ -4179,7 +4181,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             }
 
             requestors.clear();
-            if (std::get<2>(mapBuilders[m.counter])) {
+            if (std::get<2>(mapBuilders[m.counter])==QueryReuse::DISABLED) {
                 builder.reset();
             } else {
                 builder.setCounterCode(generateMapObjectCounter());
@@ -5041,7 +5043,7 @@ void CommonCore::checkInFlightQueriesForDisconnect()
             }
 
             requestors.clear();
-            if (std::get<2>(mb)) {
+            if (std::get<2>(mb)==QueryReuse::DISABLED) {
                 builder.reset();
             }
         }

@@ -241,6 +241,7 @@ void TimeCoordinator::updateValueTime(Time valueUpdateTime, bool allowRequestSen
     }
 }
 
+
 void TimeCoordinator::generateConfig(Json::Value& base) const
 {
     base["uninterruptible"] = info.uninterruptible;
