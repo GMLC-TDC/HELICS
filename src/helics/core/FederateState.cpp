@@ -2139,31 +2139,26 @@ void FederateState::sendCommand(ActionMessage& command)
         maxLogLevel = mLogManager->getMaxLevel();
     } else if (res[0] == "timeout_monitor") {
         setProperty(defs::Properties::GRANT_TIMEOUT, command.actionTime);
-    }
-    else if (res[0] == "log") {
+    } else if (res[0] == "log") {
         logMessage(HELICS_LOG_LEVEL_SUMMARY,
-            command.getString(sourceStringLoc),
-            command.payload.to_string().substr(4));
-    }
-    else if ((res[0] == "set") && (res.size()>2 && res[1] =="barrier"))
-    {
+                   command.getString(sourceStringLoc),
+                   command.payload.to_string().substr(4));
+    } else if ((res[0] == "set") && (res.size() > 2 && res[1] == "barrier")) {
         ActionMessage barrier(CMD_TIME_BARRIER);
-        barrier.dest_id=global_id;
-        barrier.actionTime=gmlc::utilities::numeric_conversionComplete<double>(res[2],0.0);
-        if (res.size() >= 4)
-        {
-            barrier.messageID=gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[3],0);
+        barrier.dest_id = global_id;
+        barrier.actionTime = gmlc::utilities::numeric_conversionComplete<double>(res[2], 0.0);
+        if (res.size() >= 4) {
+            barrier.messageID =
+                gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[3], 0);
         }
-        
+
         queue.push(barrier);
-    }
-    else if ((res[0] == "clear")  && (res.size()>=2 && res[1] =="barrier"))
-    {
+    } else if ((res[0] == "clear") && (res.size() >= 2 && res[1] == "barrier")) {
         ActionMessage barrier(CMD_TIME_BARRIER_CLEAR);
-        barrier.dest_id=global_id;
-        if (res.size() >= 3)
-        {
-            barrier.messageID=gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[2],0);
+        barrier.dest_id = global_id;
+        if (res.size() >= 3) {
+            barrier.messageID =
+                gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[2], 0);
         }
         queue.push(barrier);
     } else {
@@ -2250,17 +2245,15 @@ std::string FederateState::processQueryActual(std::string_view query) const
         base["granted_time"] = static_cast<double>(grantedTime());
         return fileops::generateJsonString(base);
     }
-    if (query == "barriers")
-    {
+    if (query == "barriers") {
         Json::Value base;
         addHeader(base);
 
-        base["barriers"]=Json::arrayValue;
-        for (const auto& br : timeCoord->getBarriers())
-        {
-            Json::Value br1=Json::objectValue;
-            br1["id"]=br.second;
-            br1["time"]=static_cast<double>(br.first);
+        base["barriers"] = Json::arrayValue;
+        for (const auto& br : timeCoord->getBarriers()) {
+            Json::Value br1 = Json::objectValue;
+            br1["id"] = br.second;
+            br1["time"] = static_cast<double>(br.first);
             base["barriers"].append(std::move(br1));
         }
         return fileops::generateJsonString(base);

@@ -161,7 +161,7 @@ class FederateInfo {
                                              propertyValue,
                                              HELICS_NULL_POINTER);
     }
-    
+
     /** get the underlying HelicsFederateInfo object*/
     HelicsFederateInfo getInfo()
     {
@@ -605,43 +605,46 @@ class Federate {
     }
 
     /**
-    * Send a command to another HELICS object through a federate.
-    *
-    * @param target The name of the object to send the command to.
-    * @param command The command to send.
-    *
-    */
+     * Send a command to another HELICS object through a federate.
+     *
+     * @param target The name of the object to send the command to.
+     * @param command The command to send.
+     *
+     */
     void sendCommand(const std::string& target, const std::string& cmd)
     {
         helicsFederateSendCommand(fed, target.c_str(), cmd.c_str(), HELICS_IGNORE_ERROR);
     }
 
     /**
-    * Get a command sent to the federate.
-    *
-    * @return A string with the command for the federate, if the string is empty no command is available.
-    */
+     * Get a command sent to the federate.
+     *
+     * @return A string with the command for the federate, if the string is empty no command is
+     * available.
+     */
     const char* getCommand()
     {
         return helicsFederateGetCommand(fed, HELICS_IGNORE_ERROR);
     }
 
     /**
-    * Get a command sent to the federate. Blocks until a command is received.
-    *
-    * @param fed The federate to get the command for.
-    * @return A string with the command for the federate, if the string is empty no command is available.
-    */
+     * Get a command sent to the federate. Blocks until a command is received.
+     *
+     * @param fed The federate to get the command for.
+     * @return A string with the command for the federate, if the string is empty no command is
+     * available.
+     */
     const char* waitCommand()
     {
         return helicsFederateWaitCommand(fed, HELICS_IGNORE_ERROR);
     }
 
     /**
-    * Get the source of the most recently retrieved command sent to the federate.
-    *
-    * @return A string with the command for the federate, if the string is empty no command is available.
-    */
+     * Get the source of the most recently retrieved command sent to the federate.
+     *
+     * @return A string with the command for the federate, if the string is empty no command is
+     * available.
+     */
     const char* getCommandSource()
     {
         return helicsFederateGetCommandSource(fed, HELICS_IGNORE_ERROR);
