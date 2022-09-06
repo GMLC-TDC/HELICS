@@ -730,7 +730,8 @@ TEST_F(timing2, time_barrier_update)
     EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
     /** test the barriers query*/
     auto qres=brokers[0]->query("root","barriers");
-    EXPECT_NE(qres.find("\"time\": 2.0"),std::string::npos);
+    EXPECT_NE(qres.find("\"time\""),std::string::npos);
+    EXPECT_NE(qres.find("2.0"),std::string::npos);
     EXPECT_NE(qres.find("barriers"),std::string::npos);
 
     brokers[0]->setTimeBarrier(4.0);
