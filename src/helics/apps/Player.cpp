@@ -698,9 +698,9 @@ namespace apps {
         }
 
         Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal();
-        bool moreToSend{ true };
-        int nextIteration{ 0 };
-        int currentIteration{ 0 };
+        bool moreToSend{true};
+        int nextIteration{0};
+        int currentIteration{0};
         while (moreToSend) {
             auto nextSendTime = Time::maxVal();
             if (isValidIndex(pointIndex, points)) {
