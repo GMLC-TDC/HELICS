@@ -83,9 +83,10 @@ class FederateState {
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
     std::unique_ptr<LogManager> mLogManager;
     int maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
-
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
+    /// storage for index group location (this only matters on construction so can be public)
+    int indexGroup{0}; 
   private:
     /// flag indicating that the federate should delay for the current time
     bool wait_for_current_time{false};

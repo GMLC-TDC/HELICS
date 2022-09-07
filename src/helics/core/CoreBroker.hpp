@@ -390,6 +390,7 @@ class CoreBroker: public Broker, public BrokerBase {
     // Handle the registration of new federates
     void fedRegistration(ActionMessage&& command);
 
+    void sendFedErrorAck(ActionMessage& command, std::int32_t errorCode);
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
     void initializeMapBuilder(std::string_view request,

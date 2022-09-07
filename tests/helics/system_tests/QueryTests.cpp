@@ -159,6 +159,7 @@ TEST_F(query, federate_map2)
     helics::cleanupHelicsLibrary();
 }
 
+
 TEST_F(query, federate_map3)
 {
     SetupTest<helics::ValueFederate>("test_3", 2);

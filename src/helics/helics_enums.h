@@ -286,7 +286,9 @@ typedef enum { /* NOLINT */
                   \ref HelicsLogLevels*/
                HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
                /** integer property controlling the size of the log buffer*/
-               HELICS_PROPERTY_INT_LOG_BUFFER = 276
+               HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+               /** integer property specifying an index group*/
+               HELICS_PROPERTY_INT_INDEX_GROUP = 282
 } HelicsProperties;
 
 /** result returned for requesting the value of an invalid/unknown property */

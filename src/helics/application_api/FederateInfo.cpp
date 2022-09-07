@@ -62,7 +62,7 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -124,6 +124,9 @@ static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTra
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
+    {"indexgroup", HELICS_PROPERTY_INT_INDEX_GROUP},
+    {"index_group", HELICS_PROPERTY_INT_INDEX_GROUP},
+    {"indexGroup", HELICS_PROPERTY_INT_INDEX_GROUP},
     {"logbuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};

@@ -457,6 +457,16 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     }
 }
 
+void CoreBroker::sendFedErrorAck(ActionMessage& command, std::int32_t errorCode)
+{
+    ActionMessage badInit(CMD_FED_ACK);
+    setActionFlag(badInit, error_flag);
+    badInit.source_id = global_broker_id_local;
+    badInit.messageID = errorCode;
+    badInit.name(command.name());
+    transmit(getRoute(command.source_id), badInit);
+}
+
 // Handle the registration of new federates;
 void CoreBroker::fedRegistration(ActionMessage&& command)
 {
@@ -466,12 +476,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     }
     bool countable = !checkActionFlag(command, non_counting_flag);
     if (countable && getCountableFederates() >= maxFederateCount) {
-        ActionMessage badInit(CMD_FED_ACK);
-        setActionFlag(badInit, error_flag);
-        badInit.source_id = global_broker_id_local;
-        badInit.messageID = max_federate_count_exceeded;
-        badInit.name(command.name());
-        transmit(getRoute(command.source_id), badInit);
+        sendFedErrorAck(command,max_federate_count_exceeded);
         return;
     }
     if (getBrokerState() < BrokerState::OPERATING) {
@@ -483,32 +488,17 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     } else if (getBrokerState() == BrokerState::OPERATING) {
         if (!checkActionFlag(command, observer_flag) && countable) {
             // we are initialized already
-            ActionMessage badInit(CMD_FED_ACK);
-            setActionFlag(badInit, error_flag);
-            badInit.source_id = global_broker_id_local;
-            badInit.messageID = already_init_error_code;
-            badInit.name(command.name());
-            transmit(getRoute(command.source_id), badInit);
+            sendFedErrorAck(command,already_init_error_code);
             return;
         }
     } else {
         // we are in an ERROR_STATE and terminating
-        ActionMessage badInit(CMD_FED_ACK);
-        setActionFlag(badInit, error_flag);
-        badInit.source_id = global_broker_id_local;
-        badInit.messageID = broker_terminating;
-        badInit.name(command.name());
-        transmit(getRoute(command.source_id), badInit);
+        sendFedErrorAck(command,broker_terminating);
         return;
     }
     // this checks for duplicate federate names
     if (mFederates.find(command.name()) != mFederates.end()) {
-        ActionMessage badName(CMD_FED_ACK);
-        setActionFlag(badName, error_flag);
-        badName.source_id = global_broker_id_local;
-        badName.messageID = duplicate_federate_name_error_code;
-        badName.name(command.name());
-        transmit(getRoute(command.source_id), badName);
+        sendFedErrorAck(command,duplicate_federate_name_error_code);
         return;
     }
     mFederates.insert(command.name(), no_search, command.name());
@@ -517,18 +507,32 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     if (checkActionFlag(command, non_counting_flag)) {
         mFederates.back().nonCounting = true;
     }
+    auto lookupIndex=mFederates.size() - 1;
     if (checkActionFlag(command, child_flag)) {
         mFederates.back().global_id = GlobalFederateId(command.getExtraData());
-        mFederates.addSearchTermForIndex(mFederates.back().global_id, mFederates.size() - 1);
+        if (!mFederates.addSearchTermForIndex(mFederates.back().global_id, lookupIndex))
+        {
+            sendFedErrorAck(command,duplicate_federate_id);
+            return;
+        }
     } else if (isRootc) {
-        mFederates.back().global_id =
-            GlobalFederateId(static_cast<GlobalFederateId::BaseType>(mFederates.size()) - 1 +
-                             gGlobalFederateIdShift);
+        if (command.counter > 0  && command.counter <= 16)
+        {
+            mFederates.back().global_id =
+                GlobalFederateId(static_cast<GlobalFederateId::BaseType>(lookupIndex) +
+                    gGlobalFederateIdShift+command.counter*gGlobalPriorityBlockSize);
+        }
+        else
+        {
+            mFederates.back().global_id =
+                GlobalFederateId(static_cast<GlobalFederateId::BaseType>(lookupIndex) +
+                    gGlobalFederateIdShift);
+        }
         mFederates.addSearchTermForIndex(mFederates.back().global_id,
-                                         static_cast<size_t>(
-                                             mFederates.back().global_id.baseValue()) -
-                                             gGlobalFederateIdShift);
+            lookupIndex);
+        
     }
+   
     if (!isRootc) {
         if (global_broker_id_local.isValid()) {
             command.source_id = global_broker_id_local;
