@@ -1717,7 +1717,7 @@ void FederateState::setProperty(int intProperty, int propertyVal)
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             break;
         case defs::Properties::INDEX_GROUP:
-            indexGroup=(propertyVal>16)?16:((propertyVal<0)?0:propertyVal);
+            indexGroup = (propertyVal > 16) ? 16 : ((propertyVal < 0) ? 0 : propertyVal);
             break;
         case defs::Properties::RT_LEAD:
             rt_lead = helics::Time(static_cast<double>(propertyVal));

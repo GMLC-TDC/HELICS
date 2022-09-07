@@ -17,7 +17,7 @@ namespace helics {
    federate numbers that can be defined per core/broker for various purposes.  These are the upper
    number of federate id's so 536,870,910 reserved federate id's.  An ID of 1 is reserved for the
    root broker
-   
+
     */
 constexpr IdentifierBaseType gGlobalFederateIdShift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
