@@ -339,7 +339,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
         }
-        const auto *loc = flagStringsTranslations.find(flg);
+        const auto* loc = flagStringsTranslations.find(flg);
         if (loc != flagStringsTranslations.end()) {
             fi.setFlagOption(loc->second, true);
         } else {
@@ -391,7 +391,7 @@ int getPropertyIndex(std::string val)
 
 int getFlagIndex(std::string val)
 {
-    const auto *fnd = flagStringsTranslations.find(val);
+    const auto* fnd = flagStringsTranslations.find(val);
     if (fnd != flagStringsTranslations.end()) {
         return fnd->second;
     }
@@ -429,7 +429,7 @@ int getOptionIndex(std::string val)
 
 int getOptionValue(std::string val)
 {
-    const auto *fnd2 = option_value_map.find(val);
+    const auto* fnd2 = option_value_map.find(val);
     if (fnd2 != option_value_map.end()) {
         return fnd2->second;
     }
