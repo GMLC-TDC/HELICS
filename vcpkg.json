@@ -3,7 +3,7 @@
   "version-string": "3.3.0",
   "description": "Hierarchical Engine for Large-scale Infrastructure Co-Simulation (HELICS)",
   "homepage": "https://helics.org/",
-  "default-features": ["zeromq", "ipc", "webserver"],
+  "default-features": ["zeromq", "ipc", "webserver", "encryption"],
   "dependencies": ["boost-core", "boost-spirit"],
   "features": {
     "zeromq": {
@@ -26,6 +26,10 @@
     "webserver": {
       "description": "Build webserver in broker_server",
       "dependencies": ["boost-beast", "boost-uuid"]
+    },
+    "encryption": {
+      "description": "Enable encryption using OpenSSL",
+      "dependencies": ["openssl"]
     }
   }
 }

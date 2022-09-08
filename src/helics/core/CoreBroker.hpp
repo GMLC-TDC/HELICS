@@ -340,7 +340,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void disconnectBroker(BasicBrokerInfo& brk);
     /** mark this broker and all other that have this as a parent as disconnected*/
     void markAsDisconnected(GlobalBrokerId brkid);
-    /** check to make sure there are no inflight queries that need to be resolved*/
+    /** check to make sure there are no in-flight queries that need to be resolved*/
     void checkInFlightQueries(GlobalBrokerId brkid);
     /** run a check for a named interface*/
     void checkForNamedInterface(ActionMessage& command);

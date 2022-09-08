@@ -1,28 +1,9 @@
 #!/bin/bash
 
 # Set variables based on build environment
-if [[ "$TRAVIS" == "true" ]]; then
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        export PATH="/usr/local/opt/ccache/libexec:$PATH"
-    fi
-
-    export CI_DEPENDENCY_DIR=${TRAVIS_BUILD_DIR}/dependencies
-
-    WAIT_COMMAND=travis_wait
-
-    # Convert commit message to lower case
-    commit_msg=$(tr '[:upper:]' '[:lower:]' <<<"${TRAVIS_COMMIT_MESSAGE}")
-
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        os_name="Linux"
-    elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-        os_name="Darwin"
-    fi
-else
-    export CI_DEPENDENCY_DIR=$1
-    commit_msg=""
-    os_name="$(uname -s)"
-fi
+export CI_DEPENDENCY_DIR=$1
+commit_msg=""
+os_name="$(uname -s)"
 
 boost_version=$CI_BOOST_VERSION
 if [[ -z "$CI_BOOST_VERSION" ]]; then
@@ -91,7 +72,7 @@ if [[ ! -d "${CI_DEPENDENCY_DIR}" ]]; then
     mkdir -p "${CI_DEPENDENCY_DIR}"
 fi
 
-# Only compile these dependencies on Linux, to install them on macOS use the Brewfile .ci/Brewfile.travis
+# Only compile these dependencies on Linux, to install them on macOS use Homebrew
 if [[ "$os_name" == "Linux" ]]; then
     # Install CMake
     if [[ ! -d "${cmake_install_path}" ]]; then
@@ -115,7 +96,7 @@ if [[ "$os_name" == "Linux" ]]; then
     echo "*** built swig successfully {$PATH}"
 
     # Install ZeroMQ
-    if [[ "$TRAVIS" != "true" && ! -d "${zmq_install_path}" ]]; then
+    if [[ ! -d "${zmq_install_path}" ]]; then
         echo "*** build libzmq"
         ./scripts/install-dependency.sh zmq ${zmq_version} "${zmq_install_path}"
         echo "*** built zmq successfully"
@@ -161,6 +142,6 @@ PYTHON_EXECUTABLE=$(command -v python3)
 export PYTHON_EXECUTABLE
 
 # Tell macOS users to use Homebrew to install additional dependencies
-if [[ "$TRAVIS" != "true" && "$os_name" == Darwin ]]; then
-    echo "To install additional dependencies on macOS, please use Homebrew to install the packages in .ci/Brewfile.travis"
+if [[ "$os_name" == Darwin ]]; then
+    echo "To install additional dependencies on macOS, please use Homebrew"
 fi
