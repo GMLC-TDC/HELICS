@@ -116,7 +116,6 @@ class CommonCore: public Core, public BrokerBase {
     virtual void processCommunications(LocalFederateId federateID,
                                        std::chrono::milliseconds msToWait) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override final;
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override final;
     virtual void
         setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override final;
     virtual void setIntegerProperty(LocalFederateId federateID,

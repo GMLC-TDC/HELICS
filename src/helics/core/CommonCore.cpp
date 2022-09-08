@@ -956,14 +956,6 @@ Time CommonCore::getCurrentTime(LocalFederateId federateID) const
     return fed->grantedTime();
 }
 
-uint64_t CommonCore::getCurrentReiteration(LocalFederateId federateID) const
-{
-    auto* fed = getFederateAt(federateID);
-    if (fed == nullptr) {
-        throw InvalidIdentifier("federateID not valid (getCurrentReiteration)");
-    }
-    return fed->getCurrentIteration();
-}
 
 void CommonCore::setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,

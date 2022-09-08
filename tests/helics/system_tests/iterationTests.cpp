@@ -43,9 +43,9 @@ TEST_F(iteration, execution_iteration)
     EXPECT_TRUE(comp == helics::IterationResult::ITERATING);
     auto val = subid.getValue<double>();
     EXPECT_EQ(val, 27.0);
+    EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),1);
 
     comp = vFed1->enterExecutingMode(helics::IterationRequest::ITERATE_IF_NEEDED);
-
     EXPECT_TRUE(comp == helics::IterationResult::NEXT_STEP);
 
     auto val2 = subid.getValue<double>();
@@ -308,7 +308,7 @@ TEST_F(iteration, time_iteration)
     EXPECT_EQ(comp.grantedTime, helics::timeZero);
     auto val = subid.getValue<double>();
     EXPECT_EQ(val, 27.0);
-
+    EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),1);
     comp = vFed1->requestTimeIterative(1.0, helics::IterationRequest::ITERATE_IF_NEEDED);
 
     EXPECT_TRUE(comp.state == helics::IterationResult::NEXT_STEP);
@@ -545,9 +545,11 @@ TEST_F(iteration, iteration_counter)
         if (c1 <= 10) {
             EXPECT_TRUE(res.state == helics::IterationResult::ITERATING);
             EXPECT_EQ(res.grantedTime, 0.0);
+            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),c1);
         } else {
             EXPECT_TRUE(res.state == helics::IterationResult::NEXT_STEP);
             EXPECT_EQ(res.grantedTime, 1.0);
+            EXPECT_EQ(vFed1->getIntegerProperty(HELICS_PROPERTY_INT_CURRENT_ITERATION),0);
         }
     }
     deadlock.join();

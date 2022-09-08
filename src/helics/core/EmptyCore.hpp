@@ -55,7 +55,6 @@ class EmptyCore: public Core {
     virtual void processCommunications(LocalFederateId fedId,
                                        std::chrono::milliseconds msToWait) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override;
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override;
     virtual void setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override;
     virtual void setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,

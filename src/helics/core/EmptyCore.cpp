@@ -153,11 +153,6 @@ Time EmptyCore::getCurrentTime(LocalFederateId /*federateID*/) const
     return Time::maxVal();
 }
 
-uint64_t EmptyCore::getCurrentReiteration(LocalFederateId /*federateID*/) const
-{
-    return 0U;
-}
-
 void EmptyCore::setIntegerProperty(LocalFederateId /*federateID*/,
                                    int32_t /*property*/,
                                    int16_t /*propertyValue*/)

@@ -292,6 +292,8 @@ typedef enum { /* NOLINT */
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
                HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
+               /** read only property getting the current iteration count*/
+               HELICS_PROPERTY_INT_CURRENT_ITERATION = 258,
                /** integer property controlling the maximum number of iterations in a federate*/
                HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
                /** integer property controlling the log level in a federate see \ref

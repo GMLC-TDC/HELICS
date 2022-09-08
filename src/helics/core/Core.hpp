@@ -266,10 +266,6 @@ class Core {
     virtual iteration_time
         requestTimeIterative(LocalFederateId federateID, Time next, IterationRequest iterate) = 0;
 
-    /**
-     * Returns the current reiteration count for the specified federate.
-     */
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const = 0;
     /** blocking call that processes helics communication messages
      * this call can be used when expecting communication from other federates or when the federate
      * has nothing else to do and doesn't want to advance time
