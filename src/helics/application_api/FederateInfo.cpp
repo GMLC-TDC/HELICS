@@ -410,7 +410,7 @@ int getFlagIndex(std::string val)
 
 int getOptionIndex(std::string val)
 {
-    auto fnd = optionStringsTranslations.find(val);
+    const auto *fnd = optionStringsTranslations.find(val);
     if (fnd != optionStringsTranslations.end()) {
         return fnd->second;
     }
