@@ -787,13 +787,17 @@ void CoreBroker::generateTimeBarrier(ActionMessage& m)
     if (checkActionFlag(m, cancel_flag)) {
         ActionMessage cancelBarrier(CMD_TIME_BARRIER_CLEAR);
         cancelBarrier.source_id = global_broker_id_local;
-        cancelBarrier.messageID = global_broker_id_local.baseValue();
+        if (cancelBarrier.messageID == 0) {
+            cancelBarrier.messageID = global_broker_id_local.baseValue();
+        }
         broadcast(cancelBarrier);
         return;
     }
     m.setAction(CMD_TIME_BARRIER);
     m.source_id = global_broker_id_local;
-    m.messageID = global_broker_id_local.baseValue();
+    if (m.messageID == 0) {
+        m.messageID = global_broker_id_local.baseValue();
+    }
     // time should already be set
     broadcast(m);
 }
@@ -2987,7 +2991,7 @@ void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
             }
 
             requestors.clear();
-            if (std::get<2>(mb)) {
+            if (std::get<2>(mb) == QueryReuse::DISABLED) {
                 builder.reset();
             }
         }
@@ -3194,6 +3198,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "federates",
                                             "brokers",
                                             "inputs",
+                                            "barriers",
                                             "input_details",
                                             "endpoints",
                                             "endpoint_details",
@@ -3220,16 +3225,17 @@ static const std::set<std::string> querySet{"isinit",
                                             "current_state",
                                             "logs"};
 
-static const std::map<std::string_view, std::pair<std::uint16_t, bool>> mapIndex{
-    {"global_time", {CURRENT_TIME_MAP, true}},
-    {"federate_map", {FEDERATE_MAP, false}},
-    {"dependency_graph", {DEPENDENCY_GRAPH, false}},
-    {"data_flow_graph", {DATA_FLOW_GRAPH, false}},
-    {"version_all", {VERSION_ALL, false}},
-    {"global_state", {GLOBAL_STATE, true}},
-    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, true}},
-    {"global_status", {GLOBAL_STATUS, true}},
-    {"global_flush", {GLOBAL_FLUSH, true}}};
+static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
+    {"global_time", {CURRENT_TIME_MAP, QueryReuse::DISABLED}},
+    {"federate_map", {FEDERATE_MAP, QueryReuse::ENABLED}},
+    {"dependency_graph", {DEPENDENCY_GRAPH, QueryReuse::ENABLED}},
+    {"data_flow_graph", {DATA_FLOW_GRAPH, QueryReuse::ENABLED}},
+    {"version_all", {VERSION_ALL, QueryReuse::ENABLED}},
+    {"global_state", {GLOBAL_STATE, QueryReuse::DISABLED}},
+    {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
+    {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
+    {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+    {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 std::string CoreBroker::quickBrokerQueries(std::string_view request) const
 {
@@ -3383,7 +3389,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
     auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {
         auto index = mi->second.first;
-        if (isValidIndex(index, mapBuilders) && !mi->second.second) {
+        if (isValidIndex(index, mapBuilders) && mi->second.second == QueryReuse::ENABLED) {
             auto& builder = std::get<0>(mapBuilders[index]);
             if (builder.isCompleted()) {
                 auto center = generateMapObjectCounter();
@@ -3399,7 +3405,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
 
         initializeMapBuilder(request, index, mi->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
-            if (!mi->second.second) {
+            if (mi->second.second == QueryReuse::ENABLED) {
                 auto center = generateMapObjectCounter();
                 std::get<0>(mapBuilders[index]).setCounterCode(center);
             }
@@ -3516,13 +3522,13 @@ std::string CoreBroker::getNameList(std::string_view gidString) const
 
 void CoreBroker::initializeMapBuilder(std::string_view request,
                                       std::uint16_t index,
-                                      bool reset,
+                                      QueryReuse reuse,
                                       bool force_ordering)
 {
     if (!isValidIndex(index, mapBuilders)) {
         mapBuilders.resize(static_cast<size_t>(index) + 1);
     }
-    std::get<2>(mapBuilders[index]) = reset;
+    std::get<2>(mapBuilders[index]) = reuse;
     auto& builder = std::get<0>(mapBuilders[index]);
     builder.reset();
     Json::Value& base = builder.getJValue();
@@ -3940,7 +3946,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
             }
 
             requestors.clear();
-            if (std::get<2>(mapBuilders[m.counter])) {
+            if (std::get<2>(mapBuilders[m.counter]) == QueryReuse::DISABLED) {
                 builder.reset();
             } else {
                 builder.setCounterCode(generateMapObjectCounter());
@@ -3979,6 +3985,23 @@ void CoreBroker::processLocalCommandInstruction(ActionMessage& m)
                 loadTimeMonitor(false, res[1]);
                 break;
         }
+    } else if ((res[0] == "set") && (res.size() > 2 && res[1] == "barrier")) {
+        ActionMessage barrier(CMD_TIME_BARRIER);
+        barrier.actionTime = gmlc::utilities::numeric_conversionComplete<double>(res[2], 0.0);
+        if (res.size() >= 4) {
+            barrier.messageID =
+                gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[3], 0);
+        }
+
+        generateTimeBarrier(barrier);
+    } else if ((res[0] == "clear") && (res.size() >= 2 && res[1] == "barrier")) {
+        ActionMessage barrier(CMD_TIME_BARRIER_CLEAR);
+        setActionFlag(barrier, cancel_flag);
+        if (res.size() >= 3) {
+            barrier.messageID =
+                gmlc::utilities::numeric_conversionComplete<std::int32_t>(res[2], 0);
+        }
+        generateTimeBarrier(barrier);
     } else {
         auto warnString = fmt::format(" unrecognized command instruction \"{}\"", res[0]);
         LOG_WARNING(global_broker_id_local, getIdentifier(), warnString);

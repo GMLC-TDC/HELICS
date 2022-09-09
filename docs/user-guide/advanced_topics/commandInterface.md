@@ -50,26 +50,32 @@ The `commandStr` is a generic string, so can be anything that can be contained i
 The following queries are defined directly in HELICS. Federates may specify a callback function which allows arbitrary user-defined queries. The queries defined here are available inside of HELICS.
 
 ```{eval-rst}
-+------------------------+------------------------------------------------------------------------------------------------+
-| Command String         | Description                                                                                    |
-+========================+================================================================================================+
-| ``terminate``          | [all objects] disconnect the object from the federation                                        |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``echo``               | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``log <string>``       | [all objects] generate a log message in a particular object                                    |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``logbuffer <size>``   | [all objects] set the log buffer to a particular size or `stop`                                |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``monitor <args...>``  | [brokers] set up a federate as the time monitor <args...> = <federate names> <logperiod>       |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``remotelog <level>``  | [all object] instruct the object to send log messages to a remote location in addition to local|
-|                        |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |
-+------------------------+------------------------------------------------------------------------------------------------+
-| ``command_status``     | [federates] when received will send a string back to the source of the command                 |
-|                        | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
-+------------------------+------------------------------------------------------------------------------------------------+
++---------------------------+------------------------------------------------------------------------------------------------+
+| Command String            | Description                                                                                    |
++===========================+================================================================================================+
+| ``terminate``             | [all objects] disconnect the object from the federation                                        |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``echo``                  | [all objects] send a command with a `commandStr`=`echo_reply` back to the sender               |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``log <string>``          | [all objects] generate a log message in a particular object                                    |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``logbuffer <size>``      | [all objects] set the log buffer to a particular size or `stop`                                |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``monitor <args...>``     | [brokers] set up a federate as the time monitor <args...> = <federate names> <logperiod>       |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``set barrier <args...>`` | [brokers,federates] set a time barrier <args...> = <time> <barrier_id*>                         |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``clear barrier <id*>``   | [brokers,federates] clear a time barrier <barrier_id*>                         |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``remotelog <level>``     | [all objects] instruct the object to send log messages to a remote location in addition to local|
+|                           |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |
++---------------------------+------------------------------------------------------------------------------------------------+
+| ``command_status``        | [federates] when received will send a string back to the source of the command                 |
+|                           | looking like \"X unprocessed commands\" where X is the number of unprocessed commands          |
++---------------------------+------------------------------------------------------------------------------------------------+
 ```
+
+`*` argument is optional
 
 ### Future
 

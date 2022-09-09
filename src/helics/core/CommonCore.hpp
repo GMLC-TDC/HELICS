@@ -48,6 +48,7 @@ class FilterFederate;
 class TranslatorFederate;
 class TimeoutMonitor;
 enum class InterfaceType : char;
+enum class QueryReuse : std::uint8_t;
 /** enumeration of possible operating conditions for a federate*/
 enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
@@ -421,12 +422,12 @@ class CommonCore: public Core, public BrokerBase {
     /** generate a mapbuilder for the federates
     @param request the query to build the map for
     @param index the key of the request
-    @param reset whether the builder should reset or use an existing (true to not use existing)
+    @param reuse enumeration of whether a query is reusable or not
     @param force_ordering true if the request should use the force_ordering pathways
     */
     void initializeMapBuilder(std::string_view request,
                               std::uint16_t index,
-                              bool reset,
+                              QueryReuse reuse,
                               bool force_ordering) const;
     /** generate results for core queries*/
     std::string coreQuery(std::string_view queryStr, bool force_ordering) const;
@@ -472,7 +473,7 @@ class CommonCore: public Core, public BrokerBase {
     /// timeout manager for queries
     std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
     /// holder for the query map builder information
-    mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>>
+    mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, QueryReuse>>
         mapBuilders;
 
     FilterFederate* filterFed{nullptr};
