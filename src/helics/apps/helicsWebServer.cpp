@@ -956,7 +956,7 @@ void WebServer::processArgs(std::string_view args)
     parser
         .add_option("--http_interface",
                     mHttpAddress,
-                    "specify the interface to use for connecting an http server")
+                    "specify the interface for the http server to listen on for connections")
         ->envname("HELICS_HTTP_ADDRESS");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
@@ -964,7 +964,7 @@ void WebServer::processArgs(std::string_view args)
     parser
         .add_option("--websocket_interface",
                     mWebsocketAddress,
-                    "specify the interface to use for connecting a web server")
+                    "specify the interface for the websocket server to listen on for connections")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
     parser

@@ -46,7 +46,7 @@ $ helics_broker_server --web --zmq --http_server_args="--http_port=80"
 
 Arguments are passed to servers using an option in the form `--<server>_server_args`, and in that arg field `--<server>_port` and `--<server>_interface` are valid arguments. Valid server names are `http`, `websocket`, `zmq`, 'tcp', and `udp`, and eventually `mpi`. The http web server also acknowledges `HELICS_HTTP_PORT` as an environment variable. The websocket server acknowledges `HELICS_WEBSOCKET_PORT` for the port numbers of the respective servers.
 
-By default the webserver only runs on the localhost this can be modified by specifying the external address directly or by declaring `--external` in the arguments
+By default the webserver only listens for connections on the localhost network interface, this can be modified by specifying the external address directly or by declaring `--external` in the arguments.
 
 ```shell-session
 $ helics_broker_server --web --zmq --http_server_args="--http_port=8080 --external"

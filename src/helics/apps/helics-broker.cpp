@@ -57,7 +57,7 @@ int main(int argc, char* argv[])  // NOLINT
                      "start a webserver to respond to http rest api requests");
     cmdLine.add_flag("--websocket",
                      websocket_server,
-                     "start a websocket to respond to api requests");
+                     "start a websocket server to respond to api requests");
 #ifdef HELICS_ENABLE_WEBSERVER
     cmdLine
         .add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")

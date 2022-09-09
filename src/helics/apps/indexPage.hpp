@@ -558,7 +558,7 @@ static constexpr const char* indexPage3 = R"raw(<br>
         >HELICS Documentation</a
       ><br>
 
-<a href="https://docs.helics.org/en/latest/advanced_topics/webserver.html"
+<a href="https://docs.helics.org/en/latest/user-guide/advanced_topics/webserver.html"
         >Using the web server</a
       ><br>
 
