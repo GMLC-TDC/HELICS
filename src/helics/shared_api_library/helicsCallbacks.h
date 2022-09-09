@@ -333,7 +333,8 @@ HELICS_EXPORT void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
 * @details This callback will be triggered to compute the next time update for a callback federate.
 *
 * @param fed The federate to set the callback for.
-* @param timeUpdate A callback with signature HelicsTime(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration, void *userdata);
+* @param timeUpdate A callback with signature HelicsTime(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration,
+void *userdata);
 *
 * @param userdata A pointer to user data that is passed to the function when executing.
 *
