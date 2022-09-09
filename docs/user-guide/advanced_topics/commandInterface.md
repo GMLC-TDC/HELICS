@@ -63,9 +63,9 @@ The following queries are defined directly in HELICS. Federates may specify a ca
 +---------------------------+------------------------------------------------------------------------------------------------+
 | ``monitor <args...>``     | [brokers] set up a federate as the time monitor <args...> = <federate names> <logperiod>       |
 +---------------------------+------------------------------------------------------------------------------------------------+
-| ``set barrier <args...>`` | [broker,federates] set a time barrier <args...> = <time> <barrier_id*>                         |
+| ``set barrier <args...>`` | [brokers,federates] set a time barrier <args...> = <time> <barrier_id*>                         |
 +---------------------------+------------------------------------------------------------------------------------------------+
-| ``clear barrier <id*>``   | [broker,federates] clear a time barrier <barrier_id*>                         |
+| ``clear barrier <id*>``   | [brokers,federates] clear a time barrier <barrier_id*>                         |
 +---------------------------+------------------------------------------------------------------------------------------------+
 | ``remotelog <level>``     | [all object] instruct the object to send log messages to a remote location in addition to local|
 |                           |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |

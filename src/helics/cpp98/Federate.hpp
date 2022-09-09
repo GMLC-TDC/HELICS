@@ -608,7 +608,7 @@ class Federate {
      * Send a command to another HELICS object through a federate.
      *
      * @param target The name of the object to send the command to.
-     * @param command The command to send.
+     * @param cmd The command to send.
      *
      */
     void sendCommand(const std::string& target, const std::string& cmd)
@@ -630,7 +630,6 @@ class Federate {
     /**
      * Get a command sent to the federate. Blocks until a command is received.
      *
-     * @param fed The federate to get the command for.
      * @return A string with the command for the federate, if the string is empty no command is
      * available.
      */

@@ -34,7 +34,7 @@ enum Subqueries : std::uint16_t {
     BARRIERS = 11
 };
 
-/// Enumeration is query result is reusable
+/// Enumeration of if query result is reusable
 enum class QueryReuse : std::uint8_t { ENABLED = 0, DISABLED = 1 };
 
 }  // namespace helics
