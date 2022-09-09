@@ -756,7 +756,7 @@ class Core {
                                        std::shared_ptr<TranslatorOperator> callback) = 0;
 
     /** set the callback Federate operators
-    @param translator  the handle of the translator
+    @param fed  the federate to set the callback for
     @param callback pointer to the operator class executing the federate
     */
     virtual void setFederateOperator(LocalFederateId fed,

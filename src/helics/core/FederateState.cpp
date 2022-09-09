@@ -509,7 +509,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
         }
 
         auto ret = processQueue();
-        updateDataforExecEntry(ret, iterate);
+        updateDataForExecEntry(ret, iterate);
         unlock();
 #ifndef HELICS_DISABLE_ASIO
         if ((realtime) && (ret == MessageProcessingResult::NEXT_STEP)) {
@@ -561,7 +561,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
     return ret;
 }
 
-void FederateState::updateDataforExecEntry(MessageProcessingResult result, IterationRequest iterate)
+void FederateState::updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate)
 {
     ++mGrantCount;
     if (result == MessageProcessingResult::NEXT_STEP) {
@@ -673,7 +673,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
         }
 #endif
         auto ret = processQueue();
-        updateDataforTimeReturn(ret, nextTime, iterate);
+        updateDataForTimeReturn(ret, nextTime, iterate);
         iteration_time retTime = {time_granted, static_cast<IterationResult>(ret)};
 #ifndef HELICS_DISABLE_ASIO
         if (realtime) {
@@ -729,7 +729,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
     return {time_granted, ret};
 }
 
-void FederateState::updateDataforTimeReturn(MessageProcessingResult result,
+void FederateState::updateDataForTimeReturn(MessageProcessingResult result,
                                             Time nextTime,
                                             IterationRequest iterate)
 {
@@ -1067,7 +1067,7 @@ void FederateState::initCallbackProcessing()
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
-            bye.payload = "Callback federate unspecified error condition in initialize callback";
+            bye.payload = "Callback federate unspecified error condition in initializing callback";
             mParent->addActionMessage(bye);
             break;
     }
@@ -1101,7 +1101,7 @@ void FederateState::execCallbackProcessing(IterationResult result)
             bye.source_id = global_id.load();
             bye.dest_id = bye.source_id;
             bye.messageID = HELICS_USER_EXCEPTION;
-            bye.payload = "Callback federate unspecified error condition in operate callback";
+            bye.payload = "Callback federate unspecified error condition in executing callback";
             mParent->addActionMessage(bye);
             break;
     }
@@ -1147,16 +1147,16 @@ void FederateState::callbackReturnResult(FederateStates lastState,
                 break;
             case FederateStates::INITIALIZING: {
                 if (newState == FederateStates::INITIALIZING) {
-                    updateDataforExecEntry(result, lastIterationRequest);
+                    updateDataForExecEntry(result, lastIterationRequest);
                     initCallbackProcessing();
                 } else {
-                    updateDataforExecEntry(result, lastIterationRequest);
+                    updateDataForExecEntry(result, lastIterationRequest);
                     execCallbackProcessing(IterationResult::NEXT_STEP);
                 }
             } break;
                 break;
             case FederateStates::EXECUTING:
-                updateDataforTimeReturn(result,
+                updateDataForTimeReturn(result,
                                         timeCoord->getRequestedTime(),
                                         lastIterationRequest);
                 execCallbackProcessing(result == MessageProcessingResult::ITERATING ?

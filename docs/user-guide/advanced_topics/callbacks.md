@@ -1,6 +1,6 @@
 # Callbacks
 
-Federates have a number of callbacks that can be specified that trigger under different stages of the cosimulation operation or conditions. These callbacks can be used to simplify the managments of a federate or enable new capabilities to be integrated with HELICS. This document is a listing and description of the callbacks available on Value, Message, and Combination Federates. Callbacks are user-specified code that is executed inline with other HELICS operations.
+Federates have a number of callbacks that can be specified that trigger under different stages of the co-simulation operation or conditions. These callbacks can be used to simplify the management of a federate or enable new capabilities to be integrated with HELICS. This document is a listing and description of the callbacks available on Value, Message, and Combination Federates. Callbacks are user-specified code that is executed inline with other HELICS operations.
 
 In C++, callbacks generally take a std::function object which can be structured as a lambda or direct object. In C and language API's the callback is structured as a function pointer, and pass through a userData object into the callback. HELICS does not manipulate the userData and simply passes it through.
 
@@ -8,7 +8,7 @@ In C++, callbacks generally take a std::function object which can be structured 
 
 Some callbacks respond to specific events from a federate this includes logging, queries, and errors.
 
-### Logging callback
+### Logging Callback
 
 The logging callback allows a specific user operation to handle log messages
 
@@ -26,11 +26,11 @@ void
 
 ```
 
-The main arguments to the callback are a loglevel integer code corresponding to log levels in HELICS. A string identifier, and a log message.
+The main arguments to the callback are a loglevel integer code corresponding to log levels in HELICS, a string identifier, and a log message.
 
 ### Query Callback
 
-The query callback allows a federate to respond to custom queries. If a federate receives a query that it does not know the answer to, it executes the query callback if supplied. In C++ the return function is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer.
+The query callback allows a federate to respond to custom queries. If a federate receives a query that it does not know the answer to, it executes the query callback if supplied. In C++ the return type is a string, in C and the other language API's the user supplied callback is expected to fill in a query buffer.
 
 ```C++
 void setQueryCallback(const std::function<std::string(std::string_view)>& queryFunction);
@@ -95,7 +95,7 @@ void
 
 ### Time Request Entry
 
-This callback is executed on a time Request call, prior to calling the blocking Core API call. The arguments are the current time of the federate, the requested time, and whether an iterative call is being made.
+This callback is executed on a time request call, prior to calling the blocking Core API call. The arguments are the current time of the federate, the requested time, and whether an iterative call is being made.
 
 ```C++
 void setTimeRequestEntryCallback(std::function<void(Time, Time, bool)> callback);
@@ -111,7 +111,7 @@ void helicsFederateSetTimeRequestEntryCallback(
 
 ### Time Update
 
-The time update callback is executed after the Core API returns from a timeRequest, and prior to any value based callbacks executing or have been updated. The arguments are the new time and the boolean argument will be set to true if this is an iterative time.
+The time update callback is executed after the Core API returns from a time request, and prior to any value based callbacks executing or having been updated. The arguments are the new time and the boolean argument will be set to true if this is an iterative time.
 
 ```C++
 void setTimeUpdateCallback(std::function<void(Time, bool)> callback);
@@ -126,7 +126,7 @@ void helicsFederateSetTimeUpdateCallback(HelicsFederate fed,
 
 ### Time Request Return
 
-The Time request return callback will execute as the last operation prior to return from a time request. It executes after all value based callbacks, and like the Time update contains arguments for the new time and an indicator if the time is iterative.
+The Time request return callback will execute as the last operation prior to return from a time request. It executes after all value based callbacks, and like the Time Update contains arguments for the new time and an indicator if the time is iterative.
 
 ```C++
 void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
@@ -140,7 +140,7 @@ void
                                                HelicsError* err);
 ```
 
-### Mode update
+### Mode Update
 
 The mode update callback executes whenever the Mode of the federate changes. It will execute prior to timeUpdateCallback when both would be called.
 The arguments are the old and new Modes.
@@ -176,7 +176,7 @@ void helicsFederateCosimulationTerminationCallback(HelicsFederate fed,
 
 ## Value Federate Callbacks
 
-These callback will execute when an input is update and can be general for all inputs or specific to a single one. This callback is not currently available in the C API.
+These callbacks will execute when an input is updated and can be general for all inputs or specific to a single one. This callback is not currently available in the C API.
 
 ```C++
     void setInputNotificationCallback(std::function<void(Input&, Time)> callback);
@@ -186,7 +186,7 @@ These callback will execute when an input is update and can be general for all i
 
 ## Message Federate Callbacks
 
-These callback will execute when an endpoint is updated and can be general for all endpoints or specific to a single one. This callback is not currently available in the C API.
+These callbacks will execute when an endpoint is updated and can be general for all endpoints or specific to a single one. This callback is not currently available in the C API.
 
 ```C++
 void setMessageNotificationCallback(const std::function<void(Endpoint&, Time)>& callback);

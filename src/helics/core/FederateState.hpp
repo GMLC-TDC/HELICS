@@ -343,9 +343,9 @@ class FederateState {
     void initCallbackProcessing();
     void execCallbackProcessing(IterationResult result);
     /** update the data and time after being granted Exec entry*/
-    void updateDataforExecEntry(MessageProcessingResult result, IterationRequest iterate);
+    void updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate);
     /** update the data and time after being granted time request*/
-    void updateDataforTimeReturn(MessageProcessingResult result,
+    void updateDataForTimeReturn(MessageProcessingResult result,
                                  Time nextTime,
                                  IterationRequest iterate);
 

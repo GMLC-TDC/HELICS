@@ -623,7 +623,7 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
     if (fed->isCallbackFederate()) {
-        throw(InvalidFunctionCall("this operation is not permitted for callback based federates"));
+        throw(InvalidFunctionCall("enterExecutingMode is not permitted for callback based federates"));
     }
     // do an exec check on the fed to process previously received messages so it can't get in a
     // deadlocked state

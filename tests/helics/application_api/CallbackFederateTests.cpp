@@ -53,7 +53,7 @@ TEST_F(callbackFed, initialize)
     EXPECT_TRUE(vFed1->isAsyncOperationCompleted());
 }
 
-// test that the initialize callback gets executed and handles termination properly
+// test that the executing callback gets executed and handles termination properly
 TEST_F(callbackFed, execute)
 {
     SetupTest<helics::CallbackFederate>("test", 1);
@@ -174,7 +174,7 @@ TEST_F(callbackFed, initException)
     EXPECT_EQ(vFed1->getCurrentMode(), helics::Federate::Modes::ERROR_STATE);
 }
 
-// test that the pre/post time request work properly
+// test that an error return in the pre/post time request work properly
 TEST_F(callbackFed, timeStepError)
 {
     SetupTest<helics::CallbackFederate>("test", 1);
@@ -240,7 +240,7 @@ TEST_F(callbackFed, timeStepException)
     EXPECT_EQ(vFed1->getCurrentMode(), helics::Federate::Modes::ERROR_STATE);
 }
 
-// test that the max time and period works correctly with the callback federate
+// test that the max time and period works correctly with two callback federates
 TEST_F(callbackFed, timeSteps2Fed)
 {
     SetupTest<helics::CallbackFederate>("test", 2);
