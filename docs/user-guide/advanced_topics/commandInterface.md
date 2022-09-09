@@ -67,7 +67,7 @@ The following queries are defined directly in HELICS. Federates may specify a ca
 +---------------------------+------------------------------------------------------------------------------------------------+
 | ``clear barrier <id*>``   | [brokers,federates] clear a time barrier <barrier_id*>                         |
 +---------------------------+------------------------------------------------------------------------------------------------+
-| ``remotelog <level>``     | [all object] instruct the object to send log messages to a remote location in addition to local|
+| ``remotelog <level>``     | [all objects] instruct the object to send log messages to a remote location in addition to local|
 |                           |  logging.  The <level> is a [log level string](../fundamental_topics/logging.md) or `stop`     |
 +---------------------------+------------------------------------------------------------------------------------------------+
 | ``command_status``        | [federates] when received will send a string back to the source of the command                 |
