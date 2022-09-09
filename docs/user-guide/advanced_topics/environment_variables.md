@@ -33,4 +33,4 @@ For setting up a federate a few environment variables are used
 - `HELICS_HTTP_ADDRESS`: The address of the interface to use in the webserver
 - `HELICS_HTTP_PORT`: The port to use on the webserver to accept connections
 - `HELICS_WEBSOCKET_ADDRESS`: The interface address to use to accept incoming websocket connections
-- `HELICS_WEBSOCKET_PORT`: the port number to use for accepting websocket connections
+- `HELICS_WEBSOCKET_PORT`: The port number to use for accepting websocket connections
