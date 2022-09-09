@@ -1716,6 +1716,9 @@ void FederateState::setProperty(int intProperty, int propertyVal)
         case defs::Properties::RT_LAG:
             rt_lag = helics::Time(static_cast<double>(propertyVal));
             break;
+        case defs::Properties::INDEX_GROUP:
+            indexGroup = (propertyVal > 16) ? 16 : ((propertyVal < 0) ? 0 : propertyVal);
+            break;
         case defs::Properties::RT_LEAD:
             rt_lead = helics::Time(static_cast<double>(propertyVal));
             break;
@@ -1906,6 +1909,8 @@ int FederateState::getIntegerProperty(int intProperty) const
             return mLogManager->getConsoleLevel();
         case defs::Properties::LOG_BUFFER:
             return static_cast<int>(mLogManager->getLogBuffer().capacity());
+        case defs::Properties::INDEX_GROUP:
+            return indexGroup;
         default:
             return timeCoord->getIntegerProperty(intProperty);
     }

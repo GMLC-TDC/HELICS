@@ -62,7 +62,7 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -124,6 +124,9 @@ static constexpr frozen::unordered_map<std::string_view, int, 63> propStringsTra
     {"intmaxiterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"intMaxIterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
     {"int_max_iterations", HELICS_PROPERTY_INT_MAX_ITERATIONS},
+    {"indexgroup", HELICS_PROPERTY_INT_INDEX_GROUP},
+    {"index_group", HELICS_PROPERTY_INT_INDEX_GROUP},
+    {"indexGroup", HELICS_PROPERTY_INT_INDEX_GROUP},
     {"logbuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
@@ -289,7 +292,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 28> option_value_m
     {"vectorize", HELICS_MULTI_INPUT_VECTORIZE_OPERATION},
     {"diff", HELICS_MULTI_INPUT_DIFF_OPERATION}};
 
-// this one is used in a few places that can't use std::string
+// this one is used in a few places that can't use std::string_view
 static const std::unordered_map<std::string, int> log_level_map{
     {"none", HELICS_LOG_LEVEL_NO_PRINT},
     {"no_print", HELICS_LOG_LEVEL_NO_PRINT},
@@ -336,7 +339,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
         if (flg.empty()) {
             continue;  // LCOV_EXCL_LINE
         }
-        auto loc = flagStringsTranslations.find(flg);
+        const auto* loc = flagStringsTranslations.find(flg);
         if (loc != flagStringsTranslations.end()) {
             fi.setFlagOption(loc->second, true);
         } else {
@@ -365,7 +368,7 @@ static void loadFlags(FederateInfo& fi, const std::string& flags)
 
 int getPropertyIndex(std::string val)
 {
-    auto fnd = propStringsTranslations.find(val);
+    const auto* fnd = propStringsTranslations.find(val);
     if (fnd != propStringsTranslations.end()) {
         return fnd->second;
     }
@@ -388,7 +391,7 @@ int getPropertyIndex(std::string val)
 
 int getFlagIndex(std::string val)
 {
-    auto fnd = flagStringsTranslations.find(val);
+    const auto* fnd = flagStringsTranslations.find(val);
     if (fnd != flagStringsTranslations.end()) {
         return fnd->second;
     }
@@ -407,7 +410,7 @@ int getFlagIndex(std::string val)
 
 int getOptionIndex(std::string val)
 {
-    auto fnd = optionStringsTranslations.find(val);
+    const auto* fnd = optionStringsTranslations.find(val);
     if (fnd != optionStringsTranslations.end()) {
         return fnd->second;
     }
@@ -426,7 +429,7 @@ int getOptionIndex(std::string val)
 
 int getOptionValue(std::string val)
 {
-    auto fnd2 = option_value_map.find(val);
+    const auto* fnd2 = option_value_map.find(val);
     if (fnd2 != option_value_map.end()) {
         return fnd2->second;
     }

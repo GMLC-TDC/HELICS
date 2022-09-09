@@ -112,6 +112,8 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "max_iterations": 10,
   "forward_compute": false,
 
+  // other
+  "indexgroup":5,
 
   //Network
   "interfaceNetwork": "local",
@@ -466,6 +468,20 @@ _API:_ `helicsFederateInfoSetIntegerProperty`
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER` [276]
 
 When set to a number greater than 0 will enable the most recent X log messages of the object to be buffered for retrieval via the ["logs" query](../user-guide/advanced_topics/queries.md). Also see discussion in [Logging](../user-guide/fundamental_topics/logging.md#log-buffer).
+
+## Other Options
+
+## `indexgroup` | `index_group` | `indexGroup` [0]
+
+_API:_ `helicsFederateInfoSetIntegerProperty`
+[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#a01dddbf428e5d1f0ad8ead05491dabff)
+| [C](api-reference/C_API.md#federateinfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_properties},Int64})
+
+_Property's enumerated name:_ `HELICS_PROPERTY_INT_INDEX_GROUP` [282]
+
+When set to a number greater than 0 will modify the internal federateId codes. Values allowed are from 0 to 16. Each group allows 100,000,000 federates. In a few select situations, such as ordering messages, or breaking a deadlock in a timing situation, the ordering ties are broken by federate index. It is possible in some scenarios that this ordering can be variable from run to run introducing a source of randomness since federate id's are assigned in the order processed. The `indexGroup` parameter allows the user to directly influence the internal id, which can eliminate a source of randomness in a few select situations. Specifically, each increment of the index group increases the internal id by 100,000,000 from what it would have been. This allows 17 total allowable option group values 0-16. In most cases, this option will have no observable impact on co-simulation results. If exceeding 100,000,000 care must be exercised in its use to ensure federate Id's do not conflict, by using only larger intervals of increments.
 
 ## Timing Options
 

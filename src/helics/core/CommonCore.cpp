@@ -691,6 +691,9 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
         setActionFlag(m, observer_flag);
     }
+    if (fed->indexGroup > 0) {
+        m.counter = static_cast<int16_t>(fed->indexGroup);
+    }
     addActionMessage(m);
     // check some properties that should be inherited from the federate if it is the first one
     if (checkProperties) {

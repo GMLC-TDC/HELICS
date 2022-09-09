@@ -9,6 +9,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/CoreApp.hpp"
 #include "helics/application_api/Federate.hpp"
 #include "helics/application_api/Filters.hpp"
+#include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/BrokerFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/CoreFactory.hpp"
@@ -185,6 +186,28 @@ TEST(federate_tests, broker_disconnect_test_ci_skip)
     res = Fed->requestTime(4.0);
     EXPECT_EQ(res, helics::Time::maxVal());
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::FINISHED);
+}
+
+TEST(federate_tests, index_groups)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setProperty(HELICS_PROPERTY_INT_INDEX_GROUP, 3);
+    auto fed1 = std::make_shared<helics::Federate>("test1", fi);
+
+    helics::FederateInfo fi2(CORE_TYPE_TO_TEST);
+    auto fed2 = std::make_shared<helics::Federate>("test2", fi2);
+
+    fed1->enterInitializingModeAsync();
+    fed2->enterInitializingMode();
+    fed1->enterInitializingModeComplete();
+
+    auto qres = fed1->query("root", "federate_map");
+    auto val = helics::fileops::loadJsonStr(qres);
+    EXPECT_GT(val["cores"][0]["federates"][0]["attributes"]["id"].asInt64(),
+              val["cores"][0]["federates"][1]["attributes"]["id"].asInt64());
+    fed1->finalize();
+    fed2->finalize();
 }
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
