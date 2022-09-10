@@ -1145,7 +1145,7 @@ void FederateState::callbackReturnResult(FederateStates lastState,
                 // this is the only valid transition that hasn't been dealt with yet
                 initCallbackProcessing();
                 break;
-            case FederateStates::INITIALIZING: {
+            case FederateStates::INITIALIZING:
                 if (newState == FederateStates::INITIALIZING) {
                     updateDataForExecEntry(result, lastIterationRequest);
                     initCallbackProcessing();
@@ -1153,7 +1153,6 @@ void FederateState::callbackReturnResult(FederateStates lastState,
                     updateDataForExecEntry(result, lastIterationRequest);
                     execCallbackProcessing(IterationResult::NEXT_STEP);
                 }
-            } break;
                 break;
             case FederateStates::EXECUTING:
                 updateDataForTimeReturn(result,

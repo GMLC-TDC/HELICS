@@ -398,7 +398,7 @@ class HELICS_CXX_EXPORT Federate {
     /** register a callback function that executes when an error is generated
    @details if set this function will execute instead of throwing an exception in some cases( NOTE:
    this is currently only used for callback federates)
-    @param callback the function to call; the function signature is void(int errorCode,
+    @param errorHandlerCallback the function to call; the function signature is void(int errorCode,
    std::string_view errorString)
     */
     void setErrorHandlerCallback(std::function<void(int, std::string_view)> errorHandlerCallback);

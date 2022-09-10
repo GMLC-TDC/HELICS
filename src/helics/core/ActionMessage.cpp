@@ -943,11 +943,11 @@ void setIterationFlags(ActionMessage& command, IterationRequest iterate)
         case IterationRequest::ITERATE_IF_NEEDED:
             setActionFlag(command, iteration_requested_flag);
             break;
-        case IterationRequest::NO_ITERATIONS:
-        default:
-            break;
         case IterationRequest::ERROR_CONDITION:
             setActionFlag(command, error_flag);
+            break;
+        case IterationRequest::NO_ITERATIONS:
+        default:
             break;
     }
 }
