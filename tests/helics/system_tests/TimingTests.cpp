@@ -782,3 +782,122 @@ TEST_F(timing, async_timing_message)
     mFed1->finalize();
     mFed2->finalize();
 }
+
+
+TEST_F(timing, dual_max_time)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto controller = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE, true);
+
+    auto& pubc = controller->registerGlobalPublication<double>("control");
+    auto& subc = controller->registerSubscription("value");
+    auto& pubv = vFed2->registerGlobalPublication<double>("value");
+    auto& subv = vFed2->registerSubscription("control");
+
+    auto cfed = [&]() {
+        controller->enterExecutingMode();
+        helics::Time grantedTime=helics::timeZero;
+        helics::Time maxTime=cHelicsBigNumber;
+        
+        grantedTime=controller->requestTime(maxTime);
+        while (grantedTime<maxTime) {
+            double v=subc.getDouble();
+            pubc.publish(2.0*v);
+            grantedTime=controller->requestTime(maxTime);
+        }
+        controller->disconnect();
+    };
+
+    double finalValue{0.0};
+    auto vfed = [&]() {
+        vFed2->enterExecutingMode();
+        helics::Time grantedTime=helics::timeZero;
+        helics::Time maxTime=12.0;
+        pubv.publish(1.0);
+        while (grantedTime<maxTime) {
+            grantedTime=vFed2->requestTime(grantedTime+2.0);
+            double v=subv.getDouble();
+            pubv.publish(v+0.7);
+        }
+        vFed2->requestTime(cHelicsBigNumber);
+        finalValue=subv.getDouble();
+    };
+
+    auto fed2res = std::async(std::launch::async, cfed);
+    auto fed1res = std::async(std::launch::async, vfed);
+
+    fed1res.get();
+
+    fed2res.get();
+    double testVal{2.0};
+    //compute the expected value
+    auto mx=[](double val){return 2.0*(val+0.7);};
+    for (int ii = 0; ii < 6; ++ii)
+    {
+        testVal=mx(testVal);
+    }
+   EXPECT_DOUBLE_EQ(finalValue,testVal);
+}
+
+
+TEST_F(timing, dual_max_time_endpoint)
+{
+    SetupTest<helics::MessageFederate>("test_2", 2);
+    auto controller = GetFederateAs<helics::MessageFederate>(0);
+    auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    vFed2->setFlagOption(HELICS_FLAG_UNINTERRUPTIBLE, true);
+
+    auto& e1 = controller->registerGlobalEndpoint("control");
+    auto& e2 = vFed2->registerGlobalEndpoint("value");
+
+    auto cfed = [&]() {
+        controller->enterExecutingMode();
+        helics::Time grantedTime=helics::timeZero;
+        helics::Time maxTime=cHelicsBigNumber;
+
+        grantedTime=controller->requestTime(maxTime);
+        while (grantedTime<maxTime) {
+            auto m=e1.getMessage();
+            m->data.append("a",1);
+            m->dest="value";
+            e1.send(std::move(m));
+            grantedTime=controller->requestTime(maxTime);
+        }
+        controller->disconnect();
+    };
+
+    std::string finalValue;
+    auto vfed = [&]() {
+        vFed2->enterExecutingMode();
+        helics::Time grantedTime=helics::timeZero;
+        helics::Time maxTime=12.0;
+        e2.sendTo("b","control");
+        while (grantedTime<maxTime) {
+            grantedTime=vFed2->requestTime(grantedTime+2.0);
+            auto m=e2.getMessage();
+            if (m)
+            {
+                m->data.append("b",1);
+                m->dest="control";
+                e2.send(std::move(m));
+            }
+            
+        }
+        vFed2->requestTime(cHelicsBigNumber);
+        finalValue=e2.getMessage()->data.to_string();
+    };
+
+    auto fed2res = std::async(std::launch::async, cfed);
+    auto fed1res = std::async(std::launch::async, vfed);
+
+    fed1res.get();
+
+    fed2res.get();
+    std::string test{"bababababababa"};
+    //compute the expected value
+    EXPECT_EQ(finalValue,test);
+}
