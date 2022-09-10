@@ -1019,28 +1019,29 @@ void WebServer::stopServer()
 void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
 {
     if (mHttpEnabled) {
+        auto httpInterfaceNetwork=mInterfaceNetwork;
         if (config->isMember("http")) {
             auto V = (*config)["http"];
             helics::fileops::replaceIfMember(V, "interface", mHttpAddress);
             helics::fileops::replaceIfMember(V, "port", mHttpPort);
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
-            if (external) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
-            }
-
             bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
 
             if (ipv4) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+                httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
             bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
             if (ipv6) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+                httpInterfaceNetwork = static_cast<int>((ipv4)?gmlc::networking::InterfaceNetworks::ALL:gmlc::networking::InterfaceNetworks::IPV6);
+            }
+
+            bool external = helics::fileops::getOrDefault(V, "external", false);
+            helics::fileops::replaceIfMember(V, "all", external);
+            if (external) {
+                httpInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
         }
         mHttpAddress = gmlc::networking::generateMatchingInterfaceAddress(
-            mHttpAddress, static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+            mHttpAddress, static_cast<gmlc::networking::InterfaceNetworks>(httpInterfaceNetwork));
         gmlc::networking::removeProtocol(mHttpAddress);
         if (mHttpAddress == "*") {
             mHttpAddress = "0.0.0.0";
@@ -1053,28 +1054,31 @@ void WebServer::mainLoop(std::shared_ptr<WebServer> keepAlive)
     }
 
     if (mWebsocketEnabled) {
+        auto websocketInterfaceNetwork=mInterfaceNetwork;
         if (config->isMember("websocket")) {
             auto V = (*config)["websocket"];
             helics::fileops::replaceIfMember(V, "interface", mWebsocketAddress);
             helics::fileops::replaceIfMember(V, "port", mWebsocketPort);
-            bool external = helics::fileops::getOrDefault(V, "external", false);
-            helics::fileops::replaceIfMember(V, "all", external);
-            if (external) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
-            }
+            
 
             bool ipv4 = helics::fileops::getOrDefault(V, "ipv4", false);
 
             if (ipv4) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
+                websocketInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV4);
             }
             bool ipv6 = helics::fileops::getOrDefault(V, "ipv6", false);
             if (ipv6) {
-                mInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::IPV6);
+                websocketInterfaceNetwork = static_cast<int>((ipv4)?gmlc::networking::InterfaceNetworks::ALL:gmlc::networking::InterfaceNetworks::IPV6);
+            }
+
+            bool external = helics::fileops::getOrDefault(V, "external", false);
+            helics::fileops::replaceIfMember(V, "all", external);
+            if (external) {
+                websocketInterfaceNetwork = static_cast<int>(gmlc::networking::InterfaceNetworks::ALL);
             }
         }
         mWebsocketAddress = gmlc::networking::generateMatchingInterfaceAddress(
-            mWebsocketAddress, static_cast<gmlc::networking::InterfaceNetworks>(mInterfaceNetwork));
+            mWebsocketAddress, static_cast<gmlc::networking::InterfaceNetworks>(websocketInterfaceNetwork));
         gmlc::networking::removeProtocol(mWebsocketAddress);
         if (mWebsocketAddress == "*") {
             mWebsocketAddress = "0.0.0.0";

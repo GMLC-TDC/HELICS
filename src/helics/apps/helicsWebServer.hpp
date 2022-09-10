@@ -24,7 +24,10 @@ namespace apps {
     /** a virtual class to use as a base for broker servers of various types*/
     class WebServer: public TypedBrokerServer {
       public:
-        static constexpr int defaultPort{43542};
+        /// @brief default port for the HTTP web server
+        static constexpr int defaultHttpPort{43542};
+        /// @brief default port for the Websocket server
+        static constexpr int defaultWebSocketPort{43543};
         WebServer() = default;
         explicit WebServer(std::string_view server_name): mName(server_name) {}
         /** start the server*/
@@ -50,9 +53,9 @@ namespace apps {
         const std::string mName;
         std::string mArgs;
         std::string mHttpAddress;
-        int mHttpPort{defaultPort};
+        int mHttpPort{defaultHttpPort};
         std::string mWebsocketAddress;
-        int mWebsocketPort{defaultPort};
+        int mWebsocketPort{defaultWebSocketPort};
         bool mHttpEnabled{false};
         bool mWebsocketEnabled{false};
         int mInterfaceNetwork{0};
