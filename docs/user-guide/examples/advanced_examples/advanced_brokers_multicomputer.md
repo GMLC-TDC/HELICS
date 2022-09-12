@@ -72,7 +72,7 @@ Note that any federates running on the same machine as the broker would also nee
 
 ## Execution and Results
 
-To run this example you'll need to use two computers, running one part of the federation on each. Each computer can launch its part of the federation with "helics_cli"
+To run this example you'll need to use two computers, running one part of the federation on each. Each computer can launch its part of the federation with the following HELICS runner commands
 
 ```shell-session
 $ helics run --path=./multi_computer_1_runner.json

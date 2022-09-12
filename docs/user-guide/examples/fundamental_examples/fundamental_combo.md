@@ -20,7 +20,7 @@ All files necessary to run the Federate Integration Example can be found in the 
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
 - Python program and configuration JSON for Controller federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Combination Federates
 
@@ -204,7 +204,7 @@ else:
 
 ### Co-simulation execution
 
-With these three federates -- Battery, Charger, and Controller -- we have partitioned the roles into the most logical places. Execution of this co-simulation is done as before with `helics_cli`:
+With these three federates -- Battery, Charger, and Controller -- we have partitioned the roles into the most logical places. Execution of this co-simulation is done as before with the HELICS runner:
 
 ```shell
 helics run --path=fundamental_combo_runner.json

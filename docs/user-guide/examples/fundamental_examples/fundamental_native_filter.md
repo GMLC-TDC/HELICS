@@ -18,7 +18,7 @@ All files necessary to run the Native Filter Example can be found in the [Fundam
 - Python program and configuration JSON for Battery federate
 - Python program and configuration JSON for Charger federate
 - Python program and configuration JSON for Controller federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## HELICS filters
 
@@ -56,7 +56,7 @@ The delay value is set to 900 seconds so that the impact of the fictitious commu
 
 ## Co-simulation execution
 
-Execution of this co-simulation is done as before with `helics_cli`:
+Execution of this co-simulation is done as before with the `helics run` command:
 
 ```shell
 helics run --path=fundamental_combo_runner.json

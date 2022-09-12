@@ -42,7 +42,7 @@ Not all federations lend themselves to segregation like this; the example here d
 
 When implementing across compute nodes, the configuration is simpler will be simpler than in this example because the need to segregate the federates and brokers is only a function of IP address where HELICS can use the default port number on each compute node. To get this example to run on a single computer, the hierarchy must be implemented through the use of specific port numbers for specific brokers.
 
-When running across multiple compute nodes, the relevant portion of the helics_cli runner files would look like this:
+When running across multiple compute nodes, the relevant portion of the HELICS runner files would look like this:
 
 `broker_hierarchy_runner_A.json`
 

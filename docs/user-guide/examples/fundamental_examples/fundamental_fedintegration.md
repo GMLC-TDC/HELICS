@@ -56,7 +56,7 @@ $ pip install numpy
   2.4.0 (2020-02-04)
   ```
 
-- helics_cli version
+- pyhelics version
 
   ```shell
   $ helics --version
@@ -83,7 +83,7 @@ The files include:
 
 - Python program for Battery federate
 - Python program for Charger federate
-- "runner" JSON to enable `helics_cli` execution of the co-simulation
+- HELICS runner JSON to enable execution of the co-simulation
 
 ## Federate Integration using the PyHELICS API
 
@@ -235,7 +235,7 @@ Here we only need to designate the number of connections to register in one plac
 
 ### Co-simulation Execution
 
-In this tutorial, we have covered how to integrate federates into a co-simulation using the PyHELICS API. Integration covers configuration of federates and registration of communication connections. Execution of the co-simulation is done the same as with the Base Example, with a runner JSON we sent to `helics_cli`. The runner JSON has not changed from the Base Example:
+In this tutorial, we have covered how to integrate federates into a co-simulation using the PyHELICS API. Integration covers configuration of federates and registration of communication connections. Execution of the co-simulation is done the same as with the Base Example, using a runner JSON. The runner JSON has not changed from the Base Example:
 
 ```json
 {
