@@ -52,16 +52,21 @@ int main(int argc, char* argv[])  // NOLINT
         "helics-broker --autorestart <broker args ...> will start a continually regenerating broker "
         "there is a 3 second countdown on broker completion to halt the program via ctrl-C\n");
 
-
     cmdLine.add_flag("--http,--web",
-        http_server,
-        "start a webserver to respond to http rest api requests");
-    cmdLine.add_flag("--websocket", websocket_server, "start a websocket to respond to api requests");
+                     http_server,
+                     "start a webserver to respond to http rest api requests");
+    cmdLine.add_flag("--websocket",
+                     websocket_server,
+                     "start a websocket server to respond to api requests");
 #ifdef HELICS_ENABLE_WEBSERVER
-    cmdLine.add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")->envname("HELICS_HTTP_ARGS");
-    cmdLine.add_option("--websocket_server_args",
-        mWebSocketArgs,
-        "command line arguments for the websocket server")->envname("HELICS_WEBSOCKET_ARGS");
+    cmdLine
+        .add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")
+        ->envname("HELICS_HTTP_ARGS");
+    cmdLine
+        .add_option("--websocket_server_args",
+                    mWebSocketArgs,
+                    "command line arguments for the websocket server")
+        ->envname("HELICS_WEBSOCKET_ARGS");
 #endif
 
     cmdLine
@@ -102,8 +107,9 @@ int main(int argc, char* argv[])  // NOLINT
     }
 #else
     if (http_server || websocket_server) {
-        std::cout << "the http webserver and websocket server are not available in this build please recompile with webserver enabled to utilize "
-                  << std::endl;
+        std::cout
+            << "the http webserver and websocket server are not available in this build please recompile with webserver enabled to utilize "
+            << std::endl;
     }
 #endif
     try {

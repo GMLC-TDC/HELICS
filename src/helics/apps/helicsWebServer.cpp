@@ -432,9 +432,11 @@ std::pair<RequestReturnVal, std::string>
                 }
             }
             if (fields.find("command_str") != fields.end()) {
-                brkr->sendCommand(std::string_view(target.data(),target.size()), fields.at("command_str"));
+                brkr->sendCommand(std::string_view(target.data(), target.size()),
+                                  fields.at("command_str"));
             } else if (!query.empty()) {
-                brkr->sendCommand(std::string_view(target.data(),target.size()), std::string_view(query.data(),query.size()));
+                brkr->sendCommand(std::string_view(target.data(), target.size()),
+                                  std::string_view(query.data(), query.size()));
             } else {
                 return {RequestReturnVal::BAD_REQUEST, "no valid command string"};
             }
@@ -925,13 +927,13 @@ class Listener: public std::enable_shared_from_this<Listener> {
         if (ec) {
             return fail(ec, "helics accept connections");
         }
-            if (websocket) {
-                // Create the session and run it
-                std::make_shared<WebSocketsession>(std::move(socket))->run();
-            } else {
-                // Create the session and run it
-                std::make_shared<HttpSession>(std::move(socket))->run();
-            }
+        if (websocket) {
+            // Create the session and run it
+            std::make_shared<WebSocketsession>(std::move(socket))->run();
+        } else {
+            // Create the session and run it
+            std::make_shared<HttpSession>(std::move(socket))->run();
+        }
 
         // Accept another connection
         do_accept();
@@ -954,7 +956,7 @@ void WebServer::processArgs(std::string_view args)
     parser
         .add_option("--http_interface",
                     mHttpAddress,
-                    "specify the interface to use for connecting an http server")
+                    "specify the interface for the http server to listen on for connections")
         ->envname("HELICS_HTTP_ADDRESS");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
@@ -962,7 +964,7 @@ void WebServer::processArgs(std::string_view args)
     parser
         .add_option("--websocket_interface",
                     mWebsocketAddress,
-                    "specify the interface to use for connecting a web server")
+                    "specify the interface for the websocket server to listen on for connections")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
     parser
