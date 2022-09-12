@@ -888,7 +888,12 @@ TEST_F(timing, dual_max_time_endpoint)
             
         }
         vFed2->requestTime(cHelicsBigNumber);
-        finalValue=e2.getMessage()->data.to_string();
+        auto m=e2.getMessage();
+        if (m)
+        {
+            finalValue=m->data.to_string();
+        }
+        
     };
 
     auto fed2res = std::async(std::launch::async, cfed);

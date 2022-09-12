@@ -29,12 +29,13 @@ enum class TimeState : std::uint8_t {
     error = 10
 };
 
+/** enumeration of the different connection arrangements*/
 enum class ConnectionType : std::uint8_t {
-    independent = 0,
-    parent = 1,
-    child = 2,
-    self = 3,
-    none = 4,
+    INDEPENDENT = 0,
+    PARENT = 1,
+    CHILD = 2,
+    SELF = 3,
+    NONE = 4,
 };
 
 /** enumeration of the possible message processing results*/
@@ -60,6 +61,7 @@ class TimeData {
     Time Te{timeZero};  //!< the next currently scheduled event
     Time minDe{timeZero};  //!< min dependency event time
     Time TeAlt{timeZero};  //!< the second min event
+    Time lastGrant{timeZero}; //!< storage for the previous grant time
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};
@@ -96,7 +98,7 @@ class DependencyInfo: public TimeData {
 
     bool cyclic{false};  //!< indicator that the dependency is cyclic and should be reset more
                          //!< completely on grant
-    ConnectionType connection{ConnectionType::independent};
+    ConnectionType connection{ConnectionType::INDEPENDENT};
     bool dependent{false};  //!< indicator the dependency is a dependent object
     bool dependency{false};  //!< indicator that the dependency is an actual dependency
     bool forwarding{false};  //!< indicator that the dependency is a forwarding time coordinator
@@ -173,7 +175,7 @@ class TimeDependencies {
     /** check if the dependencies would allow entry to exec mode*/
     bool checkIfReadyForExecEntry(bool iterating, bool waiting) const;
     /** check if all dependencies have passed exec mode and are requesting time*/
-    bool checkAllPastExec(bool iterating) const;
+    bool checkIfAllDependenciesArePastExec(bool iterating) const;
     /** check if the dependencies would allow a grant of the time
     @param iterating true if the object is iterating
     @param desiredGrantTime  the time to check for granting
@@ -216,7 +218,7 @@ inline bool checkSequenceCounter(const DependencyInfo& dep, Time tmin, std::int3
 
 const DependencyInfo& getExecEntryMinFederate(const TimeDependencies& dependencies,
                                               GlobalFederateId self,
-                                              ConnectionType ignoreType = ConnectionType::none,
+                                              ConnectionType ignoreType = ConnectionType::NONE,
                                               GlobalFederateId ignore = GlobalFederateId{});
 static constexpr GlobalFederateId NoIgnoredFederates{};
 
