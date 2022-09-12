@@ -391,7 +391,13 @@ void CommonCore::globalError(LocalFederateId federateID,
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
+    if (fed->isCallbackFederate()) {
+        setActionFlag(m, indicator_flag);
+    }
     addActionMessage(m);
+    if (fed->isCallbackFederate()) {
+        return;
+    }
     fed->addAction(m);
     MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
     while (ret != MessageProcessingResult::ERROR_RESULT) {
@@ -421,7 +427,13 @@ void CommonCore::localError(LocalFederateId federateID, int errorCode, std::stri
     m.source_id = fed->global_id.load();
     m.messageID = errorCode;
     m.payload = errorString;
+    if (fed->isCallbackFederate()) {
+        setActionFlag(m, indicator_flag);
+    }
     addActionMessage(m);
+    if (fed->isCallbackFederate()) {
+        return;
+    }
     fed->addAction(m);
     MessageProcessingResult ret = MessageProcessingResult::NEXT_STEP;
     while (ret != MessageProcessingResult::ERROR_RESULT) {
@@ -479,8 +491,14 @@ void CommonCore::finalize(LocalFederateId federateID)
             addActionMessage(bye);
         } break;
     }
-
-    fed->finalize();
+    if (fed->isCallbackFederate()) {
+        if (fed->getState() == FederateStates::CREATED) {
+            fed->finalize();
+        }
+        // else just let the normal callback operation take place
+    } else {
+        fed->finalize();
+    }
 }
 
 bool CommonCore::allInitReady() const
@@ -571,19 +589,21 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
     }
 
     bool exp = false;
-    if (fed->init_requested.compare_exchange_strong(
-            exp, true)) {  // only enter this loop once per federate
+    // only enter this loop once per federate
+    if (fed->init_requested.compare_exchange_strong(exp, true)) {
         ActionMessage m(CMD_INIT);
         m.source_id = fed->global_id.load();
         addActionMessage(m);
 
-        auto check = fed->enterInitializingMode();
-        if (check != IterationResult::NEXT_STEP) {
-            fed->init_requested = false;
-            if (check == IterationResult::HALTED) {
-                throw(HelicsSystemFailure());
+        if (!fed->isCallbackFederate()) {
+            auto check = fed->enterInitializingMode();
+            if (check != IterationResult::NEXT_STEP) {
+                fed->init_requested = false;
+                if (check == IterationResult::HALTED) {
+                    throw(HelicsSystemFailure());
+                }
+                generateFederateException(fed);
             }
-            generateFederateException(fed);
         }
         return;
     }
@@ -602,7 +622,10 @@ IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, Itera
     if (FederateStates::INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
     }
-
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "enterExecutingMode is not permitted for callback based federates"));
+    }
     // do an exec check on the fed to process previously received messages so it can't get in a
     // deadlocked state
     ActionMessage execc(CMD_EXEC_CHECK);
@@ -758,7 +781,7 @@ LocalFederateId CommonCore::getFederateId(std::string_view name) const
 int32_t CommonCore::getFederationSize()
 {
     if (getBrokerState() >= BrokerState::OPERATING) {
-        return _global_federation_size;
+        return mGlobalFederationSize;
     }
     // if we are in initialization return the local federation size
     return static_cast<int32_t>(federates.lock()->size());
@@ -769,6 +792,10 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequest"));
+    }
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "Time request operation is not permitted for callback based federates"));
     }
     auto cBrokerState = getBrokerState();
     switch (cBrokerState) {
@@ -820,7 +847,10 @@ iteration_time CommonCore::requestTimeIterative(LocalFederateId federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid timeRequestIterative"));
     }
-
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "Time request iterative operation is not permitted for callback based federates"));
+    }
     switch (fed->getState()) {
         case FederateStates::EXECUTING:
             break;
@@ -876,7 +906,10 @@ void CommonCore::processCommunications(LocalFederateId federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (processCommunications)"));
     }
-
+    if (fed->isCallbackFederate()) {
+        throw(InvalidFunctionCall(
+            "process Comms operation is not permitted for callback based federates"));
+    }
     switch (fed->getState()) {
         case FederateStates::FINISHED:
         case FederateStates::TERMINATING:
@@ -2417,6 +2450,29 @@ void CommonCore::setTranslatorOperator(InterfaceHandle translator,
     transOpUpdate.source_id = hndl->getFederateId();
     transOpUpdate.source_handle = translator;
     actionQueue.push(transOpUpdate);
+}
+
+void CommonCore::setFederateOperator(LocalFederateId federateID,
+                                     std::shared_ptr<FederateOperator> callbacks)
+{
+    static std::shared_ptr<FederateOperator> nullFederate =
+        std::make_shared<NullFederateOperator>();
+
+    auto* fed = getFederateAt(federateID);
+    if (fed == nullptr) {
+        throw(InvalidIdentifier("FederateID is not valid (setFederateOperator)"));
+    }
+
+    ActionMessage fedOpUpdate(CMD_CORE_CONFIGURE);
+    fedOpUpdate.messageID = UPDATE_FEDERATE_OPERATOR;
+    if (!callbacks) {
+        callbacks = nullFederate;
+    }
+    auto ii = getNextAirlockIndex();
+    dataAirlocks[ii].load(std::move(callbacks));
+    fedOpUpdate.counter = ii;
+    fedOpUpdate.source_id = fed->global_id.load();
+    actionQueue.push(fedOpUpdate);
 }
 
 void CommonCore::setIdentifier(std::string_view name)
@@ -4412,7 +4468,12 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
                                  cmd.payload.to_string());
                     auto fed = loopFederates.find(cmd.source_id);
                     if (fed != loopFederates.end()) {
-                        fed->state = OperatingState::ERROR_STATE;
+                        if (checkActionFlag(cmd, indicator_flag)) {
+                            fed->fed->addAction(cmd);
+                        } else {
+                            fed->state = OperatingState::ERROR_STATE;
+                        }
+
                     } else if (cmd.source_id == filterFedID) {
                         filterFed->handleMessage(cmd);
                         // filterFed->
@@ -4707,6 +4768,27 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         case UPDATE_TRANSLATOR_OPERATOR:
             if (translatorFed != nullptr) {
                 translatorFed->handleMessage(cmd);
+            }
+            break;
+        case UPDATE_FEDERATE_OPERATOR:
+            if (checkActionFlag(cmd, empty_flag)) {
+                setLoggerFunction(nullptr);
+            } else {
+                auto op = dataAirlocks[cmd.counter].try_unload();
+                if (op) {
+                    try {
+                        auto* fed = getFederateCore(cmd.source_id);
+                        if (fed != nullptr) {
+                            auto FO =
+                                std::any_cast<std::shared_ptr<FederateOperator>>(std::move(*op));
+                            fed->setCallbackOperator(std::move(FO));
+                        }
+                    }
+                    catch (const std::bad_any_cast&) {
+                        // This shouldn't really happen unless someone is being malicious so just
+                        // ignore it for now.
+                    }
+                }
             }
             break;
         default:

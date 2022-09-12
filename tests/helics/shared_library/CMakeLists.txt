@@ -27,6 +27,7 @@ set(c_shared_library_test_sources
     PropertyIndexTests.cpp
     commandInterfaceTests.cpp
     miscApiTests.cpp
+    CallbackFederateTests.cpp
 )
 
 set(cpp_shared_library_test_sources

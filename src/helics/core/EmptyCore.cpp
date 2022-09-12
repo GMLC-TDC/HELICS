@@ -456,6 +456,12 @@ void EmptyCore::setTranslatorOperator(InterfaceHandle /*translator*/,
                                       std::shared_ptr<TranslatorOperator> /*callback*/)
 {
 }
+
+void EmptyCore::setFederateOperator(LocalFederateId /*federateID */,
+                                    std::shared_ptr<FederateOperator> /*callback*/)
+{
+}
+
 void EmptyCore::setQueryCallback(LocalFederateId /*federateID*/,
                                  std::function<std::string(std::string_view)> /*queryFunction*/)
 {

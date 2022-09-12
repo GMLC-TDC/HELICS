@@ -9,6 +9,7 @@
 
 set(application_api_headers
     CombinationFederate.hpp
+    CallbackFederate.hpp
     Publications.hpp
     Subscriptions.hpp
     Endpoints.hpp
@@ -60,6 +61,7 @@ set(application_api_sources
     helicsTypes.cpp
     queryFunctions.cpp
     FederateInfo.cpp
+    CallbackFederate.cpp
     Inputs.cpp
     BrokerApp.cpp
     CoreApp.cpp

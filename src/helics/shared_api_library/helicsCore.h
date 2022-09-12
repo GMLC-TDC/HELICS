@@ -571,6 +571,36 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
 HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
 
 /**
+* Create a callback federate from a federate info object.
+*
+* @details Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
+*
+* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
+* @param fi The federate info object that contains details on the federate.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value federate object; nullptr if the object creation failed.
+*/
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+
+/**
+* Create a callback federate from a JSON file or JSON string or TOML file.
+*
+* @details Callback federates are combination federates that run a series of callbacks for execution in a completely automated fashion.
+* The enterInitializingMode call transfers complete control of the federate to the Core and no further user interaction is expected.
+*
+* @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque combination federate object.
+*/
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, HelicsError* err);
+
+/**
  * Create a new reference to an existing federate.
  *
  * @details This will create a new HelicsFederate object that references the existing federate. The new object must be freed as well.

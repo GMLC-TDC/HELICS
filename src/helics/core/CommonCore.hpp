@@ -233,6 +233,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void
         setTranslatorOperator(InterfaceHandle translator,
                               std::shared_ptr<TranslatorOperator> callbacks) override final;
+    virtual void setFederateOperator(LocalFederateId federateID,
+                                     std::shared_ptr<FederateOperator> callback) override;
     /** set the local identification for the core*/
     void setIdentifier(std::string_view name);
     /** get the local identifier for the core*/
@@ -442,7 +444,7 @@ class CommonCore: public Core, public BrokerBase {
     void processCommandInstruction(ActionMessage& command);
 
   private:
-    int32_t _global_federation_size = 0;  //!< total size of the federation
+    int32_t mGlobalFederationSize{0};  //!< total size of the federation
     /// counter for the number of times the entry to initialization Mode was explicitly delayed
     std::atomic<int16_t> delayInitCounter{0};
     bool filterTiming{false};  //!< if there are filters needing a time connection

@@ -140,7 +140,13 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_EVENT_TRIGGERED = 81,
                /** specify that that federate should capture the profiling data to the local
                   federate logging system*/
-               HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
+               HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96,
+               /** specify that the federate is a callback based federate using callbacks for
+                  execution*/
+               HELICS_FLAG_CALLBACK_FEDERATE = 103,
+               /** specify that a federate should automatically call timeRequest on completion of
+                  current request*/
+               HELICS_FLAG_AUTOMATED_TIMEREQUEST = 106
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
@@ -271,6 +277,8 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
                /** the property controlling output delay for a federate*/
                HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+               /** specify the maximum time of a federate (callback federates only)*/
+               HELICS_PROPERTY_TIME_MAXTIME = 152,
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
                HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,

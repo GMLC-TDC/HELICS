@@ -403,6 +403,7 @@ across different compilers*/
 // definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_TRANSLATOR_OPERATOR 574
+#define UPDATE_FEDERATE_OPERATOR 576
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 #define UPDATE_LOGGING_FILE 594
