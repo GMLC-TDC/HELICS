@@ -24,8 +24,12 @@ namespace apps {
     /** a virtual class to use as a base for broker servers of various types*/
     class WebServer: public TypedBrokerServer {
       public:
+        /// @brief default port for the HTTP web server
+        static constexpr int defaultHttpPort{43542};
+        /// @brief default port for the Websocket server
+        static constexpr int defaultWebSocketPort{43543};
         WebServer() = default;
-        explicit WebServer(std::string_view server_name): name_(server_name) {}
+        explicit WebServer(std::string_view server_name): mName(server_name) {}
         /** start the server*/
         virtual void startServer(const Json::Value* val,
                                  const std::shared_ptr<TypedBrokerServer>& ptr) override;
@@ -34,9 +38,9 @@ namespace apps {
         /** process any command line arguments*/
         virtual void processArgs(std::string_view args) override;
         /** enable the HTTP server*/
-        void enableHttpServer(bool enabled) { http_enabled_ = enabled; }
+        void enableHttpServer(bool enabled) { mHttpEnabled = enabled; }
         /** enable the websocket server*/
-        void enableWebSocketServer(bool enabled) { websocket_enabled_ = enabled; }
+        void enableWebSocketServer(bool enabled) { mWebsocketEnabled = enabled; }
 
       private:
         void mainLoop(std::shared_ptr<WebServer> keepAlive);
@@ -46,14 +50,15 @@ namespace apps {
         std::mutex threadGuard;
 
         const Json::Value* config{nullptr};
-        const std::string name_;
+        const std::string mName;
         std::string mArgs;
-        std::string httpAddress_{"127.0.0.1"};
-        int httpPort_{8080};
-        std::string websocketAddress_{"127.0.0.1"};
-        int websocketPort_{8080};
-        bool http_enabled_{false};
-        bool websocket_enabled_{false};
+        std::string mHttpAddress;
+        int mHttpPort{defaultHttpPort};
+        std::string mWebsocketAddress;
+        int mWebsocketPort{defaultWebSocketPort};
+        bool mHttpEnabled{false};
+        bool mWebsocketEnabled{false};
+        int mInterfaceNetwork{0};
         std::atomic<bool> executing{false};
     };
 }  // namespace apps

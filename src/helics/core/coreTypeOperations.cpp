@@ -67,7 +67,6 @@ std::string to_string(CoreType type)
             return std::string();
     }
 }
-
 static constexpr frozen::unordered_map<std::string_view, CoreType, 53> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
@@ -127,6 +126,10 @@ CoreType coreTypeFromString(std::string_view type) noexcept
 {
     if (type.empty()) {
         return CoreType::DEFAULT;
+    }
+    // in case it came from the to_string(CoreType)
+    if (type.back() == '_') {
+        type.remove_suffix(1);
     }
     const auto* fnd = coreTypes.find(type);
     if (fnd != coreTypes.end()) {
