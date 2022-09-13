@@ -19,12 +19,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-/** enumeration of possible processing results*/
-enum class message_process_result {
-    no_effect = 0,  //!< the message did not result in an update
-    processed,  //!< the message was used to update the current state
-    delay_processing,  //!< the message should be delayed and reprocessed later
-};
+
 
 /** class for the controlling fields and options for a time coordinator*/
 class tcoptions {
@@ -185,15 +180,13 @@ class TimeCoordinator: public BaseTimeCoordinator {
     bool transmitTimingMessages(ActionMessage& msg,
                                 GlobalFederateId skipFed = GlobalFederateId{}) const;
 
-    message_process_result processTimeBlockMessage(const ActionMessage& cmd);
+    TimeProcessingResult processTimeBlockMessage(const ActionMessage& cmd);
 
     Time updateTimeBlocks(int32_t blockId, Time newTime);
 
   public:
-    /** process a message related to time
-    @return the result of processing the message
-    */
-    message_process_result processTimeMessage(const ActionMessage& cmd);
+
+    virtual TimeProcessingResult processTimeMessage(const ActionMessage& cmd) override;
 
     /** process a message related to configuration
     @param cmd the update command

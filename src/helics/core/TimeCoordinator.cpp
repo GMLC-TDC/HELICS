@@ -644,7 +644,7 @@ MessageProcessingResult TimeCoordinator::checkTimeGrant(GlobalFederateId trigger
                             if (!dep.dependency) {
                                 continue;
                             }
-                            if (dep.next > time_exec || dep.connection == ConnectionType::self) {
+                            if (dep.next > time_exec || dep.connection == ConnectionType::SELF) {
                                 continue;
                             }
 
@@ -1218,7 +1218,7 @@ std::pair<GlobalFederateId, Time> TimeCoordinator::getMinGrantedDependency() con
     return {minID, minTime};
 }
 
-message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+TimeProcessingResult TimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_TIME_BLOCK:
@@ -1239,9 +1239,9 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 lastSend.minDe = time_granted;
                 lastSend.mTimeState = TimeState::time_granted;
                 transmitTimingMessages(treq);
-                return message_process_result::processed;
+                return TimeProcessingResult::PROCESSED;
             }
-            return message_process_result::no_effect;
+            return TimeProcessingResult::NOT_PROCESSED;
         case CMD_DISCONNECT:
         case CMD_BROADCAST_DISCONNECT:
         case CMD_DISCONNECT_CORE:
@@ -1251,7 +1251,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
         case CMD_LOCAL_ERROR:
             // this command requires removing dependents as well as dealing with dependency
             // processing
-            removeDependent(GlobalFederateId(cmd.source_id));
+            removeDependent(cmd.source_id);
             break;
         case CMD_REQUEST_CURRENT_TIME:
             if (disconnected || lastSend.mTimeState == TimeState::error) {
@@ -1270,33 +1270,33 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 dependencies.updateTime(cmd);
             }
 
-            return message_process_result::processed;
+            return TimeProcessingResult::PROCESSED;
         default:
             break;
     }
     if (isDelayableMessage(cmd, mSourceId)) {
-        auto* dep = dependencies.getDependencyInfo(GlobalFederateId(cmd.source_id));
+        auto* dep = dependencies.getDependencyInfo(cmd.source_id);
         if (dep == nullptr) {
-            return message_process_result::no_effect;
+            return TimeProcessingResult::NOT_PROCESSED;
         }
         switch (dep->mTimeState) {
             case TimeState::time_requested:
                 if (dep->next > time_exec) {
-                    //     return message_process_result::delay_processing;
+                    //     return TimeProcessingResult::delay_processing;
                 }
                 break;
             case TimeState::time_requested_iterative:
                 if (dep->next > time_exec) {
-                    //         return message_process_result::delay_processing;
+                    //         return TimeProcessingResult::delay_processing;
                 }
                 if ((iterating != IterationRequest::NO_ITERATIONS) && (time_exec == dep->next)) {
-                    //       return message_process_result::delay_processing;
+                    //       return TimeProcessingResult::delay_processing;
                 }
                 break;
             case TimeState::exec_requested_iterative:
                 if ((iterating != IterationRequest::NO_ITERATIONS) && (checkingExec) &&
                     (dep->hasData)) {
-                    //          return message_process_result::delay_processing;
+                    //          return TimeProcessingResult::delay_processing;
                 }
                 break;
             default:
@@ -1305,12 +1305,7 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
     }
     auto procRes = dependencies.updateTime(cmd);
     switch (procRes) {
-        case DependencyProcessingResult::NOT_PROCESSED:
-        default:
-            return message_process_result::no_effect;
-        case DependencyProcessingResult::PROCESSED:
-            return message_process_result::processed;
-        case DependencyProcessingResult::PROCESSED_AND_CHECK: {
+        case TimeProcessingResult::PROCESSED_AND_CHECK: {
             auto checkRes = dependencies.checkForIssues(info.wait_for_current_time_updates);
             if (checkRes.first != 0) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
@@ -1320,9 +1315,12 @@ message_process_result TimeCoordinator::processTimeMessage(const ActionMessage& 
                 ge.payload = checkRes.second;
                 sendMessageFunction(ge);
             }
-            return message_process_result::processed;
+            return TimeProcessingResult::PROCESSED;
         }
+        default:
+            break;
     }
+    return procRes;
 }
 
 Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime)
@@ -1343,7 +1341,7 @@ Time TimeCoordinator::updateTimeBlocks(int32_t blockId, Time newTime)
     return res->first;
 }
 
-message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMessage& cmd)
+TimeProcessingResult TimeCoordinator::processTimeBlockMessage(const ActionMessage& cmd)
 {
     Time ltime = Time::maxVal();
     switch (cmd.action()) {
@@ -1362,10 +1360,10 @@ message_process_result TimeCoordinator::processTimeBlockMessage(const ActionMess
     }
     if (ltime > time_block) {
         time_block = ltime;
-        return message_process_result::processed;
+        return TimeProcessingResult::PROCESSED;
     }
     time_block = ltime;
-    return message_process_result::no_effect;
+    return TimeProcessingResult::NOT_PROCESSED;
 }
 
 /** set a timeProperty for a the coordinator*/

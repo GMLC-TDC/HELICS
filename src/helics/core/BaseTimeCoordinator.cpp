@@ -63,12 +63,12 @@ void BaseTimeCoordinator::enteringExecMode(IterationRequest /*mode*/)
     bool fedOnly = true;
     noParent = true;
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::parent) {
+        if (dep.connection == ConnectionType::PARENT) {
             fedOnly = false;
             noParent = false;
             break;
         }
-        if (dep.connection == ConnectionType::child && dep.fedID.isBroker()) {
+        if (dep.connection == ConnectionType::CHILD && dep.fedID.isBroker()) {
             fedOnly = false;
         }
     }
@@ -159,7 +159,7 @@ bool BaseTimeCoordinator::addDependency(GlobalFederateId fedID)
         if (fedID == mSourceId) {
             auto* dep = dependencies.getDependencyInfo(fedID);
             if (dep != nullptr) {
-                dep->connection = ConnectionType::self;
+                dep->connection = ConnectionType::SELF;
             }
         }
         return true;
@@ -179,7 +179,7 @@ void BaseTimeCoordinator::setAsChild(GlobalFederateId fedID)
     }
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
-        dep->connection = ConnectionType::child;
+        dep->connection = ConnectionType::CHILD;
     }
 }
 
@@ -190,7 +190,7 @@ void BaseTimeCoordinator::setAsParent(GlobalFederateId fedID)
     }
     auto* dep = dependencies.getDependencyInfo(fedID);
     if (dep != nullptr) {
-        dep->connection = ConnectionType::parent;
+        dep->connection = ConnectionType::PARENT;
         noParent = false;
     }
 }
@@ -206,7 +206,7 @@ void BaseTimeCoordinator::setVersion(GlobalFederateId fedID, std::int8_t version
 GlobalFederateId BaseTimeCoordinator::getParent() const
 {
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::parent) {
+        if (dep.connection == ConnectionType::PARENT) {
             return dep.fedID;
         }
     }
@@ -364,7 +364,7 @@ ActionMessage BaseTimeCoordinator::generateTimeRequest(const TimeData& dep,
     return nTime;
 }
 
-bool BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_DISCONNECT:
@@ -379,12 +379,11 @@ bool BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
     }
     auto procRes = dependencies.updateTime(cmd);
     switch (procRes) {
-        case DependencyProcessingResult::NOT_PROCESSED:
+        case TimeProcessingResult::NOT_PROCESSED:
+        case TimeProcessingResult::PROCESSED:
         default:
-            return false;
-        case DependencyProcessingResult::PROCESSED:
-            return true;
-        case DependencyProcessingResult::PROCESSED_AND_CHECK: {
+            break;
+        case TimeProcessingResult::PROCESSED_AND_CHECK: {
             auto checkRes = dependencies.checkForIssues(false);
             if (checkRes.first != 0) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
@@ -394,9 +393,10 @@ bool BaseTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
                 ge.payload = checkRes.second;
                 sendMessageFunction(ge);
             }
-            return true;
+            break;
         }
     }
+    return procRes;
 }
 
 void BaseTimeCoordinator::processDependencyUpdateMessage(const ActionMessage& cmd)

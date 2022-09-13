@@ -70,7 +70,7 @@ void AsyncTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) co
     }
 
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::child) {
+        if (dep.connection == ConnectionType::CHILD) {
             continue;
         }
         if (!dep.dependent) {
@@ -92,7 +92,7 @@ void AsyncTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
         for (const auto& dep : dependencies) {
-            if (dep.connection != ConnectionType::child) {
+            if (dep.connection != ConnectionType::CHILD) {
                 continue;
             }
             if (!dep.dependent) {

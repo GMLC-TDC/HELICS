@@ -1209,7 +1209,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
         case CMD_EXEC_REQUEST:
         case CMD_EXEC_GRANT:
             if (command.dest_id == global_broker_id_local) {
-                if (timeCoord->processTimeMessage(command)) {
+                if (timeCoord->processTimeMessage(command)!=TimeProcessingResult::NOT_PROCESSED) {
                     if (!enteredExecutionMode) {
                         if (getBrokerState() >= BrokerState::OPERATING) {
                             auto res = timeCoord->checkExecEntry(command.source_id);
@@ -1260,7 +1260,7 @@ void CoreBroker::processCommand(ActionMessage&& command)
                     routeMessage(command, dep);
                 }
             } else if (command.dest_id == global_broker_id_local) {
-                if (timeCoord->processTimeMessage(command)) {
+                if (timeCoord->processTimeMessage(command)!=TimeProcessingResult::NOT_PROCESSED) {
                     if (enteredExecutionMode) {
                         timeCoord->updateTimeFactors();
                     } else {
@@ -2861,7 +2861,7 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                 if (hasTimeDependency) {
                     if (!enteredExecutionMode) {
                         if (getBrokerState() >= BrokerState::OPERATING) {
-                            if (timeCoord->processTimeMessage(command)) {
+                            if (timeCoord->processTimeMessage(command)!=TimeProcessingResult::NOT_PROCESSED) {
                                 auto res = timeCoord->checkExecEntry();
                                 if (res == MessageProcessingResult::NEXT_STEP) {
                                     enteredExecutionMode = true;
@@ -2869,7 +2869,7 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                             }
                         }
                     } else {
-                        if (timeCoord->processTimeMessage(command)) {
+                        if (timeCoord->processTimeMessage(command)!=TimeProcessingResult::NOT_PROCESSED) {
                             timeCoord->updateTimeFactors();
                         }
                     }

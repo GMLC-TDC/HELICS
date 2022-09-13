@@ -4930,7 +4930,7 @@ void CommonCore::processCommandsForCore(const ActionMessage& cmd)
                 enteredExecutionMode = true;
             }
         } else {
-            if (timeCoord->processTimeMessage(cmd)) {
+            if (timeCoord->processTimeMessage(cmd)!=TimeProcessingResult::NOT_PROCESSED) {
                 timeCoord->updateTimeFactors();
             }
         }

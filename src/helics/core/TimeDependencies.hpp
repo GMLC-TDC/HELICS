@@ -39,10 +39,14 @@ enum class ConnectionType : std::uint8_t {
 };
 
 /** enumeration of the possible message processing results*/
-enum class DependencyProcessingResult : std::uint8_t {
-    NOT_PROCESSED = 0,
-    PROCESSED = 1,
-    PROCESSED_AND_CHECK = 2
+enum class TimeProcessingResult : std::uint8_t {
+    NOT_PROCESSED = 0, //!< the message did not result in an update
+    PROCESSED = 1, //!< the message was used to update the current state
+    /// the message was used to update the current state and additional checks should be made
+    PROCESSED_AND_CHECK = 2,
+    /// the message was used to update the current state and a new request was made
+    PROCESSED_NEW_REQUEST = 3,
+    DELAY_PROCESSING = 5 //!< the message should be delayed and reprocessed later 
 };
 
 /** enumeration of delay modes which affect whether a time is granted or not*/
@@ -148,7 +152,7 @@ class TimeDependencies {
     /** remove an interdependency from consideration*/
     void removeInterdependence(GlobalFederateId id);
     /** update the info about a dependency based on a message*/
-    DependencyProcessingResult updateTime(const ActionMessage& m);
+    TimeProcessingResult updateTime(const ActionMessage& m);
     /** get the number of dependencies*/
     auto size() const { return dependencies.size(); }
     /** iterator to first dependency*/

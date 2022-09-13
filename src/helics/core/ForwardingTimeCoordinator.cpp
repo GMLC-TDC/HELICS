@@ -166,7 +166,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
     }
 
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::child) {
+        if (dep.connection == ConnectionType::CHILD) {
             continue;
         }
         if (!dep.dependent) {
@@ -188,7 +188,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
         for (const auto& dep : dependencies) {
-            if (dep.connection != ConnectionType::child) {
+            if (dep.connection != ConnectionType::CHILD) {
                 continue;
             }
             if (!dep.dependent) {

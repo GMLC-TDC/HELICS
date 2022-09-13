@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-static DependencyProcessingResult processMessage(const ActionMessage& m, DependencyInfo& dep)
+static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInfo& dep)
 {
-    DependencyProcessingResult res{DependencyProcessingResult::PROCESSED};
+    TimeProcessingResult res{TimeProcessingResult::PROCESSED};
     bool delayed{false};
     switch (m.action()) {
         case CMD_EXEC_REQUEST:
@@ -29,7 +29,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
                 TimeState::exec_requested;
             delayed = checkActionFlag(m, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
-                res = DependencyProcessingResult::PROCESSED_AND_CHECK;
+                res = TimeProcessingResult::PROCESSED_AND_CHECK;
             }
             dep.delayedTiming = delayed;
             dep.restrictionLevel = m.messageID;
@@ -64,6 +64,11 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.hasData = false;
             break;
         case CMD_TIME_REQUEST:
+            if (dep.mTimeState == TimeState::time_granted)
+            {
+                dep.lastGrant=dep.next;
+                res=TimeProcessingResult::PROCESSED_NEW_REQUEST;
+            }
             dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
                 (checkActionFlag(m, required_flag) ? TimeState::time_requested_require_iteration :
                                                      TimeState::time_requested_iterative) :
@@ -89,7 +94,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
 
             delayed = checkActionFlag(m, delayed_timing_flag);
             if (delayed && !dep.delayedTiming) {
-                res = DependencyProcessingResult::PROCESSED_AND_CHECK;
+                res = TimeProcessingResult::PROCESSED_AND_CHECK;
             }
             if (delayed) {
                 dep.delayedTiming = delayed;
@@ -139,7 +144,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.nonGranting = checkActionFlag(m, non_granting_flag);
             dep.delayedTiming = checkActionFlag(m, delayed_timing_flag);
             dep.timingVersion = static_cast<std::uint8_t>(m.getExtraData());
-            res = DependencyProcessingResult::PROCESSED_AND_CHECK;
+            res = TimeProcessingResult::PROCESSED_AND_CHECK;
             break;
         case CMD_LOCAL_ERROR:
         case CMD_GLOBAL_ERROR:
@@ -159,7 +164,7 @@ static DependencyProcessingResult processMessage(const ActionMessage& m, Depende
             dep.sequenceCounter = m.counter;
             break;
         default:
-            res = DependencyProcessingResult::NOT_PROCESSED;
+            res = TimeProcessingResult::NOT_PROCESSED;
             break;
     }
     return res;
@@ -429,11 +434,11 @@ void TimeDependencies::removeInterdependence(GlobalFederateId id)
     }
 }
 
-DependencyProcessingResult TimeDependencies::updateTime(const ActionMessage& m)
+TimeProcessingResult TimeDependencies::updateTime(const ActionMessage& m)
 {
     auto* depInfo = getDependencyInfo(m.source_id);
     if (depInfo == nullptr || !depInfo->dependency) {
-        return DependencyProcessingResult::NOT_PROCESSED;
+        return TimeProcessingResult::NOT_PROCESSED;
     }
     return processMessage(m, *depInfo);
 }
