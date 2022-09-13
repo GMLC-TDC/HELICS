@@ -23,7 +23,6 @@ Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0
 - Fixed an issue that resulted in a timeout disconnect potentially not working properly
 - Fixed the command interface API in the C++98 interface
 
-
 ### Changed
 
 - additional use of `std::string_view` in internal callbacks and network operations
@@ -37,11 +36,10 @@ Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0
 - The REST API now returns a structure on successful broker creation
 - The helics_broker executable now has the same command line arguments for the webserver as the broker_server
 
-
 ### Added
 
 - Custom Translator functionality in the C API
-- Added an asynchronous time coordinator which could be used for testing, or if all federates are driven by real time mode, or if internal synchronization is not required.  
+- Added an asynchronous time coordinator which could be used for testing, or if all federates are driven by real time mode, or if internal synchronization is not required.
 - Added alias operations to allow interfaces to have multiple names
 - Added CORS access control options to the web server
 - Added a HELICS_STATE_UNKNOWN as a potential return value used when the federate does not exist

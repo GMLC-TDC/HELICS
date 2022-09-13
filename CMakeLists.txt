@@ -910,19 +910,19 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )
 
-    if(HELICS_BUILD_TESTS)
-        list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
-    endif()
+if(HELICS_BUILD_TESTS)
+    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+endif()
 
-    if(HELICS_BUILD_BENCHMARKS)
-        list(APPEND LICENSE_LIST "Google Benchmark"
-             "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
-        )
-    endif()
+if(HELICS_BUILD_BENCHMARKS)
+    list(APPEND LICENSE_LIST "Google Benchmark"
+         "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
+    )
+endif()
 
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
-        list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
-    endif()
+if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
+    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
+endif()
 
 if(NOT HELICS_DISABLE_ASIO)
     list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt")
