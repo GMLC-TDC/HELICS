@@ -22,6 +22,7 @@ The public API includes the following
   - ValueConverter.hpp
   - ValueFederate.hpp
   - HelicsPrimaryTypes.hpp
+  - CallbackFederate.hpp
   - queryFunctions.hpp
   - FederateInfo.hpp
   - Inputs.hpp
@@ -29,7 +30,7 @@ The public API includes the following
   - CoreApp.hpp
   - timeOperations.hpp
   - typeOperations.hpp
-  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.3 release. Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure in HELICS v3.3 at which point they will be stable for at least minor releases and changes will be noted.
+  - Exceptions: Translators and the global time coordinator option are in Beta and subject to finalization in the 3.4 release (they are mostly final and any changes will be highlighted). Vector subscriptions, and vector inputs are subject to change. The queries to retrieve JSON may update the format of the returned JSON in the future. A general note on queries: the data returned via queries is subject to change, though in general queries will not be removed. As determined by the need of HELICS users and applications, the data structure may change at minor revision numbers. We hope to fully document the queries structure in HELICS v3.4 at which point they will be stable for at least minor releases and changes will be noted.  The callback federate API is considered in Beta and may change.
 
 - Core library headers
 

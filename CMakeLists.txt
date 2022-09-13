@@ -22,7 +22,7 @@ project(HELICS VERSION 3.3.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2022-06-18")
+set(HELICS_DATE "2022-09-14")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -730,6 +730,14 @@ set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/incl
 set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
 set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
 
+# hide some of the JSON in the networking library
+set(JSON_CI OFF CACHE INTERNAL "")
+set(JSON_Diagnostics OFF CACHE INTERNAL "")
+set(JSON_ImplicitConversions ON CACHE INTERNAL "")
+set(JSON_Install OFF CACHE INTERNAL "")
+set(JSON_MultipleHeaders OFF CACHE INTERNAL "")
+set(JSON_SystemInclude OFF CACHE INTERNAL "")
+
 if(HELICS_ENABLE_ENCRYPTION)
     list(APPEND VCPKG_MANIFEST_FEATURES "encryption")
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
@@ -902,8 +910,6 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.11)
-
     if(HELICS_BUILD_TESTS)
         list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
     endif()
@@ -917,22 +923,6 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
         list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
     endif()
-
-else()
-    if(HELICS_BUILD_TESTS)
-        list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest/LICENSE")
-    endif()
-
-    if(HELICS_BUILD_BENCHMARKS)
-        list(APPEND LICENSE_LIST "Google Benchmark"
-             "${PROJECT_BINARY_DIR}/_deps/gbenchmark/LICENSE"
-        )
-    endif()
-
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND HELICS_ENABLE_ZMQ_CORE)
-        list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
-    endif()
-endif()
 
 if(NOT HELICS_DISABLE_ASIO)
     list(APPEND LICENSE_LIST "asio" "${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/LICENSE_1_0.txt")
@@ -1068,14 +1058,12 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
     set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
     set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
     set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
-    set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
@@ -1092,14 +1080,11 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
     set(CPACK_COMPONENT_BENCHMARKS_DESCRIPTION "Benchmark applications for HELICS")
-    set(CPACK_COMPONENT_CEREAL_DESCRIPTION
-        "cereal C++11 serialization library [no support for other language interfaces]"
-    )
+
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
-    set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
     set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
     set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
@@ -1110,6 +1095,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_EXECUTABLES
         "helics_broker"
         "Helics Broker"
+        "helics_broker_server"
+        "Helics Broker Server"
         "helics_app"
         "Helics app executable"
         "helics_recorder"
