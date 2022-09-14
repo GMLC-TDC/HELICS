@@ -8,8 +8,8 @@ This document contains tentative plans for changes and improvements of note in u
 - Full Dynamic Federation support
 - Single thread cores
 - Iteration for entering initializing mode
-- enable data aggregation
-- wildcard support for subscribing
+- Enable data aggregation
+- Wildcard support for subscribing
 - Catchall interface of some type
 - Separate Java Interface
 - Observer App
@@ -17,6 +17,6 @@ This document contains tentative plans for changes and improvements of note in u
 ## \[3.5\] ~ January 2023
 
 - Plugin architecture for user defined cores
-- enable mesh networking in HELICS
-- separate octave interface
+- Enable mesh networking in HELICS
+- Separate octave interface
 - Tag based subscriptions
