@@ -38,7 +38,7 @@ enum class ConnectionType : std::uint8_t {
     NONE = 4,
 };
 
-/** enumeration of the possible message processing results*/
+/** enumeration of the possible time message processing results*/
 enum class TimeProcessingResult : std::uint8_t {
     NOT_PROCESSED = 0,  //!< the message did not result in an update
     PROCESSED = 1,  //!< the message was used to update the current state
