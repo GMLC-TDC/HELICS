@@ -8,7 +8,7 @@ The Base Example tutorial is organized as follows:
 - [Default Setup](#default-setup)
   - [Messages + Communication: pub sub](#messages-communication-pub-sub)
   - [Simulator Integration: External JSON](#simulator-integration-external-json)
-  - [Co-simulation Execution:](#co-simulation-execution-helics-cli)
+  - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
