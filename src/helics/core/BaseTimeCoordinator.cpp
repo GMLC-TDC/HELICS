@@ -379,10 +379,6 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
     }
     auto procRes = dependencies.updateTime(cmd);
     switch (procRes) {
-        case TimeProcessingResult::NOT_PROCESSED:
-        case TimeProcessingResult::PROCESSED:
-        default:
-            break;
         case TimeProcessingResult::PROCESSED_AND_CHECK: {
             auto checkRes = dependencies.checkForIssues(false);
             if (checkRes.first != 0) {
@@ -395,6 +391,8 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
             }
             break;
         }
+        default:
+            break;
     }
     return procRes;
 }

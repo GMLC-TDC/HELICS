@@ -29,10 +29,11 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
     // the variables for time coordination
     DependencyInfo upstream;
     DependencyInfo downstream;
-
+    static constexpr std::int32_t mSequenceIncrement{100};
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
     bool ignoreMinFed{false};  //!< flag indicating that minFed Controls should not be used
+    std::int32_t sequenceModifier{0};
   public:
     ForwardingTimeCoordinator() = default;
 
@@ -47,6 +48,8 @@ class ForwardingTimeCoordinator: public BaseTimeCoordinator {
                                           GlobalFederateId skipFed = GlobalFederateId{}) const;
 
   public:
+
+    virtual TimeProcessingResult processTimeMessage(const ActionMessage& cmd) override;
     /** check if entry to the executing state can be granted*/
     virtual MessageProcessingResult
         checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) override;
