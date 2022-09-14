@@ -783,7 +783,6 @@ TEST_F(timing, async_timing_message)
     mFed2->finalize();
 }
 
-
 TEST_F(timing, dual_max_time)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
@@ -799,14 +798,14 @@ TEST_F(timing, dual_max_time)
 
     auto cfed = [&]() {
         controller->enterExecutingMode();
-        helics::Time grantedTime=helics::timeZero;
-        helics::Time maxTime=cHelicsBigNumber;
-        
-        grantedTime=controller->requestTime(maxTime);
-        while (grantedTime<maxTime) {
-            double v=subc.getDouble();
-            pubc.publish(2.0*v);
-            grantedTime=controller->requestTime(maxTime);
+        helics::Time grantedTime = helics::timeZero;
+        helics::Time maxTime = cHelicsBigNumber;
+
+        grantedTime = controller->requestTime(maxTime);
+        while (grantedTime < maxTime) {
+            double v = subc.getDouble();
+            pubc.publish(2.0 * v);
+            grantedTime = controller->requestTime(maxTime);
         }
         controller->disconnect();
     };
@@ -814,16 +813,16 @@ TEST_F(timing, dual_max_time)
     double finalValue{0.0};
     auto vfed = [&]() {
         vFed2->enterExecutingMode();
-        helics::Time grantedTime=helics::timeZero;
-        helics::Time maxTime=12.0;
+        helics::Time grantedTime = helics::timeZero;
+        helics::Time maxTime = 12.0;
         pubv.publish(1.0);
-        while (grantedTime<maxTime) {
-            grantedTime=vFed2->requestTime(grantedTime+2.0);
-            double v=subv.getDouble();
-            pubv.publish(v+0.7);
+        while (grantedTime < maxTime) {
+            grantedTime = vFed2->requestTime(grantedTime + 2.0);
+            double v = subv.getDouble();
+            pubv.publish(v + 0.7);
         }
         vFed2->requestTime(cHelicsBigNumber);
-        finalValue=subv.getDouble();
+        finalValue = subv.getDouble();
     };
 
     auto fed2res = std::async(std::launch::async, cfed);
@@ -833,15 +832,13 @@ TEST_F(timing, dual_max_time)
 
     fed2res.get();
     double testVal{2.0};
-    //compute the expected value
-    auto mx=[](double val){return 2.0*(val+0.7);};
-    for (int ii = 0; ii < 6; ++ii)
-    {
-        testVal=mx(testVal);
+    // compute the expected value
+    auto mx = [](double val) { return 2.0 * (val + 0.7); };
+    for (int ii = 0; ii < 6; ++ii) {
+        testVal = mx(testVal);
     }
-   EXPECT_DOUBLE_EQ(finalValue,testVal);
+    EXPECT_DOUBLE_EQ(finalValue, testVal);
 }
-
 
 TEST_F(timing, dual_max_time_endpoint)
 {
@@ -856,16 +853,16 @@ TEST_F(timing, dual_max_time_endpoint)
 
     auto cfed = [&]() {
         controller->enterExecutingMode();
-        helics::Time grantedTime=helics::timeZero;
-        helics::Time maxTime=cHelicsBigNumber;
+        helics::Time grantedTime = helics::timeZero;
+        helics::Time maxTime = cHelicsBigNumber;
 
-        grantedTime=controller->requestTime(maxTime);
-        while (grantedTime<maxTime) {
-            auto m=e1.getMessage();
-            m->data.append("a",1);
-            m->dest="value";
+        grantedTime = controller->requestTime(maxTime);
+        while (grantedTime < maxTime) {
+            auto m = e1.getMessage();
+            m->data.append("a", 1);
+            m->dest = "value";
             e1.send(std::move(m));
-            grantedTime=controller->requestTime(maxTime);
+            grantedTime = controller->requestTime(maxTime);
         }
         controller->disconnect();
     };
@@ -873,27 +870,23 @@ TEST_F(timing, dual_max_time_endpoint)
     std::string finalValue;
     auto vfed = [&]() {
         vFed2->enterExecutingMode();
-        helics::Time grantedTime=helics::timeZero;
-        helics::Time maxTime=12.0;
-        e2.sendTo("b","control");
-        while (grantedTime<maxTime) {
-            grantedTime=vFed2->requestTime(grantedTime+2.0);
-            auto m=e2.getMessage();
-            if (m)
-            {
-                m->data.append("b",1);
-                m->dest="control";
+        helics::Time grantedTime = helics::timeZero;
+        helics::Time maxTime = 12.0;
+        e2.sendTo("b", "control");
+        while (grantedTime < maxTime) {
+            grantedTime = vFed2->requestTime(grantedTime + 2.0);
+            auto m = e2.getMessage();
+            if (m) {
+                m->data.append("b", 1);
+                m->dest = "control";
                 e2.send(std::move(m));
             }
-            
         }
         vFed2->requestTime(cHelicsBigNumber);
-        auto m=e2.getMessage();
-        if (m)
-        {
-            finalValue=m->data.to_string();
+        auto m = e2.getMessage();
+        if (m) {
+            finalValue = m->data.to_string();
         }
-        
     };
 
     auto fed2res = std::async(std::launch::async, cfed);
@@ -903,6 +896,6 @@ TEST_F(timing, dual_max_time_endpoint)
 
     fed2res.get();
     std::string test{"bababababababa"};
-    //compute the expected value
-    EXPECT_EQ(finalValue,test);
+    // compute the expected value
+    EXPECT_EQ(finalValue, test);
 }

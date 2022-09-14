@@ -40,13 +40,13 @@ enum class ConnectionType : std::uint8_t {
 
 /** enumeration of the possible message processing results*/
 enum class TimeProcessingResult : std::uint8_t {
-    NOT_PROCESSED = 0, //!< the message did not result in an update
-    PROCESSED = 1, //!< the message was used to update the current state
+    NOT_PROCESSED = 0,  //!< the message did not result in an update
+    PROCESSED = 1,  //!< the message was used to update the current state
     /// the message was used to update the current state and additional checks should be made
     PROCESSED_AND_CHECK = 2,
     /// the message was used to update the current state and a new request was made
     PROCESSED_NEW_REQUEST = 3,
-    DELAY_PROCESSING = 5 //!< the message should be delayed and reprocessed later 
+    DELAY_PROCESSING = 5  //!< the message should be delayed and reprocessed later
 };
 
 /** enumeration of delay modes which affect whether a time is granted or not*/
@@ -65,7 +65,7 @@ class TimeData {
     Time Te{timeZero};  //!< the next currently scheduled event
     Time minDe{timeZero};  //!< min dependency event time
     Time TeAlt{timeZero};  //!< the second min event
-    Time lastGrant{timeZero}; //!< storage for the previous grant time
+    Time lastGrant{timeZero};  //!< storage for the previous grant time
     GlobalFederateId minFed{};  //!< identifier for the min dependency
     GlobalFederateId minFedActual{};  //!< the actual forwarded minimum federate object
     TimeState mTimeState{TimeState::initialized};

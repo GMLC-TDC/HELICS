@@ -19,8 +19,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
-
 /** class for the controlling fields and options for a time coordinator*/
 class tcoptions {
   public:
@@ -185,7 +183,6 @@ class TimeCoordinator: public BaseTimeCoordinator {
     Time updateTimeBlocks(int32_t blockId, Time newTime);
 
   public:
-
     virtual TimeProcessingResult processTimeMessage(const ActionMessage& cmd) override;
 
     /** process a message related to configuration

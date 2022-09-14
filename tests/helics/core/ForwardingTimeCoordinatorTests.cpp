@@ -158,12 +158,12 @@ TEST(ftc_tests, execMode_entry)
     ActionMessage execReady(CMD_EXEC_REQUEST);
     execReady.source_id = fed2;
     auto result = ftc.processTimeMessage(execReady);
-    EXPECT_GE(result,helics::TimeProcessingResult::PROCESSED);
+    EXPECT_GE(result, helics::TimeProcessingResult::PROCESSED);
     ret = ftc.checkExecEntry();
     EXPECT_TRUE(ret == MessageProcessingResult::CONTINUE_PROCESSING);
     execReady.source_id = fed3;
     result = ftc.processTimeMessage(execReady);
-    EXPECT_GE(result,helics::TimeProcessingResult::PROCESSED);
+    EXPECT_GE(result, helics::TimeProcessingResult::PROCESSED);
     ret = ftc.checkExecEntry();
     EXPECT_TRUE(ret == MessageProcessingResult::NEXT_STEP);
 }
@@ -207,7 +207,7 @@ TEST(ftc_tests, timing_test1)
     timeUpdate.Tdemin = 1.0;
 
     auto result = ftc.processTimeMessage(timeUpdate);
-    EXPECT_GE(result,helics::TimeProcessingResult::PROCESSED);
+    EXPECT_GE(result, helics::TimeProcessingResult::PROCESSED);
     ftc.updateTimeFactors();
     // there should still be the invalid as all federates are not updated past exec
     EXPECT_TRUE(lastMessage.action() == CMD_INVALID);
@@ -218,7 +218,7 @@ TEST(ftc_tests, timing_test1)
     timeUpdate.Tdemin = 0.5;
     ftc.enteringExecMode();
     result = ftc.processTimeMessage(timeUpdate);
-    EXPECT_GE(result,helics::TimeProcessingResult::PROCESSED);
+    EXPECT_GE(result, helics::TimeProcessingResult::PROCESSED);
     ftc.updateTimeFactors();
     EXPECT_EQ(lastMessage.actionTime, 0.5);
     EXPECT_EQ(lastMessage.Te, 1.0);

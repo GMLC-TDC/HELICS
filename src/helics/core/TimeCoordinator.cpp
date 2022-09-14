@@ -1056,7 +1056,8 @@ MessageProcessingResult TimeCoordinator::checkExecEntry(GlobalFederateId trigger
             } else {
                 if ((dependencies.checkIfReadyForExecEntry(false,
                                                            info.wait_for_current_time_updates)) ||
-                    (info.wait_for_current_time_updates && dependencies.checkIfAllDependenciesArePastExec(true))) {
+                    (info.wait_for_current_time_updates &&
+                     dependencies.checkIfAllDependenciesArePastExec(true))) {
                     ret = (iterating == IterationRequest::FORCE_ITERATION) ?
                         MessageProcessingResult::ITERATING :
                         MessageProcessingResult::NEXT_STEP;

@@ -42,7 +42,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_TIME_BARRIER_CLEAR:
         case CMD_TIME_UNBLOCK: {
             auto processed = timeCoord->processTimeMessage(cmd);
-            if (processed != TimeProcessingResult::NOT_PROCESSED ) {
+            if (processed != TimeProcessingResult::NOT_PROCESSED) {
                 if (!timeGranted_mode) {
                     if (state == FederateStates::INITIALIZING) {
                         cmd.setAction(CMD_EXEC_CHECK);

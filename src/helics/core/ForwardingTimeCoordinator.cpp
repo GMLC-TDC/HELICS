@@ -54,7 +54,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 
-    sequenceCounter = upstream.sequenceCounter+sequenceModifier;
+    sequenceCounter = upstream.sequenceCounter + sequenceModifier;
     if (updateUpStream || updateDownStream) {
         auto upd =
             generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
@@ -122,15 +122,13 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
 
 TimeProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
 {
-    auto res=BaseTimeCoordinator::processTimeMessage(cmd);
-    if (res == TimeProcessingResult::PROCESSED_NEW_REQUEST)
-    {
-        sequenceModifier+=mSequenceIncrement;
-        if (sequenceModifier > 16000)
-        {
-            sequenceModifier=mSequenceIncrement;
+    auto res = BaseTimeCoordinator::processTimeMessage(cmd);
+    if (res == TimeProcessingResult::PROCESSED_NEW_REQUEST) {
+        sequenceModifier += mSequenceIncrement;
+        if (sequenceModifier > 16000) {
+            sequenceModifier = mSequenceIncrement;
         }
-       sequenceCounter=upstream.sequenceCounter+sequenceModifier;
+        sequenceCounter = upstream.sequenceCounter + sequenceModifier;
     }
     return res;
 }

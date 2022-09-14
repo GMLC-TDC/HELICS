@@ -64,10 +64,9 @@ static TimeProcessingResult processMessage(const ActionMessage& m, DependencyInf
             dep.hasData = false;
             break;
         case CMD_TIME_REQUEST:
-            if (dep.mTimeState == TimeState::time_granted)
-            {
-                dep.lastGrant=dep.next;
-                res=TimeProcessingResult::PROCESSED_NEW_REQUEST;
+            if (dep.mTimeState == TimeState::time_granted) {
+                dep.lastGrant = dep.next;
+                res = TimeProcessingResult::PROCESSED_NEW_REQUEST;
             }
             dep.mTimeState = checkActionFlag(m, iteration_requested_flag) ?
                 (checkActionFlag(m, required_flag) ? TimeState::time_requested_require_iteration :
