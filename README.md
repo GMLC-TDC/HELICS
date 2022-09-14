@@ -54,7 +54,7 @@ The design and development of HELICS is driven by a number of philosophical cons
 - The design should be layered and modular to be adaptable to a wide variety of circumstances
 - Centralized control should be minimized
 
-These design priorities directed much of the design of HELICS and supporting tools, including operation as a library vs a run time interface that requires simulations be loaded as modules into HELICS, the use of distributed timing and control, and giving federates fine grained control over the time management and operations that is independent of operations of other federates. These  core philosophies support an underlying belief driving co-simulation that "Simulations are Better Together".
+These design priorities directed much of the design of HELICS and supporting tools, including operation as a library vs a run time interface that requires simulations be loaded as modules into HELICS, the use of distributed timing and control, and giving federates fine grained control over the time management and operations that is independent of operations of other federates. These core philosophies support an underlying belief driving co-simulation that "Simulations are Better Together".
 
 ## Getting Started
 
