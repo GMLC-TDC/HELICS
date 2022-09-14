@@ -378,8 +378,7 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
             break;
     }
     auto procRes = dependencies.updateTime(cmd);
-    switch (procRes) {
-        case TimeProcessingResult::PROCESSED_AND_CHECK: {
+    if (procRes==TimeProcessingResult::PROCESSED_AND_CHECK) {
             auto checkRes = dependencies.checkForIssues(false);
             if (checkRes.first != 0) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
@@ -389,10 +388,6 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
                 ge.payload = checkRes.second;
                 sendMessageFunction(ge);
             }
-            break;
-        }
-        default:
-            break;
     }
     return procRes;
 }

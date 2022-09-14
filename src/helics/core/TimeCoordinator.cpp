@@ -1305,8 +1305,7 @@ TimeProcessingResult TimeCoordinator::processTimeMessage(const ActionMessage& cm
         }
     }
     auto procRes = dependencies.updateTime(cmd);
-    switch (procRes) {
-        case TimeProcessingResult::PROCESSED_AND_CHECK: {
+    if (procRes==TimeProcessingResult::PROCESSED_AND_CHECK) {
             auto checkRes = dependencies.checkForIssues(info.wait_for_current_time_updates);
             if (checkRes.first != 0) {
                 ActionMessage ge(CMD_GLOBAL_ERROR);
@@ -1316,10 +1315,7 @@ TimeProcessingResult TimeCoordinator::processTimeMessage(const ActionMessage& cm
                 ge.payload = checkRes.second;
                 sendMessageFunction(ge);
             }
-            return TimeProcessingResult::PROCESSED;
-        }
-        default:
-            break;
+            procRes=TimeProcessingResult::PROCESSED;
     }
     return procRes;
 }
