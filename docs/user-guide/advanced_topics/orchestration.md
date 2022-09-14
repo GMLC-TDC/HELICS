@@ -60,7 +60,7 @@ all resource allocation calls to the workload manager, the user will
 only need to provide the number of nodes they need for their study.
 
 Another benefit of using Merlin for HELICS co-simulation is its
-flexibility to manage complex co-simulations. `pyhlelics` includes functionality to launch HELICS co-simulations using a JSON file that defines the federates of the co-simulation. As of this writing it does not have
+flexibility to manage complex co-simulations. `pyhelics` includes functionality to launch HELICS co-simulations using a JSON file that defines the federates of the co-simulation. As of this writing it does not have
 the ability to analyze the data and launch subsequent co-simulations.
 In this type of scenario a user could use Merlin to setup a
 specification that included an analyze step in the Study step of
