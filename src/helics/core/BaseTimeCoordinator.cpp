@@ -378,16 +378,16 @@ TimeProcessingResult BaseTimeCoordinator::processTimeMessage(const ActionMessage
             break;
     }
     auto procRes = dependencies.updateTime(cmd);
-    if (procRes==TimeProcessingResult::PROCESSED_AND_CHECK) {
-            auto checkRes = dependencies.checkForIssues(false);
-            if (checkRes.first != 0) {
-                ActionMessage ge(CMD_GLOBAL_ERROR);
-                ge.dest_id = parent_broker_id;
-                ge.source_id = mSourceId;
-                ge.messageID = checkRes.first;
-                ge.payload = checkRes.second;
-                sendMessageFunction(ge);
-            }
+    if (procRes == TimeProcessingResult::PROCESSED_AND_CHECK) {
+        auto checkRes = dependencies.checkForIssues(false);
+        if (checkRes.first != 0) {
+            ActionMessage ge(CMD_GLOBAL_ERROR);
+            ge.dest_id = parent_broker_id;
+            ge.source_id = mSourceId;
+            ge.messageID = checkRes.first;
+            ge.payload = checkRes.second;
+            sendMessageFunction(ge);
+        }
     }
     return procRes;
 }
