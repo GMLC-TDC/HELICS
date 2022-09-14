@@ -10,8 +10,8 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.3.0][] ~ 2022-08-07
 
-Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.  
-The major new features include a callback federate, and aliases to allow interfaces to have multiple string names.  
+Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.
+The major new features include a callback federate, and aliases to allow interfaces to have multiple string names.
 The release also includes several bug fixes related to timing and iteration.
 
 ### Fixed
@@ -35,7 +35,7 @@ The release also includes several bug fixes related to timing and iteration.
 - refactor endpoint management code for consistency with other interfaces
 - The HELICS_DATA_TYPE_CHAR is now a member of the enumeration vs a standalone definition there is no change in operation but the numerical value is now different
 - the change detection on inputs/publication now can work individually for each interface
-- The default webserver ports, now uses 43542(Http) and 43543(Websocket).  This is to not conflict by default if both are used and to accomodate other servics that might be running on the same system.  
+- The default webserver ports, now uses 43542(Http) and 43543(Websocket). This is to not conflict by default if both are used and to accommodate other servics that might be running on the same system.
 - The REST API now returns a structure on successful broker creation
 - The helics_broker executable now has the same command line arguments for the webserver as the broker_server
 
