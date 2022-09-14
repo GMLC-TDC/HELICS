@@ -18,6 +18,7 @@ A multi-language, cross-platform library that enables different simulators to ea
 ## Table of contents
 
 - [Introduction](#introduction)
+  - [Philosophy](#philosophy-of-helics)
 - [Getting Started](#getting-started)
   - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
@@ -43,9 +44,9 @@ Today the core uses of HELICS are in the energy domain, where there is extensive
 
 Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
 
-## Philosophy of HELICS
+### Philosophy of HELICS
 
-The design and development of HELICS is driven by a number of philosophical considerations that have a clear path to design decisions in the code
+The design and development of HELICS is driven by a number of philosophical considerations that have a clear path to design decisions in the code and reflect the needs of the use cases that drive HELICS development.
 
 - Make it as easy as possible for federates of all kinds to work together
 - Federates cannot impose restrictions or requirements on other federates
@@ -53,7 +54,7 @@ The design and development of HELICS is driven by a number of philosophical cons
 - The design should be layered and modular to be adaptable to a wide variety of circumstances
 - Centralized control should be minimized
 
-These design priorities directed much of the design of HELICS and supporting tools, including operation as a library vs RTI, the use of distributed timing and control, and giving federates fine grained control over the time management and operations. These support an underlying belief driving co-simulation that "Simulations are Better Together"
+These design priorities directed much of the design of HELICS and supporting tools, including operation as a library vs a run time interface that requires simulations be loaded as modules into HELICS, the use of distributed timing and control, and giving federates fine grained control over the time management and operations that is independent of operations of other federates. These  core philosophies support an underlying belief driving co-simulation that "Simulations are Better Together".
 
 ## Getting Started
 
