@@ -54,7 +54,7 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     }
 
-    sequenceCounter = upstream.sequenceCounter;
+    sequenceCounter = upstream.sequenceCounter + sequenceModifier;
     if (updateUpStream || updateDownStream) {
         auto upd =
             generateTimeRequest(upstream, GlobalFederateId{}, upstream.responseSequenceCounter);
@@ -120,6 +120,19 @@ std::string ForwardingTimeCoordinator::printTimeStatus() const
                        static_cast<double>(downstream.minDe));
 }
 
+TimeProcessingResult ForwardingTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+{
+    auto res = BaseTimeCoordinator::processTimeMessage(cmd);
+    if (res == TimeProcessingResult::PROCESSED_NEW_REQUEST) {
+        sequenceModifier += mSequenceIncrement;
+        if (sequenceModifier > 16000) {
+            sequenceModifier = mSequenceIncrement;
+        }
+        sequenceCounter = upstream.sequenceCounter + sequenceModifier;
+    }
+    return res;
+}
+
 MessageProcessingResult ForwardingTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
@@ -166,7 +179,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& ms
     }
 
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::child) {
+        if (dep.connection == ConnectionType::CHILD) {
             continue;
         }
         if (!dep.dependent) {
@@ -188,7 +201,7 @@ void ForwardingTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& 
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
         for (const auto& dep : dependencies) {
-            if (dep.connection != ConnectionType::child) {
+            if (dep.connection != ConnectionType::CHILD) {
                 continue;
             }
             if (!dep.dependent) {

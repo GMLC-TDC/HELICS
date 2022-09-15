@@ -1448,10 +1448,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
-                    case message_process_result::delay_processing:
+                    case TimeProcessingResult::DELAY_PROCESSING:
                         addFederateToDelay(GlobalFederateId(cmd.source_id));
                         return MessageProcessingResult::DELAY_MESSAGE;
-                    case message_process_result::no_effect:
+                    case TimeProcessingResult::NOT_PROCESSED:
                         return MessageProcessingResult::CONTINUE_PROCESSING;
                     default:
                         break;
