@@ -38,6 +38,7 @@ jobs:
 
     steps:
       - bash: |
+          unset VCPKG_ROOT
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
@@ -81,6 +82,7 @@ jobs:
           brew install swig zeromq boost
         displayName: 'Install dependencies'
       - bash: |
+          unset VCPKG_ROOT
           source scripts/setup-helics-ci-options.sh
           mkdir -p build && cd build
           ../scripts/ci-build.sh
@@ -153,7 +155,7 @@ jobs:
         displayName: Show environment info
       - task: CMake@1
         inputs:
-          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON $(extraFlags) ..
+          cmakeArgs: -A $(vsArch) -DHELICS_ENABLE_SWIG=ON -DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_PACKAGE_BUILD=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DHELICS_DISABLE_VCPKG=ON $(extraFlags) ..
         displayName: 'Configure HELICS'
         condition: eq( variables['Agent.OS'], 'Windows_NT' )
 
