@@ -84,7 +84,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         if(WIN32)
             target_link_libraries(helics_apps PRIVATE bcrypt)
         endif()
-        
+
         if(MSVC)
             target_compile_options(helics_apps PRIVATE "/bigobj")
         endif()
