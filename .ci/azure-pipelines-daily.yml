@@ -137,8 +137,4 @@ jobs:
         displayName: 'Test HELICS packaging'
         workingDirectory: build
 
-      - task: PublishBuildArtifacts@1
-        condition: failed()
-        inputs:
-          pathtoPublish: '$(Build.SourcesDirectory)/build'
-          artifactName: buildDirContents
+      # For debugging, can get build folder contents by adding PublishBuildArtifacts task and set pathtoPublish: '$(Build.SourcesDirectory)/build'
