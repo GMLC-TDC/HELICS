@@ -4,6 +4,9 @@
 
 echo "Building ${CPACK_GEN} installer with ${BUILD_GEN} for ${BUILD_ARCH}"
 
+# Unset VCPKG_ROOT for GitHub actions environment
+unset VCPKG_ROOT
+
 # Install Boost
 COMMON_SCRIPTS="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common/Windows" && pwd)"
 # shellcheck source=.github/actions/common/Windows/install-boost.sh

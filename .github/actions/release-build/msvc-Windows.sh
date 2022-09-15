@@ -5,6 +5,9 @@
 
 echo "Building with ${BUILD_GEN} for ${BUILD_ARCH}"
 
+# Unset VCPKG_ROOT for GitHub actions environment
+unset VCPKG_ROOT
+
 # Install SWIG
 choco install -y swig
 
