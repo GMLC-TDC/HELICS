@@ -998,7 +998,7 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
 /**
  * Non blocking alternative to \ref helicsFederateEnterInitializingMode.
  *
- * @details The function helicsFederateEnterInitializationModeFinalize must be called to finish the operation.
+ * @details The function helicsFederateEnterInitializationModeComplete must be called to finish the operation.
  *
  * @param fed The federate to operate on.
  *
@@ -1006,25 +1006,62 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
 
-/**
- * Check if the current Asynchronous operation has completed.
- *
- * @param fed The federate to operate on.
- *
- * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- *
- * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
- */
-HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
+
 
 /**
- * Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
+ * Complete the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
  *
  * @param fed The federate desiring to complete the initialization step.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
+
+
+/**
+* Trigger a blocking call and return to created state after all federates have either triggered an iteration or waiting to enter initializing mode
+*
+* @details this call will return the federate to the created state to allow additional setup to occur with federates either iterating in the mode or waiting.
+*
+* @param fed The federate to operate on.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*/
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err);
+
+/**
+* Non blocking alternative to \ref helicsFederateEnterInitializingModeIterative.
+*
+* @details The function helicsFederateEnterInitializationModeIterativeComplete must be called to finish the operation.
+*
+* @param fed The federate to operate on.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*/
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
+
+
+
+/**
+* Complete the call to initialize mode that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in startup or error mode on return
+*
+* @param fed The federate desiring to iterate to the startup mode again
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*/
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
+
+
+/**
+* Check if the current Asynchronous operation has completed.
+*
+* @param fed The federate to operate on.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+*
+* @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
+*/
+HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request that the federate enter the Execution mode.

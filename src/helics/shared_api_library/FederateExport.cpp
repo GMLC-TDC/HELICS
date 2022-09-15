@@ -921,6 +921,50 @@ void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError
     }
 }
 
+
+void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterative();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+
+void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterativeAsync();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterativeComplete();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
 void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);

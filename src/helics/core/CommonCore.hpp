@@ -98,7 +98,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual int getErrorCode() const override final;
     virtual std::string getErrorMessage() const override final;
     virtual void finalize(LocalFederateId federateID) override final;
-    virtual bool enterInitializingMode(LocalFederateId federateID) override final;
+    virtual bool enterInitializingMode(LocalFederateId federateID,IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
     virtual IterationResult
         enterExecutingMode(LocalFederateId federateID,

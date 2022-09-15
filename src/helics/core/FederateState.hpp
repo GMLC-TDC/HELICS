@@ -378,7 +378,7 @@ class FederateState {
     /** process until the federate has verified its membership and assigned a global id number*/
     IterationResult waitSetup();
     /** process until the initialization state has been entered or there is a failure*/
-    IterationResult enterInitializingMode();
+    IterationResult enterInitializingMode(IterationRequest iterate);
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
     @param sendRequest generates the local actionMessage inside the function leaving to false
