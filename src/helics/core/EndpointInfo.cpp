@@ -7,11 +7,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "EndpointInfo.hpp"
 
 #include "../common/JsonGeneration.hpp"
+#include "helics_definitions.hpp"
 //#include "core/core-data.hpp"
+#include "../common/fmt_format.h"
 
 #include <algorithm>
 #include <cstring>
 #include <memory>
+#include <set>
 #include <utility>
 
 namespace helics {
@@ -249,4 +252,102 @@ const std::string& EndpointInfo::getDestinationTargets() const
     return destinationTargets;
 }
 
+void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::string>>& issues)
+{
+    if (!targetedEndpoint) {
+        return;
+    }
+    if (required) {
+        if (sourceInformation.empty() && targetInformation.empty()) {
+            issues.emplace_back(helics::defs::Errors::CONNECTION_FAILURE,
+                                fmt::format("Endpoint {} is required but has no connections", key));
+        }
+    }
+    if (required_connections > 0) {
+        auto max_connections = (std::max)(targetInformation.size(), sourceInformation.size());
+        auto sum_connections = targetInformation.size() + sourceInformation.size();
+
+        if (max_connections > static_cast<size_t>(required_connections)) {
+            if (required_connections == 1) {
+                issues.emplace_back(
+                    helics::defs::Errors::CONNECTION_FAILURE,
+                    fmt::format(
+                        "Endpoint {} is single source only but has more than one connection", key));
+            } else {
+                issues.emplace_back(
+                    helics::defs::Errors::CONNECTION_FAILURE,
+                    fmt::format("Endpoint {} requires {} connections but has at least {}",
+                                key,
+                                required_connections,
+                                max_connections));
+            }
+        } else {
+            if (static_cast<std::int32_t>(sum_connections) != required_connections) {
+                std::set<GlobalHandle> handles;
+                for (const auto& src : sourceInformation) {
+                    handles.emplace(src.id);
+                }
+                for (const auto& trg : targetInformation) {
+                    handles.emplace(trg.id);
+                }
+                if (static_cast<std::int32_t>(handles.size()) != required_connections) {
+                    issues.emplace_back(
+                        helics::defs::Errors::CONNECTION_FAILURE,
+                        fmt::format("Endpoint {} requires {} connections but has only {}",
+                                    key,
+                                    required_connections,
+                                    handles.size()));
+                }
+            }
+        }
+    }
+}
+
+void EndpointInfo::setProperty(int32_t option, int32_t value)
+{
+    bool bvalue = (value != 0);
+    switch (option) {
+        case defs::Options::CONNECTION_REQUIRED:
+            required = bvalue;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            required = !bvalue;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            required_connections = bvalue ? 1 : 0;
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            required_connections = !bvalue ? 0 : 1;
+            break;
+        case defs::Options::CONNECTIONS:
+            required_connections = value;
+            break;
+        default:
+            break;
+    }
+}
+
+int32_t EndpointInfo::getProperty(int32_t option) const
+{
+    bool flagval = false;
+    switch (option) {
+        case defs::Options::CONNECTION_REQUIRED:
+            flagval = required;
+            break;
+        case defs::Options::CONNECTION_OPTIONAL:
+            flagval = !required;
+            break;
+        case defs::Options::SINGLE_CONNECTION_ONLY:
+            flagval = (required_connections == 1);
+            break;
+        case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
+            flagval = (required_connections != 1);
+            break;
+        case defs::Options::CONNECTIONS:
+            return static_cast<int32_t>(targetInformation.size());
+        default:
+            break;
+    }
+    return flagval ? 1 : 0;
+}
 }  // namespace helics

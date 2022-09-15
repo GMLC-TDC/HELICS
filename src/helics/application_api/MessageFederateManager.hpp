@@ -114,7 +114,7 @@ class MessageFederateManager {
     class EndpointData {
       public:
         gmlc::containers::SimpleQueue<std::unique_ptr<Message>> messages;
-        atomic_guarded<std::function<void(Endpoint&, Time)>> callback;
+        std::function<void(Endpoint&, Time)> callback;
     };
     shared_guarded<gmlc::containers::DualStringMappedVector<Endpoint, InterfaceHandle>>
         local_endpoints;  //!< storage for the local endpoint information
@@ -123,11 +123,11 @@ class MessageFederateManager {
     Core* coreObject;  //!< the pointer to the actual core
     MessageFederate* mFed;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
-    shared_guarded<std::vector<std::unique_ptr<EndpointData>>>
-        eptData;  //!< the storage for the message queues and other unique Endpoint information
+    /// the storage for the message queues and other unique Endpoint information
+    shared_guarded<std::deque<EndpointData>> eptData;
     guarded<std::vector<unsigned int>>
         messageOrder;  //!< maintaining a list of the ordered messages
-  private:  // private functions
+  private:
     void removeOrderedMessage(unsigned int index);
 };
 }  // namespace helics

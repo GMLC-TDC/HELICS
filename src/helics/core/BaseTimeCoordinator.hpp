@@ -83,9 +83,9 @@ class BaseTimeCoordinator {
 
   public:
     /** process a message related to time
-    @return a message_process_result if it did anything
+    @return a TimeProcessingResult if it did anything
     */
-    bool processTimeMessage(const ActionMessage& cmd);
+    virtual TimeProcessingResult processTimeMessage(const ActionMessage& cmd);
 
     /** process a dependency update message*/
     void processDependencyUpdateMessage(const ActionMessage& cmd);

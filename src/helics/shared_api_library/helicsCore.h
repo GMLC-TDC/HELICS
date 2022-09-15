@@ -571,6 +571,36 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederate(const char* fedName
 HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
 
 /**
+* Create a callback federate from a federate info object.
+*
+* @details Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
+*
+* @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
+* @param fi The federate info object that contains details on the federate.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque value federate object; nullptr if the object creation failed.
+*/
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+
+/**
+* Create a callback federate from a JSON file or JSON string or TOML file.
+*
+* @details Callback federates are combination federates that run a series of callbacks for execution in a completely automated fashion.
+* The enterInitializingMode call transfers complete control of the federate to the Core and no further user interaction is expected.
+*
+* @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
+*
+* @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+
+*
+* @return An opaque combination federate object.
+*/
+HELICS_EXPORT HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, HelicsError* err);
+
+/**
  * Create a new reference to an existing federate.
  *
  * @details This will create a new HelicsFederate object that references the existing federate. The new object must be freed as well.
@@ -604,7 +634,7 @@ HELICS_EXPORT void helicsFederateProtect(const char* fedName, HelicsError* err);
  later otherwise it will be destroyed
  * when the library is closed
  *
- * @param fed the name of an existing federate that should not be protected
+ * @param fedName the name of an existing federate that should not be protected
  *
  * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
  */
@@ -614,7 +644,7 @@ HELICS_EXPORT void helicsFederateUnProtect(const char* fedName, HelicsError* err
  * checks if an existing federate is protected
  *
  *
- * @param fed the name of an existing federate to check the protection status
+ * @param fedName the name of an existing federate to check the protection status
  *
  * @param[in,out] err An error object that will contain an error code and string if the federate was not found.
  */
@@ -1076,8 +1106,10 @@ HELICS_EXPORT HelicsIterationResult helicsFederateEnterExecutingModeIterativeCom
  * @param fed The federate to query.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ * The err object will be removed in a future release as it is not necessary for use the function will not error, invalid federate return
+ * HELICS_STATE_UNKOWN
  *
- * @return State the resulting state if void return HELICS_OK.
+ * @return State the resulting state if the federate is invalid will return HELICS_STATE_UNKNOWN
  */
 HELICS_EXPORT HelicsFederateState helicsFederateGetState(HelicsFederate fed, HelicsError* err);
 

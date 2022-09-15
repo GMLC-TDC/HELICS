@@ -7,22 +7,24 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.10...3.23)
+cmake_minimum_required(VERSION 3.11...3.24)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
-if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+option(HELICS_DISABLE_VCPKG "Force CMake to ignore VCPKG_ROOT even if it is set" OFF)
+mark_as_advanced(HELICS_DISABLE_VCPKG)
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE AND NOT HELICS_DISABLE_VCPKG)
     set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 endif()
 
-project(HELICS VERSION 3.2.1)
+project(HELICS VERSION 3.3.0)
 
 # -----------------------------------------------------------------------------
 # HELICS Version number
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2022-06-16")
+set(HELICS_DATE "2022-09-15")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -433,6 +435,7 @@ endif()
 set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
 set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
+set(toml11_INSTALL OFF CACHE INTERNAL "")
 add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
 
 # -------------------------------------------------------------
@@ -480,6 +483,17 @@ if(HELICS_BUILD_CONFIGURATION STREQUAL "PI")
     target_link_libraries(helics_base INTERFACE atomic)
 endif()
 
+# Add to list of enabled vcpkg features based on core type
+if(HELICS_ENABLE_ZMQ_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "zeromq")
+endif()
+if(HELICS_ENABLE_IPC_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "ipc")
+endif()
+if(HELICS_ENABLE_MPI_CORE)
+    list(APPEND VCPKG_MANIFEST_FEATURES "mpi")
+endif()
+
 # -------------------------------------------------------------
 # finding MPI
 # -------------------------------------------------------------
@@ -510,7 +524,7 @@ if(UNIX AND NOT APPLE)
     target_link_libraries(helics_base INTERFACE rt)
 endif()
 
-target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=0")
+target_compile_definitions(helics_base INTERFACE "CLI11_HAS_FILESYSTEM=1")
 target_compile_definitions(helics_base INTERFACE "USE_STD_OPTIONAL=1")
 # -------------------------------------------------------------
 # add some additional libraries for MINGW and MSYS
@@ -587,8 +601,6 @@ target_include_directories(
 )
 
 target_link_libraries(helics_base INTERFACE toml11::toml11)
-# TODO(PT): this should be removed when we require a compiler with the filesystem header defined
-target_compile_definitions(helics_base INTERFACE "-DTOML11_DISABLE_STD_FILESYSTEM")
 
 if(NOT HELICS_DISABLE_BOOST)
     target_include_directories(helics_base SYSTEM INTERFACE $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>)
@@ -720,7 +732,16 @@ set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/incl
 set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
 set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
 
+# hide some of the JSON in the networking library
+set(JSON_CI OFF CACHE INTERNAL "")
+set(JSON_Diagnostics OFF CACHE INTERNAL "")
+set(JSON_ImplicitConversions ON CACHE INTERNAL "")
+set(JSON_Install OFF CACHE INTERNAL "")
+set(JSON_MultipleHeaders OFF CACHE INTERNAL "")
+set(JSON_SystemInclude OFF CACHE INTERNAL "")
+
 if(HELICS_ENABLE_ENCRYPTION)
+    list(APPEND VCPKG_MANIFEST_FEATURES "encryption")
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
 else()
     set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
@@ -891,36 +912,18 @@ set(LICENSE_LIST
     "${PROJECT_SOURCE_DIR}/ThirdParty/networking/LICENSE"
 )
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.11)
+if(HELICS_BUILD_TESTS)
+    list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
+endif()
 
-    if(HELICS_BUILD_TESTS)
-        list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest-src/LICENSE")
-    endif()
+if(HELICS_BUILD_BENCHMARKS)
+    list(APPEND LICENSE_LIST "Google Benchmark"
+         "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
+    )
+endif()
 
-    if(HELICS_BUILD_BENCHMARKS)
-        list(APPEND LICENSE_LIST "Google Benchmark"
-             "${PROJECT_BINARY_DIR}/_deps/gbenchmark-src/LICENSE"
-        )
-    endif()
-
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
-        list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
-    endif()
-
-else()
-    if(HELICS_BUILD_TESTS)
-        list(APPEND LICENSE_LIST "Google Test" "${PROJECT_BINARY_DIR}/_deps/googletest/LICENSE")
-    endif()
-
-    if(HELICS_BUILD_BENCHMARKS)
-        list(APPEND LICENSE_LIST "Google Benchmark"
-             "${PROJECT_BINARY_DIR}/_deps/gbenchmark/LICENSE"
-        )
-    endif()
-
-    if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq AND HELICS_ENABLE_ZMQ_CORE)
-        list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq/COPYING")
-    endif()
+if(EXISTS ${PROJECT_BINARY_DIR}/_deps/libzmq-src AND HELICS_ENABLE_ZMQ_CORE)
+    list(APPEND LICENSE_LIST "ZeroMQ" "${PROJECT_BINARY_DIR}/_deps/libzmq-src/COPYING")
 endif()
 
 if(NOT HELICS_DISABLE_ASIO)
@@ -1057,14 +1060,12 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_BENCHMARKS_DISPLAY_NAME "Benchmarks")
     set(CPACK_COMPONENT_SWIG_DISPLAY_NAME "SWIG")
     set(CPACK_COMPONENT_JAVA_DISPLAY_NAME "Java")
-    set(CPACK_COMPONENT_MATLAB_DISPLAY_NAME "MATLAB")
     set(CPACK_COMPONENT_OCTAVE_DISPLAY_NAME "Octave")
     set(CPACK_COMPONENT_CSHARP_DISPLAY_NAME "C#")
 
     set(CPACK_COMPONENT_GROUP_INTERFACES_DISPLAY_NAME "Interfaces")
     set(CPACK_COMPONENT_GROUP_INTERFACES_DESCRIPTION "Additional language interfaces for HELICS")
     set(CPACK_COMPONENT_SWIG_GROUP interfaces)
-    set(CPACK_COMPONENT_MATLAB_GROUP interfaces)
     set(CPACK_COMPONENT_JAVA_GROUP interfaces)
     set(CPACK_COMPONENT_OCTAVE_GROUP interfaces)
     set(CPACK_COMPONENT_CSHARP_GROUP interfaces)
@@ -1081,14 +1082,11 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_COMPONENT_HEADERS_DESCRIPTION "Headers for linking and compiling with HELICS")
     set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime libraries for HELICS")
     set(CPACK_COMPONENT_BENCHMARKS_DESCRIPTION "Benchmark applications for HELICS")
-    set(CPACK_COMPONENT_CEREAL_DESCRIPTION
-        "cereal C++11 serialization library [no support for other language interfaces]"
-    )
+
     set(CPACK_COMPONENT_SWIG_DESCRIPTION
         "SWIG files needed for building 3rd party language interfaces (requires Development Headers)"
     )
     set(CPACK_COMPONENT_JAVA_DESCRIPTION "Java language interface")
-    set(CPACK_COMPONENT_MATLAB_DESCRIPTION "MATLAB language interface")
     set(CPACK_COMPONENT_OCTAVE_DESCRIPTION "Octave language interface")
     set(CPACK_COMPONENT_CSHARP_DESCRIPTION "C# language interface")
 
@@ -1099,6 +1097,8 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
     set(CPACK_PACKAGE_EXECUTABLES
         "helics_broker"
         "Helics Broker"
+        "helics_broker_server"
+        "Helics Broker Server"
         "helics_app"
         "Helics app executable"
         "helics_recorder"

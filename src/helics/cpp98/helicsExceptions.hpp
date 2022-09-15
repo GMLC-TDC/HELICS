@@ -5,8 +5,8 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef _HELICS_CPP98_EXCEPTIONS_
-#define _HELICS_CPP98_EXCEPTIONS_
+#ifndef HELICS_CPP98_EXCEPTIONS_HPP_
+#define HELICS_CPP98_EXCEPTIONS_HPP_
 #pragma once
 
 #include "config.hpp"
@@ -56,4 +56,4 @@ class hThrowOnError {
 };
 }  // namespace helicscpp
 
-#endif /*_HELICS_CPP98_EXCEPTIONS_*/
+#endif /*HELICS_CPP98_EXCEPTIONS_HPP_*/

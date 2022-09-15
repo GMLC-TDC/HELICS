@@ -12,17 +12,11 @@
 # which gives output on failed tests without having to set an environment variable.
 #
 
-set(gtest_version release-1.10.0)
+set(gtest_version release-1.12.1)
 
-set(gtest_version_new f079775)
-
-set(gtest_vtype GIT_TAG)
-# depending on what the version is set to the git_clone command may need to change to
-# GIT_TAG||GIT_BRANCH|GIT_COMMIT
 
 string(TOLOWER "googletest" gtName)
 
-if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     include(FetchContent)
     mark_as_advanced(FETCHCONTENT_BASE_DIR)
     mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
@@ -32,7 +26,9 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     fetchcontent_declare(
         googletest
         GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG ${gtest_version_new}
+        GIT_TAG ${gtest_version}
+        GIT_SHALLOW 1
+        UPDATE_COMMAND ""
     )
 
     fetchcontent_getproperties(googletest)
@@ -44,33 +40,26 @@ if(NOT CMAKE_VERSION VERSION_LESS 3.11)
     endif()
     hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
     hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
-else() # cmake <3.11
 
-    # create the directory first
-    file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/_deps)
 
-    include(GitUtils)
-    git_clone(
-        PROJECT_NAME
-        googletest
-        GIT_URL
-        https://github.com/google/googletest.git
-        ${gtest_vtype}
-        ${gtest_version}
-        DIRECTORY
-        ${PROJECT_BINARY_DIR}/_deps
-    )
+set(gtest_force_shared_crt
+    ON
+    CACHE INTERNAL ""
+)
 
-    set(${gtName}_BINARY_DIR ${PROJECT_BINARY_DIR}/_deps/${gtName}-build)
+set(BUILD_SHARED_LIBS
+    OFF
+    CACHE INTERNAL ""
+)
+set(HAVE_STD_REGEX
+    ON
+    CACHE INTERNAL ""
+)
 
-endif()
-
-set(gtest_force_shared_crt ON CACHE INTERNAL "")
-
-set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
-set(HAVE_STD_REGEX ON CACHE INTERNAL "" )
-
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS
+    1
+    CACHE INTERNAL ""
+)
 add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
@@ -89,14 +78,11 @@ macro(add_gtest TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC gtest gmock gtest_main)
 
     if(GOOGLE_TEST_INDIVIDUAL)
-            gtest_discover_tests(
-                ${TESTNAME}
-                TEST_PREFIX
-                "${TESTNAME}."
-                PROPERTIES
-                FOLDER
-                "Tests"
-            )
+        gtest_discover_tests(
+            ${TESTNAME}
+            TEST_PREFIX "${TESTNAME}."
+            PROPERTIES FOLDER "Tests"
+        )
     else()
         add_test(${TESTNAME} ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER "Tests")
@@ -117,12 +103,12 @@ set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Exter
 
 if(MSVC)
     # add_compile_options( /wd4459)
-        target_compile_definitions(gtest PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gtest_main PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gmock PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-        target_compile_definitions(gmock_main PUBLIC
-                                   _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(gtest PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(
+        gtest_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
+    target_compile_definitions(gmock PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+    target_compile_definitions(
+        gmock_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
+    )
 endif()

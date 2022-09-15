@@ -31,6 +31,7 @@ class Federate;
 class Broker;
 class ValueFederate;
 class MessageFederate;
+class CallbackFederate;
 class Input;
 class Publication;
 class Endpoint;
@@ -42,7 +43,7 @@ class TranslatorObject;
 class SmallBuffer;
 
 /** type code embedded in the objects so the library knows how to cast them appropriately*/
-enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, INVALID };
+enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, CALLBACK, INVALID };
 
 /** object wrapping a broker for the c-api*/
 class BrokerObject {
@@ -186,7 +187,7 @@ inline void assignError(HelicsError* err, int error_code, const char* string)
 }
 
 extern const std::string gHelicsEmptyStr;
-extern const std::string gHelicsNullStringArgument;
+constexpr char gHelicsNullStringArgument[] = "The supplied string argument is null and therefore invalid";
 #define AS_STRING(str) ((str) != nullptr) ? std::string(str) : gHelicsEmptyStr
 
 #define AS_STRING_VIEW(str) ((str) != nullptr) ? std::string_view(str) : std::string_view(gHelicsEmptyStr)
@@ -194,7 +195,7 @@ extern const std::string gHelicsNullStringArgument;
 #define CHECK_NULL_STRING(str, retval)                                                                                                     \
     do {                                                                                                                                   \
         if ((str) == nullptr) {                                                                                                            \
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument.c_str());                                            \
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, gHelicsNullStringArgument);                                                    \
             return (retval);                                                                                                               \
         }                                                                                                                                  \
     } while (false)
@@ -202,6 +203,7 @@ extern const std::string gHelicsNullStringArgument;
 helics::Federate* getFed(HelicsFederate fed, HelicsError* err);
 helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err);
 helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
+helics::CallbackFederate* getCallbackFed(HelicsFederate fed, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
@@ -215,6 +217,7 @@ HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff);
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate fed, HelicsError* err);
+std::shared_ptr<helics::CallbackFederate> getCallbackFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::Core> getCoreSharedPtr(HelicsCore core, HelicsError* err);
 /**centralized error handler for the C interface*/
 void helicsErrorHandler(HelicsError* err) noexcept;

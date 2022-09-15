@@ -18,15 +18,14 @@ A multi-language, cross-platform library that enables different simulators to ea
 ## Table of contents
 
 - [Introduction](#introduction)
+  - [Philosophy](#philosophy-of-helics)
 - [Getting Started](#getting-started)
   - [Language Bindings](#language-bindings)
 - [Documentation](#documentation)
-
   - [Changelog](#changelog)
   - [RoadMap](#roadmap)
   - [Installation](#installation)
   - [Quick links](#quick-links)
-
 - [Tools with HELICS support](#tools-with-helics-support)
 - [Contributing](#contributing)
 - [Build Status](#build-status)
@@ -44,6 +43,18 @@ It is important to note that HELICS cannot in and of itself simulate anything, r
 Today the core uses of HELICS are in the energy domain, where there is extensive and growing support for a wide-range of electric power system, natural gas, communications and control-schemes, transportation, buildings, and related domain tools ([Supported Tools](docs/references/Tools_using_HELICS.md)). However, it is possible to use HELICS for co-simulation in any domain; the HELICS API and language bindings make it straightforward to connect any simulation tool that provides a scripting interface or access to source code.
 
 Previous and existing use cases have stretched across a wide range of scales in time and spatial area, from transient dynamics to long-term planning studies, and from individual appliance behavior to nation-wide simulations.
+
+### Philosophy of HELICS
+
+The design and development of HELICS is driven by a number of philosophical considerations that have a clear path to design decisions in the code and reflect the needs of the use cases that drive HELICS development.
+
+- Make it as easy as possible for federates of all kinds to work together
+- Federates cannot impose restrictions or requirements on other federates
+- Federates should maintain control and autonomy
+- The design should be layered and modular to be adaptable to a wide variety of circumstances
+- Centralized control should be minimized
+
+These design priorities directed much of the design of HELICS and supporting tools, including operation as a library vs a run time interface that requires simulations be loaded as modules into HELICS, the use of distributed timing and control, and giving federates fine grained control over the time management and operations that is independent of operations of other federates. These core philosophies support an underlying belief driving co-simulation that "Simulations are Better Together".
 
 ## Getting Started
 
@@ -138,30 +149,20 @@ Contributors are welcome, see the [Contributing](CONTRIBUTING.md) guidelines for
     <td><b>Service</b></td>
     <td><b>Main</b></td>
     <td><b>Develop</b></td>
-    <td><b>helics2</b></td>
-  </tr>
-  <tr>
-  <td>Travis CI</td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=main" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=develop" alt="Build Status" /></a></td>
-  <td><a href="https://travis-ci.com/GMLC-TDC/HELICS"><img src="https://travis-ci.com/GMLC-TDC/HELICS.svg?branch=helics2" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Azure</td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=main"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=main" alt="Build Status" /></a></td>
   <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=develop"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=develop" alt="Build Status" /></a></td>
-  <td><a href="https://dev.azure.com/HELICS-test/HELICS/_build/latest?definitionId=5&branchName=helics2"><img src="https://dev.azure.com/HELICS-test/HELICS/_apis/build/status/GMLC-TDC.HELICS?branchName=helics2" alt="Build Status" /></a></td>
   </tr>
   <tr>
   <td>Circle-CI</td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/main.svg?style=svg" alt="Build Status" /></a></td>
   <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/develop.svg?style=svg" alt="Build Status" /></a></td>
-  <td><a href="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics2"><img src="https://circleci.com/gh/GMLC-TDC/HELICS/tree/helics2.svg?style=svg" alt="Build Status" /></a></td>
   </tr>
   <td>Docs</td>
   <td><a href="https://docs.helics.org/en/latest/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   <td><a href="https://docs.helics.org/en/develop/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
-  <td><a href="https://docs.helics.org/en/helics2/"><img src="https://readthedocs.org/projects/helics/badge/?version=latest" alt="docs" /></a></td>
   </tr>
 </table>
 </details>

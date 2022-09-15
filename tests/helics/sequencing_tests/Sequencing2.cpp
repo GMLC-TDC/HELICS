@@ -172,3 +172,94 @@ TEST_P(sequencing_reroute, separate_dest)
 }
 
 INSTANTIATE_TEST_SUITE_P(sequencing_test, sequencing_reroute, ::testing::Range(15, 40), testNamer);
+
+class sequence_wait: public ::testing::TestWithParam<int>, public FederateTestFixture {};
+
+TEST_P(sequence_wait, wait_for_current_time_flag)
+{
+    extraBrokerArgs = " --debugging ";
+    extraCoreArgs = " --debugging ";
+
+    SetupTest<helics::ValueFederate>("test_2", 3);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
+
+    vFed3->setFlagOption(helics::defs::Flags::WAIT_FOR_CURRENT_TIME_UPDATE);
+
+    auto& pub1 = vFed1->registerGlobalPublication<double>("pub1");
+
+    auto& sub2 = vFed2->registerSubscription("pub1");
+    auto& sub3 = vFed3->registerSubscription("pub1");
+    sub2.setDefault(2.6);
+    sub3.setDefault(1.9);
+
+    auto act1 = [&pub1, &vFed1]() {
+        vFed1->enterExecutingMode();
+        vFed1->requestTime(1.0);
+        pub1.publish(3.5);
+        auto tm1 = vFed1->requestTime(3.0);
+        EXPECT_EQ(tm1, 3.0);
+        pub1.publish(9.3);
+        vFed1->finalize();
+    };
+
+    auto act2 = [&sub2, &vFed2]() {
+        vFed2->enterExecutingMode();
+        auto tm2 = vFed2->requestTime(1.0);
+        EXPECT_EQ(tm2, 1.0);
+        double val2 = sub2.getValue<double>();
+        EXPECT_DOUBLE_EQ(val2, 2.6);  // shouldn't have gotten the update
+        tm2 = vFed2->requestTime(2.0);
+        EXPECT_EQ(tm2, helics::Time(1.0) + helics::Time(1, time_units::ns));
+        val2 = sub2.getValue<double>();
+        EXPECT_DOUBLE_EQ(val2, 3.5);
+        // Now check that iteration works
+        auto tm3 = vFed2->requestTime(3.0);
+        EXPECT_EQ(tm3, 3.0);
+        val2 = sub2.getValue<double>();
+        EXPECT_DOUBLE_EQ(val2, 3.5);
+
+        auto itTime = vFed2->requestTimeIterative(4.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+        EXPECT_EQ(itTime.state, helics::IterationResult::ITERATING);
+        EXPECT_EQ(itTime.grantedTime, 3.0);
+        val2 = sub2.getValue<double>();
+        EXPECT_DOUBLE_EQ(val2, 9.3);
+
+        itTime = vFed2->requestTimeIterative(4.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+        EXPECT_EQ(itTime.state, helics::IterationResult::NEXT_STEP);
+        EXPECT_EQ(itTime.grantedTime, 4.0);
+        val2 = sub2.getValue<double>();
+        EXPECT_DOUBLE_EQ(val2, 9.3);
+
+        vFed2->finalize();
+    };
+    auto delay = helics::delayMessages(vFed3.get(), GetParam(), 500);
+    auto t1 = std::thread(act1);
+    auto t2 = std::thread(act2);
+
+    vFed3->enterExecutingMode();
+    auto tm3 = vFed3->requestTime(1.0);
+    EXPECT_EQ(tm3, 1.0);
+    double val3 = sub3.getValue<double>();
+    EXPECT_DOUBLE_EQ(val3,
+                     3.5);  // should have gotten the update from the wait_for_current_time_flag
+
+    tm3 = vFed3->requestTime(2.0);
+    EXPECT_EQ(tm3, 2.0);
+    val3 = sub3.getValue<double>();
+    EXPECT_DOUBLE_EQ(val3, 3.5);
+    // Now test the wait_for_current_time with iteration enabled
+    auto itTime3 = vFed3->requestTimeIterative(3.0, helics::IterationRequest::ITERATE_IF_NEEDED);
+    EXPECT_EQ(itTime3.state, helics::IterationResult::NEXT_STEP);
+    EXPECT_EQ(itTime3.grantedTime, 3.0);
+    val3 = sub3.getValue<double>();
+    EXPECT_DOUBLE_EQ(val3, 9.3);
+
+    vFed3->finalize();
+    t1.join();
+    t2.join();
+    delay.get();
+}
+
+INSTANTIATE_TEST_SUITE_P(sequencing_test, sequence_wait, ::testing::Range(0, 40), testNamer);

@@ -5,9 +5,11 @@ This demonstrates the use of iteration both in the initialization phase, as well
 - [Where is the code?](#where-is-the-code)
 - [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
   - [Differences Compared to the Fundamental Examples](#differences-compared-to-the-advanced-default-example)
-    - [HELICS Differences](#helics-differences)
-  - [HELICS Components](#helics-components)
-- [Execution and Results](#execution-and-results)
+  - [Iteration Components](#iteration-components)
+- [Execution and Results](#execution-results)
+  - [Initialization Results](#initialization-results)
+  - [Time Loop Results](#time-loop-results)
+- [Impact of Iteration](#impact-of-iteration)
 
 ## Where is the code?
 
@@ -23,7 +25,7 @@ This example changes the model of the default example so that the charger voltag
 As a result, each time step requires some iteration to find the converged fixed-point, where both models are in a consistent state.
 
 In very loose terms, the charging strategy uses constant current below a specific state of charge followed by constant voltage once rated voltage is achieved:
-![](https://batteryuniversity.com/img/content/new.jpg)
+![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/charging_behavior.jpg?raw=true)
 _source: <https://batteryuniversity.com/article/bu-409-charging-lithium-ion>_
 
 #### Charger Behavior
@@ -373,6 +375,39 @@ Once the charging mode switches to constant voltage and the current decreases th
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true)
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true)
+
+## Impact of Iteration
+
+It is useful to think about _why_ iteration would be necessary in a simulation in the first place.
+In a world governed by differential equations, iteration essentially smooths out timescales below the range of interest.
+It allows us to assume that quicker dynamics have already settled to their steady state.
+Power systems engineers might be quite familiar with this concept.
+The power flow, which assumes steady state of voltage and current dependencies, requires iteration because of the use of constant power loads.
+Dynamic simulations (in their simplest form), however, do not iterate, because all loads are converted to impedances.
+More advanced dynamic simulations do iterate because they are attempting to account for the impact of electromagnetic phenomena (e.g. power electronics control loops) that have already settled.
+
+In this example, the charger needs to find the appropriate voltage to achieve rated current.
+In reality, there are a multitude of possible control algorithms that might be implemented.
+The use of iteration here is an acknowledgement that this fixed point _will_ be found, but at a timescale that is effectively "instantaneous" w.r.t. the interval of one hour used in the simulation.
+That is $\Delta t_{\text{control}} \ll \Delta t$.
+
+To illustrate this, a second copy of the iteration is available in the repository (`Battery_noitermain.py`, `Charger_noitermain.py`, and `advanced_iteration_runner_noitermain.json`) with the iteration turn off (except for initialization) using the flag `iterative_mode = False`.
+A comparison of the two runs is presented below:
+
+|                                                                With Iteration                                                                |                                                                  Without Iteration                                                                  |
+| :------------------------------------------------------------------------------------------------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------: |
+| ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_current.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_current.png?raw=true) |
+|  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_battery_SOCs.png?raw=true)   |  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_battery_SOCs.png?raw=true)   |
+| ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_voltage.png?raw=true) | ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_voltage.png?raw=true) |
+|  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/advanced_iteration_charger_power.png?raw=true)  |  ![](https://github.com/GMLC-TDC/helics_doc_resources/blob/main/user_guide/iteration_example/noiter/advanced_iteration_charger_power.png?raw=true)  |
+
+Without iteration the "voltage hunting" that happens during the constant-current charging phase takes place over hours instead of _instantaneously_ as is the case _with_ iteration.
+During the constant voltage phase the two runs are identical, since there is no longer an interdependence between the federates.
+
+Finally, it is worth noting that the oscillation observed here is a function of the convergence algorithm implemented (see function [`voltage_update`](#charger-behavior)).
+A more sophisticated algorithm may lead to less oscillation.
+For example, if the charger had a model of the battery SOC and its dependence on the equivalent resistance, it could estimate the current and thus obtain the right voltage immediately.
+The point is, that the specific charger control architecture is not of interest in this simulation and iteration allows to abstract out the implementation without completely neglecting certain model interdependencies and focus on behavior in the time frame of interest.
 
 ## [Questions and Help](../../support.md)
 

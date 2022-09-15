@@ -16,8 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-std::shared_ptr<helicsCLI11App>
-    NetworkBrokerData::commandLineParser(const std::string& localAddress, bool enableConfig)
+std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string_view localAddress,
+                                                                     bool enableConfig)
 {
     auto nbparser = std::make_shared<helicsCLI11App>(
         "Network connection information \n(arguments allow '_' characters in the names and ignore them)");
@@ -179,7 +179,7 @@ std::shared_ptr<helicsCLI11App>
     return nbparser;
 }
 
-void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddress)
+void NetworkBrokerData::checkAndUpdateBrokerAddress(std::string_view localAddress)
 {
     using gmlc::networking::InterfaceTypes;
     switch (allowedType) {
@@ -198,17 +198,19 @@ void NetworkBrokerData::checkAndUpdateBrokerAddress(const std::string& localAddr
         case InterfaceTypes::IP:
             if ((brokerAddress == "udp://*") ||
                 (brokerAddress == "udp")) {  // the broker address can't use a wild card
+                brokerAddress = std::string("udp://");
                 if (localAddress.compare(3, 3, "://") == 0) {
-                    brokerAddress = std::string("udp://") + localAddress.substr(6);
+                    brokerAddress.append(localAddress.substr(6));
                 } else {
-                    brokerAddress = std::string("udp://") + localAddress;
+                    brokerAddress.append(localAddress);
                 }
             } else if ((brokerAddress == "tcp://*") ||
                        (brokerAddress == "tcp")) {  // the broker address can't use a wild card
+                brokerAddress = std::string("tcp://");
                 if (localAddress.compare(3, 3, "://") == 0) {
-                    brokerAddress = std::string("tcp://") + localAddress.substr(6);
+                    brokerAddress.append(localAddress.substr(6));
                 } else {
-                    brokerAddress = std::string("tcp://") + localAddress;
+                    brokerAddress.append(localAddress);
                 }
             } else if (brokerAddress == "*") {
                 brokerAddress = localAddress;

@@ -19,6 +19,17 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <unordered_map>
 
+namespace frozen {
+template<>
+struct elsa<std::string_view> {
+    constexpr std::size_t operator()(std::string_view value) const { return hash_string(value); }
+    constexpr std::size_t operator()(std::string_view value, std::size_t seed) const
+    {
+        return hash_string(value, seed);
+    }
+};
+}  // namespace frozen
+
 namespace helics::core {
 std::string to_string(CoreType type)
 {
@@ -56,8 +67,7 @@ std::string to_string(CoreType type)
             return std::string();
     }
 }
-
-static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
+static constexpr frozen::unordered_map<std::string_view, CoreType, 53> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -112,22 +122,27 @@ static constexpr frozen::unordered_map<frozen::string, CoreType, 53> coreTypes{
     {"test1", CoreType::TEST},
     {"multi", CoreType::MULTI}};
 
-CoreType coreTypeFromString(std::string type) noexcept
+CoreType coreTypeFromString(std::string_view type) noexcept
 {
     if (type.empty()) {
         return CoreType::DEFAULT;
     }
-    auto fnd = coreTypes.find(frozen::string(type));
+    // in case it came from the to_string(CoreType)
+    if (type.back() == '_') {
+        type.remove_suffix(1);
+    }
+    const auto* fnd = coreTypes.find(type);
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    std::transform(type.cbegin(), type.cend(), type.begin(), ::tolower);
-    fnd = coreTypes.find(frozen::string(type));
+    std::string type2{type};
+    std::transform(type2.cbegin(), type2.cend(), type2.begin(), ::tolower);
+    fnd = coreTypes.find(type2);
     if (fnd != coreTypes.end()) {
         return fnd->second;
     }
-    if ((type.front() == '=') || (type.front() == '-')) {
-        return coreTypeFromString(type.substr(1));
+    if ((type2.front() == '=') || (type2.front() == '-')) {
+        return coreTypeFromString(type2.substr(1));
     }
     if (type.compare(0, 4, "zmq2") == 0) {
         return CoreType::ZMQ_SS;
@@ -236,7 +251,8 @@ bool isCoreTypeAvailable(CoreType type) noexcept
         case CoreType::TCP_SS:
             available = tcp_availability;
             break;
-        case CoreType::DEFAULT:  // default should always be available
+        case CoreType::DEFAULT:  // default and empty should always be available
+        case CoreType::EMPTY:
             available = true;
             break;
         case CoreType::INPROC:
@@ -244,11 +260,10 @@ bool isCoreTypeAvailable(CoreType type) noexcept
             break;
         case CoreType::HTTP:
         case CoreType::WEBSOCKET:
-        case CoreType::NULLCORE:
-            available = false;
+            return false;  // these are not yet built
             break;
-        case CoreType::EMPTY:
-            available = true;
+        case CoreType::NULLCORE:
+            available = false;  // nullcore is never available
             break;
         default:
             break;
@@ -257,11 +272,11 @@ bool isCoreTypeAvailable(CoreType type) noexcept
     return available;
 }
 
-static constexpr frozen::set<frozen::string, 5> global_match_strings{"any",
-                                                                     "all",
-                                                                     "data",
-                                                                     "string",
-                                                                     "block"};
+static constexpr frozen::set<std::string_view, 5> global_match_strings{"any",
+                                                                       "all",
+                                                                       "data",
+                                                                       "string",
+                                                                       "block"};
 
 bool matchingTypes(std::string_view type1, std::string_view type2)
 {
@@ -274,7 +289,7 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
     if ((type1.compare(0, 3, "def") == 0) || (type2.compare(0, 3, "def") == 0)) {
         return true;
     }
-    auto res = global_match_strings.find(type1);
+    const auto* res = global_match_strings.find(type1);
     if (res != global_match_strings.end()) {
         return true;
     }

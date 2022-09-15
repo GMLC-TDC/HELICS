@@ -168,10 +168,12 @@ std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing()
                   http_server,
                   "start a webserver to respond to http rest api requests");
     app->add_flag("--websocket", websocket_server, "start a websocket to respond to api requests");
-    app->add_option("--http_server_args", mHttpArgs, "command line arguments for the http server");
+    app->add_option("--http_server_args", mHttpArgs, "command line arguments for the http server")
+        ->envname("HELICS_HTTP_ARGS");
     app->add_option("--websocket_server_args",
                     mWebSocketArgs,
-                    "command line arguments for the websocket server");
+                    "command line arguments for the websocket server")
+        ->envname("HELICS_WEBSOCKET_ARGS");
 #endif
     app->set_config();
     app->add_option("config,--config,--server-config",

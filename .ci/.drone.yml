@@ -1,47 +1,47 @@
-kind: pipeline
-name: arm
-
-platform:
-  os: linux
-  arch: arm
-
-steps:
-  - name: uname
-    image: alpine:3.12
-    commands:
-      - uname -a
-
-  - name: submodules
-    image: alpine:3.12
-    commands:
-      # for updating submodules to latest upstream, add --remote
-      - apk add --no-cache git
-      - git submodule update --init --recursive
-
-  - name: build
-    image: alpine:3.12
-    commands:
-      - apk update
-      - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
-      - gcc --version || echo "gcc not installed"
-      - clang --version || echo "clang not installed"
-      - cmake --version
-      - git --version
-      - mkdir build && cd build
-      - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
-      - cmake --build .
-      - ctest -L Continuous --output-on-failure
-
-trigger:
-  ref:
-    include:
-      - refs/heads/main
-      - refs/heads/develop
-      - refs/heads/helics2
-      - 'refs/pull/**'
-      - 'refs/tags/**'
-
----
+#kind: pipeline
+#name: arm
+#
+#platform:
+#  os: linux
+#  arch: arm
+#
+#steps:
+#  - name: uname
+#    image: alpine:3.12
+#    commands:
+#      - uname -a
+#
+#  - name: submodules
+#    image: alpine:3.12
+#    commands:
+#      # for updating submodules to latest upstream, add --remote
+#      - apk add --no-cache git
+#      - git submodule update --init --recursive
+#
+#  - name: build
+#    image: alpine:3.12
+#    commands:
+#      - apk update
+#      - apk add --no-cache build-base git bash cmake ninja boost-dev zeromq-dev
+#      - gcc --version || echo "gcc not installed"
+#      - clang --version || echo "clang not installed"
+#      - cmake --version
+#      - git --version
+#      - mkdir build && cd build
+#      - cmake -GNinja -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON ..
+#      - cmake --build .
+#      - ctest -L Continuous --output-on-failure
+#
+#trigger:
+#  ref:
+#    include:
+#      - refs/heads/main
+#      - refs/heads/develop
+#      - refs/heads/helics2
+#      - 'refs/pull/**'
+#      - 'refs/tags/**'
+#
+#---
 kind: pipeline
 name: arm64
 

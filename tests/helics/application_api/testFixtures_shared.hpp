@@ -19,20 +19,20 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 /** check if a type_name has an index code*/
-bool hasIndexCode(const std::string& type_name);
+bool hasIndexCode(std::string_view type_name);
 /** get the index code if it has one*/
-int getIndexCode(const std::string& type_name);
+int getIndexCode(std::string_view type_name);
 
 struct FederateTestFixture {
     FederateTestFixture() = default;
     ~FederateTestFixture();
 
-    helics::BrokerApp AddBroker(const std::string& CoreType_name, int count);
-    helics::BrokerApp AddBroker(const std::string& CoreType_name,
+    helics::BrokerApp AddBroker(std::string_view CoreType_name, int count);
+    helics::BrokerApp AddBroker(std::string_view CoreType_name,
                                 const std::string& initialization_string);
 
     template<class FedType>
-    void SetupTest(const std::string& CoreType_name,
+    void SetupTest(std::string_view CoreType_name,
                    int count,
                    helics::Time time_delta = helics::timeZero,
                    const std::string& name_prefix = defaultNamePrefix)
@@ -52,7 +52,7 @@ struct FederateTestFixture {
     }
 
     template<class FedType>
-    void AddFederates(std::string CoreType_name,
+    void AddFederates(std::string_view CoreType_name,
                       int count,
                       helics::BrokerApp& broker,
                       helics::Time time_delta = helics::timeZero,
@@ -61,8 +61,7 @@ struct FederateTestFixture {
         bool hasIndex = hasIndexCode(CoreType_name);
         int setup = (hasIndex) ? getIndexCode(CoreType_name) : 1;
         if (hasIndex) {
-            CoreType_name.pop_back();
-            CoreType_name.pop_back();
+            CoreType_name.remove_suffix(2);
         }
 
         std::string initString = std::string("--broker=") + broker.getIdentifier() +
@@ -73,7 +72,7 @@ struct FederateTestFixture {
             initString.append(extraCoreArgs);
         }
 
-        helics::FederateInfo fi(helics::coreTypeFromString(CoreType_name));
+        helics::FederateInfo fi(helics::coreTypeFromString(std::string(CoreType_name)));
         if (time_delta != helics::timeZero) {
             fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         }
@@ -124,7 +123,7 @@ struct FederateTestFixture {
                 if (!subbroker.isConnected()) {
                     throw(std::runtime_error("Unable to connect subbroker"));
                 }
-                auto newTypeString = CoreType_name;
+                std::string newTypeString{CoreType_name};
                 newTypeString.push_back('_');
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
@@ -132,7 +131,7 @@ struct FederateTestFixture {
                 }
             } break;
             case 4: {
-                auto newTypeString = CoreType_name;
+                std::string newTypeString{CoreType_name};
                 newTypeString.push_back('_');
                 newTypeString.push_back('2');
                 for (int ii = 0; ii < count; ++ii) {
@@ -169,7 +168,7 @@ struct FederateTestFixture {
             } break;
             case 6:  // pairs of cores per subbroker
             {
-                auto newTypeString = CoreType_name;
+                std::string newTypeString{CoreType_name};
                 newTypeString.push_back('_');
                 newTypeString.push_back('5');
                 for (int ii = 0; ii < count; ii += 4) {
@@ -186,7 +185,7 @@ struct FederateTestFixture {
             } break;
             case 7:  // two layers of subbrokers
             {
-                auto newTypeString = CoreType_name;
+                std::string newTypeString{CoreType_name};
                 newTypeString.push_back('_');
                 newTypeString.push_back('4');
                 for (int ii = 0; ii < count; ++ii) {

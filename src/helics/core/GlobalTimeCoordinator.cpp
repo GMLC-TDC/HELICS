@@ -23,7 +23,7 @@ namespace helics {
 static Time findNextTriggerEvent(const TimeDependencies& deps)
 {
     Time me{Time::maxVal()};
-    for (auto& dep : deps) {
+    for (const auto& dep : deps) {
         if (!dep.nonGranting) {
             if (dep.Te < me) {
                 me = dep.Te;
@@ -37,7 +37,7 @@ static std::pair<bool, Time> checkForTriggered(const TimeDependencies& deps, Tim
 {
     Time me{Time::maxVal()};
     bool triggered{false};
-    for (auto& dep : deps) {
+    for (const auto& dep : deps) {
         if (dep.next > nextEvent) {
             if (dep.Te < me) {
                 me = dep.Te;
@@ -111,9 +111,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                 updateTime.actionTime = trigTime;
                 updateTime.Te = trigTime;
                 updateTime.Tdemin = trigTime;
-                if (trigTime <= timeZero) {
-                    std::cerr << "negative trigger time" << std::endl;
-                }
+
                 ++sequenceCounter;
                 updateTime.counter = sequenceCounter;
                 for (const auto& dep : dependencies) {
@@ -159,6 +157,7 @@ void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["nextEvent"] = static_cast<double>(nextEvent);
     addTimeState(base, currentTimeState);
     base["minTime"] = static_cast<double>(currentMinTime);
+    base["executing"] = executionMode;
     BaseTimeCoordinator::generateDebuggingTimeInfo(base);
 }
 
@@ -171,13 +170,24 @@ std::string GlobalTimeCoordinator::printTimeStatus() const
 
 MessageProcessingResult GlobalTimeCoordinator::checkExecEntry(GlobalFederateId /*triggerFed*/)
 {
+    if (!checkingExec) {
+        if (sendMessageFunction) {
+            ActionMessage logcmd(CMD_LOG);
+            logcmd.messageID = HELICS_LOG_LEVEL_WARNING;
+            logcmd.dest_id = mSourceId;
+            logcmd.source_id = mSourceId;
+            logcmd.setString(
+                0, "calling checkExecEntry without first calling enterExec this is probably a bug");
+            sendMessageFunction(logcmd);
+        }
+        return MessageProcessingResult::CONTINUE_PROCESSING;
+    }
     auto ret = MessageProcessingResult::CONTINUE_PROCESSING;
-
     if (!dependencies.checkIfReadyForExecEntry(false, false)) {
         bool allowed{false};
         if (currentTimeState == TimeState::exec_requested_iterative) {
             allowed = true;
-            for (auto& dep : dependencies) {
+            for (const auto& dep : dependencies) {
                 if (dep.dependency) {
                     if (dep.minFed != mSourceId) {
                         allowed = false;
@@ -215,7 +225,7 @@ void GlobalTimeCoordinator::transmitTimingMessagesUpstream(ActionMessage& msg) c
     }
 
     for (const auto& dep : dependencies) {
-        if (dep.connection == ConnectionType::child) {
+        if (dep.connection == ConnectionType::CHILD) {
             continue;
         }
         if (!dep.dependent) {
@@ -237,7 +247,7 @@ void GlobalTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
     }
     if ((msg.action() == CMD_TIME_REQUEST || msg.action() == CMD_TIME_GRANT)) {
         for (const auto& dep : dependencies) {
-            if (dep.connection != ConnectionType::child) {
+            if (dep.connection != ConnectionType::CHILD) {
                 continue;
             }
             if (!dep.dependent) {
@@ -258,6 +268,9 @@ void GlobalTimeCoordinator::transmitTimingMessagesDownstream(ActionMessage& msg,
         for (const auto& dep : dependencies) {
             if (dep.dependent) {
                 if (dep.fedID == skipFed) {
+                    continue;
+                }
+                if (!dep.dependent) {
                     continue;
                 }
                 if (msg.action() == CMD_EXEC_REQUEST) {

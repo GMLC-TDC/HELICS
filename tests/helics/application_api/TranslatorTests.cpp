@@ -227,6 +227,34 @@ TEST_F(translator, translator_connections4)
     FullDisconnect();
 }
 
+TEST_F(translator, translator_connections4_alias)
+{
+    auto broker = AddBroker("test", 2);
+    broker->addAlias("t1", "trans");
+    AddFederates<helics::MessageFederate>("test", 1, broker, helics::timeZero, "A");
+    AddFederates<helics::ValueFederate>("test", 1, broker, helics::timeZero, "B");
+    // broker->setLoggingLevel (3);
+
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    mFed1->registerGlobalTranslator("t1");
+
+    auto& p2 = mFed2->registerInput("p2", "any");
+    p2.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    p2.addSourceTarget("trans");
+    mFed2->enterInitializingModeAsync();
+    mFed1->enterInitializingMode();
+    EXPECT_NO_THROW(mFed2->enterInitializingModeComplete());
+
+    mFed2->finalizeAsync();
+
+    mFed1->finalize();
+    mFed2->finalizeComplete();
+
+    FullDisconnect();
+}
+
 TEST_F(translator, translator_connections5)
 {
     auto broker = AddBroker("test", 2);
@@ -251,6 +279,35 @@ TEST_F(translator, translator_connections5)
 
     mFed1->finalize();
     // std::cout << "fFed returned\n";
+    mFed2->finalizeComplete();
+
+    FullDisconnect();
+}
+
+TEST_F(translator, translator_connections5_alias)
+{
+    auto broker = AddBroker("test", 2);
+
+    broker->addAlias("t1", "trans");
+    AddFederates<helics::MessageFederate>("test", 1, broker, helics::timeZero, "A");
+    AddFederates<helics::ValueFederate>("test", 1, broker, helics::timeZero, "B");
+    // broker->setLoggingLevel (3);
+
+    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto mFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    auto& p2 = mFed2->registerInput("p2", "any");
+    p2.setOption(HELICS_HANDLE_OPTION_CONNECTION_REQUIRED);
+    p2.addSourceTarget("trans");
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    mFed1->registerGlobalTranslator("t1");
+    mFed2->enterInitializingModeAsync();
+    mFed1->enterInitializingMode();
+    EXPECT_NO_THROW(mFed2->enterInitializingModeComplete());
+
+    mFed2->finalizeAsync();
+
+    mFed1->finalize();
     mFed2->finalizeComplete();
 
     FullDisconnect();

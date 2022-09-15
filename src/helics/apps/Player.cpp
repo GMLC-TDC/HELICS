@@ -698,12 +698,11 @@ namespace apps {
         }
 
         Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal();
-        bool moreToSend = true;
-        Time nextSendTime = timeZero;
-        int nextIteration = 0;
-        int currentIteration = 0;
+        bool moreToSend{true};
+        int nextIteration{0};
+        int currentIteration{0};
         while (moreToSend) {
-            nextSendTime = Time::maxVal();
+            auto nextSendTime = Time::maxVal();
             if (isValidIndex(pointIndex, points)) {
                 nextSendTime = std::min(nextSendTime, points[pointIndex].time);
                 nextIteration = points[pointIndex].iteration;

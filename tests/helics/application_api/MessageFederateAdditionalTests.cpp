@@ -13,7 +13,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/flagOperations.hpp"
 #include "testFixtures.hpp"
 
-#include <future>
 #include <gmlc/libguarded/guarded.hpp>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -121,7 +120,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
@@ -161,6 +160,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback)
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 {
+    debugDiagnostic = true;
     SetupTest<helics::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
@@ -169,7 +169,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
@@ -207,6 +207,7 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj)
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 {
+    debugDiagnostic = true;
     SetupTest<helics::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
@@ -215,17 +216,14 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     helics::InterfaceHandle rxend;
     helics::Time timeRx;
-    auto mend = [&](const helics::Endpoint& ept, helics::Time rtime) {
+    auto mend = [&rxend, &timeRx](const helics::Endpoint& ept, helics::Time rtime) {
         rxend = ept.getHandle();
         timeRx = rtime;
     };
-
     ep2.setCallback(mend);
-
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
     mFed1->enterExecutingMode();
-
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     helics::SmallBuffer data(500, 'a');
 
@@ -238,7 +236,6 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
     EXPECT_TRUE(res);
     res = ep1.hasMessage();
     EXPECT_TRUE(!res);
-
     EXPECT_TRUE(rxend == ep2.getHandle());
     EXPECT_EQ(timeRx, helics::Time(1.0));
     auto M = ep2.getMessage();
@@ -247,12 +244,12 @@ TEST_P(mfed_add_single_type_tests, send_receive_callback_obj2)
 
     EXPECT_EQ(M->data[245], data[245]);
     mFed1->finalize();
-
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
 TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
 {
+    debugDiagnostic = true;
     SetupTest<helics::MessageFederate>(GetParam(), 2);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
@@ -271,10 +268,9 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     mFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     mFed2->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
 
-    auto f1finish = std::async(std::launch::async, [&]() { mFed1->enterExecutingMode(); });
+    mFed1->enterExecutingModeAsync();
     mFed2->enterExecutingMode();
-    f1finish.wait();
-
+    mFed1->enterExecutingModeComplete();
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::EXECUTING);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
@@ -287,12 +283,11 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     epid.sendTo(data3, "ep2");
     epid.sendTo(data4, "ep2");
     // move the time to 1.0
-    auto f1time = std::async(std::launch::async, [&]() { return mFed1->requestTime(1.0); });
+    mFed1->requestTimeAsync(1.0);
     auto gtime = mFed2->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    EXPECT_EQ(f1time.get(), 1.0);
-
+    EXPECT_EQ(mFed1->requestTimeComplete(), 1.0);
     EXPECT_TRUE(!mFed1->hasMessage());
 
     EXPECT_TRUE(!mFed1->hasMessage(epid));
@@ -323,14 +318,12 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_EQ(M4->dest, "ep2");
     EXPECT_EQ(M4->original_source, "fed0/ep1");
     EXPECT_EQ(M4->time, 0.0);
-
     EXPECT_EQ(e1cnt, 0);
     EXPECT_EQ(e2cnt, 4);
     mFed1->finalizeAsync();
     mFed2->disconnect();
     mFed1->finalizeComplete();
     mFed1->disconnect();
-
     EXPECT_TRUE(mFed1->getCurrentMode() == helics::Federate::Modes::FINALIZE);
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }

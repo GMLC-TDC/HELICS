@@ -54,6 +54,7 @@ char typeCharacter(DataType type)
 {
     switch (type) {
         case DataType::HELICS_STRING:
+        case DataType::HELICS_CHAR:
             return 's';
         case DataType::HELICS_DOUBLE:
             return 'd';

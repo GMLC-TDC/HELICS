@@ -146,7 +146,7 @@ jobs:
 
   helicsNoZmq:
     docker:
-      - image: helics/buildenv:gcc8-builder
+      - image: helics/buildenv:gcc10-builder
     environment:
       CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_ENABLE_ZMQ_CORE=OFF -DHELICS_ENABLE_IPC_CORE=OFF -DHELICS_BUILD_TESTS=ON -DCMAKE_CXX_STANDARD=17'
     steps:
@@ -193,6 +193,15 @@ jobs:
       - run: *setup_helics
       - run: *run_helics_tests
 
+  clang14_cxx23:
+    docker:
+      - image: helics/buildenv:clang14-builder
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=ON -DHELICS_BUILD_TESTS=ON -DHELICS_BUILD_EXAMPLES=ON -DCMAKE_CXX_STANDARD=23'
+    steps:
+      - checkout
+      - run: *setup_helics
+
   benchmarkjob:
     docker:
       - image: helics/buildenv:builder
@@ -223,6 +232,10 @@ workflows:
             branches:
               ignore: /pre-commit\/.*/
       - clang14:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - clang14_cxx23:
           filters:
             branches:
               ignore: /pre-commit\/.*/

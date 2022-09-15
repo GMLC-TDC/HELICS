@@ -31,6 +31,7 @@ set(helics_shared_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/CoreApp.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/timeOperations.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/typeOperations.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/CallbackFederate.hpp
 )
 
 set(helics_shared_private_headers

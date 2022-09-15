@@ -22,8 +22,8 @@ namespace network {
     constexpr int DEFAULT_TCPSS_PORT = 33133;
 
     // for UDP comms
-    static const int DEFAULT_UDP_PORT = 23901;
-    static const int BACKUP_UDP_PORT = 23902;
+    constexpr int DEFAULT_UDP_PORT = 23901;
+    constexpr int BACKUP_UDP_PORT = 23902;
 }  // namespace network
 
 int getDefaultPort(int coreType);

@@ -15,7 +15,7 @@ TEST(timeDep_tests, dependency_tests)
 {
     std::vector<DependencyInfo> deps;
     deps.resize(2);
-    deps[0].connection = ConnectionType::child;
+    deps[0].connection = ConnectionType::CHILD;
     deps[0].fedID = GlobalFederateId{131073};
     deps[0].mTimeState = TimeState::time_requested;
     deps[0].dependent = true;
@@ -25,7 +25,7 @@ TEST(timeDep_tests, dependency_tests)
     deps[0].Te = 2.0;
     deps[0].minDe = 2.0;
 
-    deps[1].connection = ConnectionType::child;
+    deps[1].connection = ConnectionType::CHILD;
     deps[1].fedID = GlobalFederateId{1879048192};
     deps[1].mTimeState = TimeState::time_requested;
     deps[1].dependent = true;

@@ -30,12 +30,14 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint() = default;
     /**/
     // constructor used by messageFederateManager
-    Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id, void* data);
+    Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id);
 
-    Endpoint(MessageFederate* mFed, std::string_view name, std::string_view type = std::string());
+    Endpoint(MessageFederate* mFed,
+             std::string_view name,
+             std::string_view type = std::string_view{});
 
     template<class FedPtr>
-    Endpoint(FedPtr& mFed, std::string_view name, std::string_view type = std::string()):
+    Endpoint(FedPtr& mFed, std::string_view name, std::string_view type = std::string_view{}):
         Endpoint(std::addressof(*mFed), name, type)
     {
         static_assert(
@@ -51,7 +53,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint(InterfaceVisibility locality,
              MessageFederate* mFed,
              std::string_view name,
-             std::string_view type = std::string());
+             std::string_view type = std::string_view{});
     /**constructor to build an endpoint object
     @param locality visibility of the endpoint either global or local
     @param mFed  the MessageFederate to use
@@ -62,7 +64,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     Endpoint(InterfaceVisibility locality,
              FedPtr& mFed,
              std::string_view name,
-             std::string_view type = std::string()):
+             std::string_view type = std::string_view{}):
         Endpoint(locality, std::addressof(*mFed), name, type)
     {
         static_assert(

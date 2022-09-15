@@ -55,7 +55,7 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** construct through a federate*/
     Filter(InterfaceVisibility locality, Federate* ffed, std::string_view filtName = EMPTY_STRING);
     /** construct through a core object*/
-    explicit Filter(Core* cr, std::string_view filtName = EMPTY_STRING);
+    explicit Filter(Core* core, std::string_view filtName = EMPTY_STRING);
     /** virtual destructor*/
     virtual ~Filter() = default;
 
@@ -100,7 +100,7 @@ class HELICS_CXX_EXPORT CloningFilter: public Filter {
     CloningFilter() = default;
     /** construct from a core object
      */
-    explicit CloningFilter(Core* cr, std::string_view filtName = EMPTY_STRING);
+    explicit CloningFilter(Core* core, std::string_view filtName = EMPTY_STRING);
     /** construct from a Federate
      */
     explicit CloningFilter(Federate* ffed, std::string_view filtName = EMPTY_STRING);

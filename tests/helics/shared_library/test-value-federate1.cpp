@@ -45,44 +45,6 @@ TEST_P(vfed_simple_type_tests, initialize_tests)
     NoFree = true;
 }
 
-TEST_F(vfed_single_tests, publication_registration)
-{
-    SetupTest(helicsCreateValueFederate, "test", 1);
-    auto vFed1 = GetFederateAt(0);
-
-    auto pubid =
-        helicsFederateRegisterPublication(vFed1, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
-    auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub2", "int", "", &err);
-
-    auto pubid3 =
-        helicsFederateRegisterPublication(vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
-    CE(helicsFederateEnterExecutingMode(vFed1, &err));
-
-    HelicsFederateState state;
-    CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
-
-    auto sv = helicsPublicationGetName(pubid);
-    EXPECT_STREQ(sv, "fed0/pub1");
-    auto sv2 = helicsPublicationGetName(pubid2);
-    EXPECT_STREQ(sv2, "pub2");
-    auto pub3name = helicsPublicationGetName(pubid3);
-    EXPECT_STREQ(pub3name, "fed0/pub3");
-
-    auto type = helicsPublicationGetType(pubid3);
-    EXPECT_STREQ(type, "double");
-    const char* units = helicsPublicationGetUnits(pubid3);
-    EXPECT_STREQ(units, "V");
-
-    // EXPECT_TRUE (vFed1->getPublicationId ("pub1") == pubid);
-    // EXPECT_TRUE (vFed1->getPublicationId ("pub2") == pubid2);
-    // EXPECT_TRUE (vFed1->getPublicationId ("fed0/pub1") == pubid);
-    CE(helicsFederateFinalize(vFed1, &err));
-
-    CE(state = helicsFederateGetState(vFed1, &err));
-    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
-}
-
 TEST_F(vfed_single_tests, publisher_registration)
 {
     SetupTest(helicsCreateValueFederate, "test", 1);
@@ -365,6 +327,45 @@ TEST_F(vfed_single_tests, default_value_tests)
 
     helicsFederateFinalize(vFed1, &err);
 }
+
+TEST_F(vfed_single_tests, publication_registration)
+{
+    SetupTest(helicsCreateValueFederate, "test", 1);
+    auto vFed1 = GetFederateAt(0);
+
+    auto pubid =
+        helicsFederateRegisterPublication(vFed1, "pub1", HELICS_DATA_TYPE_STRING, "", &err);
+    auto pubid2 = helicsFederateRegisterGlobalTypePublication(vFed1, "pub2", "int", "", &err);
+
+    auto pubid3 =
+        helicsFederateRegisterPublication(vFed1, "pub3", HELICS_DATA_TYPE_DOUBLE, "V", &err);
+    CE(helicsFederateEnterExecutingMode(vFed1, &err));
+
+    HelicsFederateState state;
+    CE(state = helicsFederateGetState(vFed1, &err));
+    EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
+
+    auto sv = helicsPublicationGetName(pubid);
+    EXPECT_STREQ(sv, "fed0/pub1");
+    auto sv2 = helicsPublicationGetName(pubid2);
+    EXPECT_STREQ(sv2, "pub2");
+    auto pub3name = helicsPublicationGetName(pubid3);
+    EXPECT_STREQ(pub3name, "fed0/pub3");
+
+    auto type = helicsPublicationGetType(pubid3);
+    EXPECT_STREQ(type, "double");
+    const char* units = helicsPublicationGetUnits(pubid3);
+    EXPECT_STREQ(units, "V");
+
+    // EXPECT_TRUE (vFed1->getPublicationId ("pub1") == pubid);
+    // EXPECT_TRUE (vFed1->getPublicationId ("pub2") == pubid2);
+    // EXPECT_TRUE (vFed1->getPublicationId ("fed0/pub1") == pubid);
+    CE(helicsFederateFinalize(vFed1, &err));
+
+    CE(state = helicsFederateGetState(vFed1, &err));
+    EXPECT_TRUE(state == HELICS_STATE_FINALIZE);
+}
+
 TEST_P(vfed_type_tests, single_transfer)
 {
     // HelicsTime stime = 1.0;

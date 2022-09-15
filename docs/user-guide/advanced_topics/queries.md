@@ -96,6 +96,8 @@ The following queries are defined for federates. Federates may specify a callbac
 +-------------------------+------------------------------------------------------------+
 | ``tags``                | a JSON structure with the tags and values [structure]      |
 +-------------------------+------------------------------------------------------------+
+| ``barriers``            | a JSON structure with current time barriers [structure]    |
++-------------------------+------------------------------------------------------------+
 | ``logs``                | any log messages stored in the log buffer [structure]      |
 +-------------------------+------------------------------------------------------------+
 | ``tag/<tagname>``       | the value associated with a tagname [string]               |
@@ -183,6 +185,8 @@ The following queries will be answered by a core:
 | ``data_flow_graph``      | a representation of the data connections from all interfaces in a core [structure]  |
 +--------------------------+-------------------------------------------------------------------------------------+
 |``filtered_endpoints``    | data structure containing the filters on endpoints for the core[structure]          |
++-------------------------+--------------------------------------------------------------------------------------+
+| ``barriers``             | a data structure with current time barriers [structure]                             |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``queries``              | list of dependent objects [sv]                                                      |
 +--------------------------+-------------------------------------------------------------------------------------+
@@ -228,9 +232,9 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``endpoints``            | current endpoints known to a broker [sv]                                                          |
 +--------------------------+---------------------------------------------------------------------------------------------------+
-| ``inputs``               | current inputs known to a broker [sv]                                                       |
+| ``inputs``               | current inputs known to a broker [sv]                                                             |
 +--------------------------+---------------------------------------------------------------------------------------------------+
-| ``filters``              | current filters known to a broker [sv]                                                          |
+| ``filters``              | current filters known to a broker [sv]                                                            |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``federates``            | current federates under the brokers hierarchy [sv]                                                |
 +--------------------------+---------------------------------------------------------------------------------------------------+
@@ -249,6 +253,8 @@ The following queries will be answered by a broker:
 | ``dependencies``         | structure containing dependency information for the broker [structure]                            |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``dependents``           | list of dependent objects [sv]                                                                    |
++-------------------------+----------------------------------------------------------------------------------------------------+
+| ``barriers``             | a data structure with current time barriers [structure]                                           |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``counts``               | a simple count of the number of brokers, federates, and handles [structure]                       |
 +--------------------------+---------------------------------------------------------------------------------------------------+
@@ -290,7 +296,7 @@ The following queries will be answered by a broker:
 +--------------------------+---------------------------------------------------------------------------------------------------+
 ```
 
-`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower. Error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
+`federate_map`, `dependency_graph`, `global_time`,`global_state`,`global_time_debugging`, `barriers`, and `data_flow_graph` when called with the root broker as a target will generate a JSON string containing the entire structure of the federation. This can take some time to assemble since all members must be queried. `global_flush` will also force the entire structure along the ordered path which can be quite a bit slower. Error codes returned by the query follow [http error codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) for "Not Found (404)" or "Resource Not Available (400)" or "Server Failure (500)".
 
 ## Usage Notes
 

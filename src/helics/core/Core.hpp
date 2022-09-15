@@ -156,6 +156,7 @@ class Core {
      * Change the federate state to the Initializing state.
      *
      * May only be invoked in Created state otherwise an error is thrown
+     * for callback federates this call passes full control to the core
      */
     virtual void enterInitializingMode(LocalFederateId federateID) = 0;
 
@@ -602,6 +603,13 @@ class Core {
      */
     virtual void linkEndpoints(std::string_view source, std::string_view dest) = 0;
 
+    /** add an interface alias
+    This allows an interface to be referred to by multiple keys
+    @param interfaceKey the name of the interface to generate an alias for
+    @param alias the additional identification string
+    */
+    virtual void addAlias(std::string_view interfaceKey, std::string_view alias) = 0;
+
     /** load a file containing connection information
     @param file a JSON or TOML file containing connection information*/
     virtual void makeConnections(const std::string& file) = 0;
@@ -746,6 +754,13 @@ class Core {
     */
     virtual void setTranslatorOperator(InterfaceHandle translator,
                                        std::shared_ptr<TranslatorOperator> callback) = 0;
+
+    /** set the callback Federate operators
+    @param fed  the federate to set the callback for
+    @param callback pointer to the operator class executing the federate
+    */
+    virtual void setFederateOperator(LocalFederateId fed,
+                                     std::shared_ptr<FederateOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

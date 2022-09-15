@@ -27,3 +27,10 @@ For setting up a federate a few environment variables are used
 
 - `HELICS_ENCRYPTION`: set to 1 to activate encryption if built into HELICS for the TCP core types and ZMQ core types
 - `HELICS_ENCRYPTION_CONFIG`: set to the path to a config file to specify the options for encryption including any necessary keys and certificate authorities
+
+## Environment variables used in the Web server
+
+- `HELICS_HTTP_ADDRESS`: The address of the interface to use in the webserver
+- `HELICS_HTTP_PORT`: The port to use on the webserver to accept connections
+- `HELICS_WEBSOCKET_ADDRESS`: The interface address to use to accept incoming websocket connections
+- `HELICS_WEBSOCKET_PORT`: The port number to use for accepting websocket connections

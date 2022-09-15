@@ -8,7 +8,7 @@ repos:
       - id: dockerfile_lint
         args: [--rulefile, ./config/Docker/docker_rules.yml, --dockerfile]
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 22.8.0
     hooks:
       - id: black
         args: ["--line-length=100"]
@@ -18,7 +18,7 @@ repos:
       - id: blacken-docs
         additional_dependencies: [black==21.10b0]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.2.0
+    rev: v1.3.1
     hooks:
       - id: remove-tabs
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -33,14 +33,19 @@ repos:
         args: ["--allow-multiple-documents"]
       - id: check-toml
       - id: end-of-file-fixer
+      - id: check-symlinks
       - id: check-shebang-scripts-are-executable
+      - id: check-executables-have-shebangs
+      - id: debug-statements
+      - id: detect-private-key
+        exclude: ^(tests/helics/test_files/encryption_config/openssl_certs/)
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.6.2
+    rev: v3.0.0-alpha.0
     hooks:
       - id: prettier
         exclude: ^(docs/user-guide/examples/user_guide_examples)
   - repo: https://github.com/jumanjihouse/pre-commit-hooks
-    rev: 2.1.6
+    rev: 3.0.0
     hooks:
       - id: markdownlint
         args: [-s, ./config/.markdownlintrc]
@@ -57,7 +62,7 @@ repos:
       - id: cmake-format
         exclude: "cmake+"
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.1.0
+    rev: v2.2.1
     hooks:
       - id: codespell
         exclude: ^(docs/user-guide/examples/user_guide_examples)
@@ -66,9 +71,10 @@ repos:
             "-w",
             "--skip=*.csv",
             "--ignore-words=./config/spelling_whitelist.txt",
+            "--exclude-file=./config/spelling_ignorelines.txt",
           ]
   - repo: https://github.com/pre-commit/mirrors-clang-format
-    rev: v14.0.4-1
+    rev: v14.0.6
     hooks:
       - id: clang-format
         types:

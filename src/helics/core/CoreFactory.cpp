@@ -29,7 +29,7 @@ DECLARE_TRIPLINE()
 
 namespace helics::CoreFactory {
 
-static const std::string gHelicsEmptyString;
+static constexpr std::string_view gHelicsEmptyString;
 
 /*** class to hold the set of builders
 @details this doesn't work as a global since it tends to get initialized after some of the things
@@ -119,6 +119,12 @@ std::shared_ptr<Core> makeCore(CoreType type, std::string_view name)
 std::shared_ptr<Core> getEmptyCore()
 {
     return emptyCore;
+}
+
+Core* getEmptyCorePtr()
+{
+    static EmptyCore c1;
+    return &c1;
 }
 
 std::shared_ptr<Core> create(std::string_view initializationString)
@@ -396,7 +402,7 @@ void addAssociatedCoreType(std::string_view name, CoreType type)
     addExtraTypes(std::string{name}, type);
 }
 
-static const std::string helpStr{"--help"};
+static constexpr std::string_view helpStr{"--help"};
 
 void displayHelp(CoreType type)
 {

@@ -9,7 +9,6 @@ pip install sphinx
 pip install ghp-import
 pip install breathe
 pip install sphinx_rtd_theme
-pip install nbsphinx
 pip install sphinxcontrib-pandoc-markdown
 ```
 

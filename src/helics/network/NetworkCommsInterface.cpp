@@ -17,6 +17,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 
 namespace helics {
+static constexpr char localHostString[] = "localhost";
+
 NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes type,
                                              CommsInterface::thread_generation threads) noexcept:
     CommsInterface(threads),
@@ -24,9 +26,12 @@ NetworkCommsInterface::NetworkCommsInterface(gmlc::networking::InterfaceTypes ty
 {
 }
 
-static const std::string localHostString = "localhost";
+NetworkCommsInterface::PortAllocator::PortAllocator()
+{
+    addNewHost(localHostString);
+}
 
-int NetworkCommsInterface::PortAllocator::findOpenPort(int count, const std::string& host)
+int NetworkCommsInterface::PortAllocator::findOpenPort(int count, std::string_view host)
 {
     if ((host == "127.0.0.1") || (host == "::1")) {
         return findOpenPort(count, localHostString);
@@ -34,6 +39,7 @@ int NetworkCommsInterface::PortAllocator::findOpenPort(int count, const std::str
     auto np = nextPorts.find(host);
     int nextPort = startingPort;
     if (np == nextPorts.end()) {
+        host = addNewHost(host);
         nextPorts[host] = startingPort;
         nextPorts[host] += count;
     } else {
@@ -58,8 +64,14 @@ void NetworkCommsInterface::PortAllocator::addUsedPort(int port)
     usedPort[localHostString].insert(port);
 }
 
-void NetworkCommsInterface::PortAllocator::addUsedPort(const std::string& host, int port)
+void NetworkCommsInterface::PortAllocator::addUsedPort(std::string_view host, int port)
 {
+    auto hst = usedPort.find(host);
+    if (hst != usedPort.end()) {
+        hst->second.insert(port);
+    } else {
+        host = addNewHost(host);
+    }
     usedPort[host].insert(port);
 }
 /*
@@ -67,7 +79,7 @@ void NetworkCommsInterface::PortAllocator::addUsedPort(const std::string& host, 
     std::map<std::string, std::set<int>> usedPort;
     std::map<std::string, int> nextPorts;
     */
-bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, int port) const
+bool NetworkCommsInterface::PortAllocator::isPortUsed(std::string_view host, int port) const
 {
     auto fnd = usedPort.find(host);
     if (fnd == usedPort.end()) {
@@ -76,6 +88,11 @@ bool NetworkCommsInterface::PortAllocator::isPortUsed(const std::string& host, i
     return (fnd->second.count(port) != 0);
 }
 
+std::string_view NetworkCommsInterface::PortAllocator::addNewHost(std::string_view host)
+{
+    auto [it, emplaced] = hosts.emplace(host);
+    return std::string_view(*it);
+}
 /** load network information into the comms object*/
 void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
 {

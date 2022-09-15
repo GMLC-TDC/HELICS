@@ -122,6 +122,7 @@ across different compilers*/
             cmd_info_basis + 707,  //!< command to connect a publication with an endpoint
         cmd_filter_link = cmd_info_basis + 709,  //!< command to add a target to a filter
         cmd_endpoint_link = cmd_info_basis + 711,  //!< command to link endpoints
+        cmd_add_alias = cmd_info_basis + 715,  //!< command to add an alias for an interface
 
         cmd_fed_configure_time =
             202,  //!< command to update the configuration of a federate a time parameter
@@ -311,6 +312,7 @@ across different compilers*/
 #define CMD_DATA_LINK action_message_def::action_t::cmd_data_link
 #define CMD_FILTER_LINK action_message_def::action_t::cmd_filter_link
 #define CMD_ENDPOINT_LINK action_message_def::action_t::cmd_endpoint_link
+#define CMD_ADD_ALIAS action_message_def::action_t::cmd_add_alias
 
 #define CMD_REMOVE_NAMED_TARGET action_message_def::action_t::cmd_remove_named_target
 #define CMD_REMOVE_TARGET action_message_def::action_t::cmd_remove_target
@@ -401,6 +403,7 @@ across different compilers*/
 // definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_TRANSLATOR_OPERATOR 574
+#define UPDATE_FEDERATE_OPERATOR 576
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 #define UPDATE_LOGGING_FILE 594
@@ -422,7 +425,8 @@ enum CommandErrorCodes : int {
     max_federate_count_exceeded = 11,
     max_broker_count_exceeded = 13,
     broker_terminating = 14,
-    multiple_wait_for_current_time_flags = 15
+    multiple_wait_for_current_time_flags = 15,
+    duplicate_federate_id = 17
 };
 
 /** return a string associated with a particular error code

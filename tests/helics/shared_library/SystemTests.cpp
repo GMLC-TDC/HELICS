@@ -71,7 +71,7 @@ TEST(other_tests, broker_global_value_errors_nosan_ci_skip)
 // test global value creation from a core and its error pathways
 TEST(other_tests, core_global_value)
 {
-    helicsCloseLibrary();
+    helicsCleanupLibrary();
     auto err = helicsErrorInitialize();
     auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
 
@@ -102,11 +102,11 @@ TEST(other_tests, core_global_value)
 // test global value creation from a core and its error pathways
 TEST(other_tests, core_global_value_errors_nosan_ci_skip)
 {
-    helicsCloseLibrary();
+    helicsCleanupLibrary();
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+    auto brk = helicsCreateBroker("test", "gbrokerce", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerce", &err);
     EXPECT_EQ(err.error_code, 0);
     auto connected = helicsCoreConnect(cr, &err);
     EXPECT_EQ(connected, HELICS_TRUE);
@@ -141,9 +141,9 @@ TEST(other_tests, core_global_value_errors_nosan_ci_skip)
 TEST(other_tests, federate_global_value)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+    auto brk = helicsCreateBroker("test", "gbrokerf", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerf", &err);
 
     // test creation of federateInfo from command line arguments
     const char* argv[4];
@@ -198,9 +198,9 @@ TEST(other_tests, federate_global_value)
 TEST(other_tests, federate_global_value_errors_nosan_ci_skip)
 {
     auto err = helicsErrorInitialize();
-    auto brk = helicsCreateBroker("test", "gbrokerc", "--root", &err);
+    auto brk = helicsCreateBroker("test", "gbrokerfe", "--root", &err);
 
-    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerc", &err);
+    auto cr = helicsCreateCore("test", "gcore", "--broker=gbrokerfe", &err);
 
     // test creation of federateInfo from command line arguments
     const char* argv[4];

@@ -14,7 +14,7 @@ std::string to_string(CoreType type)
     return core::to_string(type);
 }
 
-CoreType coreTypeFromString(std::string type) noexcept
+CoreType coreTypeFromString(std::string_view type) noexcept
 {
     return core::coreTypeFromString(type);
 }

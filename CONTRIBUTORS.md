@@ -114,10 +114,6 @@ Very fast, header-only/compiled, C++ logging library. The spdlog library is used
 
 While not used directly, much of the inspiration for HELICS comes from three separate projects at the different National Labs. These include FNCS at PNNL, FSKIT at LLNL(unreleased), and IGMS(unreleased) at NREL. The lessons learned from these three co-simulation platforms was fed directly into the design of HELICS, and the hope that the combination and partnership is better than any one lab could have accomplished on their own.
 
-### [gulrak/filesystem](https://github.com/gulrak/filesystem)
-
-A single-header standalone variant of the filesystem library(v1.3.0) is used to avoid compiled libraries in boost. The single header version is included with the source and is released with a [MIT](https://github.com/gulrak/filesystem/blob/master/LICENSE) license (used as of HELICS 2.4.1) prior versions had a BSD-3-Clause license.
-
 ### [gmlc/networking](https://github.com/GMLC-TDC/networking)
 
 A networking library with helper functions around Asio and other network interface and address operations used within HELICS and other related tools. It is included in HELICS as a submodule and is released under a [BSD-3 clause](https://github.com/GMLC-TDC/networking/blob/main/LICENSE) license.
@@ -131,7 +127,7 @@ Several CMake scripts came from other sources and were either used or modified f
 - clang-format, clang-tidy scripts were created using tips from [Emmanuel Fleury](http://www.labri.fr/perso/fleury/posts/programming/using-clang-tidy-and-clang-format.html)
 - Viktor Kirilov, useful CMake macros [ucm](https://github.com/onqtam/ucm) particularly for the set_runtime macro to use static runtime libraries
 - scripts for cloning get repositories are included from [tschuchortdev/cmake_git_clone](https://github.com/tschuchortdev/cmake_git_clone) used with [MIT](https://github.com/tschuchortdev/cmake_git_clone/blob/master/LICENSE.TXT) License
-- Some scripts for including google test were borrowed and modified from [CLI11](https://github.com/CLIUtils/CLI11)
+- Some scripts for including google test were borrowed and modified heavily from an old version of [CLI11](https://github.com/CLIUtils/CLI11)
 
 ## Optional components
 
