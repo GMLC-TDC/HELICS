@@ -184,7 +184,9 @@ TEST_F(federateStateTests, basic_processmessage)
 
     // Test returning when the initialization state is entered
     cmd.setAction(helics::CMD_INIT_GRANT);
-    auto fs_process = std::async(std::launch::async, [&]() { return fs->enterInitializingMode(IterationRequest::NO_ITERATIONS); });
+    auto fs_process = std::async(std::launch::async, [&]() {
+        return fs->enterInitializingMode(IterationRequest::NO_ITERATIONS);
+    });
     EXPECT_EQ(fs->getState(), FederateStates::CREATED);
     fs->addAction(cmd);
     fs_process.wait();

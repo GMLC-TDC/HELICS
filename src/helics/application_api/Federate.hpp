@@ -171,23 +171,26 @@ class HELICS_CXX_EXPORT Federate {
     exception*/
     void enterInitializingModeComplete();
 
-    /** iterate into created mode.  
-    @details  the call will block until all federates have flagged they are ready for the next stage of initialization
-    all federates requesting iterations on the created mode will be notified they can continue with setup
+    /** iterate into created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup
     */
     void enterInitializingModeIterative();
 
-    /** iterate into created mode.  
-    @details  the call will block until all federates have flagged they are ready for the next stage of initialization
-    all federates requesting iterations on the created mode will be notified they can continue with setup
-    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete should be
-    made to complete the call sequence
+    /** iterate into created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup
+    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
+    should be made to complete the call sequence
     */
     void enterInitializingModeIterativeAsync();
 
-    /** second part of the async process for entering initialization mode iterative call after a call to
-    enterInitializingModeIterativeAsync if call any other time it will throw an InvalidFunctionCall
-    exception  the federate will be in the created state(or ERROR state) after this call*/
+    /** second part of the async process for entering initialization mode iterative call after a
+    call to enterInitializingModeIterativeAsync if call any other time it will throw an
+    InvalidFunctionCall exception  the federate will be in the created state(or ERROR state) after
+    this call*/
     void enterInitializingModeIterativeComplete();
 
     /** enter the normal execution mode

@@ -921,7 +921,6 @@ void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError
     }
 }
 
-
 void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
@@ -935,7 +934,6 @@ void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsErro
         helicsErrorHandler(err);
     }
 }
-
 
 void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err)
 {

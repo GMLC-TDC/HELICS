@@ -116,6 +116,7 @@ class FederateState {
     std::atomic<bool> requestingMode{false};
 
     std::atomic<bool> initIterating{false};
+
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a

@@ -485,7 +485,7 @@ class CommonCore: public Core, public BrokerBase {
     /// airlocks for updating filter operators and other functions
     std::array<gmlc::containers::AirLock<std::any>, 4> dataAirlocks;
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
-    std::atomic<bool> initIterations{false};  //!< flag indicating that 
+    std::atomic<bool> initIterations{false};  //!< flag indicating that
   private:
     // generate a filter Federate
     void generateFilterFederate();

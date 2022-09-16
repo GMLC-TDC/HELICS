@@ -383,7 +383,7 @@ class Federate {
     {
         helicsFederateEnterInitializingModeAsync(fed, hThrowOnError());
     }
-    
+
     /** second part of the async process for entering initializationState call after a call to
     enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
     exception*/
@@ -393,25 +393,26 @@ class Federate {
     }
 
     /** iterate to the startup up
-    @details  the call will block until all federates have requested entry to initializing mode iterative or not. The federate will remain in startup mode
-    and can continue to add interfaces and other activities in the startup mode.
+    @details  the call will block until all federates have requested entry to initializing mode
+    iterative or not. The federate will remain in startup mode and can continue to add interfaces
+    and other activities in the startup mode.
     */
     void enterInitializingModeIterative()
     {
         helicsFederateEnterInitializingModeIterative(fed, hThrowOnError());
     }
     /** enter the initialization mode after all interfaces have been defined
-    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete should be made
-    to complete the call sequence
+    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
+    should be made to complete the call sequence
     */
     void enterInitializingModeIterativeAsync()
     {
         helicsFederateEnterInitializingModeIterativeAsync(fed, hThrowOnError());
     }
 
-    /** second part of the async process for entering initializationModeIterative call after a call to
-    enterInitializingModeIterativeAsync if call any other time it will throw an InvalidFunctionCall
-    exception*/
+    /** second part of the async process for entering initializationModeIterative call after a call
+    to enterInitializingModeIterativeAsync if call any other time it will throw an
+    InvalidFunctionCall exception*/
     void enterInitializingModeIterativeComplete()
     {
         helicsFederateEnterInitializingModeIterativeComplete(fed, hThrowOnError());

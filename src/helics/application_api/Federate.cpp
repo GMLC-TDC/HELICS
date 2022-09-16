@@ -332,20 +332,20 @@ void Federate::enterInitializingModeIterative()
 {
     auto cm = currentMode.load();
     switch (cm) {
-    case Modes::STARTUP:
-        try {
-            coreObject->enterInitializingMode(fedID,IterationRequest::FORCE_ITERATION);
-        }
-        catch (const HelicsException&) {
-            updateFederateMode(Modes::ERROR_STATE);
-            throw;
-        }
-        break;
-    case Modes::PENDING_ITERATIVE_INIT:
-        enterInitializingModeIterativeComplete();
-        break;
-    default:
-        throw(InvalidFunctionCall("cannot call iterative initialization from current state"));
+        case Modes::STARTUP:
+            try {
+                coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+            }
+            catch (const HelicsException&) {
+                updateFederateMode(Modes::ERROR_STATE);
+                throw;
+            }
+            break;
+        case Modes::PENDING_ITERATIVE_INIT:
+            enterInitializingModeIterativeComplete();
+            break;
+        default:
+            throw(InvalidFunctionCall("cannot call iterative initialization from current state"));
     }
 }
 
@@ -356,37 +356,38 @@ void Federate::enterInitializingModeIterativeAsync()
         auto asyncInfo = asyncCallInfo->lock();
         if (currentMode.compare_exchange_strong(cm, Modes::PENDING_ITERATIVE_INIT)) {
             asyncInfo->initFuture = std::async(std::launch::async, [this]() {
-                coreObject->enterInitializingMode(fedID,IterationRequest::FORCE_ITERATION);
-                });
+                coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
+            });
         }
     } else if (cm == Modes::PENDING_ITERATIVE_INIT) {
         return;
     } else {
         // everything else is an error
-        throw(InvalidFunctionCall("cannot request iterations in initializing mode if already past that mode"));
+        throw(InvalidFunctionCall(
+            "cannot request iterations in initializing mode if already past that mode"));
     }
 }
 
 void Federate::enterInitializingModeIterativeComplete()
 {
     switch (currentMode.load()) {
-    case Modes::PENDING_ITERATIVE_INIT: {
-        auto asyncInfo = asyncCallInfo->lock();
-        try {
-            asyncInfo->initIterativeFuture.get();
-        }
-        catch (const std::exception&) {
-            updateFederateMode(Modes::ERROR_STATE);
-            throw;
-        }
-    } break;
-    case Modes::STARTUP:
-        //odd call since it would do nothing but not an error
-        break;
-    default:
-        throw(InvalidFunctionCall(
-            "cannot call enterInitializingModeIterativeComplete function without first calling "
-            "enterInitializingModeIterativeAsync function "));
+        case Modes::PENDING_ITERATIVE_INIT: {
+            auto asyncInfo = asyncCallInfo->lock();
+            try {
+                asyncInfo->initIterativeFuture.get();
+            }
+            catch (const std::exception&) {
+                updateFederateMode(Modes::ERROR_STATE);
+                throw;
+            }
+        } break;
+        case Modes::STARTUP:
+            // odd call since it would do nothing but not an error
+            break;
+        default:
+            throw(InvalidFunctionCall(
+                "cannot call enterInitializingModeIterativeComplete function without first calling "
+                "enterInitializingModeIterativeAsync function "));
     }
 }
 
