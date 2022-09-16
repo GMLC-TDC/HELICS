@@ -585,6 +585,13 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
         return finalize(federateID);
     case IterationRequest::ERROR_CONDITION:
         return localError(federateID,34,"error condition called in enterInitializingMode");
+    case IterationRequest::FORCE_ITERATION:
+    case IterationRequest::ITERATE_IF_NEEDED:
+        if (fed->isCallbackFederate())
+        {
+            // callback federates cannot iterate in startup
+            request=IterationRequest::NO_ITERATIONS;
+        }
     }
     switch (fed->getState()) {
         case FederateStates::CREATED:
@@ -601,18 +608,26 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
 
     bool exp = false;
     // only enter this loop once per federate
-    if (fed->init_requested.compare_exchange_strong(exp, true)) {
+    if (fed->initRequested.compare_exchange_strong(exp, true)) {
+
+        
         ActionMessage m(CMD_INIT);
         m.source_id = fed->global_id.load();
-        setIterationFlags(m,request);
+        if (request != IterationRequest::NO_ITERATIONS)
+        {
+            setIterationFlags(m,request);
+            fed->initIterating.store(true);
+            initIterations.store(true);
+        }
+        
         addActionMessage(m);
-
+        
         if (fed->isCallbackFederate()) {
 			return false;
 			}
             auto check = fed->enterInitializingMode(request);
             if (check != IterationResult::NEXT_STEP) {
-                fed->init_requested = false;
+                fed->initRequested = false;
                 if (check == IterationResult::HALTED) {
                     throw(HelicsSystemFailure());
                 }
@@ -3143,6 +3158,10 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                                                   BrokerState::INITIALIZING)) {
                             // make sure we only do this once
                             ActionMessage init(CMD_INIT);
+                            if (initIterations.load())
+                            {
+                                setActionFlag(init,iteration_requested_flag);
+                            }
                             checkDependencies();
                             init.source_id = global_broker_id_local;
                             init.dest_id = parent_broker_id;
@@ -3632,31 +3651,54 @@ void CommonCore::processCommand(ActionMessage&& command)
 
         } break;
         case CMD_INIT_GRANT:
-            if (transitionBrokerState(
+            if (checkActionFlag(command, iteration_requested_flag))
+            {
+                if (initIterations)
+                {
+                    if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED))
+                    {
+                        loopFederates.apply([&command](auto& fed) {
+                            if (fed->initIterating.load())
+                            {
+                                fed->addAction(command);
+                            }
+                            });
+                    }
+                    else if (checkActionFlag(command, observer_flag)) {
+                        routeMessage(command);
+                    }
+                    initIterations.store(false);
+                }
+            }
+            else
+            {
+                if (transitionBrokerState(
                     BrokerState::INITIALIZING,
                     BrokerState::OPERATING)) {  // forward the grant to all federates
-                if (filterFed != nullptr) {
-                    filterFed->organizeFilterOperations();
-                }
+                    if (filterFed != nullptr) {
+                        filterFed->organizeFilterOperations();
+                    }
 
-                loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
-                if (filterFed != nullptr && (filterTiming || globalTime)) {
-                    filterFed->handleMessage(command);
+                    loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
+                    if (filterFed != nullptr && (filterTiming || globalTime)) {
+                        filterFed->handleMessage(command);
+                    }
+                    if (translatorFed != nullptr) {
+                        translatorFed->handleMessage(command);
+                    }
+                    timeCoord->enteringExecMode();
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == MessageProcessingResult::NEXT_STEP) {
+                        enteredExecutionMode = true;
+                    }
+                    if (!timeCoord->hasActiveTimeDependencies()) {
+                        timeCoord->disconnect();
+                    }
+                } else if (checkActionFlag(command, observer_flag)) {
+                    routeMessage(command);
                 }
-                if (translatorFed != nullptr) {
-                    translatorFed->handleMessage(command);
-                }
-                timeCoord->enteringExecMode();
-                auto res = timeCoord->checkExecEntry();
-                if (res == MessageProcessingResult::NEXT_STEP) {
-                    enteredExecutionMode = true;
-                }
-                if (!timeCoord->hasActiveTimeDependencies()) {
-                    timeCoord->disconnect();
-                }
-            } else if (checkActionFlag(command, observer_flag)) {
-                routeMessage(command);
             }
+            
             break;
 
         case CMD_SEND_MESSAGE:

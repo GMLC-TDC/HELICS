@@ -111,10 +111,11 @@ class FederateState {
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
     /** atomic flag indicating this federate has requested entry to initialization */
-    std::atomic<bool> init_requested{false};
+    std::atomic<bool> initRequested{false};
     // temporary
     std::atomic<bool> requestingMode{false};
 
+    std::atomic<bool> initIterating{false};
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
     bool timeGranted_mode{false};  //!< indicator if the federate is in a granted state or a

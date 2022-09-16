@@ -1458,26 +1458,48 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                 break;
             }
             brk->state = ConnectionState::INIT_REQUESTED;
+            
             if (brk->_observer && getBrokerState() >= BrokerState::OPERATING) {
                 if (isRootc) {
                     ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, cmd.source_id);
+                    if (checkActionFlag(cmd, iteration_requested_flag))
+                    {
+                        setActionFlag(grant,iteration_requested_flag);
+                    }
                     setActionFlag(grant, observer_flag);
                     transmit(brk->route, grant);
                 } else {
                     transmit(parent_route_id, cmd);
                 }
             } else {
+                if (checkActionFlag(cmd, iteration_requested_flag))
+                {
+                    brk->initIterating=true;
+                    initIterating=true;
+                }
                 if (allInitReady()) {
                     if (isRootc) {
-                        LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
-                        LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
-                        executeInitializationOperations();
+                        if (initIterating)
+                        {
+                            executeInitializationOperations(true);
+                        }
+                        else
+                        {
+                            LOG_TIMING(global_broker_id_local, "root", "entering initialization mode");
+                            LOG_SUMMARY(global_broker_id_local, "root", generateFederationSummary());
+                            executeInitializationOperations(false);
+                        }
+                        
                     } else {
                         LOG_TIMING(global_broker_id_local,
                                    getIdentifier(),
                                    "entering initialization mode");
                         checkDependencies();
                         cmd.source_id = global_broker_id_local;
+                        if (initIterating)
+                        {
+                            setActionFlag(cmd,iteration_requested_flag);
+                        }
                         transmit(parent_route_id, cmd);
                     }
                 }
@@ -1497,25 +1519,29 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             auto* brk = getBrokerById(GlobalBrokerId(cmd.source_id));
             if (brk != nullptr) {
                 brk->state = ConnectionState::CONNECTED;
+                brk->initIterating=false;
             }
         } break;
         case CMD_INIT_GRANT:
             if (!checkActionFlag(cmd, observer_flag)) {
-                if (brokerKey == universalKey) {
-                    LOG_SUMMARY(global_broker_id_local,
-                                getIdentifier(),
-                                "Broker started with universal key");
-                }
-                setBrokerState(BrokerState::OPERATING);
-                for (const auto& brk : mBrokers) {
-                    transmit(brk.route, cmd);
-                }
+                if (checkActionFlag(cmd, iteration_requested_flag))
                 {
-                    timeCoord->enteringExecMode();
-                    auto res = timeCoord->checkExecEntry();
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
+                    executeInitializationOperations(true);
+                }
+                else
+                {
+                    if (brokerKey == universalKey) {
+                        LOG_SUMMARY(global_broker_id_local,
+                            getIdentifier(),
+                            "Broker started with universal key");
                     }
+                    setBrokerState(BrokerState::OPERATING);
+                    broadcast(cmd);
+                        timeCoord->enteringExecMode();
+                        auto res = timeCoord->checkExecEntry();
+                        if (res == MessageProcessingResult::NEXT_STEP) {
+                            enteredExecutionMode = true;
+                        }
                 }
             } else {
                 routeMessage(std::move(cmd));
@@ -2443,8 +2469,27 @@ void CoreBroker::broadcast(ActionMessage& cmd)
     }
 }
 
-void CoreBroker::executeInitializationOperations()
+void CoreBroker::executeInitializationOperations(bool iterating)
 {
+    if (iterating)
+    {
+        ActionMessage m(CMD_INIT_GRANT);
+        m.source_id = global_broker_id_local;
+        setActionFlag(m,iteration_requested_flag);
+        setBrokerState(BrokerState::CONNECTED);
+        mBrokers.apply([&m,this](auto &broker){
+            if ((!broker._nonLocal) && (broker.state < ConnectionState::DISCONNECTED)) {
+            if (broker.initIterating)
+            {
+                m.dest_id = broker.global_id;
+                transmit(broker.route, m);
+                broker.initIterating=false;
+                broker.state=ConnectionState::CONNECTED;
+            }
+        }});
+        
+        return;
+    }
     if (brokerKey == universalKey) {
         LOG_SUMMARY(global_broker_id_local, getIdentifier(), "Broker started with universal key");
     }

@@ -1201,7 +1201,7 @@ void FederateState::callbackProcessing() noexcept
     auto initError = (state == FederateStates::ERRORED);
     bool error_cmd{false};
 
-    if (!init_requested) {
+    if (!initRequested) {
         // don't run callback processing before the user calls enterInit
         return;
     }
