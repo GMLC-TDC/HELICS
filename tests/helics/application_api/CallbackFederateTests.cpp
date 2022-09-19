@@ -317,11 +317,13 @@ TEST_F(callbackFed, 100Fed)
         });
         fed->enterInitializingMode();
     }
-    GetFederateAs<helics::Federate>(0)->getCorePointer()->waitForDisconnect();
+    
     brokers.front()->waitForDisconnect();
+    GetFederateAs<helics::Federate>(1)->getCorePointer()->waitForDisconnect();
     EXPECT_TRUE(GetFederateAs<helics::CallbackFederate>(1)->isAsyncOperationCompleted());
 
     EXPECT_DOUBLE_EQ(vals[27], 120.0 + 27.0);
+    FullDisconnect();
 }
 
 TEST_F(callbackFed, 1000Fed_ci_skip)
