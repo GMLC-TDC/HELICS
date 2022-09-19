@@ -297,7 +297,7 @@ TEST_F(callbackFed, timeSteps2Fed)
     EXPECT_DOUBLE_EQ(v2[3], 20.7);
 }
 
-TEST_F(callbackFed, 100Fed)
+TEST_F(callbackFed, 100Fed_nosan)
 {
     const int fedCount{100};
     SetupTest<helics::CallbackFederate>("test", fedCount);
@@ -326,7 +326,7 @@ TEST_F(callbackFed, 100Fed)
     FullDisconnect();
 }
 
-TEST_F(callbackFed, 1000Fed_ci_skip)
+TEST_F(callbackFed, 1000Fed_ci_skip_nosan)
 {
     constexpr int fedCount{1000};
     SetupTest<helics::CallbackFederate>("test", fedCount);
