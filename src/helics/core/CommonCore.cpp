@@ -573,7 +573,8 @@ static void generateFederateException(const FederateState* fed)
             throw(HelicsException(fed->lastErrorString()));
     }
 }
-void CommonCore::enterInitializingMode(LocalFederateId federateID)
+
+bool CommonCore::enterInitializingMode(LocalFederateId federateID)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -583,7 +584,7 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
         case FederateStates::CREATED:
             break;
         case FederateStates::INITIALIZING:
-            return;
+            return false;
         default:
             throw(InvalidFunctionCall("May only enter initializing state from created state"));
     }
@@ -595,7 +596,10 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
         m.source_id = fed->global_id.load();
         addActionMessage(m);
 
-        if (!fed->isCallbackFederate()) {
+        if (fed->isCallbackFederate())
+        {
+            return false;
+        }
             auto check = fed->enterInitializingMode();
             if (check != IterationResult::NEXT_STEP) {
                 fed->init_requested = false;
@@ -604,8 +608,7 @@ void CommonCore::enterInitializingMode(LocalFederateId federateID)
                 }
                 generateFederateException(fed);
             }
-        }
-        return;
+        return true;
     }
     throw(InvalidFunctionCall("federate already has requested entry to initializing State"));
 }

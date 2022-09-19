@@ -317,6 +317,7 @@ TEST_F(callbackFed, 100Fed)
         });
         fed->enterInitializingMode();
     }
+    GetFederateAs<helics::Federate>(0)->getCorePointer()->waitForDisconnect();
     brokers.front()->waitForDisconnect();
     EXPECT_TRUE(GetFederateAs<helics::CallbackFederate>(1)->isAsyncOperationCompleted());
 
