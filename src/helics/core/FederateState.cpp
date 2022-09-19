@@ -469,6 +469,7 @@ IterationResult FederateState::enterInitializingMode(IterationRequest request)
     if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
+        initIterating=false;
         switch (ret) {
             case MessageProcessingResult::NEXT_STEP:
                 time_granted = initialTime;

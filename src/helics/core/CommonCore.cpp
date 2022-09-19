@@ -620,12 +620,17 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
 			return false;
 			}
             auto check = fed->enterInitializingMode(request);
-            if (check != IterationResult::NEXT_STEP) {
-                fed->initRequested = false;
-                if (check == IterationResult::HALTED) {
-                    throw(HelicsSystemFailure());
-                }
+            fed->initRequested = false;
+            switch (check)
+            {
+            case IterationResult::NEXT_STEP:
+            case IterationResult::ITERATING:
+                break;
+            case IterationResult::HALTED:
+                throw(HelicsSystemFailure());
+            default:
                 generateFederateException(fed);
+                break;
             }
             generateFederateException(fed);
         
@@ -3633,7 +3638,14 @@ void CommonCore::processCommand(ActionMessage&& command)
                 if (transitionBrokerState(BrokerState::CONNECTED,
                                           BrokerState::INITIALIZING)) {  // make sure we only
                                                                          // do this once
-                    checkDependencies();
+                    if (initIterations)
+                    {
+                        setActionFlag(command,iteration_requested_flag);
+                    }
+                    else
+                    {
+                        checkDependencies();
+                    }
                     command.source_id = global_broker_id_local;
                     transmit(parent_route_id, command);
                 } else if (checkActionFlag(command, observer)) {

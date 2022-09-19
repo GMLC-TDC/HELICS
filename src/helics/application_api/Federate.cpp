@@ -355,7 +355,7 @@ void Federate::enterInitializingModeIterativeAsync()
     if (cm == Modes::STARTUP) {
         auto asyncInfo = asyncCallInfo->lock();
         if (currentMode.compare_exchange_strong(cm, Modes::PENDING_ITERATIVE_INIT)) {
-            asyncInfo->initFuture = std::async(std::launch::async, [this]() {
+            asyncInfo->initIterativeFuture = std::async(std::launch::async, [this]() {
                 coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
             });
         }
@@ -375,6 +375,7 @@ void Federate::enterInitializingModeIterativeComplete()
             auto asyncInfo = asyncCallInfo->lock();
             try {
                 asyncInfo->initIterativeFuture.get();
+                updateFederateMode(Modes::STARTUP);
             }
             catch (const std::exception&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -985,6 +986,8 @@ void Federate::updateFederateMode(Modes newMode)
     }
     if (modeUpdateCallback) {
         switch (oldMode) {
+        case Modes::PENDING_ITERATIVE_INIT:
+            break;
             case Modes::PENDING_INIT:
                 modeUpdateCallback(newMode, Modes::STARTUP);
                 break;
@@ -1018,8 +1021,9 @@ void Federate::updateFederateMode(Modes newMode)
             executingEntryCallback();
         }
     }
+    if (newMode == Modes::FINALIZE || newMode == Modes::ERROR_STATE) {
     if (cosimulationTerminationCallback) {
-        if (newMode == Modes::FINALIZE || newMode == Modes::ERROR_STATE) {
+        
             cosimulationTerminationCallback();
         }
     }

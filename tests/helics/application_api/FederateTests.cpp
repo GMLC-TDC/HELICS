@@ -55,8 +55,41 @@ TEST(federate_tests, federate_initialize_tests)
     Fed = nullptr;  // force the destructor
 }
 
+TEST(federate_tests, federate_initialize_iterate)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = Fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto name = std::string(core->getFederateName(Fed->getID()));
+
+    EXPECT_EQ(name, Fed->getName());
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    Fed->enterInitializingModeIterative();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    Fed->enterInitializingModeIterative();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    Fed->enterInitializingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    Fed->enterExecutingMode();
+    EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+
+    // const auto& coreName = core->getIdentifier();
+    // const auto& fedName = Fed->getName();
+    // EXPECT_EQ(fedName+"_core", coreName);
+    Fed = nullptr;  // force the destructor
+}
+
 #ifdef HELICS_ENABLE_ZMQ_CORE
-TEST(federate_tests, federate_initialize_tests_json)
+TEST(federate_tests, federate_initialize_json)
 {
     helics::BrokerApp brk(helics::CoreType::ZMQ);
 
@@ -78,6 +111,45 @@ TEST(federate_tests, federate_initialize_tests_json)
     EXPECT_TRUE(Fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
 
     Fed = nullptr;  // force the destructor
+    brk.waitForDisconnect();
+}
+
+TEST(federate_tests, federate_initialize_iteration_multiple)
+{
+    helics::BrokerApp brk(helics::CoreType::ZMQ);
+
+    helics::FederateInfo fi(helics::CoreType::ZMQ);
+
+    auto Fed1 = std::make_shared<helics::Federate>("test1", fi);
+    auto Fed2 = std::make_shared<helics::Federate>("test2", fi);
+
+    Fed1->enterInitializingModeAsync();
+    Fed2->enterInitializingModeIterative();
+    EXPECT_EQ(Fed1->getCurrentMode(),helics::Federate::Modes::PENDING_INIT);
+    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::STARTUP);
+    EXPECT_FALSE(Fed1->isAsyncOperationCompleted());
+
+    Fed2->enterInitializingModeIterativeAsync();
+    EXPECT_TRUE(Fed2->getCurrentMode()==helics::Federate::Modes::PENDING_ITERATIVE_INIT||Fed2->getCurrentMode()==helics::Federate::Modes::STARTUP);
+    std::this_thread::yield();
+    int ii{0};
+    while (!Fed2->isAsyncOperationCompleted())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        if (++ii > 20)
+        {
+            break;
+        }
+    }
+    EXPECT_TRUE(Fed2->isAsyncOperationCompleted());
+    Fed2->enterInitializingModeIterativeComplete();
+    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::STARTUP);
+    Fed2->enterInitializingMode();
+    Fed1->enterInitializingModeComplete();
+    EXPECT_EQ(Fed1->getCurrentMode(),helics::Federate::Modes::INITIALIZING);
+    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::INITIALIZING);
+    Fed1->disconnect();
+    Fed2->disconnect();
     brk.waitForDisconnect();
 }
 

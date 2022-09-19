@@ -188,6 +188,52 @@ TEST_F(error_tests, duplicate_publication_names2)
     broker->disconnect();
 }
 
+TEST_F(error_tests, duplicate_publication_names2_init_iteration)
+{
+    auto broker = AddBroker("test", 2);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto fed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    fed1->registerGlobalPublication("testkey", "");
+    fed1->enterInitializingModeAsync();
+
+    
+    fed2->enterInitializingModeIterative();
+
+    fed2->registerGlobalPublication("testkey", "");
+
+    bool gotException = false;
+    try {
+        fed2->enterInitializingMode();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
+        // this should do nothing
+        EXPECT_THROW(fed2->enterExecutingMode(), helics::InvalidFunctionCall);
+        EXPECT_TRUE(fed2->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
+    }
+
+    try {
+        fed1->enterInitializingModeComplete();
+    }
+    catch (const helics::RegistrationFailure&) {
+        gotException = true;
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
+        // this should do nothing
+        EXPECT_THROW(fed1->enterExecutingMode(), helics::InvalidFunctionCall);
+        EXPECT_TRUE(fed1->getCurrentMode() == helics::Federate::Modes::ERROR_STATE);
+    }
+    EXPECT_TRUE(gotException);
+
+    fed1->finalize();
+    fed2->finalize();
+    broker->disconnect();
+}
+
 TEST_F(error_tests, duplicate_publication_names_auto_terminate)
 {
     auto broker = AddBroker("test", "-f 2");

@@ -61,9 +61,19 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 if (checkActionFlag(cmd, observer_flag)) {
                     timeCoord->setDynamicJoining();
                 }
-                newState = FederateStates::INITIALIZING;
+                if (checkActionFlag(cmd, iteration_requested_flag))
+                {
+                    newState = FederateStates::CREATED;
+                    newMode =false;
+                    proc = MessageProcessingResult::ITERATING;
+                }
+                else
+                {
+                    newState = FederateStates::INITIALIZING;
                 newMode = true;
                 proc = MessageProcessingResult::NEXT_STEP;
+                }
+                
             }
             break;
         case CMD_EXEC_REQUEST:
