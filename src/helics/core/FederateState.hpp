@@ -379,7 +379,8 @@ class FederateState {
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
     IterationResult waitSetup();
-    /** process until the initialization state has been entered, an iteration request granted or there is a failure
+    /** process until the initialization state has been entered, an iteration request granted or
+    there is a failure
     @param request the desired iteration condition
     @return the result of the iteration request*/
     IterationResult enterInitializingMode(IterationRequest request);

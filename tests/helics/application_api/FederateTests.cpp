@@ -125,29 +125,28 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
 
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingModeIterative();
-    EXPECT_EQ(Fed1->getCurrentMode(),helics::Federate::Modes::PENDING_INIT);
-    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::STARTUP);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::PENDING_INIT);
+    EXPECT_EQ(Fed2->getCurrentMode(), helics::Federate::Modes::STARTUP);
     EXPECT_FALSE(Fed1->isAsyncOperationCompleted());
 
     Fed2->enterInitializingModeIterativeAsync();
-    EXPECT_TRUE(Fed2->getCurrentMode()==helics::Federate::Modes::PENDING_ITERATIVE_INIT||Fed2->getCurrentMode()==helics::Federate::Modes::STARTUP);
+    EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::PENDING_ITERATIVE_INIT ||
+                Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
     std::this_thread::yield();
     int ii{0};
-    while (!Fed2->isAsyncOperationCompleted())
-    {
+    while (!Fed2->isAsyncOperationCompleted()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        if (++ii > 20)
-        {
+        if (++ii > 20) {
             break;
         }
     }
     EXPECT_TRUE(Fed2->isAsyncOperationCompleted());
     Fed2->enterInitializingModeIterativeComplete();
-    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::STARTUP);
+    EXPECT_EQ(Fed2->getCurrentMode(), helics::Federate::Modes::STARTUP);
     Fed2->enterInitializingMode();
     Fed1->enterInitializingModeComplete();
-    EXPECT_EQ(Fed1->getCurrentMode(),helics::Federate::Modes::INITIALIZING);
-    EXPECT_EQ(Fed2->getCurrentMode(),helics::Federate::Modes::INITIALIZING);
+    EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::INITIALIZING);
+    EXPECT_EQ(Fed2->getCurrentMode(), helics::Federate::Modes::INITIALIZING);
     Fed1->disconnect();
     Fed2->disconnect();
     brk.waitForDisconnect();

@@ -986,8 +986,8 @@ void Federate::updateFederateMode(Modes newMode)
     }
     if (modeUpdateCallback) {
         switch (oldMode) {
-        case Modes::PENDING_ITERATIVE_INIT:
-            break;
+            case Modes::PENDING_ITERATIVE_INIT:
+                break;
             case Modes::PENDING_INIT:
                 modeUpdateCallback(newMode, Modes::STARTUP);
                 break;
@@ -1022,8 +1022,7 @@ void Federate::updateFederateMode(Modes newMode)
         }
     }
     if (newMode == Modes::FINALIZE || newMode == Modes::ERROR_STATE) {
-    if (cosimulationTerminationCallback) {
-        
+        if (cosimulationTerminationCallback) {
             cosimulationTerminationCallback();
         }
     }

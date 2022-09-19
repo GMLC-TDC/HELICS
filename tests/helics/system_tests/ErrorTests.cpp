@@ -200,7 +200,6 @@ TEST_F(error_tests, duplicate_publication_names2_init_iteration)
     fed1->registerGlobalPublication("testkey", "");
     fed1->enterInitializingModeAsync();
 
-    
     fed2->enterInitializingModeIterative();
 
     fed2->registerGlobalPublication("testkey", "");

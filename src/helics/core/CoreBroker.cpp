@@ -2481,7 +2481,7 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 }
             }
         });
-        initIterating=false;
+        initIterating = false;
         return;
     }
     if (brokerKey == universalKey) {
