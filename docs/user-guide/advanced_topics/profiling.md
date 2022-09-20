@@ -42,7 +42,7 @@ Profiling is enabled via the command prompt by passing the `--profiler` option w
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
-Enabling this flag will pass in the appropriate flags to all children brokers and cores.  A leading `+` on the file name triggers appending new data, otherwise the file is cleared or a new one created when the broker starts
+Enabling this flag will pass in the appropriate flags to all children brokers and cores. A leading `+` on the file name triggers appending new data, otherwise the file is cleared or a new one created when the broker starts
 
 ### Core profiling
 

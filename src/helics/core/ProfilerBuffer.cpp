@@ -56,14 +56,12 @@ void ProfilerBuffer::writeFile()
 
 void ProfilerBuffer::setOutputFile(std::string fileName)
 {
-    if (fileName.empty())
-    {
+    if (fileName.empty()) {
         mFileName.clear();
         return;
     }
-    if (fileName.front() == '+')
-    {
-        mFileName=fileName.substr(1);
+    if (fileName.front() == '+') {
+        mFileName = fileName.substr(1);
         return;
     }
     mFileName = std::move(fileName);

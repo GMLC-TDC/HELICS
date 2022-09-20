@@ -319,7 +319,7 @@ TEST(profiling_tests, save_file_append)
 {
     {
         std::ofstream out("save_profile_app.txt");
-        out<<"APPENDING_TO_FILE"<<std::endl;
+        out << "APPENDING_TO_FILE" << std::endl;
     }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.coreInitString = "--autobroker --profiler=+save_profile_app.txt";
@@ -329,7 +329,7 @@ TEST(profiling_tests, save_file_append)
     Fed->enterExecutingMode();
     Fed->finalize();
     helics::cleanupHelicsLibrary();
-    
+
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
     helics::cleanupHelicsLibrary();
 
@@ -351,7 +351,7 @@ TEST(profiling_tests, save_file_append)
 
     ASSERT_TRUE(!mlog.empty());
     bool hasMarker{false};
-    EXPECT_NE(mlog.front().find("APPENDING_TO_FILE"),std::string::npos);
+    EXPECT_NE(mlog.front().find("APPENDING_TO_FILE"), std::string::npos);
     std::vector<std::int64_t> timeValues;
     for (const auto& logM : mlog) {
         if (logM.find("MARKER") != std::string::npos) {
