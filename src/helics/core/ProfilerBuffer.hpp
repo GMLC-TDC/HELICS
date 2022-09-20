@@ -17,7 +17,7 @@ class ProfilerBuffer {
     void addMessage(const std::string& data);
     void addMessage(std::string&& data);
     void writeFile();
-    void setOutputFile(std::string fileName) { mFileName = std::move(fileName); }
+    void setOutputFile(std::string fileName);
 
   private:
     std::vector<std::string> mBuffers;

@@ -549,7 +549,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option(
            "--profiler",
            profilerFileName,
-           "Enable profiling and specify a file name, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
+           "Enable profiling and specify a file name(prepend `+` to the filename to allow appending new data, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
         ->expected(0, 1)
         ->default_str("log");
     app->add_option("--broker_key,--brokerkey,--brokerKey",

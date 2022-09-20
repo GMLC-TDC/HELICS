@@ -315,6 +315,68 @@ TEST(profiling_tests, save_file)
     std::filesystem::remove("save_profile.txt");
 }
 
+TEST(profiling_tests, save_file_append)
+{
+    {
+        std::ofstream out("save_profile_app.txt");
+        out<<"APPENDING_TO_FILE"<<std::endl;
+    }
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --profiler=+save_profile_app.txt";
+
+    auto Fed = std::make_shared<helics::Federate>("test1", fi);
+
+    Fed->enterExecutingMode();
+    Fed->finalize();
+    helics::cleanupHelicsLibrary();
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    helics::cleanupHelicsLibrary();
+
+    std::vector<std::string> mlog;
+    std::ifstream in("save_profile_app.txt");
+    // Check if object is valid
+    ASSERT_TRUE(in) << "Cannot open save_profile_app.txt";
+
+    std::string str;
+    // Read the next line from File until it reaches the end.
+    while (std::getline(in, str)) {
+        // Line contains string of length > 0 then save it in vector
+        if (!str.empty()) {
+            mlog.push_back(str);
+        }
+    }
+    // Close The File
+    in.close();
+
+    ASSERT_TRUE(!mlog.empty());
+    bool hasMarker{false};
+    EXPECT_NE(mlog.front().find("APPENDING_TO_FILE"),std::string::npos);
+    std::vector<std::int64_t> timeValues;
+    for (const auto& logM : mlog) {
+        if (logM.find("MARKER") != std::string::npos) {
+            hasMarker = true;
+        } else if (logM.find("<PROFILING>") != std::string::npos) {
+            std::smatch ml;
+            std::regex ptime("<([^|>]*)></PROFILING>");
+            if (std::regex_search(logM, ml, ptime)) {
+                timeValues.push_back(std::stoll(ml[1]));
+            }
+        }
+    }
+    EXPECT_TRUE(hasMarker);
+    std::int64_t current = 0LL;
+    bool increasing{true};
+    for (auto st : timeValues) {
+        if (st < current) {
+            increasing = false;
+        }
+        current = st;
+    }
+    EXPECT_TRUE(increasing);
+    std::filesystem::remove("save_profile.txt");
+}
+
 TEST(profiling_tests, broker_file_save)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);

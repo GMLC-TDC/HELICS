@@ -197,7 +197,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                     enable_profiling = false;
                 }
             },
-            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
+            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system.  If a file name is specified with `+fileName` the contents are appended, otherwise the file is cleared and started fresh for example `--profiler=+pfile.txt` will keep the existing contents and append new data to pfile.txt")
         ->expected(0, 1)
         ->default_str("log");
 
