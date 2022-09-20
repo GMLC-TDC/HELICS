@@ -596,18 +596,17 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID)
         m.source_id = fed->global_id.load();
         addActionMessage(m);
 
-        if (fed->isCallbackFederate())
-        {
+        if (fed->isCallbackFederate()) {
             return false;
         }
-            auto check = fed->enterInitializingMode();
-            if (check != IterationResult::NEXT_STEP) {
-                fed->init_requested = false;
-                if (check == IterationResult::HALTED) {
-                    throw(HelicsSystemFailure());
-                }
-                generateFederateException(fed);
+        auto check = fed->enterInitializingMode();
+        if (check != IterationResult::NEXT_STEP) {
+            fed->init_requested = false;
+            if (check == IterationResult::HALTED) {
+                throw(HelicsSystemFailure());
             }
+            generateFederateException(fed);
+        }
         return true;
     }
     throw(InvalidFunctionCall("federate already has requested entry to initializing State"));

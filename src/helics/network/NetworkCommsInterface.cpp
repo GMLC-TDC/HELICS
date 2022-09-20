@@ -125,7 +125,7 @@ void NetworkCommsInterface::loadNetworkInfo(const NetworkBrokerData& netInfo)
                     localTargetAddress = localHostString;
                     break;
                 default:
-                    localTargetAddress.assign(1,'*');
+                    localTargetAddress.assign(1, '*');
                     break;
             }
         } else {

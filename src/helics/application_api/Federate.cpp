@@ -229,7 +229,7 @@ void Federate::enterInitializingMode()
             try {
                 if (coreObject->enterInitializingMode(fedID)) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
-                }       
+                }
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -304,9 +304,8 @@ void Federate::enterInitializingModeComplete()
         case Modes::PENDING_INIT: {
             auto asyncInfo = asyncCallInfo->lock();
             try {
-                bool res=asyncInfo->initFuture.get();
-                if (res)
-                {
+                bool res = asyncInfo->initFuture.get();
+                if (res) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
                 }
             }

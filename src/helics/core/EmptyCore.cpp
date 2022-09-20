@@ -97,7 +97,10 @@ void EmptyCore::finalize(LocalFederateId /*federateID*/) {}
 
 void EmptyCore::setCoreReadyToInit() {}
 
-bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/) { return false;}
+bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/)
+{
+    return false;
+}
 
 IterationResult EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
                                               IterationRequest /*iterate*/)
