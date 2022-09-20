@@ -38,16 +38,18 @@ Profiling can be enabled at any level of the hierarchy in HELICS and when enable
 Profiling is enabled via the command prompt by passing the `--profiler` option when calling `helics_broker`.
 
 - `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
+- `--profiler=+save_profile2.txt` will append profiling data to the text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
-Enabling this flag will pass in the appropriate flags to all children brokers and cores.
+Enabling this flag will pass in the appropriate flags to all children brokers and cores.  A leading `+` on the file name triggers appending new data, otherwise the file is cleared or a new one created when the broker starts
 
 ### Core profiling
 
 Profiling is enabled via the `coreinitstring` by adding a `--profiler` option.
 
 - `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
+- `--profiler=+save_profile2.txt` will append profiling data to the text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
