@@ -464,7 +464,7 @@ IterationResult Federate::enterExecutingModeComplete()
 void Federate::setAsyncCheck(std::function<bool()> asyncCheck)
 {
     auto asyncInfo = asyncCallInfo->lock();
-    asyncInfo->asyncCheck = asyncCheck;
+    asyncInfo->asyncCheck = std::move(asyncCheck);
 }
 
 void Federate::setTag(std::string_view tag, std::string_view value)
