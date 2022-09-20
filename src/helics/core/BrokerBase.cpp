@@ -457,14 +457,12 @@ std::pair<bool, std::vector<std::string_view>>
         return {true, {}};
     }
     if (res[0] == "ignore") {
-    }
-    else if (res[0] == "terminate") {
-        if (allowRemoteControl)
-        {
+    } else if (res[0] == "terminate") {
+        if (allowRemoteControl) {
             LOG_SUMMARY(global_broker_id_local,
-                identifier,
-                " received terminate instruction via command instruction")
-                ActionMessage udisconnect(CMD_USER_DISCONNECT);
+                        identifier,
+                        " received terminate instruction via command instruction")
+            ActionMessage udisconnect(CMD_USER_DISCONNECT);
             addActionMessage(udisconnect);
         }
     } else if (res[0] == "echo") {

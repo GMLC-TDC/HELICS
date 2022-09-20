@@ -548,10 +548,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--observer",
                   observer,
                   "tell the federate/core that this federate is an observer");
-    //this is added here to match the command arguments for a broker, also works as a flag
+    // this is added here to match the command arguments for a broker, also works as a flag
     app->add_flag_function(
         "--allow_remote_control,!--disable_remote_control",
-        [this](int64_t val) {setFlagOption(HELICS_FLAG_ALLOW_REMOTE_CONTROL,(val>0)); },"enable the federate to respond to certain remote operations such as disconnect");
+        [this](int64_t val) { setFlagOption(HELICS_FLAG_ALLOW_REMOTE_CONTROL, (val > 0)); },
+        "enable the federate to respond to certain remote operations such as disconnect");
     app->add_flag(
         "--json",
         useJsonSerialization,

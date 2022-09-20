@@ -181,9 +181,11 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_PROFILING = 93,
                /** flag trigger for generating a profiling marker*/
                HELICS_FLAG_PROFILING_MARKER = 95,
-               /** specify that the federate/core/broker should allow some remote control operations such as finalize*/
+               /** specify that the federate/core/broker should allow some remote control operations
+                  such as finalize*/
                HELICS_FLAG_ALLOW_REMOTE_CONTROL = 109,
-               /** specify that the federate/core/broker should *NOT* allow some remote control operations such as finalize*/
+               /** specify that the federate/core/broker should *NOT* allow some remote control
+                  operations such as finalize*/
                HELICS_FLAG_DISABLE_REMOTE_CONTROL = 110
 } HelicsFlags;
 
