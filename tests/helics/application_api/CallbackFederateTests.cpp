@@ -84,7 +84,8 @@ TEST_F(callbackFed, timeSteps)
     int cb1{0};
     int cb2{0};
     vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
@@ -116,7 +117,8 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     auto v = std::make_shared<std::promise<int>>();
     auto vfut = v->get_future();
@@ -181,7 +183,8 @@ TEST_F(callbackFed, timeStepError)
     int cb1{0};
     int cb2{0};
     vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
@@ -214,7 +217,8 @@ TEST_F(callbackFed, timeStepException)
     int cb1{0};
     int cb2{0};
     vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
