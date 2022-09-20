@@ -274,6 +274,109 @@ TEST_F(command_tests, federation_finalize_core_command)
     vFed2->finalize();
 }
 
+TEST_F(command_tests, federate_finalize_command)
+{
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+    vFed2->registerGlobalPublication<double>("pub2");
+
+    vFed1->registerSubscription("pub2");
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->sendCommand(vFed1->getName(), "terminate");
+    vFed1->sendCommand(vFed2->getName(), "terminate");
+
+    auto tres=vFed1->requestNextStep();
+    EXPECT_GE(tres,cHelicsBigNumber);
+    tres=vFed2->requestNextStep();
+    EXPECT_GE(tres,cHelicsBigNumber);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(command_tests, federate_finalize_command_disable)
+{
+
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+    vFed2->registerGlobalPublication<double>("pub2");
+
+    vFed1->registerSubscription("pub2");
+    vFed1->setFlagOption(HELICS_FLAG_ALLOW_REMOTE_CONTROL,false);
+    vFed2->setFlagOption(HELICS_FLAG_DISABLE_REMOTE_CONTROL,true);
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->sendCommand(vFed1->getName(), "terminate");
+    vFed1->sendCommand(vFed2->getName(), "terminate");
+
+    vFed1->requestTimeAsync(0);
+    auto tres=vFed2->requestNextStep();
+    EXPECT_LT(tres,1.0);
+    tres=vFed1->requestTimeComplete();
+    EXPECT_LT(tres,1.0);
+    vFed1->finalize();
+    vFed2->finalize();
+    
+}
+
+TEST_F(command_tests, federation_finalize_command_disable)
+{
+    extraBrokerArgs="--disable_remote_control";
+
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+    helics::CoreApp cr(vFed1->getCorePointer());
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed1->sendCommand("federation", "terminate");
+
+    EXPECT_FALSE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(command_tests, federation_finalize_core_command_disable)
+{
+    extraCoreArgs="--disable_remote_control";
+    SetupTest<helics::ValueFederate>("test_2", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    // register the publications
+    vFed1->registerGlobalPublication<double>("pub1");
+
+    vFed2->registerSubscription("pub1");
+    helics::CoreApp cr(vFed1->getCorePointer());
+
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed2->sendCommand(cr.getIdentifier(), "terminate");
+
+    EXPECT_FALSE(cr.waitForDisconnect(std::chrono::milliseconds(600)));
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
 TEST_F(command_tests, core_echo_command)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);

@@ -197,7 +197,7 @@ void FederateState::generateConfig(Json::Value& base) const
     base["observer"] = observer;
     base["source_only"] = mSourceOnly;
     base["strict_input_type_checking"] = strict_input_type_checking;
-    base["slow_responding"] = slow_responding;
+    base["slow_responding"] = mSlowResponding;
     if (rt_lag > timeZero) {
         base["rt_lag"] = static_cast<double>(rt_lag);
     }
@@ -1984,13 +1984,19 @@ void FederateState::setOptionFlag(int optionFlag, bool value)
             break;
         case defs::Flags::SLOW_RESPONDING:
         case defs::Flags::DEBUGGING:
-            slow_responding = value;
+            mSlowResponding = value;
             break;
         case defs::Flags::PROFILING:
             if (value && !mProfilerActive) {
                 generateProfilingMarker();
             }
             mProfilerActive = value;
+            break;
+        case defs::Flags::ALLOW_REMOTE_CONTROL:
+            mAllowRemoteControl = value;
+            break;
+        case defs::Flags::DISABLE_REMOTE_CONTROL:
+            mAllowRemoteControl = !value;
             break;
         case defs::Flags::PROFILING_MARKER:
             if (value && mProfilerActive) {
@@ -2101,7 +2107,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return mSourceOnly;
         case defs::Flags::SLOW_RESPONDING:
         case defs::Flags::DEBUGGING:
-            return slow_responding;
+            return mSlowResponding;
         case defs::Flags::TERMINATE_ON_ERROR:
             return terminate_on_error;
         case defs::Flags::CONNECTIONS_REQUIRED:
@@ -2116,6 +2122,7 @@ bool FederateState::getOptionFlag(int optionFlag) const
             return ignore_time_mismatch_warnings;
         case defs::Properties::LOG_BUFFER:
             return (mLogManager->getLogBuffer().capacity() > 0);
+       // NOTE: the allow remote control property is purposely not retrievable and should not be in config generation
         default:
             return timeCoord->getOptionFlag(optionFlag);
     }
@@ -2320,12 +2327,28 @@ void FederateState::sendCommand(ActionMessage& command)
         return;
     }
 
-    if (res[0] == "terminate") {
-        if (mParent != nullptr) {
-            ActionMessage bye(CMD_DISCONNECT);
-            bye.source_id = global_id.load();
-            bye.dest_id = bye.source_id;
-            mParent->addActionMessage(bye);
+    if (res[0] == "terminate" || res[0]=="halt") {
+        if (mAllowRemoteControl)
+        {
+            if (mParent != nullptr) {
+                ActionMessage bye(CMD_DISCONNECT);
+                bye.source_id = global_id.load();
+                bye.dest_id = bye.source_id;
+                mParent->addActionMessage(bye);
+            }
+        }
+        else
+        {
+            if (mParent != nullptr) {
+                ActionMessage response(command.action());
+                response.payload = fmt::format("log {} does not allow remote termination",getIdentifier());
+                response.dest_id = command.source_id;
+                response.source_id = global_id.load();
+                response.setString(targetStringLoc, command.getString(sourceStringLoc));
+                response.setString(sourceStringLoc, getIdentifier());
+
+                mParent->addActionMessage(std::move(response));
+            }
         }
     } else if (res[0] == "echo") {
         if (mParent != nullptr) {

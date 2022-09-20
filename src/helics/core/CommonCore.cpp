@@ -4728,6 +4728,12 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
         }
 
         break;
+        case defs::Flags::ALLOW_REMOTE_CONTROL:
+            allowRemoteControl=checkActionFlag(cmd, indicator_flag);
+            break;
+        case defs::Flags::DISABLE_REMOTE_CONTROL:
+            allowRemoteControl=!checkActionFlag(cmd,indicator_flag);
+            break;
         case defs::Flags::TERMINATE_ON_ERROR:
             terminate_on_error = checkActionFlag(cmd, indicator_flag);
             break;
