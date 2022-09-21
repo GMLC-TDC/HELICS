@@ -54,17 +54,17 @@ void ProfilerBuffer::writeFile()
     mBuffers.clear();
 }
 
-void ProfilerBuffer::setOutputFile(std::string fileName)
+void ProfilerBuffer::setOutputFile(std::string fileName,bool append)
 {
     if (fileName.empty()) {
         mFileName.clear();
         return;
     }
-    if (fileName.front() == '+') {
-        mFileName = fileName.substr(1);
+    mFileName = std::move(fileName);
+    if (append) {
         return;
     }
-    mFileName = std::move(fileName);
+    
     std::ofstream file;
     // can't enable exception now because of gcc bug that raises ios_base::failure with useless
     // message file.exceptions(file.exceptions() | std::ios::failbit);

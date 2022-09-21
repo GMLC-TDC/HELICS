@@ -304,7 +304,7 @@ static const std::unordered_map<std::string, int> log_level_map{
     {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
     /** interfaces + timing message*/
     {"timing", HELICS_LOG_LEVEL_TIMING},
-    {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
+    {"profiling", HELICS_LOG_LEVEL_PROFILING},
     /** timing+ data transfer notices*/
     {"data", HELICS_LOG_LEVEL_DATA},
     /** same as data for now*/
@@ -549,7 +549,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option(
            "--profiler",
            profilerFileName,
-           "Enable profiling and specify a file name(prepend `+` to the filename to allow appending new data, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
+           "Enable profiling and specify a file name (NOTE: use --profiler_append=<filename> in the core init string to append an existing file)")
         ->expected(0, 1)
         ->default_str("log");
     app->add_option("--broker_key,--brokerkey,--brokerKey",
@@ -570,7 +570,6 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_DELTA, val); },
            "The minimum time between time grants for a Federate (default in ms)")
         ->configurable(false);
-
     auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
     encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network");
     encrypt_group->add_option("--encryption_config",

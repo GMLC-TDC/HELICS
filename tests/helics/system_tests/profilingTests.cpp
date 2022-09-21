@@ -322,7 +322,7 @@ TEST(profiling_tests, save_file_append)
         out << "APPENDING_TO_FILE" << std::endl;
     }
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.coreInitString = "--autobroker --profiler=+save_profile_app.txt";
+    fi.coreInitString = "--autobroker --profiler_append=save_profile_app.txt";
 
     auto Fed = std::make_shared<helics::Federate>("test1", fi);
 
@@ -374,7 +374,7 @@ TEST(profiling_tests, save_file_append)
         current = st;
     }
     EXPECT_TRUE(increasing);
-    std::filesystem::remove("save_profile.txt");
+    std::filesystem::remove("save_profile_app.txt");
 }
 
 TEST(profiling_tests, broker_file_save)
