@@ -392,16 +392,16 @@ class Federate {
         helicsFederateEnterInitializingModeComplete(fed, hThrowOnError());
     }
 
-    /** iterate to the startup up
-    @details  the call will block until all federates have requested entry to initializing mode,
-    iterative or not. The federate will remain in startup mode and can continue to add interfaces
-    and other activities in the startup mode.
+    /** iterate in the created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup.
     */
     void enterInitializingModeIterative()
     {
         helicsFederateEnterInitializingModeIterative(fed, hThrowOnError());
     }
-    /** enter the initialization mode after all interfaces have been defined
+    /** iterate in the created mode.
     @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
     should be made to complete the call sequence
     */

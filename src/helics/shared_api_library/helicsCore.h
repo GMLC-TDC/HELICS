@@ -1040,10 +1040,10 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeIterative(HelicsFederate f
 HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
- * Complete the call to initialize mode that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in
- * startup or error mode on return.
+ * Complete the call to enter initializing mode Iterative that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in
+ * created or error mode on return
  *
- * @param fed The federate desiring to iterate to the startup mode again
+ * @param fed The federate used in the corresponding async call
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
