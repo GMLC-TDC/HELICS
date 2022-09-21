@@ -230,7 +230,7 @@ TEST(federate_tests, timeout_error_zmq_ci_skip_nosan)
                  helics::RegistrationFailure);
 }
 
-TEST(federate_tests, timeout_abort_zmq_ci_skip_nosan)
+TEST(federate_tests, timeout_abort_zmq_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -259,7 +259,7 @@ TEST(federate_tests, timeout_abort_zmq_ci_skip_nosan)
 #endif
 
 #ifdef HELICS_ENABLE_TCP_CORE
-TEST(federate_tests, timeout_abort_tcp_ci_skip_nosan)
+TEST(federate_tests, timeout_abort_tcp_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -285,7 +285,7 @@ TEST(federate_tests, timeout_abort_tcp_ci_skip_nosan)
     }
 }
 
-TEST(federate_tests, timeout_abort_tcpss_ci_skip_nosan)
+TEST(federate_tests, timeout_abort_tcpss_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {
@@ -313,7 +313,7 @@ TEST(federate_tests, timeout_abort_tcpss_ci_skip_nosan)
 #endif
 
 #ifdef HELICS_ENABLE_UDP_CORE
-TEST(federate_tests, timeout_abort_udp_ci_skip_nosan)
+TEST(federate_tests, timeout_abort_udp_ci_skip_nosan_nocov)
 {
     std::future<std::shared_ptr<helics::Federate>> fut;
     auto call = []() {

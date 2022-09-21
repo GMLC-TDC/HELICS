@@ -227,8 +227,9 @@ void Federate::enterInitializingMode()
     switch (cm) {
         case Modes::STARTUP:
             try {
-                coreObject->enterInitializingMode(fedID);
-                enteringInitializingMode(IterationResult::NEXT_STEP);
+                if (coreObject->enterInitializingMode(fedID)) {
+                    enteringInitializingMode(IterationResult::NEXT_STEP);
+                }
             }
             catch (const HelicsException&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -264,7 +265,7 @@ void Federate::enterInitializingModeAsync()
         auto asyncInfo = asyncCallInfo->lock();
         if (currentMode.compare_exchange_strong(cm, Modes::PENDING_INIT)) {
             asyncInfo->initFuture = std::async(std::launch::async, [this]() {
-                coreObject->enterInitializingMode(fedID);
+                return coreObject->enterInitializingMode(fedID);
             });
         }
     } else if (cm == Modes::PENDING_INIT) {
@@ -303,8 +304,10 @@ void Federate::enterInitializingModeComplete()
         case Modes::PENDING_INIT: {
             auto asyncInfo = asyncCallInfo->lock();
             try {
-                asyncInfo->initFuture.get();
-                enteringInitializingMode(IterationResult::NEXT_STEP);
+                bool res = asyncInfo->initFuture.get();
+                if (res) {
+                    enteringInitializingMode(IterationResult::NEXT_STEP);
+                }
             }
             catch (const std::exception&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -461,7 +464,7 @@ IterationResult Federate::enterExecutingModeComplete()
 void Federate::setAsyncCheck(std::function<bool()> asyncCheck)
 {
     auto asyncInfo = asyncCallInfo->lock();
-    asyncInfo->asyncCheck = asyncCheck;
+    asyncInfo->asyncCheck = std::move(asyncCheck);
 }
 
 void Federate::setTag(std::string_view tag, std::string_view value)

@@ -15,7 +15,7 @@ namespace helics {
 /** helper class for Federate info that holds the futures for asynchronous calls*/
 class AsyncFedCallInfo {
   public:
-    std::future<void> initFuture; /**future for the Enter initialization call*/
+    std::future<bool> initFuture; /**future for the Enter initialization call*/
     std::future<IterationResult> execFuture; /** future for the enter execution mode call*/
     std::future<Time> timeRequestFuture; /** future for the timeRequest call*/
     std::future<iteration_time>
