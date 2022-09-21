@@ -256,7 +256,7 @@ A command-line-like string that specifies options for the core as it connects to
 - `--broker_rank=`: For MPI cores only; identifies the MPI rank of the broker
 - `--broker_tag=`: For MPI cores only; identifies the MPI tag of the broker
 - `--localport=`: Port number to use when communicating with this core
-- `--autobroker`: When included the core will automatically generate a broker(does not work for all core types)
+- `--autobroker`: When included the core will automatically generate a broker (does not work for all core types)
 - `--key=`: Specifies a key to use when communicating with the broker. Only federates with this key specified will be able to talk to the broker with the same `key` value. This is used to prevent federations running on the same hardware from accidentally interfering with each other.
 - `--profiler=log` - Send the profiling messages to the default logging file. `log` can be replaced with a path to an alternative file where only the profiling messages will be sent. See the [User Guide page on profiling](../user-guide/advanced_topics/profiling.md) for further details. If a file is specified it is cleared.
 - `--profiler_append=somefile.txt` - Send the profiling messages to file and leave the existing contents appending new data. See the [User Guide page on profiling](../user-guide/advanced_topics/profiling.md) for further details.
@@ -269,7 +269,7 @@ In addition to these options, all options shown in the `broker_init_string` are 
 
 _API:_ (none)
 
-Automatically generate a broker if one cannot be connected to. For federations with only one broker (often the case) and/or with federations containing custom federates that were developed for this particular application, it can be convenient to create the broker in the process of creating a specific federate; this option allows that to take place. The downside to this is it creates a federation with a small amount of mystery as the broker is not clearly shown to be launched as its own federate alongside the other federates and those unfamiliar with the federation composition may have to spend some extra time to understand where the broker is coming from. This option does not work for all core type, specifically designed for inproc and testing cores. Others may be added later.
+Automatically generate a broker if one cannot be connected to. For federations with only one broker (often the case) and/or with federations containing custom federates that were developed for this particular application, it can be convenient to create the broker in the process of creating a specific federate; this option allows that to take place. The downside to this is it creates a federation with a small amount of mystery as the broker is not clearly shown to be launched as its own federate alongside the other federates and those unfamiliar with the federation composition may have to spend some extra time to understand where the broker is coming from. This option does not work for all core types, it is specifically designed for inproc and testing cores. Others may be added later.
 
 ---
 
