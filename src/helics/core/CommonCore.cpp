@@ -581,9 +581,9 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
     }
     switch (request) {
         case IterationRequest::HALT_OPERATIONS:
-            return finalize(federateID);
+            return finalize(federateID),false;
         case IterationRequest::ERROR_CONDITION:
-            return localError(federateID, 34, "error condition called in enterInitializingMode");
+            return localError(federateID, 34, "error condition called in enterInitializingMode"),false;
         case IterationRequest::FORCE_ITERATION:
         case IterationRequest::ITERATE_IF_NEEDED:
             if (fed->isCallbackFederate()) {
@@ -631,7 +631,6 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
                     generateFederateException(fed);
                     break;
             }
-            generateFederateException(fed);
         
         return true;
     }

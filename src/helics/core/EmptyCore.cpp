@@ -97,7 +97,7 @@ void EmptyCore::finalize(LocalFederateId /*federateID*/) {}
 
 void EmptyCore::setCoreReadyToInit() {}
 
-bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/,IterationRequest /*request*/) {}
+bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/,IterationRequest /*request*/)
 {
     return false;
 }
