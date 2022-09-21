@@ -18,11 +18,12 @@ class ProfilerBuffer {
     void addMessage(std::string&& data);
     void writeFile();
     /** specify the output file for writing the profile too
-    @details the file will be cleared when the ouput file is set unless the append parameter is specified as true
+    @details the file will be cleared when the output file is set unless the append parameter is
+    specified as true
     @param fileName the name of the file to write the profile too
-    @param append if set to true the output file will be appended insted of cleared on first use
+    @param append if set to true the output file will be appended instead of cleared on first use
     */
-    void setOutputFile(std::string fileName, bool append=false);
+    void setOutputFile(std::string fileName, bool append = false);
 
   private:
     std::vector<std::string> mBuffers;

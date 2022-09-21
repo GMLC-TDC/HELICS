@@ -189,7 +189,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                         if (!prBuff) {
                             prBuff = std::make_shared<ProfilerBuffer>();
                         }
-                        prBuff->setOutputFile(fileName,false);
+                        prBuff->setOutputFile(fileName, false);
                     }
 
                     enable_profiling = true;
@@ -201,22 +201,22 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         ->expected(0, 1)
         ->default_str("log");
 
-            // add the profiling append file option
-                hApp->add_option_function<std::string>(
-                    "--profiler_append",
-                    [this](const std::string& fileName) {
-                        if (!fileName.empty()) {
-                                if (!prBuff) {
-                                    prBuff = std::make_shared<ProfilerBuffer>();
-                                }
-                                prBuff->setOutputFile(fileName,true);
+    // add the profiling append file option
+    hApp->add_option_function<std::string>(
+        "--profiler_append",
+        [this](const std::string& fileName) {
+            if (!fileName.empty()) {
+                if (!prBuff) {
+                    prBuff = std::make_shared<ProfilerBuffer>();
+                }
+                prBuff->setOutputFile(fileName, true);
 
-                            enable_profiling = true;
-                        } else {
-                            enable_profiling = false;
-                        }
-                    },
-                    "activate profiling and set the profiler data output file; new profiler output will be appended to the file");
+                enable_profiling = true;
+            } else {
+                enable_profiling = false;
+            }
+        },
+        "activate profiling and set the profiler data output file; new profiler output will be appended to the file");
 
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
