@@ -181,29 +181,48 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                    "use the JSON serialization mode for communications");
 
     // add the profiling setup command
+    auto* popt =
+        hApp->add_option_function<std::string>(
+                "--profiler",
+                [this](const std::string& fileName) {
+                    if (!fileName.empty()) {
+                        if (fileName == "log" || fileName == "true") {
+                            if (prBuff) {
+                                prBuff.reset();
+                            }
+                        } else {
+                            if (!prBuff) {
+                                prBuff = std::make_shared<ProfilerBuffer>();
+                            }
+                            prBuff->setOutputFile(fileName, false);
+                        }
+
+                        enable_profiling = true;
+                    } else {
+                        enable_profiling = false;
+                    }
+                },
+                "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system.")
+            ->expected(0, 1)
+            ->default_str("log");
+
+    // add the profiling append file option
     hApp->add_option_function<std::string>(
-            "--profiler",
+            "--profiler_append",
             [this](const std::string& fileName) {
                 if (!fileName.empty()) {
-                    if (fileName == "log" || fileName == "true") {
-                        if (prBuff) {
-                            prBuff.reset();
-                        }
-                    } else {
-                        if (!prBuff) {
-                            prBuff = std::make_shared<ProfilerBuffer>();
-                        }
-                        prBuff->setOutputFile(fileName);
+                    if (!prBuff) {
+                        prBuff = std::make_shared<ProfilerBuffer>();
                     }
+                    prBuff->setOutputFile(fileName, true);
 
                     enable_profiling = true;
                 } else {
                     enable_profiling = false;
                 }
             },
-            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
-        ->expected(0, 1)
-        ->default_str("log");
+            "activate profiling and set the profiler data output file; new profiler output will be appended to the file")
+        ->excludes(popt);
 
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
