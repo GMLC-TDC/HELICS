@@ -177,7 +177,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                    "use the JSON serialization mode for communications");
 
     // add the profiling setup command
-    hApp->add_option_function<std::string>(
+    auto *popt=hApp->add_option_function<std::string>(
             "--profiler",
             [this](const std::string& fileName) {
                 if (!fileName.empty()) {
@@ -216,7 +216,7 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                 enable_profiling = false;
             }
         },
-        "activate profiling and set the profiler data output file; new profiler output will be appended to the file");
+        "activate profiling and set the profiler data output file; new profiler output will be appended to the file")->excludes(popt);
 
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
