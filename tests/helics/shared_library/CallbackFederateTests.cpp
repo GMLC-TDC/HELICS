@@ -117,7 +117,7 @@ TEST_F(callback_federate_tests, timeStepsPeriodMax)
     SetupTest(helicsCreateCallbackFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_MAXTIME, 3.0, NULL);
+    helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_STOPTIME, 3.0, NULL);
     helicsFederateSetTimeProperty(vFed1, HELICS_PROPERTY_TIME_PERIOD, 1.0, NULL);
 
     int cb1{0};
@@ -160,9 +160,8 @@ TEST_F(callback_federate_tests, initException)
     SetupTest(helicsCreateCallbackFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    std::function<HelicsIterationRequest()> initCall = []() {
+    std::function<HelicsIterationRequest()> initCall = []()->HelicsIterationRequest {
         throw std::runtime_error("ETEST");
-        return HELICS_ITERATION_REQUEST_NO_ITERATION;
     };
     helicsCallbackFederateInitializeCallback(vFed1, initFunction, &initCall, NULL);
 

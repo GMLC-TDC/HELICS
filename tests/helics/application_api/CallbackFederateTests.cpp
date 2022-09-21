@@ -114,7 +114,7 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
     vFed1->setTimeRequestEntryCallback(
@@ -249,9 +249,9 @@ TEST_F(callbackFed, timeSteps2Fed)
     SetupTest<helics::CallbackFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     auto vFed2 = GetFederateAs<helics::CallbackFederate>(1);
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
@@ -308,7 +308,7 @@ TEST_F(callbackFed, 100Fed_nosan)
     std::vector<double> vals(100);
     for (int ii = 0; ii < fedCount; ++ii) {
         auto fed = GetFederateAs<helics::CallbackFederate>(ii);
-        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 120.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 120.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
         auto& s1 = fed->registerSubscription(std::string("fed") +
@@ -337,7 +337,7 @@ TEST_F(callbackFed, 1000Fed_ci_skip_nosan)
     std::vector<double> vals(fedCount);
     for (int ii = 0; ii < fedCount; ++ii) {
         auto fed = GetFederateAs<helics::CallbackFederate>(ii);
-        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 25.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 25.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
         auto& s1 = fed->registerSubscription(
@@ -362,8 +362,8 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
     SetupTest<helics::CallbackFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     auto vFed2 = GetFederateAs<helics::CallbackFederate>(1);
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 18.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 18.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
     auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
     auto& s1 = vFed1->registerSubscription("pub2");

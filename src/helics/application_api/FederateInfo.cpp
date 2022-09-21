@@ -73,6 +73,8 @@ static constexpr frozen::unordered_map<std::string_view, int, 67> propStringsTra
     {"offset", HELICS_PROPERTY_TIME_OFFSET},
     {"timeoffset", HELICS_PROPERTY_TIME_OFFSET},
     {"time_offset", HELICS_PROPERTY_TIME_OFFSET},
+    {"stop_time", HELICS_PROPERTY_TIME_STOPTIME},
+    {"stoptime", HELICS_PROPERTY_TIME_STOPTIME},
     {"rtlead", HELICS_PROPERTY_TIME_RT_LEAD},
     {"rtlag", HELICS_PROPERTY_TIME_RT_LAG},
     {"rttolerance", HELICS_PROPERTY_TIME_RT_TOLERANCE},
@@ -575,6 +577,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--period",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_PERIOD, val); },
            "the execution cycle of the federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
+        "--stoptime",
+        [this](Time val) { setProperty(HELICS_PROPERTY_TIME_STOPTIME, val); },
+        "the maximum simulation time of a federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
            "--timedelta",
