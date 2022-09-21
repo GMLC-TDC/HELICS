@@ -163,7 +163,8 @@ class Core {
      * for callback federates this call passes full control to the core
      @return will return true if the call resulted in Initializing mode being reached
      */
-    virtual bool enterInitializingMode(LocalFederateId federateID,IterationRequest iterate = NO_ITERATION) = 0;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest iterate = NO_ITERATION) = 0;
 
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may

@@ -573,7 +573,7 @@ static void generateFederateException(const FederateState* fed)
             throw(HelicsException(fed->lastErrorString()));
     }
 }
-bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationRequest request)
+bool CommonCore::enterInitializingMode(LocalFederateId federateID, IterationRequest request)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
@@ -581,9 +581,10 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
     }
     switch (request) {
         case IterationRequest::HALT_OPERATIONS:
-            return finalize(federateID),false;
+            return finalize(federateID), false;
         case IterationRequest::ERROR_CONDITION:
-            return localError(federateID, 34, "error condition called in enterInitializingMode"),false;
+            return localError(federateID, 34, "error condition called in enterInitializingMode"),
+                   false;
         case IterationRequest::FORCE_ITERATION:
         case IterationRequest::ITERATE_IF_NEEDED:
             if (fed->isCallbackFederate()) {
@@ -617,21 +618,21 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID,IterationReque
         addActionMessage(m);
 
         if (fed->isCallbackFederate()) {
-			return false;
-			}
-            auto check = fed->enterInitializingMode(request);
-            fed->initRequested = false;
-            switch (check) {
-                case IterationResult::NEXT_STEP:
-                case IterationResult::ITERATING:
-                    break;
-                case IterationResult::HALTED:
-                    throw(HelicsSystemFailure());
-                default:
-                    generateFederateException(fed);
-                    break;
-            }
-        
+            return false;
+        }
+        auto check = fed->enterInitializingMode(request);
+        fed->initRequested = false;
+        switch (check) {
+            case IterationResult::NEXT_STEP:
+            case IterationResult::ITERATING:
+                break;
+            case IterationResult::HALTED:
+                throw(HelicsSystemFailure());
+            default:
+                generateFederateException(fed);
+                break;
+        }
+
         return true;
     }
     throw(InvalidFunctionCall("federate already has requested entry to initializing State"));

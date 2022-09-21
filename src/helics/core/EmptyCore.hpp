@@ -38,7 +38,8 @@ class EmptyCore: public Core {
     virtual int getErrorCode() const override;
     virtual std::string getErrorMessage() const override;
     virtual void finalize(LocalFederateId federateID) override;
-    virtual bool enterInitializingMode(LocalFederateId federateID,IterationRequest request) override;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest request) override;
     virtual void setCoreReadyToInit() override;
     virtual IterationResult enterExecutingMode(LocalFederateId federateID,
                                                IterationRequest iterate = NO_ITERATION) override;

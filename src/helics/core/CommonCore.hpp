@@ -98,7 +98,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual int getErrorCode() const override final;
     virtual std::string getErrorMessage() const override final;
     virtual void finalize(LocalFederateId federateID) override final;
-    virtual bool enterInitializingMode(LocalFederateId federateID,IterationRequest request) override final;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
     virtual IterationResult
         enterExecutingMode(LocalFederateId federateID,
@@ -486,7 +487,8 @@ class CommonCore: public Core, public BrokerBase {
     std::array<gmlc::containers::AirLock<std::any>, 4> dataAirlocks;
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
     /// flag indicating that one or more federates has requested iterative initialization
-    std::atomic<bool> initIterations{false};  
+    std::atomic<bool> initIterations{false};
+
   private:
     // generate a filter Federate
     void generateFilterFederate();
