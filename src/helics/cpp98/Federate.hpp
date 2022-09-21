@@ -361,7 +361,7 @@ class Federate {
     }
     /** called after one of the async calls and will indicate true if an async operation has
     completed
-    @details only call from the same thread as the one that called the initial async call and will
+    @details this should only be called from the same thread as the one that called the initial async call and will
     return false if called when no async operation is in flight*/
     bool isAsyncOperationCompleted() const
     {
@@ -393,7 +393,7 @@ class Federate {
     }
 
     /** iterate to the startup up
-    @details  the call will block until all federates have requested entry to initializing mode
+    @details  the call will block until all federates have requested entry to initializing mode,
     iterative or not. The federate will remain in startup mode and can continue to add interfaces
     and other activities in the startup mode.
     */
@@ -411,7 +411,7 @@ class Federate {
     }
 
     /** second part of the async process for entering initializationModeIterative call after a call
-    to enterInitializingModeIterativeAsync if call any other time it will throw an
+    to enterInitializingModeIterativeAsync; if called any other time it will throw an
     InvalidFunctionCall exception*/
     void enterInitializingModeIterativeComplete()
     {

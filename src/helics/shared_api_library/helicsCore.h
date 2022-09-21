@@ -1016,10 +1016,10 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
 HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
- * Trigger a blocking call and return to created state after all federates have either triggered an iteration or waiting to enter
- * initializing mode
+ * Trigger a blocking call and return to created state after all federates have either triggered an iteration or are waiting to enter
+ * initializing mode.
  *
- * @details this call will return the federate to the created state to allow additional setup to occur with federates either iterating in
+ * @details This call will return the federate to the created state to allow additional setup to occur with federates either iterating in
  * the mode or waiting.
  *
  * @param fed The federate to operate on.
@@ -1041,7 +1041,7 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFeder
 
 /**
  * Complete the call to initialize mode that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in
- * startup or error mode on return
+ * startup or error mode on return.
  *
  * @param fed The federate desiring to iterate to the startup mode again
  *
