@@ -131,7 +131,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 86> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 89> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
