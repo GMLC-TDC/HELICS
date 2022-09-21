@@ -77,7 +77,9 @@ class FederateState {
     bool strict_input_type_checking{false};
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     /// flag indicating that a federate is likely to be slow in responding
-    bool slow_responding{false};
+    bool mSlowResponding{false};
+    /// @brief flag indicating that the federate is open to remote control
+    bool mAllowRemoteControl{true};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
     std::unique_ptr<LogManager> mLogManager;
     int maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};

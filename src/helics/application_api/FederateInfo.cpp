@@ -131,7 +131,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 67> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 89> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
@@ -215,7 +215,13 @@ static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTra
     {"rollback", HELICS_FLAG_ROLLBACK},
     {"terminate_on_error", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateOnError", HELICS_FLAG_TERMINATE_ON_ERROR},
-    {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR}};
+    {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR},
+    {"allowRemoteControl", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"allowremotecontrol", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"allow_remote_control", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"disableRemoteControl", HELICS_FLAG_DISABLE_REMOTE_CONTROL},
+    {"disableremotecontrol", HELICS_FLAG_DISABLE_REMOTE_CONTROL},
+    {"disable_remote_control", HELICS_FLAG_DISABLE_REMOTE_CONTROL}};
 
 static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsTranslations{
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
@@ -542,6 +548,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--observer",
                   observer,
                   "tell the federate/core that this federate is an observer");
+    // this is added here to match the command arguments for a broker, also works as a flag
+    app->add_flag_function(
+        "--allow_remote_control,!--disable_remote_control",
+        [this](int64_t val) { setFlagOption(HELICS_FLAG_ALLOW_REMOTE_CONTROL, (val > 0)); },
+        "enable the federate to respond to certain remote operations such as disconnect");
     app->add_flag(
         "--json",
         useJsonSerialization,

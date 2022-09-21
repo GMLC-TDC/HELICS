@@ -148,6 +148,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag(
+        "--allow_remote_control,!--disable_remote_control",
+        allowRemoteControl,
+        "enable the broker to respond to certain remote commands that affect operations, such as disconnect");
+    hApp->add_flag(
         "--globaltime",
         globalTime,
         "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
@@ -454,11 +458,13 @@ std::pair<bool, std::vector<std::string_view>>
     }
     if (res[0] == "ignore") {
     } else if (res[0] == "terminate") {
-        LOG_SUMMARY(global_broker_id_local,
-                    identifier,
-                    " received terminate instruction via command instruction")
-        ActionMessage udisconnect(CMD_USER_DISCONNECT);
-        addActionMessage(udisconnect);
+        if (allowRemoteControl) {
+            LOG_SUMMARY(global_broker_id_local,
+                        identifier,
+                        " received terminate instruction via command instruction")
+            ActionMessage udisconnect(CMD_USER_DISCONNECT);
+            addActionMessage(udisconnect);
+        }
     } else if (res[0] == "echo") {
         LOG_SUMMARY(global_broker_id_local,
                     identifier,
