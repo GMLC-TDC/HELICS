@@ -63,7 +63,7 @@ struct InputData {
 /** class handling the implementation details of a value Federate*/
 class ValueFederateManager {
   public:
-    ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id);
+    ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id, bool singleThreaded);
     ~ValueFederateManager();
 
     Publication&
@@ -206,8 +206,8 @@ class ValueFederateManager {
     bool useJsonSerialization{false};  //!< all outgoing data should be serialized as JSON
   private:
     LocalFederateId fedID;  //!< the federation ID from the core API
-    shared_guarded_m<gmlc::containers::DualStringMappedVector<Input, InterfaceHandle>> inputs;
-    shared_guarded_m<gmlc::containers::DualStringMappedVector<Publication, InterfaceHandle>>
+    shared_guarded_m_opt<gmlc::containers::DualStringMappedVector<Input, InterfaceHandle>> inputs;
+    shared_guarded_m_opt<gmlc::containers::DualStringMappedVector<Publication, InterfaceHandle>>
         publications;
     Time CurrentTime{-1.0};  //!< the current simulation time
     Core* coreObject{nullptr};  //!< the pointer to the actual core
@@ -216,11 +216,11 @@ class ValueFederateManager {
     /// the global callback function
     atomic_guarded<std::function<void(Input&, Time)>> allCallback;
     /// the storage for the message queues and other unique Endpoint information
-    shared_guarded<std::deque<InputData>> inputData;
+    shared_guarded_opt<std::deque<InputData>> inputData;
     /// container for the target identifications
-    shared_guarded<std::multimap<std::string, InterfaceHandle>> targetIDs;
+    shared_guarded_opt<std::multimap<std::string, InterfaceHandle>> targetIDs;
     /// container for the specified input targets
-    shared_guarded<std::multimap<InterfaceHandle, std::string>> inputTargets;
+    shared_guarded_opt<std::multimap<InterfaceHandle, std::string>> inputTargets;
 
   private:
     void getUpdateFromCore(InterfaceHandle handle);

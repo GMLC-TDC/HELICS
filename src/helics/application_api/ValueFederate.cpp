@@ -29,7 +29,7 @@ ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi)
 {
     // the core object get instantiated in the Federate constructor
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID(),singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 ValueFederate::ValueFederate(std::string_view fedName,
@@ -37,21 +37,21 @@ ValueFederate::ValueFederate(std::string_view fedName,
                              const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID(),singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID(),singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID(),singleThreadFederate);
     vfManager->useJsonSerialization = useJsonSerialization;
     if (looksLikeFile(configString)) {
         ValueFederate::registerInterfaces(configString);
@@ -72,7 +72,7 @@ ValueFederate::ValueFederate() = default;
 
 ValueFederate::ValueFederate(bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID(),singleThreadFederate);
     vfManager->useJsonSerialization = useJsonSerialization;
 }
 

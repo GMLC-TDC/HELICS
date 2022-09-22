@@ -17,9 +17,9 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 MessageFederateManager::MessageFederateManager(Core* coreOb,
                                                MessageFederate* fed,
-                                               LocalFederateId id):
-    coreObject(coreOb),
-    mFed(fed), fedID(id)
+                                               LocalFederateId id, bool singleThreaded):
+    mLocalEndpoints(!singleThreaded),coreObject(coreOb),
+    mFed(fed), fedID(id),eptData(!singleThreaded),messageOrder(!singleThreaded)
 {
 }
 MessageFederateManager::~MessageFederateManager() = default;
@@ -36,7 +36,7 @@ Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::s
 {
     auto handle = coreObject->registerEndpoint(fedID, name, type);
     if (handle.isValid()) {
-        auto eptHandle = local_endpoints.lock();
+        auto eptHandle = mLocalEndpoints.lock();
         auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {
             auto& ref = eptHandle->back();
@@ -59,7 +59,7 @@ Endpoint& MessageFederateManager::registerTargetedEndpoint(std::string_view name
 {
     auto handle = coreObject->registerTargetedEndpoint(fedID, name, type);
     if (handle.isValid()) {
-        auto eptHandle = local_endpoints.lock();
+        auto eptHandle = mLocalEndpoints.lock();
         auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {
             auto& ref = eptHandle->back();
@@ -157,7 +157,7 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
         return;
     }
     InterfaceHandle endpoint_id;
-    auto epts = local_endpoints.lock();
+    auto epts = mLocalEndpoints.lock();
     auto mcall = allCallback.load();
     for (size_t ii = 0; ii < epCount; ++ii) {
         auto message = coreObject->receiveAny(fedID, endpoint_id);
@@ -178,11 +178,11 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
                 // need to be copied otherwise there is a potential race condition on lock removal
                 epts.unlock();
                 eData->callback(currentEpt, CurrentTime);
-                epts = local_endpoints.lock();
+                epts = mLocalEndpoints.lock();
             } else if (mcall) {
                 epts.unlock();
                 mcall(currentEpt, CurrentTime);
-                epts = local_endpoints.lock();
+                epts = mLocalEndpoints.lock();
             }
         }
     }
@@ -201,7 +201,7 @@ std::string MessageFederateManager::localQuery(std::string_view queryStr) const
     std::string ret;
     if (queryStr == "endpoints") {
         ret = generateStringVector_if(
-            local_endpoints.lock_shared(),
+            mLocalEndpoints.lock_shared(),
             [](const auto& info) { return info.getName(); },
             [](const auto& info) { return (!info.getName().empty()); });
     }
@@ -213,20 +213,20 @@ static Endpoint invalidEptNC{};
 
 Endpoint& MessageFederateManager::getEndpoint(std::string_view name)
 {
-    auto sharedEpt = local_endpoints.lock();
+    auto sharedEpt = mLocalEndpoints.lock();
     auto ept = sharedEpt->find(name);
     return (ept != sharedEpt.end()) ? (*ept) : invalidEptNC;
 }
 const Endpoint& MessageFederateManager::getEndpoint(std::string_view name) const
 {
-    auto sharedEpt = local_endpoints.lock_shared();
+    auto sharedEpt = mLocalEndpoints.lock_shared();
     auto ept = sharedEpt->find(name);
     return (ept != sharedEpt.end()) ? (*ept) : invalidEpt;
 }
 
 Endpoint& MessageFederateManager::getEndpoint(int index)
 {
-    auto sharedEpt = local_endpoints.lock();
+    auto sharedEpt = mLocalEndpoints.lock();
     if (isValidIndex(index, *sharedEpt)) {
         return (*sharedEpt)[index];
     }
@@ -234,7 +234,7 @@ Endpoint& MessageFederateManager::getEndpoint(int index)
 }
 const Endpoint& MessageFederateManager::getEndpoint(int index) const
 {
-    auto sharedEpt = local_endpoints.lock_shared();
+    auto sharedEpt = mLocalEndpoints.lock_shared();
     if (isValidIndex(index, *sharedEpt)) {
         return (*sharedEpt)[index];
     }
@@ -243,7 +243,7 @@ const Endpoint& MessageFederateManager::getEndpoint(int index) const
 
 int MessageFederateManager::getEndpointCount() const
 {
-    return static_cast<int>(local_endpoints.lock_shared()->size());
+    return static_cast<int>(mLocalEndpoints.lock_shared()->size());
 }
 
 void MessageFederateManager::setEndpointNotificationCallback(

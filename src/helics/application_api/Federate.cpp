@@ -117,7 +117,7 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
     observerMode = fi.observer;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID,singleThreadFederate);
 }
 
 Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi):
@@ -160,7 +160,7 @@ Federate::Federate(std::string_view fedName,
     {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     }
-    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID,singleThreadFederate);
 }
 
 Federate::Federate(std::string_view fedName, const std::string& configString):
@@ -1503,9 +1503,11 @@ QueryId Federate::queryAsync(std::string_view queryStr, HelicsSequencingModes mo
 
 std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 {
-    return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED,
-        "Async queries are not allowed when using single thread federates");
-
+    if (singleThreadFederate)
+    {
+        return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED,
+            "Async queries are not allowed when using single thread federates");
+    }
     auto asyncInfo = asyncCallInfo->lock();
     auto fnd = asyncInfo->inFlightQueries.find(queryIndex.value());
     if (fnd != asyncInfo->inFlightQueries.end()) {

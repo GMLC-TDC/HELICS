@@ -22,11 +22,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-namespace gmlc {
-namespace libguarded {
+namespace gmlc::libguarded {
     template<class T, class M>
     class shared_guarded;
-}  // namespace libguarded
 }  // namespace gmlc
 
 /**

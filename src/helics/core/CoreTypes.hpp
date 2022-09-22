@@ -29,6 +29,17 @@ enum class FederateStates : std::uint8_t {
     UNKNOWN,  //!< unknown state
 };
 
+/** enumeration of the threading options for a core*/
+enum class CoreThreading: std::uint8_t
+{
+    /** choose the default based on federate options*/
+    DEFAULT= HELICS_CORE_TYPE_DEFAULT,
+    /** specify the core should be multithreaded*/
+    MULTI = HELICS_FLAG_MULTI_THREAD_CORE,
+    /** specify a single threaded core*/
+    SINGLE = HELICS_FLAG_SINGLE_THREAD_CORE
+};
+
 /** convert the state into a human readable string*/
 const std::string& fedStateString(FederateStates state);
 
