@@ -51,6 +51,29 @@ if(Python_EXECUTABLE)
                 ../helics_enums.h
     )
 
+    #this section is for developer convenience to make sure the backup files get copied over when working on the C API
+    IF (HELICS_OVERWRITE_BACKUP_H_FILES)
+       add_custom_target(dummy_target ALL
+        DEPENDS
+           ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+           ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
+       )
+       add_custom_command(
+           TARGET dummy_target POST_BUILD
+           COMMAND ${CMAKE_COMMAND} -E copy
+                       ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+                       ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics
+           DEPENDS ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
+
+       )
+       add_custom_command(
+           TARGET dummy_target POST_BUILD
+           COMMAND ${CMAKE_COMMAND} -E copy
+                       ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
+                       ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics
+           DEPENDS ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
+       )
+    endif()
 else()
     configure_file(
         ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics/helics.h
