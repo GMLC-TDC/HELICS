@@ -55,6 +55,29 @@ TEST(federate_tests, federate_initialize_tests)
     Fed = nullptr;  // force the destructor
 }
 
+TEST(federate_tests, single_core_federate)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    fi.setFlagOption(helics::defs::SINGLE_THREAD_FEDERATE);
+    auto fed = std::make_shared<helics::Federate>("test1", fi);
+
+    auto core = fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto name = std::string(core->getFederateName(fed->getID()));
+
+    EXPECT_EQ(name, fed->getName());
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    fed->enterInitializingMode();
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    fed->enterExecutingMode();
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+
+    EXPECT_TRUE(fed->getFlagOption(helics::defs::SINGLE_THREAD_FEDERATE));
+    fed = nullptr;  // force the destructor
+}
+
 #ifdef HELICS_ENABLE_ZMQ_CORE
 TEST(federate_tests, federate_initialize_tests_json)
 {
