@@ -53,13 +53,13 @@ if(Python_EXECUTABLE)
 
     #this section is for developer convenience to make sure the backup files get copied over when working on the C API
     IF (HELICS_OVERWRITE_BACKUP_H_FILES)
-       add_custom_target(dummy_target ALL
+       add_custom_target(overwrite_backup_files ALL
         DEPENDS
            ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
            ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
        )
        add_custom_command(
-           TARGET dummy_target POST_BUILD
+           TARGET overwrite_backup_files POST_BUILD
            COMMAND ${CMAKE_COMMAND} -E copy
                        ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics.h
                        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics
@@ -67,12 +67,14 @@ if(Python_EXECUTABLE)
 
        )
        add_custom_command(
-           TARGET dummy_target POST_BUILD
+           TARGET overwrite_backup_files POST_BUILD
            COMMAND ${CMAKE_COMMAND} -E copy
                        ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
                        ${PROJECT_SOURCE_DIR}/src/helics/shared_api_library/backup/helics
            DEPENDS ${PROJECT_BINARY_DIR}/helics_generated_includes/helics/helics_api.h
        )
+
+       set_target_properties(overwrite_backup_files PROPERTIES FOLDER interfaces)
     endif()
 else()
     configure_file(
