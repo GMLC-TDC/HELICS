@@ -1336,6 +1336,4 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     brk->waitForDisconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(federate,
-                         federate_global_files,
-                         ::testing::ValuesIn(simple_global_files));
+INSTANTIATE_TEST_SUITE_P(federate, federate_global_files, ::testing::ValuesIn(simple_global_files));

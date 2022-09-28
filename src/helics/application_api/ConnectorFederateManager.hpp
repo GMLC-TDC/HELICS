@@ -25,7 +25,10 @@ class ConnectorFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    ConnectorFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id,bool singleThreaded);
+    ConnectorFederateManager(Core* coreObj,
+                             Federate* fFed,
+                             LocalFederateId id,
+                             bool singleThreaded);
     /** destructor */
     ~ConnectorFederateManager();
 

@@ -23,9 +23,9 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace gmlc::libguarded {
-    template<class T, class M>
-    class shared_guarded;
-}  // namespace gmlc
+template<class T, class M>
+class shared_guarded;
+}  // namespace gmlc::libguarded
 
 /**
  * HELICS Application API
@@ -85,6 +85,7 @@ class HELICS_CXX_EXPORT Federate {
     bool retriggerTimeRequest{false};
     /*** specify that the federate will only be used on a single thread*/
     bool singleThreadFederate{false};
+
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:

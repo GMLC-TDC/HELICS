@@ -430,9 +430,7 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     V2.finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed,
-                         valuefed_flagfile_tests,
-                         ::testing::ValuesIn(config_files));
+INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_flagfile_tests, ::testing::ValuesIn(config_files));
 #endif
 
 TEST_F(valuefed, dual_transfer_coreApp_link)
@@ -857,7 +855,7 @@ TEST_F(valuefed, time_update_callback)
 
 TEST_F(valuefed, time_update_callback_single_thread)
 {
-    extraFederateArgs="--flags=single_thread_federate";
+    extraFederateArgs = "--flags=single_thread_federate";
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
@@ -878,12 +876,12 @@ TEST_F(valuefed, time_update_callback_single_thread)
     vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
         lastTime = callTime;
         lastId = subid.getHandle();
-        });
+    });
     vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
         if (newTime > lastTime && !iterating) {
             ++validCount;
         }
-        });
+    });
     vFed1->enterExecutingMode();
     EXPECT_EQ(validCount, 1);
     vFed1->publishBytes(pubid3, db);

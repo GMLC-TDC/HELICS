@@ -35,7 +35,10 @@ class MessageFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    MessageFederateManager(Core* coreOb, MessageFederate* mFed, LocalFederateId id, bool singleThreaded);
+    MessageFederateManager(Core* coreOb,
+                           MessageFederate* mFed,
+                           LocalFederateId id,
+                           bool singleThreaded);
     ~MessageFederateManager();
     /** register an endpoint
     @details call is only valid in startup mode
@@ -118,7 +121,7 @@ class MessageFederateManager {
     };
     /// storage for the local endpoint information
     shared_guarded_opt<gmlc::containers::DualStringMappedVector<Endpoint, InterfaceHandle>>
-        mLocalEndpoints;  
+        mLocalEndpoints;
     atomic_guarded<std::function<void(Endpoint&, Time)>> allCallback;
     Time CurrentTime = Time::minVal();  //!< the current simulation time
     Core* coreObject;  //!< the pointer to the actual core
@@ -128,6 +131,7 @@ class MessageFederateManager {
     shared_guarded_opt<std::deque<EndpointData>> eptData;
     /// maintaining a list of the ordered messages
     guarded_opt<std::vector<unsigned int>> messageOrder;
+
   private:
     void removeOrderedMessage(unsigned int index);
 };

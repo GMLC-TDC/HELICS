@@ -30,10 +30,9 @@ enum class FederateStates : std::uint8_t {
 };
 
 /** enumeration of the threading options for a core*/
-enum class CoreThreading: std::uint8_t
-{
+enum class CoreThreading : std::uint8_t {
     /** choose the default based on federate options*/
-    DEFAULT= HELICS_CORE_TYPE_DEFAULT,
+    DEFAULT = HELICS_CORE_TYPE_DEFAULT,
     /** specify the core should be multithreaded*/
     MULTI = HELICS_FLAG_MULTI_THREAD_CORE,
     /** specify a single threaded core*/

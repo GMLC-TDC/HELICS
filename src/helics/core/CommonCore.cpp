@@ -4818,7 +4818,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
             if (cmd.dest_id == global_broker_id_local || cmd.dest_id == gDirectCoreId) {
                 std::string repStr = coreQuery(cmd.payload.to_string(), force_ordered);
                 if (repStr != "#wait") {
-                    if (cmd.source_id == gDirectCoreId){
+                    if (cmd.source_id == gDirectCoreId) {
                         activeQueries.setDelayedValue(cmd.messageID, std::move(repStr));
                     } else {
                         ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :

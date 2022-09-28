@@ -80,8 +80,7 @@ struct FederateTestFixture {
         if (time_delta != helics::timeZero) {
             fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         }
-        if (!extraFederateArgs.empty())
-        {
+        if (!extraFederateArgs.empty()) {
             fi.loadInfoFromArgsIgnoreOutput(extraFederateArgs);
         }
         switch (setup) {

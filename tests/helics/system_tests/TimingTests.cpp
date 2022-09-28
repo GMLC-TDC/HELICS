@@ -48,7 +48,6 @@ TEST_F(timing, simple_timing)
     vFed2->finalize();
 }
 
-
 TEST_F(timing, simple_timing2)
 {
     SetupTest<helics::ValueFederate>("test", 2);
@@ -116,7 +115,7 @@ TEST_F(timing, simple_timing_message)
 
 TEST_F(timing, simple_timing2_single_thread)
 {
-    extraFederateArgs="--flags=single_thread_federate";
+    extraFederateArgs = "--flags=single_thread_federate";
 
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -129,17 +128,15 @@ TEST_F(timing, simple_timing2_single_thread)
     auto& pub = vFed1->registerGlobalPublication<double>("pub1");
     vFed2->registerSubscription("pub1");
     std::vector<helics::Time> times;
-    
-    auto t1 = std::thread([&vFed1, &times,&pub]() {
+
+    auto t1 = std::thread([&vFed1, &times, &pub]() {
         vFed1->enterExecutingMode();
         auto res = vFed1->requestTime(0.32);
         times.push_back(res);
         pub.publish(0.27);
         res = vFed1->requestTime(1.85);
         times.push_back(res);
-
-        });
-
+    });
 
     vFed2->enterExecutingMode();
 
@@ -152,7 +149,6 @@ TEST_F(timing, simple_timing2_single_thread)
     // check that the request is only granted at the appropriate period
     EXPECT_EQ(times[0], 0.5);
 
-
     EXPECT_EQ(times[1], 2.0);
     vFed1->finalize();
     vFed2->finalize();
@@ -160,7 +156,7 @@ TEST_F(timing, simple_timing2_single_thread)
 
 TEST_F(timing, simple_timing_message_single_thread)
 {
-    extraFederateArgs="--flags=single_thread_federate";
+    extraFederateArgs = "--flags=single_thread_federate";
 
     SetupTest<helics::MessageFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
@@ -174,25 +170,21 @@ TEST_F(timing, simple_timing_message_single_thread)
     vFed2->registerGlobalEndpoint("e2");
 
     std::vector<helics::Time> times;
-    auto t1 = std::thread([&vFed1, &times,&ept1]() {
+    auto t1 = std::thread([&vFed1, &times, &ept1]() {
         vFed1->enterExecutingMode();
         auto res = vFed1->requestTime(0.32);
         times.push_back(res);
         ept1.sendTo("test1", "e2");
         res = vFed1->requestTime(1.85);
         times.push_back(res);
-
-        });
-
+    });
 
     vFed2->enterExecutingMode();
-    auto res=vFed2->requestTime(3.5);
-    
-    
-    
-    EXPECT_THROW(vFed2->requestTimeComplete(),helics::InvalidFunctionCall);
+    auto res = vFed2->requestTime(3.5);
+
+    EXPECT_THROW(vFed2->requestTimeComplete(), helics::InvalidFunctionCall);
     EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
-    res=vFed2->requestTime(2.0);
+    res = vFed2->requestTime(2.0);
     EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
     vFed2->finalize();
 
@@ -201,7 +193,6 @@ TEST_F(timing, simple_timing_message_single_thread)
 
     EXPECT_EQ(times[1], 2.4);
     vFed1->finalize();
-    
 }
 
 TEST_F(timing, simple_global_timing_message)

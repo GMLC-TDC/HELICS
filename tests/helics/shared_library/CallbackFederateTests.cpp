@@ -160,7 +160,7 @@ TEST_F(callback_federate_tests, initException)
     SetupTest(helicsCreateCallbackFederate, "test", 1);
     auto vFed1 = GetFederateAt(0);
 
-    std::function<HelicsIterationRequest()> initCall = []()->HelicsIterationRequest {
+    std::function<HelicsIterationRequest()> initCall = []() -> HelicsIterationRequest {
         throw std::runtime_error("ETEST");
     };
     helicsCallbackFederateInitializeCallback(vFed1, initFunction, &initCall, NULL);

@@ -791,9 +791,7 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
 INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_single_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(valuefed,
-                         valuefed_add_type_tests_ci_skip,
-                         ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_add_type_tests_ci_skip, ::testing::ValuesIn(CoreTypes));
 INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_all_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_all));

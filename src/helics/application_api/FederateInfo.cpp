@@ -585,9 +585,9 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "the execution cycle of the federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
-        "--stoptime",
-        [this](Time val) { setProperty(HELICS_PROPERTY_TIME_STOPTIME, val); },
-        "the maximum simulation time of a federate (default in ms)")
+           "--stoptime",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_STOPTIME, val); },
+           "the maximum simulation time of a federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
            "--timedelta",

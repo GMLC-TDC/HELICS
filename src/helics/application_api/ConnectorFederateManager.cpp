@@ -16,9 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 ConnectorFederateManager::ConnectorFederateManager(Core* coreObj,
                                                    Federate* ffed,
-                                                   LocalFederateId id, bool singleThreaded):
-    coreObject(coreObj),filters(!singleThreaded),translators(!singleThreaded),
-    fed(ffed), fedID(id)
+                                                   LocalFederateId id,
+                                                   bool singleThreaded):
+    coreObject(coreObj),
+    filters(!singleThreaded), translators(!singleThreaded), fed(ffed), fedID(id)
 {
 }
 ConnectorFederateManager::~ConnectorFederateManager() = default;

@@ -48,7 +48,7 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
         mName = fi.defName;
     }
 
-    singleThreadFederate=fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE,false);
+    singleThreadFederate = fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE, false);
 
     if (fi.coreName.empty()) {
         if (!fi.forceNewCore) {
@@ -112,12 +112,15 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
     fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
-   
+
     useJsonSerialization = fi.useJsonSerialization;
     observerMode = fi.observer;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
-    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID,singleThreadFederate);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(),
+                                                          this,
+                                                          fedID,
+                                                          singleThreadFederate);
 }
 
 Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi):
@@ -154,13 +157,15 @@ Federate::Federate(std::string_view fedName,
     nameSegmentSeparator = fi.separator;
     observerMode = fi.observer;
     strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
-    singleThreadFederate=fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE,false);
+    singleThreadFederate = fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE, false);
     mCurrentTime = coreObject->getCurrentTime(fedID);
-    if (!singleThreadFederate)
-    {
+    if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     }
-    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(), this, fedID,singleThreadFederate);
+    cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(),
+                                                          this,
+                                                          fedID,
+                                                          singleThreadFederate);
 }
 
 Federate::Federate(std::string_view fedName, const std::string& configString):
@@ -267,9 +272,9 @@ void Federate::enteringInitializingMode(IterationResult iterating)
 
 void Federate::enterInitializingModeAsync()
 {
-    if (singleThreadFederate)
-    {
-        throw(InvalidFunctionCall("Async function calls and methods are not allowed for single thread federates"));
+    if (singleThreadFederate) {
+        throw(InvalidFunctionCall(
+            "Async function calls and methods are not allowed for single thread federates"));
     }
     auto cm = currentMode.load();
     if (cm == Modes::STARTUP) {
@@ -289,8 +294,7 @@ void Federate::enterInitializingModeAsync()
 
 bool Federate::isAsyncOperationCompleted() const
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         return false;
     }
     constexpr std::chrono::seconds wait_delay{0};
@@ -315,9 +319,8 @@ bool Federate::isAsyncOperationCompleted() const
 
 void Federate::enterInitializingModeComplete()
 {
-    if (singleThreadFederate)
-    {
-       return enterInitializingMode();
+    if (singleThreadFederate) {
+        return enterInitializingMode();
     }
     switch (currentMode.load()) {
         case Modes::PENDING_INIT: {
@@ -425,9 +428,9 @@ void Federate::handleError(int errorCode, std::string_view errorString, bool noT
 
 void Federate::enterExecutingModeAsync(IterationRequest iterate)
 {
-    if (singleThreadFederate)
-    {
-        throw(InvalidFunctionCall("Async function calls and methods are not allowed for single thread federates"));
+    if (singleThreadFederate) {
+        throw(InvalidFunctionCall(
+            "Async function calls and methods are not allowed for single thread federates"));
     }
     switch (currentMode) {
         case Modes::STARTUP: {
@@ -466,8 +469,7 @@ void Federate::enterExecutingModeAsync(IterationRequest iterate)
 
 IterationResult Federate::enterExecutingModeComplete()
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         return enterExecutingMode();
     }
     switch (currentMode.load()) {
@@ -490,8 +492,7 @@ IterationResult Federate::enterExecutingModeComplete()
 
 void Federate::setAsyncCheck(std::function<bool()> asyncCheck)
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         return;
     }
     auto asyncInfo = asyncCallInfo->lock();
@@ -510,9 +511,8 @@ const std::string& Federate::getTag(std::string_view tag) const
 
 void Federate::setProperty(int32_t option, double timeValue)
 {
-    if (option == defs::Properties::STOPTIME)
-    {
-        mStopTime=timeValue;
+    if (option == defs::Properties::STOPTIME) {
+        mStopTime = timeValue;
         return;
     }
     coreObject->setTimeProperty(fedID, option, timeValue);
@@ -520,9 +520,8 @@ void Federate::setProperty(int32_t option, double timeValue)
 
 void Federate::setProperty(int32_t option, Time timeValue)
 {
-    if (option == defs::Properties::STOPTIME)
-    {
-        mStopTime=timeValue;
+    if (option == defs::Properties::STOPTIME) {
+        mStopTime = timeValue;
         return;
     }
     coreObject->setTimeProperty(fedID, option, timeValue);
@@ -535,8 +534,7 @@ void Federate::setProperty(int32_t option, int32_t optionValue)
 
 Time Federate::getTimeProperty(int32_t option) const
 {
-    if (option == defs::Properties::STOPTIME)
-    {
+    if (option == defs::Properties::STOPTIME) {
         return mStopTime;
     }
     return coreObject->getTimeProperty(fedID, option);
@@ -637,18 +635,16 @@ void Federate::setFlagOption(int flag, bool flagValue)
 
 bool Federate::getFlagOption(int flag) const
 {
-    switch (flag)
-    {
-    case defs::Flags::USE_JSON_SERIALIZATION:
-        return useJsonSerialization;
-    case defs::Flags::AUTOMATED_TIME_REQUEST:
-        return retriggerTimeRequest;
-    case defs::Flags::SINGLE_THREAD_FEDERATE:
-        return singleThreadFederate;
-    default:
-        return coreObject->getFlagOption(fedID, flag);
+    switch (flag) {
+        case defs::Flags::USE_JSON_SERIALIZATION:
+            return useJsonSerialization;
+        case defs::Flags::AUTOMATED_TIME_REQUEST:
+            return retriggerTimeRequest;
+        case defs::Flags::SINGLE_THREAD_FEDERATE:
+            return singleThreadFederate;
+        default:
+            return coreObject->getFlagOption(fedID, flag);
     }
-    
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls
@@ -696,9 +692,9 @@ void Federate::finalize()
 
 void Federate::finalizeAsync()
 {
-    if (singleThreadFederate)
-    {
-        throw(InvalidFunctionCall("Async function calls and methods are not allowed for single thread federates"));
+    if (singleThreadFederate) {
+        throw(InvalidFunctionCall(
+            "Async function calls and methods are not allowed for single thread federates"));
     }
     switch (currentMode) {
         case Modes::PENDING_INIT:
@@ -730,8 +726,7 @@ void Federate::finalizeAsync()
 /** complete the asynchronous terminate pair*/
 void Federate::finalizeComplete()
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         return finalize();
     }
     if (currentMode == Modes::PENDING_FINALIZE) {
@@ -891,9 +886,9 @@ iteration_time Federate::requestTimeIterative(Time nextInternalTimeStep, Iterati
 
 void Federate::requestTimeAsync(Time nextInternalTimeStep)
 {
-    if (singleThreadFederate)
-    {
-        throw(InvalidFunctionCall("Async function calls and methods are not allowed for single thread federates"));
+    if (singleThreadFederate) {
+        throw(InvalidFunctionCall(
+            "Async function calls and methods are not allowed for single thread federates"));
     }
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_TIME)) {
@@ -910,9 +905,9 @@ void Federate::requestTimeAsync(Time nextInternalTimeStep)
 
 void Federate::requestTimeIterativeAsync(Time nextInternalTimeStep, IterationRequest iterate)
 {
-    if (singleThreadFederate)
-    {
-        throw(InvalidFunctionCall("Async function calls and methods are not allowed for single thread federates"));
+    if (singleThreadFederate) {
+        throw(InvalidFunctionCall(
+            "Async function calls and methods are not allowed for single thread federates"));
     }
     auto exp = Modes::EXECUTING;
     if (currentMode.compare_exchange_strong(exp, Modes::PENDING_ITERATIVE_TIME)) {
@@ -945,7 +940,6 @@ Time Federate::requestTimeComplete()
 @return the granted time step*/
 iteration_time Federate::requestTimeIterativeComplete()
 {
-    
     auto exp = Modes::PENDING_ITERATIVE_TIME;
     if (currentMode.compare_exchange_strong(exp, Modes::EXECUTING)) {
         auto asyncInfo = asyncCallInfo->lock();
@@ -1477,8 +1471,7 @@ QueryId Federate::queryAsync(std::string_view target,
                              std::string_view queryStr,
                              HelicsSequencingModes mode)
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         throw(helics::InvalidFunctionCall("No Async calls are allowed in single thread federates"));
     }
     auto queryFut = std::async(std::launch::async, [this, target, queryStr, mode]() {
@@ -1493,8 +1486,7 @@ QueryId Federate::queryAsync(std::string_view target,
 
 QueryId Federate::queryAsync(std::string_view queryStr, HelicsSequencingModes mode)
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         throw(helics::InvalidFunctionCall("No Async calls are allowed in single thread federates"));
     }
     auto queryFut =
@@ -1508,9 +1500,9 @@ QueryId Federate::queryAsync(std::string_view queryStr, HelicsSequencingModes mo
 
 std::string Federate::queryComplete(QueryId queryIndex)  // NOLINT
 {
-    if (singleThreadFederate)
-    {
-        return generateJsonErrorResponse(JsonErrorCodes::METHOD_NOT_ALLOWED,
+    if (singleThreadFederate) {
+        return generateJsonErrorResponse(
+            JsonErrorCodes::METHOD_NOT_ALLOWED,
             "Async queries are not allowed when using single thread federates");
     }
     auto asyncInfo = asyncCallInfo->lock();
@@ -1529,8 +1521,7 @@ void Federate::setQueryCallback(const std::function<std::string(std::string_view
 
 bool Federate::isQueryCompleted(QueryId queryIndex) const  // NOLINT
 {
-    if (singleThreadFederate)
-    {
+    if (singleThreadFederate) {
         return false;
     }
     auto asyncInfo = asyncCallInfo->lock();

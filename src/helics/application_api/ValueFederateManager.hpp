@@ -63,7 +63,10 @@ struct InputData {
 /** class handling the implementation details of a value Federate*/
 class ValueFederateManager {
   public:
-    ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id, bool singleThreaded);
+    ValueFederateManager(Core* coreOb,
+                         ValueFederate* vfed,
+                         LocalFederateId id,
+                         bool singleThreaded);
     ~ValueFederateManager();
 
     Publication&

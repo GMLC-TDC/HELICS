@@ -16,8 +16,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <utility>
 namespace helics {
-ValueFederateManager::ValueFederateManager(Core* coreOb, ValueFederate* vfed, LocalFederateId id, bool singleThreaded):
-    fedID(id),inputs(!singleThreaded),publications(!singleThreaded), coreObject(coreOb), fed(vfed),inputData(!singleThreaded),targetIDs(!singleThreaded),inputTargets(!singleThreaded)
+ValueFederateManager::ValueFederateManager(Core* coreOb,
+                                           ValueFederate* vfed,
+                                           LocalFederateId id,
+                                           bool singleThreaded):
+    fedID(id),
+    inputs(!singleThreaded), publications(!singleThreaded), coreObject(coreOb), fed(vfed),
+    inputData(!singleThreaded), targetIDs(!singleThreaded), inputTargets(!singleThreaded)
 {
 }
 ValueFederateManager::~ValueFederateManager() = default;
