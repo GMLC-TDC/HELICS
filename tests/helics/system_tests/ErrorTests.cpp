@@ -131,6 +131,32 @@ TEST_F(error_tests, already_init_core)
     broker->disconnect();
 }
 
+TEST_F(error_tests, single_thread_fed)
+{
+    extraFederateArgs="--flags=single_thread_federate";
+    auto broker = AddBroker("test", 1);
+    AddFederates<helics::ValueFederate>("test", 1, broker, 1.0, "fed");
+
+    auto fed1 = GetFederateAs<helics::ValueFederate>(0);
+    EXPECT_THROW(fed1->enterInitializingModeAsync(),helics::InvalidFunctionCall);
+    fed1->enterInitializingMode();
+    EXPECT_THROW(fed1->enterExecutingModeAsync(),helics::InvalidFunctionCall);
+    fed1->enterExecutingMode();
+
+    EXPECT_THROW(fed1->requestTimeAsync(3.2),helics::InvalidFunctionCall);
+    EXPECT_THROW(fed1->requestTimeComplete(),helics::InvalidFunctionCall);
+    auto t1=fed1->requestTime(2.0);
+    EXPECT_EQ(t1,2.0);
+
+    EXPECT_THROW(fed1->requestTimeIterativeAsync(3.2,helics::IterationRequest::FORCE_ITERATION),helics::InvalidFunctionCall);
+    EXPECT_THROW(fed1->requestTimeIterativeComplete(),helics::InvalidFunctionCall);
+
+    EXPECT_THROW(fed1->finalizeAsync(),helics::InvalidFunctionCall);
+
+    fed1->finalize();
+    broker->disconnect();
+}
+
 TEST_F(error_tests, duplicate_publication_names)
 {
     auto broker = AddBroker("test", 1);

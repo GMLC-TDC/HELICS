@@ -68,7 +68,7 @@ typedef enum {
                HELICS_FLAG_EVENT_TRIGGERED = 81,
                HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96,
                HELICS_FLAG_CALLBACK_FEDERATE = 103,
-               HELICS_FLAG_AUTOMATED_TIMEREQUEST = 106
+               HELICS_FLAG_AUTOMATED_TIME_REQUEST = 106
 } HelicsFederateFlags;
 
 typedef enum {

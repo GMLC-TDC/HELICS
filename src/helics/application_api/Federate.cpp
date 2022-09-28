@@ -48,7 +48,7 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
         mName = fi.defName;
     }
 
-    singleThreadFederate=fi.checkFlagProperty(HELICS_FLAG_SINGLE_THREAD_FEDERATE,false);
+    singleThreadFederate=fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE,false);
 
     if (fi.coreName.empty()) {
         if (!fi.forceNewCore) {
@@ -111,7 +111,7 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
-    strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
+    strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
    
     useJsonSerialization = fi.useJsonSerialization;
     observerMode = fi.observer;
@@ -153,8 +153,8 @@ Federate::Federate(std::string_view fedName,
     fedID = coreObject->registerFederate(mName, fi);
     nameSegmentSeparator = fi.separator;
     observerMode = fi.observer;
-    strictConfigChecking = fi.checkFlagProperty(HELICS_FLAG_STRICT_CONFIG_CHECKING, true);
-    singleThreadFederate=fi.checkFlagProperty(HELICS_FLAG_SINGLE_THREAD_FEDERATE,false);
+    strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
+    singleThreadFederate=fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE,false);
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate)
     {
@@ -510,7 +510,7 @@ const std::string& Federate::getTag(std::string_view tag) const
 
 void Federate::setProperty(int32_t option, double timeValue)
 {
-    if (option == HELICS_PROPERTY_TIME_STOPTIME)
+    if (option == defs::Properties::STOPTIME)
     {
         mStopTime=timeValue;
         return;
@@ -520,7 +520,7 @@ void Federate::setProperty(int32_t option, double timeValue)
 
 void Federate::setProperty(int32_t option, Time timeValue)
 {
-    if (option == HELICS_PROPERTY_TIME_STOPTIME)
+    if (option == defs::Properties::STOPTIME)
     {
         mStopTime=timeValue;
         return;
@@ -535,7 +535,7 @@ void Federate::setProperty(int32_t option, int32_t optionValue)
 
 Time Federate::getTimeProperty(int32_t option) const
 {
-    if (option == HELICS_PROPERTY_TIME_STOPTIME)
+    if (option == defs::Properties::STOPTIME)
     {
         return mStopTime;
     }
@@ -625,10 +625,10 @@ void Federate::setErrorHandlerCallback(std::function<void(int, std::string_view)
 
 void Federate::setFlagOption(int flag, bool flagValue)
 {
-    if (flag == HELICS_FLAG_OBSERVER && currentMode < Modes::INITIALIZING) {
+    if (flag == defs::Flags::OBSERVER && currentMode < Modes::INITIALIZING) {
         observerMode = flagValue;
     }
-    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST) {
+    if (flag == defs::Flags::AUTOMATED_TIME_REQUEST) {
         retriggerTimeRequest = flagValue;
         return;
     }
@@ -637,13 +637,18 @@ void Federate::setFlagOption(int flag, bool flagValue)
 
 bool Federate::getFlagOption(int flag) const
 {
-    if (flag == HELICS_FLAG_USE_JSON_SERIALIZATION) {
+    switch (flag)
+    {
+    case defs::Flags::USE_JSON_SERIALIZATION:
         return useJsonSerialization;
-    }
-    if (flag == HELICS_FLAG_AUTOMATED_TIMEREQUEST) {
+    case defs::Flags::AUTOMATED_TIME_REQUEST:
         return retriggerTimeRequest;
+    case defs::Flags::SINGLE_THREAD_FEDERATE:
+        return singleThreadFederate;
+    default:
+        return coreObject->getFlagOption(fedID, flag);
     }
-    return coreObject->getFlagOption(fedID, flag);
+    
 }
 void Federate::finalize()
 {  // since finalize is called in the destructor we can't allow any potential virtual function calls

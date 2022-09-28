@@ -150,7 +150,7 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_CALLBACK_FEDERATE = 103,
                /** specify that a federate should automatically call timeRequest on completion of
                   current request*/
-               HELICS_FLAG_AUTOMATED_TIMEREQUEST = 106
+               HELICS_FLAG_AUTOMATED_TIME_REQUEST = 106
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
