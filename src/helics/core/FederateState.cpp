@@ -464,14 +464,19 @@ IterationResult FederateState::waitSetup()
     return ret;
 }
 
-IterationResult FederateState::enterInitializingMode()
+IterationResult FederateState::enterInitializingMode(IterationRequest request)
 {
     if (try_lock()) {  // only enter this loop once per federate
         auto ret = processQueue();
         unlock();
-        if (ret == MessageProcessingResult::NEXT_STEP) {
-            time_granted = initialTime;
-            allowed_send_time = initialTime;
+        initIterating = false;
+        switch (ret) {
+            case MessageProcessingResult::NEXT_STEP:
+                time_granted = initialTime;
+                allowed_send_time = initialTime;
+                break;
+            case MessageProcessingResult::ITERATING:
+                break;
         }
         return static_cast<IterationResult>(ret);
     }
@@ -487,7 +492,7 @@ IterationResult FederateState::enterInitializingMode()
             break;
         case FederateStates::CREATED:
             unlock();
-            return enterInitializingMode();
+            return enterInitializingMode(request);
         default:  // everything >= INITIALIZING
             ret = IterationResult::NEXT_STEP;
             break;
@@ -1196,7 +1201,7 @@ void FederateState::callbackProcessing() noexcept
     auto initError = (state == FederateStates::ERRORED);
     bool error_cmd{false};
 
-    if (!init_requested) {
+    if (!initRequested) {
         // don't run callback processing before the user calls enterInit
         return;
     }

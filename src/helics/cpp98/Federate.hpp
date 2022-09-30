@@ -359,6 +359,15 @@ class Federate {
     {
         return helicsFederateGetState(fed, HELICS_NULL_POINTER);
     }
+    /** called after one of the async calls and will indicate true if an async operation has
+    completed
+    @details this should only be called from the same thread as the one that called the initial
+    async call and will return false if called when no async operation is in flight*/
+    bool isAsyncOperationCompleted() const
+    {
+        // returns int, 1 = true, 0 = false
+        return helicsFederateIsAsyncOperationCompleted(fed, HELICS_NULL_POINTER) != HELICS_FALSE;
+    }
     /** enter the initialization mode after all interfaces have been defined
     @details  the call will block until all federates have entered initialization mode
     */
@@ -374,15 +383,7 @@ class Federate {
     {
         helicsFederateEnterInitializingModeAsync(fed, hThrowOnError());
     }
-    /** called after one of the async calls and will indicate true if an async operation has
-    completed
-    @details only call from the same thread as the one that called the initial async call and will
-    return false if called when no async operation is in flight*/
-    bool isAsyncOperationCompleted() const
-    {
-        // returns int, 1 = true, 0 = false
-        return helicsFederateIsAsyncOperationCompleted(fed, HELICS_NULL_POINTER) > 0;
-    }
+
     /** second part of the async process for entering initializationState call after a call to
     enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
     exception*/
@@ -390,6 +391,33 @@ class Federate {
     {
         helicsFederateEnterInitializingModeComplete(fed, hThrowOnError());
     }
+
+    /** iterate in the created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup.
+    */
+    void enterInitializingModeIterative()
+    {
+        helicsFederateEnterInitializingModeIterative(fed, hThrowOnError());
+    }
+    /** iterate in the created mode.
+    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
+    should be made to complete the call sequence
+    */
+    void enterInitializingModeIterativeAsync()
+    {
+        helicsFederateEnterInitializingModeIterativeAsync(fed, hThrowOnError());
+    }
+
+    /** second part of the async process for entering initializationModeIterative call after a call
+    to enterInitializingModeIterativeAsync; if called any other time it will throw an
+    InvalidFunctionCall exception*/
+    void enterInitializingModeIterativeComplete()
+    {
+        helicsFederateEnterInitializingModeIterativeComplete(fed, hThrowOnError());
+    }
+
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode

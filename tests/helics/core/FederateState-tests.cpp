@@ -48,7 +48,7 @@ TEST_F(federateStateTests, constructor)
     EXPECT_EQ(fs->getDependents().size(), 0U);
     EXPECT_TRUE(fs->local_id == helics::LocalFederateId{});
     EXPECT_TRUE(fs->global_id.load() == helics::GlobalFederateId{});
-    EXPECT_EQ(fs->init_requested, false);
+    EXPECT_EQ(fs->initRequested, false);
 
     EXPECT_EQ(fs->getCurrentIteration(), 0);
     EXPECT_EQ(fs->grantedTime(), helics::Time::minVal());
@@ -184,7 +184,9 @@ TEST_F(federateStateTests, basic_processmessage)
 
     // Test returning when the initialization state is entered
     cmd.setAction(helics::CMD_INIT_GRANT);
-    auto fs_process = std::async(std::launch::async, [&]() { return fs->enterInitializingMode(); });
+    auto fs_process = std::async(std::launch::async, [&]() {
+        return fs->enterInitializingMode(IterationRequest::NO_ITERATIONS);
+    });
     EXPECT_EQ(fs->getState(), FederateStates::CREATED);
     fs->addAction(cmd);
     fs_process.wait();

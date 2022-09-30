@@ -143,7 +143,8 @@ typedef enum {
     HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
-    HELICS_PROPERTY_INT_LOG_BUFFER = 276
+    HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+    HELICS_PROPERTY_INT_INDEX_GROUP = 282
 } HelicsProperties;
 
 const int HELICS_INVALID_PROPERTY_VALUE = -972;
@@ -419,8 +420,11 @@ void helicsFederateFree(HelicsFederate fed);
 void helicsCloseLibrary(void);
 void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
-HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
+HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* err);
@@ -768,7 +772,7 @@ void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
                                             HelicsError* err);
 void helicsCallbackFederateNextTimeIterativeCallback(
     HelicsFederate fed,
-    HelicsTime (*timeUpdate)(HelicsTime time, HelicsIterationResult, HelicsIterationRequest* iteration, void* userdata),
+    HelicsTime (*timeUpdate)(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration, void* userdata),
     void* userdata,
     HelicsError* err);
 void helicsCallbackFederateInitializeCallback(HelicsFederate fed,

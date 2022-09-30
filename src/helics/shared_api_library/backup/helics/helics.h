@@ -303,7 +303,7 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
                /** the property controlling output delay for a federate*/
                HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
-               /** specify the maximum time of a federate (callback federates only*/
+               /** specify the maximum time of a federate (callback federates only)*/
                HELICS_PROPERTY_TIME_MAXTIME = 152,
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
@@ -320,7 +320,9 @@ typedef enum { /* NOLINT */
                   \ref HelicsLogLevels*/
                HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
                /** integer property controlling the size of the log buffer*/
-               HELICS_PROPERTY_INT_LOG_BUFFER = 276
+               HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+               /** integer property specifying an index group*/
+               HELICS_PROPERTY_INT_INDEX_GROUP = 282
 } HelicsProperties;
 
 /** result returned for requesting the value of an invalid/unknown property */
@@ -1276,8 +1278,7 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
 /**
 * Create a callback federate from a federate info object.
 *
-* @details Callback federates are both value federates and message federates, objects can be used in all functions
-*                      that take a HelicsCombination object as an argument
+* @details Callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
 *
 * @param fedName A string with the name of the federate, can be NULL or an empty string to pull the default name from fi.
 * @param fi The federate info object that contains details on the federate.
@@ -1285,15 +1286,15 @@ HELICS_EXPORT HelicsFederate helicsCreateCombinationFederateFromConfig(const cha
 * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
 
 *
-* @return An opaque value federate object nullptr if the object creation failed.
+* @return An opaque value federate object; nullptr if the object creation failed.
 */
 HELICS_EXPORT HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 
 /**
 * Create a callback federate from a JSON file or JSON string or TOML file.
 *
-* @details callback federates are combination federates that run a series of callback for execution in a completely automated fashion.
-* the enterInitializingMode call transfer complete control of the federate to the Core and no further user interaction is expected
+* @details Callback federates are combination federates that run a series of callbacks for execution in a completely automated fashion.
+* The enterInitializingMode call transfers complete control of the federate to the Core and no further user interaction is expected.
 *
 * @param configFile A JSON file or a JSON string or TOML file that contains setup and configuration information.
 *
@@ -1702,13 +1703,56 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
 /**
  * Non blocking alternative to \ref helicsFederateEnterInitializingMode.
  *
- * @details The function helicsFederateEnterInitializationModeFinalize must be called to finish the operation.
+ * @details The function helicsFederateEnterInitializationModeComplete must be called to finish the operation.
  *
  * @param fed The federate to operate on.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Complete the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
+ *
+ * @param fed The federate desiring to complete the initialization step.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Trigger a blocking call and return to created state after all federates have either triggered an iteration or waiting to enter
+ * initializing mode
+ *
+ * @details this call will return the federate to the created state to allow additional setup to occur with federates either iterating in
+ * the mode or waiting.
+ *
+ * @param fed The federate to operate on.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Non blocking alternative to \ref helicsFederateEnterInitializingModeIterative.
+ *
+ * @details The function helicsFederateEnterInitializationModeIterativeComplete must be called to finish the operation.
+ *
+ * @param fed The federate to operate on.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Complete the call to initialize mode that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in
+ * startup or error mode on return
+ *
+ * @param fed The federate desiring to iterate to the startup mode again
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Check if the current Asynchronous operation has completed.
@@ -1720,15 +1764,6 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
  * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
  */
 HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
-
-/**
- * Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
- *
- * @param fed The federate desiring to complete the initialization step.
- *
- * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- */
-HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request that the federate enter the Execution mode.
@@ -5062,7 +5097,7 @@ HELICS_EXPORT void
 * @param fed The federate to set the callback for.
 * @param initializingEntry A callback with signature void(HelicsBool iterating, void *userdata);
 * the bool parameter is set to true if the entry is iterative, therefore the first time this is called the bool is false
-* all subsequent times it is false
+* and all subsequent times it is true.
 *
 * @param userdata A pointer to user data that is passed to the function when executing.
 *
@@ -5077,10 +5112,10 @@ HELICS_EXPORT void helicsFederateInitializingEntryCallback(HelicsFederate fed,
 /**
 * Set callback for the entry to ExecutingMode.
 *
-* @details This callback will be executed once on first entry to executing Mode
+* @details This callback will be executed once on first entry to executingMode
 *
 * @param fed The federate to set the callback for.
-* @param executingEntry A callback with signature void( void *userdata);
+* @param executingEntry A callback with signature void(void *userdata);
 *
 * @param userdata A pointer to user data that is passed to the function when executing.
 *
@@ -5091,14 +5126,14 @@ HELICS_EXPORT void
     helicsFederateExecutingEntryCallback(HelicsFederate fed, void (*executingEntry)(void* userdata), void* userdata, HelicsError* err);
 
 /**
-* Set callback for cosimulation termination
+* Set callback for cosimulation termination.
 *
-* @details This callback will be executed once when the time advance of the federate/co-simulation has terminated
-* this may be called as part of the finalize operation, or when a maxTime signal is returned from requestTime or when an error is
-encountered
+* @details This callback will be executed once when the time advancement of the federate/co-simulation has terminated.
+* This may be called as part of the finalize operation, or when a maxTime signal is returned from requestTime or when an error is
+encountered.
 *
 * @param fed The federate to set the callback for.
-* @param cosimTermination A callback with signature void( void *userdata);
+* @param cosimTermination A callback with signature void(void *userdata);
 *
 * @param userdata A pointer to user data that is passed to the function when executing.
 *
@@ -5111,9 +5146,9 @@ HELICS_EXPORT void helicsFederateCosimulationTerminationCallback(HelicsFederate 
                                                                  HelicsError* err);
 
 /**
-* Set callback for error handling
+* Set callback for error handling.
 *
-* @details This callback will be when a federate error is encountered
+* @details This callback will be called when a federate error is encountered.
 *
 * @param fed The federate to set the callback for.
 * @param errorHandler A callback with signature void(int errorCode, const char *errorString, void *userdata);
@@ -5131,9 +5166,9 @@ HELICS_EXPORT void helicsFederateErrorHandlerCallback(HelicsFederate fed,
 // void setNextTimeCallback(std::function<Time(Time)>
 // timeUpdateCallback){timeUpdateOperation2=std::move(timeUpdateCallback);timeUpdateOperation1=nullptr;}
 /**
-* Set callback for the next time update
+* Set callback for the next time update.
 *
-* @details This callback will be triggered to compute the next time update for a callback federate
+* @details This callback will be triggered to compute the next time update for a callback federate.
 *
 * @param fed The federate to set the callback for.
 * @param timeUpdate A callback with signature HelicsTime(HelicsTime time, void *userdata);
@@ -5151,12 +5186,13 @@ HELICS_EXPORT void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
 // void setNextTimeIterativeCallback(std::function<std::pair<Time,IterationRequest>(iteration_time)>
 // timeUpdateCallback){timeUpdateOperation1=std::move(timeUpdateCallback);}
 /**
-* Set callback for the next time update with iteration capability
+* Set callback for the next time update with iteration capability.
 *
-* @details This callback will be triggered to compute the next time update for a callback federate
+* @details This callback will be triggered to compute the next time update for a callback federate.
 *
 * @param fed The federate to set the callback for.
-* @param timeUpdate A callback with signature HelicsTime(HelicsTime time, void *userdata);
+* @param timeUpdate A callback with signature HelicsTime(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration,
+void *userdata);
 *
 * @param userdata A pointer to user data that is passed to the function when executing.
 *
@@ -5165,15 +5201,15 @@ HELICS_EXPORT void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
 */
 HELICS_EXPORT void helicsCallbackFederateNextTimeIterativeCallback(
     HelicsFederate fed,
-    HelicsTime (*timeUpdate)(HelicsTime time, HelicsIterationResult, HelicsIterationRequest* iteration, void* userdata),
+    HelicsTime (*timeUpdate)(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration, void* userdata),
     void* userdata,
     HelicsError* err);
 
 // void setInitializeCallback(std::function<IterationRequest()> initializeCallback){initializationOperation=std::move(initializeCallback); }
 /**
-* Set callback for initialization
+* Set callback for initialization.
 *
-* @details This callback will be executed when computing whether to iterate in itialization mode
+* @details This callback will be executed when computing whether to iterate in initialization mode.
 *
 * @param fed The federate to set the callback for.
 * @param initialize A callback with signature HelicsIterationRequest(void *userdata);
