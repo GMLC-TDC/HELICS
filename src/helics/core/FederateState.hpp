@@ -111,9 +111,11 @@ class FederateState {
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
     /** atomic flag indicating this federate has requested entry to initialization */
-    std::atomic<bool> init_requested{false};
+    std::atomic<bool> initRequested{false};
     // temporary
     std::atomic<bool> requestingMode{false};
+
+    std::atomic<bool> initIterating{false};
 
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
@@ -377,8 +379,11 @@ class FederateState {
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
     IterationResult waitSetup();
-    /** process until the initialization state has been entered or there is a failure*/
-    IterationResult enterInitializingMode();
+    /** process until the initialization state has been entered, an iteration request granted or
+    there is a failure
+    @param request the desired iteration condition
+    @return the result of the iteration request*/
+    IterationResult enterInitializingMode(IterationRequest request);
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
     @param sendRequest generates the local actionMessage inside the function leaving to false

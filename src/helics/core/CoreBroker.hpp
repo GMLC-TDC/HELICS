@@ -79,8 +79,8 @@ class BasicBrokerInfo {
     bool _route_key{false};  //!< indicator that the broker has a unique route id
     bool _sent_disconnect_ack{false};  //!< indicator that the disconnect ack has been sent
     bool _disable_ping{false};  //!< indicator that the broker doesn't respond to pings
-    bool _observer{false};  // indicator that the broker is an observer
-    // 1 byte gap
+    bool _observer{false};  //!< indicator that the broker is an observer
+    bool initIterating{false};  //!< indicator that initIteration was requested
     std::string routeInfo;  //!< string describing the connection information for the route
     explicit BasicBrokerInfo(std::string_view brokerName): name(brokerName) {}
 };
@@ -100,6 +100,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::atomic<bool> _isRoot{false};  //!< set to true if this object is a root broker
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
+    bool initIterating{false};  //!< using init iterations in some cores
     int routeCount = 1;  //!< counter for creating new routes;
     /// container for all federates
     gmlc::containers::
@@ -187,7 +188,7 @@ class CoreBroker: public Broker, public BrokerBase {
     route_id fillMessageRouteInformation(ActionMessage& mess);
 
     /** handle initialization operations*/
-    void executeInitializationOperations();
+    void executeInitializationOperations(bool iterating);
     /** get an index for an airlock, function is threadsafe*/
     uint16_t getNextAirlockIndex();
     /** verify the broker key contained in a message
