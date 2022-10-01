@@ -3021,8 +3021,7 @@ void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                // TODO(PT) add rvalue reference method
-                activeQueries.setDelayedValue(requestors.back().messageID, str);
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));
@@ -3976,8 +3975,7 @@ void CoreBroker::processQueryResponse(const ActionMessage& m)
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                // TODO(PT) add rvalue reference method
-                activeQueries.setDelayedValue(requestors.back().messageID, str);
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));

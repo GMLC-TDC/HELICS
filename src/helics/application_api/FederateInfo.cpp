@@ -73,6 +73,8 @@ static constexpr frozen::unordered_map<std::string_view, int, 67> propStringsTra
     {"offset", HELICS_PROPERTY_TIME_OFFSET},
     {"timeoffset", HELICS_PROPERTY_TIME_OFFSET},
     {"time_offset", HELICS_PROPERTY_TIME_OFFSET},
+    {"stop_time", HELICS_PROPERTY_TIME_STOPTIME},
+    {"stoptime", HELICS_PROPERTY_TIME_STOPTIME},
     {"rtlead", HELICS_PROPERTY_TIME_RT_LEAD},
     {"rtlag", HELICS_PROPERTY_TIME_RT_LAG},
     {"rttolerance", HELICS_PROPERTY_TIME_RT_TOLERANCE},
@@ -131,7 +133,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 67> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 89> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
@@ -195,6 +197,12 @@ static constexpr frozen::unordered_map<std::string_view, int, 89> flagStringsTra
     {"single_thread_federate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singlethreadfederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singleThreadFederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
+    {"single_thread_core", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"singlethreadcore", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"singleThreadCore", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"multi_thread_core", HELICS_FLAG_MULTI_THREAD_CORE},
+    {"multithreadcore", HELICS_FLAG_MULTI_THREAD_CORE},
+    {"multiThreadCore", HELICS_FLAG_MULTI_THREAD_CORE},
     {"force_logging_flush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceloggingflush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceLoggingFlush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
@@ -575,6 +583,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "--period",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_PERIOD, val); },
            "the execution cycle of the federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
+           "--stoptime",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_STOPTIME, val); },
+           "the maximum simulation time of a federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
            "--timedelta",

@@ -128,6 +128,10 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_REALTIME = 16,
                /** flag indicating that the federate will only interact on a single thread*/
                HELICS_FLAG_SINGLE_THREAD_FEDERATE = 27,
+               /** flag indicating use of a thread safe core*/
+               HELICS_FLAG_MULTI_THREAD_CORE = 28,
+               /** flag indicating use of a single threaded core*/
+               HELICS_FLAG_SINGLE_THREAD_CORE = 29,
                /** used to not display warnings on mismatched requested times*/
                HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS = 67,
                /** specify that checking on configuration files should be strict and throw and error
@@ -146,7 +150,7 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_CALLBACK_FEDERATE = 103,
                /** specify that a federate should automatically call timeRequest on completion of
                   current request*/
-               HELICS_FLAG_AUTOMATED_TIMEREQUEST = 106
+               HELICS_FLAG_AUTOMATED_TIME_REQUEST = 106
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
@@ -283,8 +287,8 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
                /** the property controlling output delay for a federate*/
                HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
-               /** specify the maximum time of a federate (callback federates only)*/
-               HELICS_PROPERTY_TIME_MAXTIME = 152,
+               /** specify the maximum time of a federate */
+               HELICS_PROPERTY_TIME_STOPTIME = 152,
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
                HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,

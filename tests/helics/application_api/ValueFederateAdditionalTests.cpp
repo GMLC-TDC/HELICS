@@ -678,7 +678,7 @@ TEST(valuefederate, toml_file_bad)
     helics::CoreFactory::terminateAllCores();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_configfile_tests,
                          ::testing::ValuesIn(config_files));
 
@@ -788,13 +788,11 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
     vFed.disconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_single_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
-                         valuefed_add_type_tests_ci_skip,
-                         ::testing::ValuesIn(CoreTypes));
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_add_type_tests_ci_skip, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_all_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_all));
 

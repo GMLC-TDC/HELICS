@@ -87,18 +87,13 @@ class HELICS_CXX_EXPORT CallbackFederate: public CombinationFederate {
         nextTimeOperation1 = nullptr;
         nextTimeOperation2 = nullptr;
     }
-    using Federate::setProperty;
-    virtual void setProperty(int32_t property, double val) override;
-    virtual void setProperty(int32_t property, Time val) override;
     virtual void setFlagOption(int32_t property, bool val) override;
-    virtual Time getTimeProperty(int32_t property) const override;
 
   private:
     void loadOperator();
     // pointer for the
     std::shared_ptr<CallbackFederateOperator> op;
     friend CallbackFederateOperator;
-    Time mFinalTime{Time::maxVal()};
     bool mEventTriggered{false};
     std::function<IterationRequest()> initializationOperation;
     std::function<std::pair<Time, IterationRequest>(iteration_time)> nextTimeOperation1;

@@ -4282,8 +4282,7 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
             }
             if (requestors.back().dest_id == global_broker_id_local ||
                 requestors.back().dest_id == gDirectCoreId) {
-                // TODO(PT) make setDelayedValue have move set function
-                activeQueries.setDelayedValue(requestors.back().messageID, str);
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));
@@ -4869,8 +4868,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                 std::string repStr = coreQuery(cmd.payload.to_string(), force_ordered);
                 if (repStr != "#wait") {
                     if (cmd.source_id == gDirectCoreId) {
-                        // TODO(PT) make setDelayedValue have a move method
-                        activeQueries.setDelayedValue(cmd.messageID, repStr);
+                        activeQueries.setDelayedValue(cmd.messageID, std::move(repStr));
                     } else {
                         ActionMessage queryResp(force_ordered ? CMD_QUERY_REPLY_ORDERED :
                                                                 CMD_QUERY_REPLY);
@@ -5176,8 +5174,7 @@ void CommonCore::checkInFlightQueriesForDisconnect()
                 }
             }
             if (requestors.back().dest_id == global_broker_id_local) {
-                // TODO(PT) add rvalue reference method
-                activeQueries.setDelayedValue(requestors.back().messageID, str);
+                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
             } else {
                 requestors.back().payload = std::move(str);
                 routeMessage(std::move(requestors.back()));

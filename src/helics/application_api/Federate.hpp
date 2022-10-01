@@ -22,12 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-namespace gmlc {
-namespace libguarded {
-    template<class T, class M>
-    class shared_guarded;
-}  // namespace libguarded
-}  // namespace gmlc
+namespace gmlc::libguarded {
+template<class T, class M>
+class shared_guarded;
+}  // namespace gmlc::libguarded
 
 /**
  * HELICS Application API
@@ -88,12 +86,15 @@ class HELICS_CXX_EXPORT Federate {
     bool observerMode{false};
     /** allow to retrigger time requests from callbacks (user specified)*/
     bool retriggerTimeRequest{false};
+    /*** specify that the federate will only be used on a single thread*/
+    bool singleThreadFederate{false};
 
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time mCurrentTime = Time::minVal();  //!< the current simulation time
+    Time mStopTime = Time::maxVal();  //!< the stopping time for the federate
   private:
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
