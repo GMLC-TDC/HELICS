@@ -21,7 +21,7 @@ else()
     set(FMT_SILENT ON)
 
     if(NOT CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_STANDARD 17) # Supported values are ``14``, and ``17``.
+        set(CMAKE_CXX_STANDARD 17) # Supported values are ``17``, and ``20``.
     endif()
 
     set(SUPPORTS_VARIADIC_TEMPLATES ON)
@@ -55,4 +55,5 @@ else()
     hide_variable(FMT_INC_DIR)
     hide_variable(FMT_MODULE)
     hide_variable(FMT_SYSTEM_HEADERS)
+    add_library(HELICS::fmt ALIAS fmt::fmt)
 endif()
