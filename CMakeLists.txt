@@ -683,7 +683,9 @@ include(addfmt)
 # --------------------------------------------------------------
 # Create the target for jsoncpp
 # -----------------------------------------------------------
-include(addJsoncpp)
+if (NOT TARGET jsoncpp_static)
+   include(addJsoncpp)
+endif()
 if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
     add_library(HELICS::jsoncpp ALIAS jsoncpp_static)
 endif()
@@ -701,7 +703,7 @@ include(addUnits)
 # -----------------------------------------------------------------------------
 # create utilities target
 # -----------------------------------------------------------------------------
-
+if (NOT TARGET gmlc::utilities)
 set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
 
 add_subdirectory(ThirdParty/utilities)
@@ -722,11 +724,13 @@ if(NOT HELICS_DISABLE_BOOST)
         gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     )
 endif()
+endif()
 
 # -----------------------------------------------------------------------------
 # create networking target
 # -----------------------------------------------------------------------------
 
+if (NOT TARGET gmlc::networking)
 set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
 set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
 set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
@@ -759,6 +763,8 @@ hide_variable(GMLC_NETWORKING_ENABLE_SUBMODULE_UPDATE)
 hide_variable(GMLC_NETWORKING_USE_EXTERNAL_JSON)
 
 set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
+
+endif()
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

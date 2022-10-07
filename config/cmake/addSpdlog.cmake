@@ -11,6 +11,7 @@
 # create the spdlog target
 # -----------------------------------------------------------------------------
 
+if (NOT TARGET spdlog::spdlog)
 option(${PROJECT_NAME}_USE_EXTERNAL_SPDLOG "Use external copy of spdlog" OFF)
 mark_as_advanced(${PROJECT_NAME}_USE_EXTERNAL_SPDLOG)
 
@@ -52,4 +53,5 @@ else()
     hide_variable(SPDLOG_INSTALL)
     hide_variable(SPDLOG_CLOCK_COARSE)
     hide_variable(SPDLOG_USE_STD_FORMAT)
+endif()
 endif()

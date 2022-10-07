@@ -10,6 +10,7 @@
 option(${PROJECT_NAME}_USE_EXTERNAL_UNITS "Use external copy of LLNL Units" OFF)
 mark_as_advanced(${PROJECT_NAME}_USE_EXTERNAL_UNITS)
 
+if (NOT TARGET units::units)
 if(${PROJECT_NAME}_USE_EXTERNAL_UNITS)
     # NOTE: static units should be built with CMAKE_POSITION_INDEPENDENT_CODE
     find_package(units REQUIRED)
@@ -37,4 +38,5 @@ else()
     hide_variable(UNITS_HEADER_ONLY)
     hide_variable(UNITS_BUILD_OBJECT_LIBRARY)
     hide_variable(UNITS_NAMESPACE)
+endif()
 endif()
