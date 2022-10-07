@@ -7,6 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if (NOT TARGET JsonCpp::JsonCpp)
 option(${PROJECT_NAME}_USE_EXTERNAL_JSONCPP "Use external copy of JsonCpp" OFF)
 mark_as_advanced(${PROJECT_NAME}_USE_EXTERNAL_JSONCPP)
 
@@ -84,4 +85,10 @@ else()
     hide_variable(DEBUG_LIBNAME_SUFFIX)
     hide_variable(JSONCPP_USE_SECURE_MEMORY)
     hide_variable(JSONCPP_WITH_EXAMPLE)
+    
+    if(NOT TARGET JsonCpp::JsonCpp AND TARGET jsoncpp_static)
+        add_library(JsonCpp::JsonCpp ALIAS jsoncpp_static)
+    endif()
+    
+endif()
 endif()

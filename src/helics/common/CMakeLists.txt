@@ -43,14 +43,8 @@ set_target_properties(helics_common PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(
     helics_common PUBLIC helics_base build_flags_target PRIVATE compile_flags_target
 )
-target_link_libraries(helics_common PUBLIC gmlc::utilities units::units)
+target_link_libraries(helics_common PUBLIC gmlc::utilities units::units JsonCpp::JsonCpp)
 
-if(NOT TARGET HELICS::jsoncpp)
-    # link with external jsoncpp library instead of vendored
-    target_link_libraries(helics_common PUBLIC JsonCpp::JsonCpp)
-else()
-    target_link_libraries(helics_common PUBLIC HELICS::jsoncpp)
-endif()
 
 if(TARGET Boost::boost AND NOT HELICS_DISABLE_BOOST)
     target_link_libraries(helics_common PRIVATE Boost::boost)

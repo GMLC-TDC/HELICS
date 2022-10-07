@@ -683,12 +683,7 @@ include(addfmt)
 # --------------------------------------------------------------
 # Create the target for jsoncpp
 # -----------------------------------------------------------
-if (NOT TARGET jsoncpp_static)
-   include(addJsoncpp)
-endif()
-if(TARGET jsoncpp_static AND NOT TARGET JsonCpp::JsonCpp)
-    add_library(HELICS::jsoncpp ALIAS jsoncpp_static)
-endif()
+include(addJsoncpp)
 
 # --------------------------------------------------------------
 # Create the target for spdlog
@@ -703,68 +698,13 @@ include(addUnits)
 # -----------------------------------------------------------------------------
 # create utilities target
 # -----------------------------------------------------------------------------
-if (NOT TARGET gmlc::utilities)
-set(GMLC_UTILITIES_INSTALL OFF CACHE INTERNAL "")
-
-add_subdirectory(ThirdParty/utilities)
-
-hide_variable(GMLC_UTILITIES_GENERATE_DOXYGEN_DOC)
-hide_variable(GMLC_UTILITIES_INCLUDE_BOOST)
-hide_variable(GMLC_UTILITIES_USE_BOOST_SPIRIT)
-hide_variable(GMLC_UTILITIES_WITH_CMAKE_PACKAGE)
-hide_variable(GMLC_UTILITIES_OBJECT_LIB)
-hide_variable(GMLC_UTILITIES_STATIC_LIB)
-hide_variable(GMLC_UTILITIES_CLANG_TIDY_OPTIONS)
-
-target_compile_definitions(gmlc_utilities PUBLIC USE_STD_STRING_VIEW=1)
-
-set_target_properties(gmlc_utilities PROPERTIES FOLDER Extern)
-if(NOT HELICS_DISABLE_BOOST)
-    target_include_directories(
-        gmlc_utilities SYSTEM PRIVATE $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-    )
-endif()
-endif()
+include(addUtilities)
 
 # -----------------------------------------------------------------------------
 # create networking target
 # -----------------------------------------------------------------------------
 
-if (NOT TARGET gmlc::networking)
-set(GMLC_NETWORKING_INSTALL OFF CACHE INTERNAL "")
-set(GMLC_NETWORKING_ASIO_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include)
-set(GMLC_NETWORKING_CONCURRENCY_INCLUDE ${PROJECT_SOURCE_DIR}/ThirdParty/concurrency)
-set(GMLC_NETWORKING_DISABLE_ASIO ${HELICS_DISABLE_ASIO} CACHE INTERNAL "")
-
-# hide some of the JSON in the networking library
-set(JSON_CI OFF CACHE INTERNAL "")
-set(JSON_Diagnostics OFF CACHE INTERNAL "")
-set(JSON_ImplicitConversions ON CACHE INTERNAL "")
-set(JSON_Install OFF CACHE INTERNAL "")
-set(JSON_MultipleHeaders OFF CACHE INTERNAL "")
-set(JSON_SystemInclude OFF CACHE INTERNAL "")
-
-if(HELICS_ENABLE_ENCRYPTION)
-    list(APPEND VCPKG_MANIFEST_FEATURES "encryption")
-    set(GMLC_NETWORKING_ENABLE_ENCRYPTION ON CACHE INTERNAL "")
-else()
-    set(GMLC_NETWORKING_ENABLE_ENCRYPTION OFF CACHE INTERNAL "")
-endif()
-
-add_subdirectory(ThirdParty/networking)
-
-hide_variable(GMLC_NETWORKING_GENERATE_DOXYGEN_DOC)
-hide_variable(GMLC_NETWORKING_INCLUDE_BOOST)
-hide_variable(GMLC_NETWORKING_WITH_CMAKE_PACKAGE)
-hide_variable(GMLC_NETWORKING_OBJECT_LIB)
-hide_variable(GMLC_NETWORKING_STATIC_LIB)
-hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
-hide_variable(GMLC_NETWORKING_ENABLE_SUBMODULE_UPDATE)
-hide_variable(GMLC_NETWORKING_USE_EXTERNAL_JSON)
-
-set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
-
-endif()
+include(addNetworking)
 
 # -----------------------------------------------------------------------------
 # CMAKE Subdirectories

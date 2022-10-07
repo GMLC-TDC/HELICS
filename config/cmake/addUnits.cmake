@@ -7,10 +7,11 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+if (NOT TARGET units::units)
+
 option(${PROJECT_NAME}_USE_EXTERNAL_UNITS "Use external copy of LLNL Units" OFF)
 mark_as_advanced(${PROJECT_NAME}_USE_EXTERNAL_UNITS)
 
-if (NOT TARGET units::units)
 if(${PROJECT_NAME}_USE_EXTERNAL_UNITS)
     # NOTE: static units should be built with CMAKE_POSITION_INDEPENDENT_CODE
     find_package(units REQUIRED)
