@@ -44,17 +44,24 @@ message(STATUS "SYSTEM INFO -> ${HELICS_COMPILER_VERSION}")
 # -----------------------------------------------------------------------------
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/config/cmake/"
                           "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/"
     )
 else()
-    set(ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
+    set(${PROJECT_NAME}_ORIGINAL_MODULE_PATH ${CMAKE_MODULE_PATH})
     set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/config/cmake/"
                           "${PROJECT_SOURCE_DIR}/ThirdParty/cmake/" ${CMAKE_MODULE_PATH}
     )
-    get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
 
+endif()
+
+
+include(commonBuildPaths)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+else()
+    get_property(helics-use-folders GLOBAL PROPERTY USE_FOLDERS)
 endif()
 
 if(NOT HELICS_DISABLE_GIT_OPERATIONS)
@@ -75,83 +82,7 @@ include(extraMacros)
 include(CMakeDependentOption)
 include(copy_key_files)
 include(CTest)
-include(ucm)
 
-# include(BuildType)
-# -----------------------------------------------------------------------------
-# set the install path to a local directory
-# -----------------------------------------------------------------------------
-if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT AND CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    if(WIN32)
-        if(MSVC)
-            set(CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
-                CACHE PATH "default install path" FORCE
-            )
-        elseif(MINGW AND NOT MSYS)
-            set(CMAKE_INSTALL_PREFIX "C:/local/helics_${HELICS_VERSION_UNDERSCORE}/"
-                CACHE PATH "default install path" FORCE
-            )
-        elseif(MSYS)
-            # use CMAKE_OBJCOPY here since it is somewhat less likely to be overridden by users
-            # rather than the compiler
-            get_filename_component(path_bin ${CMAKE_OBJCOPY} DIRECTORY)
-            get_filename_component(path_install ${path_bin} DIRECTORY)
-            set(CMAKE_INSTALL_PREFIX ${path_install} CACHE PATH "default install path" FORCE)
-        endif(MSVC)
-    endif(WIN32)
-endif()
-
-# Warning if CMAKE_INSTALL_PREFIX is empty. Likely set by using the wrong environment variable.
-if(NOT CMAKE_INSTALL_PREFIX)
-    message(
-        WARNING
-            "CMAKE_INSTALL_PREFIX is set to nothing. If you are using an environment variable for handling prefix paths, that variable might not have been set before using it with CMake to set the CMAKE_INSTALL_PREFIX option."
-    )
-endif()
-
-# Check to make sure the install prefix isn't the build folder, if it is, build errors will happen
-get_filename_component(tmp_install_prefix "${CMAKE_INSTALL_PREFIX}" REALPATH)
-get_filename_component(tmp_proj_bindir "${PROJECT_BINARY_DIR}" REALPATH)
-# Windows paths are case insensitive
-if(WIN32)
-    string(TOLOWER "${tmp_install_prefix}" tmp_install_prefix)
-    string(TOLOWER "${tmp_proj_bindir}" tmp_proj_bindir)
-endif()
-if(tmp_install_prefix STREQUAL tmp_proj_bindir)
-    message(FATAL_ERROR "CMAKE_INSTALL_PREFIX must not be set to the build folder")
-endif()
-
-if(MSYS
-   OR CYGWIN
-   OR UNIX
-   OR APPLE
-)
-    set(UNIX_LIKE TRUE)
-endif()
-
-# Set the build output paths
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    if(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
-                                                                           "Archive output dir."
-        )
-    endif()
-    if(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib" CACHE PATH
-                                                                           "Library output dir."
-        )
-    endif()
-    if(NOT CMAKE_PDB_OUTPUT_DIRECTORY)
-        set(CMAKE_PDB_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-            CACHE PATH "PDB (MSVC debug symbol)output dir."
-        )
-    endif()
-    if(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-            CACHE PATH "Executable/dll output dir."
-        )
-    endif()
-endif()
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.12)
     option(
@@ -251,73 +182,18 @@ cmake_dependent_advanced_option(
     HELICS_ENABLE_DEBUG_LOGGING "enable debug logging" ON "HELICS_ENABLE_LOGGING" ON
 )
 
-# -----------------------------------------------------------------------------
-# General project wide configuration for debug postfix
-# -----------------------------------------------------------------------------
-if(NOT NO_DEBUG_POSFIX AND NOT CMAKE_DEBUG_POSTFIX)
-    set(CMAKE_DEBUG_POSTFIX d)
-endif()
+include(commonBuildFlags)
 
 # add a baseline library for underlying dependencies and flags
 add_library(helics_base INTERFACE)
 
-# Prohibit in-source build
-if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
-    message(
-        FATAL_ERROR
-            "In-source build is not supported. Please, use an empty directory for building the project."
-    )
-endif()
-
-if(NOT TARGET compile_flags_target)
-    add_library(compile_flags_target INTERFACE)
-endif()
-
-if(NOT TARGET build_flags_target)
-    add_library(build_flags_target INTERFACE)
-endif()
-
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    mark_as_advanced(BUILD_TESTING)
-    include(compiler_flags)
-
-endif()
 
 add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
 
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    if(NOT USE_LIBCXX)
-        show_variable(STATIC_STANDARD_LIB STRING "Link against a static standard lib" default)
-        set_property(CACHE STATIC_STANDARD_LIB PROPERTY STRINGS default static dynamic)
-    else()
-        hide_variable(STATIC_STANDARD_LIB)
-    endif()
-    if(MSVC)
-        show_variable(HELICS_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default)
-        set_property(CACHE HELICS_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external)
-    else()
-        hide_variable(HELICS_EMBEDDED_DEBUG_INFO)
-    endif()
-endif()
 
-if(STATIC_STANDARD_LIB STREQUAL "default")
-
-elseif(STATIC_STANDARD_LIB STREQUAL "static")
-    ucm_set_runtime(STATIC)
-elseif(STATIC_STANDARD_LIB STREQUAL "dynamic")
-    ucm_set_runtime(DYNAMIC)
-endif()
-
-if(HELICS_EMBEDDED_DEBUG_INFO STREQUAL "default")
-
-elseif(HELICS_EMBEDDED_DEBUG_INFO STREQUAL "external")
-    ucm_set_embedded_debug(EXTERNAL)
-else()
-    ucm_set_embedded_debug(EMBEDDED)
-endif()
 
 # -------------------------------------------------------------
 # add coverage target
@@ -619,45 +495,8 @@ if(NOT HELICS_DISABLE_ASIO)
         INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/ThirdParty/asio/asio/include>
     )
 endif()
-# -------------------------------------------------------------
-# setting the RPATH
-# -------------------------------------------------------------
-if(NOT DEFINED CMAKE_MACOSX_RPATH)
-    set(CMAKE_MACOSX_RPATH ON)
-endif()
 
-# add the automatically determined parts of the RPATH which point to directories outside the build
-# tree to the install RPATH
-if(NOT DEFINED CMAKE_INSTALL_RPATH_USE_LINK_PATH)
-    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-endif()
-
-# Add the local directory to the rpath
-if(NOT APPLE)
-    list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
-    list(APPEND CMAKE_INSTALL_RPATH "\$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
-else()
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path")
-    list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
-    list(APPEND CMAKE_INSTALL_RPATH "@executable_path")
-    list(APPEND CMAKE_INSTALL_RPATH "@executable_path/../${CMAKE_INSTALL_LIBDIR}")
-endif()
-
-# the RPATH to be used when installing, but only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" isSystemDir
-)
-if(isSystemDir STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}")
-endif()
-
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES
-     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" isSystemDir
-)
-if(isSystemDir STREQUAL "-1")
-    list(APPEND CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-endif()
-
+include(commonRPath)
 if(NOT WIN32)
     if(HELICS_ENABLE_ZMQ_CORE AND NOT HELICS_USE_ZMQ_STATIC_LIBRARY)
         get_target_property(zmqlibfile libzmq IMPORTED_LOCATION)
