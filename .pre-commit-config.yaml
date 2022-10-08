@@ -60,7 +60,7 @@ repos:
     rev: v0.6.13
     hooks:
       - id: cmake-format
-        exclude: "cmake+"
+        exclude: "cmake_+"
   - repo: https://github.com/codespell-project/codespell
     rev: v2.2.1
     hooks:
