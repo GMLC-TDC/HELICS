@@ -821,12 +821,10 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         headers
         libs
         swig
-        matlab
         java
         octave
         csharp
         benchmarks
-        cereal
     )
     if(WIN32)
         set(CPACK_RESOURCE_FILE_LICENSE "${HELICS_SOURCE_DIR}\\\\LICENSE")
@@ -949,7 +947,7 @@ endif(HELICS_ENABLE_PACKAGE_BUILD)
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # restore the original module path
-    set(CMAKE_MODULE_PATH ${ORIGINAL_MODULE_PATH})
+    set(CMAKE_MODULE_PATH ${${PROJECT_NAME}_ORIGINAL_MODULE_PATH})
     if(old_build_shared)
         set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
     endif()
