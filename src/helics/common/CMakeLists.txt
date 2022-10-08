@@ -45,7 +45,6 @@ target_link_libraries(
 )
 target_link_libraries(helics_common PUBLIC gmlc::utilities units::units JsonCpp::JsonCpp)
 
-
 if(TARGET Boost::boost AND NOT HELICS_DISABLE_BOOST)
     target_link_libraries(helics_common PRIVATE Boost::boost)
 endif()

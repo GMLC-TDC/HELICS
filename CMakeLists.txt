@@ -55,7 +55,6 @@ else()
 
 endif()
 
-
 include(commonBuildPaths)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -82,7 +81,6 @@ include(extraMacros)
 include(CMakeDependentOption)
 include(copy_key_files)
 include(CTest)
-
 
 if(NOT CMAKE_VERSION VERSION_LESS 3.12)
     option(
@@ -187,13 +185,10 @@ include(commonBuildFlags)
 # add a baseline library for underlying dependencies and flags
 add_library(helics_base INTERFACE)
 
-
 add_library(HELICS::compile_flags_target ALIAS compile_flags_target)
 add_library(HELICS::build_flags_target ALIAS build_flags_target)
 
 get_target_property(EXTRA_BUILD_FLAGS build_flags_target INTERFACE_COMPILE_OPTIONS)
-
-
 
 # -------------------------------------------------------------
 # add coverage target
@@ -308,12 +303,12 @@ endif()
 # -------------------------------------------------------------
 # TOML11  add the TOML interpreter
 # -------------------------------------------------------------
-if (NOT TARGET toml11::toml11)
-set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
-set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
-set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
-set(toml11_INSTALL OFF CACHE INTERNAL "")
-add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
+if(NOT TARGET toml11::toml11)
+    set(toml11_BUILD_TEST OFF CACHE INTERNAL "")
+    set(toml11_TEST_WITH_ASAN OFF CACHE INTERNAL "")
+    set(toml11_TEST_WITH_UBSAN OFF CACHE INTERNAL "")
+    set(toml11_INSTALL OFF CACHE INTERNAL "")
+    add_subdirectory(ThirdParty/toml EXCLUDE_FROM_ALL)
 
 endif()
 
@@ -959,40 +954,40 @@ if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
     endif()
 
-    if (HELICS_HIDE_CMAKE_VARIABLES)
-        HIDE_VARIABLE(HELICS_BINARY_ONLY_INSTALL)
-        HIDE_VARIABLE(HELICS_BUILD_APP_LIBRARY)
-        HIDE_VARIABLE(HELICS_BUILD_CONFIGURATION)
-        HIDE_VARIABLE(HELICS_BUILD_CXX_SHARED_LIB)
-        HIDE_VARIABLE(HELICS_DISABLE_ASIO)
-        HIDE_VARIABLE(HELICS_DISABLE_BOOST)
-        HIDE_VARIABLE(HELICS_DISABLE_C_SHARED_LIB)
-        HIDE_VARIABLE(HELICS_DISABLE_WEBSERVER)
-        HIDE_VARIABLE(HELICS_DISABLE_VCPKG)
-        HIDE_VARIABLE(HELICS_ENABLE_DEBUG_LOGGING)
-        HIDE_VARIABLE(HELICS_ENABLE_ENCRYPTION)
-        HIDE_VARIABLE(HELICS_ENABLE_INPROC_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_LOGGING)
-        HIDE_VARIABLE(HELICS_ENABLE_IPC_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_MPI_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_TRACE_LOGGING)
-        HIDE_VARIABLE(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
-        HIDE_VARIABLE(HELICS_ENABLE_TEST_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_ZMQ_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_UDP_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_SUBMODULE_UPDATE)
-        HIDE_VARIABLE(HELICS_ENABLE_TCP_CORE)
-        HIDE_VARIABLE(HELICS_ENABLE_MPI_CORE)
+    if(HELICS_HIDE_CMAKE_VARIABLES)
+        hide_variable(HELICS_BINARY_ONLY_INSTALL)
+        hide_variable(HELICS_BUILD_APP_LIBRARY)
+        hide_variable(HELICS_BUILD_CONFIGURATION)
+        hide_variable(HELICS_BUILD_CXX_SHARED_LIB)
+        hide_variable(HELICS_DISABLE_ASIO)
+        hide_variable(HELICS_DISABLE_BOOST)
+        hide_variable(HELICS_DISABLE_C_SHARED_LIB)
+        hide_variable(HELICS_DISABLE_WEBSERVER)
+        hide_variable(HELICS_DISABLE_VCPKG)
+        hide_variable(HELICS_ENABLE_DEBUG_LOGGING)
+        hide_variable(HELICS_ENABLE_ENCRYPTION)
+        hide_variable(HELICS_ENABLE_INPROC_CORE)
+        hide_variable(HELICS_ENABLE_LOGGING)
+        hide_variable(HELICS_ENABLE_IPC_CORE)
+        hide_variable(HELICS_ENABLE_MPI_CORE)
+        hide_variable(HELICS_ENABLE_TRACE_LOGGING)
+        hide_variable(HELICS_ENABLE_PYTHON_BUILD_SCRIPTS)
+        hide_variable(HELICS_ENABLE_TEST_CORE)
+        hide_variable(HELICS_ENABLE_ZMQ_CORE)
+        hide_variable(HELICS_ENABLE_UDP_CORE)
+        hide_variable(HELICS_ENABLE_SUBMODULE_UPDATE)
+        hide_variable(HELICS_ENABLE_TCP_CORE)
+        hide_variable(HELICS_ENABLE_MPI_CORE)
 
-        HIDE_VARIABLE(HELICS_USE_EXTERNAL_FMT)
-        HIDE_VARIABLE(HELICS_USE_EXTERNAL_JSONCPP)
-        HIDE_VARIABLE(HELICS_USE_EXTERNAL_SPDLOG)
-        HIDE_VARIABLE(HELICS_USE_EXTERNAL_UNITS)
-        HIDE_VARIABLE(HELICS_USE_POSITION_INDEPENDENT_CODE)
-        HIDE_VARIABLE(HELICS_USE_SYSTEM_ZEROMQ_ONLY)
-        HIDE_VARIABLE(HELICS_USE_ZMQ_STATIC_LIBRARY)
-        HIDE_VARIABLE(HELICS_ZMQ_FORCE_SUBPROJECT)
-        HIDE_VARIABLE(HELICS_ZMQ_SUBPROJECT)
+        hide_variable(HELICS_USE_EXTERNAL_FMT)
+        hide_variable(HELICS_USE_EXTERNAL_JSONCPP)
+        hide_variable(HELICS_USE_EXTERNAL_SPDLOG)
+        hide_variable(HELICS_USE_EXTERNAL_UNITS)
+        hide_variable(HELICS_USE_POSITION_INDEPENDENT_CODE)
+        hide_variable(HELICS_USE_SYSTEM_ZEROMQ_ONLY)
+        hide_variable(HELICS_USE_ZMQ_STATIC_LIBRARY)
+        hide_variable(HELICS_ZMQ_FORCE_SUBPROJECT)
+        hide_variable(HELICS_ZMQ_SUBPROJECT)
     endif()
 endif()
 
@@ -1004,4 +999,3 @@ if(NOT HELICS_DISABLE_GIT_OPERATIONS)
         include(addGitHooks)
     endif()
 endif()
-
