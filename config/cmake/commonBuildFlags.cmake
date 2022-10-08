@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-#cmake script to set up build output directories
+# cmake script to set up build output directories
 
 include(ucm)
 
@@ -17,7 +17,6 @@ include(ucm)
 if(NOT NO_DEBUG_POSFIX AND NOT CMAKE_DEBUG_POSTFIX)
     set(CMAKE_DEBUG_POSTFIX d)
 endif()
-
 
 if(NOT TARGET compile_flags_target)
     add_library(compile_flags_target INTERFACE)
@@ -41,14 +40,16 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         hide_variable(STATIC_STANDARD_LIB)
     endif()
     if(MSVC)
-        show_variable(${PROJECT_NAME}_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default)
-        set_property(CACHE ${PROJECT_NAME}_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external)
+        show_variable(
+            ${PROJECT_NAME}_EMBEDDED_DEBUG_INFO STRING "embed debug info into lib files" default
+        )
+        set_property(
+            CACHE ${PROJECT_NAME}_EMBEDDED_DEBUG_INFO PROPERTY STRINGS default embedded external
+        )
     else()
         hide_variable(${PROJECT_NAME}_EMBEDDED_DEBUG_INFO)
     endif()
 endif()
-
-
 
 if(STATIC_STANDARD_LIB STREQUAL "default")
 
