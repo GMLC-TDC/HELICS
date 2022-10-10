@@ -39,12 +39,15 @@ jobs:
     steps:
     - name: Checkout event ref
       uses: actions/checkout@v2
+      with:
+        submodules: true
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
       uses: actions/checkout@v2
       with:
         ref: develop
+        submodules: true
       if: github.event_name == 'schedule'
       
     # Setup a copy of the macOS SDK
