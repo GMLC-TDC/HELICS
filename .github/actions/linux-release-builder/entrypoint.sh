@@ -5,4 +5,5 @@ if [[ -n "${INPUT_CPACK_GEN}" ]]; then
     export CPACK_GEN
 fi
 
-/hbb/activate-exec "${INPUT_SCRIPT}"
+#/hbb/activate-exec "${INPUT_SCRIPT}"
+"${INPUT_SCRIPT}"

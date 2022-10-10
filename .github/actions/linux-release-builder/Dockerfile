@@ -1,4 +1,4 @@
-FROM phusion/holy-build-box-64:2.1.0
+FROM quay.io/pypa/manylinux2010_x86_64:2022-08-05-4535177
 
 # Install a copy of git and the Boost headers
 # curl -L follows redirects and -k ignores SSL certificate warnings
@@ -9,7 +9,7 @@ RUN curl -Lk -o boost.tar.gz https://sourceforge.net/projects/boost/files/boost/
     && rm boost.tar.gz
 
 # Make sure the install location for cmake is found
-ENV PATH="/hbb/bin:${PATH}"
+#ENV PATH="/hbb/bin:${PATH}"
 
 COPY entrypoint.sh /entrypoint.sh
 
