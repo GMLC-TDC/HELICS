@@ -187,12 +187,14 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
+        submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
       uses: actions/checkout@v3
       with:
         ref: develop
+        submodules: true
       if: github.event_name == 'schedule'
  
     - name: Checkout shell scripts for workflow
@@ -286,12 +288,14 @@ jobs:
       uses: actions/checkout@v3
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
+        submodules: true
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
       uses: actions/checkout@v3
       with:
         ref: develop
+        submodules: true
       if: github.event_name == 'schedule'
 
     - name: Checkout shell scripts for workflow
