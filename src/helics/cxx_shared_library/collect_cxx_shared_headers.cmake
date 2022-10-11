@@ -15,15 +15,11 @@ file(COPY ${helics_shared_public_headers}
      DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/application_api
 )
 
-file(COPY ${conv_headers} ${basic_headers}
-     DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
-)
+file(COPY ${conv_headers} ${basic_headers} DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics)
 
 file(COPY ${core_include_files} DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/core)
 
-file(COPY ${utilities_include_files}
-     DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/utilities
-)
+file(COPY ${utilities_include_files} DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/utilities)
 
 file(COPY ${HELICS_SOURCE_DIR}/ThirdParty/helics/external
      DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
@@ -34,10 +30,6 @@ file(COPY ${HELICS_BINARY_DIR}/helics_generated_includes/helics
 )
 
 if(HELICS_BUILD_APP_LIBRARY)
-    file(COPY ${helics_apps_public_headers}
-         DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/apps
-    )
-    file(COPY ${basic_app_headers}
-         DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics
-    )
+    file(COPY ${helics_apps_public_headers} DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics/apps)
+    file(COPY ${basic_app_headers} DESTINATION ${HELICS_CXX_HEADER_FILE_LOC}/helics)
 endif()
