@@ -86,8 +86,7 @@ bool InputInfo::addData(GlobalHandle source_id,
                         unsigned int iteration,
                         std::shared_ptr<const SmallBuffer> data)
 {
-    if (!data)
-    {
+    if (!data) {
         return false;
     }
     int index;

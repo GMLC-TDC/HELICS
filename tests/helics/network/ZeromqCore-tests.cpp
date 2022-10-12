@@ -41,7 +41,7 @@ TEST(ZMQCore, zmqComms_broker)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    auto &zctx=ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket(zctx, ZMQ_REP);
     repSocket.setsockopt(ZMQ_LINGER, 200);
     repSocket.bind(defServer);
@@ -74,7 +74,7 @@ TEST(ZMQCore, zmqRequestSet1)
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = ZmqContextManager::getContextPointer();
-    auto &zctx=ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket1(zctx, ZMQ_REP);
     repSocket1.bind(defServer);
     zmq::socket_t repSocket2(zctx, ZMQ_REP);
@@ -140,7 +140,7 @@ TEST(ZMQCore, zmqRequestSet2)
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = ZmqContextManager::getContextPointer();
-    auto &zctx=ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket1(zctx, ZMQ_REP);
     repSocket1.bind(defServer);
     zmq::socket_t repSocket2(zctx, ZMQ_REP);
@@ -243,7 +243,7 @@ TEST(ZMQCore, zmqComms_broker_test_transmit)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    auto &zctx=ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
@@ -296,7 +296,7 @@ TEST(ZMQCore, zmqComms_rx)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    auto& zctx =ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
@@ -528,7 +528,7 @@ TEST(ZMQCore, zmqCore_initialization)
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
     auto ctx = ZmqContextManager::getContextPointer();
-    auto &zctx=ctx->getContext();
+    auto& zctx = ctx->getContext();
     zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
