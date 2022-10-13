@@ -39,6 +39,7 @@ jobs:
     - name: Build HELICS
       run: |
         unset VCPKG_ROOT
+        echo "workspace $GITHUB_WORKSPACE. ev github is ${{ github.workspace }}!"
         git config --global --add safe.directory /__w/HELICS/HELICS
         source scripts/setup-helics-ci-options.sh
         mkdir -p build && cd build
