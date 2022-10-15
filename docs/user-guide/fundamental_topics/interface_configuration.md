@@ -112,6 +112,7 @@ Below is a sample JSON configuration file with some of the more common options. 
   - `alias` - an alternate name for the publication must be globally unique for publications
   - `tags` - Arbitrary string value pairs that can be applied to interfaces. Tags are available to others through queries but are not transmitted by default. They can be used to store additional information about an interface that might be useful to applications. At some point in the future automated connection routines will make use of them. "tags" are applicable to any interface and can also be used on federates.
 - **`subscriptions`** - These are lists of the values being sent to and from the given federate.
+
   - `key` - This string identifies the federation-unique value that this federate wishes to receive. If `global` has been set to `false` in the `publications` JSON configuration file, the name of the value is formatted as `<federate name>/<publication key>`. Both of these strings can be found in the publishing federate's JSON configuration file as the `name` and `key` strings, respectively. If `global` is `true` the string is the publishing federate's `key` value.
   - `required` - The message being subscribed to must be provided by some other publisher in the federation.
   - `type` - Data type, such as integer, double, complex.
@@ -121,7 +122,7 @@ Below is a sample JSON configuration file with some of the more common options. 
   - `only_update_on_change` and `tolerance` - Subscriptions will only consider a new value received when that value has changed more than the delta specified by `tolerance`.
 
 - **`inputs`** - These are lists of the values being sent to and from the given federate.
-  - `name` - the name of the input. 
+  - `name` - the name of the input.
   - `required` - The input must have a valid target
   - `type` - Data type, such as integer, double, complex.
   - `units` - Same as with `publications`.

@@ -633,13 +633,13 @@ TEST(valuefed_json_tests, file_loadb)
     EXPECT_EQ(vFed.getTag("description"), "fedb description");
     EXPECT_EQ(vFed.getTag("version"), "27");
 
-    auto& sub1= vFed.getInput(0);
+    auto& sub1 = vFed.getInput(0);
     vFed.enterInitializingMode();
 
-    auto dv=sub1.getDouble();
-    EXPECT_DOUBLE_EQ(dv,9.33);
-    dv=inp2.getDouble();
-    EXPECT_DOUBLE_EQ(dv,3.67);
+    auto dv = sub1.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 9.33);
+    dv = inp2.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 3.67);
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -670,14 +670,13 @@ TEST(valuefederate, toml_file_loadb)
         EXPECT_EQ(std::stod(dval), 0.7);
     }
 
-    auto& sub1= vFed.getInput(0);
+    auto& sub1 = vFed.getInput(0);
     vFed.enterExecutingMode();
-    
 
-    auto dv=sub1.getDouble();
-    EXPECT_DOUBLE_EQ(dv,9.33);
-    dv=inp2.getDouble();
-    EXPECT_DOUBLE_EQ(dv,3.67);
+    auto dv = sub1.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 9.33);
+    dv = inp2.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 3.67);
     EXPECT_EQ(vFed.getTag("description"), "fedb description");
     EXPECT_EQ(vFed.getTag("version"), "27");
 
