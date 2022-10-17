@@ -784,10 +784,10 @@ This option allows specifying the default value used when no publication has bee
 - `helicsInputSetDefaultString()` (used for JSONs)
 - `helicsInputSetDefaultVector()`
 
-Note that the following, though they have syntactical similarities to the above APIs, **do not** set default values on HELICS inputs when no publications have been received.
+Though they are not as obviously named, the following two APIs do provide a means of setting the default value as well:
 
-- `helicsInputSetDefaultTime()`
-- `helicsInputSetDefaultNamedPoint()`
+- `helicsInputSetDefaultTime()` - int64 but can also take a double
+- `helicsInputSetDefaultNamedPoint()` - string or a double
 
 ---
 
