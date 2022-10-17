@@ -127,7 +127,7 @@ Below is a sample JSON configuration file with some of the more common options. 
   - `type` - Data type, such as integer, double, complex.
   - `units` - Same as with `publications`.
   - `global` - Applies to the `key`, same as with `publications`.
-  - `default` - set the default value to return if not publications have been received
+  - `default` - set the default value to return if no publications have been received
   - `target` - A key for a publication the input should receive, may be an array such as ["pub1","pub2","pub3"]
   - `tags` - name and value pairs defining user tags for the interface
   - `only_update_on_change` and `tolerance` - Inputs will only consider a new value received when that value has changed more than the delta specified by `tolerance`.
