@@ -771,7 +771,7 @@ _API:_ `helicsInputSetDefaultX`
 | [Python input](https://python.helics.org/api/capi-py.html#helicsInputSetDefault)
 | [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsInputSetDefulat-Tuple{HELICS.Input,XXX})
 
-This option allows the specific of the default value used when no publication has been received. Each datatype has its own API call such as:
+This option allows specifying the default value used when no publication has been received. Each datatype has its own API call such as:
 
 - `helicsInputSetDefaultBoolean()`
 - `helicsInputSetDefaultBytes()`
