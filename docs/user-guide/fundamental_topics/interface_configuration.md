@@ -118,7 +118,7 @@ Below is a sample JSON configuration file with some of the more common options. 
   - `type` - Data type, such as integer, double, complex.
   - `units` - Same as with `publications`.
   - `global` - Applies to the `key`, same as with `publications`.
-  - `default` - set the default value to return if not publications have been received
+  - `default` - set the default value to return if no publications have been received
   - `only_update_on_change` and `tolerance` - Subscriptions will only consider a new value received when that value has changed more than the delta specified by `tolerance`.
 
 - **`inputs`** - These are lists of the values being sent to and from the given federate.
