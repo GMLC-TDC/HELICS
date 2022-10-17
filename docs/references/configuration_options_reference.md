@@ -765,13 +765,29 @@ This option allows the specific numerical definition of "change" when using the 
 
 ### `default`
 
-_API:_ `helicsInputSetDefaultXX`
+_API:_ `helicsInputSetDefaultX`
 [C++ input](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a55056ac9dd2895270f575827dd9951c7)
 | [C input](api-reference/C_API.md#input)
 | [Python input](https://python.helics.org/api/capi-py.html#helicsInputSetDefault)
 | [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsInputSetDefulat-Tuple{HELICS.Input,XXX})
 
-This option allows the specific of the default value used when no publication has been received
+This option allows the specific of the default value used when no publication has been received. Each datatype has its own API call such as:
+
+* `helicsInputSetDefaultBoolean()`
+* `helicsInputSetDefaultBytes()`
+* `helicsInputSetDefaultChar()` 
+* `helicsInputSetDefaultComplex()`
+* `helicsInputSetDefaultComplexVector()`
+* `helicsInputSetDefaulDouble()`
+* `helicsInputSetDefaultInteger()`
+* `helicsInputSetDefaultRaw()`
+* `helicsInputSetDefaultString()` (used for JSONs)
+* `helicsInputSetDefaultVector()`
+
+Note that the following, though they have syntaxical similarities to the above APIs, **do not** set default values on HELICS inputs when no publications have been received.
+
+* `helicsInputSetDefaultTime()`
+* `helicsInputSetDefaultNamedPoint()`
 
 ---
 
