@@ -773,21 +773,21 @@ _API:_ `helicsInputSetDefaultX`
 
 This option allows the specific of the default value used when no publication has been received. Each datatype has its own API call such as:
 
-* `helicsInputSetDefaultBoolean()`
-* `helicsInputSetDefaultBytes()`
-* `helicsInputSetDefaultChar()` 
-* `helicsInputSetDefaultComplex()`
-* `helicsInputSetDefaultComplexVector()`
-* `helicsInputSetDefaulDouble()`
-* `helicsInputSetDefaultInteger()`
-* `helicsInputSetDefaultRaw()`
-* `helicsInputSetDefaultString()` (used for JSONs)
-* `helicsInputSetDefaultVector()`
+- `helicsInputSetDefaultBoolean()`
+- `helicsInputSetDefaultBytes()`
+- `helicsInputSetDefaultChar()`
+- `helicsInputSetDefaultComplex()`
+- `helicsInputSetDefaultComplexVector()`
+- `helicsInputSetDefaulDouble()`
+- `helicsInputSetDefaultInteger()`
+- `helicsInputSetDefaultRaw()`
+- `helicsInputSetDefaultString()` (used for JSONs)
+- `helicsInputSetDefaultVector()`
 
 Note that the following, though they have syntaxical similarities to the above APIs, **do not** set default values on HELICS inputs when no publications have been received.
 
-* `helicsInputSetDefaultTime()`
-* `helicsInputSetDefaultNamedPoint()`
+- `helicsInputSetDefaultTime()`
+- `helicsInputSetDefaultNamedPoint()`
 
 ---
 
