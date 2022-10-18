@@ -28,10 +28,10 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     Time currentMinTime{Time::minVal()};
     TimeState currentTimeState{TimeState::initialized};
     Time nextEvent{Time::maxVal()};
-
+    static constexpr std::int32_t mSequenceIncrement{100};
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
-
+    bool mNewRequest{true}; //!< flag indicating a new request has been received since the last sequence Update
   public:
     GlobalTimeCoordinator() = default;
 
@@ -48,16 +48,13 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     void sendTimeUpdateRequest(Time triggerTime);
 
   public:
-    /** check if entry to the executing state can be granted*/
+    virtual TimeProcessingResult processTimeMessage(const ActionMessage& cmd) override;
     virtual MessageProcessingResult
         checkExecEntry(GlobalFederateId triggerFed = GlobalFederateId{}) override;
 
-    /** generate a string with the current time status*/
     virtual std::string printTimeStatus() const override;
-    /** generate debugging time information*/
     virtual void generateDebuggingTimeInfo(Json::Value& base) const override;
 
-    /** get the current next time*/
     virtual Time getNextTime() const override { return currentMinTime; }
 };
 }  // namespace helics

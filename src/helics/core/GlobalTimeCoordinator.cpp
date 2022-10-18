@@ -88,6 +88,7 @@ bool GlobalTimeCoordinator::updateTimeFactors()
             nextEvent = findNextTriggerEvent(dependencies);
             ++sequenceCounter;
             auto trigTime = (nextEvent < cBigTime) ? nextEvent + Time::epsilon() : nextEvent;
+            mNewRequest=false;
             sendTimeUpdateRequest(trigTime);
             return true;
         }
@@ -102,8 +103,9 @@ bool GlobalTimeCoordinator::updateTimeFactors()
                     verified = dependencies.verifySequenceCounter(trigTime, sequenceCounter);
                 }
 
-                if (trig.first || !verified) {
+                if (trig.first || !verified||mNewRequest) {
                     ++sequenceCounter;
+                    mNewRequest=false;
                     sendTimeUpdateRequest(trigTime);
                     return true;
                 }
@@ -149,6 +151,16 @@ bool GlobalTimeCoordinator::updateTimeFactors()
         }
     }
     return true;
+}
+
+
+TimeProcessingResult GlobalTimeCoordinator::processTimeMessage(const ActionMessage& cmd)
+{
+    auto res = BaseTimeCoordinator::processTimeMessage(cmd);
+    if (res == TimeProcessingResult::PROCESSED_NEW_REQUEST) {
+        mNewRequest=true;
+    }
+    return res;
 }
 
 void GlobalTimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
