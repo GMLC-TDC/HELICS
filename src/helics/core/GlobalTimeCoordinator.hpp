@@ -29,9 +29,11 @@ class GlobalTimeCoordinator: public BaseTimeCoordinator {
     TimeState currentTimeState{TimeState::initialized};
     Time nextEvent{Time::maxVal()};
     static constexpr std::int32_t mSequenceIncrement{100};
+
   protected:
     bool iterating{false};  //!< flag indicating that the min dependency is iterating
-    bool mNewRequest{true}; //!< flag indicating a new request has been received since the last sequence Update
+    bool mNewRequest{
+        true};  //!< flag indicating a new request has been received since the last sequence Update
   public:
     GlobalTimeCoordinator() = default;
 
