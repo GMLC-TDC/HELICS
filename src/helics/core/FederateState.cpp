@@ -2154,6 +2154,8 @@ int32_t FederateState::getHandleOption(InterfaceHandle handle, char iType, int32
 int FederateState::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {
+        case defs::Properties::CURRENT_ITERATION:
+            return timeCoord->getCurrentIteration();
         case defs::Properties::LOG_LEVEL:
         case defs::Properties::FILE_LOG_LEVEL:
         case defs::Properties::CONSOLE_LOG_LEVEL:
