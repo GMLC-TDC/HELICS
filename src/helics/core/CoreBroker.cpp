@@ -573,13 +573,11 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             setActionFlag(fedEnableProfiling, indicator_flag);
             transmit(route_id, fedEnableProfiling);
         }
-        if (mNextTimeBarrier < Time::maxVal())
-        {
-            ActionMessage timeBarrier(CMD_TIME_BARRIER,global_broker_id_local,
-                global_fedid);
-            timeBarrier.actionTime=mNextTimeBarrier;
+        if (mNextTimeBarrier < Time::maxVal()) {
+            ActionMessage timeBarrier(CMD_TIME_BARRIER, global_broker_id_local, global_fedid);
+            timeBarrier.actionTime = mNextTimeBarrier;
             timeBarrier.messageID = global_broker_id_local.baseValue();
-            transmit(route_id,timeBarrier);
+            transmit(route_id, timeBarrier);
         }
     }
 }
@@ -795,7 +793,7 @@ void CoreBroker::generateTimeBarrier(ActionMessage& m)
         if (cancelBarrier.messageID == 0) {
             cancelBarrier.messageID = global_broker_id_local.baseValue();
         }
-        mNextTimeBarrier=Time::maxVal();
+        mNextTimeBarrier = Time::maxVal();
         broadcast(cancelBarrier);
         return;
     }
@@ -804,7 +802,7 @@ void CoreBroker::generateTimeBarrier(ActionMessage& m)
     if (m.messageID == 0) {
         m.messageID = global_broker_id_local.baseValue();
     }
-    mNextTimeBarrier=m.actionTime;
+    mNextTimeBarrier = m.actionTime;
     // time should already be set
     broadcast(m);
 }

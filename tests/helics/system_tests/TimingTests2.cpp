@@ -716,18 +716,17 @@ TEST_F(timing2, time_barrier1)
 // Tests that the time barrier is working even when set before federate registration
 TEST_F(timing2, time_barrier_pre_reg)
 {
-    auto broker=AddBroker("test",2);
+    auto broker = AddBroker("test", 2);
 
     AddFederates<helics::ValueFederate>("test", 1, broker, helics::Time::epsilon(), "fed");
     broker->setTimeBarrier(2.0);
-    broker->query("root","flush");
+    broker->query("root", "flush");
     AddFederates<helics::ValueFederate>("test", 1, broker, helics::Time::epsilon(), "fed");
 
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
-    
+
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
 
-    
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
