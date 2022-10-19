@@ -786,8 +786,8 @@ This option allows specifying the default value used when no publication has bee
 
 Though they are not as obviously named, the following two APIs do provide a means of setting the default value as well:
 
-- `helicsInputSetDefaultTime()` - int64 but can also take a double
-- `helicsInputSetDefaultNamedPoint()` - string or a double
+- `helicsInputSetDefaultTime()` - set the default using a HelicsTime value
+- `helicsInputSetDefaultNamedPoint()` -set the default NamedPoint which is a pair of a string and double used for tagged values or set points
 
 ---
 
