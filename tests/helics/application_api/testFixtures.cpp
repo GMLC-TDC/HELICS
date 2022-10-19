@@ -99,9 +99,7 @@ FederateTestFixture::~FederateTestFixture()
         helics::CoreFactory::cleanUpCores(200ms);
         std::cout << "cleanup3" << std::endl;
         helics::BrokerFactory::cleanUpBrokers(100ms);
-    }
-    else
-    {
+    } else {
         helics::cleanupHelicsLibrary();
     }
     if (debugDiagnostic) {
