@@ -713,6 +713,42 @@ TEST_F(timing2, time_barrier1)
     vFed2->finalize();
 }
 
+// Tests that the time barrier is working even when set before federate registration
+TEST_F(timing2, time_barrier_pre_reg)
+{
+    auto broker=AddBroker("test",2);
+
+    AddFederates<helics::ValueFederate>("test", 1, broker, helics::Time::epsilon(), "fed");
+    broker->setTimeBarrier(2.0);
+    broker->query("root","flush");
+    AddFederates<helics::ValueFederate>("test", 1, broker, helics::Time::epsilon(), "fed");
+
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+
+    
+    vFed1->enterExecutingModeAsync();
+    vFed2->enterExecutingMode();
+    vFed1->enterExecutingModeComplete();
+    vFed1->requestTimeAsync(3.0);
+    auto rtime = vFed2->requestTime(1.89);
+    EXPECT_EQ(rtime, 1.89);
+
+    vFed2->requestTimeAsync(2.5);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    EXPECT_FALSE(vFed1->isAsyncOperationCompleted());
+    EXPECT_FALSE(vFed2->isAsyncOperationCompleted());
+
+    brokers[0]->clearTimeBarrier();
+    rtime = vFed2->requestTimeComplete();
+    EXPECT_EQ(rtime, 2.5);
+    rtime = vFed1->requestTimeComplete();
+    EXPECT_EQ(rtime, 3.0);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
 TEST_F(timing2, time_barrier_update)
 {
     SetupTest<helics::ValueFederate>("test_2", 2);
