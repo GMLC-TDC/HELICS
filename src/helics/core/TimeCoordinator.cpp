@@ -1439,7 +1439,6 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
     }
 }
 
-
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {  // NOLINT

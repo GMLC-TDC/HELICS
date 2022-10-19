@@ -956,7 +956,6 @@ Time CommonCore::getCurrentTime(LocalFederateId federateID) const
     return fed->grantedTime();
 }
 
-
 void CommonCore::setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,
                                     int16_t propertyValue)
