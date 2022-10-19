@@ -591,6 +591,9 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID, IterationRequ
                 // callback federates cannot iterate in startup
                 request = IterationRequest::NO_ITERATIONS;
             }
+            break;
+        default:
+            break;
     }
     switch (fed->getState()) {
         case FederateStates::CREATED:

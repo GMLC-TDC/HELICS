@@ -39,6 +39,7 @@ jobs:
     - name: Build HELICS
       run: |
         unset VCPKG_ROOT
+        git config --global --add safe.directory ${GITHUB_WORKSPACE}
         source scripts/setup-helics-ci-options.sh
         mkdir -p build && cd build
         ../scripts/ci-build.sh

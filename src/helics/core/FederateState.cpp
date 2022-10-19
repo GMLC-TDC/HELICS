@@ -476,6 +476,7 @@ IterationResult FederateState::enterInitializingMode(IterationRequest request)
                 allowed_send_time = initialTime;
                 break;
             case MessageProcessingResult::ITERATING:
+            default:
                 break;
         }
         return static_cast<IterationResult>(ret);
