@@ -872,6 +872,7 @@ TEST(logging, log_buffer_core2)
     EXPECT_GE(js2["logs"].size(), 1U);
     EXPECT_LE(js2["logs"].size(), 3U);
     cr.reset();
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(logging, remote_log_broker)
@@ -906,6 +907,7 @@ TEST(logging, remote_log_broker)
     }
     llock.unlock();
     EXPECT_GT(remote_cnt, 0);
+    helics::cleanupHelicsLibrary();
 }
 
 TEST(logging, remote_log_fed)
