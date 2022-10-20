@@ -112,6 +112,7 @@ TEST_P(mfed_add_single_type_tests, endpoint_registration_objs)
 
 TEST_P(mfed_add_single_type_tests, send_receive_callback)
 {
+    debugDiagnostic=true;
     SetupTest<helics::MessageFederate>(GetParam(), 1);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
 
