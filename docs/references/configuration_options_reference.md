@@ -160,6 +160,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "subscriptions": [
     {
       "only_update_on_change": false,
+      "default": value,
     }
   ],
   "inputs": [
@@ -171,6 +172,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
       "multiple_connections_allowed": false
       "multi_input_handling_method": "average",
       "targets": ["pub1", "pub2"]
+      "default": 5.5,
     }
   ],
   "endpoints": [
@@ -758,6 +760,34 @@ _API:_ `helicsPublicationSetMinimumChange` and `helicsInputSetMinimumChange`
 | [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsInputSetMinimumChange-Tuple{HELICS.Subscription,Float64}) and [Julia publication](https://julia.helics.org/latest/api/#HELICS.helicsPublicationSetMinimumChange-Tuple{HELICS.Publication,Float64})
 
 This option allows the specific numerical definition of "change" when using the `only_update_on_change` and `only_transmit_on_change` options.
+
+---
+
+### `default`
+
+_API:_ `helicsInputSetDefaultX`
+[C++ input](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a55056ac9dd2895270f575827dd9951c7)
+| [C input](api-reference/C_API.md#input)
+| [Python input](https://python.helics.org/api/capi-py.html#helicsInputSetDefault)
+| [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsInputSetDefulat-Tuple{HELICS.Input,XXX})
+
+This option allows specifying the default value used when no publication has been received. Each datatype has its own API call such as:
+
+- `helicsInputSetDefaultBoolean()`
+- `helicsInputSetDefaultBytes()`
+- `helicsInputSetDefaultChar()`
+- `helicsInputSetDefaultComplex()`
+- `helicsInputSetDefaultComplexVector()`
+- `helicsInputSetDefaulDouble()`
+- `helicsInputSetDefaultInteger()`
+- `helicsInputSetDefaultRaw()`
+- `helicsInputSetDefaultString()` (used for JSONs)
+- `helicsInputSetDefaultVector()`
+
+Though they are not as obviously named, the following two APIs do provide a means of setting the default value as well:
+
+- `helicsInputSetDefaultTime()` - set the default using a HelicsTime value
+- `helicsInputSetDefaultNamedPoint()` -set the default NamedPoint which is a pair of a string and double used for tagged values or set points
 
 ---
 

@@ -12,13 +12,13 @@ period=  1.0 #the period with which federate may return time
 #set required to true to make helics issue a warning if the publication is not found
 #example of inline tables (be careful it falls under the most recent [section] or [[table]]
 subscriptions=[
-{key="pub1",  connection_required=true},
+{key="pub1",  connection_required=true, default=9.33},
   # shortcut is a naming shortcut for the publication for later retrieval
 {key="valueFed_toml/pub2", alias="pubshortcut", info="this is an information string for use by the application"}
 ]
 
 inputs=[
-{key="ipt2",  type="double",flags="connection_optional", target="pub1", global=true,tags=[{name="period",value=0.7},{name="description",value="a test input"}]}
+{key="ipt2",  type="double",flags="connection_optional", target="pub1",default="3.67", global=true,tags=[{name="period",value=0.7},{name="description",value="a test input"}]}
 ]  #specify an input with a target
 
 #add some descriptive tags to a federate

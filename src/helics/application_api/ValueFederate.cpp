@@ -292,6 +292,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                     subAct->addTarget(name);
                 }
             }
+            auto defStr = fileops::getOrDefault(sub, "default", emptyStr);
+            if (!defStr.empty()) {
+                subAct->setDefault(defStr);
+            }
             loadOptions(this, sub, *subAct);
         }
     }
@@ -312,7 +316,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                     inp = &registerInput(name, type, units);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(ipt, "default", emptyStr);
+            if (!defStr.empty()) {
+                inp->setDefault(defStr);
+            }
             loadOptions(this, ipt, *inp);
         }
     }
@@ -386,7 +393,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                     id->addTarget(name);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(sub, "default", emptyStr);
+            if (!defStr.empty()) {
+                id->setDefault(defStr);
+            }
             loadOptions(this, sub, *id);
         }
     }
@@ -412,7 +422,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                     id = &registerInput(name, type, units);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(ipt, "default", emptyStr);
+            if (!defStr.empty()) {
+                id->setDefault(defStr);
+            }
             loadOptions(this, ipt, *id);
         }
     }
