@@ -338,7 +338,7 @@ bool registerCore(const std::shared_ptr<Core>& core, CoreType type)
     if (core) {
         res = searchableCores.addObject(cname, core, type);
     }
-    //cleanUpCores();
+    // cleanUpCores();
     if (res) {
         delayedDestroyer.addObjectsToBeDestroyed(core);
         addExtraTypes(cname, type);
