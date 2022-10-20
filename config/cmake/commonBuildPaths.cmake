@@ -87,7 +87,10 @@ endif()
 # Prohibit in-source build
 if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
     if(EXISTS "${PROJECT_SOURCE_DIR}/CMakeCache.txt")
-        message(WARNING "The source directory ${PROJECT_SOURCE_DIR} contains CMakeCache.txt and possibly other cmake folders like CMakeFiles that might interfere with the current build")
+        message(
+            WARNING
+                "The source directory ${PROJECT_SOURCE_DIR} contains CMakeCache.txt and possibly other cmake folders like CMakeFiles that might interfere with the current build"
+        )
     endif()
     message(
         FATAL_ERROR
