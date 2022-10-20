@@ -151,6 +151,7 @@ class CoreBroker: public Broker, public BrokerBase {
     Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
     Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
     std::atomic<double> simTime{mInvalidSimulationTime};  //!< loaded simTime for logging
+    Time mNextTimeBarrier{Time::maxVal()};  //!< the last known time barrier
   private:
     /** function that processes all the messages
     @param command -- the message to process
