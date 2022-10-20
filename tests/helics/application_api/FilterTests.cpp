@@ -44,7 +44,7 @@ class filter: public ::testing::Test, public FederateTestFixture {};
 /** test registration of filters*/
 TEST_P(filter_single_type_test, message_filter_registration)
 {
-    debugDiagnostic=true;
+    debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 2);
 
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, helics::timeZero, "filter");
@@ -348,7 +348,7 @@ simulation
 
 TEST_P(filter_single_type_test, message_dest_filter_object)
 {
-    debugDiagnostic=true;
+    debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 2);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
@@ -533,7 +533,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage)
 
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target)
 {
-    debugDiagnostic=true;
+    debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 3);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
