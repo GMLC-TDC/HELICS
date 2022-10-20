@@ -215,4 +215,5 @@ struct FederateTestFixture {
     std::string extraBrokerArgs;
     std::string extraFederateArgs;
     std::string ctype;
+    bool debugDiagnostic{false};
 };
