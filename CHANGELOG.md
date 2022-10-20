@@ -22,11 +22,11 @@ Patch release to fix some issues with using HELICS as a subproject, and fix a fe
 ### Changed
 
 - Cleaned up usage of HELICS in external subprojects and adding some cleanup features, also cleanup the CMake usage to divide some operations into included files to simplify the main CMakeList.txt
-- Changed the default behavior for profiler output files to create a new file instead of appending.  Use `--profiler_append=<file>` to maintain the old behavior. 
+- Changed the default behavior for profiler output files to create a new file instead of appending. Use `--profiler_append=<file>` to maintain the old behavior.
 
 ### Added
 
-- Added single thread federate support which includes an federate optimized for use in a single thread.(Corresponding single thread core will come in next release).  
+- Added single thread federate support which includes an federate optimized for use in a single thread.(Corresponding single thread core will come in next release).
 - Added support for initialization iteration to allow federates to specify ready and then return to the created mode to do additional initialization potentially with information from other federates.
 - added flag to disable remote termination commands.
 - Added read only property HELICS_PROPERTY_INT_ITERATION_COUNT to get the current iteration count for a federate
