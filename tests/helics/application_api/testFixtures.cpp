@@ -92,9 +92,16 @@ FederateTestFixture::~FederateTestFixture()
     }
     federates.clear();
     if (debugDiagnostic) {
-        std::cout << "cleanup" << std::endl;
+        using namespace std::chrono_literals;  // NOLINT
+        std::cout << "cleanup1" << std::endl;
+        helics::BrokerFactory::cleanUpBrokers(100ms);
+        std::cout << "cleanup2" << std::endl;
+        helics::CoreFactory::cleanUpCores(200ms);
+        std::cout << "cleanup3" << std::endl;
+        helics::BrokerFactory::cleanUpBrokers(100ms);
+    } else {
+        helics::cleanupHelicsLibrary();
     }
-    helics::cleanupHelicsLibrary();
     if (debugDiagnostic) {
         std::cout << "finished" << std::endl;
     }
