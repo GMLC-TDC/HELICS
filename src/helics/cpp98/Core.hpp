@@ -131,6 +131,15 @@ class Core {
         helicsCoreSetGlobal(core, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
+    void addAlias(const std::string& interfaceName, const std::string& alias)
+    {
+        helicsCoreAddAlias(core, interfaceName.c_str(), alias.c_str(), hThrowOnError());
+    }
+
     void globalError(int errorCode, const std::string& errorString)
     {
         helicsCoreGlobalError(core, errorCode, errorString.c_str(), HELICS_IGNORE_ERROR);

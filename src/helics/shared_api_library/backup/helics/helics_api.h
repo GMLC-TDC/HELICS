@@ -459,6 +459,7 @@ HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, H
 HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int flag, HelicsError* err);
 int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, HelicsError* err);
 HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
+void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
 void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
 const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
@@ -475,6 +476,8 @@ const char* helicsFederateGetCommandSource(HelicsFederate fed, HelicsError* err)
 const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsError* err);
 void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err);
 void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
+void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
+void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);

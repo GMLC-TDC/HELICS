@@ -1646,6 +1646,33 @@ void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const ch
     // LCOV_EXCL_STOP
 }
 
+static constexpr char invalidInterfaceName[] = "Interface name cannot be empty";
+static constexpr char invalidAliasName[] = "Alias cannot be empty";
+
+void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
+        return;
+    }
+    if (alias == nullptr || strlen(alias) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
+        return;
+    }
+    try {
+        fedObj->addAlias(interfaceName, alias);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
 static constexpr char invalidTagString[] = "Tag name cannot be null";
 void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err)
 {

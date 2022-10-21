@@ -1381,6 +1381,17 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intPr
 HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
 
 /**
+ * Create an alias for an interface.
+ *
+ * @param fed The federate to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
  * Set a federation global value through a federate.
  *
  * @details This overwrites any previous value for this name.
@@ -1553,6 +1564,28 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
+
+/**
+ * Create an alias for an interface.
+ *
+ * @param core The core to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
+ * Create an alias for an interface.
+ *
+ * @param broker The broker to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 
 /**
  * Send a command to another helics object though a core using asynchronous(fast) operations.

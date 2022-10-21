@@ -588,6 +588,57 @@ void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const cha
     brk->setGlobal(valueName, AS_STRING_VIEW(value));
 }
 
+static constexpr char invalidInterfaceName[] = "Interface name cannot be empty";
+static constexpr char invalidAliasName[] = "Alias cannot be empty";
+
+void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err)
+{
+    auto* cr = getCore(core, err);
+    if (cr == nullptr) {
+        return;
+    }
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
+        return;
+    }
+    if (alias == nullptr || strlen(alias) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
+        return;
+    }
+    try {
+        cr->addAlias(interfaceName, alias);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err)
+{
+    auto* brk = getBroker(broker, err);
+    if (brk == nullptr) {
+        return;
+    }
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
+        return;
+    }
+    if (alias == nullptr || strlen(alias) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
+        return;
+    }
+    try {
+        brk->addAlias(interfaceName, alias);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
 void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err)
 {
     auto* brk = getBroker(broker, err);
