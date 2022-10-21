@@ -29,6 +29,7 @@ Patch release to fix some issues with using HELICS as a subproject, and fix a fe
 - Added single thread federate support which includes an federate optimized for use in a single thread.(Corresponding single thread core will come in next release).
 - Added support for initialization iteration to allow federates to specify ready and then return to the created mode to do additional initialization potentially with information from other federates.
 - added flag to disable remote termination commands.
+- added C API function calls for alias operations
 - Added read only property HELICS_PROPERTY_INT_ITERATION_COUNT to get the current iteration count for a federate
 
 ### Removed
