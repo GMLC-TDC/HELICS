@@ -137,7 +137,7 @@ class Core {
     */
     void addAlias(const std::string& interfaceName, const std::string& alias)
     {
-        helicsFederateAddAlias(core, interfaceName.c_str(), alias.c_str(), hThrowOnError());
+        helicsCoreAddAlias(core, interfaceName.c_str(), alias.c_str(), hThrowOnError());
     }
 
     void globalError(int errorCode, const std::string& errorString)

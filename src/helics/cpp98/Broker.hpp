@@ -132,7 +132,7 @@ class Broker {
     */
     void addAlias(const std::string& interfaceName, const std::string& alias)
     {
-        helicsFederateAddAlias(broker, interfaceName.c_str(), alias.c_str(), hThrowOnError());
+        helicsBrokerAddAlias(broker, interfaceName.c_str(), alias.c_str(), hThrowOnError());
     }
     /** create a data link between a named publication and a named input
      @param source the name of the publication
