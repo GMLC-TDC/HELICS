@@ -250,7 +250,7 @@ bool registerBroker(const std::shared_ptr<Broker>& broker, CoreType type)
     if (broker) {
         registered = searchableBrokers.addObject(bname, broker, type);
     }
-    // cleanUpBrokers();
+    cleanUpBrokers();
     if ((!registered) && (broker)) {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         registered = searchableBrokers.addObject(bname, broker, type);
