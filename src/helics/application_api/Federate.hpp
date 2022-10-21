@@ -518,7 +518,10 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(std::string_view valueName, std::string_view value);
-    /** add a global alias for an interface */
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
     void addAlias(std::string_view interfaceName, std::string_view alias);
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a

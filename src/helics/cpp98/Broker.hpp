@@ -126,6 +126,14 @@ class Broker {
     {
         helicsBrokerSetGlobal(broker, valueName.c_str(), value.c_str(), hThrowOnError());
     }
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
+    void addAlias(const std::string& interfaceName, const std::string& alias)
+    {
+        helicsFederateAddAlias(broker, interfaceName.c_str(), alias.c_str(), hThrowOnError());
+    }
     /** create a data link between a named publication and a named input
      @param source the name of the publication
      @param target the name of the input*/

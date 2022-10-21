@@ -865,6 +865,15 @@ class Federate {
         helicsFederateSetGlobal(fed, valueName.c_str(), value.c_str(), hThrowOnError());
     }
 
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
+    void addAlias(const std::string& interfaceName, const std::string& alias)
+    {
+        helicsFederateAddAlias(fed, interfaceName.c_str(), alias.c_str(), hThrowOnError());
+    }
+
     /** set a tag (key-value pair) for a federate
     @details the tag is an arbitrary user defined string and value; the tags for a federate are
     queryable through a "tags" query or "tag/<tagname>"
