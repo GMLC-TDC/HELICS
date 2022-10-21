@@ -62,7 +62,7 @@ FederateInfo::FederateInfo(const std::string& args)
     loadInfoFromArgsIgnoreOutput(args);
 }
 
-static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 69> propStringsTranslations{
     {"period", HELICS_PROPERTY_TIME_PERIOD},
     {"timeperiod", HELICS_PROPERTY_TIME_PERIOD},
     {"time_period", HELICS_PROPERTY_TIME_PERIOD},
@@ -73,6 +73,8 @@ static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTra
     {"offset", HELICS_PROPERTY_TIME_OFFSET},
     {"timeoffset", HELICS_PROPERTY_TIME_OFFSET},
     {"time_offset", HELICS_PROPERTY_TIME_OFFSET},
+    {"stop_time", HELICS_PROPERTY_TIME_STOPTIME},
+    {"stoptime", HELICS_PROPERTY_TIME_STOPTIME},
     {"rtlead", HELICS_PROPERTY_TIME_RT_LEAD},
     {"rtlag", HELICS_PROPERTY_TIME_RT_LAG},
     {"rttolerance", HELICS_PROPERTY_TIME_RT_TOLERANCE},
@@ -131,7 +133,7 @@ static constexpr frozen::unordered_map<std::string_view, int, 66> propStringsTra
     {"logBuffer", HELICS_PROPERTY_INT_LOG_BUFFER},
     {"log_buffer", HELICS_PROPERTY_INT_LOG_BUFFER}};
 
-static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTranslations{
+static constexpr frozen::unordered_map<std::string_view, int, 95> flagStringsTranslations{
     {"source_only", HELICS_FLAG_SOURCE_ONLY},
     {"sourceonly", HELICS_FLAG_SOURCE_ONLY},
     {"sourceOnly", HELICS_FLAG_SOURCE_ONLY},
@@ -195,6 +197,12 @@ static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTra
     {"single_thread_federate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singlethreadfederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
     {"singleThreadFederate", HELICS_FLAG_SINGLE_THREAD_FEDERATE},
+    {"single_thread_core", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"singlethreadcore", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"singleThreadCore", HELICS_FLAG_SINGLE_THREAD_CORE},
+    {"multi_thread_core", HELICS_FLAG_MULTI_THREAD_CORE},
+    {"multithreadcore", HELICS_FLAG_MULTI_THREAD_CORE},
+    {"multiThreadCore", HELICS_FLAG_MULTI_THREAD_CORE},
     {"force_logging_flush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceloggingflush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
     {"forceLoggingFlush", HELICS_FLAG_FORCE_LOGGING_FLUSH},
@@ -215,7 +223,13 @@ static constexpr frozen::unordered_map<std::string_view, int, 83> flagStringsTra
     {"rollback", HELICS_FLAG_ROLLBACK},
     {"terminate_on_error", HELICS_FLAG_TERMINATE_ON_ERROR},
     {"terminateOnError", HELICS_FLAG_TERMINATE_ON_ERROR},
-    {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR}};
+    {"terminateonerror", HELICS_FLAG_TERMINATE_ON_ERROR},
+    {"allowRemoteControl", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"allowremotecontrol", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"allow_remote_control", HELICS_FLAG_ALLOW_REMOTE_CONTROL},
+    {"disableRemoteControl", HELICS_FLAG_DISABLE_REMOTE_CONTROL},
+    {"disableremotecontrol", HELICS_FLAG_DISABLE_REMOTE_CONTROL},
+    {"disable_remote_control", HELICS_FLAG_DISABLE_REMOTE_CONTROL}};
 
 static constexpr frozen::unordered_map<std::string_view, int, 41> optionStringsTranslations{
     {"buffer_data", HELICS_HANDLE_OPTION_BUFFER_DATA},
@@ -304,7 +318,7 @@ static const std::unordered_map<std::string, int> log_level_map{
     {"interfaces", HELICS_LOG_LEVEL_INTERFACES},
     /** interfaces + timing message*/
     {"timing", HELICS_LOG_LEVEL_TIMING},
-    {"profiling", HELICS_LOG_LEVEL_WARNING - 1},
+    {"profiling", HELICS_LOG_LEVEL_PROFILING},
     /** timing+ data transfer notices*/
     {"data", HELICS_LOG_LEVEL_DATA},
     /** same as data for now*/
@@ -542,6 +556,11 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_flag("--observer",
                   observer,
                   "tell the federate/core that this federate is an observer");
+    // this is added here to match the command arguments for a broker, also works as a flag
+    app->add_flag_function(
+        "--allow_remote_control,!--disable_remote_control",
+        [this](int64_t val) { setFlagOption(HELICS_FLAG_ALLOW_REMOTE_CONTROL, (val > 0)); },
+        "enable the federate to respond to certain remote operations such as disconnect");
     app->add_flag(
         "--json",
         useJsonSerialization,
@@ -549,7 +568,7 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     app->add_option(
            "--profiler",
            profilerFileName,
-           "Enable profiling and specify a file name, \"log\" for sending profiling messages to the logger, otherwise specify the output file name")
+           "Enable profiling and specify a file name (NOTE: use --profiler_append=<filename> in the core init string to append to an existing file)")
         ->expected(0, 1)
         ->default_str("log");
     app->add_option("--broker_key,--brokerkey,--brokerKey",
@@ -566,11 +585,15 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
            "the execution cycle of the federate (default in ms)")
         ->configurable(false);
     app->add_option_function<Time>(
+           "--stoptime",
+           [this](Time val) { setProperty(HELICS_PROPERTY_TIME_STOPTIME, val); },
+           "the maximum simulation time of a federate (default in ms)")
+        ->configurable(false);
+    app->add_option_function<Time>(
            "--timedelta",
            [this](Time val) { setProperty(HELICS_PROPERTY_TIME_DELTA, val); },
            "The minimum time between time grants for a Federate (default in ms)")
         ->configurable(false);
-
     auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
     encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network");
     encrypt_group->add_option("--encryption_config",

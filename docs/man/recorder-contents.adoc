@@ -10,7 +10,7 @@
 
 DESCRIPTION
 -----------
-The recorder appliation provides an easy way to capture data from a federation.
+The recorder application provides an easy way to capture data from a federation.
 It acts as a federate that can "capture" values or messages from publications,
 direct endpoints, or cloned endpoints that were created by other federates.
 

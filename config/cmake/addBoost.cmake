@@ -13,8 +13,7 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 
 if(WIN32 AND NOT UNIX_LIKE)
 
-    set(
-        boost_versions
+    set(boost_versions
         boost_1_80_0
         boost_1_79_0
         boost_1_78_0
@@ -31,8 +30,7 @@ if(WIN32 AND NOT UNIX_LIKE)
         boost_1_67_0
     )
 
-    set(
-        poss_prefixes
+    set(poss_prefixes
         C:
         C:/local
         C:/boost
@@ -92,11 +90,7 @@ endif()
 set(BOOST_MINIMUM_VERSION 1.67)
 
 if(BOOST_REQUIRED_LIBRARIES)
-    find_package(
-        Boost ${BOOST_MINIMUM_VERSION}
-        COMPONENTS ${BOOST_REQUIRED_LIBRARIES}
-        REQUIRED
-    )
+    find_package(Boost ${BOOST_MINIMUM_VERSION} COMPONENTS ${BOOST_REQUIRED_LIBRARIES} REQUIRED)
 else()
     find_package(Boost ${BOOST_MINIMUM_VERSION})
 endif()
@@ -159,8 +153,8 @@ else()
     if(NOT TARGET Boostlibs::test)
         add_library(Boostlibs::test UNKNOWN IMPORTED)
     endif()
-    # if(MINGW) set_property(TARGET Boostlibs::core PROPERTY
-    # INTERFACE_COMPILE_DEFINTIONS BOOST_USE_WINDOWS_H) endif()
+    # if(MINGW) set_property(TARGET Boostlibs::core PROPERTY INTERFACE_COMPILE_DEFINTIONS
+    # BOOST_USE_WINDOWS_H) endif()
 endif()
 
 list(LENGTH Boost_LIBRARIES_core_debug core_debug_size)
@@ -180,20 +174,15 @@ if(core_debug_size EQUAL 0)
         else()
             add_library(Boostlibs::${rand_name} UNKNOWN IMPORTED)
         endif()
-        set_target_properties(
-            Boostlibs::${rand_name}
-            PROPERTIES IMPORTED_LOCATION ${next_lib}
-        )
+        set_target_properties(Boostlibs::${rand_name} PROPERTIES IMPORTED_LOCATION ${next_lib})
         list(APPEND boost_core_deps Boostlibs::${rand_name})
     endforeach()
 else()
     list(GET Boost_LIBRARIES_core_release 0 first_lib_r)
     list(GET Boost_LIBRARIES_core_debug 0 first_lib_d)
     set_target_properties(
-        Boostlibs::core
-        PROPERTIES
-            IMPORTED_LOCATION_DEBUG ${first_lib_d} IMPORTED_LOCATION_RELEASE
-            ${first_lib_r}
+        Boostlibs::core PROPERTIES IMPORTED_LOCATION_DEBUG ${first_lib_d} IMPORTED_LOCATION_RELEASE
+                                                                          ${first_lib_r}
     )
 
     foreach(item RANGE 1 ${rng})
@@ -206,10 +195,8 @@ else()
             add_library(Boostlibs::${rand_name} UNKNOWN IMPORTED)
         endif()
         set_target_properties(
-            Boostlibs::${rand_name}
-            PROPERTIES
-                IMPORTED_LOCATION_DEBUG ${next_lib_d} IMPORTED_LOCATION_RELEASE
-                ${next_lib_r}
+            Boostlibs::${rand_name} PROPERTIES IMPORTED_LOCATION_DEBUG ${next_lib_d}
+                                               IMPORTED_LOCATION_RELEASE ${next_lib_r}
         )
         list(APPEND boost_core_deps Boostlibs::${rand_name})
     endforeach()
@@ -217,29 +204,23 @@ endif()
 
 if(Boost_INCLUDE_DIR)
     set_target_properties(
-        Boostlibs::core Boostlibs::test
-        PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+        Boostlibs::core Boostlibs::test PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                                                   ${Boost_INCLUDE_DIR}
     )
 endif()
 if(BOOST_REQUIRED_LIBRARIES)
-    set_target_properties(
-        Boostlibs::core
-        PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}"
-    )
+    set_target_properties(Boostlibs::core PROPERTIES INTERFACE_LINK_LIBRARIES "${boost_core_deps}")
 
     if(Boost_LIBRARIES_test_debug)
         set_target_properties(
-            Boostlibs::test
-            PROPERTIES
-                IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}"
-                IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}"
+            Boostlibs::test PROPERTIES IMPORTED_LOCATION_DEBUG "${Boost_LIBRARIES_test_debug}"
+                                       IMPORTED_LOCATION_RELEASE "${Boost_LIBRARIES_test_release}"
         )
     else()
         set_target_properties(
-            Boostlibs::test
-            PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
+            Boostlibs::test PROPERTIES IMPORTED_LOCATION "${Boost_LIBRARIES_test_release}"
         )
     endif()
 endif()
-# message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}")
-# message(STATUS "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")
+# message(STATUS "Using Boost core debug libraries : ${Boost_LIBRARIES_core_debug}") message(STATUS
+# "Using Boost core release libraries : ${Boost_LIBRARIES_core_release}")

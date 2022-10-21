@@ -1390,7 +1390,6 @@ void TimeCoordinator::setProperty(int timeProperty, Time propertyVal)
     }
 }
 
-/** set a timeProperty for a the coordinator*/
 void TimeCoordinator::setProperty(int intProperty, int propertyVal)
 {
     if (intProperty == defs::Properties::MAX_ITERATIONS) {
@@ -1420,6 +1419,7 @@ void TimeCoordinator::setOptionFlag(int optionFlag, bool value)
             break;
     }
 }
+
 /** get a time Property*/
 Time TimeCoordinator::getTimeProperty(int timeProperty) const
 {
@@ -1439,18 +1439,18 @@ Time TimeCoordinator::getTimeProperty(int timeProperty) const
     }
 }
 
-/** get a time Property*/
 int TimeCoordinator::getIntegerProperty(int intProperty) const
 {
     switch (intProperty) {  // NOLINT
         case defs::Properties::MAX_ITERATIONS:
             return info.maxIterations;
+        case defs::Properties::CURRENT_ITERATION:
+            return iteration.load();
         default:
             return HELICS_INVALID_PROPERTY_VALUE;
     }
 }
 
-/** get an option flag value*/
 bool TimeCoordinator::getOptionFlag(int optionFlag) const
 {
     switch (optionFlag) {

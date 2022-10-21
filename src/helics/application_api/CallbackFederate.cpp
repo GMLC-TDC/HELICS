@@ -112,7 +112,7 @@ std::pair<Time, IterationRequest> CallbackFederate::operateCallback(iteration_ti
     auto rval = std::make_pair((mEventTriggered) ? Time::maxVal() : timeZero,
                                IterationRequest::NO_ITERATIONS);
 
-    if (newTime.grantedTime >= mFinalTime) {
+    if (newTime.grantedTime >= mStopTime) {
         rval = std::make_pair(Time::maxVal(), IterationRequest::HALT_OPERATIONS);
     } else if (nextTimeOperation1) {
         rval = nextTimeOperation1(newTime);
@@ -127,24 +127,6 @@ std::pair<Time, IterationRequest> CallbackFederate::operateCallback(iteration_ti
     return rval;
 }
 
-void CallbackFederate::setProperty(int32_t property, double val)
-{
-    if (property == HELICS_PROPERTY_TIME_MAXTIME) {
-        mFinalTime = val;
-        return;
-    }
-    Federate::setProperty(property, val);
-}
-
-void CallbackFederate::setProperty(int32_t property, Time val)
-{
-    if (property == HELICS_PROPERTY_TIME_MAXTIME) {
-        mFinalTime = val;
-        return;
-    }
-    Federate::setProperty(property, val);
-}
-
 void CallbackFederate::setFlagOption(int32_t property, bool val)
 {
     if (property == HELICS_FLAG_EVENT_TRIGGERED) {
@@ -152,14 +134,6 @@ void CallbackFederate::setFlagOption(int32_t property, bool val)
         // this does need to fallthrough
     }
     Federate::setFlagOption(property, val);
-}
-
-Time CallbackFederate::getTimeProperty(int32_t property) const
-{
-    if (property == HELICS_PROPERTY_TIME_MAXTIME) {
-        return mFinalTime;
-    }
-    return Federate::getTimeProperty(property);
 }
 
 void CallbackFederate::finalizeCallback()

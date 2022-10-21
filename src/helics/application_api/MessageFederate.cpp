@@ -21,26 +21,38 @@ namespace helics {
 MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
 }
 MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
                                  const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
 }
 
 MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
 }
 
 MessageFederate::MessageFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
     if (looksLikeFile(configString)) {
         MessageFederate::registerInterfaces(configString);
     }
@@ -65,7 +77,10 @@ MessageFederate::MessageFederate(bool /*unused*/)
 {  // this constructor should only be called by child class that has already constructed the
    // underlying federate in
     // a virtual inheritance
-    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(), this, getID());
+    mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
+                                                         this,
+                                                         getID(),
+                                                         singleThreadFederate);
 }
 MessageFederate::MessageFederate(MessageFederate&&) noexcept = default;
 

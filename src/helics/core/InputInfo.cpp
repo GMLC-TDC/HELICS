@@ -86,6 +86,9 @@ bool InputInfo::addData(GlobalHandle source_id,
                         unsigned int iteration,
                         std::shared_ptr<const SmallBuffer> data)
 {
+    if (!data) {
+        return false;
+    }
     int index;
     bool found = false;
     for (index = 0; index < static_cast<int>(input_sources.size()); ++index) {
@@ -141,7 +144,7 @@ bool InputInfo::addData(GlobalHandle source_id,
                 }
             }
             if (only_update_on_change) {
-                if (*prev->data == *data) {
+                if (*prev->data == *newRecord.data) {
                     return false;
                 }
             }

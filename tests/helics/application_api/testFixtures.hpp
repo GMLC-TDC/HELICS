@@ -80,7 +80,9 @@ struct FederateTestFixture {
         if (time_delta != helics::timeZero) {
             fi.setProperty(HELICS_PROPERTY_TIME_DELTA, time_delta);
         }
-
+        if (!extraFederateArgs.empty()) {
+            fi.loadInfoFromArgsIgnoreOutput(extraFederateArgs);
+        }
         switch (setup) {
             case 1:
             default: {
@@ -218,6 +220,7 @@ struct FederateTestFixture {
     std::vector<std::shared_ptr<helics::Federate>> federates;
     std::string extraCoreArgs;
     std::string extraBrokerArgs;
+    std::string extraFederateArgs;
     std::string ctype;
     bool debugDiagnostic{false};
 };

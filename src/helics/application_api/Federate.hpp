@@ -22,12 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-namespace gmlc {
-namespace libguarded {
-    template<class T, class M>
-    class shared_guarded;
-}  // namespace libguarded
-}  // namespace gmlc
+namespace gmlc::libguarded {
+template<class T, class M>
+class shared_guarded;
+}  // namespace gmlc::libguarded
 
 /**
  * HELICS Application API
@@ -60,7 +58,7 @@ class HELICS_CXX_EXPORT Federate {
         /** error state no core communication is possible but values can be retrieved */
         ERROR_STATE = 4,
         // the following states are for asynchronous operations
-        /** indicator that the federate is pending entry to initialization state */
+        /** indicator that the federate is pending entry to initialization mode */
         PENDING_INIT = 5,
         /** state pending EnterExecution State */
         PENDING_EXEC = 6,
@@ -71,7 +69,10 @@ class HELICS_CXX_EXPORT Federate {
         /** state that the federate is pending a finalize call */
         PENDING_FINALIZE = 9,
         /** the simulation has finished normally but everything is still connected */
-        FINISHED = 10
+        FINISHED = 10,
+
+        /** the simulation is pending an iterative call to initializing mode */
+        PENDING_ITERATIVE_INIT = 12,
     };
 
   protected:
@@ -85,12 +86,15 @@ class HELICS_CXX_EXPORT Federate {
     bool observerMode{false};
     /** allow to retrigger time requests from callbacks (user specified)*/
     bool retriggerTimeRequest{false};
+    /*** specify that the federate will only be used on a single thread*/
+    bool singleThreadFederate{false};
 
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
     Time mCurrentTime = Time::minVal();  //!< the current simulation time
+    Time mStopTime = Time::maxVal();  //!< the stopping time for the federate
   private:
     /// pointer to a class defining the async call information
     std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
@@ -167,6 +171,26 @@ class HELICS_CXX_EXPORT Federate {
     enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
     exception*/
     void enterInitializingModeComplete();
+
+    /** iterate in the created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup.
+    */
+    void enterInitializingModeIterative();
+
+    /** iterate in the created mode.
+    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
+    should be made to complete the call sequence
+    */
+    void enterInitializingModeIterativeAsync();
+
+    /** second part of the async process for entering initialization mode iterative call after a
+    call to enterInitializingModeIterativeAsync; if called any other time it will throw an
+    InvalidFunctionCall exception. The federate will be in the created state(or ERROR state) after
+    this call*/
+    void enterInitializingModeIterativeComplete();
+
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
@@ -494,7 +518,10 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(std::string_view valueName, std::string_view value);
-    /** add a global alias for an interface */
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
     void addAlias(std::string_view interfaceName, std::string_view alias);
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a

@@ -998,13 +998,56 @@ HELICS_EXPORT void helicsFederateEnterInitializingMode(HelicsFederate fed, Helic
 /**
  * Non blocking alternative to \ref helicsFederateEnterInitializingMode.
  *
- * @details The function helicsFederateEnterInitializationModeFinalize must be called to finish the operation.
+ * @details The function helicsFederateEnterInitializationModeComplete must be called to finish the operation.
  *
  * @param fed The federate to operate on.
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Complete the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
+ *
+ * @param fed The federate desiring to complete the initialization step.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Trigger a blocking call and return to created state after all federates have either triggered an iteration or are waiting to enter
+ * initializing mode.
+ *
+ * @details This call will return the federate to the created state to allow additional setup to occur with federates either iterating in
+ * the mode or waiting.
+ *
+ * @param fed The federate to operate on.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Non blocking alternative to \ref helicsFederateEnterInitializingModeIterative.
+ *
+ * @details The function helicsFederateEnterInitializationModeIterativeComplete must be called to finish the operation.
+ *
+ * @param fed The federate to operate on.
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
+
+/**
+ * Complete the call to enter initializing mode Iterative that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The
+ * federate will be in created or error mode on return
+ *
+ * @param fed The federate used in the corresponding async call
+ *
+ * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
+ */
+HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Check if the current Asynchronous operation has completed.
@@ -1016,15 +1059,6 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
  * @return HELICS_FALSE if not completed, HELICS_TRUE if completed.
  */
 HELICS_EXPORT HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
-
-/**
- * Finalize the entry to initialize mode that was initiated with /ref heliceEnterInitializingModeAsync.
- *
- * @param fed The federate desiring to complete the initialization step.
- *
- * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
- */
-HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
  * Request that the federate enter the Execution mode.
@@ -1347,6 +1381,17 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intPr
 HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
 
 /**
+ * Create an alias for an interface.
+ *
+ * @param fed The federate to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
  * Set a federation global value through a federate.
  *
  * @details This overwrites any previous value for this name.
@@ -1519,6 +1564,28 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
+
+/**
+ * Create an alias for an interface.
+ *
+ * @param core The core to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
+ * Create an alias for an interface.
+ *
+ * @param broker The broker to use to set the alias.
+ * @param interfaceName The current name of an interface.
+ * @param alias The additional name to use for the given interface.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
+HELICS_EXPORT void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 
 /**
  * Send a command to another helics object though a core using asynchronous(fast) operations.

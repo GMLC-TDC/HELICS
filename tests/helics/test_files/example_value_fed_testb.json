@@ -46,7 +46,8 @@
     {
       "key": "pub1", // the key of the publication
       "connection_required": true, //set to true to make helics issue a warning if the publication is not found
-      "tolerance": 0.3
+      "tolerance": 0.3,
+      "default": "9.33"
     },
     {
       "key": "fedName/pub2", // the name of the publication to subscribe to
@@ -63,6 +64,7 @@
       "connection_required": true,
       "target": "pub1",
       "global": true,
+      "default": 3.67,
       "tags": [
         { "name": "period", "value": "0.7" },
         { "name": "description", "value": "a test input" }

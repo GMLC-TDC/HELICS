@@ -83,16 +83,16 @@ TEST_F(callbackFed, timeSteps)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
+    vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
             return std::make_pair(helics::Time::maxVal(),
                                   helics::IterationRequest::HALT_OPERATIONS);
-        } else {
-            return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
         }
+        return std::make_pair(t.grantedTime + 1.0, helics::IterationRequest::NO_ITERATIONS);
     });
     auto v = std::make_shared<std::promise<int>>();
     auto vfut = v->get_future();
@@ -114,10 +114,11 @@ TEST_F(callbackFed, timeStepsPeriodMax)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
+    vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     auto v = std::make_shared<std::promise<int>>();
     auto vfut = v->get_future();
@@ -181,8 +182,9 @@ TEST_F(callbackFed, timeStepError)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
+    vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
@@ -214,8 +216,9 @@ TEST_F(callbackFed, timeStepException)
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     int cb1{0};
     int cb2{0};
-    vFed1->setTimeRequestReturnCallback([&cb1](auto, bool) { ++cb1; });
-    vFed1->setTimeRequestEntryCallback([&cb2](auto, auto, bool) { ++cb2; });
+    vFed1->setTimeRequestReturnCallback([&cb1](auto /*unused*/, bool /*unused*/) { ++cb1; });
+    vFed1->setTimeRequestEntryCallback(
+        [&cb2](auto /*unused*/, auto /*unused*/, bool /*unused*/) { ++cb2; });
 
     vFed1->setNextTimeIterativeCallback([](auto t) {
         if (t.grantedTime >= 3.0) {
@@ -246,9 +249,9 @@ TEST_F(callbackFed, timeSteps2Fed)
     SetupTest<helics::CallbackFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     auto vFed2 = GetFederateAs<helics::CallbackFederate>(1);
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 3.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 3.0);
     vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
     auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
@@ -256,13 +259,14 @@ TEST_F(callbackFed, timeSteps2Fed)
     auto& s2 = vFed2->registerSubscription("pub1");
     s1.setDefault(0.3);
     s2.setDefault(0.4);
-    std::vector<double> v1, v2;
+    std::vector<double> v1;
 
-    vFed1->setTimeRequestReturnCallback([&](auto time, bool) {
+    vFed1->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         p1.publish(18.7 + static_cast<double>(time));
         v1.push_back(s1.getValue<double>());
     });
-    vFed2->setTimeRequestReturnCallback([&](auto time, bool) {
+    std::vector<double> v2;
+    vFed2->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         p2.publish(23.7 + static_cast<double>(time));
         v2.push_back(s2.getValue<double>());
     });
@@ -297,47 +301,50 @@ TEST_F(callbackFed, timeSteps2Fed)
     EXPECT_DOUBLE_EQ(v2[3], 20.7);
 }
 
-TEST_F(callbackFed, 100Fed)
+TEST_F(callbackFed, 100Fed_nosan)
 {
     const int fedCount{100};
     SetupTest<helics::CallbackFederate>("test", fedCount);
     std::vector<double> vals(100);
     for (int ii = 0; ii < fedCount; ++ii) {
         auto fed = GetFederateAs<helics::CallbackFederate>(ii);
-        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 120.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 120.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
         auto& s1 = fed->registerSubscription(std::string("fed") +
                                              std::to_string((ii < 99) ? ii + 1 : 0) + "/p1");
         s1.setDefault(0.7);
 
-        fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool) {
+        fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool /*unused*/) {
             fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
             vals[ii] = fed->getInput(0).getValue<double>();
         });
         fed->enterInitializingMode();
     }
+
     brokers.front()->waitForDisconnect();
+    GetFederateAs<helics::Federate>(1)->getCorePointer()->waitForDisconnect();
     EXPECT_TRUE(GetFederateAs<helics::CallbackFederate>(1)->isAsyncOperationCompleted());
 
     EXPECT_DOUBLE_EQ(vals[27], 120.0 + 27.0);
+    FullDisconnect();
 }
 
-TEST_F(callbackFed, 1000Fed_ci_skip)
+TEST_F(callbackFed, 1000Fed_ci_skip_nosan)
 {
     constexpr int fedCount{1000};
     SetupTest<helics::CallbackFederate>("test", fedCount);
     std::vector<double> vals(fedCount);
     for (int ii = 0; ii < fedCount; ++ii) {
         auto fed = GetFederateAs<helics::CallbackFederate>(ii);
-        fed->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 25.0);
+        fed->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 25.0);
         fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         fed->registerPublication<double>("p1");
         auto& s1 = fed->registerSubscription(
             std::string("fed") + std::to_string((ii < (fedCount - 1)) ? ii + 1 : 0) + "/p1");
         s1.setDefault(0.7);
 
-        fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool) {
+        fed->setTimeRequestReturnCallback([fed, ii, &vals](auto time, bool /*unused*/) {
             fed->getPublication(0).publish(static_cast<double>(ii) + static_cast<double>(time));
             vals[ii] = fed->getInput(0).getValue<double>();
         });
@@ -355,18 +362,18 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
     SetupTest<helics::CallbackFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::CallbackFederate>(0);
     auto vFed2 = GetFederateAs<helics::CallbackFederate>(1);
-    vFed1->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 18.0);
-    vFed2->setProperty(HELICS_PROPERTY_TIME_MAXTIME, 18.0);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_STOPTIME, 18.0);
     auto& p1 = vFed1->registerGlobalPublication<double>("pub1");
     auto& p2 = vFed2->registerGlobalPublication<double>("pub2");
     auto& s1 = vFed1->registerSubscription("pub2");
     auto& s2 = vFed2->registerSubscription("pub1");
     s1.setDefault(0.3);
     s2.setDefault(0.4);
-    std::vector<double> v1, v2;
-    std::vector<helics::Time> t1, t2;
+    std::vector<double> v1;
+    std::vector<helics::Time> t1;
 
-    vFed1->setTimeRequestReturnCallback([&](auto time, bool) {
+    vFed1->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         static bool trigger = false;
         if (trigger) {
             p1.publish(22.1 + static_cast<double>(time));
@@ -376,7 +383,10 @@ TEST_F(callbackFed, timeSteps2FedIterruption)
         t1.push_back(time);
         trigger = !trigger;
     });
-    vFed2->setTimeRequestReturnCallback([&](auto time, bool) {
+
+    std::vector<double> v2;
+    std::vector<helics::Time> t2;
+    vFed2->setTimeRequestReturnCallback([&](auto time, bool /*unused*/) {
         static bool trigger = false;
         if (trigger) {
             p2.publish(98.7 + static_cast<double>(time));

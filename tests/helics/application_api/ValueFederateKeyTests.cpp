@@ -35,7 +35,7 @@ class valuefed_all_type_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
 
-class valuefed_tests: public ::testing::Test, public FederateTestFixture {};
+class valuefed: public ::testing::Test, public FederateTestFixture {};
 
 static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
     return std::string(parameter.param);
@@ -100,7 +100,7 @@ TEST_P(valuefed_single_type, subscriber_and_publisher_registration)
     EXPECT_TRUE(vFed1->getCurrentMode() == Federate::Modes::FINALIZE);
 }
 
-TEST_F(valuefed_tests, single_transfer_publisher_alias)
+TEST_F(valuefed, single_transfer_publisher_alias)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -141,7 +141,7 @@ TEST_F(valuefed_tests, single_transfer_publisher_alias)
     vFed1->finalize();
 }
 
-TEST_F(valuefed_tests, single_transfer_publisher_alias2)
+TEST_F(valuefed, single_transfer_publisher_alias2)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -384,7 +384,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_broker_link)
     EXPECT_TRUE(res);
 }
 
-TEST_F(valuefed_tests, dual_transfer_brokerApp_link)
+TEST_F(valuefed, dual_transfer_brokerApp_link)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -430,12 +430,10 @@ TEST_P(valuefed_flagfile_tests, configure_test)
     V2.finalize();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
-                         valuefed_flagfile_tests,
-                         ::testing::ValuesIn(config_files));
+INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_flagfile_tests, ::testing::ValuesIn(config_files));
 #endif
 
-TEST_F(valuefed_tests, dual_transfer_coreApp_link)
+TEST_F(valuefed, dual_transfer_coreApp_link)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -515,7 +513,7 @@ TEST_P(valuefed_link_file, dual_transfer_broker_link_file)
     EXPECT_TRUE(res);
 }
 
-TEST_F(valuefed_tests, dual_transfer_broker_link_json_string)
+TEST_F(valuefed, dual_transfer_broker_link_json_string)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -643,11 +641,11 @@ TEST_P(valuefed_link_file, dual_transfer_core_link_file)
     EXPECT_TRUE(res);
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_link_file,
                          ::testing::ValuesIn(simple_connection_files));
 
-TEST_F(valuefed_tests, dual_transfer_core_link_json_string)
+TEST_F(valuefed, dual_transfer_core_link_json_string)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -735,7 +733,7 @@ TEST_P(valuefed_single_type, block_send_receive)
 
 /** test the all callback*/
 
-TEST_F(valuefed_tests, all_callback)
+TEST_F(valuefed, all_callback)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -798,7 +796,7 @@ TEST_F(valuefed_tests, all_callback)
     vFed1->finalize();
 }
 
-TEST_F(valuefed_tests, time_update_callback)
+TEST_F(valuefed, time_update_callback)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -855,7 +853,66 @@ TEST_F(valuefed_tests, time_update_callback)
     vFed1->finalize();
 }
 
-TEST_F(valuefed_tests, mode_update_callback)
+TEST_F(valuefed, time_update_callback_single_thread)
+{
+    extraFederateArgs = "--flags=single_thread_federate";
+    SetupTest<helics::ValueFederate>("test", 1, 1.0);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+
+    EXPECT_TRUE(vFed1->getFlagOption(HELICS_FLAG_SINGLE_THREAD_FEDERATE));
+    auto& pubid1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pubid2 = vFed1->registerGlobalPublication<int>("pub2");
+
+    auto& pubid3 = vFed1->registerPublication("pub3", "");
+
+    auto& sub1 = vFed1->registerSubscription("fed0/pub1", "");
+    auto& sub2 = vFed1->registerSubscription("pub2", "");
+    auto& sub3 = vFed1->registerSubscription("fed0/pub3", "");
+
+    helics::SmallBuffer db(547, ';');
+    helics::InterfaceHandle lastId;
+    helics::Time lastTime{helics::Time::minVal()};
+    int validCount{0};
+    vFed1->setInputNotificationCallback([&](const helics::Input& subid, helics::Time callTime) {
+        lastTime = callTime;
+        lastId = subid.getHandle();
+    });
+    vFed1->setTimeUpdateCallback([&](helics::Time newTime, bool iterating) {
+        if (newTime > lastTime && !iterating) {
+            ++validCount;
+        }
+    });
+    vFed1->enterExecutingMode();
+    EXPECT_EQ(validCount, 1);
+    vFed1->publishBytes(pubid3, db);
+    vFed1->requestTime(1.0);
+    // the callbacks should have occurred here
+    EXPECT_EQ(validCount, 2);
+    EXPECT_TRUE(lastId == sub3.getHandle());
+    if (lastId == sub3.getHandle()) {
+        EXPECT_EQ(lastTime, 1.0);
+        EXPECT_EQ(vFed1->getLastUpdateTime(sub3), lastTime);
+    } else {
+        EXPECT_TRUE(false) << " missed callback\n";
+    }
+
+    pubid2.publish(4);
+    vFed1->requestTime(2.0);
+    // the callback should have occurred here
+    EXPECT_EQ(validCount, 3);
+    EXPECT_TRUE(lastId == sub2.getHandle());
+    EXPECT_EQ(lastTime, 2.0);
+    pubid1.publish("this is a test");
+    vFed1->requestTime(3.0);
+    // the callback should have occurred here
+    EXPECT_EQ(validCount, 4);
+    EXPECT_TRUE(lastId == sub1.getHandle());
+    EXPECT_EQ(lastTime, 3.0);
+
+    vFed1->finalize();
+}
+
+TEST_F(valuefed, mode_update_callback)
 {
     using Modes = helics::Federate::Modes;
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
@@ -1093,7 +1150,7 @@ TEST_P(valuefed_all_type_tests, dual_transfer_remove_target)
     vFed2->finalize();
 }
 
-TEST_F(valuefed_tests, rem_target_single_test)
+TEST_F(valuefed, rem_target_single_test)
 {
     SetupTest<helics::ValueFederate>("test", 2);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1231,7 +1288,7 @@ INSTANTIATE_TEST_SUITE_P(valuefed_key_tests,
                          ::testing::ValuesIn(CoreTypes_all),
                          testNamer);
 
-TEST_F(valuefed_tests, empty_get_default)
+TEST_F(valuefed, empty_get_default)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1251,7 +1308,7 @@ TEST_F(valuefed_tests, empty_get_default)
     vFed1->finalize();
 }
 
-TEST_F(valuefed_tests, empty_get_complex)
+TEST_F(valuefed, empty_get_complex)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1273,7 +1330,7 @@ TEST_F(valuefed_tests, empty_get_complex)
     vFed1->finalize();
 }
 
-TEST_F(valuefed_tests, publish_time_restrict)
+TEST_F(valuefed, publish_time_restrict)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1300,7 +1357,7 @@ TEST_F(valuefed_tests, publish_time_restrict)
     EXPECT_GE(returned.size(), 19);
 }
 
-TEST_F(valuefed_tests, input_time_restrict)
+TEST_F(valuefed, input_time_restrict)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1327,7 +1384,7 @@ TEST_F(valuefed_tests, input_time_restrict)
     EXPECT_GE(returned.size(), 19);
 }
 
-TEST_F(valuefed_tests, publish_change_restrict)
+TEST_F(valuefed, publish_change_restrict)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
@@ -1354,7 +1411,7 @@ TEST_F(valuefed_tests, publish_change_restrict)
     EXPECT_GE(returned.size(), 19);
 }
 
-TEST_F(valuefed_tests, input_change_restrict)
+TEST_F(valuefed, input_change_restrict)
 {
     SetupTest<helics::ValueFederate>("test", 1);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);

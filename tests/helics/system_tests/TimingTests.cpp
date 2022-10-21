@@ -113,6 +113,88 @@ TEST_F(timing, simple_timing_message)
                         // it will time out.
 }
 
+TEST_F(timing, simple_timing2_single_thread)
+{
+    extraFederateArgs = "--flags=single_thread_federate";
+
+    SetupTest<helics::ValueFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
+    auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.5);
+
+    auto& pub = vFed1->registerGlobalPublication<double>("pub1");
+    vFed2->registerSubscription("pub1");
+    std::vector<helics::Time> times;
+
+    auto t1 = std::thread([&vFed1, &times, &pub]() {
+        vFed1->enterExecutingMode();
+        auto res = vFed1->requestTime(0.32);
+        times.push_back(res);
+        pub.publish(0.27);
+        res = vFed1->requestTime(1.85);
+        times.push_back(res);
+    });
+
+    vFed2->enterExecutingMode();
+
+    auto res = vFed2->requestTime(1.79);
+    EXPECT_EQ(res, 0.5);  // the result should show up at the next available time point
+    res = vFed2->requestTime(2.0);
+    EXPECT_EQ(res, 2.0);
+
+    t1.join();
+    // check that the request is only granted at the appropriate period
+    EXPECT_EQ(times[0], 0.5);
+
+    EXPECT_EQ(times[1], 2.0);
+    vFed1->finalize();
+    vFed2->finalize();
+}
+
+TEST_F(timing, simple_timing_message_single_thread)
+{
+    extraFederateArgs = "--flags=single_thread_federate";
+
+    SetupTest<helics::MessageFederate>("test", 2);
+    auto vFed1 = GetFederateAs<helics::MessageFederate>(0);
+    auto vFed2 = GetFederateAs<helics::MessageFederate>(1);
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.6);
+    vFed2->setProperty(HELICS_PROPERTY_TIME_PERIOD, 0.45);
+    vFed1->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    vFed2->setFlagOption(HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS);
+    auto& ept1 = vFed1->registerGlobalEndpoint("e1");
+    vFed2->registerGlobalEndpoint("e2");
+
+    std::vector<helics::Time> times;
+    auto t1 = std::thread([&vFed1, &times, &ept1]() {
+        vFed1->enterExecutingMode();
+        auto res = vFed1->requestTime(0.32);
+        times.push_back(res);
+        ept1.sendTo("test1", "e2");
+        res = vFed1->requestTime(1.85);
+        times.push_back(res);
+    });
+
+    vFed2->enterExecutingMode();
+    auto res = vFed2->requestTime(3.5);
+
+    EXPECT_THROW(vFed2->requestTimeComplete(), helics::InvalidFunctionCall);
+    EXPECT_EQ(res, 0.9);  // the message should show up at the next available time point
+    res = vFed2->requestTime(2.0);
+    EXPECT_EQ(res, 2.25);  // the message should show up at the next available time point
+    vFed2->finalize();
+
+    t1.join();
+    EXPECT_EQ(times[0], 0.6);
+
+    EXPECT_EQ(times[1], 2.4);
+    vFed1->finalize();
+}
+
 TEST_F(timing, simple_global_timing_message)
 {
     extraBrokerArgs = " --globaltime ";

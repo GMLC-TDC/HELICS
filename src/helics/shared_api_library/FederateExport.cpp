@@ -921,6 +921,48 @@ void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError
     }
 }
 
+void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterative();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterativeAsync();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
+void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    try {
+        fedObj->enterInitializingModeIterativeComplete();
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+}
+
 void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err)
 {
     auto* fedObj = getFed(fed, err);
@@ -1596,6 +1638,33 @@ void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const ch
     }
     try {
         fedObj->setGlobal(valueName, AS_STRING(value));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
+}
+
+static constexpr char invalidInterfaceName[] = "Interface name cannot be empty";
+static constexpr char invalidAliasName[] = "Alias cannot be empty";
+
+void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err)
+{
+    auto* fedObj = getFed(fed, err);
+    if (fedObj == nullptr) {
+        return;
+    }
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
+        return;
+    }
+    if (alias == nullptr || strlen(alias) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
+        return;
+    }
+    try {
+        fedObj->addAlias(interfaceName, alias);
     }
     // LCOV_EXCL_START
     catch (...) {

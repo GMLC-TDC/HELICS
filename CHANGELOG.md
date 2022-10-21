@@ -8,7 +8,35 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [3.3.0][] ~ 2022-08-07
+## [3.3.1][] ~ 2022-10-21
+
+Patch release to fix some issues with using HELICS as a subproject, and fix a few bugs related to time barriers, and a few other timing issues.
+
+### Fixed
+
+- Fixed an issue where broker based time barriers were not propagating to new federates.
+- Fix the code coverage build system.
+- Fixed a potential race condition with callback federates if the callback operations are modified during cosimulation.
+- Fixed timing synchronization issue with global time coordinator.
+
+### Changed
+
+- Cleaned up usage of HELICS in external subprojects and adding some cleanup features, also cleanup the CMake usage to divide some operations into included files to simplify the main CMakeLists.txt
+- Changed the default behavior for profiler output files to create a new file instead of appending. Use `--profiler_append=<file>` to maintain the old behavior.
+
+### Added
+
+- Added single thread federate support which includes a federate optimized for use in a single thread.(Corresponding single thread core will come in next release).
+- Added support for initialization iteration to allow federates to specify ready and then return to the created mode to do additional initialization potentially with information from other federates.
+- Added flag to disable remote termination commands.
+- Added C API function calls for alias operations.
+- Added read only property HELICS_PROPERTY_INT_ITERATION_COUNT to get the current iteration count for a federate.
+
+### Removed
+
+- Removed an unused and unexposed method in the Core API to retrieve the current iteration count, use HELICS_PROPERTY_INT_ITERATION_COUNT with getProperty to retrieve the same data.
+
+## [3.3.0][] - 2022-09-15
 
 Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.
 The major new features include a callback federate, and aliases to allow interfaces to have multiple string names.
@@ -55,13 +83,11 @@ The release also includes several bug fixes related to timing and iteration.
 - Added a [callback Federate](https://docs.helics.org/en/latest/user-guide/advanced_topics/CallbackFederate.html) capability which allows a large number of callback based federates to execute on a single core without direct user calls
 - Added some additional [callbacks](https://docs.helics.org/en/latest/user-guide/advanced_topics/callbacks.html) for federates
 - Added flags on the webserver to allow much easier configuration to external network interfaces
-- Added read only property HELICS_PROPERTY_INT_ITERATION_COUNT to get the current iteration count for a federate
 
 ### Removed
 
 - ghc::filesystem, since all minimum compilers have support for std::filesystem available.
 - Removed Travis CI related configuration and documentation
-- Removed an unused and unexposed method in the Core API to retrieve the current iteration count, use HELICS_PROPERTY_INT_ITERATION_COUNT with getProperty to retrieve the same data.
 
 ## [3.2.1][] - 2022-06-17
 
@@ -292,6 +318,8 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.1
 [3.1.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.2
 [3.2.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.0
-[3.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.0
+[3.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.1
+[3.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.0
+[3.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.1
 
 The changelog for HELICS 1.X and 2.X can be found [here](./docs/HELICS2_CHANGELOG.md)

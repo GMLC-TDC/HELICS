@@ -97,7 +97,10 @@ void EmptyCore::finalize(LocalFederateId /*federateID*/) {}
 
 void EmptyCore::setCoreReadyToInit() {}
 
-void EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/) {}
+bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/, IterationRequest /*request*/)
+{
+    return false;
+}
 
 IterationResult EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
                                               IterationRequest /*iterate*/)
@@ -148,11 +151,6 @@ void EmptyCore::processCommunications(LocalFederateId /*federateID*/,
 Time EmptyCore::getCurrentTime(LocalFederateId /*federateID*/) const
 {
     return Time::maxVal();
-}
-
-uint64_t EmptyCore::getCurrentReiteration(LocalFederateId /*federateID*/) const
-{
-    return 0U;
 }
 
 void EmptyCore::setIntegerProperty(LocalFederateId /*federateID*/,

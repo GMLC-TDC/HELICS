@@ -55,7 +55,9 @@ file(COPY ${CMAKE_CURRENT_BINARY_DIR}/helics_cxx_export.h
 )
 
 if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set_target_properties(helics_application_api helics_common helics_core PROPERTIES FOLDER helics)
+    set_target_properties(
+        helics_application_api helics_common helics_core helics_network PROPERTIES FOLDER helics
+    )
 endif()
 
 if(HELICS_BUILD_APP_LIBRARY)
@@ -68,4 +70,8 @@ endif(HELICS_BUILD_APP_LIBRARY)
 if(NOT HELICS_DISABLE_C_SHARED_LIB)
     add_subdirectory(shared_api_library)
     add_subdirectory(cpp98)
+
+    if(NOT CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+        set_target_properties(helics helicsCpp98_ide PROPERTIES FOLDER helics)
+    endif()
 endif()

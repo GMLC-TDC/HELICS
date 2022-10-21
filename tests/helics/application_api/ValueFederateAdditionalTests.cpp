@@ -632,6 +632,14 @@ TEST(valuefed_json_tests, file_loadb)
 
     EXPECT_EQ(vFed.getTag("description"), "fedb description");
     EXPECT_EQ(vFed.getTag("version"), "27");
+
+    auto& sub1 = vFed.getInput(0);
+    vFed.enterInitializingMode();
+
+    auto dv = sub1.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 9.33);
+    dv = inp2.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 3.67);
     vFed.disconnect();
     helics::BrokerFactory::terminateAllBrokers();
     helics::CoreFactory::terminateAllCores();
@@ -662,8 +670,13 @@ TEST(valuefederate, toml_file_loadb)
         EXPECT_EQ(std::stod(dval), 0.7);
     }
 
+    auto& sub1 = vFed.getInput(0);
     vFed.enterExecutingMode();
 
+    auto dv = sub1.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 9.33);
+    dv = inp2.getDouble();
+    EXPECT_DOUBLE_EQ(dv, 3.67);
     EXPECT_EQ(vFed.getTag("description"), "fedb description");
     EXPECT_EQ(vFed.getTag("version"), "27");
 
@@ -678,7 +691,7 @@ TEST(valuefederate, toml_file_bad)
     helics::CoreFactory::terminateAllCores();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_configfile_tests,
                          ::testing::ValuesIn(config_files));
 
@@ -788,13 +801,11 @@ TEST(valuefed_json_tests, test_json_register_publish_error)
     vFed.disconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_single_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_single));
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
-                         valuefed_add_type_tests_ci_skip,
-                         ::testing::ValuesIn(CoreTypes));
-INSTANTIATE_TEST_SUITE_P(valuefed_tests,
+INSTANTIATE_TEST_SUITE_P(valuefed, valuefed_add_type_tests_ci_skip, ::testing::ValuesIn(CoreTypes));
+INSTANTIATE_TEST_SUITE_P(valuefed,
                          valuefed_add_all_type_tests_ci_skip,
                          ::testing::ValuesIn(CoreTypes_all));
 

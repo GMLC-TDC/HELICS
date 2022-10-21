@@ -38,7 +38,8 @@ class EmptyCore: public Core {
     virtual int getErrorCode() const override;
     virtual std::string getErrorMessage() const override;
     virtual void finalize(LocalFederateId federateID) override;
-    virtual void enterInitializingMode(LocalFederateId federateID) override;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest request) override;
     virtual void setCoreReadyToInit() override;
     virtual IterationResult enterExecutingMode(LocalFederateId federateID,
                                                IterationRequest iterate = NO_ITERATION) override;
@@ -54,7 +55,6 @@ class EmptyCore: public Core {
     virtual void processCommunications(LocalFederateId fedId,
                                        std::chrono::milliseconds msToWait) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override;
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override;
     virtual void setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override;
     virtual void setIntegerProperty(LocalFederateId federateID,
                                     int32_t property,

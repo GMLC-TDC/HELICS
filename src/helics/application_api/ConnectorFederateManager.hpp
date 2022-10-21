@@ -25,7 +25,10 @@ class ConnectorFederateManager {
   public:
     /** construct from a pointer to a core and a specified federate id
      */
-    ConnectorFederateManager(Core* coreObj, Federate* fFed, LocalFederateId id);
+    ConnectorFederateManager(Core* coreObj,
+                             Federate* fFed,
+                             LocalFederateId id,
+                             bool singleThreaded);
     /** destructor */
     ~ConnectorFederateManager();
 
@@ -101,8 +104,8 @@ class ConnectorFederateManager {
 
   private:
     Core* coreObject{nullptr};
-    shared_guarded<gmlc::containers::StringMappedVector<std::unique_ptr<Filter>>> filters;
-    shared_guarded<gmlc::containers::StringMappedVector<Translator>> translators;
+    shared_guarded_opt<gmlc::containers::StringMappedVector<std::unique_ptr<Filter>>> filters;
+    shared_guarded_opt<gmlc::containers::StringMappedVector<Translator>> translators;
     Federate* fed = nullptr;  //!< pointer back to the message Federate
     const LocalFederateId fedID;  //!< storage for the federate ID
 };
