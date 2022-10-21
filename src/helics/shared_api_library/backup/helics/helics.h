@@ -1731,10 +1731,10 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, 
 HELICS_EXPORT void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
 
 /**
- * Trigger a blocking call and return to created state after all federates have either triggered an iteration or waiting to enter
- * initializing mode
+ * Trigger a blocking call and return to created state after all federates have either triggered an iteration or are waiting to enter
+ * initializing mode.
  *
- * @details this call will return the federate to the created state to allow additional setup to occur with federates either iterating in
+ * @details This call will return the federate to the created state to allow additional setup to occur with federates either iterating in
  * the mode or waiting.
  *
  * @param fed The federate to operate on.
@@ -1755,10 +1755,10 @@ HELICS_EXPORT void helicsFederateEnterInitializingModeIterative(HelicsFederate f
 HELICS_EXPORT void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
 
 /**
- * Complete the call to initialize mode that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The federate will be in
- * startup or error mode on return
+ * Complete the call to enter initializing mode Iterative that was initiated with /ref heliceEnterInitializingModeIterativeAsync.  The
+ * federate will be in created or error mode on return
  *
- * @param fed The federate desiring to iterate to the startup mode again
+ * @param fed The federate used in the corresponding async call
  *
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
@@ -2096,15 +2096,26 @@ HELICS_EXPORT int helicsFederateGetIntegerProperty(HelicsFederate fed, int intPr
 HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
 
 /**
- * Set a federation global value through a federate.
+ * create an alias for an interface
  *
- * @details This overwrites any previous value for this name.
- * @param fed The federate to set the global through.
- * @param valueName The name of the global to set.
- * @param value The value of the global.
+ * @param fed The federate to use to set the alias
+ * @param interfaceName The current name of an interface
+ * @param alias the additional name to use for the given interface
  *
  * @param[in,out] err A pointer to an error object for catching errors.
  */
+HELICS_EXPORT void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
+* Set a federation global value through a federate.
+*
+* @details This overwrites any previous value for this name.
+* @param fed The federate to set the global through.
+* @param valueName The name of the global to set.
+* @param value The value of the global.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
 /**
@@ -2268,6 +2279,28 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
  * @param[in,out] err An error object that will contain an error code and string if any error occurred during the execution of the function.
  */
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
+
+/**
+* create an alias for an interface
+*
+* @param core The core to use to set the alias
+* @param interfaceName The current name of an interface
+* @param alias the additional name to use for the given interface
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
+
+/**
+* create an alias for an interface
+*
+* @param broker The broker to use to set the alias
+* @param interfaceName The current name of an interface
+* @param alias the additional name to use for the given interface
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+*/
+HELICS_EXPORT void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 
 /**
  * Send a command to another helics object though a core using asynchronous(fast) operations.

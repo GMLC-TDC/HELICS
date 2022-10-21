@@ -152,6 +152,80 @@ TEST_F(vfed2_tests, file_load)
     helicsFederateFree(vFed);
 }
 
+
+TEST(valuefederate, fedAlias)
+{
+    auto fi=helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi,HELICS_CORE_TYPE_TEST,nullptr);
+    helicsFederateInfoSetCoreName(fi,"core_alias",nullptr);
+    helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker",nullptr);
+    helicsFederateInfoSetFlagOption(fi,HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,HELICS_TRUE,nullptr);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fi,nullptr);
+    helicsFederateInfoFree(fi);
+    helicsFederateRegisterGlobalPublication(Fed1,"pub1",HELICS_DATA_TYPE_DOUBLE, "parsecs",nullptr);
+
+    helicsFederateAddAlias(Fed1,"pub1","theBigPub",nullptr);
+
+    helicsFederateRegisterSubscription(Fed1,"theBigPub",nullptr,nullptr);
+
+    auto err=helicsErrorInitialize();
+    helicsFederateEnterExecutingMode(Fed1,&err);
+    EXPECT_EQ(err.error_code,0);
+    helicsFederateDestroy(Fed1);
+
+}
+
+TEST(valuefederate, coreAlias)
+{
+    auto fi=helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi,HELICS_CORE_TYPE_TEST,nullptr);
+    helicsFederateInfoSetCoreName(fi,"core_alias",nullptr);
+    helicsFederateInfoSetCoreInitString(fi,"-f 1 --autobroker",nullptr);
+    helicsFederateInfoSetFlagOption(fi,HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,HELICS_TRUE,nullptr);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fi,nullptr);
+    auto cr=helicsFederateGetCore(Fed1,nullptr);
+    helicsFederateInfoFree(fi);
+    helicsFederateRegisterGlobalPublication(Fed1,"pub1",HELICS_DATA_TYPE_DOUBLE, "parsecs",nullptr);
+
+    helicsCoreAddAlias(cr,"pub1","theBigPub",nullptr);
+
+    helicsFederateRegisterSubscription(Fed1,"theBigPub",nullptr,nullptr);
+
+    auto err=helicsErrorInitialize();
+    helicsFederateEnterExecutingMode(Fed1,&err);
+    EXPECT_EQ(err.error_code,0);
+    helicsFederateDestroy(Fed1);
+    helicsCoreDestroy(cr);
+}
+
+TEST(valuefederate, brokerAlias)
+{
+    auto brk=helicsCreateBroker("test","alias_broker","-f1",nullptr);
+    auto fi=helicsCreateFederateInfo();
+    helicsFederateInfoSetCoreType(fi,HELICS_CORE_TYPE_TEST,nullptr);
+    helicsFederateInfoSetCoreName(fi,"core_alias",nullptr);
+    helicsFederateInfoSetCoreInitString(fi,"-f 1 --broker=alias_broker",nullptr);
+    helicsFederateInfoSetFlagOption(fi,HELICS_HANDLE_OPTION_CONNECTION_REQUIRED,HELICS_TRUE,nullptr);
+    auto Fed1 = helicsCreateValueFederate("vfed1", fi,nullptr);
+    
+    helicsFederateInfoFree(fi);
+    helicsFederateRegisterGlobalPublication(Fed1,"pub1",HELICS_DATA_TYPE_DOUBLE, "parsecs",nullptr);
+
+    helicsBrokerAddAlias(brk,"pub1","theBigPub",nullptr);
+
+    helicsFederateRegisterSubscription(Fed1,"theBigPub",nullptr,nullptr);
+
+    auto err=helicsErrorInitialize();
+    helicsFederateEnterExecutingMode(Fed1,&err);
+    EXPECT_EQ(err.error_code,0);
+    helicsFederateDestroy(Fed1);
+    auto res=helicsBrokerWaitForDisconnect(brk,1000,&err);
+    EXPECT_EQ(err.error_code,0);
+    EXPECT_EQ(res,HELICS_TRUE);
+    helicsBrokerDestroy(brk);
+    
+}
+
 static void stateChangeCallback(HelicsFederateState newState,
                                 HelicsFederateState /*oldState*/,
                                 void* userData)
