@@ -1655,11 +1655,11 @@ void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const
     if (fedObj == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || strlen(interfaceName)==0) {
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr|| strlen(alias)==0) {
+    if (alias == nullptr || strlen(alias) == 0) {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }

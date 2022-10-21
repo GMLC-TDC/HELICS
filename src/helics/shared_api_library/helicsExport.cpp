@@ -597,22 +597,22 @@ void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* 
     if (cr == nullptr) {
         return;
     }
-if (interfaceName == nullptr || strlen(interfaceName)==0) {
-    assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
-    return;
-}
-if (alias == nullptr|| strlen(alias)==0) {
-    assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
-    return;
-}
-try {
-    cr->addAlias(interfaceName, alias);
-}
-// LCOV_EXCL_START
-catch (...) {
-    helicsErrorHandler(err);
-}
-// LCOV_EXCL_STOP
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
+        return;
+    }
+    if (alias == nullptr || strlen(alias) == 0) {
+        assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
+        return;
+    }
+    try {
+        cr->addAlias(interfaceName, alias);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err)
@@ -621,11 +621,11 @@ void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const 
     if (brk == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || strlen(interfaceName)==0) {
+    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr|| strlen(alias)==0) {
+    if (alias == nullptr || strlen(alias) == 0) {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }

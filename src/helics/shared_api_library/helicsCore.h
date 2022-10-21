@@ -1391,17 +1391,16 @@ HELICS_EXPORT HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, Helics
  */
 HELICS_EXPORT void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
 
-
 /**
-* Set a federation global value through a federate.
-*
-* @details This overwrites any previous value for this name.
-* @param fed The federate to set the global through.
-* @param valueName The name of the global to set.
-* @param value The value of the global.
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-*/
+ * Set a federation global value through a federate.
+ *
+ * @details This overwrites any previous value for this name.
+ * @param fed The federate to set the global through.
+ * @param valueName The name of the global to set.
+ * @param value The value of the global.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
 HELICS_EXPORT void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 
 /**
@@ -1567,25 +1566,25 @@ HELICS_EXPORT void helicsCoreSetGlobal(HelicsCore core, const char* valueName, c
 HELICS_EXPORT void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
 
 /**
-* create an alias for an interface
-*
-* @param core The core to use to set the alias
-* @param interfaceName The current name of an interface
-* @param alias the additional name to use for the given interface
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-*/
+ * create an alias for an interface
+ *
+ * @param core The core to use to set the alias
+ * @param interfaceName The current name of an interface
+ * @param alias the additional name to use for the given interface
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
 HELICS_EXPORT void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
 
 /**
-* create an alias for an interface
-*
-* @param broker The broker to use to set the alias
-* @param interfaceName The current name of an interface
-* @param alias the additional name to use for the given interface
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-*/
+ * create an alias for an interface
+ *
+ * @param broker The broker to use to set the alias
+ * @param interfaceName The current name of an interface
+ * @param alias the additional name to use for the given interface
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ */
 HELICS_EXPORT void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 
 /**
