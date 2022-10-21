@@ -5,7 +5,7 @@ branches:
     - main
     - develop
 
-version: 3.3.0.{build}
+version: 3.3.1.{build}
 
 image: Visual Studio 2019
 
