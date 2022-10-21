@@ -197,7 +197,7 @@ jobs:
       # -----------------------
       # Test HELICS
       # -----------------------
-      - bash: ctest --output-on-failure --timeout 480 -C Release -L "Continuous"
+      - bash: ctest --output-on-failure --timeout 1000 -C Release -L "Continuous"
         displayName: 'Test HELICS'
         workingDirectory: build
 
