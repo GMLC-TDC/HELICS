@@ -7,9 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(common_test_headers testFixtures.hpp
-                                 ../coreTypeLists.hpp
-)
+set(common_test_headers testFixtures.hpp ../coreTypeLists.hpp)
 
 set(common_test_sources testFixtures.cpp applicationApiTests.cpp)
 
@@ -28,18 +26,11 @@ set(valueFederate_test_sources
     MultiInputTests.cpp
 )
 
-set(messageFederate_test_sources
-    MessageFederateKeyTests.cpp
-    MessageFederateAdditionalTests.cpp
-    ValueFederateAdditionalTests.cpp
-    CombinationFederateTests.cpp
+set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp
+                                 ValueFederateAdditionalTests.cpp CombinationFederateTests.cpp
 )
 
-set(filterTranslator_test_sources
-    FilterTests.cpp
-    TranslatorTests.cpp
-    FilterAdditionalTests.cpp
-)
+set(filterTranslator_test_sources FilterTests.cpp TranslatorTests.cpp FilterAdditionalTests.cpp)
 
 set(application_api_test_sources
     CallbackFederateTests.cpp
@@ -50,13 +41,13 @@ set(application_api_test_sources
     FederateInfoTests.cpp
 )
 
-
 if(HELICS_ENABLE_ZMQ_CORE)
     list(APPEND application_api_test_sources zmqSSTests.cpp)
 endif()
 
 add_executable(
-    applicationApiTests ${application_api_test_sources} ${common_test_headers} ${common_test_sources}
+    applicationApiTests ${application_api_test_sources} ${common_test_headers}
+                        ${common_test_sources}
 )
 
 add_executable(
@@ -64,38 +55,40 @@ add_executable(
 )
 
 add_executable(
-    messageFederateTests ${messageFederate_test_sources} ${common_test_headers} ${common_test_sources}
+    messageFederateTests ${messageFederate_test_sources} ${common_test_headers}
+                         ${common_test_sources}
 )
 
 add_executable(
-    filterTranslatorTests ${filterTranslator_test_sources_test_sources} ${common_test_headers} ${common_test_sources}
+    filterTranslatorTests ${filterTranslator_test_sources_test_sources} ${common_test_headers}
+                          ${common_test_sources}
 )
 
-set(testExecutables applicationApiTests valueFederateTests messageFederateTests filterTranslatorTests)
+set(testExecutables applicationApiTests valueFederateTests messageFederateTests
+                    filterTranslatorTests
+)
 
 foreach(testTarget IN LISTS testExecutables)
-target_link_libraries(${testTarget} PUBLIC helics_application_api helics_test_base gmock)
+    target_link_libraries(${testTarget} PUBLIC helics_application_api helics_test_base gmock)
 
-set_target_properties(${testTarget} PROPERTIES FOLDER tests)
+    set_target_properties(${testTarget} PROPERTIES FOLDER tests)
 
-target_compile_definitions(
-    ${testTarget} PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\""
-)
-target_compile_definitions(
-    ${testTarget} PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\""
-)
-target_compile_definitions(
-    ${testTarget} PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
-)
+    target_compile_definitions(
+        ${testTarget} PRIVATE "-DHELICS_BROKER_LOCATION=\"${HELICS_BROKER_LOC}\""
+    )
+    target_compile_definitions(
+        ${testTarget} PRIVATE "-DHELICS_INSTALL_LOCATION=\"${CMAKE_INSTALL_PREFIX}\""
+    )
+    target_compile_definitions(
+        ${testTarget} PRIVATE "-DTEST_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../test_files/\""
+    )
 
-add_test(NAME ${testTarget} COMMAND ${testTarget})
-set_property(TEST ${testTarget} PROPERTY LABELS ApplicationApi Coverage Daily)
+    add_test(NAME ${testTarget} COMMAND ${testTarget})
+    set_property(TEST ${testTarget} PROPERTY LABELS ApplicationApi Coverage Daily)
 
-# Tests for Continuous Integration builds
-add_test(NAME ${testTarget}-ci COMMAND ${testTarget}
-                                               --gtest_filter=-*ci_skip*:*nosan*
-)
-set_property(TEST ${testTarget}-ci PROPERTY LABELS ApplicationApiCI Continuous)
+    # Tests for Continuous Integration builds
+    add_test(NAME ${testTarget}-ci COMMAND ${testTarget} --gtest_filter=-*ci_skip*:*nosan*)
+    set_property(TEST ${testTarget}-ci PROPERTY LABELS ApplicationApiCI Continuous)
 
 endforeach()
 
@@ -117,8 +110,7 @@ target_compile_definitions(
     applicationApiTests PRIVATE "-DLONG_TEST_NAME=\"${LONG_TEST_PATH}/${LONG_FILE_NAME}\""
 )
 
-
-## shared cxx library tests
+# shared cxx library tests
 if(HELICS_BUILD_CXX_SHARED_LIB)
     set(shared_cxx_test_sources MessageFederateKeyTests.cpp ValueFederateKeyTests.cpp
                                 FilterTests.cpp testFixtures_shared.cpp testFixtures_shared.hpp

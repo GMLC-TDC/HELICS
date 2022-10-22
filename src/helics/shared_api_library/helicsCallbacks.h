@@ -305,7 +305,6 @@ HELICS_EXPORT void helicsFederateErrorHandlerCallback(HelicsFederate fed,
                                                       void* userdata,
                                                       HelicsError* err);
 
-
 /**
 * Set callback for the next time update.
 *
@@ -323,7 +322,6 @@ HELICS_EXPORT void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
                                                           HelicsTime (*timeUpdate)(HelicsTime time, void* userdata),
                                                           void* userdata,
                                                           HelicsError* err);
-
 
 /**
 * Set callback for the next time update with iteration capability.
