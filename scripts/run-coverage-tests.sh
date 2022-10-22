@@ -6,7 +6,10 @@ tests=(
     "./bin/helics_apps-tests --gtest_filter=-*nocov*"
     "./bin/shared-library-tests-cpp --gtest_filter=-*death*:*nocov*"
     "./bin/shared-library-tests --gtest_filter=-*death*:*nocov*"
-    "./bin/application-api-tests --gtest_filter=-*nocov*"
+    "./bin/applicationApiTests --gtest_filter=-*nosan*"
+    "./bin/filterTranslatorTests --gtest_filter=-*nosan*"
+    "./bin/messageFederateTests --gtest_filter=-*nosan*"
+    "./bin/valueFederateTests --gtest_filter=-*nosan*"
     "./bin/helics_webserver-tests --gtest_filter=-*nocov*"
     "./bin/network-tests --gtest_filter=-*nocov*"
 )

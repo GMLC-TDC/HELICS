@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2019,
+Copyright (c) 2017-2022,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -10,6 +10,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/Subscriptions.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/Core.hpp"
+#include "helics/core/BrokerFactory.hpp"
+#include "helics/core/CoreFactory.hpp"
 
 #include "gtest/gtest.h"
 #include <future>
@@ -53,8 +55,8 @@ class FedTest {
         helics::FederateInfo fi;
         fi.coreName = coreName;
         vFed = std::make_unique<helics::ValueFederate>(fed_name, fi);
-        pub = vFed->registerPublicationIndexed<std::string>("fedrx", pub_index);
-        sub = vFed->registerSubscriptionIndexed("fedrx", pub_index);
+        pub = vFed->registerIndexedPublication<std::string>("fedrx", pub_index);
+        sub = vFed->registerIndexedSubscription("fedrx", pub_index);
         initialized = true;
     }
 
@@ -65,12 +67,12 @@ class FedTest {
 
         while (nextTime < finalTime) {
             nextTime = vFed->requestTime(nextTime + deltaTime);
-            vFed->publish(pub, txstring);
+            pub.publish(txstring);
 
             if (vFed->isUpdated(sub)) {
                 if (vFed->isUpdated(sub)) {
                     // get the latest value for the subscription
-                    auto& nstring = vFed->getString(sub);
+                    auto& nstring = sub.getString();
                     if (nstring != txstring) {
                         std::cout << "incorrect string\n";
                         break;
@@ -84,7 +86,7 @@ class FedTest {
     }
 };
 
-TEST(ZMQSSCore_tests, zmqSSMultiCoreInitialization_test)
+TEST(ZMQSSCore_tests, zmqSSMultiCoreInitialization_ci_skip)
 {
     int feds = 20;
     auto broker = helics::BrokerFactory::create(helics::CoreType::ZMQ_SS,
