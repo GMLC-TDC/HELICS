@@ -13,11 +13,9 @@ set(common_test_sources testFixtures.cpp applicationApiTests.cpp)
 
 set(valueFederate_test_sources
     ValueFederateKeyTests.cpp
-    TranslatorTests.cpp
     ValueFederateTestTemplates.hpp
     PrimaryTypeConversionTests.cpp
     ValueConverterTests.cpp
-    data_viewTests.cpp
     subPubObjectTests.cpp
     ValueFederateAdditionalTests.cpp
     ValueFederateSingleTransfer.cpp
@@ -27,7 +25,7 @@ set(valueFederate_test_sources
 )
 
 set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp
-                                 ValueFederateAdditionalTests.cpp CombinationFederateTests.cpp
+                                 CombinationFederateTests.cpp
 )
 
 set(filterTranslator_test_sources FilterTests.cpp TranslatorTests.cpp FilterAdditionalTests.cpp)

@@ -21,17 +21,17 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
     struct ValueSetter {
-        Time time;
+        Time time{Time::minVal()};
         int iteration = 0;
-        int index;
+        int index{-1};
         std::string type;
         std::string pubName;
         defV value;
     };
 
     struct MessageHolder {
-        Time sendTime;
-        int index;
+        Time sendTime{Time::minVal()};
+        int index{ -1 };
         Message mess;
     };
 
