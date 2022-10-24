@@ -1744,7 +1744,7 @@ void helicsFederateSetLogFile(HelicsFederate fed, const char* logFile, HelicsErr
     if (fedObj == nullptr) {
         return;
     }
-    auto &cr = fedObj->getCorePointer();
+    auto& cr = fedObj->getCorePointer();
 
     try {
         if (cr) {

@@ -273,7 +273,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
         }
     }
     if (doc.isMember("subscriptions")) {
-        auto &subs = doc["subscriptions"];
+        auto& subs = doc["subscriptions"];
         for (const auto& sub : subs) {
             bool skipNameTarget{false};
             auto name = fileops::getName(sub);
@@ -342,7 +342,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
     replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (isMember(doc, "publications")) {
-        auto &pubs = toml::find(doc, "publications");
+        auto& pubs = toml::find(doc, "publications");
         if (!pubs.is_array()) {
             throw(helics::InvalidParameter("publications section in toml file must be an array"));
         }
@@ -366,7 +366,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         }
     }
     if (isMember(doc, "subscriptions")) {
-        auto &subs = toml::find(doc, "subscriptions");
+        auto& subs = toml::find(doc, "subscriptions");
         if (!subs.is_array()) {
             // this line is tested in the publications section so not really necessary to check
             // again since it is an expensive test
@@ -460,7 +460,7 @@ static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
 {
     auto mn = val.getMemberNames();
     for (auto& name : mn) {
-        auto &so = val[name];
+        auto& so = val[name];
         if (so.isObject()) {
             generateData(vpairs, prefix + name + separator, separator, so);
         } else {

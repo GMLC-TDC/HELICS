@@ -231,7 +231,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
     fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (fileops::isMember(doc, "endpoints")) {
-        auto &epts = toml::find(doc, "endpoints");
+        auto& epts = toml::find(doc, "endpoints");
         if (!epts.is_array()) {
             throw(helics::InvalidParameter("endpoints section in toml file must be an array"));
         }

@@ -31,7 +31,7 @@ namespace apps {
 
     struct MessageHolder {
         Time sendTime{Time::minVal()};
-        int index{ -1 };
+        int index{-1};
         Message mess;
     };
 
