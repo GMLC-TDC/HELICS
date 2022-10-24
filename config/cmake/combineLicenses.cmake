@@ -7,22 +7,14 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# takes a list of names and license file paths and combines the contents into a single
-# file
+# takes a list of names and license file paths and combines the contents into a single file
 function(combineLicenses OUT_FILE)
     file(WRITE "${OUT_FILE}.in" "Third-Party Licenses")
     list(LENGTH ARGN num_entries)
     math(EXPR end_entries "${num_entries}-1")
-    foreach(
-        entry
-        RANGE
-        0
-        ${end_entries}
-        2
-    )
-        file(
-            APPEND "${OUT_FILE}.in"
-            "\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n"
+    foreach(entry RANGE 0 ${end_entries} 2)
+        file(APPEND "${OUT_FILE}.in"
+             "\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n"
         )
         list(GET ARGN ${entry} entry_name)
         math(EXPR entry_file "${entry}+1")

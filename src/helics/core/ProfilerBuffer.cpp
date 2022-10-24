@@ -54,4 +54,24 @@ void ProfilerBuffer::writeFile()
     mBuffers.clear();
 }
 
+void ProfilerBuffer::setOutputFile(std::string fileName, bool append)
+{
+    if (fileName.empty()) {
+        mFileName.clear();
+        return;
+    }
+    mFileName = std::move(fileName);
+    if (append) {
+        return;
+    }
+
+    std::ofstream file;
+    // can't enable exception now because of gcc bug that raises ios_base::failure with useless
+    // message file.exceptions(file.exceptions() | std::ios::failbit);
+    file.open(mFileName, std::ios::out | std::ios::trunc);
+    if (file.fail()) {
+        throw std::ios_base::failure(std::strerror(errno));
+    }
+}
+
 }  // namespace helics

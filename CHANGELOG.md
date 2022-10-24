@@ -8,21 +8,86 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [3.3.0][] ~ 2022-08-07
+## [3.3.1][] ~ 2022-10-21
 
-Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.
+Patch release to fix some issues with using HELICS as a subproject, and fix a few bugs related to time barriers, and a few other timing issues.
 
 ### Fixed
 
+- Fixed an issue where broker based time barriers were not propagating to new federates.
+- Fix the code coverage build system.
+- Fixed a potential race condition with callback federates if the callback operations are modified during cosimulation.
+- Fixed timing synchronization issue with global time coordinator.
+
 ### Changed
 
-- additional use of `std::string_view` in internal callbacks and network operations
+- Cleaned up usage of HELICS in external subprojects and adding some cleanup features, also cleanup the CMake usage to divide some operations into included files to simplify the main CMakeLists.txt
+- Changed the default behavior for profiler output files to create a new file instead of appending. Use `--profiler_append=<file>` to maintain the old behavior.
 
 ### Added
+
+- Added single thread federate support which includes a federate optimized for use in a single thread.(Corresponding single thread core will come in next release).
+- Added support for initialization iteration to allow federates to specify ready and then return to the created mode to do additional initialization potentially with information from other federates.
+- Added flag to disable remote termination commands.
+- Added C API function calls for alias operations.
+- Added read only property HELICS_PROPERTY_INT_ITERATION_COUNT to get the current iteration count for a federate.
+
+### Removed
+
+- Removed an unused and unexposed method in the Core API to retrieve the current iteration count, use HELICS_PROPERTY_INT_ITERATION_COUNT with getProperty to retrieve the same data.
+
+## [3.3.0][] - 2022-09-15
+
+Minimum build requirements updated to CMake 3.11, Visual Studio 2019, XCode 11.0, GCC 8.1, Clang 7.0.
+The major new features include a callback federate, and aliases to allow interfaces to have multiple string names.
+The release also includes several bug fixes related to timing and iteration.
+
+### Fixed
+
+- Fixed an issue with using very large iteration counts
+- Fixed some potential memory leaks in the test set
+- Fixed an issue created by the long name tests with the release generation
+- Fixed an issue with mismatching key names for publishers
+- Removed additional use of std::async in the tests which was causing sporadic failures in the test execution
+- Fixed an issue that could occur when switching between NO_ITERATIONS and ITERATE_IF_NEEDED resulting in deadlock
+- Fixed an issue that resulted in a timeout disconnect potentially not working properly
+- Fixed the command interface API in the C++98 interface
+- Fixed issue with potential out of order messages when using interruptions, MAX_TIME, and endpoint communications
+
+### Changed
+
+- Additional use of `std::string_view` in internal callbacks and network operations
+- cleaned up use of internal flags and separated them by category
+- Updated the docker images used in CI tests for no_zmq and octave tests
+- Updated Utilities, Units, ASIO, fmtlib, gtest to latest versions
+- Refactored endpoint management code for consistency with other interfaces
+- The HELICS_DATA_TYPE_CHAR is now a member of the enumeration vs a standalone definition there is no change in operation but the numerical value is now different
+- The change detection on inputs/publication now can work individually for each interface
+- The default webserver ports, now uses 43542(Http) and 43543(Websocket). This is to not conflict by default if both are used and to accommodate other servics that might be running on the same system.
+- The REST API now returns a structure on successful broker creation
+- The helics_broker executable now has the same command line arguments for the webserver as the broker_server
+
+### Added
+
+- Custom Translator functionality in the C API
+- Added an asynchronous time coordinator which could be used for testing, or if all federates are driven by real time mode, or if internal synchronization is not required.
+- Added alias operations to allow interfaces to have multiple names
+- Added CORS access control options to the web server
+- Added a HELICS_STATE_UNKNOWN as a potential return value used when the federate does not exist
+- A time gate to the publications and input to restrict publications to a certain period
+- Added encryption related options to vcpkg
+- Tested support for Boost 1.80 and CMake 3.24
+- Added a [command](https://docs.helics.org/en/latest/user-guide/advanced_topics/commandInterface.html) interface to set/clear time barriers
+- Added a [Query](https://docs.helics.org/en/latest/user-guide/advanced_topics/queries.html) to retrieve current time barriers
+- Added an index group property to manipulate the internal id which could have an impact on some unusual cases of ordering and remove a potential source of randomness in the final results of a co-simulation
+- Added a [callback Federate](https://docs.helics.org/en/latest/user-guide/advanced_topics/CallbackFederate.html) capability which allows a large number of callback based federates to execute on a single core without direct user calls
+- Added some additional [callbacks](https://docs.helics.org/en/latest/user-guide/advanced_topics/callbacks.html) for federates
+- Added flags on the webserver to allow much easier configuration to external network interfaces
 
 ### Removed
 
 - ghc::filesystem, since all minimum compilers have support for std::filesystem available.
+- Removed Travis CI related configuration and documentation
 
 ## [3.2.1][] - 2022-06-17
 
@@ -253,6 +318,8 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.1.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.1
 [3.1.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.1.2
 [3.2.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.0
-[3.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.0
+[3.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.1
+[3.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.0
+[3.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.1
 
 The changelog for HELICS 1.X and 2.X can be found [here](./docs/HELICS2_CHANGELOG.md)

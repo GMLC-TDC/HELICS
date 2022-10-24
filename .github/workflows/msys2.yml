@@ -62,6 +62,7 @@ jobs:
         #ZMQ_SUBPROJECT: "true"
         #ZMQ_FORCE_SUBPROJECT: "true"
       run: |
+        unset VCPKG_ROOT
         source scripts/setup-helics-ci-options.sh
         mkdir -p build && cd build
         ../scripts/ci-build.sh

@@ -7,8 +7,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# this file just contains the lists of header files to use for the cxx shared library
-# and app library for public headers
+# this file just contains the lists of header files to use for the cxx shared library and app
+# library for public headers
 set(helics_shared_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/CombinationFederate.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/Publications.hpp
@@ -31,6 +31,7 @@ set(helics_shared_public_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/CoreApp.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/timeOperations.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api/typeOperations.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/application_api/CallbackFederate.hpp
 )
 
 set(helics_shared_private_headers
@@ -45,8 +46,7 @@ set(helics_shared_private_headers
 set(conv_headers
     ${HELICS_LIBRARY_SOURCE_DIR}/application_api.hpp
     ${HELICS_LIBRARY_SOURCE_DIR}/ValueFederates.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/MessageFederates.hpp
-    ${HELICS_LIBRARY_SOURCE_DIR}/helics.hpp
+    ${HELICS_LIBRARY_SOURCE_DIR}/MessageFederates.hpp ${HELICS_LIBRARY_SOURCE_DIR}/helics.hpp
 )
 set(basic_headers ${HELICS_LIBRARY_SOURCE_DIR}/helics_enums.h)
 set(basic_app_headers ${HELICS_LIBRARY_SOURCE_DIR}/helics_apps.hpp)

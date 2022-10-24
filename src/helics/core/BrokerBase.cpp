@@ -148,6 +148,10 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
         debugging,
         "specify that a broker/core should operate in user debugging mode equivalent to --slow_responding --disable_timer");
     hApp->add_flag(
+        "--allow_remote_control,!--disable_remote_control",
+        allowRemoteControl,
+        "enable the broker to respond to certain remote commands that affect operations, such as disconnect");
+    hApp->add_flag(
         "--globaltime",
         globalTime,
         "specify that the broker should use a globalTime coordinator to coordinate a master clock time with all federates");
@@ -177,29 +181,48 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
                    "use the JSON serialization mode for communications");
 
     // add the profiling setup command
+    auto* popt =
+        hApp->add_option_function<std::string>(
+                "--profiler",
+                [this](const std::string& fileName) {
+                    if (!fileName.empty()) {
+                        if (fileName == "log" || fileName == "true") {
+                            if (prBuff) {
+                                prBuff.reset();
+                            }
+                        } else {
+                            if (!prBuff) {
+                                prBuff = std::make_shared<ProfilerBuffer>();
+                            }
+                            prBuff->setOutputFile(fileName, false);
+                        }
+
+                        enable_profiling = true;
+                    } else {
+                        enable_profiling = false;
+                    }
+                },
+                "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system.")
+            ->expected(0, 1)
+            ->default_str("log");
+
+    // add the profiling append file option
     hApp->add_option_function<std::string>(
-            "--profiler",
+            "--profiler_append",
             [this](const std::string& fileName) {
                 if (!fileName.empty()) {
-                    if (fileName == "log" || fileName == "true") {
-                        if (prBuff) {
-                            prBuff.reset();
-                        }
-                    } else {
-                        if (!prBuff) {
-                            prBuff = std::make_shared<ProfilerBuffer>();
-                        }
-                        prBuff->setOutputFile(fileName);
+                    if (!prBuff) {
+                        prBuff = std::make_shared<ProfilerBuffer>();
                     }
+                    prBuff->setOutputFile(fileName, true);
 
                     enable_profiling = true;
                 } else {
                     enable_profiling = false;
                 }
             },
-            "activate profiling and set the profiler data output file, set to empty string to disable profiling, set to \"log\" to route profile message to the logging system")
-        ->expected(0, 1)
-        ->default_str("log");
+            "activate profiling and set the profiler data output file; new profiler output will be appended to the file")
+        ->excludes(popt);
 
     hApp->add_flag("--terminate_on_error",
                    terminate_on_error,
@@ -454,11 +477,13 @@ std::pair<bool, std::vector<std::string_view>>
     }
     if (res[0] == "ignore") {
     } else if (res[0] == "terminate") {
-        LOG_SUMMARY(global_broker_id_local,
-                    identifier,
-                    " received terminate instruction via command instruction")
-        ActionMessage udisconnect(CMD_USER_DISCONNECT);
-        addActionMessage(udisconnect);
+        if (allowRemoteControl) {
+            LOG_SUMMARY(global_broker_id_local,
+                        identifier,
+                        " received terminate instruction via command instruction")
+            ActionMessage udisconnect(CMD_USER_DISCONNECT);
+            addActionMessage(udisconnect);
+        }
     } else if (res[0] == "echo") {
         LOG_SUMMARY(global_broker_id_local,
                     identifier,

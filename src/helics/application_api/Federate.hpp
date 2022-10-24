@@ -22,12 +22,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <utility>
 
-namespace gmlc {
-namespace libguarded {
-    template<class T, class M>
-    class shared_guarded;
-}  // namespace libguarded
-}  // namespace gmlc
+namespace gmlc::libguarded {
+template<class T, class M>
+class shared_guarded;
+}  // namespace gmlc::libguarded
 
 /**
  * HELICS Application API
@@ -60,7 +58,7 @@ class HELICS_CXX_EXPORT Federate {
         /** error state no core communication is possible but values can be retrieved */
         ERROR_STATE = 4,
         // the following states are for asynchronous operations
-        /** indicator that the federate is pending entry to initialization state */
+        /** indicator that the federate is pending entry to initialization mode */
         PENDING_INIT = 5,
         /** state pending EnterExecution State */
         PENDING_EXEC = 6,
@@ -71,7 +69,10 @@ class HELICS_CXX_EXPORT Federate {
         /** state that the federate is pending a finalize call */
         PENDING_FINALIZE = 9,
         /** the simulation has finished normally but everything is still connected */
-        FINISHED = 10
+        FINISHED = 10,
+
+        /** the simulation is pending an iterative call to initializing mode */
+        PENDING_ITERATIVE_INIT = 12,
     };
 
   protected:
@@ -83,21 +84,30 @@ class HELICS_CXX_EXPORT Federate {
     bool useJsonSerialization{false};
     /** set to true for observer mode, no outgoing synchronized communications*/
     bool observerMode{false};
+    /** allow to retrigger time requests from callbacks (user specified)*/
+    bool retriggerTimeRequest{false};
+    /*** specify that the federate will only be used on a single thread*/
+    bool singleThreadFederate{false};
 
   private:
     LocalFederateId fedID;  //!< the federate ID of the object for use in the core
   protected:
     std::shared_ptr<Core> coreObject;  //!< reference to the core simulation API
-    Time currentTime = Time::minVal();  //!< the current simulation time
+    Time mCurrentTime = Time::minVal();  //!< the current simulation time
+    Time mStopTime = Time::maxVal();  //!< the stopping time for the federate
   private:
-    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>>
-        asyncCallInfo;  //!< pointer to a class defining the async call information
+    /// pointer to a class defining the async call information
+    std::unique_ptr<gmlc::libguarded::shared_guarded<AsyncFedCallInfo, std::mutex>> asyncCallInfo;
     std::unique_ptr<ConnectorFederateManager> cManager;  //!< class for managing filter operations
     std::string mName;  //!< the name of the federate
     std::function<void(Time, Time, bool)> timeRequestEntryCallback;
     std::function<void(Time, bool)> timeUpdateCallback;
     std::function<void(Modes, Modes)> modeUpdateCallback;
     std::function<void(Time, bool)> timeRequestReturnCallback;
+    std::function<void(bool)> initializingEntryCallback;
+    std::function<void()> executingEntryCallback;
+    std::function<void()> cosimulationTerminationCallback;
+    std::function<void(int, std::string_view)> errorHandlerCallback;
 
   public:
     /**constructor taking a federate information structure
@@ -161,6 +171,26 @@ class HELICS_CXX_EXPORT Federate {
     enterInitializingModeAsync if call any other time it will throw an InvalidFunctionCall
     exception*/
     void enterInitializingModeComplete();
+
+    /** iterate in the created mode.
+    @details  the call will block until all federates have flagged they are ready for the next stage
+    of initialization all federates requesting iterations on the created mode will be notified they
+    can continue with setup.
+    */
+    void enterInitializingModeIterative();
+
+    /** iterate in the created mode.
+    @details  the call will not block but a call to \ref enterInitializingModeIterativeComplete
+    should be made to complete the call sequence
+    */
+    void enterInitializingModeIterativeAsync();
+
+    /** second part of the async process for entering initialization mode iterative call after a
+    call to enterInitializingModeIterativeAsync; if called any other time it will throw an
+    InvalidFunctionCall exception. The federate will be in the created state(or ERROR state) after
+    this call*/
+    void enterInitializingModeIterativeComplete();
+
     /** enter the normal execution mode
     @details call will block until all federates have entered this mode
     @param iterate an optional flag indicating the desired iteration mode
@@ -237,7 +267,7 @@ class HELICS_CXX_EXPORT Federate {
     /** request a time advancement by a certain amount
     @param timeDelta the amount of time to advance
     @return the granted time step*/
-    Time requestTimeAdvance(Time timeDelta) { return requestTime(currentTime + timeDelta); }
+    Time requestTimeAdvance(Time timeDelta) { return requestTime(mCurrentTime + timeDelta); }
 
     /** request a time advancement
     @param nextInternalTimeStep the next requested time step
@@ -286,13 +316,13 @@ class HELICS_CXX_EXPORT Federate {
     @param option the option to set
     @param timeValue the value to be set
     */
-    void setProperty(int32_t option, double timeValue);
+    virtual void setProperty(int32_t option, double timeValue);
 
     /** set a time option for the federate
     @param option the option to set
     @param timeValue the value to be set
     */
-    void setProperty(int32_t option, Time timeValue);
+    virtual void setProperty(int32_t option, Time timeValue);
 
     /** set a flag for the federate
     @param flag an index into the flag /ref flag-definitions.h
@@ -303,12 +333,12 @@ class HELICS_CXX_EXPORT Federate {
     @param option an index of the option to set
     @param optionValue an integer option value for an integer based property
     */
-    void setProperty(int32_t option, int32_t optionValue);
+    virtual void setProperty(int32_t option, int32_t optionValue);
 
     /** get the value of a time option for the federate
     @param option the option to get
     */
-    Time getTimeProperty(int32_t option) const;
+    virtual Time getTimeProperty(int32_t option) const;
 
     /** get the value of a flag option
     @param flag an index into the flag /ref flag-definitions.h
@@ -317,7 +347,7 @@ class HELICS_CXX_EXPORT Federate {
     /**  get an integer option for the federate
     @param option  the option to inquire see /ref defs
     */
-    int getIntegerProperty(int32_t option) const;
+    virtual int getIntegerProperty(int32_t option) const;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate
@@ -327,6 +357,22 @@ class HELICS_CXX_EXPORT Federate {
     */
     void setLoggingCallback(
         const std::function<void(int, std::string_view, std::string_view)>& logFunction);
+
+    /** register a callback function to call when the system enters initializingMode
+    @details this callback will execute in the calling thread just prior to returning control to the
+    caller
+    @param callback the function to call; the function signature is void(bool) where the
+     boolean is set to true if the iterating
+    to true if the request is possibly iterating
+    */
+    void setInitializingEntryCallback(std::function<void(bool)> callback);
+
+    /** register a callback function to call when the system enters executingMode
+    @details this callback will execute once in the calling thread just prior to calling
+    timeUpdateCallback for the first time and
+    @param callback the function to call; the function signature is void(void)
+    */
+    void setExecutingEntryCallback(std::function<void()> callback);
 
     /** register a callback function to call when a timeRequest function is called
     @details this callback is executed prior to any blocking operation on any valid timeRequest
@@ -365,6 +411,21 @@ class HELICS_CXX_EXPORT Federate {
   true if the request is an iteration
   */
     void setTimeRequestReturnCallback(std::function<void(Time, bool)> callback);
+
+    /** register a callback function to call when the cosimulation is completed for this federate
+    @details this callback will execute once when time has reached max value or when finalize is
+    called and
+    @param callback the function to call; the function signature is void(void)
+    */
+    void setCosimulationTerminatedCallback(std::function<void()> callback);
+
+    /** register a callback function that executes when an error is generated
+   @details if set this function will execute instead of throwing an exception in some cases( NOTE:
+   this is currently only used for callback federates)
+    @param errorHandlerCallback the function to call; the function signature is void(int errorCode,
+   std::string_view errorString)
+    */
+    void setErrorHandlerCallback(std::function<void(int, std::string_view)> errorHandlerCallback);
 
     /** make a query of the core
     @details this call is blocking until the value is returned which make take some time depending
@@ -457,7 +518,10 @@ class HELICS_CXX_EXPORT Federate {
     @param value the value of the global
     */
     void setGlobal(std::string_view valueName, std::string_view value);
-    /** add a global alias for an interface */
+    /** add a global alias for an interface
+    @param interfaceName the given name of the interface
+    @param alias the new name by which the interface can be referenced
+    */
     void addAlias(std::string_view interfaceName, std::string_view alias);
     /** send a command to another core or federate
   @param target  the target of the command can be "federation", "federate", "broker", "core", or a
@@ -666,6 +730,15 @@ received
     int getTranslatorCount() const;
 
   protected:
+    /** function to run required operations for entering initializingMode*/
+    void enteringInitializingMode(IterationResult iterating);
+
+    /** function to run required operations for entering executing Mode*/
+    void enteringExecutingMode(IterationResult res);
+    /** function tor run required operations when finalizing*/
+    void finalizeOperations();
+    void preTimeRequestOperations(Time nextStep, bool iterating);
+    void postTimeRequestOperations(Time newTime, bool iterating);
     /** function to deal with any operations that need to occur on a time update*/
     virtual void updateTime(Time newTime, Time oldTime);
     /** function to deal with any operations that need to occur on the transition from startup to
@@ -682,6 +755,9 @@ received
     /** generate a string with the local variant of the name with the specified suffix
     @param[in] addition the suffix to append to the current object name*/
     std::string localNameGenerator(std::string_view addition) const;
+    /** process an error */
+    void handleError(int errorCode, std::string_view errorString, bool noThrow);
+    void setAsyncCheck(std::function<bool()> asyncCheck);
 
   public:
     /** register a set of interfaces defined in a file
@@ -703,7 +779,7 @@ received
     Modes getCurrentMode() const noexcept { return currentMode.load(); }
     /** get the current Time
     @details the most recent granted time of the federate*/
-    Time getCurrentTime() const { return currentTime; }
+    Time getCurrentTime() const noexcept { return mCurrentTime; }
     /** get the federate name*/
     const std::string& getName() const { return mName; }
     /** get a shared pointer to the core object used by the federate*/

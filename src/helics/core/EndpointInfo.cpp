@@ -282,7 +282,7 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
                                 max_connections));
             }
         } else {
-            if (sum_connections != required_connections) {
+            if (static_cast<std::int32_t>(sum_connections) != required_connections) {
                 std::set<GlobalHandle> handles;
                 for (const auto& src : sourceInformation) {
                     handles.emplace(src.id);
@@ -290,7 +290,7 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
                 for (const auto& trg : targetInformation) {
                     handles.emplace(trg.id);
                 }
-                if (handles.size() != required_connections) {
+                if (static_cast<std::int32_t>(handles.size()) != required_connections) {
                     issues.emplace_back(
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Endpoint {} requires {} connections but has only {}",

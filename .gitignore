@@ -257,3 +257,6 @@ tags
 *.mex*
 .DS_Store
 HELICS_xcode
+
+### Backup files
+*.bak

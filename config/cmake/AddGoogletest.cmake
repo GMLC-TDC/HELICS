@@ -8,64 +8,50 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #
-# Downloads GTest and provides a helper macro to add tests. Add make check, as well,
-# which gives output on failed tests without having to set an environment variable.
+# Downloads GTest and provides a helper macro to add tests. Add make check, as well, which gives
+# output on failed tests without having to set an environment variable.
 #
 
 set(gtest_version release-1.12.1)
 
-
 string(TOLOWER "googletest" gtName)
 
-    include(FetchContent)
-    mark_as_advanced(FETCHCONTENT_BASE_DIR)
-    mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
-    mark_as_advanced(FETCHCONTENT_QUIET)
-    mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
+include(FetchContent)
+mark_as_advanced(FETCHCONTENT_BASE_DIR)
+mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
+mark_as_advanced(FETCHCONTENT_QUIET)
+mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
-    fetchcontent_declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG ${gtest_version}
-        GIT_SHALLOW 1
-        UPDATE_COMMAND ""
-    )
-
-    fetchcontent_getproperties(googletest)
-
-    if(NOT ${gtName}_POPULATED)
-        # Fetch the content using previously declared details
-        fetchcontent_populate(googletest)
-
-    endif()
-    hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
-    hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
-
-
-set(gtest_force_shared_crt
-    ON
-    CACHE INTERNAL ""
+fetchcontent_declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG ${gtest_version}
+    GIT_SHALLOW 1
+    UPDATE_COMMAND ""
 )
 
-set(BUILD_SHARED_LIBS
-    OFF
-    CACHE INTERNAL ""
-)
-set(HAVE_STD_REGEX
-    ON
-    CACHE INTERNAL ""
-)
+fetchcontent_getproperties(googletest)
 
-set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS
-    1
-    CACHE INTERNAL ""
-)
+if(NOT ${gtName}_POPULATED)
+    # Fetch the content using previously declared details
+    fetchcontent_populate(googletest)
+
+endif()
+hide_variable(FETCHCONTENT_SOURCE_DIR_GOOGLETEST)
+hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_GOOGLETEST)
+
+set(gtest_force_shared_crt ON CACHE INTERNAL "")
+
+set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+set(HAVE_STD_REGEX ON CACHE INTERNAL "")
+
+set(CMAKE_SUPPRESS_DEVELOPER_WARNINGS 1 CACHE INTERNAL "")
 add_subdirectory(${${gtName}_SOURCE_DIR} ${${gtName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 message(STATUS "loading google-test directory ${${gtName}_SOURCE_DIR}")
 if(NOT MSVC)
-    # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock
-    # PRIVATE "-Wno-undef") target_Compile_options(gtest_main PRIVATE "-Wno-undef")
+    # target_Compile_options(gtest PRIVATE "-Wno-undef") target_Compile_options(gmock PRIVATE
+    # "-Wno-undef") target_Compile_options(gtest_main PRIVATE "-Wno-undef")
     # target_Compile_options(gmock_main PRIVATE "-Wno-undef")
 endif()
 
@@ -78,11 +64,7 @@ macro(add_gtest TESTNAME)
     target_link_libraries(${TESTNAME} PUBLIC gtest gmock gtest_main)
 
     if(GOOGLE_TEST_INDIVIDUAL)
-        gtest_discover_tests(
-            ${TESTNAME}
-            TEST_PREFIX "${TESTNAME}."
-            PROPERTIES FOLDER "Tests"
-        )
+        gtest_discover_tests(${TESTNAME} TEST_PREFIX "${TESTNAME}." PROPERTIES FOLDER "Tests")
     else()
         add_test(${TESTNAME} ${TESTNAME})
         set_target_properties(${TESTNAME} PROPERTIES FOLDER "Tests")
@@ -104,11 +86,7 @@ set_target_properties(gtest gtest_main gmock gmock_main PROPERTIES FOLDER "Exter
 if(MSVC)
     # add_compile_options( /wd4459)
     target_compile_definitions(gtest PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-    target_compile_definitions(
-        gtest_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
-    )
+    target_compile_definitions(gtest_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
     target_compile_definitions(gmock PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-    target_compile_definitions(
-        gmock_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING
-    )
+    target_compile_definitions(gmock_main PUBLIC _SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 endif()

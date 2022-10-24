@@ -64,38 +64,43 @@ class FederateState {
   public:
     LocalFederateId local_id;  //!< id code for the local federate descriptor
     std::atomic<GlobalFederateId> global_id;  //!< global id code, default to invalid
-
   private:
-    std::atomic<FederateStates> state{
-        FederateStates::CREATED};  //!< the current state of the federate
+    //!< the current state of the federate
+    std::atomic<FederateStates> state{FederateStates::CREATED};
     bool only_transmit_on_change{false};  //!< flag indicating that values should only be
                                           //!< transmitted if different than previous values
     bool realtime{false};  //!< flag indicating that the federate runs in real time
     bool observer{false};  //!< flag indicating the federate is an observer only
-    bool source_only{false};  //!< flag indicating the federate is a source_only
-    /// flag indicating that time mismatches should be ignored
-    bool ignore_time_mismatch_warnings{false};
+    bool mSourceOnly{false};  //!< flag indicating the federate is a source_only
+    bool mCallbackBased{false};  //!< flag indicating the federate is a callback federate
     /// flag indicating that inputs should have strict type checking
     bool strict_input_type_checking{false};
     bool ignore_unit_mismatch{false};  //!< flag to ignore mismatching units
     /// flag indicating that a federate is likely to be slow in responding
-    bool slow_responding{false};
+    bool mSlowResponding{false};
+    /// @brief flag indicating that the federate is open to remote control
+    bool mAllowRemoteControl{true};
     InterfaceInfo interfaceInformation;  //!< the container for the interface information objects
     std::unique_ptr<LogManager> mLogManager;
     int maxLogLevel{HELICS_LOG_LEVEL_NO_PRINT};
 
   public:
     std::atomic<bool> init_transmitted{false};  //!< the initialization request has been transmitted
+    /// storage for index group location (this only matters on construction so can be public)
+    int indexGroup{0};
+
   private:
     /// flag indicating that the federate should delay for the current time
     bool wait_for_current_time{false};
+    /// flag indicating that time mismatches should be ignored
+    bool ignore_time_mismatch_warnings{false};
     /// flag indicating that the profiler code should be activated
     bool mProfilerActive{false};
     /// flag indicating that the profiling should be captured in the federate log instead of
     /// forwarded
     bool mLocalProfileCapture{false};
     int errorCode{0};  //!< storage for an error code
-    CommonCore* parent_{nullptr};  //!< pointer to the higher level;
+    CommonCore* mParent{nullptr};  //!< pointer to the higher level;
     std::string errorString;  //!< storage for an error string populated on an error
     /** time the initialization mode started for real time capture */
     decltype(std::chrono::steady_clock::now()) start_clock_time;
@@ -106,9 +111,11 @@ class FederateState {
     std::int32_t grantTimeoutTimeIndex{-1};  //!< time index for the grant time out timer;
   public:
     /** atomic flag indicating this federate has requested entry to initialization */
-    std::atomic<bool> init_requested{false};
+    std::atomic<bool> initRequested{false};
     // temporary
     std::atomic<bool> requestingMode{false};
+
+    std::atomic<bool> initIterating{false};
 
   private:
     bool iterating{false};  //!< the federate is iterating at a time step
@@ -116,6 +123,7 @@ class FederateState {
                                    //!< requesting state waiting to grant
     bool terminate_on_error{false};  //!< indicator that if the federate encounters a configuration
                                      //!< error it should cause a co-simulation abort
+    IterationRequest lastIterationRequest{IterationRequest::NO_ITERATIONS};
     /// the time keeping method in use
     TimeSynchronizationMethod timeMethod{TimeSynchronizationMethod::DISTRIBUTED};
     /** counter for the number of times time or execution mode has been granted */
@@ -139,7 +147,7 @@ class FederateState {
 
     /** a callback for additional queries */
     std::function<std::string(std::string_view)> queryCallback;
-
+    std::shared_ptr<FederateOperator> fedCallbacks;  //!< storage for a callback federate
     std::vector<std::pair<std::string, std::string>> tags;  //!< storage for user defined tags
     std::atomic<bool> queueProcessing{false};
     /** find the next Value Event*/
@@ -202,7 +210,7 @@ class FederateState {
     /** getPublishedValue */
     std::pair<SmallBuffer, Time> getPublishedValue(InterfaceHandle handle);
     /** set the CommonCore object that is managing this Federate*/
-    void setParent(CommonCore* coreObject) { parent_ = coreObject; }
+    void setParent(CommonCore* coreObject) { mParent = coreObject; }
     /** update the info structure
    @details public call so it also calls the federate lock before calling private update function
    the action Message should be CMD_FED_CONFIGURE
@@ -276,6 +284,8 @@ class FederateState {
     }
     /** get the number of tags associated with an interface*/
     auto tagCount() const { return tags.size(); }
+    /** return true if the federate is callback based*/
+    bool isCallbackFederate() const { return mCallbackBased; }
 
   private:
     /** process the federate queue until returnable event
@@ -332,6 +342,20 @@ class FederateState {
     /** go through and update the max log level*/
     void updateMaxLogLevel();
 
+    /** run the processing but don't block assuming a callback based federate*/
+    void callbackProcessing() noexcept;
+    void callbackReturnResult(FederateStates lastState,
+                              MessageProcessingResult result,
+                              FederateStates newState) noexcept;
+    void initCallbackProcessing();
+    void execCallbackProcessing(IterationResult result);
+    /** update the data and time after being granted Exec entry*/
+    void updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate);
+    /** update the data and time after being granted time request*/
+    void updateDataForTimeReturn(MessageProcessingResult result,
+                                 Time nextTime,
+                                 IterationRequest iterate);
+
   public:
     /** get the granted time of a federate*/
     Time grantedTime() const { return time_granted; }
@@ -355,8 +379,11 @@ class FederateState {
     // the next 5 functions are the processing functions that actually process the queue
     /** process until the federate has verified its membership and assigned a global id number*/
     IterationResult waitSetup();
-    /** process until the initialization state has been entered or there is a failure*/
-    IterationResult enterInitializingMode();
+    /** process until the initialization state has been entered, an iteration request granted or
+    there is a failure
+    @param request the desired iteration condition
+    @return the result of the iteration request*/
+    IterationResult enterInitializingMode(IterationRequest request);
     /** function to call when entering execution state
     @param iterate indicator of whether the fed should iterate if need be or not
     @param sendRequest generates the local actionMessage inside the function leaving to false
@@ -419,6 +446,13 @@ class FederateState {
     std::string &message)
     */
     void setLogger(std::function<void(int, std::string_view, std::string_view)> logFunction);
+
+    /** set the federate callback operator
+     */
+    void setCallbackOperator(std::shared_ptr<FederateOperator> fed)
+    {
+        fedCallbacks = std::move(fed);
+    }
 
     /** set the query callback function
     @details function must have signature std::string(const std::string &query)

@@ -41,7 +41,8 @@ TEST(ZMQCore, zmqComms_broker)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket(zctx, ZMQ_REP);
     repSocket.setsockopt(ZMQ_LINGER, 200);
     repSocket.bind(defServer);
 
@@ -73,11 +74,12 @@ TEST(ZMQCore, zmqRequestSet1)
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket1(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket1(zctx, ZMQ_REP);
     repSocket1.bind(defServer);
-    zmq::socket_t repSocket2(ctx->getContext(), ZMQ_REP);
+    zmq::socket_t repSocket2(zctx, ZMQ_REP);
     repSocket2.bind(defRoute1);
-    zmq::socket_t repSocket3(ctx->getContext(), ZMQ_REP);
+    zmq::socket_t repSocket3(zctx, ZMQ_REP);
     repSocket3.bind(defRoute2);
 
     reqset.addRoutes(1, defServer);
@@ -138,11 +140,12 @@ TEST(ZMQCore, zmqRequestSet2)
     helics::zeromq::ZmqRequestSets reqset;
 
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket1(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket1(zctx, ZMQ_REP);
     repSocket1.bind(defServer);
-    zmq::socket_t repSocket2(ctx->getContext(), ZMQ_REP);
+    zmq::socket_t repSocket2(zctx, ZMQ_REP);
     repSocket2.bind(defRoute1);
-    zmq::socket_t repSocket3(ctx->getContext(), ZMQ_REP);
+    zmq::socket_t repSocket3(zctx, ZMQ_REP);
     repSocket3.bind(defRoute2);
 
     repSocket1.setsockopt(ZMQ_LINGER, 100);
@@ -240,7 +243,8 @@ TEST(ZMQCore, zmqComms_broker_test_transmit)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
     }
@@ -250,7 +254,7 @@ TEST(ZMQCore, zmqComms_broker_test_transmit)
         GTEST_FAIL() << "Unable to bind Socket";
     }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    zmq::socket_t pullSocket(zctx, ZMQ_PULL);
     try {
         pullSocket.bind(defRoute1);
     }
@@ -292,7 +296,8 @@ TEST(ZMQCore, zmqComms_rx)
     comm.loadTargetInfo(host, host);
 
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
     }
@@ -302,7 +307,7 @@ TEST(ZMQCore, zmqComms_rx)
         GTEST_FAIL() << "Unable to bind Socket";
     }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    zmq::socket_t pullSocket(zctx, ZMQ_PULL);
     try {
         pullSocket.bind(defRoute1);
     }
@@ -324,7 +329,7 @@ TEST(ZMQCore, zmqComms_rx)
     bool connected = comm.connect();
     EXPECT_TRUE(connected);
 
-    zmq::socket_t pushSocket(ctx->getContext(), ZMQ_PUSH);
+    zmq::socket_t pushSocket(zctx, ZMQ_PUSH);
     pushSocket.connect("tcp://127.0.0.1:23407");
 
     helics::ActionMessage cmd(helics::CMD_ACK);
@@ -523,7 +528,8 @@ TEST(ZMQCore, zmqCore_initialization)
     ASSERT_TRUE(core != nullptr);
     EXPECT_TRUE(core->isConfigured());
     auto ctx = ZmqContextManager::getContextPointer();
-    zmq::socket_t repSocket(ctx->getContext(), ZMQ_REP);
+    auto& zctx = ctx->getContext();
+    zmq::socket_t repSocket(zctx, ZMQ_REP);
     try {
         repSocket.bind(defServer);
     }
@@ -533,7 +539,7 @@ TEST(ZMQCore, zmqCore_initialization)
         GTEST_FAIL() << "Unable to bind Socket";
     }
     repSocket.setsockopt(ZMQ_LINGER, 100);
-    zmq::socket_t pullSocket(ctx->getContext(), ZMQ_PULL);
+    zmq::socket_t pullSocket(zctx, ZMQ_PULL);
     try {
         pullSocket.bind(defRoute1);
     }

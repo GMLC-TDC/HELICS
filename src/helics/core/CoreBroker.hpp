@@ -47,6 +47,9 @@ enum class ConnectionState : std::uint8_t {
     DISCONNECTED = 50
 };
 
+/// forward declaration of QueryReuse
+enum class QueryReuse : std::uint8_t;
+
 /** class defining the common information for a federate*/
 class BasicFedInfo {
   public:
@@ -76,8 +79,8 @@ class BasicBrokerInfo {
     bool _route_key{false};  //!< indicator that the broker has a unique route id
     bool _sent_disconnect_ack{false};  //!< indicator that the disconnect ack has been sent
     bool _disable_ping{false};  //!< indicator that the broker doesn't respond to pings
-    bool _observer{false};  // indicator that the broker is an observer
-    // 1 byte gap
+    bool _observer{false};  //!< indicator that the broker is an observer
+    bool initIterating{false};  //!< indicator that initIteration was requested
     std::string routeInfo;  //!< string describing the connection information for the route
     explicit BasicBrokerInfo(std::string_view brokerName): name(brokerName) {}
 };
@@ -97,6 +100,7 @@ class CoreBroker: public Broker, public BrokerBase {
     std::atomic<bool> _isRoot{false};  //!< set to true if this object is a root broker
     bool isRootc{false};
     bool connectionEstablished{false};  //!< the setup has been received by the core loop thread
+    bool initIterating{false};  //!< using init iterations in some cores
     int routeCount = 1;  //!< counter for creating new routes;
     /// container for all federates
     gmlc::containers::
@@ -125,7 +129,8 @@ class CoreBroker: public Broker, public BrokerBase {
     bool force_connection{false};
     gmlc::concurrency::DelayedObjects<std::string> activeQueries;  //!< holder for active queries
     /// holder for the query map builder information
-    std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>> mapBuilders;
+    std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, QueryReuse>>
+        mapBuilders;
     /// timeout manager for queries
     std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
 
@@ -146,6 +151,7 @@ class CoreBroker: public Broker, public BrokerBase {
     Time mTimeMonitorLastLogTime{Time::minVal()};  //!< the time of the last timing log message
     Time mTimeMonitorCurrentTime{Time::minVal()};  //!< the last time from the timing federate
     std::atomic<double> simTime{mInvalidSimulationTime};  //!< loaded simTime for logging
+    Time mNextTimeBarrier{Time::maxVal()};  //!< the last known time barrier
   private:
     /** function that processes all the messages
     @param command -- the message to process
@@ -183,7 +189,7 @@ class CoreBroker: public Broker, public BrokerBase {
     route_id fillMessageRouteInformation(ActionMessage& mess);
 
     /** handle initialization operations*/
-    void executeInitializationOperations();
+    void executeInitializationOperations(bool iterating);
     /** get an index for an airlock, function is threadsafe*/
     uint16_t getNextAirlockIndex();
     /** verify the broker key contained in a message
@@ -390,11 +396,12 @@ class CoreBroker: public Broker, public BrokerBase {
     // Handle the registration of new federates
     void fedRegistration(ActionMessage&& command);
 
+    void sendFedErrorAck(ActionMessage& command, std::int32_t errorCode);
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
     void initializeMapBuilder(std::string_view request,
                               std::uint16_t index,
-                              bool reset,
+                              QueryReuse reuse,
                               bool force_ordering);
 
     std::string generateGlobalStatus(fileops::JsonMapBuilder& builder);

@@ -37,7 +37,8 @@ Profiling can be enabled at any level of the hierarchy in HELICS and when enable
 
 Profiling is enabled via the command prompt by passing the `--profiler` option when calling `helics_broker`.
 
-- `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
+- `--profiler=save_profile2.txt` will clear save_profile2.txt and save new profiling data to a text file `save_profile2.txt`
+- `--profiler_append=save_profile2.txt` will append profiling data to the text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
@@ -47,7 +48,8 @@ Enabling this flag will pass in the appropriate flags to all children brokers an
 
 Profiling is enabled via the `coreinitstring` by adding a `--profiler` option.
 
-- `--profiler=save_profile2.txt` will save profiling data to a text file `save_profile2.txt`
+- `--profiler=save_profile2.txt` will clear save_profile2.txt and save new profiling data to a text file `save_profile2.txt`
+- `--profiler_append=save_profile2.txt` will append profiling data to the text file `save_profile2.txt`
 - `--profiler=log` will capture the profile text output to the normal log file or callback
 - `--profiler` is the same as `--profiler=log`
 
@@ -82,4 +84,4 @@ Some can be set through the flags option for federate configuration.
 
 This capability is preliminary and subject to change based on initial feedback. In HELICS 3 there will probably be some additional command infrastructure to handle profiling as well added in the future.
 
-If timing is done in the federate itself as well there will be a time gap; there is some processing code between the profiling message, and when the actual function call returns, but it is not blocking and should be fairly short, though dependent on how much data is actually transferred in the federate.
+If timing is done in the federate itself as well there will be a time gap; there is some processing code between the profiling message, and when the actual function call returns, but it is not blocking and should be fairly short, though dependent on how much data is actually transferred in the federate. Profiling does not work with callback federates.

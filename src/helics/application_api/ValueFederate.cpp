@@ -29,7 +29,10 @@ ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fi):
     Federate(fedName, fi)
 {
     // the core object get instantiated in the Federate constructor
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 ValueFederate::ValueFederate(std::string_view fedName,
@@ -37,21 +40,30 @@ ValueFederate::ValueFederate(std::string_view fedName,
                              const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
     Federate(fedName, core, fi)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = fi.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = useJsonSerialization;
     if (looksLikeFile(configString)) {
         ValueFederate::registerInterfaces(configString);
@@ -72,7 +84,10 @@ ValueFederate::ValueFederate() = default;
 
 ValueFederate::ValueFederate(bool /*res*/)
 {
-    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(), this, getID());
+    vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
+                                                       this,
+                                                       getID(),
+                                                       singleThreadFederate);
     vfManager->useJsonSerialization = useJsonSerialization;
 }
 
@@ -277,6 +292,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                     subAct->addTarget(name);
                 }
             }
+            auto defStr = fileops::getOrDefault(sub, "default", emptyStr);
+            if (!defStr.empty()) {
+                subAct->setDefault(defStr);
+            }
             loadOptions(this, sub, *subAct);
         }
     }
@@ -297,7 +316,10 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                     inp = &registerInput(name, type, units);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(ipt, "default", emptyStr);
+            if (!defStr.empty()) {
+                inp->setDefault(defStr);
+            }
             loadOptions(this, ipt, *inp);
         }
     }
@@ -371,7 +393,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                     id->addTarget(name);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(sub, "default", emptyStr);
+            if (!defStr.empty()) {
+                id->setDefault(defStr);
+            }
             loadOptions(this, sub, *id);
         }
     }
@@ -397,7 +422,10 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                     id = &registerInput(name, type, units);
                 }
             }
-
+            auto defStr = fileops::getOrDefault(ipt, "default", emptyStr);
+            if (!defStr.empty()) {
+                id->setDefault(defStr);
+            }
             loadOptions(this, ipt, *id);
         }
     }

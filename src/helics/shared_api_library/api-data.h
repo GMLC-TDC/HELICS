@@ -120,7 +120,9 @@ const HelicsBool HELICS_FALSE = 0; /*!< indicator used for a false response */
 typedef enum {
     HELICS_ITERATION_REQUEST_NO_ITERATION = 0, /*!< no iteration is requested */
     HELICS_ITERATION_REQUEST_FORCE_ITERATION = 1, /*!< force iteration return when able */
-    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2 /*!< only return an iteration if necessary */
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2, /*!< only return an iteration if necessary */
+    HELICS_ITERATION_REQUEST_HALT_OPERATIONS = 5, /*!< halt the federate*/
+    HELICS_ITERATION_REQUEST_ERROR = 7 /*!< indicate there was an error */
 } HelicsIterationRequest;
 
 /**

@@ -60,11 +60,15 @@ typedef enum {
     HELICS_FLAG_FORWARD_COMPUTE = 14,
     HELICS_FLAG_REALTIME = 16,
     HELICS_FLAG_SINGLE_THREAD_FEDERATE = 27,
+    HELICS_FLAG_MULTI_THREAD_CORE = 28,
+    HELICS_FLAG_SINGLE_THREAD_CORE = 29,
     HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS = 67,
     HELICS_FLAG_STRICT_CONFIG_CHECKING = 75,
     HELICS_FLAG_USE_JSON_SERIALIZATION = 79,
     HELICS_FLAG_EVENT_TRIGGERED = 81,
-    HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
+    HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96,
+    HELICS_FLAG_CALLBACK_FEDERATE = 103,
+    HELICS_FLAG_AUTOMATED_TIME_REQUEST = 106
 } HelicsFederateFlags;
 
 typedef enum {
@@ -82,7 +86,9 @@ typedef enum {
     HELICS_FLAG_FORCE_LOGGING_FLUSH = 88,
     HELICS_FLAG_DUMPLOG = 89,
     HELICS_FLAG_PROFILING = 93,
-    HELICS_FLAG_PROFILING_MARKER = 95
+    HELICS_FLAG_PROFILING_MARKER = 95,
+    HELICS_FLAG_ALLOW_REMOTE_CONTROL = 109,
+    HELICS_FLAG_DISABLE_REMOTE_CONTROL = 110
 } HelicsFlags;
 
 typedef enum {
@@ -135,12 +141,14 @@ typedef enum {
     HELICS_PROPERTY_TIME_RT_TOLERANCE = 145,
     HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+    HELICS_PROPERTY_TIME_STOPTIME = 152,
     HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
     HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
-    HELICS_PROPERTY_INT_LOG_BUFFER = 276
+    HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+    HELICS_PROPERTY_INT_INDEX_GROUP = 282
 } HelicsProperties;
 
 const int HELICS_INVALID_PROPERTY_VALUE = -972;
@@ -173,7 +181,8 @@ typedef enum {
     HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD = 507,
     HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION = 510,
     HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST = 512,
-    HELICS_HANDLE_OPTION_CONNECTIONS = 522
+    HELICS_HANDLE_OPTION_CONNECTIONS = 522,
+    HELICS_HANDLE_OPTION_TIME_RESTRICTED = 557
 } HelicsHandleOptions;
 
 typedef enum {
@@ -244,7 +253,9 @@ const HelicsBool HELICS_FALSE = 0;
 typedef enum {
     HELICS_ITERATION_REQUEST_NO_ITERATION = 0,
     HELICS_ITERATION_REQUEST_FORCE_ITERATION = 1,
-    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2
+    HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = 2,
+    HELICS_ITERATION_REQUEST_HALT_OPERATIONS = 5,
+    HELICS_ITERATION_REQUEST_ERROR = 7
 } HelicsIterationRequest;
 
 typedef enum {
@@ -370,6 +381,8 @@ HelicsFederate helicsCreateMessageFederate(const char* fedName, HelicsFederateIn
 HelicsFederate helicsCreateMessageFederateFromConfig(const char* configFile, HelicsError* err);
 HelicsFederate helicsCreateCombinationFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
 HelicsFederate helicsCreateCombinationFederateFromConfig(const char* configFile, HelicsError* err);
+HelicsFederate helicsCreateCallbackFederate(const char* fedName, HelicsFederateInfo fi, HelicsError* err);
+HelicsFederate helicsCreateCallbackFederateFromConfig(const char* configFile, HelicsError* err);
 HelicsFederate helicsFederateClone(HelicsFederate fed, HelicsError* err);
 void helicsFederateProtect(const char* fedName, HelicsError* err);
 void helicsFederateUnProtect(const char* fedName, HelicsError* err);
@@ -411,8 +424,11 @@ void helicsFederateFree(HelicsFederate fed);
 void helicsCloseLibrary(void);
 void helicsFederateEnterInitializingMode(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterInitializingModeAsync(HelicsFederate fed, HelicsError* err);
-HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterInitializingModeComplete(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterative(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterativeAsync(HelicsFederate fed, HelicsError* err);
+void helicsFederateEnterInitializingModeIterativeComplete(HelicsFederate fed, HelicsError* err);
+HelicsBool helicsFederateIsAsyncOperationCompleted(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingMode(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingModeAsync(HelicsFederate fed, HelicsError* err);
 void helicsFederateEnterExecutingModeComplete(HelicsFederate fed, HelicsError* err);
@@ -443,6 +459,7 @@ HelicsTime helicsFederateGetTimeProperty(HelicsFederate fed, int timeProperty, H
 HelicsBool helicsFederateGetFlagOption(HelicsFederate fed, int flag, HelicsError* err);
 int helicsFederateGetIntegerProperty(HelicsFederate fed, int intProperty, HelicsError* err);
 HelicsTime helicsFederateGetCurrentTime(HelicsFederate fed, HelicsError* err);
+void helicsFederateAddAlias(HelicsFederate fed, const char* interfaceName, const char* alias, HelicsError* err);
 void helicsFederateSetGlobal(HelicsFederate fed, const char* valueName, const char* value, HelicsError* err);
 void helicsFederateSetTag(HelicsFederate fed, const char* tagName, const char* value, HelicsError* err);
 const char* helicsFederateGetTag(HelicsFederate fed, const char* tagName, HelicsError* err);
@@ -459,6 +476,8 @@ const char* helicsFederateGetCommandSource(HelicsFederate fed, HelicsError* err)
 const char* helicsFederateWaitCommand(HelicsFederate fed, HelicsError* err);
 void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* value, HelicsError* err);
 void helicsBrokerSetGlobal(HelicsBroker broker, const char* valueName, const char* value, HelicsError* err);
+void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* alias, HelicsError* err);
+void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const char* alias, HelicsError* err);
 void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err);
 void helicsBrokerSendCommand(HelicsBroker broker, const char* target, const char* command, HelicsError* err);
@@ -741,4 +760,30 @@ void helicsFederateSetTimeRequestReturnCallback(HelicsFederate fed,
                                                 void (*requestTimeReturn)(HelicsTime newTime, HelicsBool iterating, void* userdata),
                                                 void* userdata,
                                                 HelicsError* err);
+void helicsFederateInitializingEntryCallback(HelicsFederate fed,
+                                             void (*initializingEntry)(HelicsBool iterating, void* userdata),
+                                             void* userdata,
+                                             HelicsError* err);
+void helicsFederateExecutingEntryCallback(HelicsFederate fed, void (*executingEntry)(void* userdata), void* userdata, HelicsError* err);
+void helicsFederateCosimulationTerminationCallback(HelicsFederate fed,
+                                                   void (*cosimTermination)(void* userdata),
+                                                   void* userdata,
+                                                   HelicsError* err);
+void helicsFederateErrorHandlerCallback(HelicsFederate fed,
+                                        void (*errorHandler)(int errorCode, const char* errorString, void* userdata),
+                                        void* userdata,
+                                        HelicsError* err);
+void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
+                                            HelicsTime (*timeUpdate)(HelicsTime time, void* userdata),
+                                            void* userdata,
+                                            HelicsError* err);
+void helicsCallbackFederateNextTimeIterativeCallback(
+    HelicsFederate fed,
+    HelicsTime (*timeUpdate)(HelicsTime time, HelicsIterationResult result, HelicsIterationRequest* iteration, void* userdata),
+    void* userdata,
+    HelicsError* err);
+void helicsCallbackFederateInitializeCallback(HelicsFederate fed,
+                                              HelicsIterationRequest (*initialize)(void* userdata),
+                                              void* userdata,
+                                              HelicsError* err);
 void helicsQueryBufferFill(HelicsQueryBuffer buffer, const char* queryResult, int strSize, HelicsError* err);

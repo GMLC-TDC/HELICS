@@ -403,6 +403,7 @@ across different compilers*/
 // definitions related to Core Configure
 #define UPDATE_FILTER_OPERATOR 572
 #define UPDATE_TRANSLATOR_OPERATOR 574
+#define UPDATE_FEDERATE_OPERATOR 576
 #define UPDATE_QUERY_CALLBACK 581
 #define UPDATE_LOGGING_CALLBACK 592
 #define UPDATE_LOGGING_FILE 594
@@ -424,7 +425,8 @@ enum CommandErrorCodes : int {
     max_federate_count_exceeded = 11,
     max_broker_count_exceeded = 13,
     broker_terminating = 14,
-    multiple_wait_for_current_time_flags = 15
+    multiple_wait_for_current_time_flags = 15,
+    duplicate_federate_id = 17
 };
 
 /** return a string associated with a particular error code

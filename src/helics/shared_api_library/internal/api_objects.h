@@ -31,6 +31,7 @@ class Federate;
 class Broker;
 class ValueFederate;
 class MessageFederate;
+class CallbackFederate;
 class Input;
 class Publication;
 class Endpoint;
@@ -42,7 +43,7 @@ class TranslatorObject;
 class SmallBuffer;
 
 /** type code embedded in the objects so the library knows how to cast them appropriately*/
-enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, INVALID };
+enum class FederateType : int { GENERIC, VALUE, MESSAGE, COMBINATION, CALLBACK, INVALID };
 
 /** object wrapping a broker for the c-api*/
 class BrokerObject {
@@ -202,6 +203,7 @@ constexpr char gHelicsNullStringArgument[] = "The supplied string argument is nu
 helics::Federate* getFed(HelicsFederate fed, HelicsError* err);
 helics::ValueFederate* getValueFed(HelicsFederate fed, HelicsError* err);
 helics::MessageFederate* getMessageFed(HelicsFederate fed, HelicsError* err);
+helics::CallbackFederate* getCallbackFed(HelicsFederate fed, HelicsError* err);
 helics::Core* getCore(HelicsCore core, HelicsError* err);
 helics::Broker* getBroker(HelicsBroker broker, HelicsError* err);
 helics::Message* getMessageObj(HelicsMessage message, HelicsError* err);
@@ -215,6 +217,7 @@ HelicsDataBuffer createAPIDataBuffer(helics::SmallBuffer& buff);
 std::shared_ptr<helics::Federate> getFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::ValueFederate> getValueFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::MessageFederate> getMessageFedSharedPtr(HelicsFederate fed, HelicsError* err);
+std::shared_ptr<helics::CallbackFederate> getCallbackFedSharedPtr(HelicsFederate fed, HelicsError* err);
 std::shared_ptr<helics::Core> getCoreSharedPtr(HelicsCore core, HelicsError* err);
 /**centralized error handler for the C interface*/
 void helicsErrorHandler(HelicsError* err) noexcept;

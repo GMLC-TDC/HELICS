@@ -48,6 +48,7 @@ class FilterFederate;
 class TranslatorFederate;
 class TimeoutMonitor;
 enum class InterfaceType : char;
+enum class QueryReuse : std::uint8_t;
 /** enumeration of possible operating conditions for a federate*/
 enum class OperatingState : std::uint8_t { OPERATING = 0, ERROR_STATE = 5, DISCONNECTED = 10 };
 
@@ -97,7 +98,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual int getErrorCode() const override final;
     virtual std::string getErrorMessage() const override final;
     virtual void finalize(LocalFederateId federateID) override final;
-    virtual void enterInitializingMode(LocalFederateId federateID) override final;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
     virtual IterationResult
         enterExecutingMode(LocalFederateId federateID,
@@ -114,7 +116,6 @@ class CommonCore: public Core, public BrokerBase {
     virtual void processCommunications(LocalFederateId federateID,
                                        std::chrono::milliseconds msToWait) override final;
     virtual Time getCurrentTime(LocalFederateId federateID) const override final;
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const override final;
     virtual void
         setTimeProperty(LocalFederateId federateID, int32_t property, Time time) override final;
     virtual void setIntegerProperty(LocalFederateId federateID,
@@ -232,6 +233,8 @@ class CommonCore: public Core, public BrokerBase {
     virtual void
         setTranslatorOperator(InterfaceHandle translator,
                               std::shared_ptr<TranslatorOperator> callbacks) override final;
+    virtual void setFederateOperator(LocalFederateId federateID,
+                                     std::shared_ptr<FederateOperator> callback) override;
     /** set the local identification for the core*/
     void setIdentifier(std::string_view name);
     /** get the local identifier for the core*/
@@ -421,12 +424,12 @@ class CommonCore: public Core, public BrokerBase {
     /** generate a mapbuilder for the federates
     @param request the query to build the map for
     @param index the key of the request
-    @param reset whether the builder should reset or use an existing (true to not use existing)
+    @param reuse enumeration of whether a query is reusable or not
     @param force_ordering true if the request should use the force_ordering pathways
     */
     void initializeMapBuilder(std::string_view request,
                               std::uint16_t index,
-                              bool reset,
+                              QueryReuse reuse,
                               bool force_ordering) const;
     /** generate results for core queries*/
     std::string coreQuery(std::string_view queryStr, bool force_ordering) const;
@@ -441,7 +444,7 @@ class CommonCore: public Core, public BrokerBase {
     void processCommandInstruction(ActionMessage& command);
 
   private:
-    int32_t _global_federation_size = 0;  //!< total size of the federation
+    int32_t mGlobalFederationSize{0};  //!< total size of the federation
     /// counter for the number of times the entry to initialization Mode was explicitly delayed
     std::atomic<int16_t> delayInitCounter{0};
     bool filterTiming{false};  //!< if there are filters needing a time connection
@@ -472,7 +475,7 @@ class CommonCore: public Core, public BrokerBase {
     /// timeout manager for queries
     std::deque<std::pair<int32_t, decltype(std::chrono::steady_clock::now())>> queryTimeouts;
     /// holder for the query map builder information
-    mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, bool>>
+    mutable std::vector<std::tuple<fileops::JsonMapBuilder, std::vector<ActionMessage>, QueryReuse>>
         mapBuilders;
 
     FilterFederate* filterFed{nullptr};
@@ -482,6 +485,9 @@ class CommonCore: public Core, public BrokerBase {
     /// airlocks for updating filter operators and other functions
     std::array<gmlc::containers::AirLock<std::any>, 4> dataAirlocks;
     gmlc::concurrency::TriggerVariable disconnection;  //!< controller for the disconnection process
+    /// flag indicating that one or more federates has requested iterative initialization
+    std::atomic<bool> initIterations{false};
+
   private:
     // generate a filter Federate
     void generateFilterFederate();

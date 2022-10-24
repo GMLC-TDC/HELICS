@@ -1,5 +1,6 @@
 *helicsBroker*
 *helicsFederate*
+*helicsCallbackFederate*
 *helicsCore*
 *helicsPublication*
 *helicsInput*

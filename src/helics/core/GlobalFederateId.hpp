@@ -15,12 +15,15 @@ namespace helics {
    as a program has been phenomenally successful beyond all wildest imaginations and we can probably
    afford to change these to 64 bit numbers to accommodate.  Of the available federates there are 2
    federate numbers that can be defined per core/broker for various purposes.  These are the upper
-   number of federate id's so 268,435,455 reserved federate id's.  An ID of 1 is reserved for the
+   number of federate id's so 536,870,910 reserved federate id's.  An ID of 1 is reserved for the
    root broker
+
     */
 constexpr IdentifierBaseType gGlobalFederateIdShift{0x0002'0000};
 /** a shift in the global id index to discriminate between global ids of brokers vs federates*/
 constexpr IdentifierBaseType gGlobalBrokerIdShift{0x7000'0000};
+/** the block size for global priority levels*/
+constexpr IdentifierBaseType gGlobalPriorityBlockSize{100'000'000};
 
 /** class holding a globally unique identifier for brokers
     @details the class is fully compatible with GlobalFederateId*/

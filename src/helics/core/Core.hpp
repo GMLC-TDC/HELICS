@@ -155,9 +155,16 @@ class Core {
     /**
      * Change the federate state to the Initializing state.
      *
+     *@param federateID  the identifier of the federate
+     *@param iterate  the requested iteration mode, ITERATE_IF_NEEDED will operate identically to
+     *FORCE_ITERATION in this case
+     *
      * May only be invoked in Created state otherwise an error is thrown
+     * for callback federates this call passes full control to the core
+     @return will return true if the call resulted in Initializing mode being reached
      */
-    virtual void enterInitializingMode(LocalFederateId federateID) = 0;
+    virtual bool enterInitializingMode(LocalFederateId federateID,
+                                       IterationRequest iterate = NO_ITERATION) = 0;
 
     /** set the core to ready to enter init
     @details this function only needs to be called for cores that don't have any federates but may
@@ -259,10 +266,6 @@ class Core {
     virtual iteration_time
         requestTimeIterative(LocalFederateId federateID, Time next, IterationRequest iterate) = 0;
 
-    /**
-     * Returns the current reiteration count for the specified federate.
-     */
-    virtual uint64_t getCurrentReiteration(LocalFederateId federateID) const = 0;
     /** blocking call that processes helics communication messages
      * this call can be used when expecting communication from other federates or when the federate
      * has nothing else to do and doesn't want to advance time
@@ -753,6 +756,13 @@ class Core {
     */
     virtual void setTranslatorOperator(InterfaceHandle translator,
                                        std::shared_ptr<TranslatorOperator> callback) = 0;
+
+    /** set the callback Federate operators
+    @param fed  the federate to set the callback for
+    @param callback pointer to the operator class executing the federate
+    */
+    virtual void setFederateOperator(LocalFederateId fed,
+                                     std::shared_ptr<FederateOperator> callback) = 0;
 
     /** define a logging function to use for logging message and notices from the federation and
     individual federate

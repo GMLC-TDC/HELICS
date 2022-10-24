@@ -19,151 +19,87 @@ else()
     set(zmq_shared_build ON)
 endif()
 
-
 set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.4)
-
 
 string(TOLOWER "libzmq" lcName)
 
-    include(FetchContent)
+include(FetchContent)
 
-    mark_as_advanced(FETCHCONTENT_BASE_DIR)
-    mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
-    mark_as_advanced(FETCHCONTENT_QUIET)
-    mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
+mark_as_advanced(FETCHCONTENT_BASE_DIR)
+mark_as_advanced(FETCHCONTENT_FULLY_DISCONNECTED)
+mark_as_advanced(FETCHCONTENT_QUIET)
+mark_as_advanced(FETCHCONTENT_UPDATES_DISCONNECTED)
 
-    fetchcontent_declare(
-        libzmq
-        GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-        GIT_TAG ${${PROJECT_NAME}_LIBZMQ_VERSION}
-    )
+fetchcontent_declare(
+    libzmq GIT_REPOSITORY https://github.com/zeromq/libzmq.git
+    GIT_TAG ${${PROJECT_NAME}_LIBZMQ_VERSION}
+)
 
-    fetchcontent_getproperties(libzmq)
+fetchcontent_getproperties(libzmq)
 
-    if(NOT ${lcName}_POPULATED)
-        # Fetch the content using previously declared details
-        fetchcontent_populate(libzmq)
+if(NOT ${lcName}_POPULATED)
+    # Fetch the content using previously declared details
+    fetchcontent_populate(libzmq)
 
-    endif()
+endif()
 
-    hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
-    hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_LIBZMQ)
+hide_variable(FETCHCONTENT_SOURCE_DIR_LIBZMQ)
+hide_variable(FETCHCONTENT_UPDATES_DISCONNECTED_LIBZMQ)
 
 # Set custom variables, policies, etc. ...
 
-set(ZMQ_BUILD_TESTS
-    OFF
-    CACHE INTERNAL ""
-)
-set(ENABLE_CURVE
-    OFF
-    CACHE INTERNAL ""
-)
-set(ENABLE_DRAFTS
-    OFF
-    CACHE INTERNAL ""
-)
-set(WITH_DOCS
-    OFF
-    CACHE INTERNAL ""
-)
-set(${PROJECT_NAME}_ZMQ_LOCAL_BUILD
-    ON
-    CACHE INTERNAL ""
-)
-set(LIBZMQ_PEDANTIC
-    OFF
-    CACHE INTERNAL ""
-)
-set(WITH_PERF_TOOL
-    OFF
-    CACHE INTERNAL ""
-)
-set(ENABLE_CPACK
-    OFF
-    CACHE INTERNAL ""
-)
-set(BUILD_STATIC
-    ${zmq_static_build}
-    CACHE INTERNAL ""
-)
-set(BUILD_SHARED
-    ${zmq_shared_build}
-    CACHE INTERNAL ""
-)
-set(ENABLE_CPACK
-    OFF
-    CACHE INTERNAL ""
-)
-set(ENABLE_WS
-    OFF
-    CACHE INTERNAL ""
-)
+set(ZMQ_BUILD_TESTS OFF CACHE INTERNAL "")
+set(ENABLE_CURVE OFF CACHE INTERNAL "")
+set(ENABLE_DRAFTS OFF CACHE INTERNAL "")
+set(WITH_DOCS OFF CACHE INTERNAL "")
+set(${PROJECT_NAME}_ZMQ_LOCAL_BUILD ON CACHE INTERNAL "")
+set(LIBZMQ_PEDANTIC OFF CACHE INTERNAL "")
+set(WITH_PERF_TOOL OFF CACHE INTERNAL "")
+set(ENABLE_CPACK OFF CACHE INTERNAL "")
+set(BUILD_STATIC ${zmq_static_build} CACHE INTERNAL "")
+set(BUILD_SHARED ${zmq_shared_build} CACHE INTERNAL "")
+set(ENABLE_CPACK OFF CACHE INTERNAL "")
+set(ENABLE_WS OFF CACHE INTERNAL "")
 
-set(ENABLE_PRECOMPILED
-    OFF
-    CACHE INTERNAL ""
-)
+set(ENABLE_PRECOMPILED OFF CACHE INTERNAL "")
 
-set(ENABLE_CLANG
-    ON
-    CACHE INTERNAL ""
-)
+set(ENABLE_CLANG ON CACHE INTERNAL "")
 
-set(ENABLE_TSAN
-    OFF
-    CACHE INTERNAL ""
-)
+set(ENABLE_TSAN OFF CACHE INTERNAL "")
 
-set(ENABLE_TSAN
-    OFF
-    CACHE INTERNAL ""
-)
-if (${PROJECT_NAME}_ENABLE_ENCRYPTION AND NOT ${PROJECT_NAME}_DISABLE_ZMQ_ENCRYPTION)
-    set(WITH_LIBSODIUM
-        ON
-        CACHE INTERNAL ""
-)
+set(ENABLE_TSAN OFF CACHE INTERNAL "")
+if(${PROJECT_NAME}_ENABLE_ENCRYPTION AND NOT ${PROJECT_NAME}_DISABLE_ZMQ_ENCRYPTION)
+    set(WITH_LIBSODIUM ON CACHE INTERNAL "")
 else()
- set(WITH_LIBSODIUM
-        OFF
-        CACHE INTERNAL ""
-)
+    set(WITH_LIBSODIUM OFF CACHE INTERNAL "")
 endif()
 
-set(ZMQ_OUTPUT_BASENAME
-    zmq
-    CACHE INTERNAL ""
-)
+set(ZMQ_OUTPUT_BASENAME zmq CACHE INTERNAL "")
 
-set(ZEROMQ_CMAKECONFIG_INSTALL_DIR
-    ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ
-    CACHE INTERNAL ""
-)
+set(ZEROMQ_CMAKECONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/ZeroMQ CACHE INTERNAL "")
 # Bring the populated content into the build
 set(COMPILER_SUPPORTS_CXX11 ON)
 set(ZMQ_HAVE_NOEXCEPT ON)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
-        set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-inconsistent-missing-override -Wno-unused-parameter ")
+    message(STATUS "clang compiling for ZMQ ${CMAKE_CXX_FLAGS}")
+    set(OLD_CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    set(CMAKE_CXX_FLAGS
+        "${CMAKE_CXX_FLAGS} -Wno-inconsistent-missing-override -Wno-unused-parameter "
+    )
 endif()
 
 add_subdirectory(${${lcName}_SOURCE_DIR} ${${lcName}_BINARY_DIR} EXCLUDE_FROM_ALL)
 
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        set(CMAKE_CXX_FLAGS ${OLDCMAKE_CXX_FLAGS})
+    set(CMAKE_CXX_FLAGS ${OLDCMAKE_CXX_FLAGS})
 endif()
-
 
 set(ZeroMQ_FOUND TRUE)
 
 if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
     set_target_properties(libzmq-static PROPERTIES FOLDER "Extern")
-    target_compile_options(
-        libzmq-static PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-fPIC>
-    )
+    target_compile_options(libzmq-static PRIVATE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-fPIC>)
 
 else()
     set_target_properties(libzmq PROPERTIES FOLDER "Extern")
@@ -209,10 +145,8 @@ if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_
                 FRAMEWORK DESTINATION "Library/Frameworks"
             )
         elseif(WIN32)
-            install(
-                FILES $<TARGET_FILE:${zmq_target_output}>
-                DESTINATION ${CMAKE_INSTALL_BINDIR}
-                COMPONENT libs
+            install(FILES $<TARGET_FILE:${zmq_target_output}> DESTINATION ${CMAKE_INSTALL_BINDIR}
+                    COMPONENT libs
             )
         else()
             message(
@@ -220,10 +154,7 @@ if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_
                     "Update to CMake 3.13+ or enable the ${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY CMake option to install when using ZMQ as a subproject"
             )
         endif()
-        if(MSVC
-           AND NOT EMBEDDED_DEBUG_INFO
-           AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL
-        )
+        if(MSVC AND NOT EMBEDDED_DEBUG_INFO AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL)
             install(
                 FILES $<TARGET_PDB_FILE:${zmq_target_output}>
                 DESTINATION ${CMAKE_INSTALL_BINDIR}
@@ -232,10 +163,8 @@ if(${PROJECT_NAME}_BUILD_CXX_SHARED_LIB OR NOT ${PROJECT_NAME}_DISABLE_C_SHARED_
             )
         endif()
         if(MSVC AND NOT ${PROJECT_NAME}_BINARY_ONLY_INSTALL)
-            install(
-                FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
-                DESTINATION ${CMAKE_INSTALL_LIBDIR}
-                COMPONENT libs
+            install(FILES $<TARGET_LINKER_FILE:${zmq_target_output}>
+                    DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT libs
             )
         endif()
 

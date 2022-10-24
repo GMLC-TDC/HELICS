@@ -42,7 +42,7 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_TIME_BARRIER_CLEAR:
         case CMD_TIME_UNBLOCK: {
             auto processed = timeCoord->processTimeMessage(cmd);
-            if (processed == message_process_result::processed) {
+            if (processed != TimeProcessingResult::NOT_PROCESSED) {
                 if (!timeGranted_mode) {
                     if (state == FederateStates::INITIALIZING) {
                         cmd.setAction(CMD_EXEC_CHECK);
@@ -61,9 +61,15 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 if (checkActionFlag(cmd, observer_flag)) {
                     timeCoord->setDynamicJoining();
                 }
-                newState = FederateStates::INITIALIZING;
-                newMode = true;
-                proc = MessageProcessingResult::NEXT_STEP;
+                if (checkActionFlag(cmd, iteration_requested_flag)) {
+                    newState = FederateStates::CREATED;
+                    newMode = false;
+                    proc = MessageProcessingResult::ITERATING;
+                } else {
+                    newState = FederateStates::INITIALIZING;
+                    newMode = true;
+                    proc = MessageProcessingResult::NEXT_STEP;
+                }
             }
             break;
         case CMD_EXEC_REQUEST:
@@ -83,11 +89,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_EXEC_GRANT: {
             bool processed = false;
             switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
+                case TimeProcessingResult::DELAY_PROCESSING:
                     proc = MessageProcessingResult::DELAY_MESSAGE;
                     processed = true;
                     break;
-                case message_process_result::no_effect:
+                case TimeProcessingResult::NOT_PROCESSED:
                     proc = MessageProcessingResult::CONTINUE_PROCESSING;
                     processed = true;
                     break;
@@ -167,11 +173,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
             } else {
                 // returnable = false;
                 switch (timeCoord->processTimeMessage(cmd)) {
-                    case message_process_result::delay_processing:
+                    case TimeProcessingResult::DELAY_PROCESSING:
                         // returnable = true;
                         proc = MessageProcessingResult::DELAY_MESSAGE;
                         break;
-                    case message_process_result::no_effect:
+                    case TimeProcessingResult::NOT_PROCESSED:
                         // returnable = true;
                         proc = MessageProcessingResult::CONTINUE_PROCESSING;
                         break;
@@ -194,11 +200,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_DISCONNECT_CORE:
             returnable = false;
             switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
+                case TimeProcessingResult::DELAY_PROCESSING:
                     returnable = true;
                     proc = MessageProcessingResult::DELAY_MESSAGE;
                     break;
-                case message_process_result::no_effect:
+                case TimeProcessingResult::NOT_PROCESSED:
                     proc = MessageProcessingResult::CONTINUE_PROCESSING;
                     returnable = true;
                     break;
@@ -223,11 +229,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         case CMD_TIME_GRANT:
             returnable = false;
             switch (timeCoord->processTimeMessage(cmd)) {
-                case message_process_result::delay_processing:
+                case TimeProcessingResult::DELAY_PROCESSING:
                     proc = MessageProcessingResult::DELAY_MESSAGE;
                     returnable = true;
                     break;
-                case message_process_result::no_effect:
+                case TimeProcessingResult::NOT_PROCESSED:
                     proc = MessageProcessingResult::CONTINUE_PROCESSING;
                     returnable = true;
                     break;
@@ -280,11 +286,11 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
                 }
             } else {
                 switch (timeCoord->processTimeMessage(cmd)) {
-                    case message_process_result::delay_processing:
+                    case TimeProcessingResult::DELAY_PROCESSING:
                         returnable = true;
                         proc = MessageProcessingResult::DELAY_MESSAGE;
                         break;
-                    case message_process_result::no_effect:
+                    case TimeProcessingResult::NOT_PROCESSED:
                         returnable = true;
                         proc = MessageProcessingResult::CONTINUE_PROCESSING;
                         break;

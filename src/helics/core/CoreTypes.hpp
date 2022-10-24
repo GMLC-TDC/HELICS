@@ -29,6 +29,16 @@ enum class FederateStates : std::uint8_t {
     UNKNOWN,  //!< unknown state
 };
 
+/** enumeration of the threading options for a core*/
+enum class CoreThreading : std::uint8_t {
+    /** choose the default based on federate options*/
+    DEFAULT = HELICS_CORE_TYPE_DEFAULT,
+    /** specify the core should be multithreaded*/
+    MULTI = HELICS_FLAG_MULTI_THREAD_CORE,
+    /** specify a single threaded core*/
+    SINGLE = HELICS_FLAG_SINGLE_THREAD_CORE
+};
+
 /** convert the state into a human readable string*/
 const std::string& fedStateString(FederateStates state);
 
@@ -68,8 +78,8 @@ enum class MessageProcessingResult : std::int8_t {
     NEXT_STEP = 0,  //!< indicator that the iterations have completed
     ITERATING = 2,  //!< indicator that the iterations need to continue
     HALTED = 3,  //!< indicator that the simulation has been halted
-    USER_RETURN =
-        5,  //!< indicator that there was a return request but no other conditions or issues
+    /// indicator that there was a return request but no other conditions or issues
+    USER_RETURN = 5,
     ERROR_RESULT = 7,  //!< indicator that an error has occurred
     REPROCESS_MESSAGE = 8,  // indicator that the message needs to be processed again
     BUSY = 10,  // indicator that processing could not be done since the resource was busy
@@ -92,7 +102,9 @@ enum class IterationResult : signed char {
 enum class IterationRequest : signed char {
     NO_ITERATIONS = 0,  //!< indicator that the iterations have completed
     FORCE_ITERATION = 1,  //!< force an iteration whether it is needed or not
-    ITERATE_IF_NEEDED = 2  //!< indicator that the iterations need to continue
+    ITERATE_IF_NEEDED = 2,  //!< indicator that the iterations need to continue
+    HALT_OPERATIONS = 3,  //!< indicator that the federate should halt
+    ERROR_CONDITION = 7  //!< indicator that the federate has errored and co-simulation should stop
 };
 
 /** define the type of the handle*/

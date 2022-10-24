@@ -128,6 +128,10 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_REALTIME = 16,
                /** flag indicating that the federate will only interact on a single thread*/
                HELICS_FLAG_SINGLE_THREAD_FEDERATE = 27,
+               /** flag indicating use of a thread safe core*/
+               HELICS_FLAG_MULTI_THREAD_CORE = 28,
+               /** flag indicating use of a single threaded core*/
+               HELICS_FLAG_SINGLE_THREAD_CORE = 29,
                /** used to not display warnings on mismatched requested times*/
                HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS = 67,
                /** specify that checking on configuration files should be strict and throw and error
@@ -140,7 +144,13 @@ typedef enum { /* NOLINT */
                HELICS_FLAG_EVENT_TRIGGERED = 81,
                /** specify that that federate should capture the profiling data to the local
                   federate logging system*/
-               HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96
+               HELICS_FLAG_LOCAL_PROFILING_CAPTURE = 96,
+               /** specify that the federate is a callback based federate using callbacks for
+                  execution*/
+               HELICS_FLAG_CALLBACK_FEDERATE = 103,
+               /** specify that a federate should automatically call timeRequest on completion of
+                  current request*/
+               HELICS_FLAG_AUTOMATED_TIME_REQUEST = 106
 } HelicsFederateFlags;
 
 /** enumeration of additional core flags*/
@@ -174,7 +184,13 @@ typedef enum { /* NOLINT */
                /** specify that helics should capture profiling data*/
                HELICS_FLAG_PROFILING = 93,
                /** flag trigger for generating a profiling marker*/
-               HELICS_FLAG_PROFILING_MARKER = 95
+               HELICS_FLAG_PROFILING_MARKER = 95,
+               /** specify that the federate/core/broker should allow some remote control operations
+                  such as finalize*/
+               HELICS_FLAG_ALLOW_REMOTE_CONTROL = 109,
+               /** specify that the federate/core/broker should *NOT* allow some remote control
+                  operations such as finalize*/
+               HELICS_FLAG_DISABLE_REMOTE_CONTROL = 110
 } HelicsFlags;
 
 /** log level definitions
@@ -271,9 +287,13 @@ typedef enum { /* NOLINT */
                HELICS_PROPERTY_TIME_INPUT_DELAY = 148,
                /** the property controlling output delay for a federate*/
                HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
+               /** specify the maximum time of a federate */
+               HELICS_PROPERTY_TIME_STOPTIME = 152,
                /** the property specifying a timeout to trigger actions if the time for granting
                   exceeds a certain threshold*/
                HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
+               /** read only property getting the current iteration count*/
+               HELICS_PROPERTY_INT_CURRENT_ITERATION = 258,
                /** integer property controlling the maximum number of iterations in a federate*/
                HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
                /** integer property controlling the log level in a federate see \ref
@@ -286,7 +306,9 @@ typedef enum { /* NOLINT */
                   \ref HelicsLogLevels*/
                HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL = 274,
                /** integer property controlling the size of the log buffer*/
-               HELICS_PROPERTY_INT_LOG_BUFFER = 276
+               HELICS_PROPERTY_INT_LOG_BUFFER = 276,
+               /** integer property specifying an index group*/
+               HELICS_PROPERTY_INT_INDEX_GROUP = 282
 } HelicsProperties;
 
 /** result returned for requesting the value of an invalid/unknown property */

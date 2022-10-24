@@ -9,41 +9,36 @@
 
 # file to include ZMQ
 option(${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY
-       "only search for system zeromq libraries, bypass local build options" OFF)
+       "only search for system zeromq libraries, bypass local build options" OFF
+)
 
 mark_as_advanced(${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY)
 
 if(MSVC)
     cmake_dependent_option(
         ${PROJECT_NAME}_ZMQ_SUBPROJECT
-        "enable ZMQ to automatically download and include as a subproject"
-        ON
-        "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY"
-        OFF
+        "enable ZMQ to automatically download and include as a subproject" ON
+        "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY" OFF
     )
 else()
     cmake_dependent_option(
         ${PROJECT_NAME}_ZMQ_SUBPROJECT
-        "enable ZMQ to automatically download and include as a subproject"
-        OFF
-        "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY"
-        OFF
+        "enable ZMQ to automatically download and include as a subproject" OFF
+        "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY" OFF
     )
 endif()
 cmake_dependent_option(
     ${PROJECT_NAME}_ZMQ_FORCE_SUBPROJECT
-    "force ZMQ to automatically download and include as a subproject"
-    OFF
-    "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY"
-    OFF
+    "force ZMQ to automatically download and include as a subproject" OFF
+    "NOT ${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY" OFF
 )
 
 mark_as_advanced(${PROJECT_NAME}_USE_SYSTEM_ZEROMQ_ONLY)
 mark_as_advanced(${PROJECT_NAME}_ZMQ_SUBPROJECT)
 mark_as_advanced(${PROJECT_NAME}_ZMQ_FORCE_SUBPROJECT)
 
-# Add option after seeing if only the static ZMQ library is available
-# Using a macro so the option() command appears near other option() commands
+# Add option after seeing if only the static ZMQ library is available Using a macro so the option()
+# command appears near other option() commands
 macro(add_zmq_static_lib_option)
     if(ZeroMQ_STATIC_LIBRARY AND NOT ZeroMQ_LIBRARY)
         option(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY "use the ZMQ static library" ON)
@@ -108,17 +103,15 @@ else()
                 hide_variable(ZeroMQ_STATIC_LIBRARY)
                 hide_variable(ZeroMQ_INCLUDE_DIR)
             else()
-                show_variable(ZeroMQ_DEBUG_LIBRARY FILEPATH
-                              "path to the ZeroMQ debug library" "")
+                show_variable(ZeroMQ_DEBUG_LIBRARY FILEPATH "path to the ZeroMQ debug library" "")
                 show_variable(ZeroMQ_LIBRARY FILEPATH "path to the ZeroMQ library" "")
-                show_variable(ZeroMQ_ROOT_DIR PATH "path to the ZeroMQ root directory"
-                              "")
+                show_variable(ZeroMQ_ROOT_DIR PATH "path to the ZeroMQ root directory" "")
                 if(${PROJECT_NAME}_USE_ZMQ_STATIC_LIBRARY)
-                    show_variable(ZeroMQ_STATIC_LIBRARY FILEPATH
-                                  "path to the ZeroMQ static library" "")
+                    show_variable(
+                        ZeroMQ_STATIC_LIBRARY FILEPATH "path to the ZeroMQ static library" ""
+                    )
                 endif()
-                show_variable(ZeroMQ_INCLUDE_DIR PATH
-                              "path to the ZeroMQ include directory" "")
+                show_variable(ZeroMQ_INCLUDE_DIR PATH "path to the ZeroMQ include directory" "")
             endif()
         else()
             set(${PROJECT_NAME}_ZMQ_LOCAL_BUILD OFF CACHE INTERNAL "")
@@ -132,10 +125,6 @@ add_zmq_static_lib_option()
 
 if(WIN32 AND NOT MSYS AND NOT CYGWIN)
     if(TARGET libzmq)
-        install(
-            FILES $<TARGET_FILE:libzmq>
-            DESTINATION ${CMAKE_INSTALL_BINDIR}
-            COMPONENT Runtime
-        )
+        install(FILES $<TARGET_FILE:libzmq> DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime)
     endif()
 endif()
