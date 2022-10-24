@@ -597,11 +597,11 @@ void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* 
     if (cr == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+    if (interfaceName == nullptr || interfaceName[0] == '/0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr || strlen(alias) == 0) {
+    if (alias == nullptr || alias[0] == '/0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }
@@ -621,11 +621,11 @@ void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const 
     if (brk == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || strlen(interfaceName) == 0) {
+    if (interfaceName == nullptr || interfaceName[0] == '/0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr || strlen(alias) == 0) {
+    if (alias == nullptr || alias[0] == '/0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }

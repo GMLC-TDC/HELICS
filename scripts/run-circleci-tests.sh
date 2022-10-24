@@ -6,7 +6,10 @@ tests=(
     "/root/project/build/bin/helics_apps-tests --gtest_filter=-*ci_skip*"
     "/root/project/build/bin/shared-library-tests-cpp --gtest_filter=-*death*"
     "/root/project/build/bin/shared-library-tests --gtest_filter=-*bad_input*:*evil*:*after_close*:*death*"
-    "/root/project/build/bin/application-api-tests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/applicationApiTests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/filterTranslatorTests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/messageFederateTests --gtest_filter=-*ci_skip*"
+    "/root/project/build/bin/valueFederateTests --gtest_filter=-*ci_skip*"
     "/root/project/build/bin/helics_webserver-tests --gtest_filter=*"
     "/root/project/build/bin/network-tests --gtest_filter=*"
 )
