@@ -82,6 +82,7 @@ int singleConnection(int n)
                                                       helics::network::DEFAULT_TCP_PORT);
 
     while (!server->isReady()) {
+        std::this_thread::sleep_for(100ms);
     };
 
     auto contextloop = contextp->startContextLoop();
