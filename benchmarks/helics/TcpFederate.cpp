@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-using namespace std::literals::chrono_literals;  //NOLINT
+using namespace std::literals::chrono_literals;  // NOLINT
 using asio::ip::tcp;
 using gmlc::networking::AsioContextManager;
 using helics::Core;
@@ -58,13 +58,11 @@ int singleMessage(int msg_size)
                                                               "24160",
                                                               1024);
     auto connected = connection->waitUntilConnected(1000ms);
-    if (!connected)
-    {
+    if (!connected) {
         connected = connection->waitUntilConnected(1000ms);
     }
-    if (!connected)
-    {
-        std::cerr<<"unable to connect"<<std::endl;
+    if (!connected) {
+        std::cerr << "unable to connect" << std::endl;
         return -1;
     }
     std::this_thread::sleep_for(200ms);
@@ -97,12 +95,13 @@ int singleConnection(int n)
     auto contextloop = contextp->startContextLoop();
 
     size_t data_recv_size;
-    server->setDataCall(
-        [&](const gmlc::networking::TcpConnection::pointer&, [[maybe_unused]] const char* data, size_t data_size) {
-            data_recv_size = data_size;
-            count++;
-            return data_size;
-        });
+    server->setDataCall([&](const gmlc::networking::TcpConnection::pointer&,
+                            [[maybe_unused]] const char* data,
+                            size_t data_size) {
+        data_recv_size = data_size;
+        count++;
+        return data_size;
+    });
 
     server->start();
 
@@ -113,13 +112,11 @@ int singleConnection(int n)
     auto connected = connection->waitUntilConnected(1000ms);
 
     std::this_thread::sleep_for(200ms);
-    if (!connected)
-    {
+    if (!connected) {
         connected = connection->waitUntilConnected(1000ms);
     }
-    if (!connected)
-    {
-        std::cerr<<"unable to connect"<<std::endl;
+    if (!connected) {
+        std::cerr << "unable to connect" << std::endl;
         return -1;
     }
     for (int i = 1; i <= n; i++) {
