@@ -21,8 +21,11 @@ set(HELICS_BENCHMARKS
     timingBenchmarks
     wattsStrogatzBenchmarks
     barabasiAlbertBenchmarks
-    TcpFederate
 )
+
+if(HELICS_ENABLE_TCP_CORE)
+    list(APPEND HELICS_BENCHMARKS TcpFederate)
+endif()
 
 set(HELICS_MULTINODE_BENCHMARKS
     PholdFederate

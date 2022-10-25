@@ -18,7 +18,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-using namespace std::literals::chrono_literals;
+using namespace std::literals::chrono_literals;  //NOLINT
 using asio::ip::tcp;
 using gmlc::networking::AsioContextManager;
 using helics::Core;
@@ -37,7 +37,8 @@ int singleMessage(int msg_size)
                                                       helics::network::DEFAULT_TCP_PORT);
 
     while (!server->isReady()) {
-    };
+        std::this_thread::sleep_for(100ms);
+    }
 
     auto contextloop = contextp->startContextLoop();
 
@@ -57,7 +58,15 @@ int singleMessage(int msg_size)
                                                               "24160",
                                                               1024);
     auto connected = connection->waitUntilConnected(1000ms);
-
+    if (!connected)
+    {
+        connected = connection->waitUntilConnected(1000ms);
+    }
+    if (!connected)
+    {
+        std::cerr<<"unable to connect"<<std::endl;
+        return -1;
+    }
     std::this_thread::sleep_for(200ms);
     std::string txstring(msg_size, '1');
     connection->send(txstring);
@@ -83,13 +92,13 @@ int singleConnection(int n)
 
     while (!server->isReady()) {
         std::this_thread::sleep_for(100ms);
-    };
+    }
 
     auto contextloop = contextp->startContextLoop();
 
     size_t data_recv_size;
     server->setDataCall(
-        [&](const gmlc::networking::TcpConnection::pointer&, const char* data, size_t data_size) {
+        [&](const gmlc::networking::TcpConnection::pointer&, [[maybe_unused]] const char* data, size_t data_size) {
             data_recv_size = data_size;
             count++;
             return data_size;
@@ -104,7 +113,15 @@ int singleConnection(int n)
     auto connected = connection->waitUntilConnected(1000ms);
 
     std::this_thread::sleep_for(200ms);
-
+    if (!connected)
+    {
+        connected = connection->waitUntilConnected(1000ms);
+    }
+    if (!connected)
+    {
+        std::cerr<<"unable to connect"<<std::endl;
+        return -1;
+    }
     for (int i = 1; i <= n; i++) {
         // send messages the size of i
         std::string txstring(i, '1');
@@ -120,12 +137,12 @@ int singleConnection(int n)
 
 int main()
 {
-    int msg_size = 1000;
+    [[maybe_unused]] int msg_size = 1000;
     int num_messages = 1000;
 
     // send a single message of a certain size
     // singleMessage(msg_size);
 
     // send increasing larger messages up to size num_messages
-    singleConnection(num_messages);
+    return singleConnection(num_messages);
 }
