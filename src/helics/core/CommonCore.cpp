@@ -701,7 +701,10 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             "core is unable to register and has timed out, federate cannot be registered"));
     }
     if (getBrokerState() >= BrokerState::OPERATING) {
-        throw(RegistrationFailure("Core has already moved to operating state"));
+        if (!dynamicFederation)
+        {
+            throw(RegistrationFailure("Core has already moved to operating state"));
+        }
     }
     auto iloc = name.find("${");
     std::string nname;

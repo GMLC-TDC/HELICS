@@ -90,7 +90,8 @@ class BrokerBase {
     bool globalTime{false};
     /// flag indicating the use of async time keeping
     bool asyncTime{false};
-
+  /// @brief flag indicating that the broker supports dynamic federates
+    bool dynamicFederation{false};
   private:
     /// flag indicating that the main processing loop is running
     std::atomic<bool> mainLoopIsRunning{false};

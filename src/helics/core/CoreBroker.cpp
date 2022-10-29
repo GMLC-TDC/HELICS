@@ -241,8 +241,8 @@ bool CoreBroker::isOpenToNewFederates() const
 void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCode)
 {
     route_id newroute;
-    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     bool route_created = false;
+    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
         newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
         addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
@@ -255,6 +255,17 @@ void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCo
     badInit.source_id = global_broker_id_local;
     badInit.name(command.name());
     badInit.messageID = errorCode;
+    switch (errorCode)
+    {
+    case broker_terminating:
+        badInit.setString(0, "broker is terminating");
+        break;
+    case mismatch_broker_key_error_code:
+        badInit.setString(0,"broker key does not match");
+        break;
+    default:
+        break;
+    }
     transmit(newroute, badInit);
 
     if (route_created) {
@@ -311,11 +322,11 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         }
     } else if (currentBrokerState == BrokerState::OPERATING) {
         // we are initialized already
-        if (!checkActionFlag(command, observer_flag)) {
-            sendBrokerErrorAck(command, already_init_error_code);
+        if (!checkActionFlag(command, observer_flag) && !dynamicFederation) {
+            sendBrokerErrorAck(command,already_init_error_code);
             return;
         }
-        // can't add a non observer federate in OPERATING mode
+        // can't add a non observer federate in OPERATING mode unless this is a dynamicFederation
     } else {
         sendBrokerErrorAck(command, broker_terminating);
         return;
@@ -389,7 +400,6 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             mBrokers.back()._disable_ping = true;
         }
         routing_table.emplace(global_brkid, route);
-        // don't bother with the broker_table for root broker
 
         // sending the response message
         ActionMessage brokerReply(CMD_BROKER_ACK);
@@ -461,7 +471,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             transmit(parent_route_id, noInit);
         }
     } else if (getBrokerState() == BrokerState::OPERATING) {
-        if (!checkActionFlag(command, observer_flag) && countable) {
+        bool allowed=dynamicFederation|| !countable || checkActionFlag(command, observer_flag);
+        if (!allowed) {
             // we are initialized already
             sendFedErrorAck(command, already_init_error_code);
             return;
