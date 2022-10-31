@@ -276,6 +276,41 @@ TEST(federate, time_step_tests)
     EXPECT_EQ(res, 3.0);
 }
 
+TEST(federate, dynamic_join)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker --broker_init_string='--dynamic --name=dyn_broker'";
+
+    auto fed = std::make_shared<helics::Federate>("test1", fi);
+
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::STARTUP);
+    fed->enterInitializingMode();
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    fed->enterExecutingMode();
+    EXPECT_TRUE(fed->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    auto res = fed->requestTime(1.0);
+    EXPECT_EQ(res, 1.0);
+    res = fed->requestTime(2.0);
+    EXPECT_EQ(res, 2.0);
+    // now join a dynamic broker
+    fi.coreInitString.clear();
+    fi.broker="dyn_broker";
+    decltype(fed) fedDyn;
+    EXPECT_NO_THROW(fedDyn=std::make_shared<helics::Federate>("test_dyn", fi));
+   
+    fedDyn->enterInitializingMode();
+    EXPECT_TRUE(fedDyn->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
+    fedDyn->enterExecutingMode();
+    EXPECT_TRUE(fedDyn->getCurrentMode() == helics::Federate::Modes::EXECUTING);
+    res = fed->requestTime(3.0);
+    EXPECT_EQ(res, 3.0);
+
+    res=fedDyn->requestTime(2.5);
+    EXPECT_EQ(res, 2.5);
+    fed->disconnect();
+    fedDyn->disconnect();
+}
+
 TEST(federate, broker_disconnect_test_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "b1", "-f 1");

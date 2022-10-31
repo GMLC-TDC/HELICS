@@ -218,7 +218,7 @@ void CoreBroker::addAlias(std::string_view interfaceKey, std::string_view alias)
 route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 {
     const auto& endpointName = mess.getString(targetStringLoc);
-    auto* eptInfo = handles.getEndpoint(endpointName);
+    auto* eptInfo = handles.getInterfaceHandle(endpointName,InterfaceType::ENDPOINT);
     if (eptInfo != nullptr) {
         mess.setDestination(eptInfo->handle);
         return getRoute(eptInfo->handle.fed_id);
@@ -233,9 +233,20 @@ route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = getBrokerState();
-    return (cstate != BrokerState::CREATED && cstate < BrokerState::OPERATING && !haltOperations &&
-            (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
-             getCountableFederates() < maxFederateCount));
+    if (cstate > BrokerState::OPERATING)
+    {
+        return false;
+    }
+    if ((maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
+        getCountableFederates() < maxFederateCount) && !haltOperations)
+    {
+        if (!dynamicFederation)
+        {
+            return (cstate < BrokerState::OPERATING );
+        }
+        return true;
+    }
+    return false;
 }
 
 void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCode)
@@ -493,6 +504,10 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     mFederates.back().parent = command.source_id;
     if (checkActionFlag(command, non_counting_flag)) {
         mFederates.back().nonCounting = true;
+    }
+    if (checkActionFlag(command, observer_flag))
+    {
+        mFederates.back().observer=true;
     }
     auto lookupIndex = mFederates.size() - 1;
     if (checkActionFlag(command, child_flag)) {
@@ -1454,13 +1469,20 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             }
             brk->state = ConnectionState::INIT_REQUESTED;
 
-            if (brk->_observer && getBrokerState() >= BrokerState::OPERATING) {
+            if ((dynamicFederation || brk->_observer) && getBrokerState() >= BrokerState::OPERATING) {
                 if (isRootc) {
                     ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, cmd.source_id);
                     if (checkActionFlag(cmd, iteration_requested_flag)) {
                         setActionFlag(grant, iteration_requested_flag);
                     }
-                    setActionFlag(grant, observer_flag);
+                    if (brk->_observer)
+                    {
+                        setActionFlag(grant, observer_flag);
+                    }
+                    else
+                    {
+                        setActionFlag(grant,dynamic_join_flag);
+                    }
                     transmit(brk->route, grant);
                 } else {
                     transmit(parent_route_id, cmd);
@@ -1516,7 +1538,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             }
         } break;
         case CMD_INIT_GRANT:
-            if (!checkActionFlag(cmd, observer_flag)) {
+            if (!(checkActionFlag(cmd, observer_flag)||checkActionFlag(cmd,dynamic_join_flag))) {
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     executeInitializationOperations(true);
                 } else {
@@ -1609,7 +1631,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(),InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 auto fed = mFederates.find(pub->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1634,7 +1656,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_INPUT: {
-            auto* inp = handles.getInput(command.name());
+            auto* inp = handles.getInterfaceHandle(command.name(),InterfaceType::INPUT);
             if (inp != nullptr) {
                 auto fed = mFederates.find(inp->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1663,7 +1685,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_FILTER: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(),InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.setAction(CMD_ADD_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1682,7 +1704,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_ENDPOINT: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(),InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 auto fed = mFederates.find(ept->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1795,7 +1817,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_REMOVE_NAMED_PUBLICATION: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(),InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 command.setAction(CMD_REMOVE_SUBSCRIBER);
                 command.setDestination(pub->handle);
@@ -1808,7 +1830,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_INPUT: {
-            auto* inp = handles.getInput(command.name());
+            auto* inp = handles.getInterfaceHandle(command.name(),InterfaceType::INPUT);
             if (inp != nullptr) {
                 command.setAction(CMD_REMOVE_PUBLICATION);
                 command.setDestination(inp->handle);
@@ -1821,7 +1843,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_FILTER: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(),InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.setAction(CMD_REMOVE_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1834,7 +1856,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_ENDPOINT: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(),InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 command.setAction(CMD_REMOVE_FILTER);
                 command.setDestination(ept->handle);
@@ -1891,23 +1913,59 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
     routeMessage(std::move(cmd));
 }
 
-void CoreBroker::addPublication(ActionMessage& m)
+bool CoreBroker::checkInterfaceCreation(ActionMessage& m, InterfaceType type)
 {
-    // detect duplicate publications
-    if (handles.getPublication(m.name()) != nullptr) {
+    bool existingName{false};
+    if (type == InterfaceType::TRANSLATOR)
+    {
+        existingName=(handles.getInterfaceHandle(m.name(),InterfaceType::ENDPOINT) != nullptr || handles.getInterfaceHandle(m.name(),InterfaceType::INPUT) != nullptr ||
+            handles.getInterfaceHandle(m.name(),InterfaceType::PUBLICATION) != nullptr);
+    }
+    else
+    {
+        existingName=(handles.getInterfaceHandle(m.name(),type) != nullptr);
+    }
+    
+    // detect duplicate InterfaceName;
+    if (existingName) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate PUBLICATION names ({})", m.name());
+        eret.payload = fmt::format("Duplicate {} names ({})", interfaceTypeName(type),m.name());
         propagateError(std::move(eret));
-        return;
+        return false;
     }
+    if (disableDynamicSources && type!=InterfaceType::INPUT)
+    {
+        if (getBrokerState() == BrokerState::OPERATING)
+        {
+            auto fed = mFederates.find(m.source_id);
+            if (fed->state != ConnectionState::CONNECTED && !fed->observer)
+            {
+                ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+                eret.dest_handle = m.source_handle;
+                eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+                eret.payload = fmt::format("Source {} not allowed after entering initializing mode ({})", interfaceTypeName(type),m.name());
+                propagateError(std::move(eret));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void CoreBroker::addPublication(ActionMessage& m)
+{
+    if (!checkInterfaceCreation(m, InterfaceType::PUBLICATION))
+    {
+        return;
+   }
     auto& pub = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::PUBLICATION,
                                   m.name(),
-                                  m.getString(0),
-                                  m.getString(1));
+                                  m.getString(typeStringLoc),
+                                  m.getString(unitStringLoc));
 
     addLocalInfo(pub, m);
     if (!isRootc) {
@@ -1918,21 +1976,16 @@ void CoreBroker::addPublication(ActionMessage& m)
 }
 void CoreBroker::addInput(ActionMessage& m)
 {
-    // detect duplicate publications
-    if (handles.getInput(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate input names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::INPUT))
+    {
         return;
     }
     auto& inp = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::INPUT,
                                   m.name(),
-                                  m.getString(0),
-                                  m.getString(1));
+                                  m.getString(typeStringLoc),
+                                  m.getString(unitStringLoc));
 
     addLocalInfo(inp, m);
     if (!isRootc) {
@@ -1944,13 +1997,8 @@ void CoreBroker::addInput(ActionMessage& m)
 
 void CoreBroker::addEndpoint(ActionMessage& m)
 {
-    // detect duplicate endpoints
-    if (handles.getEndpoint(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate endpoint names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::ENDPOINT))
+    {
         return;
     }
     auto& ept = handles.addHandle(m.source_id,
@@ -1983,16 +2031,10 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 }
 void CoreBroker::addFilter(ActionMessage& m)
 {
-    // detect duplicate filters
-    if (handles.getFilter(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate filter names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::FILTER))
+    {
         return;
     }
-
     auto& filt = handles.addHandle(m.source_id,
                                    m.source_handle,
                                    InterfaceType::FILTER,
@@ -2010,17 +2052,10 @@ void CoreBroker::addFilter(ActionMessage& m)
 
 void CoreBroker::addTranslator(ActionMessage& m)
 {
-    // detect duplicate endpoints/pubs/inputs
-    if (handles.getEndpoint(m.name()) != nullptr || handles.getInput(m.name()) != nullptr ||
-        handles.getPublication(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate names for translator({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::TRANSLATOR))
+    {
         return;
     }
-
     auto& trans = handles.addHandle(m.source_id,
                                     m.source_handle,
                                     InterfaceType::TRANSLATOR,
@@ -2053,14 +2088,14 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
 {
     switch (command.action()) {
         case CMD_DATA_LINK: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(),InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 command.name(command.getString(targetStringLoc));
                 command.setAction(CMD_ADD_NAMED_INPUT);
                 command.setSource(pub->handle);
                 checkForNamedInterface(command);
             } else {
-                auto* input = handles.getInput(command.getString(targetStringLoc));
+                auto* input = handles.getInterfaceHandle(command.getString(targetStringLoc),InterfaceType::INPUT);
                 if (input == nullptr) {
                     if (isRootc) {
                         unknownHandles.addDataLink(command.name(),
@@ -2076,7 +2111,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_ENDPOINT_LINK: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(),InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 command.name(command.getString(targetStringLoc));
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -2085,7 +2120,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 command.setSource(ept->handle);
                 checkForNamedInterface(command);
             } else {
-                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
+                auto* target = handles.getInterfaceHandle(command.getString(targetStringLoc),InterfaceType::ENDPOINT);
                 if (target == nullptr) {
                     if (isRootc) {
                         unknownHandles.addEndpointLink(command.name(),
@@ -2102,7 +2137,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_FILTER_LINK: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(),InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.payload = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -2112,7 +2147,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 }
                 checkForNamedInterface(command);
             } else {
-                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
+                auto* ept = handles.getInterfaceHandle(command.getString(targetStringLoc),InterfaceType::ENDPOINT);
                 if (ept == nullptr) {
                     if (isRootc) {
                         if (checkActionFlag(command, destination_target)) {
@@ -2494,25 +2529,25 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                                                                   GlobalHandle /*handle*/) {
             switch (type) {
                 case 'p': {
-                    const auto* p = handles.getPublication(target);
+                    const auto* p = handles.getInterfaceHandle(target,InterfaceType::PUBLICATION);
                     if (p != nullptr) {
                         foundAliasHandles[0].emplace_back(target);
                     }
                 } break;
                 case 'i': {
-                    const auto* p = handles.getInput(target);
+                    const auto* p = handles.getInterfaceHandle(target,InterfaceType::INPUT);
                     if (p != nullptr) {
                         foundAliasHandles[1].emplace_back(target);
                     }
                 } break;
                 case 'e': {
-                    const auto* p = handles.getEndpoint(target);
+                    const auto* p = handles.getInterfaceHandle(target,InterfaceType::ENDPOINT);
                     if (p != nullptr) {
                         foundAliasHandles[2].emplace_back(target);
                     }
                 } break;
                 case 'f': {
-                    const auto* p = handles.getFilter(target);
+                    const auto* p = handles.getInterfaceHandle(target,InterfaceType::FILTER);
                     if (p != nullptr) {
                         foundAliasHandles[3].emplace_back(target);
                     }
@@ -2523,25 +2558,25 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         });
         if (!foundAliasHandles[0].empty()) {
             for (const auto& target : foundAliasHandles[0]) {
-                auto* p = handles.getPublication(target);
+                auto* p = handles.getInterfaceHandle(target,InterfaceType::PUBLICATION);
                 findAndNotifyPublicationTargets(*p, target);
             }
         }
         if (!foundAliasHandles[1].empty()) {
             for (const auto& target : foundAliasHandles[1]) {
-                auto* p = handles.getInput(target);
+                auto* p = handles.getInterfaceHandle(target,InterfaceType::INPUT);
                 findAndNotifyInputTargets(*p, target);
             }
         }
         if (!foundAliasHandles[2].empty()) {
             for (const auto& target : foundAliasHandles[2]) {
-                auto* p = handles.getEndpoint(target);
+                auto* p = handles.getInterfaceHandle(target,InterfaceType::ENDPOINT);
                 findAndNotifyEndpointTargets(*p, target);
             }
         }
         if (!foundAliasHandles[3].empty()) {
             for (const auto& target : foundAliasHandles[3]) {
-                auto* p = handles.getFilter(target);
+                auto* p = handles.getInterfaceHandle(target,InterfaceType::FILTER);
                 findAndNotifyFilterTargets(*p, target);
             }
         }

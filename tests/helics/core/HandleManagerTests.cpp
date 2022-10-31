@@ -98,20 +98,20 @@ TEST(handleManager, finding)
     auto h1 = generateExampleHandleManager();
 
     EXPECT_EQ(h1.size(), 10U);
-    const auto* ep = h1.getEndpoint("e1");
+    const auto* ep = h1.getInterfaceHandle("e1",InterfaceType::ENDPOINT);
     EXPECT_NE(ep, nullptr);
 
-    const auto* p1 = h1.getPublication("p1");
+    const auto* p1 = h1.getInterfaceHandle("p1",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "p1");
 
-    const auto* in1 = h1.getInput("in1");
+    const auto* in1 = h1.getInterfaceHandle("in1", InterfaceType::INPUT);
     EXPECT_NE(in1, nullptr);
 
-    const auto* f1 = h1.getFilter("f1");
+    const auto* f1 = h1.getInterfaceHandle("f1",InterfaceType::FILTER);
     EXPECT_NE(f1, nullptr);
 
-    const auto* tr1 = h1.getTranslator("t1");
+    const auto* tr1 = h1.getInterfaceHandle("t1",InterfaceType::TRANSLATOR);
     EXPECT_NE(tr1, nullptr);
 }
 
@@ -119,19 +119,19 @@ TEST(handleManager, notfinding)
 {
     auto h1 = generateExampleHandleManager();
 
-    const auto* ep = h1.getPublication("e1");
+    const auto* ep = h1.getInterfaceHandle("e1",InterfaceType::PUBLICATION);
     EXPECT_EQ(ep, nullptr);
 
-    const auto* p1 = h1.getEndpoint("p1");
+    const auto* p1 = h1.getInterfaceHandle("p1",InterfaceType::ENDPOINT);
     EXPECT_EQ(p1, nullptr);
 
-    const auto* in1 = h1.getTranslator("in1");
+    const auto* in1 = h1.getInterfaceHandle("in1",InterfaceType::TRANSLATOR);
     EXPECT_EQ(in1, nullptr);
 
-    const auto* f1 = h1.getInput("f1");
+    const auto* f1 = h1.getInterfaceHandle("f1", InterfaceType::INPUT);
     EXPECT_EQ(f1, nullptr);
 
-    const auto* tr1 = h1.getFilter("t1");
+    const auto* tr1 = h1.getInterfaceHandle("t1",InterfaceType::FILTER);
     EXPECT_EQ(tr1, nullptr);
 }
 
@@ -140,20 +140,20 @@ TEST(handleManager, constFinding)
     const auto h1 = generateExampleHandleManager();
 
     EXPECT_EQ(h1.size(), 10U);
-    const auto* ep = h1.getEndpoint("e1");
+    const auto* ep = h1.getInterfaceHandle("e1",InterfaceType::ENDPOINT);
     EXPECT_NE(ep, nullptr);
 
-    const auto* p1 = h1.getPublication("p1");
+    const auto* p1 = h1.getInterfaceHandle("p1",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "p1");
 
-    const auto* in1 = h1.getInput("in1");
+    const auto* in1 = h1.getInterfaceHandle("in1", InterfaceType::INPUT);
     EXPECT_NE(in1, nullptr);
 
-    const auto* f1 = h1.getFilter("f1");
+    const auto* f1 = h1.getInterfaceHandle("f1",InterfaceType::FILTER);
     EXPECT_NE(f1, nullptr);
 
-    const auto* tr1 = h1.getTranslator("t1");
+    const auto* tr1 = h1.getInterfaceHandle("t1",InterfaceType::TRANSLATOR);
     EXPECT_NE(tr1, nullptr);
 }
 
@@ -161,19 +161,19 @@ TEST(handleManager, constNotfinding)
 {
     const auto h1 = generateExampleHandleManager();
 
-    const auto* ep = h1.getPublication("e1");
+    const auto* ep = h1.getInterfaceHandle("e1",InterfaceType::PUBLICATION);
     EXPECT_EQ(ep, nullptr);
 
-    const auto* p1 = h1.getEndpoint("p1");
+    const auto* p1 = h1.getInterfaceHandle("p1",InterfaceType::ENDPOINT);
     EXPECT_EQ(p1, nullptr);
 
-    const auto* in1 = h1.getTranslator("in1");
+    const auto* in1 = h1.getInterfaceHandle("in1",InterfaceType::TRANSLATOR);
     EXPECT_EQ(in1, nullptr);
 
-    const auto* f1 = h1.getInput("f1");
+    const auto* f1 = h1.getInterfaceHandle("f1", InterfaceType::INPUT);
     EXPECT_EQ(f1, nullptr);
 
-    const auto* tr1 = h1.getFilter("t1");
+    const auto* tr1 = h1.getInterfaceHandle("t1",InterfaceType::FILTER);
     EXPECT_EQ(tr1, nullptr);
 }
 
@@ -181,11 +181,11 @@ TEST(handleManager, translatorfinding)
 {
     // translators should map to all the types except filter
     auto h1 = generateExampleHandleManager();
-    const auto* in1 = h1.getInput("t1");
+    const auto* in1 = h1.getInterfaceHandle("t1", InterfaceType::INPUT);
     EXPECT_NE(in1, nullptr);
-    const auto* p1 = h1.getPublication("t1");
+    const auto* p1 = h1.getInterfaceHandle("t1",InterfaceType::PUBLICATION);
     EXPECT_NE(p1, nullptr);
-    const auto* e1 = h1.getEndpoint("t1");
+    const auto* e1 = h1.getInterfaceHandle("t1",InterfaceType::ENDPOINT);
     EXPECT_NE(e1, nullptr);
 
     EXPECT_EQ(e1, p1);
@@ -251,37 +251,37 @@ TEST(handleManager, alias1)
     auto h1 = generateExampleHandleManager();
     h1.addAlias("p1", "pub1");
 
-    const auto* p1 = h1.getPublication("pub1");
+    const auto* p1 = h1.getInterfaceHandle("pub1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "p1");
 
     h1.addAlias("in1", "input1");
 
-    p1 = h1.getInput("input1");
+    p1 = h1.getInterfaceHandle("input1", InterfaceType::INPUT);
 
     EXPECT_EQ(p1->key, "in1");
 
     h1.addAlias("e1", "end1");
 
-    p1 = h1.getEndpoint("end1");
+    p1 = h1.getInterfaceHandle("end1",InterfaceType::ENDPOINT);
 
     EXPECT_EQ(p1->key, "e1");
 
     h1.addAlias("f1", "filt1");
 
-    p1 = h1.getFilter("filt1");
+    p1 = h1.getInterfaceHandle("filt1",InterfaceType::FILTER);
 
     EXPECT_EQ(p1->key, "f1");
 
     h1.addAlias("t1", "translator1");
 
-    p1 = h1.getEndpoint("translator1");
+    p1 = h1.getInterfaceHandle("translator1",InterfaceType::ENDPOINT);
 
     EXPECT_EQ(p1->key, "t1");
-    p1 = h1.getInput("translator1");
+    p1 = h1.getInterfaceHandle("translator1", InterfaceType::INPUT);
 
     EXPECT_EQ(p1->key, "t1");
-    p1 = h1.getPublication("translator1");
+    p1 = h1.getInterfaceHandle("translator1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "t1");
 }
@@ -291,25 +291,25 @@ TEST(handleManager, multipleAlias)
     auto h1 = generateExampleHandleManager();
     h1.addAlias("p1", "pub1");
 
-    const auto* p1 = h1.getPublication("pub1");
+    const auto* p1 = h1.getInterfaceHandle("pub1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "p1");
 
     h1.addAlias("p1", "pubA1");
 
-    p1 = h1.getPublication("pubA1");
+    p1 = h1.getInterfaceHandle("pubA1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "p1");
 
     h1.addAlias("p1", "publication1");
 
-    p1 = h1.getPublication("publication1");
+    p1 = h1.getInterfaceHandle("publication1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "p1");
 
     h1.addAlias("p1", "publisher1");
 
-    p1 = h1.getPublication("publisher1");
+    p1 = h1.getInterfaceHandle("publisher1",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "p1");
 }
@@ -327,7 +327,7 @@ TEST(handleManager, futureAlias)
 
     addTestHandle(h1, "pub1", InterfaceType::PUBLICATION);
 
-    const auto* p1 = h1.getPublication("publisher");
+    const auto* p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "pub1");
 }
@@ -341,15 +341,15 @@ TEST(handleManager, multiFutureAlias)
 
     addTestHandle(h1, "if", InterfaceType::PUBLICATION);
 
-    const auto* p1 = h1.getPublication("ifonly");
+    const auto* p1 = h1.getInterfaceHandle("ifonly",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getPublication("ifandonlyif");
+    p1 = h1.getInterfaceHandle("ifandonlyif",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getPublication("iff");
+    p1 = h1.getInterfaceHandle("iff",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "if");
 }
@@ -364,20 +364,20 @@ TEST(handleManager, multiTypeFutureAlias)
     addTestHandle(h1, "if", InterfaceType::ENDPOINT);
     addTestHandle(h1, "if", InterfaceType::FILTER);
 
-    const auto* p1 = h1.getPublication("ifonly");
+    const auto* p1 = h1.getInterfaceHandle("ifonly",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getPublication("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::PUBLICATION);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getInput("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly", InterfaceType::INPUT);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getEndpoint("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::ENDPOINT);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getFilter("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::FILTER);
     EXPECT_EQ(p1->key, "if");
 }
 
@@ -388,20 +388,20 @@ TEST(handleManager, translatorAlias)
 
     addTestHandle(h1, "if", InterfaceType::TRANSLATOR);
 
-    const auto* p1 = h1.getPublication("ifonly");
+    const auto* p1 = h1.getInterfaceHandle("ifonly",InterfaceType::PUBLICATION);
 
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getPublication("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::PUBLICATION);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getInput("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly", InterfaceType::INPUT);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getEndpoint("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::ENDPOINT);
     EXPECT_EQ(p1->key, "if");
 
-    p1 = h1.getTranslator("ifonly");
+    p1 = h1.getInterfaceHandle("ifonly",InterfaceType::TRANSLATOR);
     EXPECT_EQ(p1->key, "if");
 }
 
@@ -507,7 +507,7 @@ TEST(handleManager, aliasReciprocity)
     // exist, this will create an alias to original interfaceName.
     EXPECT_NO_THROW(addTestHandle(h1, "matt", InterfaceType::ENDPOINT));
 
-    const auto* ep = h1.getEndpoint("matthew");
+    const auto* ep = h1.getInterfaceHandle("matthew",InterfaceType::ENDPOINT);
     ASSERT_NE(ep, nullptr);
     EXPECT_EQ(ep->key, "matt");
 }
@@ -518,11 +518,11 @@ TEST(handleManager, aliasCascadeExisting)
     h1.addAlias("p1", "pub");
     h1.addAlias("pub", "publisher");
 
-    const auto* p1 = h1.getPublication("publisher");
+    const auto* p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "p1");
 
-    const auto* p2 = h1.getPublication("pub");
+    const auto* p2 = h1.getInterfaceHandle("pub",InterfaceType::PUBLICATION);
     ASSERT_NE(p2, nullptr);
     EXPECT_EQ(p2->key, "p1");
 }
@@ -534,11 +534,11 @@ TEST(handleManager, aliasCascadeFuture)
     h1.addAlias("pub", "publisher");
 
     addTestHandle(h1, "pub1", InterfaceType::PUBLICATION);
-    const auto* p1 = h1.getPublication("publisher");
+    const auto* p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 
-    const auto* p2 = h1.getPublication("pub");
+    const auto* p2 = h1.getInterfaceHandle("pub",InterfaceType::PUBLICATION);
     ASSERT_NE(p2, nullptr);
     EXPECT_EQ(p2->key, "pub1");
 }
@@ -553,26 +553,26 @@ TEST(handleManager, aliasCascadeFutureMany)
     h1.addAlias("publisher2", "publisher3");
 
     EXPECT_NO_THROW(addTestHandle(h1, "pub1", InterfaceType::PUBLICATION));
-    const auto* p1 = h1.getPublication("publisher");
+    const auto* p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 
-    p1 = h1.getPublication("pub");
+    p1 = h1.getInterfaceHandle("pub",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
-    p1 = h1.getPublication("publisher3");
-    ASSERT_NE(p1, nullptr);
-    EXPECT_EQ(p1->key, "pub1");
-
-    p1 = h1.getPublication("publisher2");
+    p1 = h1.getInterfaceHandle("publisher3",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 
-    p1 = h1.getPublication("publisher1");
+    p1 = h1.getInterfaceHandle("publisher2",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 
-    p1 = h1.getPublication("publisher");
+    p1 = h1.getInterfaceHandle("publisher1",InterfaceType::PUBLICATION);
+    ASSERT_NE(p1, nullptr);
+    EXPECT_EQ(p1->key, "pub1");
+
+    p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
     EXPECT_EQ(p1->key, "pub1");
 }
@@ -587,21 +587,21 @@ TEST(handleManager, aliasCascadeFutureManyOther)
     h1.addAlias("publisher2", "publisher3");
 
     EXPECT_NO_THROW(addTestHandle(h1, "publisher1", InterfaceType::PUBLICATION));
-    const auto* p1 = h1.getPublication("pub1");
+    const auto* p1 = h1.getInterfaceHandle("pub1",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 
-    p1 = h1.getPublication("pub");
+    p1 = h1.getInterfaceHandle("pub",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 
-    p1 = h1.getPublication("publisher3");
+    p1 = h1.getInterfaceHandle("publisher3",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 
-    p1 = h1.getPublication("publisher2");
+    p1 = h1.getInterfaceHandle("publisher2",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 
-    p1 = h1.getPublication("publisher1");
+    p1 = h1.getInterfaceHandle("publisher1",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 
-    p1 = h1.getPublication("publisher");
+    p1 = h1.getInterfaceHandle("publisher",InterfaceType::PUBLICATION);
     ASSERT_NE(p1, nullptr);
 }
