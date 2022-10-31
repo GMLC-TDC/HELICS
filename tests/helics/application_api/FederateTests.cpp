@@ -294,10 +294,10 @@ TEST(federate, dynamic_join)
     EXPECT_EQ(res, 2.0);
     // now join a dynamic broker
     fi.coreInitString.clear();
-    fi.broker="dyn_broker";
+    fi.broker = "dyn_broker";
     decltype(fed) fedDyn;
-    EXPECT_NO_THROW(fedDyn=std::make_shared<helics::Federate>("test_dyn", fi));
-   
+    EXPECT_NO_THROW(fedDyn = std::make_shared<helics::Federate>("test_dyn", fi));
+
     fedDyn->enterInitializingMode();
     EXPECT_TRUE(fedDyn->getCurrentMode() == helics::Federate::Modes::INITIALIZING);
     fedDyn->enterExecutingMode();
@@ -305,7 +305,7 @@ TEST(federate, dynamic_join)
     res = fed->requestTime(3.0);
     EXPECT_EQ(res, 3.0);
 
-    res=fedDyn->requestTime(2.5);
+    res = fedDyn->requestTime(2.5);
     EXPECT_EQ(res, 2.5);
     fed->disconnect();
     fedDyn->disconnect();

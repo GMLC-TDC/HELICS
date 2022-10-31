@@ -434,8 +434,7 @@ HelicsCore helicsCoreClone(HelicsCore core, HelicsError* err)
     if (coreObj == nullptr) {
         return nullptr;
     }
-    try
-    {
+    try {
         auto coreClone = std::make_unique<helics::CoreObject>();
         coreClone->valid = gCoreValidationIdentifier;
         coreClone->coreptr = coreObj->coreptr;
@@ -808,8 +807,7 @@ void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* val
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    try
-    {
+    try {
         cr->setGlobal(valueName, AS_STRING_VIEW(value));
     }
     // LCOV_EXCL_START
@@ -825,8 +823,7 @@ void helicsCoreSendCommand(HelicsCore core, const char* target, const char* comm
     if (cr == nullptr) {
         return;
     }
-    try
-    {
+    try {
         cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string_view{}, HELICS_SEQUENCING_MODE_FAST);
     }
     // LCOV_EXCL_START
@@ -842,8 +839,7 @@ void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const cha
     if (cr == nullptr) {
         return;
     }
-    try
-    {
+    try {
         cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
     }
     // LCOV_EXCL_START
@@ -859,8 +855,7 @@ void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError*
     if (cr == nullptr) {
         return;
     }
-    try
-    {
+    try {
         cr->setLogFile(AS_STRING_VIEW(logFileName));
     }
     // LCOV_EXCL_START
@@ -919,8 +914,7 @@ void helicsCoreSetReadyToInit(HelicsCore core, HelicsError* err)
     if (cr == nullptr) {
         return;
     }
-    try
-    {
+    try {
         cr->setCoreReadyToInit();
     }
     // LCOV_EXCL_START
@@ -971,8 +965,7 @@ HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int msToWait, Heli
     if (brk == nullptr) {
         return HELICS_TRUE;
     }
-    try
-    {
+    try {
         bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
         return res ? HELICS_TRUE : HELICS_FALSE;
     }
@@ -990,8 +983,7 @@ HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsErro
     if (cr == nullptr) {
         return HELICS_TRUE;
     }
-    try
-    {
+    try {
         bool res = cr->waitForDisconnect(std::chrono::milliseconds(msToWait));
         return res ? HELICS_TRUE : HELICS_FALSE;
     }

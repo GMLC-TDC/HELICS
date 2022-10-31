@@ -340,7 +340,8 @@ const BasicHandleInfo* CommonCore::getHandleInfo(InterfaceHandle handle) const
 
 const BasicHandleInfo* CommonCore::getLocalEndpoint(std::string_view name) const
 {
-    return handles.read([&name](auto& hand) { return hand.getInterfaceHandle(name,InterfaceType::ENDPOINT); });
+    return handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::ENDPOINT); });
 }
 
 bool CommonCore::isLocal(GlobalFederateId global_fedid) const
@@ -701,8 +702,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             "core is unable to register and has timed out, federate cannot be registered"));
     }
     if (getBrokerState() >= BrokerState::OPERATING) {
-        if (!dynamicFederation)
-        {
+        if (!dynamicFederation) {
             throw(RegistrationFailure("Core has already moved to operating state"));
         }
     }
@@ -1153,42 +1153,43 @@ const BasicHandleInfo& CommonCore::createBasicHandle(GlobalFederateId global_fed
 // NOLINTNEXTLINE
 static const std::string gEmptyString;
 
-
 /** check that a new interface is valid and is allowed to be created*/
-FederateState *CommonCore::checkNewInterface(LocalFederateId federateID, std::string_view key, InterfaceType type)
+FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
+                                             std::string_view key,
+                                             InterfaceType type)
 {
-    std::string_view tname=interfaceTypeName(type);
-    FederateState *fed{nullptr};
-    if (federateID != gLocalCoreId && type != InterfaceType::FILTER)
-    {
+    std::string_view tname = interfaceTypeName(type);
+    FederateState* fed{nullptr};
+    if (federateID != gLocalCoreId && type != InterfaceType::FILTER) {
         fed = getFederateAt(federateID);
         if (fed == nullptr) {
-            throw(InvalidIdentifier(fmt::format("federateID not valid (register {})",tname)));
+            throw(InvalidIdentifier(fmt::format("federateID not valid (register {})", tname)));
         }
     }
-    
-    if (disableDynamicSources && type!=InterfaceType::INPUT)
-    {
-        if (fed->getState() >= FederateStates::INITIALIZING && !fed->getOptionFlag(HELICS_FLAG_OBSERVER))
-        {
-            throw(RegistrationFailure(fmt::format("Source {} not allowed after entering initializing mode ({})", interfaceTypeName(type),key)));
+
+    if (disableDynamicSources && type != InterfaceType::INPUT) {
+        if (fed->getState() >= FederateStates::INITIALIZING &&
+            !fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
+            throw(RegistrationFailure(
+                fmt::format("Source {} not allowed after entering initializing mode ({})",
+                            interfaceTypeName(type),
+                            key)));
         }
     }
-    const auto* ci = handles.read([&key,type,&tname](auto& hand) { return hand.getInterfaceHandle(key,type); });
+    const auto* ci = handles.read(
+        [&key, type, &tname](auto& hand) { return hand.getInterfaceHandle(key, type); });
     if (ci != nullptr) {  // this key is already found
-        throw(RegistrationFailure(fmt::format("named {} already exists",tname)));
+        throw(RegistrationFailure(fmt::format("named {} already exists", tname)));
     }
     return fed;
 }
-
 
 InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
                                           std::string_view key,
                                           std::string_view type,
                                           std::string_view units)
 {
-    
-    auto *fed=checkNewInterface(federateID, key, InterfaceType::INPUT);
+    auto* fed = checkNewInterface(federateID, key, InterfaceType::INPUT);
     const auto& handle = createBasicHandle(fed->global_id,
                                            fed->local_id,
                                            InterfaceType::INPUT,
@@ -1216,7 +1217,8 @@ InterfaceHandle CommonCore::registerInput(LocalFederateId federateID,
 
 InterfaceHandle CommonCore::getInput(LocalFederateId federateID, std::string_view key) const
 {
-    const auto* ci = handles.read([&key](auto& hand) { return hand.getInterfaceHandle(key,InterfaceType::INPUT); });
+    const auto* ci = handles.read(
+        [&key](auto& hand) { return hand.getInterfaceHandle(key, InterfaceType::INPUT); });
     if (ci->local_fed_id != federateID) {
         return {};
     }
@@ -1228,7 +1230,7 @@ InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
                                                 std::string_view type,
                                                 std::string_view units)
 {
-    auto *fed=checkNewInterface(federateID, key, InterfaceType::PUBLICATION);
+    auto* fed = checkNewInterface(federateID, key, InterfaceType::PUBLICATION);
     const auto& handle = createBasicHandle(fed->global_id,
                                            fed->local_id,
                                            InterfaceType::PUBLICATION,
@@ -1254,7 +1256,8 @@ InterfaceHandle CommonCore::registerPublication(LocalFederateId federateID,
 
 InterfaceHandle CommonCore::getPublication(LocalFederateId federateID, std::string_view key) const
 {
-    const auto* pub = handles.read([&key](auto& hand) { return hand.getInterfaceHandle(key,InterfaceType::PUBLICATION); });
+    const auto* pub = handles.read(
+        [&key](auto& hand) { return hand.getInterfaceHandle(key, InterfaceType::PUBLICATION); });
     if (pub->local_fed_id != federateID) {
         return {};
     }
@@ -1756,7 +1759,7 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
                                              std::string_view name,
                                              std::string_view type)
 {
-    auto *fed=checkNewInterface(federateID, name, InterfaceType::ENDPOINT);
+    auto* fed = checkNewInterface(federateID, name, InterfaceType::ENDPOINT);
     const auto& handle = createBasicHandle(fed->global_id,
                                            fed->local_id,
                                            InterfaceType::ENDPOINT,
@@ -1787,7 +1790,8 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (registerEndpoint)"));
     }
-    const auto* ept = handles.read([&name](auto& hand) { return hand.getInterfaceHandle(name,InterfaceType::ENDPOINT); });
+    const auto* ept = handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::ENDPOINT); });
     if (ept != nullptr) {
         throw(RegistrationFailure("endpoint name is already used"));
     }
@@ -1811,7 +1815,8 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
 
 InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, std::string_view name) const
 {
-    const auto* ept = handles.read([&name](auto& hand) { return hand.getInterfaceHandle(name,InterfaceType::ENDPOINT); });
+    const auto* ept = handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::ENDPOINT); });
     if (ept->local_fed_id != federateID) {
         return {};
     }
@@ -1822,7 +1827,6 @@ InterfaceHandle CommonCore::registerFilter(std::string_view filterName,
                                            std::string_view type_in,
                                            std::string_view type_out)
 {
-
     if (!waitCoreRegistration()) {
         if (getBrokerState() >= BrokerState::CONNECTED_ERROR) {
             throw(RegistrationFailure(
@@ -1852,7 +1856,6 @@ InterfaceHandle CommonCore::registerCloningFilter(std::string_view filterName,
                                                   std::string_view type_in,
                                                   std::string_view type_out)
 {
-
     if (!waitCoreRegistration()) {
         if (getBrokerState() >= BrokerState::TERMINATING) {
             throw(RegistrationFailure("core is terminated no further registration possible"));
@@ -1915,7 +1918,8 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
 
 InterfaceHandle CommonCore::getFilter(std::string_view name) const
 {
-    const auto* filt = handles.read([&name](auto& hand) { return hand.getInterfaceHandle(name,InterfaceType::FILTER); });
+    const auto* filt = handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::FILTER); });
     if ((filt != nullptr) && (filt->handleType == InterfaceType::FILTER)) {
         return filt->getInterfaceHandle();
     }
@@ -1924,7 +1928,8 @@ InterfaceHandle CommonCore::getFilter(std::string_view name) const
 
 InterfaceHandle CommonCore::getTranslator(std::string_view name) const
 {
-    const auto* trans = handles.read([&name](auto& hand) { return hand.getInterfaceHandle(name,InterfaceType::TRANSLATOR); });
+    const auto* trans = handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::TRANSLATOR); });
     if ((trans != nullptr) && (trans->handleType == InterfaceType::TRANSLATOR)) {
         return trans->getInterfaceHandle();
     }
@@ -2232,7 +2237,8 @@ void CommonCore::deliverMessage(ActionMessage& message)
         case CMD_SEND_MESSAGE: {
             // Find the destination endpoint
             auto* localP = (message.dest_id == parent_broker_id) ?
-                loopHandles.getInterfaceHandle(message.getString(targetStringLoc),InterfaceType::ENDPOINT) :
+                loopHandles.getInterfaceHandle(message.getString(targetStringLoc),
+                                               InterfaceType::ENDPOINT) :
                 loopHandles.findHandle(message.getDest());
             if (localP == nullptr) {
                 auto kfnd = knownExternalEndpoints.find(message.getString(targetStringLoc));
@@ -3657,7 +3663,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                                 fed->addAction(command);
                             }
                         });
-                    } else if (checkActionFlag(command, observer_flag)||checkActionFlag(command,dynamic_join_flag)) {
+                    } else if (checkActionFlag(command, observer_flag) ||
+                               checkActionFlag(command, dynamic_join_flag)) {
                         routeMessage(command);
                     }
                     initIterations.store(false);
@@ -3685,7 +3692,8 @@ void CommonCore::processCommand(ActionMessage&& command)
                     if (!timeCoord->hasActiveTimeDependencies()) {
                         timeCoord->disconnect();
                     }
-                } else if (checkActionFlag(command, observer_flag)||checkActionFlag(command,dynamic_join_flag)) {
+                } else if (checkActionFlag(command, observer_flag) ||
+                           checkActionFlag(command, dynamic_join_flag)) {
                     routeMessage(command);
                 }
             }
@@ -3959,7 +3967,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
 {
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
-            auto* pub = loopHandles.getInterfaceHandle(command.name(),InterfaceType::PUBLICATION);
+            auto* pub = loopHandles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 if (checkActionFlag(*pub, disconnected_flag)) {
                     // TODO(PT): this might generate an error if the required flag was set
@@ -3982,7 +3990,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
         } break;
         case CMD_ADD_NAMED_INPUT: {
             const std::string inputName(command.name());  // need to copy the name
-            auto* inp = loopHandles.getInterfaceHandle(inputName,InterfaceType::INPUT);
+            auto* inp = loopHandles.getInterfaceHandle(inputName, InterfaceType::INPUT);
             if (inp != nullptr) {
                 if (checkActionFlag(*inp, disconnected_flag)) {
                     // TODO(PT): this might generate an error if the required flag was set
@@ -4008,7 +4016,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_FILTER: {
-            auto* filt = loopHandles.getInterfaceHandle(command.name(),InterfaceType::FILTER);
+            auto* filt = loopHandles.getInterfaceHandle(command.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 if (checkActionFlag(*filt, disconnected_flag)) {
                     // TODO(PT): this might generate an error if the required flag was set
@@ -4029,7 +4037,7 @@ void CommonCore::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_ENDPOINT: {
-            auto* ept = loopHandles.getInterfaceHandle(command.name(),InterfaceType::ENDPOINT);
+            auto* ept = loopHandles.getInterfaceHandle(command.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 if (checkActionFlag(*ept, disconnected_flag)) {
                     // TODO(PT): this might generate an error if the required flag was set
@@ -4070,7 +4078,7 @@ void CommonCore::removeNamedTarget(ActionMessage& command)
 {
     switch (command.action()) {
         case CMD_REMOVE_NAMED_PUBLICATION: {
-            auto* pub = loopHandles.getInterfaceHandle(command.name(),InterfaceType::PUBLICATION);
+            auto* pub = loopHandles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 command.setAction(CMD_REMOVE_SUBSCRIBER);
                 command.setDestination(pub->handle);
@@ -4084,7 +4092,7 @@ void CommonCore::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_INPUT: {
-            auto* inp = loopHandles.getInterfaceHandle(command.name(),InterfaceType::INPUT);
+            auto* inp = loopHandles.getInterfaceHandle(command.name(), InterfaceType::INPUT);
             if (inp != nullptr) {
                 command.setAction(CMD_REMOVE_PUBLICATION);
                 command.setDestination(inp->handle);
@@ -4098,7 +4106,7 @@ void CommonCore::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_FILTER: {
-            auto* filt = loopHandles.getInterfaceHandle(command.name(),InterfaceType::FILTER);
+            auto* filt = loopHandles.getInterfaceHandle(command.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.setAction(CMD_REMOVE_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -4112,7 +4120,7 @@ void CommonCore::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_ENDPOINT: {
-            auto* ept = loopHandles.getInterfaceHandle(command.name(),InterfaceType::ENDPOINT);
+            auto* ept = loopHandles.getInterfaceHandle(command.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 command.setAction(CMD_REMOVE_FILTER);
                 command.setDestination(ept->handle);
@@ -4404,7 +4412,7 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
         case CMD_DATA_LINK: {
-            auto* pub = loopHandles.getInterfaceHandle(cmd.name(),InterfaceType::PUBLICATION);
+            auto* pub = loopHandles.getInterfaceHandle(cmd.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 cmd.name(cmd.getString(targetStringLoc));
                 cmd.setAction(CMD_ADD_NAMED_INPUT);
@@ -4412,7 +4420,8 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
                 cmd.clearStringData();
                 checkForNamedInterface(cmd);
             } else {
-                auto* input = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),InterfaceType::INPUT);
+                auto* input = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),
+                                                             InterfaceType::INPUT);
                 if (input == nullptr) {
                     routeMessage(cmd);
                 } else {
@@ -4424,7 +4433,7 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
             }
         } break;
         case CMD_ENDPOINT_LINK: {
-            auto* ept = loopHandles.getInterfaceHandle(cmd.name(),InterfaceType::ENDPOINT);
+            auto* ept = loopHandles.getInterfaceHandle(cmd.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 cmd.name(cmd.getString(targetStringLoc));
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -4434,7 +4443,8 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
                 cmd.clearStringData();
                 checkForNamedInterface(cmd);
             } else {
-                auto* target = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),InterfaceType::ENDPOINT);
+                auto* target = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),
+                                                              InterfaceType::ENDPOINT);
                 if (target == nullptr) {
                     routeMessage(cmd);
                 } else {
@@ -4447,7 +4457,7 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
             }
         } break;
         case CMD_FILTER_LINK: {
-            auto* filt = loopHandles.getInterfaceHandle(cmd.name(),InterfaceType::FILTER);
+            auto* filt = loopHandles.getInterfaceHandle(cmd.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 cmd.name(cmd.getString(targetStringLoc));
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -4457,7 +4467,8 @@ void CommonCore::processLinkingCommand(ActionMessage& cmd)
                 }
                 checkForNamedInterface(cmd);
             } else {
-                auto* ept = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),InterfaceType::ENDPOINT);
+                auto* ept = loopHandles.getInterfaceHandle(cmd.getString(targetStringLoc),
+                                                           InterfaceType::ENDPOINT);
                 if (ept == nullptr) {
                     routeMessage(cmd);
                 } else {
@@ -5214,7 +5225,7 @@ void CommonCore::sendDisconnect(action_message_def::action_t disconnectType)
 
 bool CommonCore::checkForLocalPublication(ActionMessage& cmd)
 {
-    auto* pub = loopHandles.getInterfaceHandle(cmd.name(),InterfaceType::PUBLICATION);
+    auto* pub = loopHandles.getInterfaceHandle(cmd.name(), InterfaceType::PUBLICATION);
     if (pub != nullptr) {
         // now send the same command to the publication
         cmd.dest_handle = pub->getInterfaceHandle();
@@ -5362,7 +5373,7 @@ void CommonCore::routeMessage(ActionMessage&& cmd)
 // Checks for filter operations
 ActionMessage& CommonCore::processMessage(ActionMessage& m)
 {
-    auto* handle = loopHandles.getInterfaceHandle(m.source_handle,InterfaceType::ENDPOINT);
+    auto* handle = loopHandles.getInterfaceHandle(m.source_handle, InterfaceType::ENDPOINT);
     if (handle == nullptr) {
         return m;
     }

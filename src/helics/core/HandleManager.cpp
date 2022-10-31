@@ -202,73 +202,70 @@ int32_t HandleManager::getHandleOption(InterfaceHandle handle, int32_t option) c
 
 static bool interfaceTypeMatch(InterfaceType given, InterfaceType expected)
 {
-    if (given == expected)
-    {
+    if (given == expected) {
         return true;
     }
-    switch (expected)
-    {
-    case InterfaceType::PUBLICATION:
-    case InterfaceType::INPUT:
-    case InterfaceType::ENDPOINT:
-        return (given == InterfaceType::TRANSLATOR);
+    switch (expected) {
+        case InterfaceType::PUBLICATION:
+        case InterfaceType::INPUT:
+        case InterfaceType::ENDPOINT:
+            return (given == InterfaceType::TRANSLATOR);
     }
     return false;
 }
 BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name, InterfaceType type)
 {
-    mapType &imap = [this,type]()->mapType &{switch (type){
-    case InterfaceType::ENDPOINT:
-    case InterfaceType::TRANSLATOR:
-    default:
-       return endpoints;
-    case InterfaceType::PUBLICATION:
-        return publications;
-    case InterfaceType::INPUT:
-        return inputs;
-    case InterfaceType::FILTER:
-        return filters;
-    }
+    mapType& imap = [this, type]() -> mapType& {
+        switch (type) {
+            case InterfaceType::ENDPOINT:
+            case InterfaceType::TRANSLATOR:
+            default:
+                return endpoints;
+            case InterfaceType::PUBLICATION:
+                return publications;
+            case InterfaceType::INPUT:
+                return inputs;
+            case InterfaceType::FILTER:
+                return filters;
+        }
     }();
-    BasicHandleInfo* handle{ nullptr };
+    BasicHandleInfo* handle{nullptr};
     auto fnd = imap.find(name);
     if (fnd != imap.end()) {
-        handle= &handles[fnd->second.baseValue()];
-        if (type == InterfaceType::TRANSLATOR)
-        {
-            if (handle->handleType != InterfaceType::TRANSLATOR)
-            {
-                handle=nullptr;
+        handle = &handles[fnd->second.baseValue()];
+        if (type == InterfaceType::TRANSLATOR) {
+            if (handle->handleType != InterfaceType::TRANSLATOR) {
+                handle = nullptr;
             }
         }
     }
     return handle;
 }
 
-const BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name, InterfaceType type) const
+const BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name,
+                                                         InterfaceType type) const
 {
-    const mapType &imap = [this,type]()->const mapType &{switch (type){
-    case InterfaceType::ENDPOINT:
-    case InterfaceType::TRANSLATOR:
-    default:
-        return endpoints;
-    case InterfaceType::PUBLICATION:
-        return publications;
-    case InterfaceType::INPUT:
-        return inputs;
-    case InterfaceType::FILTER:
-        return filters;
-    }
+    const mapType& imap = [this, type]() -> const mapType& {
+        switch (type) {
+            case InterfaceType::ENDPOINT:
+            case InterfaceType::TRANSLATOR:
+            default:
+                return endpoints;
+            case InterfaceType::PUBLICATION:
+                return publications;
+            case InterfaceType::INPUT:
+                return inputs;
+            case InterfaceType::FILTER:
+                return filters;
+        }
     }();
-    const BasicHandleInfo* handle{ nullptr };
+    const BasicHandleInfo* handle{nullptr};
     auto fnd = imap.find(name);
     if (fnd != imap.end()) {
-        handle=&handles[fnd->second.baseValue()];
-        if (type == InterfaceType::TRANSLATOR)
-        {
-            if (handle->handleType != InterfaceType::TRANSLATOR)
-            {
-                handle=nullptr;
+        handle = &handles[fnd->second.baseValue()];
+        if (type == InterfaceType::TRANSLATOR) {
+            if (handle->handleType != InterfaceType::TRANSLATOR) {
+                handle = nullptr;
             }
         }
     }
@@ -280,7 +277,7 @@ BasicHandleInfo* HandleManager::getInterfaceHandle(InterfaceHandle handle, Inter
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         auto& hand = handles[index];
-        if (interfaceTypeMatch(hand.handleType,type)) {
+        if (interfaceTypeMatch(hand.handleType, type)) {
             return &hand;
         }
     }
@@ -288,12 +285,13 @@ BasicHandleInfo* HandleManager::getInterfaceHandle(InterfaceHandle handle, Inter
     return nullptr;
 }
 
-const BasicHandleInfo* HandleManager::getInterfaceHandle(InterfaceHandle handle, InterfaceType type) const
+const BasicHandleInfo* HandleManager::getInterfaceHandle(InterfaceHandle handle,
+                                                         InterfaceType type) const
 {
     auto index = handle.baseValue();
     if (isValidIndex(index, handles)) {
         const auto& hand = handles[index];
-        if (interfaceTypeMatch(hand.handleType,type)) {
+        if (interfaceTypeMatch(hand.handleType, type)) {
             return &hand;
         }
     }

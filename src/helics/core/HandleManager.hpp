@@ -24,7 +24,7 @@ namespace helics {
 */
 class HandleManager {
   private:
-    using mapType=std::unordered_map<std::string_view, InterfaceHandle>;
+    using mapType = std::unordered_map<std::string_view, InterfaceHandle>;
     /** use deque here as there are several use cases which use two properties of a deque vs vector
     namely that references are not invalidated by emplace back, which is unlike a vector
     and that the memory growth is a stable and not subject to large copy operations

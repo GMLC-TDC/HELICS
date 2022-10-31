@@ -103,20 +103,17 @@ namespace inproc {
                 } else {
                     if (!tbroker->isOpenToNewFederates() && !observer) {
                         ++ecount;
-                        if (ecount == 1)
-                        {
+                        if (ecount == 1) {
                             logError("broker is not open to new federates " + brokerName);
                         }
                         tbroker = nullptr;
                         broker = nullptr;
-                        if (ecount >= 3)
-                        {
+                        if (ecount >= 3) {
                             setTxStatus(ConnectionStatus::ERRORED);
                             setRxStatus(ConnectionStatus::ERRORED);
                             return;
                         }
-                        if (ecount == 1)
-                        {
+                        if (ecount == 1) {
                             std::this_thread::sleep_for(milliseconds(200));
                         }
                         BrokerFactory::cleanUpBrokers(milliseconds(200));

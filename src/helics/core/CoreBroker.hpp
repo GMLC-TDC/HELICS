@@ -59,7 +59,7 @@ class BasicFedInfo {
     GlobalBrokerId parent;  //!< the id of the parent broker/core
     ConnectionState state{ConnectionState::CONNECTED};
     bool nonCounting{false};  //!< indicator the federate shouldn't count toward limits or total
-    bool observer{false}; //!, indicator that the federate is an observer only
+    bool observer{false};  //!, indicator that the federate is an observer only
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 
@@ -391,7 +391,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void addEndpoint(ActionMessage& m);
     void addFilter(ActionMessage& m);
     void addTranslator(ActionMessage& m);
-    bool checkInterfaceCreation(ActionMessage &m, InterfaceType type);
+    bool checkInterfaceCreation(ActionMessage& m, InterfaceType type);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
     /// @brief send an error response to broker registration
