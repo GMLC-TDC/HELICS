@@ -58,7 +58,7 @@ add_executable(
 )
 
 add_executable(
-    filterTranslatorTests ${filterTranslator_test_sources_test_sources} ${common_test_headers}
+    filterTranslatorTests ${filterTranslator_test_sources} ${common_test_headers}
                           ${common_test_sources}
 )
 

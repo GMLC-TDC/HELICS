@@ -1159,6 +1159,17 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
                                              InterfaceType type)
 {
     std::string_view tname = interfaceTypeName(type);
+    if (type == InterfaceType::FILTER || type == InterfaceType::TRANSLATOR)
+    {
+        if (!waitCoreRegistration()) {
+            if (getBrokerState() >= BrokerState::CONNECTED_ERROR) {
+                throw(RegistrationFailure(
+                    "core is terminated or in error state no further registration possible"));
+            }
+            throw(RegistrationFailure(fmt::format("registration timeout exceeded for register {}",tname)));
+        }
+    }
+
     FederateState* fed{nullptr};
     if (federateID != gLocalCoreId && type != InterfaceType::FILTER) {
         fed = getFederateAt(federateID);
@@ -1166,20 +1177,36 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
             throw(InvalidIdentifier(fmt::format("federateID not valid (register {})", tname)));
         }
     }
-
+    
     if (disableDynamicSources && type != InterfaceType::INPUT) {
-        if (fed->getState() >= FederateStates::INITIALIZING &&
-            !fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
-            throw(RegistrationFailure(
-                fmt::format("Source {} not allowed after entering initializing mode ({})",
-                            interfaceTypeName(type),
-                            key)));
+        if (fed != nullptr)
+        {
+            if (fed->getState() >= FederateStates::INITIALIZING &&
+                !fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
+                throw(RegistrationFailure(
+                    fmt::format("Source {} not allowed after entering initializing mode ({})",
+                        interfaceTypeName(type),
+                        key)));
+            }
+        }
+        else
+        {
+            if (getBrokerState() >= BrokerState::INITIALIZING)
+            {
+                throw(RegistrationFailure(
+                    fmt::format("Source {} not allowed after entering initializing mode ({})",
+                        interfaceTypeName(type),
+                        key)));
+            }
         }
     }
-    const auto* ci = handles.read(
-        [&key, type, &tname](auto& hand) { return hand.getInterfaceHandle(key, type); });
-    if (ci != nullptr) {  // this key is already found
-        throw(RegistrationFailure(fmt::format("named {} already exists", tname)));
+    if (!key.empty())
+    {
+        const auto* ci = handles.read(
+            [&key, type, &tname](auto& hand) { return hand.getInterfaceHandle(key, type); });
+        if (ci != nullptr) {  // this key is already found
+            throw(RegistrationFailure(fmt::format("named {} already exists", tname)));
+        }
     }
     return fed;
 }
@@ -1786,15 +1813,8 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
                                                      std::string_view name,
                                                      std::string_view type)
 {
-    auto* fed = getFederateAt(federateID);
-    if (fed == nullptr) {
-        throw(InvalidIdentifier("federateID not valid (registerEndpoint)"));
-    }
-    const auto* ept = handles.read(
-        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::ENDPOINT); });
-    if (ept != nullptr) {
-        throw(RegistrationFailure("endpoint name is already used"));
-    }
+    auto* fed = checkNewInterface(federateID, name, InterfaceType::ENDPOINT);
+
     auto flags = fed->getInterfaceFlags();
     flags |= (1U << targeted_flag);
     const auto& handle = createBasicHandle(
@@ -1827,13 +1847,6 @@ InterfaceHandle CommonCore::registerFilter(std::string_view filterName,
                                            std::string_view type_in,
                                            std::string_view type_out)
 {
-    if (!waitCoreRegistration()) {
-        if (getBrokerState() >= BrokerState::CONNECTED_ERROR) {
-            throw(RegistrationFailure(
-                "core is terminated or in error state no further registration possible"));
-        }
-        throw(RegistrationFailure("registration timeout exceeded for registerFilter"));
-    }
     checkNewInterface(gLocalCoreId, filterName, InterfaceType::FILTER);
     auto fid = filterFedID.load();
 
@@ -1856,12 +1869,6 @@ InterfaceHandle CommonCore::registerCloningFilter(std::string_view filterName,
                                                   std::string_view type_in,
                                                   std::string_view type_out)
 {
-    if (!waitCoreRegistration()) {
-        if (getBrokerState() >= BrokerState::TERMINATING) {
-            throw(RegistrationFailure("core is terminated no further registration possible"));
-        }
-        throw(RegistrationFailure("registration timeout exceeded"));
-    }
     checkNewInterface(gLocalCoreId, filterName, InterfaceType::FILTER);
     auto fid = filterFedID.load();
 
@@ -1893,12 +1900,7 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
 {
     // check to make sure the name isn't already used
     checkNewInterface(gLocalCoreId, translatorName, InterfaceType::TRANSLATOR);
-    if (!waitCoreRegistration()) {
-        if (getBrokerState() >= BrokerState::TERMINATING) {
-            throw(RegistrationFailure("core is terminated no further registration possible"));
-        }
-        throw(RegistrationFailure("registration timeout exceeded"));
-    }
+    
     auto fid = translatorFedID.load();
 
     const auto& handle = createBasicHandle(

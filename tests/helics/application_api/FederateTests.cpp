@@ -309,6 +309,9 @@ TEST(federate, dynamic_join)
     EXPECT_EQ(res, 2.5);
     fed->disconnect();
     fedDyn->disconnect();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    helics::cleanupHelicsLibrary();
+
 }
 
 TEST(federate, broker_disconnect_test_ci_skip)
