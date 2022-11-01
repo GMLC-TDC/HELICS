@@ -1159,14 +1159,14 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
                                              InterfaceType type)
 {
     std::string_view tname = interfaceTypeName(type);
-    if (type == InterfaceType::FILTER || type == InterfaceType::TRANSLATOR)
-    {
+    if (type == InterfaceType::FILTER || type == InterfaceType::TRANSLATOR) {
         if (!waitCoreRegistration()) {
             if (getBrokerState() >= BrokerState::CONNECTED_ERROR) {
                 throw(RegistrationFailure(
                     "core is terminated or in error state no further registration possible"));
             }
-            throw(RegistrationFailure(fmt::format("registration timeout exceeded for register {}",tname)));
+            throw(RegistrationFailure(
+                fmt::format("registration timeout exceeded for register {}", tname)));
         }
     }
 
@@ -1177,31 +1177,26 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
             throw(InvalidIdentifier(fmt::format("federateID not valid (register {})", tname)));
         }
     }
-    
+
     if (disableDynamicSources && type != InterfaceType::INPUT) {
-        if (fed != nullptr)
-        {
+        if (fed != nullptr) {
             if (fed->getState() >= FederateStates::INITIALIZING &&
                 !fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
                 throw(RegistrationFailure(
                     fmt::format("Source {} not allowed after entering initializing mode ({})",
-                        interfaceTypeName(type),
-                        key)));
+                                interfaceTypeName(type),
+                                key)));
             }
-        }
-        else
-        {
-            if (getBrokerState() >= BrokerState::INITIALIZING)
-            {
+        } else {
+            if (getBrokerState() >= BrokerState::INITIALIZING) {
                 throw(RegistrationFailure(
                     fmt::format("Source {} not allowed after entering initializing mode ({})",
-                        interfaceTypeName(type),
-                        key)));
+                                interfaceTypeName(type),
+                                key)));
             }
         }
     }
-    if (!key.empty())
-    {
+    if (!key.empty()) {
         const auto* ci = handles.read(
             [&key, type, &tname](auto& hand) { return hand.getInterfaceHandle(key, type); });
         if (ci != nullptr) {  // this key is already found
@@ -1900,7 +1895,7 @@ InterfaceHandle CommonCore::registerTranslator(std::string_view translatorName,
 {
     // check to make sure the name isn't already used
     checkNewInterface(gLocalCoreId, translatorName, InterfaceType::TRANSLATOR);
-    
+
     auto fid = translatorFedID.load();
 
     const auto& handle = createBasicHandle(
