@@ -880,14 +880,13 @@ Time CommonCore::timeRequest(LocalFederateId federateID, Time next)
 
             switch (ret.state) {
                 case IterationResult::ERROR_RESULT:
-                    switch (fed->lastErrorCode())
-                    {
-                    case HELICS_ERROR_REGISTRATION_FAILURE:
-                        throw(RegistrationFailure(fed->lastErrorString()));
-                    default:
-                        throw(FunctionExecutionFailure(fed->lastErrorString()));
+                    switch (fed->lastErrorCode()) {
+                        case HELICS_ERROR_REGISTRATION_FAILURE:
+                            throw(RegistrationFailure(fed->lastErrorString()));
+                        default:
+                            throw(FunctionExecutionFailure(fed->lastErrorString()));
                     }
-                    
+
                 case IterationResult::HALTED:
                     return Time::maxVal();
                 default:
@@ -1189,10 +1188,11 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
         if (fed != nullptr) {
             if (fed->getState() >= FederateStates::INITIALIZING &&
                 !fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
-                throw(RegistrationFailure(
-                    fmt::format("Source {} from {} not allowed after entering initializing mode ({})",
-                                interfaceTypeName(type),fed->getIdentifier(),
-                                key)));
+                throw(RegistrationFailure(fmt::format(
+                    "Source {} from {} not allowed after entering initializing mode ({})",
+                    interfaceTypeName(type),
+                    fed->getIdentifier(),
+                    key)));
             }
         } else {
             if (getBrokerState() >= BrokerState::INITIALIZING) {

@@ -33,7 +33,6 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
     return std::string(parameter.param);
 };
 
-
 TEST_F(dynFed, initPubSubs)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
@@ -54,11 +53,10 @@ TEST_F(dynFed, initPubSubs)
     pub1.publish(12.0);
     pub2.publish(13.3);
     vFed1->requestNextStep();
-    EXPECT_DOUBLE_EQ(in1.getDouble(),12.0);
-    EXPECT_DOUBLE_EQ(in2.getDouble(),13.3);
+    EXPECT_DOUBLE_EQ(in1.getDouble(), 12.0);
+    EXPECT_DOUBLE_EQ(in2.getDouble(), 13.3);
 
     vFed1->disconnect();
-
 }
 
 TEST_F(dynFed, execPubSubs)
@@ -81,31 +79,28 @@ TEST_F(dynFed, execPubSubs)
     pub1.publish(12.0);
     pub2.publish(13.3);
     vFed1->requestNextStep();
-    EXPECT_DOUBLE_EQ(in1.getDouble(),12.0);
-    EXPECT_DOUBLE_EQ(in2.getDouble(),13.3);
+    EXPECT_DOUBLE_EQ(in1.getDouble(), 12.0);
+    EXPECT_DOUBLE_EQ(in2.getDouble(), 13.3);
 
     vFed1->disconnect();
-
 }
-
 
 TEST_F(dynFed, initPub_disable)
 {
-    extraCoreArgs="--disable_dynamic_sources";
+    extraCoreArgs = "--disable_dynamic_sources";
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
     vFed1->enterInitializingMode();
 
-    EXPECT_THROW(vFed1->registerGlobalPublication<double>("pub2"),helics::RegistrationFailure);
+    EXPECT_THROW(vFed1->registerGlobalPublication<double>("pub2"), helics::RegistrationFailure);
 
     vFed1->disconnect();
-
 }
 
 TEST_F(dynFed, execPubSubs_disable)
 {
-    extraBrokerArgs="--disable_dynamic_sources";
+    extraBrokerArgs = "--disable_dynamic_sources";
     SetupTest<helics::ValueFederate>("test", 1, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
 
@@ -118,12 +113,10 @@ TEST_F(dynFed, execPubSubs_disable)
     vFed1->registerGlobalPublication<double>("pub2");
 
     vFed1->registerSubscription("pub2");
-    vFed1->query("root","global_flush");
-    EXPECT_THROW(vFed1->requestNextStep(),helics::RegistrationFailure);
+    vFed1->query("root", "global_flush");
+    EXPECT_THROW(vFed1->requestNextStep(), helics::RegistrationFailure);
     vFed1->disconnect();
-
 }
-
 
 TEST_F(dynFed, execPubSubs_2fed)
 {
@@ -143,21 +136,20 @@ TEST_F(dynFed, execPubSubs_2fed)
 
     auto& in2 = vFed1->registerSubscription("pub2");
 
-    auto res=vFed2->query("root","global_flush");
+    auto res = vFed2->query("root", "global_flush");
     vFed1->requestTimeAsync(helics::timeZero);
     vFed2->requestNextStep();
-    auto tres=vFed1->requestTimeComplete();
-    EXPECT_EQ(tres,1.0);
+    auto tres = vFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 1.0);
 
     pub1.publish(12.0);
     pub2.publish(13.3);
     vFed1->requestTimeAsync(helics::timeZero);
     vFed2->requestNextStep();
-    tres=vFed1->requestTimeComplete();
-    EXPECT_EQ(tres,2.0);
-    EXPECT_DOUBLE_EQ(in1.getDouble(),12.0);
-    EXPECT_DOUBLE_EQ(in2.getDouble(),13.3);
+    tres = vFed1->requestTimeComplete();
+    EXPECT_EQ(tres, 2.0);
+    EXPECT_DOUBLE_EQ(in1.getDouble(), 12.0);
+    EXPECT_DOUBLE_EQ(in2.getDouble(), 13.3);
 
     vFed1->disconnect();
-
 }
