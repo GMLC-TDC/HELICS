@@ -468,6 +468,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     bool countable = !checkActionFlag(command, non_counting_flag);
+    bool dynamicFed{false};
     if (countable && getCountableFederates() >= maxFederateCount) {
         sendFedErrorAck(command, max_federate_count_exceeded);
         return;
@@ -485,6 +486,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             sendFedErrorAck(command, already_init_error_code);
             return;
         }
+        dynamicFed=true;
     } else {
         // we are in an ERROR_STATE and terminating
         sendFedErrorAck(command, broker_terminating);
@@ -505,6 +507,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     if (checkActionFlag(command, observer_flag)) {
         mFederates.back().observer = true;
     }
+    mFederates.back().dynamic=dynamicFed;
     auto lookupIndex = mFederates.size() - 1;
     if (checkActionFlag(command, child_flag)) {
         mFederates.back().global_id = GlobalFederateId(command.getExtraData());
@@ -1931,13 +1934,25 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& m, InterfaceType type)
     if (disableDynamicSources && type != InterfaceType::INPUT) {
         if (getBrokerState() == BrokerState::OPERATING) {
             auto fed = mFederates.find(m.source_id);
-            if (fed->state != ConnectionState::CONNECTED && !fed->observer) {
+            if (fed == mFederates.end())
+            {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
                 eret.dest_handle = m.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;
                 eret.payload =
                     fmt::format("Source {} not allowed after entering initializing mode ({})",
-                                interfaceTypeName(type),
+                        interfaceTypeName(type),
+                        m.name());
+                propagateError(std::move(eret));
+                return false;
+            }
+            else if (!(fed->observer||(fed->dynamic && fed->state==ConnectionState::CONNECTED))) {
+                ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+                eret.dest_handle = m.source_handle;
+                eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+                eret.payload =
+                    fmt::format("Source {} from {} not allowed after entering initializing mode ({})",
+                                interfaceTypeName(type),fed->name,
                                 m.name());
                 propagateError(std::move(eret));
                 return false;

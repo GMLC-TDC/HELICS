@@ -60,6 +60,7 @@ class BasicFedInfo {
     ConnectionState state{ConnectionState::CONNECTED};
     bool nonCounting{false};  //!< indicator the federate shouldn't count toward limits or total
     bool observer{false};  //!, indicator that the federate is an observer only
+    bool dynamic{false}; //!< indicator that the federate joined dynamically
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 

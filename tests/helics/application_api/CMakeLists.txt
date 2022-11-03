@@ -22,6 +22,7 @@ set(valueFederate_test_sources
     ValueFederateDualTransfer.cpp
     helicsTypeTests.cpp
     MultiInputTests.cpp
+    DynamicValueFederateTests.cpp
 )
 
 set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp

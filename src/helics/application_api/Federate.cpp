@@ -897,6 +897,11 @@ Time Federate::requestTime(Time nextInternalTimeStep)
                 updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
+            catch (const RegistrationFailure&)
+            {
+                updateFederateMode(Modes::ERROR_STATE);
+                throw;
+            }
             break;
         case Modes::FINALIZE:
         case Modes::FINISHED:

@@ -313,7 +313,7 @@ TEST(federate, dynamic_join)
     helics::cleanupHelicsLibrary();
 }
 
-TEST(federate, broker_disconnect_test_ci_skip)
+TEST(federate, broker_disconnect_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(CORE_TYPE_TO_TEST, "b1", "-f 1");
     brk->connect();
