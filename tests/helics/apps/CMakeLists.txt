@@ -23,6 +23,7 @@ set(helics_apps_test_sources
     CoreAppTests.cpp
     BrokerAppTests.cpp
     MultiBrokerTests.cpp
+    ProbeTests.cpp
     exeTestHelper.h
 )
 

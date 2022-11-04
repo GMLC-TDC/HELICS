@@ -23,6 +23,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         helicsApp.hpp
         Clone.hpp
         CoreApp.hpp
+        Probe.hpp
         BrokerApp.hpp
     )
 
@@ -42,6 +43,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         Tracer.cpp
         helicsApp.cpp
         Clone.cpp
+        Probe.cpp
     )
 
     set(helics_apps_broker_files MultiBroker.cpp BrokerServer.cpp zmqBrokerServer.cpp
