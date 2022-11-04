@@ -70,8 +70,8 @@ namespace helics::apps {
             }
         }
 
-        endpoint=fed->registerTargetedEndpoint("probePoint","probe");
-        fed->enterInitializingMode();
+        endpoint=fed->registerEndpoint("probePoint","probe");
+        fed->enterInitializingModeIterative();
         auto qres=fed->query("root","endpoints");
        auto epoints= vectorizeQueryResult(qres);
 
@@ -91,7 +91,7 @@ namespace helics::apps {
            ++connections;
        }
        fed->logInfoMessage(fmt::format("Probe {} connected to {} endpoints",fed->getName(),connections));
-
+       fed->enterInitializingMode();
     }
 
     void Probe::runTo(Time stopTime_input)
