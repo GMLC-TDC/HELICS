@@ -84,6 +84,8 @@ enum ConnectionFlags : uint16_t {
     /// flag indicating that a broker/federate is disconnected
     disconnected_flag = 12,
 
+    /// flag indicating that some processing needs to be done on the name
+    rename_flag = 13,
     /// flag indicating a federate, core or broker is slow responding
     slow_responding_flag = 14,
     /// flag indicating that a federate should not count in any totals

@@ -82,7 +82,7 @@ namespace helics::apps {
         void runProbe();
 
         Endpoint endpoint;  //!< the actual endpoint objects
-        int connections{0};
-        int messagesReceived{0};
+        int connections{0}; //!< count the number of connections
+        int messagesReceived{0}; //!< count the number of messages received
     };
 }  // namespace apps

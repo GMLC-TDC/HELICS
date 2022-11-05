@@ -66,7 +66,7 @@ namespace helics::apps {
             auto td=fed->getTimeProperty(HELICS_PROPERTY_TIME_DELTA);
             if (td <= Time::epsilon())
             {
-                fed->logWarningMessage("Probe federate with no period or time delta will generate a large number of messages");
+                fed->setProperty(HELICS_PROPERTY_TIME_PERIOD,1.0);
             }
         }
 

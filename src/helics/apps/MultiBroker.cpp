@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../core/BrokerFactory.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../network/CommsInterface.hpp"
 #include "../network/NetworkBrokerData.hpp"
 #include "../network/NetworkCommsInterface.hpp"
@@ -91,6 +92,11 @@ bool MultiBroker::brokerConnect()
         app = netInfo.commandLineParser("");
         app->addTypeOption();
         app->allow_config_extras(CLI::config_extras_mode::error);
+        if (!fileops::hasJsonExtension(configString))
+        {
+            auto *cfg=dynamic_cast<HelicsConfigJSON *>(app->get_config_formatter().get());
+            cfg->skipJson(true);
+        }
     } else if (type == CoreType::MULTI) {
         type = CoreType::DEFAULT;
     }

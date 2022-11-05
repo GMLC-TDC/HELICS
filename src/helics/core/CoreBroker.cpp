@@ -464,7 +464,33 @@ void CoreBroker::sendFedErrorAck(ActionMessage& command, std::int32_t errorCode)
     badInit.source_id = global_broker_id_local;
     badInit.messageID = errorCode;
     badInit.name(command.name());
+    if (checkActionFlag(command, rename_flag))
+    {
+        setActionFlag(badInit,rename_flag);
+        badInit.setExtraDestData(command.getExtraDestData());
+    }
     transmit(getRoute(command.source_id), badInit);
+}
+
+std::string CoreBroker::generateRename(const std::string& name)
+{
+    auto newName=name;
+    auto cntLoc=newName.find("$#$");
+    if (cntLoc!=std::string::npos)
+    {
+        auto rn=renamers.find(newName);
+        if (rn != renamers.end())
+        {
+            newName.replace(cntLoc,3,std::to_string(rn->second+1));
+            rn->second++;
+        }
+        else
+        {
+            newName.replace(cntLoc,3,"1");
+            renamers.emplace(name,1);
+        }
+    }
+    return newName;
 }
 
 // Handle the registration of new federates;
@@ -496,12 +522,16 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         sendFedErrorAck(command, broker_terminating);
         return;
     }
+    std::string fedName{ command.name() };
+    if (checkActionFlag(command, rename_flag)) {
+       fedName=generateRename(fedName);
+    }
     // this checks for duplicate federate names
-    if (mFederates.find(command.name()) != mFederates.end()) {
+    if (mFederates.find(fedName) != mFederates.end()) {
         sendFedErrorAck(command, duplicate_federate_name_error_code);
         return;
     }
-    mFederates.insert(command.name(), no_search, command.name());
+    mFederates.insert(fedName, no_search, fedName);
     mFederates.back().route = getRoute(command.source_id);
     mFederates.back().parent = command.source_id;
     if (checkActionFlag(command, non_counting_flag)) {
@@ -544,7 +574,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         ActionMessage fedReply(CMD_FED_ACK);
         fedReply.source_id = global_broker_id_local;
         fedReply.dest_id = global_fedid;
-        fedReply.name(command.name());
+        fedReply.name(fedName);
         if (checkActionFlag(command, child_flag)) {
             setActionFlag(fedReply, child_flag);
         }
@@ -563,7 +593,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         LOG_CONNECTIONS(global_broker_id_local,
                         getIdentifier(),
                         fmt::format("registering federate {}({}) on route {}",
-                                    command.name(),
+                                    fedName,
                                     global_fedid.baseValue(),
                                     route_id.baseValue()));
         if (enable_profiling) {
