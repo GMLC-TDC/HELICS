@@ -96,11 +96,11 @@ external protection, that will result in undefined behavior
         virtual void runTo(Time stopTime_input) override;
 
         /** add a publication to a Player
-    @param key the key of the publication to add
+    @param name the identifier of the publication to add
     @param type the type of the publication
     @param pubUnits the units associated with the publication
     */
-        void addPublication(std::string_view key,
+        void addPublication(std::string_view name,
                             DataType type,
                             std::string_view pubUnits = std::string_view());
 
