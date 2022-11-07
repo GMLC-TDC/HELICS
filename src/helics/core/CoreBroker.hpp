@@ -423,7 +423,7 @@ class CoreBroker: public Broker, public BrokerBase {
     void generateTimeBarrier(ActionMessage& m);
     int generateMapObjectCounter() const;
     /** handle the renaming operation*/
-    std::string generateRename(const std::string &name);
+    std::string generateRename(std::string_view name);
     friend class TimeoutMonitor;
 };
 

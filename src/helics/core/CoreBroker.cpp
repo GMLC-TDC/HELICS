@@ -464,29 +464,24 @@ void CoreBroker::sendFedErrorAck(ActionMessage& command, std::int32_t errorCode)
     badInit.source_id = global_broker_id_local;
     badInit.messageID = errorCode;
     badInit.name(command.name());
-    if (checkActionFlag(command, rename_flag))
-    {
-        setActionFlag(badInit,rename_flag);
-        badInit.setExtraDestData(command.getExtraDestData());
-    }
     transmit(getRoute(command.source_id), badInit);
 }
 
-std::string CoreBroker::generateRename(const std::string& name)
+std::string CoreBroker::generateRename(std::string_view name)
 {
-    auto newName=name;
-    auto cntLoc=newName.find("$#$");
+    std::string newName{name};
+    auto cntLoc=newName.find("${#}");
     if (cntLoc!=std::string::npos)
     {
         auto rn=renamers.find(newName);
         if (rn != renamers.end())
         {
-            newName.replace(cntLoc,3,std::to_string(rn->second+1));
+            newName.replace(cntLoc,4,std::to_string(rn->second+1));
             rn->second++;
         }
         else
         {
-            newName.replace(cntLoc,3,"1");
+            newName.replace(cntLoc,4,"1");
             renamers.emplace(name,1);
         }
     }
@@ -522,10 +517,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         sendFedErrorAck(command, broker_terminating);
         return;
     }
-    std::string fedName{ command.name() };
-    if (checkActionFlag(command, rename_flag)) {
-       fedName=generateRename(fedName);
-    }
+    auto fedName=command.name();
     // this checks for duplicate federate names
     if (mFederates.find(fedName) != mFederates.end()) {
         sendFedErrorAck(command, duplicate_federate_name_error_code);
@@ -3460,6 +3452,10 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             gs["timestep"] = -1;
             return fileops::generateJsonString(gs);
         }
+    }
+    if (request.compare(0, 7, "rename:") == 0)
+    {
+        return generateRename(request.substr(7));
     }
     auto mi = mapIndex.find(request);
     if (mi != mapIndex.end()) {

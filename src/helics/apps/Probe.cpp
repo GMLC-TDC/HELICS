@@ -20,12 +20,12 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics::apps {
 
 
-    Probe::Probe(int argc, char* argv[]): App("probe", argc, argv)
+    Probe::Probe(int argc, char* argv[]): App("probe_${#}", argc, argv)
     {
 
     }
 
-    Probe::Probe(std::vector<std::string> args): App("probe", std::move(args))
+    Probe::Probe(std::vector<std::string> args): App("probe_${#}", std::move(args))
     {
 
     }

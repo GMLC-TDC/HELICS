@@ -78,6 +78,32 @@ TEST(federate, single_core_federate)
     fed = nullptr;  // force the destructor
 }
 
+TEST(federate, renamer)
+{
+    helics::FederateInfo fi(CORE_TYPE_TO_TEST);
+    fi.coreInitString = "--autobroker";
+    auto fed = std::make_shared<helics::Federate>("test_${#}", fi);
+
+    auto core = fed->getCorePointer();
+    ASSERT_TRUE((core));
+
+    auto name = std::string(core->getFederateName(fed->getID()));
+
+    EXPECT_EQ(name, fed->getName());
+    EXPECT_EQ(name,"test_1");
+
+    fi.coreInitString.clear();
+    auto fed2 = std::make_shared<helics::Federate>("test_${#}", fi);
+    EXPECT_EQ("test_2", fed2->getName());
+
+    fed->enterInitializingModeAsync();
+    fed2->enterInitializingMode();
+    fed->enterInitializingModeComplete();
+
+    fed = nullptr;  // force the destructor
+    fed2=nullptr;
+}
+
 TEST(federate_tests, federate_initialize_iterate)
 {
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);

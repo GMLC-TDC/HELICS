@@ -703,6 +703,18 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (getBrokerState() >= BrokerState::OPERATING) {
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
+    bool renamer = (name.find("${")!=std::string_view::npos);
+    std::string nname;
+    if (renamer)
+    {
+        /** this will block*/
+        nname=query("root",fmt::format("rename:{}",name),HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
+        if (name != nname)
+        {
+            sendToLogger(parent_broker_id, HELICS_LOG_LEVEL_SUMMARY, getIdentifier(), fmt::format("generated name for fed {}->{}",name,nname));
+            name=nname;
+        }
+    }
     FederateState* fed = nullptr;
     bool checkProperties{false};
     LocalFederateId local_id;
@@ -711,15 +723,17 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
         if (static_cast<decltype(maxFederateCount)>(feds->size()) >= maxFederateCount) {
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
-        auto id = feds->insert(std::string(name), std::string(name), info);
-        if (id) {
-            local_id = LocalFederateId(static_cast<int32_t>(*id));
-            fed = (*feds)[*id];
-        } else {
-            throw(RegistrationFailure(
-                fmt::format("duplicate names {} detected: multiple federates with the same name",
-                            name)));
-        }
+
+            auto id = feds->insert(std::string(name), std::string(name), info);
+            if (id) {
+                local_id = LocalFederateId(static_cast<int32_t>(*id));
+                fed = (*feds)[*id];
+            } else {
+                throw(RegistrationFailure(
+                    fmt::format("duplicate names {} detected: multiple federates with the same name",
+                        name)));
+            }
+        
         if (feds->size() == 1) {
             checkProperties = true;
         }
@@ -742,11 +756,6 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     }
     ActionMessage m(CMD_REG_FED);
     m.name(name);
-    if (name.find("$#$") != std::string_view::npos)
-    {
-        setActionFlag(m,rename_flag);
-        m.setExtraDestData(local_id.baseValue());
-    }
     if (observer || fed->getOptionFlag(HELICS_FLAG_OBSERVER)) {
         setActionFlag(m, observer_flag);
     }
@@ -3086,10 +3095,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_REG_FED:
             // this one in the core needs to be the thread-safe version of getFederate
-            if (!checkActionFlag(command, rename_flag))
-            {
-                loopFederates.insert(command.name(), no_search, getFederate(command.name()));
-            }
+            loopFederates.insert(command.name(), no_search, getFederate(command.name()));
             if (global_broker_id_local != parent_broker_id) {
                 // forward on to Broker
                 command.source_id = global_broker_id_local;
@@ -3172,17 +3178,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             break;
         case CMD_FED_ACK: {
             FederateState *fed{nullptr};
-            if (checkActionFlag(command, rename_flag))
-            {
-                
-                fed=getFederateAt(LocalFederateId(command.getExtraDestData()));
-               fed
-
-            }
-            else
-            {
-                fed = getFederateCore(command.name());
-            }
+            fed = getFederateCore(command.name());
             if (fed != nullptr) {
                 if (checkActionFlag(command, error_flag)) {
                     LOG_ERROR(
