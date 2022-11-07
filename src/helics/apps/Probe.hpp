@@ -78,7 +78,7 @@ class HELICS_CXX_EXPORT Probe: public App {
     /** get the number of connections made*/
     int getConnections() const { return connections; }
     /** get the number of messages received*/
-    int getMessageCount() const { return messagesReceived; };
+    int getMessageCount() const { return messagesReceived; }
 
   private:
     void runProbe();

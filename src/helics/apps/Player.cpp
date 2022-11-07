@@ -44,8 +44,8 @@ std::map<std::string, int> pubids;
 std::map<std::string, int> eptids;
 */
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
+
     static inline bool vComp(const ValueSetter& v1, const ValueSetter& v2)
     {
         return (v1.time == v2.time) ? (v1.iteration < v2.iteration) : (v1.time < v2.time);
@@ -784,7 +784,6 @@ namespace apps {
     }
 
 }  // namespace apps
-}  // namespace helics
 
 static int hasB64Wrapper(std::string_view str)
 {
