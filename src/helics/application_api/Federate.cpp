@@ -110,7 +110,7 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
 
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(mName, fi);
-    if (mName.find("${")!=std::string::npos) {
+    if (mName.find("${") != std::string::npos) {
         mName = coreObject->getFederateName(fedID);
     }
     nameSegmentSeparator = fi.separator;
