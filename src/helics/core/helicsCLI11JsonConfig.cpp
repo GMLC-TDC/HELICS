@@ -112,9 +112,10 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
                     "specify the section index of the config file to use for configuration arrays")
         ->configurable(false)
         ->trigger_on_parse();
-    app->get_config_ptr()->each([fmtr](std::string& filename)
+    app->get_config_ptr()->check([fmtr](const std::string& filename)
         {
              fmtr->skipJson(!fileops::hasJsonExtension(filename));
+             return std::string{};
         });
 
     app->config_formatter(std::move(fmtr)); 
