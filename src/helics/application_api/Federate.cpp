@@ -110,9 +110,8 @@ Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedN
 
     // this call will throw an error on failure
     fedID = coreObject->registerFederate(mName, fi);
-    if (mName.find_first_of('$'))
-    {
-        mName=coreObject->getFederateName(fedID);
+    if (mName.find_first_of('$')) {
+        mName = coreObject->getFederateName(fedID);
     }
     nameSegmentSeparator = fi.separator;
     strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);

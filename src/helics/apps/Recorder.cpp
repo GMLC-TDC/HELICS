@@ -366,11 +366,11 @@ void Recorder::generateInterfaces()
 void Recorder::loadCaptureInterfaces()
 {
     for (auto& capt : captureInterfaces) {
-            auto pubs = vectorizeQueryResult(
-                fed->query(capt, "publications", HELICS_SEQUENCING_MODE_FAST));
-            for (auto& pub : pubs) {
-                addSubscription(pub);
-            }
+        auto pubs =
+            vectorizeQueryResult(fed->query(capt, "publications", HELICS_SEQUENCING_MODE_FAST));
+        for (auto& pub : pubs) {
+            addSubscription(pub);
+        }
     }
 }
 

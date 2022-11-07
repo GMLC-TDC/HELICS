@@ -470,19 +470,15 @@ void CoreBroker::sendFedErrorAck(ActionMessage& command, std::int32_t errorCode)
 std::string CoreBroker::generateRename(std::string_view name)
 {
     std::string newName{name};
-    auto cntLoc=newName.find("${#}");
-    if (cntLoc!=std::string::npos)
-    {
-        auto rn=renamers.find(newName);
-        if (rn != renamers.end())
-        {
-            newName.replace(cntLoc,4,std::to_string(rn->second+1));
+    auto cntLoc = newName.find("${#}");
+    if (cntLoc != std::string::npos) {
+        auto rn = renamers.find(newName);
+        if (rn != renamers.end()) {
+            newName.replace(cntLoc, 4, std::to_string(rn->second + 1));
             rn->second++;
-        }
-        else
-        {
-            newName.replace(cntLoc,4,"1");
-            renamers.emplace(name,1);
+        } else {
+            newName.replace(cntLoc, 4, "1");
+            renamers.emplace(name, 1);
         }
     }
     return newName;
@@ -517,7 +513,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         sendFedErrorAck(command, broker_terminating);
         return;
     }
-    auto fedName=command.name();
+    auto fedName = command.name();
     // this checks for duplicate federate names
     if (mFederates.find(fedName) != mFederates.end()) {
         sendFedErrorAck(command, duplicate_federate_name_error_code);
@@ -3453,8 +3449,7 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             return fileops::generateJsonString(gs);
         }
     }
-    if (request.compare(0, 7, "rename:") == 0)
-    {
+    if (request.compare(0, 7, "rename:") == 0) {
         return generateRename(request.substr(7));
     }
     auto mi = mapIndex.find(request);

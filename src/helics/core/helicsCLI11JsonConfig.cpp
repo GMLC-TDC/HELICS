@@ -38,8 +38,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
             }
             return fromConfigInternal(config);
         }
-        if (mThrowJsonErrors && !errs.empty())
-        {
+        if (mThrowJsonErrors && !errs.empty()) {
             throw(CLI::FileError(errs));
         }
     }
@@ -112,13 +111,12 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
                     "specify the section index of the config file to use for configuration arrays")
         ->configurable(false)
         ->trigger_on_parse();
-    app->get_config_ptr()->check([fmtr](const std::string& filename)
-        {
-             fmtr->skipJson(!fileops::hasJsonExtension(filename));
-             return std::string{};
-        });
+    app->get_config_ptr()->check([fmtr](const std::string& filename) {
+        fmtr->skipJson(!fileops::hasJsonExtension(filename));
+        return std::string{};
+    });
 
-    app->config_formatter(std::move(fmtr)); 
+    app->config_formatter(std::move(fmtr));
     return fmtrRet;
 }
 }  // namespace helics

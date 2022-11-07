@@ -90,7 +90,7 @@ TEST(federate, renamer)
     auto name = std::string(core->getFederateName(fed->getID()));
 
     EXPECT_EQ(name, fed->getName());
-    EXPECT_EQ(name,"test_1");
+    EXPECT_EQ(name, "test_1");
 
     fi.coreInitString.clear();
     auto fed2 = std::make_shared<helics::Federate>("test_${#}", fi);
@@ -101,7 +101,7 @@ TEST(federate, renamer)
     fed->enterInitializingModeComplete();
 
     fed = nullptr;  // force the destructor
-    fed2=nullptr;
+    fed2 = nullptr;
 }
 
 TEST(federate_tests, federate_initialize_iterate)

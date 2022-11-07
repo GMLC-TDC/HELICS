@@ -25,7 +25,8 @@ class HelicsConfigJSON: public CLI::ConfigBase {
     /// if the specified section isn't available use the root section
     void fallbackToDefault(bool ftd = true) { mFallbackToDefault = ftd; }
     /// throw if the json processing produces errors
-    void throwJsonErrors(bool tje = true) { mThrowJsonErrors = tje; }
+    void throwJsonErrors(bool the = true) { mThrowJsonErrors = the; }
+
   private:
     bool mSkipJson{false};
     bool mFallbackToDefault{false};

@@ -703,16 +703,19 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (getBrokerState() >= BrokerState::OPERATING) {
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
-    bool renamer = (name.find("${")!=std::string_view::npos);
+    bool renamer = (name.find("${") != std::string_view::npos);
     std::string nname;
-    if (renamer)
-    {
+    if (renamer) {
         /** this will block*/
-        nname=query("root",fmt::format("rename:{}",name),HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
-        if (name != nname)
-        {
-            sendToLogger(parent_broker_id, HELICS_LOG_LEVEL_SUMMARY, getIdentifier(), fmt::format("generated name for fed {}->{}",name,nname));
-            name=nname;
+        nname = query("root",
+                      fmt::format("rename:{}", name),
+                      HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
+        if (name != nname) {
+            sendToLogger(parent_broker_id,
+                         HELICS_LOG_LEVEL_SUMMARY,
+                         getIdentifier(),
+                         fmt::format("generated name for fed {}->{}", name, nname));
+            name = nname;
         }
     }
     FederateState* fed = nullptr;
@@ -724,16 +727,16 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
 
-            auto id = feds->insert(std::string(name), std::string(name), info);
-            if (id) {
-                local_id = LocalFederateId(static_cast<int32_t>(*id));
-                fed = (*feds)[*id];
-            } else {
-                throw(RegistrationFailure(
-                    fmt::format("duplicate names {} detected: multiple federates with the same name",
-                        name)));
-            }
-        
+        auto id = feds->insert(std::string(name), std::string(name), info);
+        if (id) {
+            local_id = LocalFederateId(static_cast<int32_t>(*id));
+            fed = (*feds)[*id];
+        } else {
+            throw(RegistrationFailure(
+                fmt::format("duplicate names {} detected: multiple federates with the same name",
+                            name)));
+        }
+
         if (feds->size() == 1) {
             checkProperties = true;
         }
@@ -3177,7 +3180,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             }
             break;
         case CMD_FED_ACK: {
-            FederateState *fed{nullptr};
+            FederateState* fed{nullptr};
             fed = getFederateCore(command.name());
             if (fed != nullptr) {
                 if (checkActionFlag(command, error_flag)) {

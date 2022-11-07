@@ -124,7 +124,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /// external map for all known external endpoints with names and route
     std::unordered_map<std::string, route_id> knownExternalEndpoints;
     std::unordered_map<std::string, std::string> global_values;  //!< storage for global values
-    std::unordered_map<std::string,std::int64_t> renamers; //!< storage for counting federates
+    std::unordered_map<std::string, std::int64_t> renamers;  //!< storage for counting federates
     std::mutex name_mutex_;  //!< mutex lock for name and identifier
     std::atomic<int> queryCounter{1};  // counter for active queries going to the local API
     bool force_connection{false};

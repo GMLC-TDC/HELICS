@@ -27,12 +27,18 @@ std::shared_ptr<helicsCLI11App> NetworkBrokerData::commandLineParser(std::string
     }
     nbparser->option_defaults()->ignore_underscore()->ignore_case();
 
-    auto *interfaceFlag=nbparser
-        ->add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
-                   interfaceNetwork,
-                   "specify external interface to use, default is --local")
-        ->disable_flag_override();
-    nbparser->add_option("--network_connectivity",interfaceNetwork,"specify the connectivity of the network interface")->transform(CLI::CheckedTransformer({{"local","0"},{"ipv4","4"},{"ipv6","6"},{"external","10"},{"all","10"}}))->excludes(interfaceFlag);
+    auto* interfaceFlag = nbparser
+                              ->add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
+                                         interfaceNetwork,
+                                         "specify external interface to use, default is --local")
+                              ->disable_flag_override();
+    nbparser
+        ->add_option("--network_connectivity",
+                     interfaceNetwork,
+                     "specify the connectivity of the network interface")
+        ->transform(CLI::CheckedTransformer(
+            {{"local", "0"}, {"ipv4", "4"}, {"ipv6", "6"}, {"external", "10"}, {"all", "10"}}))
+        ->excludes(interfaceFlag);
     nbparser
         ->add_option_function<std::string>(
             "--broker_address",
