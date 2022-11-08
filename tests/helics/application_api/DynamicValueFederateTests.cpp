@@ -154,10 +154,9 @@ TEST_F(dynFed, execPubSubs_2fed)
     vFed1->disconnect();
 }
 
-
 TEST_F(dynFed, dynamicPubSubs_2fed)
 {
-    extraBrokerArgs="--dynamic";
+    extraBrokerArgs = "--dynamic";
     SetupTest<helics::ValueFederate>("test_2", 2, 1.0);
     auto vFed1 = GetFederateAs<helics::ValueFederate>(0);
     auto vFed2 = GetFederateAs<helics::ValueFederate>(1);
@@ -169,8 +168,6 @@ TEST_F(dynFed, dynamicPubSubs_2fed)
     vFed1->enterExecutingModeAsync();
     vFed2->enterExecutingMode();
     vFed1->enterExecutingModeComplete();
-
-    
 
     auto& pub2 = vFed2->registerGlobalPublication<double>("pub2");
 
@@ -191,14 +188,14 @@ TEST_F(dynFed, dynamicPubSubs_2fed)
     EXPECT_DOUBLE_EQ(in1.getDouble(), 12.0);
     EXPECT_DOUBLE_EQ(in2.getDouble(), 13.3);
     EXPECT_TRUE(brokers[0]->isOpenToNewFederates());
-    AddFederates<helics::ValueFederate>("test_2",1,brokers[0],1.0);
+    AddFederates<helics::ValueFederate>("test_2", 1, brokers[0], 1.0);
     auto vFed3 = GetFederateAs<helics::ValueFederate>(2);
     auto& pub3 = vFed3->registerGlobalPublication<double>("pub3");
-    auto & in3=vFed1->registerSubscription("pub3");
-    auto & in1_3=vFed3->registerSubscription("pub1");
+    auto& in3 = vFed1->registerSubscription("pub3");
+    auto& in1_3 = vFed3->registerSubscription("pub1");
     vFed3->enterExecutingMode();
 
-    auto ctime=vFed3->getCurrentTime();
+    auto ctime = vFed3->getCurrentTime();
     pub3.publish(7.5);
     pub1.publish(8.5);
 
@@ -206,7 +203,7 @@ TEST_F(dynFed, dynamicPubSubs_2fed)
     vFed3->requestTimeAsync(helics::timeZero);
     vFed2->requestNextStep();
     vFed1->requestTimeComplete();
-    tres=vFed3->requestTimeComplete();
+    tres = vFed3->requestTimeComplete();
 
     EXPECT_DOUBLE_EQ(in1.getDouble(), 8.5);
     EXPECT_DOUBLE_EQ(in3.getDouble(), 7.5);
@@ -217,12 +214,10 @@ TEST_F(dynFed, dynamicPubSubs_2fed)
     vFed1->disconnect();
     std::this_thread::yield();
     int cnt{0};
-    while (brokers[0]->isOpenToNewFederates())
-    {
+    while (brokers[0]->isOpenToNewFederates()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(150));
         ++cnt;
-        if (cnt > 10)
-        {
+        if (cnt > 10) {
             break;
         }
     }
