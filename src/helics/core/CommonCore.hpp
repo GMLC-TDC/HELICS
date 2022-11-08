@@ -101,7 +101,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool enterInitializingMode(LocalFederateId federateID,
                                        IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
-    virtual IterationResult
+    virtual iteration_time
         enterExecutingMode(LocalFederateId federateID,
                            IterationRequest iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(std::string_view name,

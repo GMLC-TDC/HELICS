@@ -207,7 +207,7 @@ TEST_F(federateStateTests, basic_processmessage)
     fs->global_id = helics::GlobalFederateId();
     auto state = fs_process2.get();
 
-    EXPECT_TRUE(state == IterationResult::HALTED);
+    EXPECT_TRUE(state.state == IterationResult::HALTED);
     EXPECT_EQ(fs->getState(), FederateStates::FINISHED);
 
     // Return to created state
@@ -248,12 +248,12 @@ TEST_F(federateStateTests, basic_processmessage)
     EXPECT_TRUE((st == FederateStates::INITIALIZING) || (st == FederateStates::EXECUTING));
     fs->addAction(cmd);
     auto res = fs_process2.get();
-    if (res != IterationResult::ERROR_RESULT) {
+    if (res.state != IterationResult::ERROR_RESULT) {
         auto ittime = fs->requestTime(5.0, helics::IterationRequest::NO_ITERATIONS);
-        res = ittime.state;
+        res.state = ittime.state;
     }
 
-    EXPECT_TRUE(res == IterationResult::ERROR_RESULT);
+    EXPECT_TRUE(res.state == IterationResult::ERROR_RESULT);
     EXPECT_EQ(fs->getState(), FederateStates::ERRORED);
 
     fs->reset();

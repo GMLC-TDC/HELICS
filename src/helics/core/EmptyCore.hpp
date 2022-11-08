@@ -41,7 +41,7 @@ class EmptyCore: public Core {
     virtual bool enterInitializingMode(LocalFederateId federateID,
                                        IterationRequest request) override;
     virtual void setCoreReadyToInit() override;
-    virtual IterationResult enterExecutingMode(LocalFederateId federateID,
+    virtual iteration_time enterExecutingMode(LocalFederateId federateID,
                                                IterationRequest iterate = NO_ITERATION) override;
     virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) override;

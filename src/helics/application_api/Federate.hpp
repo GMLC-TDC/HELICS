@@ -734,7 +734,7 @@ received
     void enteringInitializingMode(IterationResult iterating);
 
     /** function to run required operations for entering executing Mode*/
-    void enteringExecutingMode(IterationResult res);
+    void enteringExecutingMode(iteration_time res);
     /** function tor run required operations when finalizing*/
     void finalizeOperations();
     void preTimeRequestOperations(Time nextStep, bool iterating);
@@ -746,7 +746,7 @@ received
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition(IterationResult iterate);
+    virtual void initializeToExecuteStateTransition(iteration_time iterate);
     /** function to handle any disconnect operations*/
     virtual void disconnectTransition();
     /** function to generate results for a local Query

@@ -82,7 +82,7 @@ class MessageFederateManager {
     /** transition from Startup To the Initialize State*/
     void startupToInitializeStateTransition();
     /** transition from initialize to execution State*/
-    void initializeToExecuteStateTransition(IterationResult result);
+    void initializeToExecuteStateTransition(iteration_time result);
     /** generate results for a local query */
     std::string localQuery(std::string_view queryStr) const;
 

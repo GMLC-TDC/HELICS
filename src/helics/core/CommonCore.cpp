@@ -642,14 +642,14 @@ bool CommonCore::enterInitializingMode(LocalFederateId federateID, IterationRequ
     throw(InvalidFunctionCall("federate already has requested entry to initializing State"));
 }
 
-IterationResult CommonCore::enterExecutingMode(LocalFederateId federateID, IterationRequest iterate)
+iteration_time CommonCore::enterExecutingMode(LocalFederateId federateID, IterationRequest iterate)
 {
     auto* fed = getFederateAt(federateID);
     if (fed == nullptr) {
         throw(InvalidIdentifier("federateID not valid (EnterExecutingState)"));
     }
     if (FederateStates::EXECUTING == fed->getState()) {
-        return IterationResult::NEXT_STEP;
+        return { fed->grantedTime(),IterationResult::NEXT_STEP };
     }
     if (FederateStates::INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));
