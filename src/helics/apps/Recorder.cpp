@@ -333,6 +333,7 @@ void Recorder::writeTextFile(const std::string& filename)
 
 void Recorder::initialize()
 {
+    fed->enterInitializingModeIterative();
     generateInterfaces();
 
     vStat.resize(subids.size());
@@ -365,14 +366,10 @@ void Recorder::generateInterfaces()
 void Recorder::loadCaptureInterfaces()
 {
     for (auto& capt : captureInterfaces) {
-        auto res = waitForInit(fed.get(), capt);
-        if (res) {
-            fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
-            auto pubs = vectorizeQueryResult(
-                fed->query(capt, "publications", HELICS_SEQUENCING_MODE_ORDERED));
-            for (auto& pub : pubs) {
-                addSubscription(pub);
-            }
+        auto pubs =
+            vectorizeQueryResult(fed->query(capt, "publications", HELICS_SEQUENCING_MODE_FAST));
+        for (auto& pub : pubs) {
+            addSubscription(pub);
         }
     }
 }

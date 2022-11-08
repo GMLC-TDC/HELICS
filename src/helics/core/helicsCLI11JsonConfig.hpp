@@ -20,14 +20,17 @@ class HelicsConfigJSON: public CLI::ConfigBase {
   public:
     std::vector<CLI::ConfigItem> from_config(std::istream& input) const override final;
 
-    /// skip checking the JSON and go directory to the TOML processing
-    void skipJson(bool skj = true) { skip_json_ = skj; }
+    /// skip checking the JSON and go directly to the TOML processing
+    void skipJson(bool skj = true) { mSkipJson = skj; }
     /// if the specified section isn't available use the root section
-    void fallbackToDefault(bool ftd = true) { fallback_to_default_ = ftd; }
+    void fallbackToDefault(bool ftd = true) { mFallbackToDefault = ftd; }
+    /// throw if the json processing produces errors
+    void throwJsonErrors(bool the = true) { mThrowJsonErrors = the; }
 
   private:
-    bool skip_json_{false};
-    bool fallback_to_default_{false};
+    bool mSkipJson{false};
+    bool mFallbackToDefault{false};
+    bool mThrowJsonErrors{true};
     /// Internal parser for the configuration
     std::vector<CLI::ConfigItem>
         fromConfigInternal(Json::Value j,

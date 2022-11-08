@@ -11,6 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "Clone.hpp"
 #include "Echo.hpp"
 #include "Player.hpp"
+#include "Probe.hpp"
 #include "Recorder.hpp"
 #include "Source.hpp"
 #include "Tracer.hpp"
@@ -85,7 +86,18 @@ int main(int argc, char* argv[])
             helics::apps::Source src({"-?"});
             return std::string{};
         });
-
+    app.add_subcommand("probe", "Helics Probe App")
+        ->callback([&app]() {
+            std::cout << "probe subcommand\n";
+            helics::apps::Probe probe(app.remaining_for_passthrough(true));
+            if (probe.isActive()) {
+                probe.run();
+            }
+        })
+        ->footer([] {
+            helics::apps::Probe prb({"-?"});
+            return std::string{};
+        });
     app.add_subcommand("tracer", "Helics Tracer App")
         ->callback([&app]() {
             std::cout << "tracer subcommand\n";
