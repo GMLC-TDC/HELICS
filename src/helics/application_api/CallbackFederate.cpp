@@ -95,7 +95,7 @@ IterationRequest CallbackFederate::initializeOperationsCallback()
     if (currentMode.load() == Modes::STARTUP) {
         enteringInitializingMode(IterationResult::NEXT_STEP);
     } else {
-        enteringExecutingMode({ timeZero,IterationResult::ITERATING });
+        enteringExecutingMode({timeZero, IterationResult::ITERATING});
     }
 
     return (initializationOperation) ? initializationOperation() : IterationRequest::NO_ITERATIONS;

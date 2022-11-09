@@ -649,7 +649,7 @@ iteration_time CommonCore::enterExecutingMode(LocalFederateId federateID, Iterat
         throw(InvalidIdentifier("federateID not valid (EnterExecutingState)"));
     }
     if (FederateStates::EXECUTING == fed->getState()) {
-        return { fed->grantedTime(),IterationResult::NEXT_STEP };
+        return {fed->grantedTime(), IterationResult::NEXT_STEP};
     }
     if (FederateStates::INITIALIZING != fed->getState()) {
         throw(InvalidFunctionCall("federate is in invalid state for calling entry to exec mode"));

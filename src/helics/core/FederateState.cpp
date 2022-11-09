@@ -531,7 +531,7 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
             }
         }
 #endif
-        return { time_granted,static_cast<IterationResult>(ret) };
+        return {time_granted, static_cast<IterationResult>(ret)};
     }
 
     // if this is not true then try again the core may have been handing something short so try
@@ -564,7 +564,7 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
             ret = IterationResult::NEXT_STEP;
             break;
     }
-    return { time_granted,ret };
+    return {time_granted, ret};
 }
 
 void FederateState::updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate)

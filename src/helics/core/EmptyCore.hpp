@@ -42,7 +42,7 @@ class EmptyCore: public Core {
                                        IterationRequest request) override;
     virtual void setCoreReadyToInit() override;
     virtual iteration_time enterExecutingMode(LocalFederateId federateID,
-                                               IterationRequest iterate = NO_ITERATION) override;
+                                              IterationRequest iterate = NO_ITERATION) override;
     virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) override;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override;

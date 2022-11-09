@@ -428,7 +428,7 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
         case Modes::INITIALIZING: {
             auto ires = coreObject->enterExecutingMode(fedID, iterate);
             enteringExecutingMode(ires);
-            res=ires.state;
+            res = ires.state;
             break;
         }
         case Modes::PENDING_EXEC:
@@ -456,7 +456,7 @@ void Federate::enteringExecutingMode(iteration_time res)
     switch (res.state) {
         case IterationResult::NEXT_STEP:
             updateFederateMode(Modes::EXECUTING);
-           
+
             mCurrentTime = res.grantedTime;
             if (timeUpdateCallback) {
                 timeUpdateCallback(mCurrentTime, false);

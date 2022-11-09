@@ -179,10 +179,12 @@ class Core {
      *@param iterate  the requested iteration mode
      *if nonconverged the federate requests an iterative update
      *
-     *@return an iteration_time result enumeration value indicating the current state of iterations and a time with the current simulation time (usually 0) unless the federate is joining dynamically
+     *@return an iteration_time result enumeration value indicating the current state of iterations
+     *and a time with the current simulation time (usually 0) unless the federate is joining
+     *dynamically
      */
     virtual iteration_time enterExecutingMode(LocalFederateId federateID,
-                                               IterationRequest iterate = NO_ITERATION) = 0;
+                                              IterationRequest iterate = NO_ITERATION) = 0;
 
     /**
      * Register a federate.

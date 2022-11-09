@@ -389,7 +389,8 @@ class FederateState {
     @param sendRequest generates the local actionMessage inside the function leaving to false
     assumes the caller generated the message returns either converged or nonconverged depending on
     whether an iteration is needed
-    @return an iteration time with two elements the granted time and the iteration result. The time will usually be 0 unless the federate is joining dynamically
+    @return an iteration time with two elements the granted time and the iteration result. The time
+    will usually be 0 unless the federate is joining dynamically
     */
     iteration_time enterExecutingMode(IterationRequest iterate, bool sendRequest = false);
     /** request a time advancement
