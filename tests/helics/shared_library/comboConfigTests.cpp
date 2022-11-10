@@ -38,7 +38,7 @@ TEST_F(config_tests, control_file_test)
     EXPECT_STREQ(helicsFilterGetName(filt), "EV_Controller/filterEV3");
 
     auto ipt = helicsFederateGetInputByIndex(cfed, 4, &err);
-    EXPECT_STREQ(helicsSubscriptionGetTarget(ipt), "IEEE_123_feeder_0/charge_EV3");
+    EXPECT_STREQ(helicsInputGetTarget(ipt), "IEEE_123_feeder_0/charge_EV3");
 
     helicsFederateDestroy(cfed);
 }

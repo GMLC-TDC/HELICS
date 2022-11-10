@@ -463,7 +463,7 @@ Input& ValueFederateManager::getInput(int index)
     return invalidIptNC;
 }
 
-const Input& ValueFederateManager::getSubscription(std::string_view key) const
+const Input& ValueFederateManager::getInputByTarget(std::string_view key) const
 {
     auto TIDhandle = targetIDs.lock_shared();
     auto res = TIDhandle->equal_range(std::string(key));
@@ -477,7 +477,7 @@ const Input& ValueFederateManager::getSubscription(std::string_view key) const
     return invalidIpt;
 }
 
-Input& ValueFederateManager::getSubscription(std::string_view key)
+Input& ValueFederateManager::getInputByTarget(std::string_view key)
 {
     auto TIDhandle = targetIDs.lock_shared();
     auto res = TIDhandle->equal_range(std::string(key));
