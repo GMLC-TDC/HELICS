@@ -446,7 +446,7 @@ class ValueFederate: public virtual Federate {
     }
 
     /** get an input by index*/
-     Input getInput(int index)
+    Input getInput(int index)
     {
         return Input(helicsFederateGetInputByIndex(fed, index, hThrowOnError()));
     }

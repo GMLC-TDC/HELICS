@@ -439,7 +439,7 @@ static constexpr char invalidTargetKey[] = "the specified input target is a not 
 
 HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* target, HelicsError* err)
 {
-    return helicsFederateGetInputByTarget(fed,target,err);
+    return helicsFederateGetInputByTarget(fed, target, err);
 }
 
 HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* target, HelicsError* err)

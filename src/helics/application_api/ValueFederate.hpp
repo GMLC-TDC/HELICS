@@ -474,25 +474,30 @@ class HELICS_CXX_EXPORT ValueFederate:
     /** get the input id based on target
     @return an invalid input object if the target is not valid, otherwise a reference to the
     corresponding input*/
-    [[deprecated("Use getInputByTarget")]] const Input& getSubscription(std::string_view target) const { return getInputByTarget(target); }
-    
+    [[deprecated("Use getInputByTarget")]] const Input&
+        getSubscription(std::string_view target) const
+    {
+        return getInputByTarget(target);
+    }
 
     /** get an input based on target
     @details this will only get the first input with a specific target
-   @return an invalid input object if the target is not valid, otherwise a reference to the corresponding
-   input*/
-    [[deprecated("Use getInputByTarget")]]Input& getSubscription(std::string_view target){ return getInputByTarget(target); }
+   @return an invalid input object if the target is not valid, otherwise a reference to the
+   corresponding input*/
+    [[deprecated("Use getInputByTarget")]] Input& getSubscription(std::string_view target)
+    {
+        return getInputByTarget(target);
+    }
 
     /** get the input id based on target
     @return an invalid input object if the target is not valid, otherwise a reference to the
     corresponding input*/
     const Input& getInputByTarget(std::string_view target) const;
 
-
     /** get an input based on target
     @details this will only get the first input with a specific target
-    @return an invalid input object if the target is not valid, otherwise a reference to the corresponding
-    input*/
+    @return an invalid input object if the target is not valid, otherwise a reference to the
+    corresponding input*/
     Input& getInputByTarget(std::string_view target);
 
     /** get a publication from its name

@@ -837,10 +837,10 @@ HELICS_EXPORT const char* helicsInputGetName(HelicsInput ipt);
 HELICS_EXPORT HELICS_DEPRECATED const char* helicsSubscriptionGetTarget(HelicsInput ipt);
 
 /**
-* Get the target of an input.
-*
-* @return A const char with the input target.
-*/
+ * Get the target of an input.
+ *
+ * @return A const char with the input target.
+ */
 HELICS_EXPORT const char* helicsInputGetTarget(HelicsInput ipt);
 
 /**
