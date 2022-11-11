@@ -887,7 +887,7 @@ TEST(logging, remote_log_broker)
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "broker_rlog";
-    fi.forceNewCore=true;
+    fi.forceNewCore = true;
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
     broker->sendCommand("monitor", "remotelog timing");
@@ -920,7 +920,7 @@ TEST(logging, remote_log_fed)
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "broker9";
-    fi.forceNewCore=true;
+    fi.forceNewCore = true;
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
     Fed->setLoggingCallback([&mlog](int level, std::string_view source, std::string_view message) {
         mlog.lock()->emplace_back(level, source, message);
