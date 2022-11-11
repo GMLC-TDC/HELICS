@@ -877,7 +877,7 @@ TEST(logging, log_buffer_core2)
 
 TEST(logging, remote_log_broker)
 {
-    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker8");
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker_rlog");
     gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view source, std::string_view message) {
@@ -886,7 +886,8 @@ TEST(logging, remote_log_broker)
     broker->connect();
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker8";
+    fi.broker = "broker_rlog";
+    fi.forceNewCore=true;
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
     broker->sendCommand("monitor", "remotelog timing");
@@ -919,6 +920,7 @@ TEST(logging, remote_log_fed)
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "broker9";
+    fi.forceNewCore=true;
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
     Fed->setLoggingCallback([&mlog](int level, std::string_view source, std::string_view message) {
         mlog.lock()->emplace_back(level, source, message);
