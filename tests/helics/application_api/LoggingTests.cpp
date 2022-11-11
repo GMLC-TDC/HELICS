@@ -877,7 +877,7 @@ TEST(logging, log_buffer_core2)
 
 TEST(logging, remote_log_broker)
 {
-    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker8");
+    auto broker = helics::BrokerFactory::create(helics::CoreType::TEST, "--name=broker_rlog");
     gmlc::libguarded::guarded<std::vector<std::tuple<int, std::string, std::string>>> mlog;
     broker->setLoggingCallback(
         [&mlog](int level, std::string_view source, std::string_view message) {
@@ -886,18 +886,23 @@ TEST(logging, remote_log_broker)
     broker->connect();
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
-    fi.broker = "broker8";
+    fi.broker = "broker_rlog";
+    fi.forceNewCore = true;
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
+    std::cout << "send command" << std::endl;
     broker->sendCommand("monitor", "remotelog timing");
+    std::cout << "send flush query" << std::endl;
     broker->query("root", "global_flush");
+    std::cout << "enter exec" << std::endl;
     Fed->enterExecutingMode();
-
+    std::cout << "request time" << std::endl;
     auto rtime = Fed->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
+    std::cout << "finalize" << std::endl;
     Fed->finalize();
-    broker->query("root", "global_flush");
-    broker.reset();
+    std::cout << "wait for disconnect" << std::endl;
+    broker->waitForDisconnect();
     auto llock = mlog.lock();
     int remote_cnt{0};
     for (const auto& lg : llock) {
@@ -906,6 +911,7 @@ TEST(logging, remote_log_broker)
         }
     }
     llock.unlock();
+    broker.reset();
     EXPECT_GT(remote_cnt, 0);
     helics::cleanupHelicsLibrary();
 }
@@ -919,6 +925,7 @@ TEST(logging, remote_log_fed)
 
     helics::FederateInfo fi(CORE_TYPE_TO_TEST);
     fi.broker = "broker9";
+    fi.forceNewCore = true;
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
     Fed->setLoggingCallback([&mlog](int level, std::string_view source, std::string_view message) {
         mlog.lock()->emplace_back(level, source, message);
