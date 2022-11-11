@@ -901,8 +901,6 @@ TEST(logging, remote_log_broker)
     EXPECT_EQ(rtime, 2.0);
     std::cout << "finalize" << std::endl;
     Fed->finalize();
-    std::cout << "flush" << std::endl;
-    broker->query("root", "global_flush");
     std::cout << "wait for disconnect" << std::endl;
     broker->waitForDisconnect();
     auto llock = mlog.lock();
