@@ -2547,24 +2547,23 @@ HELICS_EXPORT void helicsQueryFree(HelicsQuery query);
 HELICS_EXPORT void helicsCleanupLibrary(void);
 
 /**
- * sub/pub registration
+ * input/publication registration
  */
 
 /**
- * Create a subscription.
+ * Create an input and add a publication target.
  *
- * @details The subscription becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * @details this method is a wrapper method to create and unnamed input and add a publication target to it
  *
- * @param fed The federate object in which to create a subscription, must have been created with /ref helicsCreateValueFederate or
+ * @param fed The federate object in which to create an input, must have been created with /ref helicsCreateValueFederate or
  * /ref helicsCreateCombinationFederate.
- * @param key The identifier matching a publication to get a subscription for.
- * @param units A string listing the units of the subscription (may be NULL).
+ * @param key The identifier matching a publication to add as an input target.
+ * @param units A string listing the units of the input (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the subscription.
+ * @return An object containing the input.
  */
 HELICS_EXPORT HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err);
 
@@ -2572,12 +2571,12 @@ HELICS_EXPORT HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed,
  * Register a publication with a known type.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication the global publication key will be prepended with the federate name.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
- * @param units A string listing the units of the subscription (may be NULL).
+ * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2591,12 +2590,12 @@ HELICS_EXPORT HelicsPublication
  * Register a publication with a defined type.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
  * @param type A string labeling the type of the publication.
- * @param units A string listing the units of the subscription (may be NULL).
+ * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2610,12 +2609,12 @@ HELICS_EXPORT HelicsPublication
  * Register a global named publication with an arbitrary type.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
- * @param units A string listing the units of the subscription (may be NULL).
+ * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2629,12 +2628,12 @@ HELICS_EXPORT HelicsPublication
  * Register a global publication with a defined type.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
  * @param type A string describing the expected type of the publication.
- * @param units A string listing the units of the subscription (may be NULL).
+ * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2648,7 +2647,7 @@ HELICS_EXPORT HelicsPublication
  * Register a named input.
  *
  * @details The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions, inputs, and publications.
+ * functions for inputs, and publications.
  *
  * @param fed The federate object in which to create an input.
  * @param key The identifier for the publication the global input key will be prepended with the federate name.
@@ -2667,7 +2666,7 @@ HELICS_EXPORT HelicsInput
  * Register an input with a defined type.
  *
  * @details The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions, inputs, and publications.
+ * functions for inputs, and publications.
  *
  * @param fed The federate object in which to create an input.
  * @param key The identifier for the input.
@@ -2686,12 +2685,12 @@ HELICS_EXPORT HelicsInput
  * Register a global named input.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
- * @param units A string listing the units of the subscription maybe NULL.
+ * @param units A string listing the units of the input maybe NULL.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2705,12 +2704,12 @@ HELICS_EXPORT HelicsPublication
  * Register a global publication with an arbitrary type.
  *
  * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for subscriptions and publications.
+ * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
  * @param key The identifier for the publication.
  * @param type A string defining the type of the input.
- * @param units A string listing the units of the subscription maybe NULL.
+ * @param units A string listing the units of the input maybe NULL.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
@@ -2775,18 +2774,33 @@ HELICS_EXPORT HelicsInput helicsFederateGetInput(HelicsFederate fed, const char*
 HELICS_EXPORT HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsError* err);
 
 /**
- * Get an input object from a subscription target.
- *
- * @param fed The value federate object to use to get the publication.
- * @param key The name of the publication that a subscription is targeting.
- *
- * @param[in,out] err The error object to complete if there is an error.
+* Get an input object from a subscription target.
+* DEPRECATED: use helicsFederateInputByTarget instead
+*
+* @param fed The value federate object to use to get the publication.
+* @param key The name of the publication that a subscription is targeting.
+*
+* @param[in,out] err The error object to complete if there is an error.
 
- *
- * @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
- * key exists.
- */
-HELICS_EXPORT HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err);
+*
+* @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
+* key exists.
+*/
+HELICS_EXPORT HELICS_DEPRECATED HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err);
+
+/**
+* Get an input object from a target.
+*
+* @param fed The value federate object to use to get the publication.
+* @param target The name of the publication that an input is targeting.
+*
+* @param[in,out] err The error object to complete if there is an error.
+
+*
+* @return A HelicsInput object, the object will not be valid and err will contain an error code if no input with the specified
+* key exists.
+*/
+HELICS_EXPORT HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* target, HelicsError* err);
 
 /**
  * Clear all the update flags from a federates inputs.
@@ -3004,14 +3018,14 @@ HELICS_EXPORT void helicsInputAddTarget(HelicsInput ipt, const char* target, Hel
  */
 
 /**
- * Get the size of the raw value for subscription.
+ * Get the size of the raw value for an input.
  *
  * @return The size of the raw data/string in bytes.
  */
 HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
 
 /**
- * Get the raw data for the latest value of a subscription.
+ * Get the raw data for the latest value of an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3023,14 +3037,14 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
 
 /**
- * Get the size of a value for subscription assuming return as a string.
+ * Get the size of a value for an input assuming return as a string.
  *
  * @return The size of the string.
  */
 HELICS_EXPORT int helicsInputGetStringSize(HelicsInput ipt);
 
 /**
- * Get a string value from a subscription.
+ * Get a string value from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3042,7 +3056,7 @@ HELICS_EXPORT int helicsInputGetStringSize(HelicsInput ipt);
 HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int maxStringLength, int* actualLength, HelicsError* err);
 
 /**
- * Get an integer value from a subscription.
+ * Get an integer value from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3053,7 +3067,7 @@ HELICS_EXPORT void helicsInputGetString(HelicsInput ipt, char* outputString, int
 HELICS_EXPORT int64_t helicsInputGetInteger(HelicsInput ipt, HelicsError* err);
 
 /**
- * Get a boolean value from a subscription.
+ * Get a boolean value from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3064,7 +3078,7 @@ HELICS_EXPORT int64_t helicsInputGetInteger(HelicsInput ipt, HelicsError* err);
 HELICS_EXPORT HelicsBool helicsInputGetBoolean(HelicsInput ipt, HelicsError* err);
 
 /**
- * Get a double value from a subscription.
+ * Get a double value from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3075,7 +3089,7 @@ HELICS_EXPORT HelicsBool helicsInputGetBoolean(HelicsInput ipt, HelicsError* err
 HELICS_EXPORT double helicsInputGetDouble(HelicsInput ipt, HelicsError* err);
 
 /**
- * Get a time value from a subscription.
+ * Get a time value from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3110,7 +3124,7 @@ HELICS_EXPORT char helicsInputGetChar(HelicsInput ipt, HelicsError* err);
 HELICS_EXPORT HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsError* err);
 
 /**
- * Get a pair of double forming a complex number from a subscriptions.
+ * Get a pair of double forming a complex number from an input.
  *
  * @param ipt The input to get the data for.
  *
@@ -3122,14 +3136,14 @@ HELICS_EXPORT HelicsComplex helicsInputGetComplexObject(HelicsInput ipt, HelicsE
 HELICS_EXPORT void helicsInputGetComplex(HelicsInput ipt, double* real, double* imag, HelicsError* err);
 
 /**
- * Get the size of a value for subscription assuming return as an array of doubles.
+ * Get the size of a value for an ionput assuming return as an array of doubles.
  *
  * @return The number of doubles in a returned vector.
  */
 HELICS_EXPORT int helicsInputGetVectorSize(HelicsInput ipt);
 
 /**
- * Get a vector from a subscription.
+ * Get a vector from an input.
  *
  * @param ipt The input to get the result for.
  *
@@ -3153,7 +3167,7 @@ HELICS_EXPORT void helicsInputGetVector(HelicsInput ipt, double data[], int maxL
 HELICS_EXPORT void helicsInputGetComplexVector(HelicsInput ipt, double data[], int maxLength, int* actualSize, HelicsError* err);
 
 /**
- * Get a named point from a subscription.
+ * Get a named point from an input.
  *
  * @param ipt The input to get the result for.
  *
@@ -3170,7 +3184,7 @@ HELICS_EXPORT void
 
 /**
  * \defgroup default_values Default Value functions
- * @details These functions set the default value for a subscription. That is the value returned if nothing was published from elsewhere.
+ * @details These functions set the default value for an input. That is the value returned if nothing was published from elsewhere.
  * @{
  */
 
@@ -3346,7 +3360,14 @@ HELICS_EXPORT const char* helicsInputGetName(HelicsInput ipt);
  *
  * @return A const char with the subscription target.
  */
-HELICS_EXPORT const char* helicsSubscriptionGetTarget(HelicsInput ipt);
+HELICS_EXPORT HELICS_DEPRECATED const char* helicsSubscriptionGetTarget(HelicsInput ipt);
+
+/**
+ * Get the target of an input.
+ *
+ * @return A const char with the input target.
+ */
+HELICS_EXPORT const char* helicsInputGetTarget(HelicsInput ipt);
 
 /**
  * Get the name of a publication.
@@ -3540,14 +3561,14 @@ HELICS_EXPORT void helicsInputSetMinimumChange(HelicsInput inp, double tolerance
 /**@}*/
 
 /**
- * Check if a particular subscription was updated.
+ * Check if a particular input was updated.
  *
  * @return HELICS_TRUE if it has been updated since the last value retrieval.
  */
 HELICS_EXPORT HelicsBool helicsInputIsUpdated(HelicsInput ipt);
 
 /**
- * Get the last time a subscription was updated.
+ * Get the last time a input was updated.
  */
 HELICS_EXPORT HelicsTime helicsInputLastUpdateTime(HelicsInput ipt);
 
@@ -3564,9 +3585,9 @@ HELICS_EXPORT void helicsInputClearUpdate(HelicsInput ipt);
 HELICS_EXPORT int helicsFederateGetPublicationCount(HelicsFederate fed);
 
 /**
- * Get the number of subscriptions in a federate.
+ * Get the number of inputs in a federate.
  *
- * @return (-1) if fed was not a valid federate otherwise returns the number of subscriptions.
+ * @return (-1) if fed was not a valid federate otherwise returns the number of inputs.
  */
 HELICS_EXPORT int helicsFederateGetInputCount(HelicsFederate fed);
 
