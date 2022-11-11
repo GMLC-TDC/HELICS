@@ -890,20 +890,20 @@ TEST(logging, remote_log_broker)
     fi.forceNewCore = true;
 
     auto Fed = std::make_shared<helics::Federate>("monitor", fi);
-    std::cout<<"send command"<<std::endl;
+    std::cout << "send command" << std::endl;
     broker->sendCommand("monitor", "remotelog timing");
-    std::cout<<"send flush query"<<std::endl;
+    std::cout << "send flush query" << std::endl;
     broker->query("root", "global_flush");
-    std::cout<<"enter exec"<<std::endl;
+    std::cout << "enter exec" << std::endl;
     Fed->enterExecutingMode();
-    std::cout<<"request time"<<std::endl;
+    std::cout << "request time" << std::endl;
     auto rtime = Fed->requestTime(2.0);
     EXPECT_EQ(rtime, 2.0);
-    std::cout<<"finalize"<<std::endl;
+    std::cout << "finalize" << std::endl;
     Fed->finalize();
-    std::cout<<"flush"<<std::endl;
+    std::cout << "flush" << std::endl;
     broker->query("root", "global_flush");
-    std::cout<<"wait for disconnect"<<std::endl;
+    std::cout << "wait for disconnect" << std::endl;
     broker->waitForDisconnect();
     auto llock = mlog.lock();
     int remote_cnt{0};
