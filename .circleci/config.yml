@@ -215,6 +215,17 @@ jobs:
       - store_artifacts:
           path: /tmp/bm_results
 
+  arm64:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: arm.medium
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=OFF -DHELICS_BUILD_TESTS=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+    
 workflows:
   version: 2
   helics_test:
@@ -236,6 +247,10 @@ workflows:
             branches:
               ignore: /pre-commit\/.*/
       - clang14_cxx23:
+          filters:
+            branches:
+              ignore: /pre-commit\/.*/
+      - arm64:
           filters:
             branches:
               ignore: /pre-commit\/.*/
