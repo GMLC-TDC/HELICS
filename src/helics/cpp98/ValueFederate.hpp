@@ -440,9 +440,9 @@ class ValueFederate: public virtual Federate {
     }
 
     /** get an input by target*/
-    Input getInputByTarget(const std::string& name)
+    Input getInputByTarget(const std::string& target)
     {
-        return Input(helicsFederateGetInputByTarget(fed, name.c_str(), hThrowOnError()));
+        return Input(helicsFederateGetInputByTarget(fed, target.c_str(), hThrowOnError()));
     }
 
     /** get an input by index*/
