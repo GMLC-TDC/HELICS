@@ -703,14 +703,19 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (getBrokerState() >= BrokerState::OPERATING) {
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
-    bool renamer = (name.find("${") != std::string_view::npos);
+    auto iloc=name.find("${");
     std::string nname;
-    if (renamer) {
+    if (iloc != std::string_view::npos) {
         /** this will block*/
         nname = query("root",
                       fmt::format("rename:{}", name),
                       HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
         if (name != nname) {
+            if (name.compare(0, iloc, nname) != 0 && nname.find("error")!=std::string::npos)
+            {
+                throw(RegistrationFailure(
+                    "automatic naming resulting in failure, may not be supported by broker"));
+            }
             sendToLogger(parent_broker_id,
                          HELICS_LOG_LEVEL_SUMMARY,
                          getIdentifier(),

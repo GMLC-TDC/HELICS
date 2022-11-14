@@ -93,12 +93,29 @@ void BrokerServer::startServers()
         if (http_server) {
             webs->enableHttpServer(true);
             if (!mHttpArgs.empty()) {
+                auto fc=mHttpArgs.find_first_not_of(' ');
+                if (fc != std::string::npos)
+                {
+                    if (mHttpArgs[fc] == '-')
+                    {
+                        mHttpArgs.insert(0,"http ",5);
+                    }
+                }
+
                 webs->processArgs(mHttpArgs);
             }
         }
         if (websocket_server) {
             webs->enableWebSocketServer(true);
             if (!mWebSocketArgs.empty()) {
+                auto fc=mWebSocketArgs.find_first_not_of(' ');
+                if (fc != std::string::npos)
+                {
+                    if (mWebSocketArgs[fc] == '-')
+                    {
+                        mWebSocketArgs.insert(0, "websocket ", 10);
+                    }
+                }
                 webs->processArgs(mWebSocketArgs);
             }
         }
@@ -144,6 +161,7 @@ std::unique_ptr<helicsCLI11App> BrokerServer::generateArgProcessing()
     auto app = std::make_unique<helicsCLI11App>(
         "The Broker server is a helics broker coordinator that can generate brokers on request",
         "broker_server");
+    app->ignore_case()->ignore_underscore();
 #ifdef HELICS_ENABLE_ZMQ_CORE
     app->add_flag("--zmq,-z", zmq_server, "start a broker-server for the zmq comms in helics");
     app->add_flag("--zmqss",

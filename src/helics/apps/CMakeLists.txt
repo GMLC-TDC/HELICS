@@ -31,7 +31,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    AsioBrokerServer.hpp TypedBrokerServer.hpp
     )
 
-    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
+    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp RestAPIConnection.hpp)
 
     set(helics_apps_library_files
         Player.cpp
@@ -58,8 +58,8 @@ if(HELICS_BUILD_APP_LIBRARY)
                                                OR HELICS_DISABLE_ASIO)
     )
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
-        list(APPEND helics_apps_broker_files helicsWebServer.cpp)
-        list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp)
+        list(APPEND helics_apps_broker_files helicsWebServer.cpp RestApiConnection.cpp)
+        list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp RestApiConnection.hpp)
     endif()
 
     add_library(
@@ -82,6 +82,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                                OR HELICS_DISABLE_ASIO)
     )
         target_compile_definitions(helics_apps PUBLIC BOOST_DATE_TIME_NO_LIB)
+        target_compile_definitions(helics_apps PUBLIC BOOST_BEAST_USE_STD_STRING_VIEW)
         target_compile_definitions(helics_apps PUBLIC HELICS_ENABLE_WEBSERVER=1)
         if(WIN32)
             target_link_libraries(helics_apps PRIVATE bcrypt)

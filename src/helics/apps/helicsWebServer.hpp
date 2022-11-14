@@ -16,8 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
 
     class IocWrapper;
 
@@ -62,4 +61,3 @@ namespace apps {
         std::atomic<bool> executing{false};
     };
 }  // namespace apps
-}  // namespace helics

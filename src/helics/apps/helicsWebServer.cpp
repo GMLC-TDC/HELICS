@@ -86,7 +86,7 @@ static std::string generateIndexPage()
     return index;
 }
 // decode a URI to clean up a string, convert character codes in a URI to the original character
-static std::string uriDecode(beast::string_view str)
+static std::string uriDecode(std::string_view str)
 {
     std::string ret;
     size_t len = str.length();
@@ -114,26 +114,26 @@ static std::string uriDecode(beast::string_view str)
 }
 
 // function to extract the request parameters and clean up the target
-static std::pair<beast::string_view, boost::container::flat_map<std::string, std::string>>
-    processRequestParameters(beast::string_view target, beast::string_view body)
+static std::pair<std::string_view, boost::container::flat_map<std::string, std::string>>
+    processRequestParameters(std::string_view target, std::string_view body)
 {
-    std::pair<beast::string_view, boost::container::flat_map<std::string, std::string>> results;
+    std::pair<std::string_view, boost::container::flat_map<std::string, std::string>> results;
     auto param_mark = target.find('?');
-    if (param_mark != beast::string_view::npos) {
+    if (param_mark != std::string_view::npos) {
         results.first = target.substr(0, param_mark);
         target = target.substr(param_mark + 1);
     } else {
         results.first = target;
-        target.clear();
+        target = std::string_view{};
     }
-    if (results.first.starts_with('/')) {
+    if (!results.first.empty() && results.first.front()=='/') {
         results.first.remove_prefix(1);
     }
 
-    std::vector<beast::string_view> parameters;
+    std::vector<std::string_view> parameters;
     if (!target.empty()) {
         auto splitloc = target.find_first_of('&');
-        while (splitloc != beast::string_view::npos) {
+        while (splitloc != std::string_view::npos) {
             parameters.push_back(target.substr(0, splitloc));
             target = target.substr(splitloc + 1);
             splitloc = target.find_first_of('&');
@@ -144,7 +144,7 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
     }
     if (!body.empty()) {
         if (body.front() == '{') {
-            Json::Value val = helics::fileops::loadJsonStr(body.to_string());
+            Json::Value val = helics::fileops::loadJsonStr(body);
             auto mnames = val.getMemberNames();
             for (auto& vb : mnames) {
                 if (val[vb].isString()) {
@@ -155,7 +155,7 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
             }
         } else {
             auto splitloc = body.find_first_of('&');
-            while (splitloc != beast::string_view::npos) {
+            while (splitloc != std::string_view::npos) {
                 parameters.push_back(body.substr(0, splitloc));
                 body = body.substr(splitloc + 1);
                 splitloc = body.find_first_of('&');
@@ -168,36 +168,36 @@ static std::pair<beast::string_view, boost::container::flat_map<std::string, std
 
     for (auto& param : parameters) {
         auto eq_loc = param.find_first_of('=');
-        results.second[param.substr(0, eq_loc).to_string()] = uriDecode(param.substr(eq_loc + 1));
+        results.second[std::string{ param.substr(0, eq_loc) }] = uriDecode(param.substr(eq_loc + 1));
     }
     return results;
 }
 
-void partitionTarget(beast::string_view target,
+void partitionTarget(std::string_view target,
                      std::string& brokerName,
                      std::string& query,
                      std::string& targetObj)
 {
-    if (target.back() == '/') {
+    if (!target.empty() && target.back() == '/') {
         target.remove_suffix(1);
     }
     if (!target.empty() && target.front() == '/') {
         target.remove_prefix(1);
     }
     auto slashLoc = target.find('/');
-    if (slashLoc == beast::string_view::npos) {
-        brokerName = target.to_string();
+    if (slashLoc == std::string_view::npos) {
+        brokerName = target;
         return;
     }
-    brokerName = target.substr(0, slashLoc).to_string();
+    brokerName = target.substr(0, slashLoc);
     auto tstr = target.substr(slashLoc + 1);
     slashLoc = tstr.find('/');
-    if (slashLoc == beast::string_view::npos) {
-        targetObj = tstr.to_string();
+    if (slashLoc == std::string_view::npos) {
+        targetObj = tstr;
         return;
     }
-    targetObj = tstr.substr(0, slashLoc).to_string();
-    query = tstr.substr(slashLoc + 1).to_string();
+    targetObj = tstr.substr(0, slashLoc);
+    query = tstr.substr(slashLoc + 1);
 }
 
 std::string getBrokerList()
@@ -231,8 +231,8 @@ enum class RestCommand { QUERY, CREATE, REMOVE, BARRIER, CLEAR_BARRIER, COMMAND,
 std::pair<RequestReturnVal, std::string>
     generateResults(RestCommand command,
                     std::string brokerName,
-                    beast::string_view target,
-                    beast::string_view query,
+                    std::string_view target,
+                    std::string_view query,
                     const boost::container::flat_map<std::string, std::string>& fields)
 {
     static const std::string emptyString;
@@ -319,7 +319,7 @@ std::pair<RequestReturnVal, std::string>
     std::shared_ptr<helics::Broker> brkr;
     if (brokerName.empty()) {
         if (!target.empty()) {
-            brkr = helics::BrokerFactory::findBroker(target.to_string());
+            brkr = helics::BrokerFactory::findBroker(target);
         }
     } else {
         brkr = helics::BrokerFactory::findBroker(brokerName);
@@ -479,13 +479,13 @@ std::pair<RequestReturnVal, std::string>
     if (query.empty()) {
         query = "current_state";
     }
-    auto res = brkr->query(target.to_string(), query.to_string());
+    auto res = brkr->query(target, query);
     if (res.find("\"error\"") == std::string::npos) {
         return {RequestReturnVal::OK, res};
     }
 
     if (autoquery) {
-        res = brkr->query(query.to_string(), "current_state");
+        res = brkr->query(query, "current_state");
         if (res.find("\"error\"") != std::string::npos) {
             return {RequestReturnVal::NOT_FOUND, "target not found"};
         }
@@ -568,7 +568,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
             return fail(ec, "helics web server read");
         }
 
-        beast::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
+        std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
                                   buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
@@ -637,7 +637,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
 {
     static const std::string index_page = generateIndexPage();
     // Returns a bad request response
-    auto const bad_request = [&req](beast::string_view why) {
+    auto const bad_request = [&req](std::string_view why) {
         http::response<http::string_body> res{http::status::bad_request, req.version()};
         res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
@@ -651,7 +651,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     };
 
     // Returns a bad request response
-    auto const not_found = [&req](beast::string_view why) {
+    auto const not_found = [&req](std::string_view why) {
         http::response<http::string_body> res{http::status::not_found, req.version()};
         res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, "text/html");
@@ -665,7 +665,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
     };
 
     // generate a conversion response
-    auto const response_ok = [&req](const std::string& resp, beast::string_view content_type) {
+    auto const response_ok = [&req](const std::string& resp, std::string_view content_type) {
         http::response<http::string_body> res{http::status::ok, req.version()};
         res.set(http::field::server, "HELICS_WEB_SERVER " HELICS_VERSION_STRING);
         res.set(http::field::content_type, content_type);
@@ -705,7 +705,7 @@ void handle_request(http::request<Body, http::basic_fields<Allocator>>&& req, Se
             return send(bad_request("Unknown HTTP-method"));
     }
 
-    beast::string_view target(req.target());
+    std::string_view target(req.target());
     auto psize = req.payload_size();
     if (target == "/index.html" || target == "index.html" ||
         (target == "/" && (!psize || *psize < 4))) {
@@ -958,6 +958,10 @@ void WebServer::processArgs(std::string_view args)
                     mHttpAddress,
                     "specify the interface for the http server to listen on for connections")
         ->envname("HELICS_HTTP_ADDRESS");
+    auto *httpsub=parser.add_subcommand("http")->fallthrough();
+    httpsub->add_option("--port",mHttpPort, "specify the http port to use");
+    httpsub->add_option("--interface",mHttpAddress,
+        "specify the interface for the http server to listen on for connections");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
@@ -967,12 +971,23 @@ void WebServer::processArgs(std::string_view args)
                     "specify the interface for the websocket server to listen on for connections")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
-    parser
+    auto *websub=parser.add_subcommand("websocket");
+    websub->add_option("--port",mWebsocketPort, "specify the websocket port to use");
+    websub->add_option("--interface",mWebsocketAddress,
+        "specify the interface for the websocket server to listen on for connections");
+    auto *niflag=parser
         .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
                   mInterfaceNetwork,
                   "specify external interface to use, default is --local")
         ->disable_flag_override()
         ->envname("HELICS_WEBSERVER_INTERFACE");
+
+    parser.add_option("--network_connectivity",
+        mInterfaceNetwork,
+            "specify the connectivity of the network interface")
+        ->transform(CLI::CheckedTransformer(
+            {{"local", "0"}, {"ipv4", "4"}, {"ipv6", "6"}, {"external", "10"}, {"all", "10"}}))
+        ->excludes(niflag);
 
     try {
         parser.parse(std::string(args));
