@@ -126,7 +126,7 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
         results.first = target;
         target = std::string_view{};
     }
-    if (!results.first.empty() && results.first.front()=='/') {
+    if (!results.first.empty() && results.first.front() == '/') {
         results.first.remove_prefix(1);
     }
 
@@ -168,7 +168,7 @@ static std::pair<std::string_view, boost::container::flat_map<std::string, std::
 
     for (auto& param : parameters) {
         auto eq_loc = param.find_first_of('=');
-        results.second[std::string{ param.substr(0, eq_loc) }] = uriDecode(param.substr(eq_loc + 1));
+        results.second[std::string{param.substr(0, eq_loc)}] = uriDecode(param.substr(eq_loc + 1));
     }
     return results;
 }
@@ -569,7 +569,7 @@ class WebSocketsession: public std::enable_shared_from_this<WebSocketsession> {
         }
 
         std::string_view result{boost::asio::buffer_cast<const char*>(buffer.data()),
-                                  buffer.size()};
+                                buffer.size()};
         // Echo the message
         auto reqpr = processRequestParameters("", result);
 
@@ -958,10 +958,11 @@ void WebServer::processArgs(std::string_view args)
                     mHttpAddress,
                     "specify the interface for the http server to listen on for connections")
         ->envname("HELICS_HTTP_ADDRESS");
-    auto *httpsub=parser.add_subcommand("http")->fallthrough();
-    httpsub->add_option("--port",mHttpPort, "specify the http port to use");
-    httpsub->add_option("--interface",mHttpAddress,
-        "specify the interface for the http server to listen on for connections");
+    auto* httpsub = parser.add_subcommand("http")->fallthrough();
+    httpsub->add_option("--port", mHttpPort, "specify the http port to use");
+    httpsub->add_option("--interface",
+                        mHttpAddress,
+                        "specify the interface for the http server to listen on for connections");
 
     parser.add_option("--websocket_port", mWebsocketPort, "specify the websocket port to use")
         ->envname("HELICS_WEBSOCKET_PORT");
@@ -971,20 +972,23 @@ void WebServer::processArgs(std::string_view args)
                     "specify the interface for the websocket server to listen on for connections")
         ->envname("HELICS_WEBSOCKET_ADDRESS");
 
-    auto *websub=parser.add_subcommand("websocket");
-    websub->add_option("--port",mWebsocketPort, "specify the websocket port to use");
-    websub->add_option("--interface",mWebsocketAddress,
+    auto* websub = parser.add_subcommand("websocket");
+    websub->add_option("--port", mWebsocketPort, "specify the websocket port to use");
+    websub->add_option(
+        "--interface",
+        mWebsocketAddress,
         "specify the interface for the websocket server to listen on for connections");
-    auto *niflag=parser
-        .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
-                  mInterfaceNetwork,
-                  "specify external interface to use, default is --local")
-        ->disable_flag_override()
-        ->envname("HELICS_WEBSERVER_INTERFACE");
+    auto* niflag = parser
+                       .add_flag("--local{0},--ipv4{4},--ipv6{6},--all{10},--external{10}",
+                                 mInterfaceNetwork,
+                                 "specify external interface to use, default is --local")
+                       ->disable_flag_override()
+                       ->envname("HELICS_WEBSERVER_INTERFACE");
 
-    parser.add_option("--network_connectivity",
-        mInterfaceNetwork,
-            "specify the connectivity of the network interface")
+    parser
+        .add_option("--network_connectivity",
+                    mInterfaceNetwork,
+                    "specify the connectivity of the network interface")
         ->transform(CLI::CheckedTransformer(
             {{"local", "0"}, {"ipv4", "4"}, {"ipv6", "6"}, {"external", "10"}, {"all", "10"}}))
         ->excludes(niflag);

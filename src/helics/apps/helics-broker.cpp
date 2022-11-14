@@ -14,8 +14,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #ifdef HELICS_ENABLE_WEBSERVER
-#    include "../apps/helicsWebServer.hpp"
 #    include "../apps/RestApiConnection.hpp"
+#    include "../apps/helicsWebServer.hpp"
 #endif
 
 #include <iostream>
@@ -54,11 +54,11 @@ int main(int argc, char* argv[])  // NOLINT
 
     auto* remote =
         cmdLine
-        .add_subcommand(
-            "remote",
-            "helics-broker remote <connection args>  will start a terminal and connect to a remote HELICS rest API and allow sending API commands through a terminal")
-        ->prefix_command();
-    remote->callback([&runremote]() {runremote = true; });
+            .add_subcommand(
+                "remote",
+                "helics-broker remote <connection args>  will start a terminal and connect to a remote HELICS rest API and allow sending API commands through a terminal")
+            ->prefix_command();
+    remote->callback([&runremote]() { runremote = true; });
 
     cmdLine.add_flag(
         "--autorestart",
@@ -122,8 +122,7 @@ int main(int argc, char* argv[])  // NOLINT
     try {
         if (runterminal) {
             terminalFunction(cmdLine.remainArgs());
-        }
-        else if (runremote) {
+        } else if (runremote) {
             remoteTerminalFunction(cmdLine.remainArgs());
         } else if (autorestart) {
             while (true) {
@@ -309,28 +308,26 @@ void terminalFunction(std::vector<std::string> args)
 /** function to control a user terminal for the broker*/
 void remoteTerminalFunction(std::vector<std::string> args)
 {
-    //args order is reversed from parsing
-    std::string port=std::to_string(helics::apps::WebServer::defaultHttpPort);
+    // args order is reversed from parsing
+    std::string port = std::to_string(helics::apps::WebServer::defaultHttpPort);
     std::string server{"localhost"};
 
     std::cout << "starting broker remote terminal \n";
     auto connection = std::make_unique<helics::apps::RestApiConnection>("local");
-    if (args.size() >= 2)
-    {
-        port=args[0];
-        server=args[1];
+    if (args.size() >= 2) {
+        port = args[0];
+        server = args[1];
     }
-    if (!args.empty())
-    {
-        server=args[0];
+    if (!args.empty()) {
+        server = args[0];
     }
-    connection->connect(server,port);
+    connection->connect(server, port);
     auto closeConnection = [&connection]() {
         if (!connection) {
             std::cout << "connection has terminated\n";
             return;
         }
-       connection->disconnect();
+        connection->disconnect();
         std::cout << "connection has terminated\n";
     };
 
@@ -339,110 +336,109 @@ void remoteTerminalFunction(std::vector<std::string> args)
             connection = std::make_unique<helics::apps::RestApiConnection>("local");
             std::cout << "connection has started\n";
         }
-        if (args.size() > 2)
-        {
-            connection->connect(args[1],args[0]);
-        }
-        else if (args.size() == 1)
-        {
-            connection->connect(args[0],port);
-        }
-        else
-        {
-            connection->connect(server,port);
+        if (args.size() > 2) {
+            connection->connect(args[1], args[0]);
+        } else if (args.size() == 1) {
+            connection->connect(args[0], port);
+        } else {
+            connection->connect(server, port);
         }
     };
 
-    auto get = [&connection](const std::string &query) {
+    auto get = [&connection](const std::string& query) {
         if (!connection) {
             std::cout << "connection is not available\n";
             return;
         }
-        std::cout<<connection->sendGet(query)<<std::endl;
+        std::cout << connection->sendGet(query) << std::endl;
     };
 
-    auto put = [&connection](const std::string &target, const std::string &body) {
+    auto put = [&connection](const std::string& target, const std::string& body) {
         if (!connection) {
             std::cout << "connection is not available\n";
             return;
         }
-        std::cout<<connection->sendCommand(boost::beast::http::verb::put,target,body)<<std::endl;
+        std::cout << connection->sendCommand(boost::beast::http::verb::put, target, body)
+                  << std::endl;
     };
 
-    auto post = [&connection](const std::string &target, const std::string &body) {
+    auto post = [&connection](const std::string& target, const std::string& body) {
         if (!connection) {
             std::cout << "connection is not available\n";
             return;
         }
-        std::cout<<connection->sendCommand(boost::beast::http::verb::post,target,body)<<std::endl;
+        std::cout << connection->sendCommand(boost::beast::http::verb::post, target, body)
+                  << std::endl;
     };
 
-    auto search = [&connection](const std::string &target) {
+    auto search = [&connection](const std::string& target) {
         if (!connection) {
             std::cout << "connection is not available\n";
             return;
         }
-        std::cout<<connection->sendCommand(boost::beast::http::verb::search,target,"")<<std::endl;
+        std::cout << connection->sendCommand(boost::beast::http::verb::search, target, "")
+                  << std::endl;
     };
 
-    auto del = [&connection](const std::string &target) {
+    auto del = [&connection](const std::string& target) {
         if (!connection) {
             std::cout << "connection is not available\n";
             return;
         }
-        std::cout<<connection->sendCommand(boost::beast::http::verb::delete_,target,"")<<std::endl;
+        std::cout << connection->sendCommand(boost::beast::http::verb::delete_, target, "")
+                  << std::endl;
     };
 
     bool cmdcont = true;
     helics::helicsCLI11App termProg("helics remote API command line terminal");
     termProg.ignore_case();
     termProg.add_flag("-q{false},--quit{false},--exit{false}",
-        cmdcont,
-        "close the terminal and wait for the broker to exit");
+                      cmdcont,
+                      "close the terminal and wait for the broker to exit");
     termProg.add_subcommand("quit", "close the terminal and  wait for the broker to exit")
         ->callback([&cmdcont]() { cmdcont = false; });
     termProg.add_subcommand("terminate", "terminate the broker")->callback(closeConnection);
 
-
     auto* restart =
         termProg.add_subcommand("restart", "restart the broker if it is not currently executing")
-        ->allow_extras();
-    restart->callback([&reConnect,&restart]() {
-        reConnect(restart->remaining_for_passthrough());
-        });
+            ->allow_extras();
+    restart->callback(
+        [&reConnect, &restart]() { reConnect(restart->remaining_for_passthrough()); });
 
     std::string target;
     std::string body;
-    //GET call
-    auto * getsub=termProg.add_subcommand("get", "run a get query on the server")
-        ->callback([&get,&target]() {get(target); });
-    getsub->add_option("target,--target",target,"specify the target uri to GET")->required();
+    // GET call
+    auto* getsub = termProg.add_subcommand("get", "run a get query on the server")
+                       ->callback([&get, &target]() { get(target); });
+    getsub->add_option("target,--target", target, "specify the target uri to GET")->required();
     // POST call
-    auto * postsub=termProg.add_subcommand("post", "post data to the server")
-        ->callback([&post,&target,&body]() {post(target,body); });
-    postsub->add_option("target,--target",target,"specify the target uri to POST")->required();
-    postsub->add_option("body,--body",body,"specify the body of the POST message");
+    auto* postsub = termProg.add_subcommand("post", "post data to the server")
+                        ->callback([&post, &target, &body]() { post(target, body); });
+    postsub->add_option("target,--target", target, "specify the target uri to POST")->required();
+    postsub->add_option("body,--body", body, "specify the body of the POST message");
 
     // POST call
-    auto * putsub=termProg.add_subcommand("put", "put data to the server")
-        ->callback([&put,&target,&body]() {put(target,body); });
-    putsub->add_option("target,--target",target,"specify the target uri to PUT")->required();
-    putsub->add_option("body,--body",body,"specify the body of the PUT message");
+    auto* putsub = termProg.add_subcommand("put", "put data to the server")
+                       ->callback([&put, &target, &body]() { put(target, body); });
+    putsub->add_option("target,--target", target, "specify the target uri to PUT")->required();
+    putsub->add_option("body,--body", body, "specify the body of the PUT message");
 
-    //DELETE call
-    auto * delsub=termProg.add_subcommand("delete", "delete data from a server")
-        ->callback([&del,&target]() {del(target); });
-    delsub->add_option("target,--target",target,"specify the target uri to DELETE")->required();
+    // DELETE call
+    auto* delsub =
+        termProg.add_subcommand("delete", "delete data from a server")->callback([&del, &target]() {
+            del(target);
+        });
+    delsub->add_option("target,--target", target, "specify the target uri to DELETE")->required();
 
-    //DELETE call
-    auto * searchsub=termProg.add_subcommand("search", "run a search on the server")
-        ->callback([&search,&target]() {search(target); });
-    delsub->add_option("target,--target",target,"specify the target uri to SEARCH")->required();
+    // DELETE call
+    auto* searchsub = termProg.add_subcommand("search", "run a search on the server")
+                          ->callback([&search, &target]() { search(target); });
+    delsub->add_option("target,--target", target, "specify the target uri to SEARCH")->required();
 
     termProg.add_subcommand("help", "display the help")->callback([&termProg]() {
         termProg.helics_parse("-?");
-        });
-    
+    });
+
     while (cmdcont) {
         std::string cmdin;
         std::cout << "\nhelics_remote>>";
@@ -459,6 +455,6 @@ void remoteTerminalFunction(std::vector<std::string> args)
 #else
 void remoteTerminalFunction(std::vector<std::string> /*args*/)
 {
-    std::cout<<"webserver not enabled terminating broker"<<std::endl;
+    std::cout << "webserver not enabled terminating broker" << std::endl;
 }
 #endif

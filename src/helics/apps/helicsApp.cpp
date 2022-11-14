@@ -122,7 +122,7 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
 
 void App::loadFile(const std::string& filename)
 {
-   if (fileops::hasJsonExtension(filename)) {
+    if (fileops::hasJsonExtension(filename)) {
         loadJsonFile(filename);
     } else {
         loadTextFile(filename);

@@ -20,37 +20,35 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string_view>
 #include <vector>
 
-namespace helics::apps
-{
+namespace helics::apps {
 
-    class RestApiConnection {
-    public:
-        // Per-test-suite set-up.
-        // Called before the first test in this test suite.
-        // Can be omitted if not needed.
-        explicit RestApiConnection(std::string_view host="localhost");
+class RestApiConnection {
+  public:
+    // Per-test-suite set-up.
+    // Called before the first test in this test suite.
+    // Can be omitted if not needed.
+    explicit RestApiConnection(std::string_view host = "localhost");
 
-        ~RestApiConnection();
-        
-        bool connect(std::string_view server, std::string_view port);
+    ~RestApiConnection();
 
-        void disconnect();
+    bool connect(std::string_view server, std::string_view port);
 
-        std::string sendGet(const std::string &target);
-        
+    void disconnect();
 
-        std::string
-            sendCommand(boost::beast::http::verb command, const std::string &target, const std::string &body);
-       
+    std::string sendGet(const std::string& target);
 
-    private:
-        boost::asio::io_context ioc;
+    std::string sendCommand(boost::beast::http::verb command,
+                            const std::string& target,
+                            const std::string& body);
 
-        std::unique_ptr<boost::beast::tcp_stream> stream;
-        boost::beast::flat_buffer buffer;
+  private:
+    boost::asio::io_context ioc;
 
-        std::string hostName{"localHost"};
-        Json::Value config;
-        bool connected{false};
-    };
-}
+    std::unique_ptr<boost::beast::tcp_stream> stream;
+    boost::beast::flat_buffer buffer;
+
+    std::string hostName{"localHost"};
+    Json::Value config;
+    bool connected{false};
+};
+}  // namespace helics::apps

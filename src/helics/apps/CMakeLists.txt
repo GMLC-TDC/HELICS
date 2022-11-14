@@ -59,7 +59,9 @@ if(HELICS_BUILD_APP_LIBRARY)
     )
         message(STATUS "Building webserver Boost version ${Boost_VERSION} ${BOOST_VERSION_LEVEL}")
         list(APPEND helics_apps_broker_files helicsWebServer.cpp RestApiConnection.cpp)
-        list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp RestApiConnection.hpp)
+        list(APPEND helics_apps_broker_headers helicsWebServer.hpp indexPage.hpp
+             RestApiConnection.hpp
+        )
     endif()
 
     add_library(

@@ -93,12 +93,10 @@ void BrokerServer::startServers()
         if (http_server) {
             webs->enableHttpServer(true);
             if (!mHttpArgs.empty()) {
-                auto fc=mHttpArgs.find_first_not_of(' ');
-                if (fc != std::string::npos)
-                {
-                    if (mHttpArgs[fc] == '-')
-                    {
-                        mHttpArgs.insert(0,"http ",5);
+                auto fc = mHttpArgs.find_first_not_of(' ');
+                if (fc != std::string::npos) {
+                    if (mHttpArgs[fc] == '-') {
+                        mHttpArgs.insert(0, "http ", 5);
                     }
                 }
 
@@ -108,11 +106,9 @@ void BrokerServer::startServers()
         if (websocket_server) {
             webs->enableWebSocketServer(true);
             if (!mWebSocketArgs.empty()) {
-                auto fc=mWebSocketArgs.find_first_not_of(' ');
-                if (fc != std::string::npos)
-                {
-                    if (mWebSocketArgs[fc] == '-')
-                    {
+                auto fc = mWebSocketArgs.find_first_not_of(' ');
+                if (fc != std::string::npos) {
+                    if (mWebSocketArgs[fc] == '-') {
                         mWebSocketArgs.insert(0, "websocket ", 10);
                     }
                 }

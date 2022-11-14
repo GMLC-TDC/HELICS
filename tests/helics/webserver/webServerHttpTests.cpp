@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/apps/RestApiConnection.hpp"
 #include "helics/apps/helicsWebServer.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -15,7 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <algorithm>
-#include "helics/apps/RestApiConnection.hpp"
 #include <cstdlib>
 #include <fstream>
 #include <functional>
@@ -48,7 +48,6 @@ class httpTest: public ::testing::Test {
         webs->startServer(&config, webs);
 
         connection.connect(localhost, "26242");
-
     }
 
     // Per-test-suite tear-down.
@@ -64,15 +63,13 @@ class httpTest: public ::testing::Test {
     // You can define per-test set-up logic as usual.
     void SetUp() final {}
 
-    static std::string sendGet(const std::string& target)
-    {
-       return connection.sendGet(target);
-    }
+    static std::string sendGet(const std::string& target) { return connection.sendGet(target); }
 
-    static std::string
-        sendCommand(boost::beast::http::verb command, const std::string& target, const std::string &body)
+    static std::string sendCommand(boost::beast::http::verb command,
+                                   const std::string& target,
+                                   const std::string& body)
     {
-        return connection.sendCommand(command,target,body);
+        return connection.sendCommand(command, target, body);
     }
 
     static std::shared_ptr<helics::Broker> addBroker(helics::CoreType ctype,
