@@ -37,7 +37,7 @@ aliases:
   - &run_helics_tests
     name: run_helics_tests
     command: |
-      /root/project/scripts/run-circleci-tests.sh
+      scripts/run-circleci-tests.sh build
       RESULT=$?
       exit $RESULT
 
