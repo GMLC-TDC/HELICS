@@ -23,11 +23,11 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 namespace beast = boost::beast;  // from <boost/beast.hpp>
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 namespace http = beast::http;  // from <boost/beast/http.hpp>
-//NOLINTNEXTLINE
+// NOLINTNEXTLINE
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 
 namespace helics::apps {
