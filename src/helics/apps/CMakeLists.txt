@@ -31,7 +31,7 @@ if(HELICS_BUILD_APP_LIBRARY)
                                    AsioBrokerServer.hpp TypedBrokerServer.hpp
     )
 
-    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp RestAPIConnection.hpp)
+    set(helics_apps_private_headers PrecHelper.hpp SignalGenerators.hpp)
 
     set(helics_apps_library_files
         Player.cpp

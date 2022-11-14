@@ -23,11 +23,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
+//NOLINTNEXTLINE
 namespace beast = boost::beast;  // from <boost/beast.hpp>
+//NOLINTNEXTLINE
 namespace http = beast::http;  // from <boost/beast/http.hpp>
-namespace net = boost::asio;  // from <boost/asio.hpp>
+//NOLINTNEXTLINE
 using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
-using namespace helics::fileops;
 
 namespace helics::apps {
 
@@ -42,7 +43,7 @@ bool RestApiConnection::connect(std::string_view server, std::string_view port)
     }
     // These objects perform our I/O
     tcp::resolver resolverObj(ioc);
-    stream = std::make_unique<beast::tcp_stream>(ioc);  // NOLINT
+    stream = std::make_unique<boost::beast::tcp_stream>(ioc);  // NOLINT
 
     // Look up the domain name
     auto const results = resolverObj.resolve(server, port);
