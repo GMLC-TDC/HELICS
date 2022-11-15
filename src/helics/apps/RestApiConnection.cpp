@@ -38,7 +38,6 @@ RestApiConnection::~RestApiConnection() {}
 
 bool RestApiConnection::connect(std::string_view server, std::string_view port)
 {
-
     disconnect();
     // These objects perform our I/O
     tcp::resolver resolverObj(ioc);
