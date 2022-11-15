@@ -228,6 +228,20 @@ jobs:
       - run:
           name: system info
           command: build/bin/helics_app --system
+          
+  arm64-alpine:
+    machine:
+      image: alpine:3.16
+    resource_class: arm.medium
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_BOOST=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+      - run:
+          name: system info
+          command: build/bin/helics_app --system
 
 workflows:
   version: 2
@@ -253,7 +267,7 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - arm64:
+      - arm64-alpine:
           filters:
             branches:
               ignore: /pre-commit\/.*/
@@ -318,6 +332,7 @@ workflows:
       - helicsgccASan
       - helicsgccTSan
       - helicsMSan
+      - arm64
   benchmark:
     triggers:
       - schedule:
