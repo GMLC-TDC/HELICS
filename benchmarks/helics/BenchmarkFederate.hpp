@@ -311,13 +311,14 @@ class BenchmarkFederate {
         auto res = app->helics_parse(args...);
 
         helics::FederateInfo fi;
-        if (res != helics::helicsCLI11App::parse_output::ok) {
+        if (res != helics::helicsCLI11App::ParseOutput::OK) {
             switch (res) {
-                case helics::helicsCLI11App::parse_output::help_call:
-                case helics::helicsCLI11App::parse_output::help_all_call:
+                case helics::helicsCLI11App::ParseOutput::HELP_CALL:
+                case helics::helicsCLI11App::ParseOutput::HELP_ALL_CALL:
                     fi.loadInfoFromArgs("--help");
-                    // FALLTHRU
-                case helics::helicsCLI11App::parse_output::version_call:
+                    [[fallthrough]];
+                case helics::helicsCLI11App::ParseOutput::VERSION_CALL:
+                case helics::helicsCLI11App::ParseOutput::SUCCESS_TERMINATION:
                 default:
                     // Nothing to do, send result higher up to decide what should happen
                     break;

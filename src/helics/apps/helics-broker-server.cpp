@@ -52,22 +52,12 @@ int main(int argc, char* argv[])
             (void)brk;
             return std::string{};
         });
-    cmdLine.add_flag_callback("--system", [](){
-        std::cout<<helics::systemInfo() << std::endl;
-        throw CLI::Success{};
-        }, "display system information details");
+    cmdLine.addSystemInfoCall();
     cmdLine.allow_extras();
     cmdLine.set_config();
     auto res = cmdLine.helics_parse(argc, argv);
-    if (res != helics::helicsCLI11App::parse_output::ok) {
-        switch (res) {
-            case helics::helicsCLI11App::parse_output::help_call:
-            case helics::helicsCLI11App::parse_output::help_all_call:
-            case helics::helicsCLI11App::parse_output::version_call:
-                return 0;
-            default:
-                return static_cast<int>(res);
-        }
+    if (res != helics::helicsCLI11App::ParseOutput::OK) {
+        return (static_cast<int>(ret)>0)?0:static_cast<int>(ret);
     }
     try {
         if (runterminal) {

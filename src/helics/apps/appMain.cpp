@@ -122,21 +122,10 @@ int main(int argc, char* argv[])
         });
     app.footer(
         "helics_app [SUBCOMMAND] --help will display the options for a particular subcommand");
-    app.add_flag_callback("--system", [](){
-        std::cout<<helics::systemInfo() << std::endl;
-        throw CLI::Success{};
-        }, "display system information details");
+    app.addSystemInfoCall();
     auto ret = app.helics_parse(argc, argv);
 
     helics::cleanupHelicsLibrary();
 
-    switch (ret) {
-        case helics::helicsCLI11App::parse_output::help_call:
-        case helics::helicsCLI11App::parse_output::help_all_call:
-        case helics::helicsCLI11App::parse_output::version_call:
-        case helics::helicsCLI11App::parse_output::ok:
-            return 0;
-        default:
-            return static_cast<int>(ret);
-    }
+    return (static_cast<int>(ret)>=0)?0:static_cast<int>(ret);
 }

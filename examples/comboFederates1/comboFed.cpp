@@ -44,11 +44,11 @@ int main(int argc, char* argv[])
     auto ret = app.helics_parse(argc, argv);
 
     helics::FederateInfo fi;
-    if (ret == helics::helicsCLI11App::parse_output::help_call) {
+    if (ret == helics::helicsCLI11App::ParseOutput::HELP_CALL) {
         (void)(fi.loadInfoFromArgs("--help"));
         return 0;
     }
-    if (ret != helics::helicsCLI11App::parse_output::ok) {
+    if (ret != helics::helicsCLI11App::ParseOutput::OK) {
         return -1;
     }
     fi.defName = "fed";
