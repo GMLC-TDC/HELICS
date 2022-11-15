@@ -7,10 +7,19 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-add_executable(
+if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
+                                               OR HELICS_DISABLE_ASIO)
+    )
+        add_executable(
     helics_webserver-tests helics_webserver_tests.cpp webServerHttpTests.cpp
                            webServerWebSocketTests.cpp
 )
+else()
+#add so the test gets created but doesn't do much
+    add_executable(
+    helics_webserver-tests helics_webserver_tests.cpp 
+)
+endif()
 
 set_target_properties(helics_webserver-tests PROPERTIES FOLDER tests)
 

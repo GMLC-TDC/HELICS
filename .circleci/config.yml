@@ -225,7 +225,10 @@ jobs:
       - checkout
       - run: *setup_helics
       - run: *run_helics_tests
-    
+      - run:
+          name: system info
+          command: build/bin/helics_app --system
+
 workflows:
   version: 2
   helics_test:

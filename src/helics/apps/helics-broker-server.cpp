@@ -52,6 +52,10 @@ int main(int argc, char* argv[])
             (void)brk;
             return std::string{};
         });
+    cmdLine.add_flag_callback("--system", [](){
+        std::cout<<helics::systemInfo() << std::endl;
+        throw CLI::Success{};
+        }, "display system information details");
     cmdLine.allow_extras();
     cmdLine.set_config();
     auto res = cmdLine.helics_parse(argc, argv);

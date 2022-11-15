@@ -25,12 +25,7 @@ add_subdirectory(sequencing_tests)
 
 if(HELICS_BUILD_APP_LIBRARY)
     add_subdirectory(apps)
-    if(BOOST_VERSION_LEVEL GREATER 69 AND NOT (HELICS_DISABLE_WEBSERVER OR HELICS_DISABLE_BOOST
-                                               OR HELICS_DISABLE_ASIO)
-    )
-        add_subdirectory(webserver)
-    endif()
-
+    add_subdirectory(webserver)
 endif()
 
 add_subdirectory(application_api)

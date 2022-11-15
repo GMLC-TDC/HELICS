@@ -79,6 +79,10 @@ int main(int argc, char* argv[])  // NOLINT
         });
     cmdLine.allow_extras();
     cmdLine.set_config();
+    cmdLine.add_flag_callback("--system", [](){
+        std::cout<<helics::systemInfo() << std::endl;
+        throw CLI::Success{};
+        }, "display system information details");
     auto res = cmdLine.helics_parse(argc, argv);
     if (res != helics::helicsCLI11App::parse_output::ok) {
         switch (res) {
