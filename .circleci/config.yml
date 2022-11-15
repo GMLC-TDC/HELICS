@@ -253,10 +253,6 @@ workflows:
           filters:
             branches:
               ignore: /pre-commit\/.*/
-      - arm64:
-          filters:
-            branches:
-              ignore: /pre-commit\/.*/
   sanitizers:
     jobs:
       - helicsTSan:
