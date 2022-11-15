@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     cmdLine.set_config();
     auto res = cmdLine.helics_parse(argc, argv);
     if (res != helics::helicsCLI11App::ParseOutput::OK) {
-        return (static_cast<int>(ret)>0)?0:static_cast<int>(ret);
+        return (static_cast<int>(ret) > 0) ? 0 : static_cast<int>(ret);
     }
     try {
         if (runterminal) {

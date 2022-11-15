@@ -62,7 +62,7 @@ class helicsCLI11App: public CLI::App {
         HELP_ALL_CALL = 2,
         VERSION_CALL = 4,
         SUCCESS_TERMINATION = 7
-        
+
     };
     bool quiet{false};
     bool passConfig{true};
@@ -101,8 +101,7 @@ class helicsCLI11App: public CLI::App {
             }
             last_output = ParseOutput::VERSION_CALL;
         }
-        catch (const CLI::Success& /*sc*/)
-        {
+        catch (const CLI::Success& /*sc*/) {
             last_output = ParseOutput::SUCCESS_TERMINATION;
         }
         catch (const CLI::Error& ce) {
@@ -141,10 +140,13 @@ class helicsCLI11App: public CLI::App {
     }
     void addSystemInfoCall()
     {
-        add_flag_callback("--system", [](){
-            std::cout<<helics::systemInfo() << std::endl;
-            throw CLI::Success{};
-            }, "display system information details");
+        add_flag_callback(
+            "--system",
+            []() {
+                std::cout << helics::systemInfo() << std::endl;
+                throw CLI::Success{};
+            },
+            "display system information details");
     }
 
     void addTypeOption(bool includeEnvironmentVariable = true)

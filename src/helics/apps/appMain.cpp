@@ -127,5 +127,5 @@ int main(int argc, char* argv[])
 
     helics::cleanupHelicsLibrary();
 
-    return (static_cast<int>(ret)>=0)?0:static_cast<int>(ret);
+    return (static_cast<int>(ret) >= 0) ? 0 : static_cast<int>(ret);
 }

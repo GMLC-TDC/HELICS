@@ -81,8 +81,8 @@ int main(int argc, char* argv[])  // NOLINT
     cmdLine.set_config();
     cmdLine.addSystemInfoCall();
     auto parseResult = cmdLine.helics_parse(argc, argv);
-    if (parseResult!= helics::helicsCLI11App::ParseOutput::OK) {
-        return (static_cast<int>(parseResult)>0)?0:static_cast<int>(parseResult);
+    if (parseResult != helics::helicsCLI11App::ParseOutput::OK) {
+        return (static_cast<int>(parseResult) > 0) ? 0 : static_cast<int>(parseResult);
     }
 #ifdef HELICS_ENABLE_WEBSERVER
     std::shared_ptr<helics::apps::WebServer> webserver;
