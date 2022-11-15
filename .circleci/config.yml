@@ -228,7 +228,7 @@ jobs:
       - run:
           name: system info
           command: build/bin/helics_app --system
-          
+
   arm64-alpine:
     machine:
       image: alpine:3.16
