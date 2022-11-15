@@ -231,8 +231,10 @@ jobs:
 
   arm64-alpine:
     machine:
-      image: alpine:3.16
+      image: ubuntu-2004:current
     resource_class: arm.medium
+    docker:
+      - image: alpine:3.16
     environment:
       CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_BOOST=ON'
     steps:
