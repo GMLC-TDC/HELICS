@@ -433,7 +433,7 @@ void remoteTerminalFunction(std::vector<std::string> args)
     // DELETE call
     auto* searchsub = termProg.add_subcommand("search", "run a search on the server")
                           ->callback([&search, &target]() { search(target); });
-    delsub->add_option("target,--target", target, "specify the target uri to SEARCH")->required();
+    searchsub->add_option("target,--target", target, "specify the target uri to SEARCH")->required();
 
     termProg.add_subcommand("help", "display the help")->callback([&termProg]() {
         termProg.helics_parse("-?");

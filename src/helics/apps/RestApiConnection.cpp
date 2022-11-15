@@ -38,9 +38,8 @@ RestApiConnection::~RestApiConnection() {}
 
 bool RestApiConnection::connect(std::string_view server, std::string_view port)
 {
-    if (connected) {
-        disconnect();
-    }
+
+    disconnect();
     // These objects perform our I/O
     tcp::resolver resolverObj(ioc);
     stream = std::make_unique<boost::beast::tcp_stream>(ioc);  // NOLINT
