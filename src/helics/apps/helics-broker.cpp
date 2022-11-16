@@ -79,16 +79,10 @@ int main(int argc, char* argv[])  // NOLINT
         });
     cmdLine.allow_extras();
     cmdLine.set_config();
-    auto res = cmdLine.helics_parse(argc, argv);
-    if (res != helics::helicsCLI11App::parse_output::ok) {
-        switch (res) {
-            case helics::helicsCLI11App::parse_output::help_call:
-            case helics::helicsCLI11App::parse_output::help_all_call:
-            case helics::helicsCLI11App::parse_output::version_call:
-                return 0;
-            default:
-                return static_cast<int>(res);
-        }
+    cmdLine.addSystemInfoCall();
+    auto parseResult = cmdLine.helics_parse(argc, argv);
+    if (parseResult != helics::helicsCLI11App::ParseOutput::OK) {
+        return (static_cast<int>(parseResult) > 0) ? 0 : static_cast<int>(parseResult);
     }
 #ifdef HELICS_ENABLE_WEBSERVER
     std::shared_ptr<helics::apps::WebServer> webserver;

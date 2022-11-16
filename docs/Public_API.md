@@ -57,6 +57,7 @@ The public API includes the following
   - Echo.hpp
   - Source.hpp
   - Tracer.hpp
+  - Probe.hpp
   - Clone.hpp
   - helicsApp.hpp
   - BrokerApp.hpp (aliased to application_api version)

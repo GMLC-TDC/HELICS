@@ -22,7 +22,7 @@ CoreApp::CoreApp(CoreType ctype, std::string_view coreName, std::vector<std::str
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
-    if (app->helics_parse(std::move(args)) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::move(args)) == helicsCLI11App::ParseOutput::OK) {
         processArgs(app);
     }
 }
@@ -31,7 +31,7 @@ CoreApp::CoreApp(CoreType ctype, std::vector<std::string> args)
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
-    if (app->helics_parse(std::move(args)) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::move(args)) == helicsCLI11App::ParseOutput::OK) {
         processArgs(app);
     }
 }
@@ -42,7 +42,7 @@ CoreApp::CoreApp(CoreType ctype, std::string_view coreName, int argc, char* argv
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
-    if (app->helics_parse(argc, argv) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(argc, argv) == helicsCLI11App::ParseOutput::OK) {
         processArgs(app);
     }
 }
@@ -58,7 +58,7 @@ CoreApp::CoreApp(CoreType ctype, std::string_view coreName, std::string_view arg
 {
     auto app = generateParser();
     app->setDefaultCoreType(ctype);
-    if (app->helics_parse(std::string{argString}) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string{argString}) == helicsCLI11App::ParseOutput::OK) {
         processArgs(app);
     }
 }
@@ -78,7 +78,7 @@ CoreApp::CoreApp(std::string_view argString)
         }
     }
     auto app = generateParser();
-    if (app->helics_parse(std::string{argString}) == helicsCLI11App::parse_output::ok) {
+    if (app->helics_parse(std::string{argString}) == helicsCLI11App::ParseOutput::OK) {
         processArgs(app);
     }
 }

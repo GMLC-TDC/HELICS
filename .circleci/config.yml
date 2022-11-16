@@ -37,7 +37,7 @@ aliases:
   - &run_helics_tests
     name: run_helics_tests
     command: |
-      /root/project/scripts/run-circleci-tests.sh
+      scripts/run-circleci-tests.sh build
       RESULT=$?
       exit $RESULT
 
@@ -215,6 +215,20 @@ jobs:
       - store_artifacts:
           path: /tmp/bm_results
 
+  arm64:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: arm.medium
+    environment:
+      CMAKE_FLAGS: '-DHELICS_BUILD_CXX_SHARED_LIB=OFF -DHELICS_BUILD_TESTS=ON -DHELICS_ZMQ_SUBPROJECT=ON -DHELICS_ZMQ_FORCE_SUBPROJECT=ON -DHELICS_DISABLE_BOOST=ON'
+    steps:
+      - checkout
+      - run: *setup_helics
+      - run: *run_helics_tests
+      - run:
+          name: system info
+          command: build/bin/helics_app --system
+
 workflows:
   version: 2
   helics_test:
@@ -300,6 +314,7 @@ workflows:
       - helicsgccASan
       - helicsgccTSan
       - helicsMSan
+      - arm64
   benchmark:
     triggers:
       - schedule:
