@@ -190,7 +190,7 @@ CoreType coreTypeFromString(std::string_view type) noexcept
     if (type.compare(0, 4, "null") == 0) {
         return CoreType::NULLCORE;
     }
-   
+
     return CoreType::UNRECOGNIZED;
 }
 
