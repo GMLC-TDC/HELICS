@@ -24,9 +24,6 @@ namespace helics::apps {
 
 class RestApiConnection {
   public:
-    // Per-test-suite set-up.
-    // Called before the first test in this test suite.
-    // Can be omitted if not needed.
     explicit RestApiConnection(std::string_view host = "localhost");
 
     ~RestApiConnection();

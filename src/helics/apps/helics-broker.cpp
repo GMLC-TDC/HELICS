@@ -323,11 +323,9 @@ void remoteTerminalFunction(std::vector<std::string> args)
     }
     connection->connect(server, port);
     auto closeConnection = [&connection]() {
-        if (!connection) {
-            std::cout << "connection has terminated\n";
-            return;
+        if (connection) {
+            connection->disconnect();
         }
-        connection->disconnect();
         std::cout << "connection has terminated\n";
     };
 
@@ -417,7 +415,7 @@ void remoteTerminalFunction(std::vector<std::string> args)
     postsub->add_option("target,--target", target, "specify the target uri to POST")->required();
     postsub->add_option("body,--body", body, "specify the body of the POST message");
 
-    // POST call
+    // PUT call
     auto* putsub = termProg.add_subcommand("put", "put data to the server")
                        ->callback([&put, &target, &body]() { put(target, body); });
     putsub->add_option("target,--target", target, "specify the target uri to PUT")->required();
