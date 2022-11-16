@@ -67,7 +67,7 @@ std::string to_string(CoreType type)
             return std::string();
     }
 }
-static constexpr frozen::unordered_map<std::string_view, CoreType, 59> coreTypes{
+static constexpr frozen::unordered_map<std::string_view, CoreType, 57> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -148,6 +148,12 @@ CoreType coreTypeFromString(std::string_view type) noexcept
     if ((type2.front() == '=') || (type2.front() == '-')) {
         return coreTypeFromString(type2.substr(1));
     }
+    if (type.compare(0, 5, "zmqss") == 0) {
+        return CoreType::ZMQ_SS;
+    }
+    if (type.compare(0, 6, "zmq_ss") == 0) {
+        return CoreType::ZMQ_SS;
+    }
     if (type.compare(0, 4, "zmq2") == 0) {
         return CoreType::ZMQ_SS;
     }
@@ -184,6 +190,7 @@ CoreType coreTypeFromString(std::string_view type) noexcept
     if (type.compare(0, 4, "null") == 0) {
         return CoreType::NULLCORE;
     }
+   
     return CoreType::UNRECOGNIZED;
 }
 
