@@ -67,7 +67,7 @@ std::string to_string(CoreType type)
             return std::string();
     }
 }
-static constexpr frozen::unordered_map<std::string_view, CoreType, 53> coreTypes{
+static constexpr frozen::unordered_map<std::string_view, CoreType, 59> coreTypes{
     {"default", CoreType::DEFAULT},
     {"def", CoreType::DEFAULT},
     {"mpi", CoreType::MPI},
@@ -78,8 +78,12 @@ static constexpr frozen::unordered_map<std::string_view, CoreType, 53> coreTypes
     {"zmq", CoreType::ZMQ},
     {"zeromq", CoreType::ZMQ},
     {"zeromq_ss", CoreType::ZMQ_SS},
+    {"zmqss", CoreType::ZMQ_SS},
+    {"ZMQSS", CoreType::ZMQ_SS},
     {"zmq_ss", CoreType::ZMQ_SS},
     {"ZMQ_SS", CoreType::ZMQ_SS},
+    {"0mq_ss", CoreType::ZMQ_SS},
+    {"0mqss", CoreType::ZMQ_SS},
     {"zeromq2", CoreType::ZMQ_SS},
     {"zmq2", CoreType::ZMQ_SS},
     {"ZMQ2", CoreType::ZMQ_SS},
