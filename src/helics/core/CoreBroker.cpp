@@ -238,6 +238,30 @@ bool CoreBroker::isOpenToNewFederates() const
              getCountableFederates() < maxFederateCount));
 }
 
+void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCode)
+{
+    route_id newroute;
+    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
+    bool route_created = false;
+    if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
+        newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
+        addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
+        route_created = true;
+    } else {
+        newroute = getRoute(command.source_id);
+    }
+    ActionMessage badInit(CMD_BROKER_ACK);
+    setActionFlag(badInit, error_flag);
+    badInit.source_id = global_broker_id_local;
+    badInit.name(command.name());
+    badInit.messageID = errorCode;
+    transmit(newroute, badInit);
+
+    if (route_created) {
+        removeRoute(newroute);
+    }
+}
+
 void CoreBroker::brokerRegistration(ActionMessage&& command)
 {
     if (!connectionEstablished) {
@@ -273,25 +297,7 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     }
     // check the max broker count
     if (static_cast<decltype(maxBrokerCount)>(mBrokers.size()) >= maxBrokerCount) {
-        route_id newroute;
-        bool route_created = false;
-        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-            route_created = true;
-        } else {
-            newroute = getRoute(command.source_id);
-        }
-        ActionMessage badInit(CMD_BROKER_ACK);
-        setActionFlag(badInit, error_flag);
-        badInit.source_id = global_broker_id_local;
-        badInit.name(command.name());
-        badInit.messageID = max_broker_count_exceeded;
-        transmit(newroute, badInit);
-
-        if (route_created) {
-            removeRoute(newroute);
-        }
+        sendBrokerErrorAck(command, max_broker_count_exceeded);
         return;
     }
 
@@ -306,30 +312,21 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     } else if (currentBrokerState == BrokerState::OPERATING) {
         // we are initialized already
         if (!checkActionFlag(command, observer_flag)) {
-            route_id newroute;
-            bool route_created = false;
-            if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-                newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-                addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-                route_created = true;
-            } else {
-                newroute = getRoute(command.source_id);
-            }
-            ActionMessage badInit(CMD_BROKER_ACK);
-            setActionFlag(badInit, error_flag);
-            badInit.source_id = global_broker_id_local;
-            badInit.name(command.name());
-            badInit.messageID = already_init_error_code;
-            transmit(newroute, badInit);
-
-            if (route_created) {
-                removeRoute(newroute);
-            }
+            sendBrokerErrorAck(command, already_init_error_code);
             return;
         }
         // can't add a non observer federate in OPERATING mode
     } else {
+        sendBrokerErrorAck(command, broker_terminating);
+        return;
+    }
+    if (!verifyBrokerKey(command)) {
+        sendBrokerErrorAck(command, mismatch_broker_key_error_code);
+        return;
+    }
+    if (checkActionFlag(command, test_connection_flag)) {
         route_id newroute;
+        bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
         bool route_created = false;
         if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
             newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
@@ -338,61 +335,23 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         } else {
             newroute = getRoute(command.source_id);
         }
-        ActionMessage badInit(CMD_BROKER_ACK);
-        setActionFlag(badInit, error_flag);
-        badInit.source_id = global_broker_id_local;
-        badInit.name(command.name());
-        badInit.setString(0, "broker is terminating");
-        badInit.messageID = broker_terminating;
-        transmit(newroute, badInit);
+        ActionMessage testInit(CMD_BROKER_ACK);
+        setActionFlag(testInit, error_flag);
+        setActionFlag(testInit, test_connection_flag);
+        testInit.source_id = global_broker_id_local;
+        testInit.name(command.name());
+        testInit.messageID = CONNECTION_TEST;
+        transmit(newroute, testInit);
 
         if (route_created) {
             removeRoute(newroute);
         }
-        return;
-    }
-    if (!verifyBrokerKey(command)) {
-        route_id newroute;
-        bool route_created = false;
-        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-            route_created = true;
-        } else {
-            newroute = getRoute(command.source_id);
-        }
-        ActionMessage badKey(CMD_BROKER_ACK);
-        setActionFlag(badKey, error_flag);
-        badKey.source_id = global_broker_id_local;
-        badKey.messageID = mismatch_broker_key_error_code;
-        badKey.name(command.name());
-        badKey.setString(0, "broker key does not match");
-        transmit(newroute, badKey);
-        if (route_created) {
-            removeRoute(newroute);
-        }
+        // this was a test connection and should not be added
         return;
     }
     auto inserted = mBrokers.insert(command.name(), no_search, command.name());
     if (!inserted) {
-        route_id newroute;
-        bool route_created = false;
-        if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
-            newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
-            addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
-            route_created = true;
-        } else {
-            newroute = getRoute(command.source_id);
-        }
-        ActionMessage badName(CMD_BROKER_ACK);
-        setActionFlag(badName, error_flag);
-        badName.source_id = global_broker_id_local;
-        badName.messageID = duplicate_broker_name_error_code;
-        badName.name(command.name());
-        transmit(newroute, badName);
-        if (route_created) {
-            removeRoute(newroute);
-        }
+        sendBrokerErrorAck(command, duplicate_broker_name_error_code);
         return;
     }
     if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {

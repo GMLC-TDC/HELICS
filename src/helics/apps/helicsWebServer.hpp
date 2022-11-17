@@ -16,50 +16,48 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <utility>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
 
-    class IocWrapper;
+class IocWrapper;
 
-    /** a virtual class to use as a base for broker servers of various types*/
-    class WebServer: public TypedBrokerServer {
-      public:
-        /// @brief default port for the HTTP web server
-        static constexpr int defaultHttpPort{43542};
-        /// @brief default port for the Websocket server
-        static constexpr int defaultWebSocketPort{43543};
-        WebServer() = default;
-        explicit WebServer(std::string_view server_name): mName(server_name) {}
-        /** start the server*/
-        virtual void startServer(const Json::Value* val,
-                                 const std::shared_ptr<TypedBrokerServer>& ptr) override;
-        /** stop the server*/
-        virtual void stopServer() override;
-        /** process any command line arguments*/
-        virtual void processArgs(std::string_view args) override;
-        /** enable the HTTP server*/
-        void enableHttpServer(bool enabled) { mHttpEnabled = enabled; }
-        /** enable the websocket server*/
-        void enableWebSocketServer(bool enabled) { mWebsocketEnabled = enabled; }
+/** a virtual class to use as a base for broker servers of various types*/
+class WebServer: public TypedBrokerServer {
+  public:
+    /// @brief default port for the HTTP web server
+    static constexpr int defaultHttpPort{43542};
+    /// @brief default port for the Websocket server
+    static constexpr int defaultWebSocketPort{43543};
+    WebServer() = default;
+    explicit WebServer(std::string_view server_name): mName(server_name) {}
+    /** start the server*/
+    virtual void startServer(const Json::Value* val,
+                             const std::shared_ptr<TypedBrokerServer>& ptr) override;
+    /** stop the server*/
+    virtual void stopServer() override;
+    /** process any command line arguments*/
+    virtual void processArgs(std::string_view args) override;
+    /** enable the HTTP server*/
+    void enableHttpServer(bool enabled) { mHttpEnabled = enabled; }
+    /** enable the websocket server*/
+    void enableWebSocketServer(bool enabled) { mWebsocketEnabled = enabled; }
 
-      private:
-        void mainLoop(std::shared_ptr<WebServer> keepAlive);
-        std::atomic<bool> running{false};
-        std::shared_ptr<IocWrapper> context;
-        std::thread mainLoopThread;
-        std::mutex threadGuard;
+  private:
+    void mainLoop(std::shared_ptr<WebServer> keepAlive);
+    std::atomic<bool> running{false};
+    std::shared_ptr<IocWrapper> context;
+    std::thread mainLoopThread;
+    std::mutex threadGuard;
 
-        const Json::Value* config{nullptr};
-        const std::string mName;
-        std::string mArgs;
-        std::string mHttpAddress;
-        int mHttpPort{defaultHttpPort};
-        std::string mWebsocketAddress;
-        int mWebsocketPort{defaultWebSocketPort};
-        bool mHttpEnabled{false};
-        bool mWebsocketEnabled{false};
-        int mInterfaceNetwork{0};
-        std::atomic<bool> executing{false};
-    };
-}  // namespace apps
-}  // namespace helics
+    const Json::Value* config{nullptr};
+    const std::string mName;
+    std::string mArgs;
+    std::string mHttpAddress;
+    int mHttpPort{defaultHttpPort};
+    std::string mWebsocketAddress;
+    int mWebsocketPort{defaultWebSocketPort};
+    bool mHttpEnabled{false};
+    bool mWebsocketEnabled{false};
+    int mInterfaceNetwork{0};
+    std::atomic<bool> executing{false};
+};
+}  // namespace helics::apps

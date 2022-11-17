@@ -49,7 +49,10 @@ void Probe::initialize()
             fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         }
     }
-
+    if (stopTime == Time::maxVal()) {
+        // use default stop time of 10s
+        stopTime = 10.0;
+    }
     endpoint = fed->registerEndpoint("probePoint", "probe");
     fed->enterInitializingModeIterative();
     auto qres = fed->query("root", "endpoints");

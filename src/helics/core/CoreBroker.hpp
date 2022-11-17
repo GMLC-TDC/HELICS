@@ -392,11 +392,17 @@ class CoreBroker: public Broker, public BrokerBase {
     void addTranslator(ActionMessage& m);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
+    /// @brief send an error response to broker registration
+    /// @param command the original message that was sent
+    /// @param errorCode the error code to reply with
+    void sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCode);
     // Helper function for linking interfaces
     void linkInterfaces(ActionMessage& command);
     // Handle the registration of new federates
     void fedRegistration(ActionMessage&& command);
-
+    /// @brief send an error response to fed registration
+    /// @param command the original message that was sent
+    /// @param errorCode the error code to reply with
     void sendFedErrorAck(ActionMessage& command, std::int32_t errorCode);
     //   bool updateSourceFilterOperator (ActionMessage &m);
     /** generate a JSON string containing one of the data Maps*/
