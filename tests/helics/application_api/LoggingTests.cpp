@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
-//#include "helics/core/CoreFactory.hpp"
+// #include "helics/core/CoreFactory.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/common/LogBuffer.hpp"
 #include "helics/core/Core.hpp"
