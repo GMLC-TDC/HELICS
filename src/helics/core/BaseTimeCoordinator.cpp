@@ -83,6 +83,7 @@ void BaseTimeCoordinator::disconnect()
     }
 
     if (dependencies.empty()) {
+        disconnected = true;
         return;
     }
     ActionMessage bye(CMD_DISCONNECT);
