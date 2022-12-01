@@ -6,7 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "FilterInfo.hpp"
-//#include "core/core-data.h"
+// #include "core/core-data.h"
 #include "../common/JsonGeneration.hpp"
 
 #include <algorithm>

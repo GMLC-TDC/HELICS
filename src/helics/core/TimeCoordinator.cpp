@@ -1316,7 +1316,7 @@ TimeProcessingResult TimeCoordinator::processTimeMessage(const ActionMessage& cm
         }
         procRes = TimeProcessingResult::PROCESSED;
     }
-    
+
     return procRes;
 }
 

@@ -13,7 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/libguarded/shared_guarded.hpp"
 #include "gmlc/libguarded/shared_guarded_opt.hpp"
 
-//#include "gmlc/libguarded/staged_guarded.hpp"
+// #include "gmlc/libguarded/staged_guarded.hpp"
 
 template<class T>
 using guarded = gmlc::libguarded::guarded<T>;

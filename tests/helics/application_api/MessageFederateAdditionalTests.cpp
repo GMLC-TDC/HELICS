@@ -329,7 +329,7 @@ TEST_P(mfed_add_all_type_tests, send_receive_2fed_multisend_callback)
     EXPECT_TRUE(mFed2->getCurrentMode() == helics::Federate::Modes::FINALIZE);
 }
 
-//#define ENABLE_OUTPUT
+// #define ENABLE_OUTPUT
 /**trivial Federate that sends Messages and echoes a ping with a pong
  */
 class PingPongFed {
