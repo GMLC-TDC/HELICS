@@ -326,7 +326,6 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
     }
     if (checkActionFlag(command, test_connection_flag)) {
         route_id newroute;
-        bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
         bool route_created = false;
         if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
             newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
