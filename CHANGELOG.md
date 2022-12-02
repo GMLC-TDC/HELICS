@@ -1,12 +1,34 @@
 # Changelog
 
-All notable changes to this project after the 1.0.0 release will be documented in this file
+All notable changes to this project after the 3.0.0 release will be documented in this file
+The changelog for HELICS 1.X and 2.X can be found [here](./docs/HELICS2_CHANGELOG.md)
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
+
+## [3.3.2][] ~ 2022-12-02
+
+Patch release to fix some testing issues and add some network probing capabilities and remote terminal connections.  
+
+### Fixed
+
+- Fixed a few sporadically failing CI tests
+
+### Changed
+
+- Update containers library
+- Update the units library
+- Split the application API tests in a set of 4 smaller tests to reduce test runtime and ease maintenance. 
+
+### Added
+
+- Added a remote terminal capability to link with a remote Broker server running a rest API.
+- Added ARM based Circle CI test.
+- Added a probe app for testing some networking situations and connections.
+- Added tests for the tcp federate under various conditions.
 
 ## [3.3.1][] ~ 2022-10-21
 
@@ -321,5 +343,4 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.2.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.2.1
 [3.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.0
 [3.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.1
-
-The changelog for HELICS 1.X and 2.X can be found [here](./docs/HELICS2_CHANGELOG.md)
+[3.3.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.2
