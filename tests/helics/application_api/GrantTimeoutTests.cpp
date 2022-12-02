@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/application_api/MessageFederate.hpp"
 #include "helics/application_api/ValueFederate.hpp"
 #include "helics/core/BrokerFactory.hpp"
-//#include "helics/core/CoreFactory.hpp"
+// #include "helics/core/CoreFactory.hpp"
 #include "helics/core/Core.hpp"
 #include "helics/core/core-exceptions.hpp"
 #include "helics/core/helics_definitions.hpp"
