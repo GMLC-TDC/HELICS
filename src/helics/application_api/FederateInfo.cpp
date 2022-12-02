@@ -670,7 +670,7 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(const std::string& args)
 {
     auto app = makeCLIApp();
     auto ret = app->helics_parse(args);
-    if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::ParseOutput::PARSE_ERROR) {
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());
@@ -681,7 +681,7 @@ std::vector<std::string> FederateInfo::loadInfoFromArgs(int argc, char* argv[])
 {
     auto app = makeCLIApp();
     auto ret = app->helics_parse(argc, argv);
-    if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::ParseOutput::PARSE_ERROR) {
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());
@@ -692,7 +692,7 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(const std::string& args)
 {
     auto app = makeCLIApp();
     auto ret = app->helics_parse(args);
-    if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::ParseOutput::PARSE_ERROR) {
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());
@@ -702,7 +702,7 @@ void FederateInfo::loadInfoFromArgsIgnoreOutput(int argc, char* argv[])
 {
     auto app = makeCLIApp();
     auto ret = app->helics_parse(argc, argv);
-    if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::ParseOutput::PARSE_ERROR) {
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());
@@ -713,7 +713,7 @@ void FederateInfo::loadInfoFromArgs(std::vector<std::string>& args)
     auto app = makeCLIApp();
     app->allow_extras();
     auto ret = app->helics_parse(args);
-    if (ret == helicsCLI11App::parse_output::parse_error) {
+    if (ret == helicsCLI11App::ParseOutput::PARSE_ERROR) {
         throw helics::InvalidParameter("argument parsing failed");
     }
     config_additional(app.get());

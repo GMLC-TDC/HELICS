@@ -671,7 +671,7 @@ bool BrokerBase::tryReconnect()
     return false;
 }
 
-//#define DISABLE_TICK
+// #define DISABLE_TICK
 void BrokerBase::queueProcessingLoop()
 {
     if (haltOperations) {

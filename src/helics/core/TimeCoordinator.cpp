@@ -277,7 +277,6 @@ void TimeCoordinator::generateDebuggingTimeInfo(Json::Value& base) const
     base["message"] = static_cast<double>(time_message);
     base["minde"] = static_cast<double>(time_minDe);
     base["minminde"] = static_cast<double>(time_minminDe);
-
     Json::Value upBlock;
     generateJsonOutputTimeData(upBlock, upstream);
 
@@ -1317,6 +1316,7 @@ TimeProcessingResult TimeCoordinator::processTimeMessage(const ActionMessage& cm
         }
         procRes = TimeProcessingResult::PROCESSED;
     }
+
     return procRes;
 }
 

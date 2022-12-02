@@ -305,8 +305,6 @@ HELICS_EXPORT void helicsFederateErrorHandlerCallback(HelicsFederate fed,
                                                       void* userdata,
                                                       HelicsError* err);
 
-// void setNextTimeCallback(std::function<Time(Time)>
-// timeUpdateCallback){timeUpdateOperation2=std::move(timeUpdateCallback);timeUpdateOperation1=nullptr;}
 /**
 * Set callback for the next time update.
 *
@@ -325,8 +323,6 @@ HELICS_EXPORT void helicsCallbackFederateNextTimeCallback(HelicsFederate fed,
                                                           void* userdata,
                                                           HelicsError* err);
 
-// void setNextTimeIterativeCallback(std::function<std::pair<Time,IterationRequest>(iteration_time)>
-// timeUpdateCallback){timeUpdateOperation1=std::move(timeUpdateCallback);}
 /**
 * Set callback for the next time update with iteration capability.
 *

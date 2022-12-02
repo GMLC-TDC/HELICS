@@ -21,17 +21,17 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 namespace apps {
     struct ValueSetter {
-        Time time;
+        Time time{Time::minVal()};
         int iteration = 0;
-        int index;
+        int index{-1};
         std::string type;
         std::string pubName;
         defV value;
     };
 
     struct MessageHolder {
-        Time sendTime;
-        int index;
+        Time sendTime{Time::minVal()};
+        int index{-1};
         Message mess;
     };
 
@@ -96,11 +96,11 @@ external protection, that will result in undefined behavior
         virtual void runTo(Time stopTime_input) override;
 
         /** add a publication to a Player
-    @param key the key of the publication to add
+    @param name the identifier of the publication to add
     @param type the type of the publication
     @param pubUnits the units associated with the publication
     */
-        void addPublication(std::string_view key,
+        void addPublication(std::string_view name,
                             DataType type,
                             std::string_view pubUnits = std::string_view());
 

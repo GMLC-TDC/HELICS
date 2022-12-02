@@ -82,16 +82,9 @@ int main(int argc, char* argv[])
 
         addBM<BarabasiAlbertFederate>(app, "barabasi-albert", "Barabasi-Albert benchmark federate");
 
-        auto ret = app.helics_parse(argc, argv);
-        if (ret != helics::helicsCLI11App::parse_output::ok) {
-            switch (ret) {
-                case helics::helicsCLI11App::parse_output::help_call:
-                case helics::helicsCLI11App::parse_output::help_all_call:
-                case helics::helicsCLI11App::parse_output::version_call:
-                    return 0;
-                default:
-                    return static_cast<int>(ret);
-            }
+        auto parseResult = app.helics_parse(argc, argv);
+        if (parseResult != helics::helicsCLI11App::ParseOutput::OK) {
+            return (static_cast<int>(parseResult) > 0) ? 0 : static_cast<int>(parseResult);
         }
 
         helics::FederateInfo fi;

@@ -95,11 +95,11 @@ else
             ;;
         *continuous*)
             TEST_CONFIG="Continuous"
-            CTEST_OPTIONS+=" --timeout 1000"
+            CTEST_OPTIONS+=" --timeout 420"
             ;;
         *ci*)
             TEST_CONFIG="Continuous"
-            CTEST_OPTIONS+=" --timeout 1000"
+            CTEST_OPTIONS+=" --timeout 420"
             ;;
         *)
             # Use whatever user gave for TEST_CONFIG
@@ -118,7 +118,7 @@ else
             ;;
         *)
             TEST_CONFIG="Continuous"
-            CTEST_OPTIONS+=" --timeout 600"
+            CTEST_OPTIONS+=" --timeout 420"
             ;;
         esac
     fi

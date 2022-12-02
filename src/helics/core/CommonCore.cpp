@@ -703,6 +703,25 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
     if (getBrokerState() >= BrokerState::OPERATING) {
         throw(RegistrationFailure("Core has already moved to operating state"));
     }
+    auto iloc = name.find("${");
+    std::string nname;
+    if (iloc != std::string_view::npos) {
+        /** this will block*/
+        nname = query("root",
+                      fmt::format("rename:{}", name),
+                      HelicsSequencingModes::HELICS_SEQUENCING_MODE_FAST);
+        if (name != nname) {
+            if (name.compare(0, iloc, nname) != 0 && nname.find("error") != std::string::npos) {
+                throw(RegistrationFailure(
+                    "automatic naming resulting in failure, may not be supported by broker"));
+            }
+            sendToLogger(parent_broker_id,
+                         HELICS_LOG_LEVEL_SUMMARY,
+                         getIdentifier(),
+                         fmt::format("generated name for fed {}->{}", name, nname));
+            name = nname;
+        }
+    }
     FederateState* fed = nullptr;
     bool checkProperties{false};
     LocalFederateId local_id;
@@ -711,6 +730,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
         if (static_cast<decltype(maxFederateCount)>(feds->size()) >= maxFederateCount) {
             throw(RegistrationFailure("maximum number of federates in the core has been reached"));
         }
+
         auto id = feds->insert(std::string(name), std::string(name), info);
         if (id) {
             local_id = LocalFederateId(static_cast<int32_t>(*id));
@@ -720,6 +740,7 @@ LocalFederateId CommonCore::registerFederate(std::string_view name, const CoreFe
                 fmt::format("duplicate names {} detected: multiple federates with the same name",
                             name)));
         }
+
         if (feds->size() == 1) {
             checkProperties = true;
         }
@@ -3163,7 +3184,8 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
             }
             break;
         case CMD_FED_ACK: {
-            auto* fed = getFederateCore(command.name());
+            FederateState* fed{nullptr};
+            fed = getFederateCore(command.name());
             if (fed != nullptr) {
                 if (checkActionFlag(command, error_flag)) {
                     LOG_ERROR(

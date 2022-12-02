@@ -104,10 +104,7 @@ class Input {
         return size;
     }
     /** get the size of the raw value */
-    int getByteCount()
-    {
-        return helicsInputGetByteCount(inp);
-    }
+    int getByteCount() { return helicsInputGetByteCount(inp); }
 
     /** get the size of the value as a string */
     int getStringSize()
@@ -158,10 +155,7 @@ class Input {
         name.resize(size);
     }
     /** get the current value as a 64 bit integer*/
-    int64_t getInteger()
-    {
-        return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR);
-    }
+    int64_t getInteger() { return helicsInputGetInteger(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a boolean*/
     bool getBoolean()
     {
@@ -169,10 +163,7 @@ class Input {
         return (val == HELICS_TRUE);
     }
     /** get the value as a double*/
-    double getDouble()
-    {
-        return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR);
-    }
+    double getDouble() { return helicsInputGetDouble(inp, HELICS_IGNORE_ERROR); }
     /** get the value as a complex number*/
     std::complex<double> getComplex()
     {
@@ -229,60 +220,30 @@ class Input {
 #endif
 
     /** Check if an input is updated **/
-    bool isUpdated() const
-    {
-        return (helicsInputIsUpdated(inp) > 0);
-    }
+    bool isUpdated() const { return (helicsInputIsUpdated(inp) > 0); }
 
     /** Get the last time an input was updated **/
-    HelicsTime getLastUpdateTime() const
-    {
-        return helicsInputLastUpdateTime(inp);
-    }
+    HelicsTime getLastUpdateTime() const { return helicsInputLastUpdateTime(inp); }
 
     /** clear the updated flag*/
-    void clearUpdate()
-    {
-        helicsInputClearUpdate(inp);
-    }
+    void clearUpdate() { helicsInputClearUpdate(inp); }
     // call helicsInputIsUpdated for each inp
 
     /** get the Name for the input
    @details the name is full name vs the local one for non-global interfaces*/
-    const char* getName() const
-    {
-        return helicsInputGetName(inp);
-    }
+    const char* getName() const { return helicsInputGetName(inp); }
     /** get the units associated with a input*/
-    const char* getUnits() const
-    {
-        return helicsInputGetExtractionUnits(inp);
-    }
+    const char* getUnits() const { return helicsInputGetExtractionUnits(inp); }
     /** get the units associated with an inputs publication*/
-    const char* getInjectionUnits() const
-    {
-        return helicsInputGetInjectionUnits(inp);
-    }
+    const char* getInjectionUnits() const { return helicsInputGetInjectionUnits(inp); }
     /** get the units associated with a publication of an input*/
-    const char* getPublicationType() const
-    {
-        return helicsInputGetPublicationType(inp);
-    }
+    const char* getPublicationType() const { return helicsInputGetPublicationType(inp); }
     /** get the type of the input*/
-    const char* getType() const
-    {
-        return helicsInputGetType(inp);
-    }
+    const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
-    const char* getTarget() const
-    {
-        return helicsSubscriptionGetTarget(inp);
-    }
+    const char* getTarget() const { return helicsSubscriptionGetTarget(inp); }
     /** get the interface information field of the input`*/
-    const char* getInfo() const
-    {
-        return helicsInputGetInfo(inp);
-    }
+    const char* getInfo() const { return helicsInputGetInfo(inp); }
     /** set the interface information field of the input*/
     void setInfo(const std::string& info)
     {
@@ -302,10 +263,7 @@ class Input {
     {
         helicsInputSetOption(inp, option, value, HELICS_IGNORE_ERROR);
     }
-    int32_t getOption(int32_t option)
-    {
-        return helicsInputGetOption(inp, option);
-    }
+    int32_t getOption(int32_t option) { return helicsInputGetOption(inp, option); }
 
   private:
     HelicsInput inp;  //!< the reference to the underlying publication

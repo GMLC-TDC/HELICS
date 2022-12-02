@@ -2539,7 +2539,8 @@ std::string FederateState::processQueryActual(std::string_view query) const
     if (query == "global_time_debugging") {
         Json::Value base;
         addHeader(base);
-        base["state"] = fedStateString(state.load());
+        base["federate_state"] = fedStateString(state.load());
+        base["granted_mode"] = timeGranted_mode;
         if (!timeCoord->empty()) {
             timeCoord->generateDebuggingTimeInfo(base);
         }

@@ -23,6 +23,10 @@ set(HELICS_BENCHMARKS
     barabasiAlbertBenchmarks
 )
 
+if(HELICS_ENABLE_TCP_CORE)
+    list(APPEND HELICS_BENCHMARKS TcpFederate)
+endif()
+
 set(HELICS_MULTINODE_BENCHMARKS
     PholdFederate
     MessageExchangeFederate

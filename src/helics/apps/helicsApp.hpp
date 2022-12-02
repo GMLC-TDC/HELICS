@@ -77,12 +77,12 @@ threads without external protection, that will result in undefined behavior
         virtual ~App();
 
         /** load a file containing publication information
-    @param filename the file containing the configuration and Player data  accepted format are JSON,
-    xml, and a Player format which is tab delimited or comma delimited*/
+    @param filename the file containing the configuration and App data  accepted format are JSON,
+    xml, and a App format which is tab delimited or comma delimited*/
         void loadFile(const std::string& filename);
-        /** initialize the Player federate
+        /** initialize the App federate
     @details generate all the publications and organize the points, the final publication count will
-    be available after this time and the Player will enter the initialization mode, which means it
+    be available after this time and the App will enter the initialization mode, which means it
     will not be possible to add more publications calling run will automatically do this if
     necessary
     */
@@ -127,8 +127,8 @@ threads without external protection, that will result in undefined behavior
                          std::string_view defaultAppName);
 
       protected:
-        std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the Player
-        Time stopTime = Time::maxVal();  //!< the time the Player should stop
+        std::shared_ptr<CombinationFederate> fed;  //!< the federate created for the App
+        Time stopTime = Time::maxVal();  //!< the time the App should stop
         std::string masterFileName;  //!< the name of the master file used to do the construction
         bool useLocal{false};
         bool fileLoaded{false};

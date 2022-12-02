@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #pragma once
 
 #define CLI11_EXPERIMENTAL_OPTIONAL 0
+#define CLI11_HAS_FILESYSTEM 1
 #include "helics/external/CLI11/CLI11.hpp"
 #undef CLI11_EXPERIMENTAL_OPTIONAL
 
@@ -54,23 +55,25 @@ class helicsCLI11App: public CLI::App {
                                                                   "silence most print output");
     }
 
-    enum class parse_output : int {
-        ok = 0,
-        help_call = 1,
-        help_all_call = 2,
-        version_call = 4,
-        parse_error = -4,
+    enum class ParseOutput : int {
+        PARSE_ERROR = -4,
+        OK = 0,
+        HELP_CALL = 1,
+        HELP_ALL_CALL = 2,
+        VERSION_CALL = 4,
+        SUCCESS_TERMINATION = 7
+
     };
     bool quiet{false};
     bool passConfig{true};
-    parse_output last_output{parse_output::ok};
+    ParseOutput last_output{ParseOutput::OK};
 
     template<typename... Args>
-    parse_output helics_parse(Args&&... args) noexcept
+    ParseOutput helics_parse(Args&&... args) noexcept
     {
         try {
             parse(std::forward<Args>(args)...);
-            last_output = parse_output::ok;
+            last_output = ParseOutput::OK;
             remArgs = remaining_for_passthrough();
             if (passConfig) {
                 auto* opt = get_option_no_throw("--config");
@@ -79,39 +82,36 @@ class helicsCLI11App: public CLI::App {
                     remArgs.emplace_back("--config");
                 }
             }
-
-            return parse_output::ok;
         }
         catch (const CLI::CallForHelp& ch) {
             if (!quiet) {
                 exit(ch);
             }
-            last_output = parse_output::help_call;
-            return parse_output::help_call;
+            last_output = ParseOutput::HELP_CALL;
         }
         catch (const CLI::CallForAllHelp& ca) {
             if (!quiet) {
                 exit(ca);
             }
-            last_output = parse_output::help_all_call;
-            return parse_output::help_all_call;
+            last_output = ParseOutput::HELP_ALL_CALL;
         }
         catch (const CLI::CallForVersion& cv) {
             if (!quiet) {
                 exit(cv);
             }
-            last_output = parse_output::version_call;
-            return parse_output::version_call;
+            last_output = ParseOutput::VERSION_CALL;
+        }
+        catch (const CLI::Success& /*sc*/) {
+            last_output = ParseOutput::SUCCESS_TERMINATION;
         }
         catch (const CLI::Error& ce) {
             CLI::App::exit(ce);
-            last_output = parse_output::parse_error;
-            return parse_output::parse_error;
+            last_output = ParseOutput::PARSE_ERROR;
         }
         catch (...) {
-            last_output = parse_output::parse_error;
-            return parse_output::parse_error;
+            last_output = ParseOutput::PARSE_ERROR;
         }
+        return last_output;
     }
     std::vector<std::string>& remainArgs() { return remArgs; }
     void remove_helics_specifics()
@@ -137,6 +137,16 @@ class helicsCLI11App: public CLI::App {
             });
         }
         cbacks.push_back(std::move(cback));
+    }
+    void addSystemInfoCall()
+    {
+        add_flag_callback(
+            "--system",
+            []() {
+                std::cout << helics::systemInfo() << std::endl;
+                throw CLI::Success{};
+            },
+            "display system information details");
     }
 
     void addTypeOption(bool includeEnvironmentVariable = true)

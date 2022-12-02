@@ -6,6 +6,7 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 
 #include "helics/application_api/ValueFederate.hpp"
+#include "helics/apps/RestApiConnection.hpp"
 #include "helics/apps/helicsWebServer.hpp"
 #include "helics/common/JsonProcessingFunctions.hpp"
 #include "helics/core/BrokerFactory.hpp"
@@ -15,13 +16,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "gtest/gtest.h"
 #include <algorithm>
-#include <boost/asio/connect.hpp>
-#include <boost/asio/strand.hpp>
-#include <boost/beast/core.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/version.hpp>
-#include <boost/config.hpp>
-#include <boost/container/flat_map.hpp>
 #include <cstdlib>
 #include <fstream>
 #include <functional>
@@ -33,11 +27,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 #include <vector>
 
-namespace beast = boost::beast;  // from <boost/beast.hpp>
-namespace http = beast::http;  // from <boost/beast/http.hpp>
-namespace net = boost::asio;  // from <boost/asio.hpp>
-using tcp = boost::asio::ip::tcp;  // from <boost/asio/ip/tcp.hpp>
 using namespace helics::fileops;
+namespace http = boost::beast::http;  // from <boost/beast/http.hpp>
 
 const constexpr char localhost[] = "localhost";
 
@@ -56,15 +47,7 @@ class httpTest: public ::testing::Test {
 
         webs->startServer(&config, webs);
 
-        // These objects perform our I/O
-        tcp::resolver resolverObj(ioc);
-        stream = std::make_unique<beast::tcp_stream>(ioc);  // NOLINT
-
-        // Look up the domain name
-        auto const results = resolverObj.resolve(localhost, "26242");
-
-        // Make the connection on the IP address we get from a lookup
-        stream->connect(results);
+        connection.connect(localhost, "26242");
     }
 
     // Per-test-suite tear-down.
@@ -72,70 +55,21 @@ class httpTest: public ::testing::Test {
     // Can be omitted if not needed.
     static void TearDownTestSuite()
     {
-        beast::error_code ec;
-        stream->socket().shutdown(tcp::socket::shutdown_both, ec);
+        connection.disconnect();
         webs->stopServer();
         helics::BrokerFactory::terminateAllBrokers();
-        stream.reset();
     }
 
     // You can define per-test set-up logic as usual.
     void SetUp() final {}
 
-    static std::string sendGet(const std::string& target)
+    static std::string sendGet(const std::string& target) { return connection.sendGet(target); }
+
+    static std::string sendCommand(boost::beast::http::verb command,
+                                   const std::string& target,
+                                   const std::string& body)
     {
-        // Set up an HTTP GET request message
-        http::request<http::string_body> req{http::verb::get, target, 11};
-        req.set(http::field::host, localhost);
-        req.set(http::field::user_agent, "HELICS_HTTP_TEST");
-
-        // Send the HTTP request to the remote host
-        http::write(*stream, req);
-
-        // Declare a container to hold the response
-        http::response<http::string_body> res;
-
-        // Receive the HTTP response
-        http::read(*stream, buffer, res);
-        return res.body();
-    }
-
-    static std::string
-        sendCommand(http::verb command, const std::string& target, const std::string& body)
-    {
-        // Set up an HTTP command message
-        http::request<http::string_body> req{command, target, 11};
-        req.set(http::field::host, localhost);
-        req.set(http::field::user_agent, "HELICS_HTTP_TEST");
-        if (!body.empty()) {
-            if (body.front() == '{') {
-                req.set(http::field::content_type, "application/json");
-            } else {
-                req.set(http::field::content_type, "text/plain");
-            }
-            req.body() = body;
-            req.prepare_payload();
-        }
-        // Send the HTTP request to the remote host
-        http::write(*stream, req);
-        if (command == http::verb::head) {
-            // Declare a container to hold the response
-            http::response_parser<http::empty_body> res;
-            res.skip(true);
-            // Receive the HTTP response
-            http::read(*stream, buffer, res);
-            return (res.content_length()) ? std::to_string(*res.content_length()) :
-                                            std::string("0");
-        }
-        // Declare a container to hold the response
-        http::response<http::string_body> res;
-
-        // Receive the HTTP response
-        http::read(*stream, buffer, res);
-        if (res.result() == http::status::not_found) {
-            return "#invalid";
-        }
-        return res.body();
+        return connection.sendCommand(command, target, body);
     }
 
     static std::shared_ptr<helics::Broker> addBroker(helics::CoreType ctype,
@@ -172,12 +106,7 @@ class httpTest: public ::testing::Test {
   private:
     // Some expensive resource shared by all tests.
     static std::shared_ptr<helics::apps::WebServer> webs;
-    static net::io_context ioc;
-
-    // These objects perform our I/O
-
-    static std::unique_ptr<beast::tcp_stream> stream;
-    static beast::flat_buffer buffer;
+    static helics::apps::RestApiConnection connection;
 
     static std::vector<std::shared_ptr<helics::Broker>> brks;
     static std::vector<std::shared_ptr<helics::Core>> cores;
@@ -188,9 +117,7 @@ class httpTest: public ::testing::Test {
 std::shared_ptr<helics::apps::WebServer> httpTest::webs;
 std::vector<std::shared_ptr<helics::Broker>> httpTest::brks;
 std::vector<std::shared_ptr<helics::Core>> httpTest::cores;
-beast::flat_buffer httpTest::buffer;
-std::unique_ptr<beast::tcp_stream> httpTest::stream;
-net::io_context httpTest::ioc;
+helics::apps::RestApiConnection httpTest::connection(localhost);
 Json::Value httpTest::config;
 
 TEST_F(httpTest, test1)

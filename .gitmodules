@@ -7,7 +7,7 @@
 [submodule "ThirdParty/containers"]
     path = ThirdParty/containers
     url = ../../GMLC-TDC/containers.git
-    branch = master
+    branch = main
 [submodule "ThirdParty/concurrency"]
     path = ThirdParty/concurrency
     url = ../../GMLC-TDC/concurrency.git

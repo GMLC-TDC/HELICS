@@ -20,7 +20,7 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
     Json::CharReaderBuilder rbuilder;
     rbuilder["collectComments"] = false;
     std::string errs;
-    if (!skip_json_) {
+    if (!mSkipJson) {
         Json::Value config;
         if (Json::parseFromStream(rbuilder, input, &config, &errs)) {
             if (!section().empty()) {
@@ -32,11 +32,14 @@ std::vector<CLI::ConfigItem> HelicsConfigJSON::from_config(std::istream& input) 
                     if (config.isNull()) {
                         return {};
                     }
-                } else if (!fallback_to_default_) {
+                } else if (!mFallbackToDefault) {
                     return {};
                 }
             }
             return fromConfigInternal(config);
+        }
+        if (mThrowJsonErrors && !errs.empty()) {
+            throw(CLI::FileError(errs));
         }
     }
     return ConfigBase::from_config(input);
@@ -108,6 +111,11 @@ HelicsConfigJSON* addJsonConfig(CLI::App* app)
                     "specify the section index of the config file to use for configuration arrays")
         ->configurable(false)
         ->trigger_on_parse();
+    app->get_config_ptr()->check([fmtr](const std::string& filename) {
+        fmtr->skipJson(!fileops::hasJsonExtension(filename));
+        return std::string{};
+    });
+
     app->config_formatter(std::move(fmtr));
     return fmtrRet;
 }

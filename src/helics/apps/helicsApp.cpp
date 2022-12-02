@@ -56,10 +56,10 @@ void App::processArgs(std::unique_ptr<helicsCLI11App>& app,
 {
     remArgs = app->remaining_for_passthrough();
     auto ret = app->last_output;
-    if (ret == helicsCLI11App::parse_output::help_call) {
+    if (ret == helicsCLI11App::ParseOutput::HELP_CALL) {
         helpMode = true;
     }
-    if (ret != helicsCLI11App::parse_output::ok) {
+    if (ret != helicsCLI11App::ParseOutput::OK) {
         deactivated = true;
         return;
     }
@@ -122,8 +122,7 @@ std::unique_ptr<helicsCLI11App> App::generateParser()
 
 void App::loadFile(const std::string& filename)
 {
-    auto ext = filename.substr(filename.find_last_of('.'));
-    if ((ext == ".json") || (ext == ".JSON")) {
+    if (fileops::hasJsonExtension(filename)) {
         loadJsonFile(filename);
     } else {
         loadTextFile(filename);

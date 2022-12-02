@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "MultiBroker.hpp"
 
+#include "../common/JsonProcessingFunctions.hpp"
 #include "../core/BrokerFactory.hpp"
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsCLI11JsonConfig.hpp"

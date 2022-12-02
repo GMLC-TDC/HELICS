@@ -16,10 +16,12 @@ them using the jsoncpp library
 #include "json/json.h"
 #include <functional>
 #include <string>
+#include <string_view>
+
 namespace helics::fileops {
 
 /** check if the file has a valid JSON extension*/
-bool hasJsonExtension(const std::string& jsonString);
+bool hasJsonExtension(std::string_view jsonString);
 
 /** load a JSON string or filename that points to a JSON file and return a
 JSON::Value to the root object
