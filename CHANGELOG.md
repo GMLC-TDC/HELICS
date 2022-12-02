@@ -11,7 +11,7 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.3.2][] ~ 2022-12-02
 
-Patch release to fix some testing issues and add some network probing capabilities and remote terminal connections.  
+Patch release to fix some testing issues and add some network probing capabilities and remote terminal connections.
 
 ### Fixed
 
@@ -21,7 +21,7 @@ Patch release to fix some testing issues and add some network probing capabiliti
 
 - Update containers library
 - Update the units library
-- Split the application API tests in a set of 4 smaller tests to reduce test runtime and ease maintenance. 
+- Split the application API tests in a set of 4 smaller tests to reduce test runtime and ease maintenance.
 
 ### Added
 
