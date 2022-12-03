@@ -97,7 +97,7 @@ HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* k
 HelicsPublication
     helicsFederateRegisterTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err)
 {
-    // now generate a generic subscription
+    // now generate a generic input
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -147,7 +147,7 @@ HelicsPublication
 HelicsPublication
     helicsFederateRegisterGlobalTypePublication(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err)
 {
-    // now generate a generic subscription
+    // now generate a generic input
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -195,7 +195,7 @@ HelicsPublication
 
 HelicsInput helicsFederateRegisterTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err)
 {
-    // now generate a generic subscription
+    // now generate a generic input
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -245,7 +245,7 @@ HelicsInput helicsFederateRegisterInput(HelicsFederate fed, const char* key, Hel
 HelicsInput
     helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err)
 {
-    // now generate a generic subscription
+    // now generate a generic input
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
         return nullptr;
@@ -435,9 +435,14 @@ HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsE
     // LCOV_EXCL_STOP
 }
 
-static constexpr char invalidSubKey[] = "the specified subscription target is a not a recognized";
+static constexpr char invalidTargetKey[] = "the specified input target is a not a recognized";
 
 HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* target, HelicsError* err)
+{
+    return helicsFederateGetInputByTarget(fed, target, err);
+}
+
+HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* target, HelicsError* err)
 {
     auto fedObj = getValueFedSharedPtr(fed, err);
     if (!fedObj) {
@@ -445,9 +450,9 @@ HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* target
     }
     CHECK_NULL_STRING(target, nullptr);
     try {
-        auto& id = fedObj->getSubscription(target);
+        auto& id = fedObj->getInputByTarget(target);
         if (!id.isValid()) {
-            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidSubKey);
+            assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTargetKey);
             return nullptr;
         }
         auto inp = std::make_unique<helics::InputObject>();
@@ -1248,9 +1253,9 @@ const char* helicsInputGetName(HelicsInput inp)
     // LCOV_EXCL_STOP
 }
 
-const char* helicsSubscriptionGetTarget(HelicsInput sub)
+const char* helicsInputGetTarget(HelicsInput ipt)
 {
-    auto* inpObj = verifyInput(sub, nullptr);
+    auto* inpObj = verifyInput(ipt, nullptr);
     if (inpObj == nullptr) {
         return gHelicsEmptyStr.c_str();
     }
@@ -1264,6 +1269,11 @@ const char* helicsSubscriptionGetTarget(HelicsInput sub)
         return gHelicsEmptyStr.c_str();
     }
     // LCOV_EXCL_STOP
+}
+
+const char* helicsSubscriptionGetTarget(HelicsInput ipt)
+{
+    return helicsInputGetTarget(ipt);
 }
 
 const char* helicsPublicationGetName(HelicsPublication pub)

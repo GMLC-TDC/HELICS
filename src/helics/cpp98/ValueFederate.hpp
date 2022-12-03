@@ -433,13 +433,20 @@ class ValueFederate: public virtual Federate {
         return registerGlobalInput(indexed_name, type, units);
     }
 
-    /** get an input by index*/
+    /** get an input by name*/
     Input getInput(const std::string& name)
     {
         return Input(helicsFederateGetInput(fed, name.c_str(), hThrowOnError()));
     }
-    /** get a subscription by index*/
-    Input getSubscription(int index)
+
+    /** get an input by target*/
+    Input getInputByTarget(const std::string& target)
+    {
+        return Input(helicsFederateGetInputByTarget(fed, target.c_str(), hThrowOnError()));
+    }
+
+    /** get an input by index*/
+    Input getInput(int index)
     {
         return Input(helicsFederateGetInputByIndex(fed, index, hThrowOnError()));
     }
@@ -448,7 +455,7 @@ class ValueFederate: public virtual Federate {
     /** get the number of publications in this federate*/
     int getPublicationCount() const { return helicsFederateGetPublicationCount(fed); }
     // TODO(PT): use c api to implement this method... callbacks too?
-    /** Get a list of all subscriptions with updates since the last call **/
+    /** Get a list of all inputs with updates since the last call **/
     std::vector<HelicsInput> queryUpdates() { return std::vector<HelicsInput>(); }
 
     /** clear all the update flags from all federate inputs*/

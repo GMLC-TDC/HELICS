@@ -150,10 +150,10 @@ TEST_P(valuefed_add_single_type_tests_ci_skip, subscription_registration)
 
     EXPECT_EQ(subid3.getExtractionUnits(), "V");
 
-    EXPECT_TRUE(vFed1->getSubscription("sub1").getHandle() == subid.getHandle());
-    EXPECT_TRUE(vFed1->getSubscription("sub2").getHandle() == subid2.getHandle());
+    EXPECT_TRUE(vFed1->getInputByTarget("sub1").getHandle() == subid.getHandle());
+    EXPECT_TRUE(vFed1->getInputByTarget("sub2").getHandle() == subid2.getHandle());
 
-    EXPECT_TRUE(vFed1->getSubscription("Shortcut").getHandle() == subid.getHandle());
+    EXPECT_TRUE(vFed1->getInputByTarget("Shortcut").getHandle() == subid.getHandle());
 
     vFed1->finalize();
 
@@ -1045,7 +1045,7 @@ TEST(valuefederate, indexed_pubs)
     EXPECT_TRUE(pg4.isValid());
     EXPECT_EQ(pg4.getName(), pz.getName());
 
-    auto& gs = cFed.getSubscription("pubg");
+    auto& gs = cFed.getInputByTarget("pubg");
     EXPECT_TRUE(gs.isValid());
     EXPECT_EQ(gs.getTarget(), "pubg");
 

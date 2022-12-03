@@ -156,17 +156,18 @@ class ValueFederateManager {
 
     /** get an Input from Its Name
     @param key the identifier or shortcut of the input
-    @return ivalid_input_id if name is not a recognized*/
+    @return an empty Input if name is not a recognized */
     Input& getInput(std::string_view key);
     const Input& getInput(std::string_view key) const;
     /** get an input by index*/
     Input& getInput(int index);
     const Input& getInput(int index) const;
-    /** get the id of a subscription
-    @param key the target of a subscription
-    @return ivalid_input_id if name is not a recognized*/
-    const Input& getSubscription(std::string_view key) const;
-    Input& getSubscription(std::string_view key);
+
+    /** get the id of an by the target name
+    @param key the target of a input
+    @return an invalid input if the target is not found*/
+    const Input& getInputByTarget(std::string_view key) const;
+    Input& getInputByTarget(std::string_view key);
 
     /** get a publication based on its key
     @param key the publication id
