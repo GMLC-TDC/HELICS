@@ -156,7 +156,7 @@ class ValueFederateManager {
 
     /** get an Input from Its Name
     @param key the identifier or shortcut of the input
-    @return and empty Input if name is not a recognized*/
+    @return an empty Input if name is not a recognized */
     Input& getInput(std::string_view key);
     const Input& getInput(std::string_view key) const;
     /** get an input by index*/
