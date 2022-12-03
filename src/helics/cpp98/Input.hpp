@@ -241,10 +241,7 @@ class Input {
     /** get the type of the input*/
     const char* getType() const { return helicsInputGetType(inp); }
     /** get an associated target*/
-    const char* getTarget() const
-    {
-        return helicsInputGetTarget(inp);
-    }
+    const char* getTarget() const { return helicsInputGetTarget(inp); }
     /** get the interface information field of the input`*/
     const char* getInfo() const { return helicsInputGetInfo(inp); }
     /** set the interface information field of the input*/
