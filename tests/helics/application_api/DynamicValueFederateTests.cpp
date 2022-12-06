@@ -256,7 +256,7 @@ TEST_F(dynFed, dynamicPubSubs_2fed_pubStore)
 
     auto& in2 = vFed1->registerSubscription("pub2");
 
-    auto res = vFed2->query("root", "global_flush");
+    vFed2->query("root", "global_flush");
     vFed1->requestTimeAsync(helics::timeZero);
     vFed2->requestNextStep();
     auto tres = vFed1->requestTimeComplete();
