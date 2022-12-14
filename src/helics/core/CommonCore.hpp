@@ -101,7 +101,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool enterInitializingMode(LocalFederateId federateID,
                                        IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
-    virtual IterationResult
+    virtual iteration_time
         enterExecutingMode(LocalFederateId federateID,
                            IterationRequest iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(std::string_view name,
@@ -393,7 +393,9 @@ class CommonCore: public Core, public BrokerBase {
     /** function for routing a message from based on the destination specified in the
      * ActionMessage*/
     void routeMessage(ActionMessage&& cmd);
-
+    /** check that a new interface is valid and is allowed to be created*/
+    FederateState*
+        checkNewInterface(LocalFederateId federateID, std::string_view key, InterfaceType type);
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** deal with a query response addressed to this core*/

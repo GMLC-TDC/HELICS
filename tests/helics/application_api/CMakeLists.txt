@@ -22,6 +22,7 @@ set(valueFederate_test_sources
     ValueFederateDualTransfer.cpp
     helicsTypeTests.cpp
     MultiInputTests.cpp
+    DynamicValueFederateTests.cpp
 )
 
 set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp
@@ -58,7 +59,7 @@ add_executable(
 )
 
 add_executable(
-    filterTranslatorTests ${filterTranslator_test_sources_test_sources} ${common_test_headers}
+    filterTranslatorTests ${filterTranslator_test_sources} ${common_test_headers}
                           ${common_test_sources}
 )
 

@@ -208,7 +208,7 @@ void ZmqComms::queue_rx_function()
                         if (serverMode) {
                             repSocket.setsockopt(ZMQ_LINGER, 500);
                         }
-                        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                        std::this_thread::sleep_for(std::chrono::milliseconds(100));
                         bindsuccess = bindzmqSocket(repSocket,
                                                     localTargetAddress,
                                                     PortNumber + 1,
@@ -216,6 +216,7 @@ void ZmqComms::queue_rx_function()
                         if (bindsuccess) {
                             notConnected = false;
                         } else {
+                            repSocket.close();
                             if (cnt >= 10) {
                                 break;
                             }

@@ -192,10 +192,9 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
 void MessageFederateManager::startupToInitializeStateTransition() {}
 
-void MessageFederateManager::initializeToExecuteStateTransition(IterationResult result)
+void MessageFederateManager::initializeToExecuteStateTransition(iteration_time result)
 {
-    Time ctime = result == IterationResult::NEXT_STEP ? timeZero : initializationTime;
-    updateTime(ctime, initializationTime);
+    updateTime(result.grantedTime, initializationTime);
 }
 
 std::string MessageFederateManager::localQuery(std::string_view queryStr) const

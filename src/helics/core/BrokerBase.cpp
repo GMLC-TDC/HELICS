@@ -176,6 +176,13 @@ std::shared_ptr<helicsCLI11App> BrokerBase::generateBaseCLI()
     hApp->add_flag("--observer",
                    observer,
                    "specify that the broker/core should be added as an observer only");
+    hApp->add_flag("--dynamic",
+                   dynamicFederation,
+                   "specify that the broker/core should allow dynamic federates");
+    hApp->add_flag(
+        "--disable_dynamic_sources",
+        disableDynamicSources,
+        "specify that the data sources must be registered before entering Initializing mode");
     hApp->add_flag("--json",
                    useJsonSerialization,
                    "use the JSON serialization mode for communications");

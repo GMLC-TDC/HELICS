@@ -24,6 +24,7 @@ namespace helics {
 */
 class HandleManager {
   private:
+    using mapType = std::unordered_map<std::string_view, InterfaceHandle>;
     /** use deque here as there are several use cases which use two properties of a deque vs vector
     namely that references are not invalidated by emplace back, which is unlike a vector
     and that the memory growth is a stable and not subject to large copy operations
@@ -33,12 +34,11 @@ class HandleManager {
     container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
     /// map of all local publications
-    std::unordered_map<std::string_view, InterfaceHandle> publications;
+    mapType publications;
     /// map of all local endpoints
-    std::unordered_map<std::string_view, InterfaceHandle> endpoints;
-    std::unordered_map<std::string_view, InterfaceHandle> inputs;  //!< map of all local endpoints
-    std::unordered_map<std::string_view, InterfaceHandle> filters;  //!< map of all local endpoints
-    std::unordered_map<std::string_view, InterfaceHandle> translators;  //!< map of all translators
+    mapType endpoints;
+    mapType inputs;  //!< map of all local endpoints
+    mapType filters;  //!< map of all local endpoints
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
     /// set of all valid aliases <interface_name,aliases>
     std::unordered_map<std::string_view, std::vector<std::string_view>> aliases;
@@ -82,36 +82,16 @@ class HandleManager {
 
     int32_t getHandleOption(InterfaceHandle handle, int32_t option) const;
     /** get an endpoint from its name*/
-    BasicHandleInfo* getEndpoint(std::string_view name);
+    BasicHandleInfo* getInterfaceHandle(std::string_view name, InterfaceType type);
     /** get an endpoint from its name*/
-    const BasicHandleInfo* getEndpoint(std::string_view name) const;
+    const BasicHandleInfo* getInterfaceHandle(std::string_view name, InterfaceType type) const;
     /** get an endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    BasicHandleInfo* getEndpoint(InterfaceHandle handle);
+    BasicHandleInfo* getInterfaceHandle(InterfaceHandle handle, InterfaceType type);
     /** get a const endpoint by index
     @return nullptr if the index doesn't point to a valid endpoint*/
-    const BasicHandleInfo* getEndpoint(InterfaceHandle handle) const;
-    /** get a const filter by name*/
-    const BasicHandleInfo* getFilter(std::string_view name) const;
-    BasicHandleInfo* getFilter(std::string_view name);
-    /** get a filter by index
-    @return nullptr if the index doesn't point to a valid filter*/
-    BasicHandleInfo* getFilter(InterfaceHandle handle);
+    const BasicHandleInfo* getInterfaceHandle(InterfaceHandle handle, InterfaceType type) const;
 
-    const BasicHandleInfo* getTranslator(std::string_view name) const;
-    BasicHandleInfo* getTranslator(std::string_view name);
-    /** get a translator by index
-    @return nullptr if the index doesn't point to a valid translator*/
-    BasicHandleInfo* getTranslator(InterfaceHandle handle);
-
-    /** get a publication by name*/
-    BasicHandleInfo* getPublication(std::string_view name);
-    const BasicHandleInfo* getPublication(std::string_view name) const;
-    /** get a publication by index
-    @return nullptr if the index doesn't point to a valid publication*/
-    BasicHandleInfo* getPublication(InterfaceHandle handle);
-    BasicHandleInfo* getInput(std::string_view name);
-    const BasicHandleInfo* getInput(std::string_view name) const;
     LocalFederateId getLocalFedID(InterfaceHandle handle) const;
 
     BasicHandleInfo& operator[](size_t index) { return handles[index]; }

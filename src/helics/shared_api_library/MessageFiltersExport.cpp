@@ -115,8 +115,8 @@ HelicsFilter helicsCoreRegisterFilter(HelicsCore cr, HelicsFilterTypes type, con
     }
     catch (...) {
         helicsErrorHandler(err);
+        return nullptr;
     }
-    return nullptr;
 }
 
 HelicsFilter helicsFederateRegisterCloningFilter(HelicsFederate fed, const char* name, HelicsError* err)

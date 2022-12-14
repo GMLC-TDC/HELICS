@@ -79,8 +79,10 @@ enum ConnectionFlags : uint16_t {
     use_json_serialization_flag = 6,
     /// flag indicating use of asynchronous timing on a global level
     async_timing_flag = 7,
-    /// flag indicating that a federate is an observer only
+    /// flag indicating that the connection is an observer only
     observer_flag = 8,
+    /// flag indicating that the connection allows joining dynamically
+    dynamic_join_flag = 9,
     /// flag indicating that a broker/federate is disconnected
     disconnected_flag = 12,
     /// flag indicating this is a test connection

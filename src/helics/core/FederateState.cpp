@@ -502,7 +502,7 @@ IterationResult FederateState::enterInitializingMode(IterationRequest request)
     return ret;
 }
 
-IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool sendRequest)
+iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
@@ -531,7 +531,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
             }
         }
 #endif
-        return static_cast<IterationResult>(ret);
+        return {time_granted, static_cast<IterationResult>(ret)};
     }
 
     // if this is not true then try again the core may have been handing something short so try
@@ -564,7 +564,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
             ret = IterationResult::NEXT_STEP;
             break;
     }
-    return ret;
+    return {time_granted, ret};
 }
 
 void FederateState::updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate)

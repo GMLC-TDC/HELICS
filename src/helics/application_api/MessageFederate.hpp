@@ -88,7 +88,7 @@ class HELICS_CXX_EXPORT MessageFederate:
 
   protected:
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition(IterationResult result) override;
+    virtual void initializeToExecuteStateTransition(iteration_time result) override;
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual std::string localQuery(std::string_view queryStr) const override;
 

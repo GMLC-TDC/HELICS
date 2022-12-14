@@ -102,10 +102,10 @@ bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/, IterationR
     return false;
 }
 
-IterationResult EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
-                                              IterationRequest /*iterate*/)
+iteration_time EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
+                                             IterationRequest /*iterate*/)
 {
-    return IterationResult::HALTED;
+    return {Time::maxVal(), IterationResult::HALTED};
 }
 
 LocalFederateId EmptyCore::registerFederate(std::string_view /*name*/,

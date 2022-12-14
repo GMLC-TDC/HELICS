@@ -58,7 +58,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         }
         case CMD_INIT_GRANT:
             if (state == FederateStates::CREATED) {
-                if (checkActionFlag(cmd, observer_flag)) {
+                if (checkActionFlag(cmd, observer_flag) ||
+                    checkActionFlag(cmd, dynamic_join_flag)) {
                     timeCoord->setDynamicJoining();
                 }
                 if (checkActionFlag(cmd, iteration_requested_flag)) {

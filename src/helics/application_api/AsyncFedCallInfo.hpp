@@ -18,7 +18,7 @@ class AsyncFedCallInfo {
     /**future for the Enter initialization call*/
     std::future<bool> initFuture;
     /** future for the enter execution mode call*/
-    std::future<IterationResult> execFuture;
+    std::future<iteration_time> execFuture;
     /** future for the timeRequest call*/
     std::future<Time> timeRequestFuture;
     /** future for the time request iterative call*/
