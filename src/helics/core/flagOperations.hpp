@@ -81,7 +81,7 @@ enum ConnectionFlags : uint16_t {
     async_timing_flag = 7,
     /// flag indicating that the connection is an observer only
     observer_flag = 8,
-    /// flag indicating that the connection joining dynamically
+    /// flag indicating that the connection allows joining dynamically
     dynamic_join_flag = 9,
     /// flag indicating that a broker/federate is disconnected
     disconnected_flag = 12,
