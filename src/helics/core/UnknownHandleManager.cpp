@@ -61,10 +61,10 @@ void UnknownHandleManager::addDestinationFilterLink(std::string_view filter,
 }
 
 static auto
-    getTargets(const std::unordered_multimap<std::string, UnknownHandleManager::targetInfo>& tmap,
+    getTargets(const std::unordered_multimap<std::string, UnknownHandleManager::TargetInfo>& tmap,
                const std::string& target)
 {
-    std::vector<UnknownHandleManager::targetInfo> targets;
+    std::vector<UnknownHandleManager::TargetInfo> targets;
     auto rp = tmap.equal_range(target);
     if (rp.first != tmap.end()) {
         auto it = rp.first;
@@ -92,13 +92,13 @@ static auto getTargets(const std::unordered_multimap<std::string, std::string>& 
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo>
+std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForInputs(const std::string& newInput) const
 {
     return getTargets(unknown_inputs, newInput);
 }
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo>
+std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForPublications(const std::string& newPublication) const
 {
     return getTargets(unknown_publications, newPublication);
@@ -116,14 +116,14 @@ std::vector<std::string>
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo>
+std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForEndpoints(const std::string& newEndpoint) const
 {
     return getTargets(unknown_endpoints, newEndpoint);
 }
 
 /** specify a found input*/
-std::vector<UnknownHandleManager::targetInfo>
+std::vector<UnknownHandleManager::TargetInfo>
     UnknownHandleManager::checkForFilters(const std::string& newFilter) const
 {
     return getTargets(unknown_filters, newFilter);
@@ -209,74 +209,74 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
 }
 
 void UnknownHandleManager::processUnknowns(
-    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
+    const std::function<void(const std::string&, InterfaceType, TargetInfo )>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
-        cfunc(upub.first, 'p', upub.second.first);
+        cfunc(upub.first, InterfaceType::PUBLICATION, upub.second);
     }
     for (const auto& uept : unknown_endpoints) {
-        cfunc(uept.first, 'e', uept.second.first);
+        cfunc(uept.first, InterfaceType::ENDPOINT, uept.second);
     }
     for (const auto& uinp : unknown_inputs) {
-        cfunc(uinp.first, 'i', uinp.second.first);
+        cfunc(uinp.first, InterfaceType::INPUT, uinp.second);
     }
     for (const auto& ufilt : unknown_filters) {
-        cfunc(ufilt.first, 'f', ufilt.second.first);
+        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second);
     }
 }
 
 void UnknownHandleManager::processNonOptionalUnknowns(
-    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
+    const std::function<void(const std::string&, InterfaceType, TargetInfo handle)>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
-        cfunc(upub.first, 'p', upub.second.first);
+        cfunc(upub.first, InterfaceType::PUBLICATION, upub.second);
     }
     for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
-        cfunc(uept.first, 'e', uept.second.first);
+        cfunc(uept.first, InterfaceType::ENDPOINT, uept.second);
     }
     for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
-        cfunc(uinp.first, 'i', uinp.second.first);
+        cfunc(uinp.first, InterfaceType::INPUT, uinp.second);
     }
 
     for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(optional_flag)) != 0) {
             continue;
         }
-        cfunc(ufilt.first, 'f', ufilt.second.first);
+        cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second);
     }
 }
 
 void UnknownHandleManager::processRequiredUnknowns(
-    const std::function<void(const std::string&, char, GlobalHandle handle)>& cfunc) const
+    const std::function<void(const std::string&, InterfaceType, TargetInfo)>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
         if ((upub.second.second & make_flags(required_flag)) != 0) {
-            cfunc(upub.first, 'p', upub.second.first);
+            cfunc(upub.first, InterfaceType::PUBLICATION, upub.second);
         }
     }
     for (const auto& uept : unknown_endpoints) {
         if ((uept.second.second & make_flags(required_flag)) != 0) {
-            cfunc(uept.first, 'e', uept.second.first);
+            cfunc(uept.first, InterfaceType::ENDPOINT, uept.second);
         }
     }
     for (const auto& uinp : unknown_inputs) {
         if ((uinp.second.second & make_flags(required_flag)) != 0) {
-            cfunc(uinp.first, 'i', uinp.second.first);
+            cfunc(uinp.first, InterfaceType::INPUT, uinp.second);
         }
     }
 
     for (const auto& ufilt : unknown_filters) {
         if ((ufilt.second.second & make_flags(required_flag)) != 0) {
-            cfunc(ufilt.first, 'f', ufilt.second.first);
+            cfunc(ufilt.first, InterfaceType::FILTER, ufilt.second);
         }
     }
 }
@@ -308,39 +308,37 @@ void UnknownHandleManager::clearFilter(const std::string& newFilter)
     unknown_dest_filters.erase(newFilter);
 }
 
+// TODO(PT):  When move to C++20 use std::erase_if
+template< typename ContainerT, typename PredicateT >
+void maperase_if( ContainerT& items, const PredicateT& predicate ) {
+    for( auto it = items.begin(); it != items.end(); ) {
+        if( predicate(*it) ) it = items.erase(it);
+        else ++it;
+    }
+}
+
 void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId id)
 {
-    for (auto it = std::begin(unknown_publications); it != std::end(unknown_publications);) {
-        if (it->second.first.fed_id == id) {
-            it = unknown_publications.erase(
-                it);  // previously this was something like m_map.erase(it++);
-        } else {
-            ++it;
-        }
-    }
-    for (auto it = std::begin(unknown_endpoints); it != std::end(unknown_endpoints);) {
-        if (it->second.first.fed_id == id) {
-            it = unknown_endpoints.erase(
-                it);  // previously this was something like m_map.erase(it++);
-        } else {
-            ++it;
-        }
-    }
-    for (auto it = std::begin(unknown_filters); it != std::end(unknown_filters);) {
-        if (it->second.first.fed_id == id) {
-            it =
-                unknown_filters.erase(it);  // previously this was something like m_map.erase(it++);
-        } else {
-            ++it;
-        }
-    }
-    for (auto it = std::begin(unknown_inputs); it != std::end(unknown_inputs);) {
-        if (it->second.first.fed_id == id) {
-            it = unknown_inputs.erase(it);  // previously this was something like m_map.erase(it++);
-        } else {
-            ++it;
-        }
-    }
+    auto ck=[id](const auto &it){return it.second.first.fed_id==id;};
+    maperase_if(unknown_publications,ck);
+    maperase_if(unknown_endpoints,ck);
+    maperase_if(unknown_filters,ck);
+    maperase_if(unknown_inputs,ck);
+
+}
+
+void UnknownHandleManager::clearUnknownsIf(
+    const std::function<bool(const std::string& name, InterfaceType, TargetInfo)>& cfunc)
+{
+    InterfaceType type=InterfaceType::PUBLICATION;
+    auto ck=[&cfunc,&type](const auto &it){return cfunc(it.first, type, it.second); };
+    maperase_if(unknown_publications,ck);
+    type=InterfaceType::ENDPOINT;
+    maperase_if(unknown_endpoints,ck);
+    type=InterfaceType::FILTER;
+    maperase_if(unknown_filters,ck);
+    type=InterfaceType::INPUT;
+    maperase_if(unknown_inputs,ck);
 }
 
 }  // namespace helics

@@ -86,6 +86,12 @@ void InterfaceInfo::createEndpoint(InterfaceHandle handle,
     if (checkActionFlag(flags, single_connection_flag)) {
         ceHandle->back()->setProperty(defs::Options::SINGLE_CONNECTION_ONLY, 1);
     }
+    if (checkActionFlag(flags, source_only_flag)) {
+        ceHandle->back()->setProperty(defs::Options::SEND_ONLY, 1);
+    }
+    if (checkActionFlag(flags, receive_only_flag)) {
+        ceHandle->back()->setProperty(defs::Options::RECIEVE_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
@@ -283,9 +289,9 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 pub->key));
             }
         }
-        if (pub->required_connections > 0) {
-            if (pub->subscribers.size() != static_cast<size_t>(pub->required_connections)) {
-                if (pub->required_connections == 1) {
+        if (pub->requiredConnections > 0) {
+            if (pub->subscribers.size() != static_cast<size_t>(pub->requiredConnections)) {
+                if (pub->requiredConnections == 1) {
                     issues.emplace_back(
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format(
@@ -296,7 +302,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Publication {} requires {} connections but only {} are made",
                                     pub->key,
-                                    pub->required_connections,
+                                    pub->requiredConnections,
                                     pub->subscribers.size()));
                 }
             }

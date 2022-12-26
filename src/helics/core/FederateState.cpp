@@ -365,6 +365,9 @@ void FederateState::createInterface(InterfaceType htype,
             interfaceInformation.createEndpoint(handle, key, type, flags);
 
             break;
+        case InterfaceType::SINK:
+            interfaceInformation.createEndpoint(handle, key, type, flags);
+            break;
         default:
             break;
     }
@@ -1484,7 +1487,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
 
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
-            if (epi != nullptr) {
+            if (epi != nullptr && !epi->sourceOnly) {
                 // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);

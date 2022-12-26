@@ -323,6 +323,18 @@ InterfaceHandle EmptyCore::getEndpoint(LocalFederateId /*federateID*/,
     return {};
 }
 
+InterfaceHandle EmptyCore::registerDataSink(LocalFederateId /*federateID*/,
+    std::string_view /*name*/)
+{
+    return {};
+}
+
+InterfaceHandle EmptyCore::getDataSink(LocalFederateId /*federateID*/,
+    std::string_view /*name*/) const
+{
+    return {};
+}
+
 InterfaceHandle EmptyCore::registerFilter(std::string_view /*filterName*/,
                                           std::string_view /*type_in*/,
                                           std::string_view /*type_out*/)

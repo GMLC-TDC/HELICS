@@ -1390,6 +1390,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             addTranslator(command);
             break;
+        case CMD_REG_DATASINK:
+            if ((!isRootc) && (command.dest_id != parent_broker_id)) {
+                routeMessage(command);
+                // break;
+            }
+            addDataSink(command);
+            break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
@@ -2087,6 +2094,27 @@ void CoreBroker::addTranslator(ActionMessage& m)
     }
 }
 
+void CoreBroker::addDataSink(ActionMessage& m)
+{
+    if (!checkInterfaceCreation(m, InterfaceType::SINK)) {
+        return;
+    }
+    auto& sink = handles.addHandle(m.source_id,
+        m.source_handle,
+        InterfaceType::SINK,
+        m.name(),
+        m.getString(typeStringLoc),
+        m.getString(unitStringLoc));
+    addLocalInfo(sink, m);
+
+    if (!isRootc) {
+        transmit(parent_route_id, m);
+    } else {
+        findAndNotifyInputTargets(sink, sink.key);
+        findAndNotifyEndpointTargets(sink, sink.key);
+    }
+}
+
 void CoreBroker::linkInterfaces(ActionMessage& command)
 {
     switch (command.action()) {
@@ -2500,6 +2528,66 @@ void CoreBroker::broadcast(ActionMessage& cmd)
     }
 }
 
+static action_message_def::action_t getAction(InterfaceType type)
+{
+    switch (type)
+    {
+    case InterfaceType::ENDPOINT:
+    default:
+        return CMD_ADD_ENDPOINT;
+    case InterfaceType::FILTER:
+        return CMD_ADD_FILTER;
+    }
+}
+void CoreBroker::connectInterfaces(const BasicHandleInfo* origin, const BasicHandleInfo* target, uint32_t flags)
+{
+    if (origin == nullptr || target == nullptr)
+    {
+        return;
+    }
+    // notify the target about a source
+    ActionMessage m(getAction(origin->handleType));
+    m.setSource(origin->handle);
+    m.setDestination(target->handle);
+    m.flags = flags;
+    m.name(origin->key);
+    if (!origin->type.empty()) {
+        m.setString(typeStringLoc, origin->type);
+    }
+    transmit(getRoute(m.dest_id), m);
+
+        m.setAction(getAction(target->handleType));
+        m.name(target->key);
+        if (!target->type.empty()) {
+            m.setString(typeStringLoc, target->type);
+        }
+        toggleActionFlag(m, destination_target);
+
+    m.swapSourceDest();
+    transmit(getRoute(m.dest_id), m);
+}
+
+void CoreBroker::findRegexMatch(const std::string& target, InterfaceType type, GlobalHandle handle, uint16_t flags)
+{
+    const auto *dest=handles.getHandleInfo(handle.handle);
+    try
+    {
+        auto matches = handles.regexSearch(target, type);
+            for (auto& mtch : matches)
+            {
+                connectInterfaces(handles.getHandleInfo(mtch.handle),dest,flags);
+            }
+
+    }
+    catch(const std::invalid_argument &ia)
+    {
+        LOG_WARNING(global_id.load(),
+            getIdentifier(),
+            fmt::format("invalid regular expression processing {}",
+                ia.what()));
+    }
+}
+
 void CoreBroker::executeInitializationOperations(bool iterating)
 {
     if (iterating) {
@@ -2530,34 +2618,34 @@ void CoreBroker::executeInitializationOperations(bool iterating)
     if (unknownHandles.hasUnknowns()) {
         std::vector<std::vector<std::string>> foundAliasHandles;
         foundAliasHandles.resize(4);
-        unknownHandles.processUnknowns([this, &foundAliasHandles](const std::string& target,
-                                                                  char type,
-                                                                  GlobalHandle /*handle*/) {
+        bool useRegex{false};
+        unknownHandles.processUnknowns([this, &foundAliasHandles,&useRegex](const std::string& target,
+                                                                  InterfaceType type, UnknownHandleManager::TargetInfo /*target*/) {
+
+                const auto* p = handles.getInterfaceHandle(target, type);
+                if (p == nullptr) {
+                    if (!useRegex)
+                    {
+                        if (target.compare(0,6,"REGEX:") == 0)
+                        {
+                            useRegex=true;
+                        }
+                    }
+                    return;
+                }
             switch (type) {
-                case 'p': {
-                    const auto* p = handles.getInterfaceHandle(target, InterfaceType::PUBLICATION);
-                    if (p != nullptr) {
+            case InterfaceType::PUBLICATION:
                         foundAliasHandles[0].emplace_back(target);
-                    }
-                } break;
-                case 'i': {
-                    const auto* p = handles.getInterfaceHandle(target, InterfaceType::INPUT);
-                    if (p != nullptr) {
+                        break;
+                case InterfaceType::INPUT:
                         foundAliasHandles[1].emplace_back(target);
-                    }
-                } break;
-                case 'e': {
-                    const auto* p = handles.getInterfaceHandle(target, InterfaceType::ENDPOINT);
-                    if (p != nullptr) {
+                    break;
+                case InterfaceType::ENDPOINT: 
                         foundAliasHandles[2].emplace_back(target);
-                    }
-                } break;
-                case 'f': {
-                    const auto* p = handles.getInterfaceHandle(target, InterfaceType::FILTER);
-                    if (p != nullptr) {
+                   break;
+                case InterfaceType::FILTER:
                         foundAliasHandles[3].emplace_back(target);
-                    }
-                } break;
+               break;
                 default:
                     break;
             }
@@ -2586,49 +2674,34 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 findAndNotifyFilterTargets(*p, target);
             }
         }
+        if (useRegex)
+        {
+            unknownHandles.processUnknowns([this ](const std::string& target,
+                InterfaceType type, UnknownHandleManager::TargetInfo tinfo) {
+                    if (target.compare(0,6,"REGEX:") == 0)
+                    {
+                        findRegexMatch(target,type,tinfo.first,tinfo.second);
+                    }
+                });
+            unknownHandles.clearUnknownsIf([this ](const std::string& target,
+                InterfaceType /*type*/, UnknownHandleManager::TargetInfo /*tinfo*/) {
+                    return (target.compare(0,6,"REGEX:") == 0);
+                });
+        }
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::Errors::CONNECTION_FAILURE;
                 unknownHandles.processRequiredUnknowns([this, &eMiss](const std::string& target,
-                                                                      char type,
-                                                                      GlobalHandle handle) {
-                    switch (type) {
-                        case 'p':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required publication target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'i':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required input target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'f':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required filter target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'e':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required endpoint target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        default:
-                            // LCOV_EXCL_START
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required unknown target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                            // LCOV_EXCL_STOP
-                    }
-                    eMiss.setDestination(handle);
+                                                                      InterfaceType type,
+                    UnknownHandleManager::TargetInfo tinfo) {
+                        eMiss.payload =
+                            fmt::format("Unable to connect to required {} target {}",
+                                interfaceTypeName(type),target);
+                        LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
+
+                    eMiss.setDestination(tinfo.first);
                     routeMessage(eMiss);
                 });
                 eMiss.payload = "Missing required connections";
@@ -2642,37 +2715,14 @@ void CoreBroker::executeInitializationOperations(bool iterating)
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::Errors::CONNECTION_FAILURE;
             unknownHandles.processNonOptionalUnknowns([this, &wMiss](const std::string& target,
-                                                                     char type,
-                                                                     GlobalHandle handle) {
-                switch (type) {
-                    case 'p':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to publication target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'i':
-                        wMiss.payload = fmt::format("Unable to connect to input target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'f':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to filter target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'e':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to endpoint target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    default:
-                        // LCOV_EXCL_START
-                        wMiss.payload =
-                            fmt::format("Unable to connect to undefined target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                        // LCOV_EXCL_STOP
-                }
-                wMiss.setDestination(handle);
+                                                                     InterfaceType type,
+                UnknownHandleManager::TargetInfo tinfo) {
+
+                    wMiss.payload =
+                        fmt::format("Unable to connect to {} target {}", interfaceTypeName(type), target);
+                    LOG_WARNING(parent_broker_id,getIdentifier(), wMiss.payload.to_string());
+
+                wMiss.setDestination(tinfo.first);
                 routeMessage(wMiss);
             });
         }

@@ -355,6 +355,10 @@ typedef enum { /* NOLINT */
                HELICS_HANDLE_OPTION_BUFFER_DATA = 411,
                /** specify that the types should be checked strictly for pub/sub and filters*/
                HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING = 414,
+               /** specify that the handle is receive only*/
+               HELICS_HANDLE_OPTION_RECEIVE_ONLY = 422,
+               /** specify that the handle is source only*/
+               HELICS_HANDLE_OPTION_SOURCE_ONLY = 423,
                /** specify that the mismatching units should be ignored*/
                HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH = 447,
                /** specify that an interface will only transmit on change(only applicable to

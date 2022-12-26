@@ -37,7 +37,7 @@ enum TimingFlags : uint16_t {
 
 /// @brief flags used on handles
 enum InterfaceFlags : uint16_t {
-    /// indicator that the target is a destination target
+    /// indicator that the interface should buffer data
     buffer_data_flag = 0,
     /// indicator that the target is a destination target
     destination_target = 1,
@@ -51,21 +51,39 @@ enum InterfaceFlags : uint16_t {
     mapped_flag = 7,
     /// flag indicating that a connection is optional and may not be matched
     optional_flag = 8,
-    /// flag indicating the filter is a clone filter or the data needs to be cloned
-    clone_flag = 9,
+
+    // 9,10,11,13,14 are interface specific
+
+    /// indicator that the interface should only transmit on change
+    only_transmit_on_change_flag = 12,
+   
+    /// flag to indicate an interface is nameless
+    nameless_interface_flag = 15
+};
+
+/// @brief enumeration of endpoint specific flags
+enum EndpointFlags
+{
     /// flag indicating an endpoint is targeted
     targeted_flag = 10,
 
     /// indicator that an endpoint or message has a source filter
     has_source_filter_flag = 11,
-    /// indicator that the interface should only transmit on change
-    only_transmit_on_change_flag = 12,
+    /// indicator that an endpoint is source only
+    source_only_flag = 13,
+    /// indicator that an endpoint is recieve only
+    receive_only_flag = 14
+};
+
+/// @brief enumeration of filter specific flags
+enum FilterFlags
+{
+    /// flag indicating the filter is a clone filter or the data needs to be cloned
+    clone_flag = 9,
     /// indicator that an endpoint or message has a destination filter
     has_dest_filter_flag = 13,
     /// indicator that the endpoint or filter has a destination filter that alters the message
     has_non_cloning_dest_filter_flag = 14,
-    /// flag to indicate an interface is nameless
-    nameless_interface_flag = 15
 };
 
 /// @brief flags used when connecting a federate/core/broker to a federation

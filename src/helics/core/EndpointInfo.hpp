@@ -55,7 +55,9 @@ class EndpointInfo {
     bool hasFilter{false};  //!< indicator that the message has a filter
     bool required{false};
     bool targetedEndpoint{false};  //!< indicator that the endpoint is a targeted endpoint only
-    int32_t required_connections{0};  //!< an exact number of connections required
+    bool sourceOnly{false};  //!< the endpoint can only be a source of data and cannot receive data
+    bool recieveOnly{false}; //!< the endpoint can only receive data cannot send
+    int32_t requiredConnections{0};  //!< an exact number of connections required
     /** get the next message up to the specified time*/
     std::unique_ptr<Message> getMessage(Time maxTime);
     /** get the number of messages in the queue up to the specified time*/

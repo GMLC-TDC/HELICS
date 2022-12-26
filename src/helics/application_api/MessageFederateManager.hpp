@@ -41,18 +41,21 @@ class MessageFederateManager {
                            bool singleThreaded);
     ~MessageFederateManager();
     /** register an endpoint
-    @details call is only valid in startup mode
     @param name the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
     Endpoint& registerEndpoint(std::string_view name, std::string_view type);
 
     /** register a targeted endpoint
-@details call is only valid in startup mode
 @param name the name of the endpoint
 @param type the defined type of the interface for endpoint checking if requested
 */
     Endpoint& registerTargetedEndpoint(std::string_view name, std::string_view type);
+
+    /** register a data sink
+    @param name the name of the data sink
+    */
+    Endpoint& registerDataSink(std::string_view name);
 
     /** check if the federate has any outstanding messages*/
     bool hasMessage() const;
@@ -86,14 +89,20 @@ class MessageFederateManager {
     /** generate results for a local query */
     std::string localQuery(std::string_view queryStr) const;
 
-    /** get the id of a registered publication from its id
-    @param name the publication id
+    /** get an endpoint object from its name
+    @param name the endpoint
     @return ivalid_publication_id if name is not recognized otherwise returns the publication_id*/
     Endpoint& getEndpoint(std::string_view name);
     const Endpoint& getEndpoint(std::string_view name) const;
 
     Endpoint& getEndpoint(int index);
     const Endpoint& getEndpoint(int index) const;
+
+    /** get a data sink from its name
+    @param name the data sink
+    @return an invalid endpoint if name is not recognized otherwise returns the requested endpoint object*/
+    Endpoint& getDataSink(std::string_view name);
+    const Endpoint& getDataSink(std::string_view name) const;
 
     /** register a callback function to call when any endpoint receives a message
     @details there can only be one generic callback

@@ -37,7 +37,7 @@ class PublicationInfo {
     bool only_update_on_change{false};
     bool required{false};  //!< indicator that it is required to be output someplace
     bool buffer_data{false};  //!< indicator that the publication should buffer data
-    int32_t required_connections{0};  //!< the number of required connections 0 is no requirement
+    int32_t requiredConnections{0};  //!< the number of required connections 0 is no requirement
     Time minTimeGap{timeZero};  //!< a time restriction on amount of publishing
     /** check if the value should be published or not*/
     bool CheckSetValue(const char* dataToCheck,

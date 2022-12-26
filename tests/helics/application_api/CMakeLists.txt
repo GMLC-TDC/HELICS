@@ -26,7 +26,7 @@ set(valueFederate_test_sources
 )
 
 set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp
-                                 CombinationFederateTests.cpp
+                                 CombinationFederateTests.cpp EndpointLinkingTests.cpp
 )
 
 set(filterTranslator_test_sources FilterTests.cpp TranslatorTests.cpp FilterAdditionalTests.cpp)

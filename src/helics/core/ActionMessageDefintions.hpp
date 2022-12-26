@@ -175,6 +175,7 @@ across different compilers*/
         cmd_reg_translator = cmd_info_basis + 80,  //!< register a translator
 
         cmd_reg_end = cmd_info_basis + 90,  //!< register an endpoint
+        cmd_reg_datasink = cmd_info_basis+95, //!< register a sink interface
         cmd_add_endpoint = 90,  //!< notify of a source endpoint
 
         cmd_add_named_input = 104,  //!< command to add a named input as a target
@@ -319,6 +320,8 @@ across different compilers*/
 
 #define CMD_REG_ENDPOINT action_message_def::action_t::cmd_reg_end
 #define CMD_ADD_ENDPOINT action_message_def::action_t::cmd_add_endpoint
+
+#define CMD_REG_DATASINK action_message_def::action_t::cmd_reg_datasink
 
 #define CMD_REG_FILTER action_message_def::action_t::cmd_reg_filter
 #define CMD_ADD_FILTER action_message_def::action_t::cmd_add_filter

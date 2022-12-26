@@ -116,9 +116,9 @@ static auto msgSorter = [](const auto& m1, const auto& m2) {
 
 void EndpointInfo::addMessage(std::unique_ptr<Message> message)
 {
-    auto handle = message_queue.lock();
-    handle->push_back(std::move(message));
-    std::stable_sort(handle->begin(), handle->end(), msgSorter);
+     auto handle = message_queue.lock();
+     handle->push_back(std::move(message));
+     std::stable_sort(handle->begin(), handle->end(), msgSorter);
 }
 
 void EndpointInfo::clearQueue()
@@ -263,12 +263,12 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
                                 fmt::format("Endpoint {} is required but has no connections", key));
         }
     }
-    if (required_connections > 0) {
+    if (requiredConnections > 0) {
         auto max_connections = (std::max)(targetInformation.size(), sourceInformation.size());
         auto sum_connections = targetInformation.size() + sourceInformation.size();
 
-        if (max_connections > static_cast<size_t>(required_connections)) {
-            if (required_connections == 1) {
+        if (max_connections > static_cast<size_t>(requiredConnections)) {
+            if (requiredConnections == 1) {
                 issues.emplace_back(
                     helics::defs::Errors::CONNECTION_FAILURE,
                     fmt::format(
@@ -278,11 +278,11 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
                     helics::defs::Errors::CONNECTION_FAILURE,
                     fmt::format("Endpoint {} requires {} connections but has at least {}",
                                 key,
-                                required_connections,
+                                requiredConnections,
                                 max_connections));
             }
         } else {
-            if (static_cast<std::int32_t>(sum_connections) != required_connections) {
+            if (static_cast<std::int32_t>(sum_connections) != requiredConnections) {
                 std::set<GlobalHandle> handles;
                 for (const auto& src : sourceInformation) {
                     handles.emplace(src.id);
@@ -290,12 +290,12 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
                 for (const auto& trg : targetInformation) {
                     handles.emplace(trg.id);
                 }
-                if (static_cast<std::int32_t>(handles.size()) != required_connections) {
+                if (static_cast<std::int32_t>(handles.size()) != requiredConnections) {
                     issues.emplace_back(
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Endpoint {} requires {} connections but has only {}",
                                     key,
-                                    required_connections,
+                                    requiredConnections,
                                     handles.size()));
                 }
             }
@@ -313,14 +313,20 @@ void EndpointInfo::setProperty(int32_t option, int32_t value)
         case defs::Options::CONNECTION_OPTIONAL:
             required = !bvalue;
             break;
+        case defs::Options::SEND_ONLY:
+            sourceOnly=bvalue;
+            break;
+        case defs::Options::RECIEVE_ONLY:
+            recieveOnly=bvalue;
+            break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
-            required_connections = bvalue ? 1 : 0;
+            requiredConnections = bvalue ? 1 : 0;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            required_connections = !bvalue ? 0 : 1;
+            requiredConnections = !bvalue ? 0 : 1;
             break;
         case defs::Options::CONNECTIONS:
-            required_connections = value;
+            requiredConnections = value;
             break;
         default:
             break;
@@ -338,10 +344,16 @@ int32_t EndpointInfo::getProperty(int32_t option) const
             flagval = !required;
             break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
-            flagval = (required_connections == 1);
+            flagval = (requiredConnections == 1);
+            break;
+        case defs::Options::SEND_ONLY:
+            flagval=sourceOnly;
+            break;
+        case defs::Options::RECIEVE_ONLY:
+            flagval=recieveOnly;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            flagval = (required_connections != 1);
+            flagval = (requiredConnections != 1);
             break;
         case defs::Options::CONNECTIONS:
             return static_cast<int32_t>(targetInformation.size());
