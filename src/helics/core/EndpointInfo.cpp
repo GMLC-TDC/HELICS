@@ -116,9 +116,9 @@ static auto msgSorter = [](const auto& m1, const auto& m2) {
 
 void EndpointInfo::addMessage(std::unique_ptr<Message> message)
 {
-     auto handle = message_queue.lock();
-     handle->push_back(std::move(message));
-     std::stable_sort(handle->begin(), handle->end(), msgSorter);
+    auto handle = message_queue.lock();
+    handle->push_back(std::move(message));
+    std::stable_sort(handle->begin(), handle->end(), msgSorter);
 }
 
 void EndpointInfo::clearQueue()
@@ -314,10 +314,10 @@ void EndpointInfo::setProperty(int32_t option, int32_t value)
             required = !bvalue;
             break;
         case defs::Options::SEND_ONLY:
-            sourceOnly=bvalue;
+            sourceOnly = bvalue;
             break;
         case defs::Options::RECIEVE_ONLY:
-            recieveOnly=bvalue;
+            recieveOnly = bvalue;
             break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
             requiredConnections = bvalue ? 1 : 0;
@@ -347,10 +347,10 @@ int32_t EndpointInfo::getProperty(int32_t option) const
             flagval = (requiredConnections == 1);
             break;
         case defs::Options::SEND_ONLY:
-            flagval=sourceOnly;
+            flagval = sourceOnly;
             break;
         case defs::Options::RECIEVE_ONLY:
-            flagval=recieveOnly;
+            flagval = recieveOnly;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             flagval = (requiredConnections != 1);

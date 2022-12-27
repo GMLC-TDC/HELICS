@@ -209,7 +209,7 @@ bool UnknownHandleManager::hasRequiredUnknowns() const
 }
 
 void UnknownHandleManager::processUnknowns(
-    const std::function<void(const std::string&, InterfaceType, TargetInfo )>& cfunc) const
+    const std::function<void(const std::string&, InterfaceType, TargetInfo)>& cfunc) const
 {
     for (const auto& upub : unknown_publications) {
         cfunc(upub.first, InterfaceType::PUBLICATION, upub.second);
@@ -309,36 +309,38 @@ void UnknownHandleManager::clearFilter(const std::string& newFilter)
 }
 
 // TODO(PT):  When move to C++20 use std::erase_if
-template< typename ContainerT, typename PredicateT >
-void maperase_if( ContainerT& items, const PredicateT& predicate ) {
-    for( auto it = items.begin(); it != items.end(); ) {
-        if( predicate(*it) ) it = items.erase(it);
-        else ++it;
+template<typename ContainerT, typename PredicateT>
+void maperase_if(ContainerT& items, const PredicateT& predicate)
+{
+    for (auto it = items.begin(); it != items.end();) {
+        if (predicate(*it))
+            it = items.erase(it);
+        else
+            ++it;
     }
 }
 
 void UnknownHandleManager::clearFederateUnknowns(GlobalFederateId id)
 {
-    auto ck=[id](const auto &it){return it.second.first.fed_id==id;};
-    maperase_if(unknown_publications,ck);
-    maperase_if(unknown_endpoints,ck);
-    maperase_if(unknown_filters,ck);
-    maperase_if(unknown_inputs,ck);
-
+    auto ck = [id](const auto& it) { return it.second.first.fed_id == id; };
+    maperase_if(unknown_publications, ck);
+    maperase_if(unknown_endpoints, ck);
+    maperase_if(unknown_filters, ck);
+    maperase_if(unknown_inputs, ck);
 }
 
 void UnknownHandleManager::clearUnknownsIf(
     const std::function<bool(const std::string& name, InterfaceType, TargetInfo)>& cfunc)
 {
-    InterfaceType type=InterfaceType::PUBLICATION;
-    auto ck=[&cfunc,&type](const auto &it){return cfunc(it.first, type, it.second); };
-    maperase_if(unknown_publications,ck);
-    type=InterfaceType::ENDPOINT;
-    maperase_if(unknown_endpoints,ck);
-    type=InterfaceType::FILTER;
-    maperase_if(unknown_filters,ck);
-    type=InterfaceType::INPUT;
-    maperase_if(unknown_inputs,ck);
+    InterfaceType type = InterfaceType::PUBLICATION;
+    auto ck = [&cfunc, &type](const auto& it) { return cfunc(it.first, type, it.second); };
+    maperase_if(unknown_publications, ck);
+    type = InterfaceType::ENDPOINT;
+    maperase_if(unknown_endpoints, ck);
+    type = InterfaceType::FILTER;
+    maperase_if(unknown_filters, ck);
+    type = InterfaceType::INPUT;
+    maperase_if(unknown_inputs, ck);
 }
 
 }  // namespace helics

@@ -107,7 +107,9 @@ class HandleManager {
     auto end() const { return handles.end(); }
     auto size() const { return handles.size(); }
     /* search for handles based on a regex string and type*/
-    std::vector<GlobalHandle> regexSearch(const std::string &regexExpression, InterfaceType type) const;
+    std::vector<GlobalHandle> regexSearch(const std::string& regexExpression,
+                                          InterfaceType type) const;
+
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
     std::string generateName(InterfaceType what) const;
@@ -125,8 +127,8 @@ class HandleManager {
     /// @return true if there are multiple interacting aliases
     bool addAliasName(std::string_view interfaceName, std::string_view alias);
     /** get the appropriate map based on type*/
-    MapType &getMap(InterfaceType type);
-    const MapType &getMap(InterfaceType type) const;
+    MapType& getMap(InterfaceType type);
+    const MapType& getMap(InterfaceType type) const;
 };
 
 }  // namespace helics

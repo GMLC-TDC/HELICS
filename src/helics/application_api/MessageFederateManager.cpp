@@ -64,7 +64,7 @@ Endpoint& MessageFederateManager::registerDataSink(std::string_view name)
         auto loc = eptHandle->insert(name, handle, mFed, name, handle);
         if (loc) {
             auto& ref = eptHandle->back();
-            ref.receiveOnly=true;
+            ref.receiveOnly = true;
             auto datHandle = eptData.lock();
             auto& edat = datHandle->emplace_back();
 
@@ -252,12 +252,10 @@ Endpoint& MessageFederateManager::getDataSink(std::string_view name)
 {
     auto sharedEpt = mLocalEndpoints.lock();
     auto ept = sharedEpt->find(name);
-    if (ept == sharedEpt.end())
-    {
+    if (ept == sharedEpt.end()) {
         return invalidEptNC;
     }
-    if (ept->getType() != "sink")
-    {
+    if (ept->getType() != "sink") {
         return invalidEptNC;
     }
     return *ept;
@@ -266,12 +264,10 @@ const Endpoint& MessageFederateManager::getDataSink(std::string_view name) const
 {
     auto sharedEpt = mLocalEndpoints.lock();
     auto ept = sharedEpt->find(name);
-    if (ept == sharedEpt.end())
-    {
+    if (ept == sharedEpt.end()) {
         return invalidEpt;
     }
-    if (ept->getType() != "sink")
-    {
+    if (ept->getType() != "sink") {
         return invalidEptNC;
     }
     return *ept;

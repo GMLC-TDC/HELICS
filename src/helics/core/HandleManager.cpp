@@ -176,9 +176,8 @@ void HandleManager::setHandleOption(InterfaceHandle handle, int32_t option, int3
                     clearActionFlag(handles[index], optional_flag);
                 }
                 break;
-            case  HELICS_HANDLE_OPTION_RECEIVE_ONLY:
-                if (handles[index].handleType == InterfaceType::ENDPOINT)
-                {
+            case HELICS_HANDLE_OPTION_RECEIVE_ONLY:
+                if (handles[index].handleType == InterfaceType::ENDPOINT) {
                     if (val != 0) {
                         setActionFlag(handles[index], receive_only_flag);
                     } else {
@@ -234,7 +233,7 @@ static bool interfaceTypeMatch(InterfaceType given, InterfaceType expected)
             return (given == InterfaceType::TRANSLATOR);
         case InterfaceType::INPUT:
         case InterfaceType::ENDPOINT:
-            return (given == InterfaceType::TRANSLATOR || given==InterfaceType::SINK);
+            return (given == InterfaceType::TRANSLATOR || given == InterfaceType::SINK);
         default:
             break;
     }
@@ -244,24 +243,6 @@ static bool interfaceTypeMatch(InterfaceType given, InterfaceType expected)
 HandleManager::MapType& HandleManager::getMap(InterfaceType type)
 {
     switch (type) {
-    case InterfaceType::ENDPOINT:
-    case InterfaceType::TRANSLATOR:
-    case InterfaceType::SINK:
-    default:
-        return endpoints;
-    case InterfaceType::PUBLICATION:
-        return publications;
-    case InterfaceType::INPUT:
-        return inputs;
-    case InterfaceType::FILTER:
-        return filters;
-    }
-}
-
-const HandleManager::MapType& HandleManager::getMap(InterfaceType type) const
-{
-    {
-        switch (type) {
         case InterfaceType::ENDPOINT:
         case InterfaceType::TRANSLATOR:
         case InterfaceType::SINK:
@@ -273,13 +254,31 @@ const HandleManager::MapType& HandleManager::getMap(InterfaceType type) const
             return inputs;
         case InterfaceType::FILTER:
             return filters;
+    }
+}
+
+const HandleManager::MapType& HandleManager::getMap(InterfaceType type) const
+{
+    {
+        switch (type) {
+            case InterfaceType::ENDPOINT:
+            case InterfaceType::TRANSLATOR:
+            case InterfaceType::SINK:
+            default:
+                return endpoints;
+            case InterfaceType::PUBLICATION:
+                return publications;
+            case InterfaceType::INPUT:
+                return inputs;
+            case InterfaceType::FILTER:
+                return filters;
         }
     }
 }
 
 BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name, InterfaceType type)
 {
-    auto & imap = getMap(type);
+    auto& imap = getMap(type);
 
     BasicHandleInfo* handle{nullptr};
     auto fnd = imap.find(name);
@@ -289,8 +288,7 @@ BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name, Interf
             if (handle->handleType != InterfaceType::TRANSLATOR) {
                 handle = nullptr;
             }
-        }
-        else if (type == InterfaceType::SINK) {
+        } else if (type == InterfaceType::SINK) {
             if (handle->handleType != InterfaceType::SINK) {
                 handle = nullptr;
             }
@@ -302,7 +300,7 @@ BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name, Interf
 const BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name,
                                                          InterfaceType type) const
 {
-    const auto & imap = getMap(type);
+    const auto& imap = getMap(type);
     const BasicHandleInfo* handle{nullptr};
     auto fnd = imap.find(name);
     if (fnd != imap.end()) {
@@ -311,8 +309,7 @@ const BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name,
             if (handle->handleType != InterfaceType::TRANSLATOR) {
                 handle = nullptr;
             }
-        }
-        else if (type == InterfaceType::SINK) {
+        } else if (type == InterfaceType::SINK) {
             if (handle->handleType != InterfaceType::SINK) {
                 handle = nullptr;
             }
@@ -321,35 +318,29 @@ const BasicHandleInfo* HandleManager::getInterfaceHandle(std::string_view name,
     return handle;
 }
 
-
-std::vector<GlobalHandle> HandleManager::regexSearch(const std::string& regexExpression, InterfaceType type) const
+std::vector<GlobalHandle> HandleManager::regexSearch(const std::string& regexExpression,
+                                                     InterfaceType type) const
 {
-    const auto & imap = getMap(type);
+    const auto& imap = getMap(type);
     std::vector<GlobalHandle> matches;
-    if (regexExpression.compare(0,6,"REGEX:")!=0)
-    {
+    if (regexExpression.compare(0, 6, "REGEX:") != 0) {
         return matches;
     }
-    
-    std::string rex=regexExpression.substr(6);
-    if (rex == "*")
-    {
-        rex=".*";
+
+    std::string rex = regexExpression.substr(6);
+    if (rex == "*") {
+        rex = ".*";
     }
-    try
-    {
+    try {
         std::regex rgx(rex);
-        for (const auto& mres : imap)
-        {
-            if (std::regex_match(mres.first.data(), rgx))
-            {
-                auto *handle=getHandleInfo(mres.second);
+        for (const auto& mres : imap) {
+            if (std::regex_match(mres.first.data(), rgx)) {
+                auto* handle = getHandleInfo(mres.second);
                 matches.push_back(handle->handle);
             }
         }
     }
-    catch (const std::regex_error& re)
-    {
+    catch (const std::regex_error& re) {
         throw std::invalid_argument(re.what());
     }
     return matches;
@@ -611,7 +602,6 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                             throw std::runtime_error(std::string("duplicate input alias key (") +
                                                      std::string(alias) + ") found");
                         }
-                        
                     }
                 }
                 break;
@@ -630,14 +620,13 @@ void HandleManager::addSearchFields(const BasicHandleInfo& handle, int32_t index
                         placed2 = endpoints.try_emplace(alias, InterfaceHandle(index));
                         if (!placed2.second) {
                             throw std::runtime_error(std::string("duplicate endpoint alias key (") +
-                                std::string(alias) + ") found");
+                                                     std::string(alias) + ") found");
                         }
                         placed3 = inputs.try_emplace(alias, InterfaceHandle(index));
                         if (!placed3.second) {
                             throw std::runtime_error(std::string("duplicate input alias key (") +
-                                std::string(alias) + ") found");
+                                                     std::string(alias) + ") found");
                         }
-                        
                     }
                 }
                 break;

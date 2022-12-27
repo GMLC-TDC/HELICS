@@ -336,7 +336,10 @@ class CoreBroker: public Broker, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
 
-    void connectInterfaces(const BasicHandleInfo& source, const BasicHandleInfo& dest, uint32_t flags,uint32_t flagsDest);
+    void connectInterfaces(const BasicHandleInfo& source,
+                           const BasicHandleInfo& dest,
+                           uint32_t flags,
+                           uint32_t flagsDest);
 
     /** find any existing publishers for a subscription*/
     void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
@@ -345,7 +348,10 @@ class CoreBroker: public Broker, public BrokerBase {
     void findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
-    void findRegexMatch(const std::string &target,InterfaceType type, GlobalHandle handle,uint16_t flags);
+    void findRegexMatch(const std::string& target,
+                        InterfaceType type,
+                        GlobalHandle handle,
+                        uint16_t flags);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/

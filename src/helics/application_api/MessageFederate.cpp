@@ -142,7 +142,6 @@ Endpoint& MessageFederate::registerGlobalTargetedEndpoint(std::string_view eptNa
     return mfManager->registerTargetedEndpoint(eptName, type);
 }
 
-
 Endpoint& MessageFederate::registerDataSink(std::string_view sinkName)
 {
     return mfManager->registerDataSink(sinkName);
@@ -225,7 +224,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
     if (doc.isMember("datasinks")) {
         for (const auto& ept : doc["datasinks"]) {
             auto eptName = fileops::getName(ept);
-            Endpoint& epObj =registerDataSink(eptName) ;
+            Endpoint& epObj = registerDataSink(eptName);
 
             loadOptions(this, ept, epObj);
         }
@@ -268,7 +267,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
         auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {
             auto key = fileops::getName(ept);
-            Endpoint& epObj =registerDataSink(key);
+            Endpoint& epObj = registerDataSink(key);
 
             loadOptions(this, ept, epObj);
         }

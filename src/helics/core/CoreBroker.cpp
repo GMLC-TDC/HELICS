@@ -2100,11 +2100,11 @@ void CoreBroker::addDataSink(ActionMessage& m)
         return;
     }
     auto& sink = handles.addHandle(m.source_id,
-        m.source_handle,
-        InterfaceType::SINK,
-        m.name(),
-        m.getString(typeStringLoc),
-        m.getString(unitStringLoc));
+                                   m.source_handle,
+                                   InterfaceType::SINK,
+                                   m.name(),
+                                   m.getString(typeStringLoc),
+                                   m.getString(unitStringLoc));
     addLocalInfo(sink, m);
 
     if (!isRootc) {
@@ -2530,24 +2530,25 @@ void CoreBroker::broadcast(ActionMessage& cmd)
 
 static action_message_def::action_t getAction(InterfaceType type)
 {
-    switch (type)
-    {
-    case InterfaceType::ENDPOINT:
-    default:
-        return CMD_ADD_ENDPOINT;
-    case InterfaceType::FILTER:
-        return CMD_ADD_FILTER;
-    case InterfaceType::PUBLICATION:
-        return CMD_ADD_PUBLISHER;
-    case InterfaceType::INPUT:
-        return CMD_ADD_SUBSCRIBER;
+    switch (type) {
+        case InterfaceType::ENDPOINT:
+        default:
+            return CMD_ADD_ENDPOINT;
+        case InterfaceType::FILTER:
+            return CMD_ADD_FILTER;
+        case InterfaceType::PUBLICATION:
+            return CMD_ADD_PUBLISHER;
+        case InterfaceType::INPUT:
+            return CMD_ADD_SUBSCRIBER;
     }
 }
-static constexpr std::uint32_t invalidFlags=0xFFFF'FFFF;
+static constexpr std::uint32_t invalidFlags = 0xFFFF'FFFF;
 
-void CoreBroker::connectInterfaces(const BasicHandleInfo& origin, const BasicHandleInfo& target, uint32_t flagsSource, uint32_t flagsDest)
+void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
+                                   const BasicHandleInfo& target,
+                                   uint32_t flagsSource,
+                                   uint32_t flagsDest)
 {
-
     // notify the target about a source
     ActionMessage m(getAction(origin.handleType));
     m.setSource(origin.handle);
@@ -2567,55 +2568,46 @@ void CoreBroker::connectInterfaces(const BasicHandleInfo& origin, const BasicHan
     if (!target.type.empty()) {
         m.setString(typeStringLoc, target.type);
     }
-    if (!target.units.empty())
-    {
+    if (!target.units.empty()) {
         m.setString(unitStringLoc, target.units);
     }
-    if (flagsDest != invalidFlags)
-    {
-        m.flags=flagsDest;
-    }
-    else
-    {
+    if (flagsDest != invalidFlags) {
+        m.flags = flagsDest;
+    } else {
         toggleActionFlag(m, destination_target);
     }
-        
 
     m.swapSourceDest();
     transmit(getRoute(m.dest_id), m);
 }
 
-void CoreBroker::findRegexMatch(const std::string& target, InterfaceType type, GlobalHandle handle, uint16_t flags)
+void CoreBroker::findRegexMatch(const std::string& target,
+                                InterfaceType type,
+                                GlobalHandle handle,
+                                uint16_t flags)
 {
-    const auto *dest=handles.getHandleInfo(handle.handle);
-    if (dest == nullptr)
-    {
+    const auto* dest = handles.getHandleInfo(handle.handle);
+    if (dest == nullptr) {
         return;
     }
-    try
-    {
+    try {
         auto matches = handles.regexSearch(target, type);
-            for (auto& mtch : matches)
-            {
-                const auto *hnd=handles.getHandleInfo(mtch.handle);
-                if (hnd == nullptr)
-                {
-                    continue;
-                }
-                connectInterfaces(*hnd,*dest,flags,invalidFlags);
+        for (auto& mtch : matches) {
+            const auto* hnd = handles.getHandleInfo(mtch.handle);
+            if (hnd == nullptr) {
+                continue;
             }
-
+            connectInterfaces(*hnd, *dest, flags, invalidFlags);
+        }
     }
-    catch(const std::invalid_argument &ia)
-    {
+    catch (const std::invalid_argument& ia) {
         LOG_WARNING(global_id.load(),
-            getIdentifier(),
-            fmt::format("invalid regular expression processing {}",
-                ia.what()));
+                    getIdentifier(),
+                    fmt::format("invalid regular expression processing {}", ia.what()));
     }
 }
 
-static constexpr auto regexKey="REGEX:";
+static constexpr auto regexKey = "REGEX:";
 
 void CoreBroker::executeInitializationOperations(bool iterating)
 {
@@ -2648,37 +2640,36 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         std::vector<std::vector<std::string>> foundAliasHandles;
         foundAliasHandles.resize(4);
         bool useRegex{false};
-        unknownHandles.processUnknowns([this, &foundAliasHandles,&useRegex](const std::string& target,
-                                                                  InterfaceType type, UnknownHandleManager::TargetInfo /*target*/) {
-
+        unknownHandles.processUnknowns(
+            [this, &foundAliasHandles, &useRegex](const std::string& target,
+                                                  InterfaceType type,
+                                                  UnknownHandleManager::TargetInfo /*target*/) {
                 const auto* p = handles.getInterfaceHandle(target, type);
                 if (p == nullptr) {
-                    if (!useRegex)
-                    {
-                        if (target.compare(0,6,regexKey) == 0)
-                        {
-                            useRegex=true;
+                    if (!useRegex) {
+                        if (target.compare(0, 6, regexKey) == 0) {
+                            useRegex = true;
                         }
                     }
                     return;
                 }
-            switch (type) {
-            case InterfaceType::PUBLICATION:
+                switch (type) {
+                    case InterfaceType::PUBLICATION:
                         foundAliasHandles[0].emplace_back(target);
                         break;
-                case InterfaceType::INPUT:
+                    case InterfaceType::INPUT:
                         foundAliasHandles[1].emplace_back(target);
-                    break;
-                case InterfaceType::ENDPOINT: 
+                        break;
+                    case InterfaceType::ENDPOINT:
                         foundAliasHandles[2].emplace_back(target);
-                   break;
-                case InterfaceType::FILTER:
+                        break;
+                    case InterfaceType::FILTER:
                         foundAliasHandles[3].emplace_back(target);
-               break;
-                default:
-                    break;
-            }
-        });
+                        break;
+                    default:
+                        break;
+                }
+            });
         if (!foundAliasHandles[0].empty()) {
             for (const auto& target : foundAliasHandles[0]) {
                 auto* p = handles.getInterfaceHandle(target, InterfaceType::PUBLICATION);
@@ -2703,36 +2694,37 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 findAndNotifyFilterTargets(*p, target);
             }
         }
-        if (useRegex)
-        {
-            unknownHandles.processUnknowns([this ](const std::string& target,
-                InterfaceType type, UnknownHandleManager::TargetInfo tinfo) {
-                    if (target.compare(0,6,regexKey) == 0)
-                    {
-                        findRegexMatch(target,type,tinfo.first,tinfo.second);
-                    }
-                });
-            unknownHandles.clearUnknownsIf([this ](const std::string& target,
-                InterfaceType /*type*/, UnknownHandleManager::TargetInfo /*tinfo*/) {
-                    return (target.compare(0,6,regexKey) == 0);
-                });
+        if (useRegex) {
+            unknownHandles.processUnknowns([this](const std::string& target,
+                                                  InterfaceType type,
+                                                  UnknownHandleManager::TargetInfo tinfo) {
+                if (target.compare(0, 6, regexKey) == 0) {
+                    findRegexMatch(target, type, tinfo.first, tinfo.second);
+                }
+            });
+            unknownHandles.clearUnknownsIf([this](const std::string& target,
+                                                  InterfaceType /*type*/,
+                                                  UnknownHandleManager::TargetInfo /*tinfo*/) {
+                return (target.compare(0, 6, regexKey) == 0);
+            });
         }
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::Errors::CONNECTION_FAILURE;
-                unknownHandles.processRequiredUnknowns([this, &eMiss](const std::string& target,
-                                                                      InterfaceType type,
-                    UnknownHandleManager::TargetInfo tinfo) {
-                        eMiss.payload =
-                            fmt::format("Unable to connect to required {} target {}",
-                                interfaceTypeName(type),target);
+                unknownHandles.processRequiredUnknowns(
+                    [this, &eMiss](const std::string& target,
+                                   InterfaceType type,
+                                   UnknownHandleManager::TargetInfo tinfo) {
+                        eMiss.payload = fmt::format("Unable to connect to required {} target {}",
+                                                    interfaceTypeName(type),
+                                                    target);
                         LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
 
-                    eMiss.setDestination(tinfo.first);
-                    routeMessage(eMiss);
-                });
+                        eMiss.setDestination(tinfo.first);
+                        routeMessage(eMiss);
+                    });
                 eMiss.payload = "Missing required connections";
                 eMiss.dest_handle = InterfaceHandle{};
                 broadcast(eMiss);
@@ -2743,17 +2735,18 @@ void CoreBroker::executeInitializationOperations(bool iterating)
             ActionMessage wMiss(CMD_WARNING);
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::Errors::CONNECTION_FAILURE;
-            unknownHandles.processNonOptionalUnknowns([this, &wMiss](const std::string& target,
-                                                                     InterfaceType type,
-                UnknownHandleManager::TargetInfo tinfo) {
+            unknownHandles.processNonOptionalUnknowns(
+                [this, &wMiss](const std::string& target,
+                               InterfaceType type,
+                               UnknownHandleManager::TargetInfo tinfo) {
+                    wMiss.payload = fmt::format("Unable to connect to {} target {}",
+                                                interfaceTypeName(type),
+                                                target);
+                    LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
 
-                    wMiss.payload =
-                        fmt::format("Unable to connect to {} target {}", interfaceTypeName(type), target);
-                    LOG_WARNING(parent_broker_id,getIdentifier(), wMiss.payload.to_string());
-
-                wMiss.setDestination(tinfo.first);
-                routeMessage(wMiss);
-            });
+                    wMiss.setDestination(tinfo.first);
+                    routeMessage(wMiss);
+                });
         }
     }
 
@@ -2775,11 +2768,14 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
     for (auto& target : Handles) {
         auto* pub = handles.findHandle(target.first);
         if (pub == nullptr) {
-            connectInterfaces(handleInfo,BasicHandleInfo(target.first.fed_id,target.first.handle,InterfaceType::PUBLICATION),handleInfo.flags,target.second);
-        }
-        else
-        {
-            connectInterfaces(handleInfo,*pub,handleInfo.flags,target.second);
+            connectInterfaces(handleInfo,
+                              BasicHandleInfo(target.first.fed_id,
+                                              target.first.handle,
+                                              InterfaceType::PUBLICATION),
+                              handleInfo.flags,
+                              target.second);
+        } else {
+            connectInterfaces(handleInfo, *pub, handleInfo.flags, target.second);
         }
     }
     if (!Handles.empty()) {

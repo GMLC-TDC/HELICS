@@ -24,7 +24,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
     bool disableAssign{false};  //!< disable assignment for the object
-    bool receiveOnly{false}; //!< disable sending messages from this object
+    bool receiveOnly{false};  //!< disable sending messages from this object
     std::string defDest;  //!< storage for a default destination
   public:
     /** default constructor*/

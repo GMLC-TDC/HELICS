@@ -1494,8 +1494,7 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
-    if (checkActionFlag(*handleInfo, receive_only_flag))
-    {
+    if (checkActionFlag(*handleInfo, receive_only_flag)) {
         throw(InvalidIdentifier("Interface is receive only and cannot have destination targets"));
     }
     ActionMessage cmd;
@@ -1568,8 +1567,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
-    if (checkActionFlag(*handleInfo, source_only_flag))
-    {
+    if (checkActionFlag(*handleInfo, source_only_flag)) {
         throw(InvalidIdentifier("Interface is receive only and cannot have destination targets"));
     }
     ActionMessage cmd;
@@ -1588,7 +1586,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
             }
             break;
-            
+
         case InterfaceType::TRANSLATOR:
             switch (hint) {
                 case InterfaceType::PUBLICATION:
@@ -1823,23 +1821,16 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
     return id;
 }
 
-InterfaceHandle CommonCore::registerDataSink(LocalFederateId federateID,
-    std::string_view name)
+InterfaceHandle CommonCore::registerDataSink(LocalFederateId federateID, std::string_view name)
 {
     auto* fed = checkNewInterface(federateID, name, InterfaceType::SINK);
-    uint16_t sinkFlags=fed->getInterfaceFlags()|make_flags(receive_only_flag,targeted_flag);
-    
-    const auto& handle = createBasicHandle(fed->global_id,
-        fed->local_id,
-        InterfaceType::SINK,
-        name,
-        "sink",
-        std::string{},
-        sinkFlags);
+    uint16_t sinkFlags = fed->getInterfaceFlags() | make_flags(receive_only_flag, targeted_flag);
+
+    const auto& handle = createBasicHandle(
+        fed->global_id, fed->local_id, InterfaceType::SINK, name, "sink", std::string{}, sinkFlags);
 
     auto id = handle.getInterfaceHandle();
-    fed->createInterface(
-        InterfaceType::SINK, id, name, "sink", gEmptyString, sinkFlags);
+    fed->createInterface(InterfaceType::SINK, id, name, "sink", gEmptyString, sinkFlags);
     ActionMessage m(CMD_REG_DATASINK);
     m.source_id = fed->global_id.load();
     m.source_handle = id;
@@ -1857,7 +1848,7 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
 {
     auto* fed = checkNewInterface(federateID, name, InterfaceType::ENDPOINT);
 
-    auto flags = fed->getInterfaceFlags()|make_flags(targeted_flag);
+    auto flags = fed->getInterfaceFlags() | make_flags(targeted_flag);
 
     const auto& handle = createBasicHandle(
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
@@ -2240,9 +2231,9 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     if (hndl->handleType != InterfaceType::ENDPOINT) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
     }
-    if (checkActionFlag(*hndl, receive_only_flag))
-    {
-        throw(InvalidFunctionCall("Endpoint is receive only; no messages can be sent through this endpoint"));
+    if (checkActionFlag(*hndl, receive_only_flag)) {
+        throw(InvalidFunctionCall(
+            "Endpoint is receive only; no messages can be sent through this endpoint"));
     }
     ActionMessage m(std::move(message));
 

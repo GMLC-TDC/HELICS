@@ -121,10 +121,10 @@ class EmptyCore: public Core {
                                         std::string_view name) const override;
 
     virtual InterfaceHandle registerDataSink(LocalFederateId federateID,
-        std::string_view name) override final;
+                                             std::string_view name) override final;
 
     virtual InterfaceHandle getDataSink(LocalFederateId federateID,
-        std::string_view name) const override final;
+                                        std::string_view name) const override final;
 
     virtual InterfaceHandle registerFilter(std::string_view filterName,
                                            std::string_view type_in,

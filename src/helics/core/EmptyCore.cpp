@@ -324,13 +324,13 @@ InterfaceHandle EmptyCore::getEndpoint(LocalFederateId /*federateID*/,
 }
 
 InterfaceHandle EmptyCore::registerDataSink(LocalFederateId /*federateID*/,
-    std::string_view /*name*/)
+                                            std::string_view /*name*/)
 {
     return {};
 }
 
 InterfaceHandle EmptyCore::getDataSink(LocalFederateId /*federateID*/,
-    std::string_view /*name*/) const
+                                       std::string_view /*name*/) const
 {
     return {};
 }

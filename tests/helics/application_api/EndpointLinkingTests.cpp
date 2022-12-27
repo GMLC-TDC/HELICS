@@ -24,7 +24,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <thread>
 
 /** these test cases test out the message federates
-*/
+ */
 class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 
@@ -34,7 +34,7 @@ static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& pa
 
 TEST_F(mfed_tests, regex1)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
+    SetupTest<helics::MessageFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
@@ -58,47 +58,40 @@ TEST_F(mfed_tests, regex1)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
     EXPECT_TRUE(ep1.hasMessage());
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    auto m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep2.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep3.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
-
 
 TEST_F(mfed_tests, regex2)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
+    SetupTest<helics::MessageFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
@@ -122,46 +115,40 @@ TEST_F(mfed_tests, regex2)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
     EXPECT_TRUE(ep1.hasMessage());
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    auto m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep2.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep3.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
 
 TEST_F(mfed_tests, regex3)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
+    SetupTest<helics::MessageFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
@@ -186,46 +173,40 @@ TEST_F(mfed_tests, regex3)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ep1.pendingMessageCount(),3);
+    EXPECT_EQ(ep1.pendingMessageCount(), 3);
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message1");
+    auto m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message1");
     }
 
-    m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message2");
+    m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message2");
     }
 
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message3");
+    m = ep3.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message3");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
 
 TEST_F(mfed_tests, regex_data_sink)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
+    SetupTest<helics::MessageFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
     auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
     auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
@@ -234,7 +215,7 @@ TEST_F(mfed_tests, regex_data_sink)
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
     auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
 
-    auto ds= mFed1->registerDataSink("ds1");
+    auto ds = mFed1->registerDataSink("ds1");
 
     ds.addSourceTarget("REGEX:.*");
 
@@ -244,7 +225,6 @@ TEST_F(mfed_tests, regex_data_sink)
     mFed1->enterExecutingModeComplete();
     mFed3->enterExecutingModeComplete();
 
-    
     ep3.send("test message3");
     ep1.send("test message1");
     ep2.send("test message2");
@@ -254,47 +234,42 @@ TEST_F(mfed_tests, regex_data_sink)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ds.pendingMessageCount(),3);
+    EXPECT_EQ(ds.pendingMessageCount(), 3);
     EXPECT_FALSE(ep1.hasMessage());
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message1");
+    auto m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message1");
     }
 
-    m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message2");
+    m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message2");
     }
 
-    m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message3");
+    m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message3");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
 
 // test combinationFederate linking with value Fed
 TEST_F(mfed_tests, regex_combo1)
 {
-    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    SetupTest<helics::CombinationFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
     auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
@@ -318,47 +293,40 @@ TEST_F(mfed_tests, regex_combo1)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
     EXPECT_TRUE(ep1.hasMessage());
     EXPECT_TRUE(ep2.hasMessage());
     EXPECT_TRUE(ep3.hasMessage());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    auto m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep2.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep2.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
 
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
+    m = ep3.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
-
 
 TEST_F(mfed_tests, regex_combo2)
 {
-    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    SetupTest<helics::CombinationFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
     auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
@@ -369,7 +337,7 @@ TEST_F(mfed_tests, regex_combo2)
     auto sub2 = mFed2->registerGlobalInput<std::string>("input2");
     auto sub3 = mFed3->registerGlobalInput<std::string>("input3");
 
-   pub1.addDestinationTarget("REGEX:input.");
+    pub1.addDestinationTarget("REGEX:input.");
 
     mFed1->enterExecutingModeAsync();
     mFed3->enterExecutingModeAsync();
@@ -384,9 +352,9 @@ TEST_F(mfed_tests, regex_combo2)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
     EXPECT_TRUE(sub1.isUpdated());
@@ -396,20 +364,17 @@ TEST_F(mfed_tests, regex_combo2)
     EXPECT_EQ(sub1.getString(), "test message");
     EXPECT_EQ(sub2.getString(), "test message");
     EXPECT_EQ(sub3.getString(), "test message");
-    
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
 
 TEST_F(mfed_tests, regex_combo3)
 {
-    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    SetupTest<helics::CombinationFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
     auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
@@ -434,46 +399,40 @@ TEST_F(mfed_tests, regex_combo3)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ep1.pendingMessageCount(),3);
+    EXPECT_EQ(ep1.pendingMessageCount(), 3);
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message1");
+    auto m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message1");
     }
 
-    m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message2");
+    m = ep1.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message2");
     }
 
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message3");
+    m = ep3.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message3");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }
-
 
 TEST_F(mfed_tests, regex_combo_data_sink)
 {
-    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    SetupTest<helics::CombinationFederate>("test", 3, 1.0);
     auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
     auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
     auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
@@ -482,7 +441,7 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
     auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
 
-    auto ds= mFed1->registerDataSink("ds1");
+    auto ds = mFed1->registerDataSink("ds1");
 
     ds.addSourceTarget("REGEX:.*");
 
@@ -491,7 +450,6 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     mFed2->enterExecutingMode();
     mFed1->enterExecutingModeComplete();
     mFed3->enterExecutingModeComplete();
-
 
     ep3.send("test message3");
     ep1.send("test message1");
@@ -502,39 +460,34 @@ TEST_F(mfed_tests, regex_combo_data_sink)
     auto gtime = mFed3->requestTime(1.0);
 
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed1->requestTimeComplete();
+    gtime = mFed1->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
-    gtime=mFed2->requestTimeComplete();
+    gtime = mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_EQ(ds.pendingMessageCount(),3);
+    EXPECT_EQ(ds.pendingMessageCount(), 3);
     EXPECT_FALSE(ep1.hasMessage());
     EXPECT_FALSE(ep2.hasMessage());
     EXPECT_FALSE(ep3.hasMessage());
 
-    auto m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message1");
+    auto m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message1");
     }
 
-    m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message2");
+    m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message2");
     }
 
-    m=ds.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message3");
+    m = ds.getMessage();
+    if (m) {
+        EXPECT_EQ(m->to_string(), "test message3");
     }
-
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
     mFed3->finalize();
     mFed2->finalizeComplete();
     mFed1->finalizeComplete();
-
 }

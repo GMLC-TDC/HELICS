@@ -36,10 +36,10 @@ class BasicHandleInfo {
     }
 
     BasicHandleInfo(GlobalFederateId federate_id,
-        InterfaceHandle handle_id,
-        InterfaceType type_of_handle) noexcept:
+                    InterfaceHandle handle_id,
+                    InterfaceType type_of_handle) noexcept:
         handle{federate_id, handle_id},
-        handleType(type_of_handle),type_in(type), type_out(units)
+        handleType(type_of_handle), type_in(type), type_out(units)
     {
     }
 

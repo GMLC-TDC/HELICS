@@ -100,7 +100,8 @@ class MessageFederateManager {
 
     /** get a data sink from its name
     @param name the data sink
-    @return an invalid endpoint if name is not recognized otherwise returns the requested endpoint object*/
+    @return an invalid endpoint if name is not recognized otherwise returns the requested endpoint
+    object*/
     Endpoint& getDataSink(std::string_view name);
     const Endpoint& getDataSink(std::string_view name) const;
 

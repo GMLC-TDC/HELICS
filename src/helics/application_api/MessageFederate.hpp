@@ -137,8 +137,7 @@ class HELICS_CXX_EXPORT MessageFederate:
         return registerGlobalEndpoint(std::string(eptName) + '_' + std::to_string(index1), type);
     }
 
-
-    /** register a dataSink 
+    /** register a dataSink
     @param sinkName the name of the endpoint
     @return the data sink will function identically to an endpoint except it only receives
     */
