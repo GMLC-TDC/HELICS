@@ -2537,31 +2537,49 @@ static action_message_def::action_t getAction(InterfaceType type)
         return CMD_ADD_ENDPOINT;
     case InterfaceType::FILTER:
         return CMD_ADD_FILTER;
+    case InterfaceType::PUBLICATION:
+        return CMD_ADD_PUBLISHER;
+    case InterfaceType::INPUT:
+        return CMD_ADD_SUBSCRIBER;
     }
 }
-void CoreBroker::connectInterfaces(const BasicHandleInfo* origin, const BasicHandleInfo* target, uint32_t flags)
+static constexpr std::uint32_t invalidFlags=0xFFFF'FFFF;
+
+void CoreBroker::connectInterfaces(const BasicHandleInfo& origin, const BasicHandleInfo& target, uint32_t flagsSource, uint32_t flagsDest)
 {
-    if (origin == nullptr || target == nullptr)
-    {
-        return;
-    }
+
     // notify the target about a source
-    ActionMessage m(getAction(origin->handleType));
-    m.setSource(origin->handle);
-    m.setDestination(target->handle);
-    m.flags = flags;
-    m.name(origin->key);
-    if (!origin->type.empty()) {
-        m.setString(typeStringLoc, origin->type);
+    ActionMessage m(getAction(origin.handleType));
+    m.setSource(origin.handle);
+    m.setDestination(target.handle);
+    m.flags = flagsSource;
+    m.name(origin.key);
+    if (!origin.type.empty()) {
+        m.setString(typeStringLoc, origin.type);
+    }
+    if (!origin.units.empty()) {
+        m.setString(unitStringLoc, origin.units);
     }
     transmit(getRoute(m.dest_id), m);
 
-        m.setAction(getAction(target->handleType));
-        m.name(target->key);
-        if (!target->type.empty()) {
-            m.setString(typeStringLoc, target->type);
-        }
+    m.setAction(getAction(target.handleType));
+    m.name(target.key);
+    if (!target.type.empty()) {
+        m.setString(typeStringLoc, target.type);
+    }
+    if (!target.units.empty())
+    {
+        m.setString(unitStringLoc, target.units);
+    }
+    if (flagsDest != invalidFlags)
+    {
+        m.flags=flagsDest;
+    }
+    else
+    {
         toggleActionFlag(m, destination_target);
+    }
+        
 
     m.swapSourceDest();
     transmit(getRoute(m.dest_id), m);
@@ -2570,12 +2588,21 @@ void CoreBroker::connectInterfaces(const BasicHandleInfo* origin, const BasicHan
 void CoreBroker::findRegexMatch(const std::string& target, InterfaceType type, GlobalHandle handle, uint16_t flags)
 {
     const auto *dest=handles.getHandleInfo(handle.handle);
+    if (dest == nullptr)
+    {
+        return;
+    }
     try
     {
         auto matches = handles.regexSearch(target, type);
             for (auto& mtch : matches)
             {
-                connectInterfaces(handles.getHandleInfo(mtch.handle),dest,flags);
+                const auto *hnd=handles.getHandleInfo(mtch.handle);
+                if (hnd == nullptr)
+                {
+                    continue;
+                }
+                connectInterfaces(*hnd,*dest,flags,invalidFlags);
             }
 
     }
@@ -2587,6 +2614,8 @@ void CoreBroker::findRegexMatch(const std::string& target, InterfaceType type, G
                 ia.what()));
     }
 }
+
+static constexpr auto regexKey="REGEX:";
 
 void CoreBroker::executeInitializationOperations(bool iterating)
 {
@@ -2626,7 +2655,7 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 if (p == nullptr) {
                     if (!useRegex)
                     {
-                        if (target.compare(0,6,"REGEX:") == 0)
+                        if (target.compare(0,6,regexKey) == 0)
                         {
                             useRegex=true;
                         }
@@ -2678,14 +2707,14 @@ void CoreBroker::executeInitializationOperations(bool iterating)
         {
             unknownHandles.processUnknowns([this ](const std::string& target,
                 InterfaceType type, UnknownHandleManager::TargetInfo tinfo) {
-                    if (target.compare(0,6,"REGEX:") == 0)
+                    if (target.compare(0,6,regexKey) == 0)
                     {
                         findRegexMatch(target,type,tinfo.first,tinfo.second);
                     }
                 });
             unknownHandles.clearUnknownsIf([this ](const std::string& target,
                 InterfaceType /*type*/, UnknownHandleManager::TargetInfo /*tinfo*/) {
-                    return (target.compare(0,6,"REGEX:") == 0);
+                    return (target.compare(0,6,regexKey) == 0);
                 });
         }
         if (unknownHandles.hasNonOptionalUnknowns()) {
@@ -2744,26 +2773,14 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
 {
     auto Handles = unknownHandles.checkForInputs(key);
     for (auto& target : Handles) {
-        // notify the publication about its subscriber
-        ActionMessage m(CMD_ADD_SUBSCRIBER);
-
-        m.setDestination(target.first);
-        m.setSource(handleInfo.handle);
-        m.payload = key;
-        m.flags = handleInfo.flags;
-        transmit(getRoute(m.dest_id), m);
-
-        // notify the subscriber about its publisher
-        m.setAction(CMD_ADD_PUBLISHER);
-        m.setSource(target.first);
-        m.setDestination(handleInfo.handle);
-        m.flags = target.second;
         auto* pub = handles.findHandle(target.first);
-        if (pub != nullptr) {
-            m.setStringData(pub->type, pub->units);
+        if (pub == nullptr) {
+            connectInterfaces(handleInfo,BasicHandleInfo(target.first.fed_id,target.first.handle,InterfaceType::PUBLICATION),handleInfo.flags,target.second);
         }
-
-        transmit(getRoute(m.dest_id), std::move(m));
+        else
+        {
+            connectInterfaces(handleInfo,*pub,handleInfo.flags,target.second);
+        }
     }
     if (!Handles.empty()) {
         unknownHandles.clearInput(key);

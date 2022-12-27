@@ -336,7 +336,7 @@ class CoreBroker: public Broker, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
 
-    void connectInterfaces(const BasicHandleInfo* source, const BasicHandleInfo* dest, uint32_t flags);
+    void connectInterfaces(const BasicHandleInfo& source, const BasicHandleInfo& dest, uint32_t flags,uint32_t flagsDest);
 
     /** find any existing publishers for a subscription*/
     void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);

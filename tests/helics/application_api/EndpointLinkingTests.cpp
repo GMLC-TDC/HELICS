@@ -294,10 +294,10 @@ TEST_F(mfed_tests, regex_data_sink)
 // test combinationFederate linking with value Fed
 TEST_F(mfed_tests, regex_combo1)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
-    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
+    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
 
     auto ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
@@ -358,16 +358,18 @@ TEST_F(mfed_tests, regex_combo1)
 
 TEST_F(mfed_tests, regex_combo2)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
-    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
+    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
 
-    auto ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
-    auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
-    auto ep3 = mFed3->registerGlobalTargetedEndpoint("ep3");
+    auto pub1 = mFed1->registerGlobalPublication<std::string>("ep1");
 
-    ep1.addDestinationTarget("REGEX:ep.");
+    auto sub1 = mFed3->registerGlobalInput<std::string>("input1");
+    auto sub2 = mFed2->registerGlobalInput<std::string>("input2");
+    auto sub3 = mFed3->registerGlobalInput<std::string>("input3");
+
+   pub1.addDestinationTarget("REGEX:input.");
 
     mFed1->enterExecutingModeAsync();
     mFed3->enterExecutingModeAsync();
@@ -375,7 +377,7 @@ TEST_F(mfed_tests, regex_combo2)
     mFed1->enterExecutingModeComplete();
     mFed3->enterExecutingModeComplete();
 
-    ep1.send("test message");
+    pub1.publish("test message");
 
     mFed1->requestTimeAsync(1.0);
     mFed2->requestTimeAsync(1.0);
@@ -387,28 +389,14 @@ TEST_F(mfed_tests, regex_combo2)
     gtime=mFed2->requestTimeComplete();
     EXPECT_EQ(gtime, 1.0);
 
-    EXPECT_TRUE(ep1.hasMessage());
-    EXPECT_TRUE(ep2.hasMessage());
-    EXPECT_TRUE(ep3.hasMessage());
+    EXPECT_TRUE(sub1.isUpdated());
+    EXPECT_TRUE(sub2.isUpdated());
+    EXPECT_TRUE(sub3.isUpdated());
 
-    auto m=ep1.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
-    }
-
-    m=ep2.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
-    }
-
-    m=ep3.getMessage();
-    if (m)
-    {
-        EXPECT_EQ(m->to_string(),"test message");
-    }
-
+    EXPECT_EQ(sub1.getString(), "test message");
+    EXPECT_EQ(sub2.getString(), "test message");
+    EXPECT_EQ(sub3.getString(), "test message");
+    
 
     mFed1->finalizeAsync();
     mFed2->finalizeAsync();
@@ -421,10 +409,10 @@ TEST_F(mfed_tests, regex_combo2)
 
 TEST_F(mfed_tests, regex_combo3)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
-    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
+    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
 
     auto ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");
@@ -485,10 +473,10 @@ TEST_F(mfed_tests, regex_combo3)
 
 TEST_F(mfed_tests, regex_combo_data_sink)
 {
-    SetupTest<helics::MessageFederate>("test", 3,1.0);
-    auto mFed1 = GetFederateAs<helics::MessageFederate>(0);
-    auto mFed2 = GetFederateAs<helics::MessageFederate>(1);
-    auto mFed3 = GetFederateAs<helics::MessageFederate>(2);
+    SetupTest<helics::CombinationFederate>("test", 3,1.0);
+    auto mFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    auto mFed2 = GetFederateAs<helics::CombinationFederate>(1);
+    auto mFed3 = GetFederateAs<helics::CombinationFederate>(2);
 
     auto ep1 = mFed1->registerGlobalTargetedEndpoint("ep1");
     auto ep2 = mFed2->registerGlobalTargetedEndpoint("ep2");

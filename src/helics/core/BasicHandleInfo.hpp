@@ -35,6 +35,14 @@ class BasicHandleInfo {
     {
     }
 
+    BasicHandleInfo(GlobalFederateId federate_id,
+        InterfaceHandle handle_id,
+        InterfaceType type_of_handle) noexcept:
+        handle{federate_id, handle_id},
+        handleType(type_of_handle),type_in(type), type_out(units)
+    {
+    }
+
     const GlobalHandle handle{};  //!< the global federate id for the creator of the handle
     LocalFederateId local_fed_id{};  //!< the local federate id of the handle
     const InterfaceType handleType{InterfaceType::UNKNOWN};  //!< the type of the handle
