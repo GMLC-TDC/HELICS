@@ -2539,7 +2539,6 @@ static action_message_def::action_t getAction(InterfaceType type)
             return CMD_ADD_SUBSCRIBER;
         default:
             return CMD_ADD_ENDPOINT;
-
     }
 }
 
@@ -2547,23 +2546,23 @@ static action_message_def::action_t getAction(InterfaceType type)
 static action_message_def::action_t getMatchAction(InterfaceType type, InterfaceType destType)
 {
     switch (type) {
-    case InterfaceType::FILTER:
-        return CMD_ADD_ENDPOINT;
-    case InterfaceType::PUBLICATION:
-        return CMD_ADD_SUBSCRIBER;
-    case InterfaceType::INPUT:
-        return CMD_ADD_PUBLISHER;
-    default:
-        return (destType==InterfaceType::FILTER)?CMD_ADD_FILTER:CMD_ADD_ENDPOINT;
-
+        case InterfaceType::FILTER:
+            return CMD_ADD_ENDPOINT;
+        case InterfaceType::PUBLICATION:
+            return CMD_ADD_SUBSCRIBER;
+        case InterfaceType::INPUT:
+            return CMD_ADD_PUBLISHER;
+        default:
+            return (destType == InterfaceType::FILTER) ? CMD_ADD_FILTER : CMD_ADD_ENDPOINT;
     }
 }
 
-void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
-                                   const BasicHandleInfo& target,
-                                   uint32_t flagsSource,
-                                   uint32_t flagsDest,
-    std::pair<action_message_def::action_t,action_message_def::action_t> actions)
+void CoreBroker::connectInterfaces(
+    const BasicHandleInfo& origin,
+    const BasicHandleInfo& target,
+    uint32_t flagsSource,
+    uint32_t flagsDest,
+    std::pair<action_message_def::action_t, action_message_def::action_t> actions)
 {
     // notify the target about a source
     ActionMessage m(actions.first);
@@ -2589,9 +2588,7 @@ void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
         m.setString(unitStringLoc, target.units);
     }
 
-    
     m.flags = flagsDest;
-    
 
     m.swapSourceDest();
     transmit(getRoute(m.dest_id), m);
@@ -2613,8 +2610,13 @@ void CoreBroker::findRegexMatch(const std::string& target,
             if (hnd == nullptr) {
                 continue;
             }
-            auto destFlags=flags;
-            connectInterfaces(*hnd, *dest, flags, destFlags,std::make_pair(getAction(type),getMatchAction(type,dest->handleType)));
+            auto destFlags = flags;
+            connectInterfaces(*hnd,
+                              *dest,
+                              flags,
+                              destFlags,
+                              std::make_pair(getAction(type),
+                                             getMatchAction(type, dest->handleType)));
         }
     }
     catch (const std::invalid_argument& ia) {
@@ -2790,9 +2792,14 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
                                               target.first.handle,
                                               InterfaceType::PUBLICATION),
                               handleInfo.flags,
-                              target.second,std::make_pair(CMD_ADD_SUBSCRIBER,CMD_ADD_PUBLISHER));
+                              target.second,
+                              std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
         } else {
-            connectInterfaces(handleInfo, *pub, handleInfo.flags, target.second,std::make_pair(CMD_ADD_SUBSCRIBER,CMD_ADD_PUBLISHER));
+            connectInterfaces(handleInfo,
+                              *pub,
+                              handleInfo.flags,
+                              target.second,
+                              std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
         }
     }
     if (!Handles.empty()) {
@@ -2805,13 +2812,11 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
 {
     auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
-       
-            connectInterfaces(handleInfo,
-                BasicHandleInfo(sub.first.fed_id,
-                    sub.first.handle,
-                    InterfaceType::INPUT),
-                sub.second,
-                handleInfo.flags,std::make_pair(CMD_ADD_PUBLISHER,CMD_ADD_SUBSCRIBER));
+        connectInterfaces(handleInfo,
+                          BasicHandleInfo(sub.first.fed_id, sub.first.handle, InterfaceType::INPUT),
+                          sub.second,
+                          handleInfo.flags,
+                          std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(key);
@@ -2830,20 +2835,20 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
 {
     auto Handles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : Handles) {
-
-        
         const auto* iface = handles.findHandle(target.first);
-        auto destFlags=target.second;
-        if (iface->handleType != InterfaceType::FILTER)
-        {
-            destFlags=toggle_flag(destFlags,destination_target);
+        auto destFlags = target.second;
+        if (iface->handleType != InterfaceType::FILTER) {
+            destFlags = toggle_flag(destFlags, destination_target);
         }
 
         connectInterfaces(handleInfo,
-            *iface,
-            target.second,
-            destFlags,std::make_pair(CMD_ADD_ENDPOINT,(iface->handleType!=InterfaceType::FILTER)?CMD_ADD_ENDPOINT:CMD_ADD_FILTER));
-        
+                          *iface,
+                          target.second,
+                          destFlags,
+                          std::make_pair(CMD_ADD_ENDPOINT,
+                                         (iface->handleType != InterfaceType::FILTER) ?
+                                             CMD_ADD_ENDPOINT :
+                                             CMD_ADD_FILTER));
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(key);
     for (const auto& ept : EptTargets) {
@@ -2864,17 +2869,17 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
 {
     auto Handles = unknownHandles.checkForFilters(key);
     for (const auto& target : Handles) {
-        auto flags=target.second;
+        auto flags = target.second;
         if (checkActionFlag(handleInfo, clone_flag)) {
-           flags|=make_flags(clone_flag);
+            flags |= make_flags(clone_flag);
         }
         connectInterfaces(handleInfo,
-            BasicHandleInfo(target.first.fed_id,
-                target.first.handle,InterfaceType::ENDPOINT),
-            flags,
-            flags,
-            std::make_pair(CMD_ADD_FILTER,CMD_ADD_ENDPOINT));
-
+                          BasicHandleInfo(target.first.fed_id,
+                                          target.first.handle,
+                                          InterfaceType::ENDPOINT),
+                          flags,
+                          flags,
+                          std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(key);

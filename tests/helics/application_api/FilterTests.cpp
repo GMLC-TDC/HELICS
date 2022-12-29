@@ -347,7 +347,7 @@ simulation
 
 TEST_P(filter_single_type_test, message_dest_filter_object)
 {
-    //debugDiagnostic = true;
+    // debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 2);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "message");
@@ -532,7 +532,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage)
 
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target)
 {
-   // debugDiagnostic = true;
+    // debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 3);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
@@ -561,7 +561,7 @@ TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_targe
 
 TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
 {
-    //debugDiagnostic = true;
+    // debugDiagnostic = true;
     auto broker = AddBroker("test", 3);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
@@ -592,7 +592,7 @@ TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
 
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target_dest)
 {
-    //debugDiagnostic = true;
+    // debugDiagnostic = true;
     auto broker = AddBroker(GetParam(), 3);
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>(GetParam(), 1, broker, 1.0, "filter2");
