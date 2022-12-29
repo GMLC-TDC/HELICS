@@ -339,7 +339,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void connectInterfaces(const BasicHandleInfo& source,
                            const BasicHandleInfo& dest,
                            uint32_t flags,
-                           uint32_t flagsDest);
+                           uint32_t flagsDest,
+        std::pair<action_message_def::action_t,action_message_def::action_t> actions);
 
     /** find any existing publishers for a subscription*/
     void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);

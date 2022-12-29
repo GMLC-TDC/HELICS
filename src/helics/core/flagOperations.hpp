@@ -203,4 +203,9 @@ inline constexpr uint16_t make_flags(unsigned int flag1, unsigned int flag2, uns
     return make_flags(flag1, flag2) | make_flags(flag3);
 }
 
+/** helper function to toggle a bit in a uint16_t value*/
+inline constexpr uint16_t toggle_flag(uint16_t base, unsigned int flag)
+{
+    return base^make_flags(flag);
+}
 }  // namespace helics

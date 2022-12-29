@@ -2527,30 +2527,46 @@ void CoreBroker::broadcast(ActionMessage& cmd)
         }
     }
 }
-
+// get the action associated with an interfaceType
 static action_message_def::action_t getAction(InterfaceType type)
 {
     switch (type) {
-        case InterfaceType::ENDPOINT:
-        default:
-            return CMD_ADD_ENDPOINT;
         case InterfaceType::FILTER:
             return CMD_ADD_FILTER;
         case InterfaceType::PUBLICATION:
             return CMD_ADD_PUBLISHER;
         case InterfaceType::INPUT:
             return CMD_ADD_SUBSCRIBER;
+        default:
+            return CMD_ADD_ENDPOINT;
+
     }
 }
-static constexpr std::uint32_t invalidFlags = 0xFFFF'FFFF;
+
+// get the matching action associated with an interfaceType
+static action_message_def::action_t getMatchAction(InterfaceType type, InterfaceType destType)
+{
+    switch (type) {
+    case InterfaceType::FILTER:
+        return CMD_ADD_ENDPOINT;
+    case InterfaceType::PUBLICATION:
+        return CMD_ADD_SUBSCRIBER;
+    case InterfaceType::INPUT:
+        return CMD_ADD_PUBLISHER;
+    default:
+        return (destType==InterfaceType::FILTER)?CMD_ADD_FILTER:CMD_ADD_ENDPOINT;
+
+    }
+}
 
 void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
                                    const BasicHandleInfo& target,
                                    uint32_t flagsSource,
-                                   uint32_t flagsDest)
+                                   uint32_t flagsDest,
+    std::pair<action_message_def::action_t,action_message_def::action_t> actions)
 {
     // notify the target about a source
-    ActionMessage m(getAction(origin.handleType));
+    ActionMessage m(actions.first);
     m.setSource(origin.handle);
     m.setDestination(target.handle);
     m.flags = flagsSource;
@@ -2563,19 +2579,19 @@ void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
     }
     transmit(getRoute(m.dest_id), m);
 
-    m.setAction(getAction(target.handleType));
+    m.setAction(actions.second);
     m.name(target.key);
+    m.clearStringData();
     if (!target.type.empty()) {
         m.setString(typeStringLoc, target.type);
     }
     if (!target.units.empty()) {
         m.setString(unitStringLoc, target.units);
     }
-    if (flagsDest != invalidFlags) {
-        m.flags = flagsDest;
-    } else {
-        toggleActionFlag(m, destination_target);
-    }
+
+    
+    m.flags = flagsDest;
+    
 
     m.swapSourceDest();
     transmit(getRoute(m.dest_id), m);
@@ -2597,7 +2613,8 @@ void CoreBroker::findRegexMatch(const std::string& target,
             if (hnd == nullptr) {
                 continue;
             }
-            connectInterfaces(*hnd, *dest, flags, invalidFlags);
+            auto destFlags=flags;
+            connectInterfaces(*hnd, *dest, flags, destFlags,std::make_pair(getAction(type),getMatchAction(type,dest->handleType)));
         }
     }
     catch (const std::invalid_argument& ia) {
@@ -2773,9 +2790,9 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
                                               target.first.handle,
                                               InterfaceType::PUBLICATION),
                               handleInfo.flags,
-                              target.second);
+                              target.second,std::make_pair(CMD_ADD_SUBSCRIBER,CMD_ADD_PUBLISHER));
         } else {
-            connectInterfaces(handleInfo, *pub, handleInfo.flags, target.second);
+            connectInterfaces(handleInfo, *pub, handleInfo.flags, target.second,std::make_pair(CMD_ADD_SUBSCRIBER,CMD_ADD_PUBLISHER));
         }
     }
     if (!Handles.empty()) {
@@ -2788,22 +2805,13 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
 {
     auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
-        // notify the publication about its subscriber
-        ActionMessage m(CMD_ADD_SUBSCRIBER);
-        m.setSource(sub.first);
-        m.setDestination(handleInfo.handle);
-        m.flags = sub.second;
-
-        transmit(getRoute(m.dest_id), m);
-
-        // notify the subscriber about its publisher
-        m.setAction(CMD_ADD_PUBLISHER);
-        m.setDestination(sub.first);
-        m.setSource(handleInfo.handle);
-        m.payload = key;
-        m.flags = handleInfo.flags;
-        m.setStringData(handleInfo.type, handleInfo.units);
-        transmit(getRoute(m.dest_id), std::move(m));
+       
+            connectInterfaces(handleInfo,
+                BasicHandleInfo(sub.first.fed_id,
+                    sub.first.handle,
+                    InterfaceType::INPUT),
+                sub.second,
+                handleInfo.flags,std::make_pair(CMD_ADD_PUBLISHER,CMD_ADD_SUBSCRIBER));
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(key);
@@ -2822,33 +2830,20 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
 {
     auto Handles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : Handles) {
-        // notify the filter or endpoint about its target
-        ActionMessage m(CMD_ADD_ENDPOINT);
-        m.setSource(handleInfo.handle);
-        m.setDestination(target.first);
-        m.flags = target.second;
-        m.name(key);
-        if (!handleInfo.type.empty()) {
-            m.setString(typeStringLoc, handleInfo.type);
-        }
-        transmit(getRoute(m.dest_id), m);
 
+        
         const auto* iface = handles.findHandle(target.first);
-        if (iface->handleType != InterfaceType::FILTER) {
-            // notify the endpoint about its endpoint
-            m.setAction(CMD_ADD_ENDPOINT);
-            m.name(iface->key);
-            if (!iface->type.empty()) {
-                m.setString(typeStringLoc, iface->type);
-            }
-            toggleActionFlag(m, destination_target);
-        } else {
-            // notify the endpoint about its filter
-            m.setAction(CMD_ADD_FILTER);
+        auto destFlags=target.second;
+        if (iface->handleType != InterfaceType::FILTER)
+        {
+            destFlags=toggle_flag(destFlags,destination_target);
         }
 
-        m.swapSourceDest();
-        transmit(getRoute(m.dest_id), m);
+        connectInterfaces(handleInfo,
+            *iface,
+            target.second,
+            destFlags,std::make_pair(CMD_ADD_ENDPOINT,(iface->handleType!=InterfaceType::FILTER)?CMD_ADD_ENDPOINT:CMD_ADD_FILTER));
+        
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(key);
     for (const auto& ept : EptTargets) {
@@ -2869,24 +2864,17 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
 {
     auto Handles = unknownHandles.checkForFilters(key);
     for (const auto& target : Handles) {
-        // notify the endpoint about a filter
-        ActionMessage m(CMD_ADD_FILTER);
-        m.setSource(handleInfo.handle);
-        m.flags = target.second;
+        auto flags=target.second;
         if (checkActionFlag(handleInfo, clone_flag)) {
-            setActionFlag(m, clone_flag);
+           flags|=make_flags(clone_flag);
         }
-        m.setDestination(target.first);
-        if ((!handleInfo.type_in.empty()) || (!handleInfo.type_out.empty())) {
-            m.setStringData(handleInfo.type_in, handleInfo.type_out);
-        }
-        transmit(getRoute(m.dest_id), m);
+        connectInterfaces(handleInfo,
+            BasicHandleInfo(target.first.fed_id,
+                target.first.handle,InterfaceType::ENDPOINT),
+            flags,
+            flags,
+            std::make_pair(CMD_ADD_FILTER,CMD_ADD_ENDPOINT));
 
-        // notify the filter about an endpoint
-        m.setAction(CMD_ADD_ENDPOINT);
-        m.swapSourceDest();
-        m.clearStringData();
-        transmit(getRoute(m.dest_id), m);
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(key);
