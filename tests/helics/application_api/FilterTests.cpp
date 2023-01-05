@@ -592,7 +592,7 @@ TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
 
 TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias_regex)
 {
-    //debugDiagnostic = true;
+    // debugDiagnostic = true;
     auto broker = AddBroker("test", 3);
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
     AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");

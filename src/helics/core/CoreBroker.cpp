@@ -2546,13 +2546,13 @@ static action_message_def::action_t getAction(InterfaceType type)
 static action_message_def::action_t getMatchAction(InterfaceType type, InterfaceType destType)
 {
     switch (type) {
-    case InterfaceType::FILTER:
-        return CMD_ADD_ENDPOINT;
-    case InterfaceType::PUBLICATION:
-        return CMD_ADD_SUBSCRIBER;
-    case InterfaceType::INPUT:
-        return CMD_ADD_PUBLISHER;
-    default:
+        case InterfaceType::FILTER:
+            return CMD_ADD_ENDPOINT;
+        case InterfaceType::PUBLICATION:
+            return CMD_ADD_SUBSCRIBER;
+        case InterfaceType::INPUT:
+            return CMD_ADD_PUBLISHER;
+        default:
             return (destType == InterfaceType::FILTER) ? CMD_ADD_FILTER : CMD_ADD_ENDPOINT;
     }
 }
@@ -2561,21 +2561,21 @@ static action_message_def::action_t getMatchAction(InterfaceType type, Interface
 static InterfaceType getMatchType(InterfaceType type)
 {
     switch (type) {
-    case InterfaceType::FILTER:
-        return InterfaceType::ENDPOINT;
-    case InterfaceType::PUBLICATION:
-        return InterfaceType::INPUT;
-    case InterfaceType::INPUT:
-        return InterfaceType::PUBLICATION;
-    default:
-        return InterfaceType::ENDPOINT;
-
+        case InterfaceType::FILTER:
+            return InterfaceType::ENDPOINT;
+        case InterfaceType::PUBLICATION:
+            return InterfaceType::INPUT;
+        case InterfaceType::INPUT:
+            return InterfaceType::PUBLICATION;
+        default:
+            return InterfaceType::ENDPOINT;
     }
 }
-void CoreBroker::connectInterfaces(const BasicHandleInfo& origin,
-                                   const BasicHandleInfo& target,
-                                   uint32_t flagsSource,
-                                   uint32_t flagsDest,
+void CoreBroker::connectInterfaces(
+    const BasicHandleInfo& origin,
+    const BasicHandleInfo& target,
+    uint32_t flagsSource,
+    uint32_t flagsDest,
     std::pair<action_message_def::action_t, action_message_def::action_t> actions)
 {
     // notify the target about a source
@@ -2614,7 +2614,7 @@ void CoreBroker::findRegexMatch(const std::string& target,
                                 uint16_t flags)
 {
     const auto* dest = handles.findHandle(handle);
-    
+
     try {
         auto matches = handles.regexSearch(target, type);
         for (auto& mtch : matches) {
@@ -2622,16 +2622,23 @@ void CoreBroker::findRegexMatch(const std::string& target,
             if (hnd == nullptr) {
                 continue;
             }
-            auto destFlags=flags;
-            if (dest!=nullptr && dest->handleType == InterfaceType::FILTER)
-            {
-                if (checkActionFlag(*dest, clone_flag))
-                {
-                    destFlags|=make_flags(clone_flag);
-                    flags|=make_flags(clone_flag);
+            auto destFlags = flags;
+            if (dest != nullptr && dest->handleType == InterfaceType::FILTER) {
+                if (checkActionFlag(*dest, clone_flag)) {
+                    destFlags |= make_flags(clone_flag);
+                    flags |= make_flags(clone_flag);
                 }
             }
-            connectInterfaces(*hnd, (dest!=nullptr)? *dest:BasicHandleInfo(handle,getMatchType(type)), flags, destFlags, std::make_pair(getAction(type), getMatchAction(type, (dest!=nullptr)?dest->handleType:getMatchType(type))));
+            connectInterfaces(*hnd,
+                              (dest != nullptr) ? *dest :
+                                                  BasicHandleInfo(handle, getMatchType(type)),
+                              flags,
+                              destFlags,
+                              std::make_pair(getAction(type),
+                                             getMatchAction(type,
+                                                            (dest != nullptr) ?
+                                                                dest->handleType :
+                                                                getMatchType(type))));
         }
     }
     catch (const std::invalid_argument& ia) {
@@ -2827,9 +2834,9 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
 {
     auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
-            connectInterfaces(handleInfo,
+        connectInterfaces(handleInfo,
                           BasicHandleInfo(sub.first.fed_id, sub.first.handle, InterfaceType::INPUT),
-                sub.second,
+                          sub.second,
                           handleInfo.flags,
                           std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
     }
@@ -2857,8 +2864,8 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
         }
 
         connectInterfaces(handleInfo,
-            *iface,
-            target.second,
+                          *iface,
+                          target.second,
                           destFlags,
                           std::make_pair(CMD_ADD_ENDPOINT,
                                          (iface->handleType != InterfaceType::FILTER) ?
@@ -2889,11 +2896,11 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
             flags |= make_flags(clone_flag);
         }
         connectInterfaces(handleInfo,
-            BasicHandleInfo(target.first.fed_id,
+                          BasicHandleInfo(target.first.fed_id,
                                           target.first.handle,
                                           InterfaceType::ENDPOINT),
-            flags,
-            flags,
+                          flags,
+                          flags,
                           std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
     }
 

@@ -43,10 +43,8 @@ class BasicHandleInfo {
     {
     }
 
-    BasicHandleInfo(GlobalHandle gHandle,
-        InterfaceType type_of_handle) noexcept:
-        handle{gHandle},
-        handleType(type_of_handle), type_in(type), type_out(units)
+    BasicHandleInfo(GlobalHandle gHandle, InterfaceType type_of_handle) noexcept:
+        handle{gHandle}, handleType(type_of_handle), type_in(type), type_out(units)
     {
     }
 
