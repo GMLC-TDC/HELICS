@@ -37,20 +37,24 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck,
     return true;
 }
 
-bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber,std::string_view subscriberName)
+bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view subscriberName)
 {
     for (const auto& sub : subscribers) {
         if (sub.first == newSubscriber) {
             return false;
         }
     }
-    subscribers.emplace_back(newSubscriber,subscriberName);
+    subscribers.emplace_back(newSubscriber, subscriberName);
     return true;
 }
 
 void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
 {
-    subscribers.erase(std::remove_if(subscribers.begin(), subscribers.end(), [subscriberToRemove](const auto& val) {return val.first == subscriberToRemove; }),
+    subscribers.erase(std::remove_if(subscribers.begin(),
+                                     subscribers.end(),
+                                     [subscriberToRemove](const auto& val) {
+                                         return val.first == subscriberToRemove;
+                                     }),
                       subscribers.end());
 }
 
@@ -118,7 +122,6 @@ int32_t PublicationInfo::getProperty(int32_t option) const
     }
     return flagval ? 1 : 0;
 }
-
 
 const std::string& PublicationInfo::getTargets() const
 {

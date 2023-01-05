@@ -1632,8 +1632,7 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
         switch (handleInfo->handleType) {
             case InterfaceType::INPUT:
                 return gEmptyString;
-            case InterfaceType::PUBLICATION:
-            {
+            case InterfaceType::PUBLICATION: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* pubInfo = fed->interfaces().getPublication(handle);
                 if (pubInfo != nullptr) {
@@ -1673,7 +1672,7 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
             case InterfaceType::PUBLICATION:
                 return gEmptyString;
             case InterfaceType::ENDPOINT:
-            case InterfaceType::SINK:{
+            case InterfaceType::SINK: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
                 if (eptInfo != nullptr) {

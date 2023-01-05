@@ -353,7 +353,6 @@ TEST(comboFederate, constructor3)
     EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(500)));
 }
 
-
 TEST_F(combofed, regex_link_anon_inp)
 {
     SetupTest<helics::CombinationFederate>("test", 1);
@@ -362,7 +361,7 @@ TEST_F(combofed, regex_link_anon_inp)
     // register the publications
     vFed1->addAlias("pub1", "publisher");
 
-    auto &inp1=vFed1->registerDataSink("");
+    auto& inp1 = vFed1->registerDataSink("");
 
     auto& pub1 = vFed1->registerPublication<std::string>("pub1");
     auto& pub2 = vFed1->registerPublication<std::string>("pub2");
@@ -371,7 +370,8 @@ TEST_F(combofed, regex_link_anon_inp)
 
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     inp1.subscribe("REGEX:fed0/.*");
-    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,HELICS_MULTI_INPUT_SUM_OPERATION);
+    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+                   HELICS_MULTI_INPUT_SUM_OPERATION);
 
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -384,10 +384,10 @@ TEST_F(combofed, regex_link_anon_inp)
 
     EXPECT_EQ(gtime, 1.0);
     // get the value
-    EXPECT_EQ(inp1.pendingMessageCount(),4);
+    EXPECT_EQ(inp1.pendingMessageCount(), 4);
 
-    const auto &str=inp1.getSourceTargets();
-    EXPECT_NE(str.find("pub2"),std::string::npos);
+    const auto& str = inp1.getSourceTargets();
+    EXPECT_NE(str.find("pub2"), std::string::npos);
 
     vFed1->finalize();
 }

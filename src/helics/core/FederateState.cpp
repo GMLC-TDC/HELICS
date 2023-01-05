@@ -611,8 +611,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
     std::vector<GlobalHandle> subs;
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
-        for (const auto& sub : pubInfo->subscribers)
-        {
+        for (const auto& sub : pubInfo->subscribers) {
             subs.emplace_back(sub.first);
         }
     }
@@ -1660,7 +1659,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
-                if (pubI->addSubscriber(cmd.getSource(),cmd.name())) {
+                if (pubI->addSubscriber(cmd.getSource(), cmd.name())) {
                     if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependent(cmd.source_id);
                     }

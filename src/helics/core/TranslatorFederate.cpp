@@ -234,7 +234,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_ADD_SUBSCRIBER: {
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
-                tranI->getPubInfo()->addSubscriber(command.getSource(),command.name());
+                tranI->getPubInfo()->addSubscriber(command.getSource(), command.name());
 
                 if (!checkActionFlag(command, error_flag)) {
                     mCoord.addDependent(command.source_id);

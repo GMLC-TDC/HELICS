@@ -192,10 +192,10 @@ TEST_F(valuefed, regex_link_anon_pub)
     // register the publications
     vFed1->addAlias("pub1", "publisher");
 
-    auto &inp1=vFed1->registerInput<std::string>("input1");
-    auto &inp2=vFed1->registerInput<std::string>("input2");
-    auto &inp3=vFed1->registerInput<std::string>("input3");
-    auto &inp4=vFed1->registerInput<std::string>("input4");
+    auto& inp1 = vFed1->registerInput<std::string>("input1");
+    auto& inp2 = vFed1->registerInput<std::string>("input2");
+    auto& inp3 = vFed1->registerInput<std::string>("input3");
+    auto& inp4 = vFed1->registerInput<std::string>("input4");
 
     auto& pub = vFed1->registerPublication<std::string>("");
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
@@ -221,9 +221,9 @@ TEST_F(valuefed, regex_link_anon_pub)
     inp4.getValue(s);
     EXPECT_EQ(s, "string1");
 
-    const auto &str=pub.getDestinationTargets();
-    EXPECT_NE(str.find("input3"),std::string::npos);
-   
+    const auto& str = pub.getDestinationTargets();
+    EXPECT_NE(str.find("input3"), std::string::npos);
+
     vFed1->finalize();
 }
 
@@ -235,7 +235,7 @@ TEST_F(valuefed, regex_link_anon_inp)
     // register the publications
     vFed1->addAlias("pub1", "publisher");
 
-    auto &inp1=vFed1->registerInput<std::string>("");
+    auto& inp1 = vFed1->registerInput<std::string>("");
 
     auto& pub1 = vFed1->registerPublication<std::string>("pub1");
     auto& pub2 = vFed1->registerPublication<std::string>("pub2");
@@ -244,7 +244,8 @@ TEST_F(valuefed, regex_link_anon_inp)
 
     vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
     inp1.addTarget("REGEX:fed0/.*");
-    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,HELICS_MULTI_INPUT_SUM_OPERATION);
+    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+                   HELICS_MULTI_INPUT_SUM_OPERATION);
 
     vFed1->enterExecutingMode();
     // publish string1 at time=0.0;
@@ -260,14 +261,13 @@ TEST_F(valuefed, regex_link_anon_inp)
     // get the value
     inp1.getValue(s);
     // make sure the string is what we expect
-    EXPECT_NE(s.find("string1"),std::string::npos);
-    EXPECT_NE(s.find("string2"),std::string::npos);
-    EXPECT_NE(s.find("string3"),std::string::npos);
-    EXPECT_NE(s.find("string4"),std::string::npos);
+    EXPECT_NE(s.find("string1"), std::string::npos);
+    EXPECT_NE(s.find("string2"), std::string::npos);
+    EXPECT_NE(s.find("string3"), std::string::npos);
+    EXPECT_NE(s.find("string4"), std::string::npos);
 
-
-    const auto &str=inp1.getSourceTargets();
-    EXPECT_NE(str.find("pub2"),std::string::npos);
+    const auto& str = inp1.getSourceTargets();
+    EXPECT_NE(str.find("pub2"), std::string::npos);
 
     vFed1->finalize();
 }
@@ -487,8 +487,6 @@ TEST_F(valuefed, dual_transfer_brokerApp_link)
     bool res = dual_transfer_test(vFed1, vFed2, pubid, inpid);
     EXPECT_TRUE(res);
 }
-
-
 
 #ifdef HELICS_ENABLE_ZMQ_CORE
 static constexpr const char* config_files[] = {"bes_config.json",

@@ -389,23 +389,18 @@ static defV sumOperation(const std::vector<defV>& vals)
     if (vals.empty()) {
         return std::string{};
     }
-    if (vals.front().index()==string_loc)
-    {
+    if (vals.front().index() == string_loc) {
         std::string output;
-        for (const auto& v : vals)
-        {
+        for (const auto& v : vals) {
             std::string valOutput;
-            valueExtract(v,valOutput);
+            valueExtract(v, valOutput);
             output.append(valOutput);
         }
         return output;
-    }
-    else
-    {
+    } else {
         return vectorSum(vals);
     }
 }
-
 
 static bool changeDetected(const defV& prevValue, const defV& newVal, double deltaV)
 {
@@ -450,16 +445,14 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
             type = DataType::HELICS_VECTOR;
             break;
         case MultiInputHandlingMethod::SUM_OPERATION:
-            switch (targetType)
-            {
-
-            case DataType::HELICS_STRING:
-            case DataType::HELICS_CHAR:
-                type = DataType::HELICS_STRING;
-                break;
-            default:
-                type=DataType::HELICS_VECTOR;
-                break;
+            switch (targetType) {
+                case DataType::HELICS_STRING:
+                case DataType::HELICS_CHAR:
+                    type = DataType::HELICS_STRING;
+                    break;
+                default:
+                    type = DataType::HELICS_VECTOR;
+                    break;
             }
             break;
         case MultiInputHandlingMethod::VECTORIZE_OPERATION:
