@@ -392,6 +392,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
                     Json::Value sid;
                     sid["federate"] = source.fed_id.baseValue();
                     sid["handle"] = source.handle.baseValue();
+                    
                     ibase["sources"].append(sid);
                 }
             }
@@ -413,8 +414,12 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
                 pbase["targets"] = Json::arrayValue;
                 for (auto& target : pub->subscribers) {
                     Json::Value sid;
-                    sid["federate"] = target.fed_id.baseValue();
-                    sid["handle"] = target.handle.baseValue();
+                    sid["federate"] = target.first.fed_id.baseValue();
+                    sid["handle"] = target.first.handle.baseValue();
+                    if (!target.second.empty())
+                    {
+                        sid["key"]=target.second;
+                    }
                     pbase["targets"].append(sid);
                 }
             }

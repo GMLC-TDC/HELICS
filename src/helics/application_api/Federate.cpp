@@ -1867,7 +1867,7 @@ const std::string& Interface::getDestinationTargets() const
 
 const std::string& Interface::getDisplayName() const
 {
-    return (mName.empty() ? getTarget() : mName);
+    return (mName.empty() ? getSourceTargets() : mName);
 }
 
 void Interface::close()

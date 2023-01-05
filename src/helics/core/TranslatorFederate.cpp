@@ -65,7 +65,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
     }
     switch (command.action()) {
         case CMD_SEND_MESSAGE: {
-            auto targets = trans->getPubInfo()->subscribers;
+            const auto& targets = trans->getPubInfo()->subscribers;
             if (targets.empty()) {
                 break;
             }
@@ -74,7 +74,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
             if (!val.empty()) {
                 if (targets.size() == 1) {
                     ActionMessage sendM(CMD_PUB);
-                    sendM.setDestination(targets.front());
+                    sendM.setDestination(targets.front().first);
                     sendM.setSource(trans->id);
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
@@ -86,7 +86,7 @@ void TranslatorFederate::executeTranslator(ActionMessage& command, TranslatorInf
                     sendM.actionTime = trans->tranOp->computeNewValueTime(command.actionTime);
                     sendM.payload = std::move(val);
                     for (const auto& tg : targets) {
-                        sendM.setDestination(tg);
+                        sendM.setDestination(tg.first);
                         mSendMessage(sendM);
                     }
                 }
@@ -222,7 +222,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
                 tranI->getInputInfo()->addSource(command.getSource(),
-                                                 command.payload.to_string(),
+                                                 command.name(),
                                                  command.getString(typeStringLoc),
                                                  command.getString(unitStringLoc));
 
@@ -234,7 +234,7 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
         case CMD_ADD_SUBSCRIBER: {
             auto* tranI = getTranslatorInfo(mFedID, command.dest_handle);
             if (tranI != nullptr) {
-                tranI->getPubInfo()->addSubscriber(command.getSource());
+                tranI->getPubInfo()->addSubscriber(command.getSource(),command.name());
 
                 if (!checkActionFlag(command, error_flag)) {
                     mCoord.addDependent(command.source_id);

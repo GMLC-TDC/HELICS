@@ -27,7 +27,7 @@ class PublicationInfo {
     {
     }
     const GlobalHandle id;  //!< the identifier for the containing federate
-    std::vector<GlobalHandle> subscribers;  //!< container for all the subscribers of a publication
+    std::vector<std::pair<GlobalHandle,std::string>> subscribers;  //!< container for all the subscribers of a publication
     const std::string key;  //!< the key identifier for the publication
     const std::string type;  //!< the type of the publication data
     const std::string units;  //!< the units of the publication data
@@ -47,12 +47,15 @@ class PublicationInfo {
     /** add a new subscriber to the publication
 @return true if the subscriber was added false if duplicate
 */
-    bool addSubscriber(GlobalHandle newSubscriber);
+    bool addSubscriber(GlobalHandle newSubscriber,std::string_view inputName);
 
     /** remove a subscriber*/
     void removeSubscriber(GlobalHandle subscriberToRemove);
 
     void setProperty(int32_t option, int32_t value);
     int32_t getProperty(int32_t option) const;
+    const std::string& getTargets() const;
+private:
+    mutable std::string destTargets;
 };
 }  // namespace helics

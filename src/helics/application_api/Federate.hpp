@@ -871,7 +871,7 @@ class HELICS_CXX_EXPORT Interface {
     @details the name is the local name if given, key is the full key name*/
     const std::string& getName() const;
     /** get an associated target*/
-    const std::string& getTarget() const;
+    [[deprecated]] const std::string& getTarget() const;
     /** add a source of information to an interface*/
     void addSourceTarget(std::string_view newTarget, InterfaceType hint = InterfaceType::UNKNOWN);
     /** add destination for data sent via the interface*/

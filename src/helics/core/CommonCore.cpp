@@ -1630,16 +1630,17 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
-            case InterfaceType::INPUT: {
+            case InterfaceType::INPUT:
+                return gEmptyString;
+            case InterfaceType::PUBLICATION:
+            {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
-                auto* inpInfo = fed->interfaces().getInput(handle);
-                if (inpInfo != nullptr) {
-                    return inpInfo->getTargets();
+                auto* pubInfo = fed->interfaces().getPublication(handle);
+                if (pubInfo != nullptr) {
+                    return pubInfo->getTargets();
                 }
                 break;
             }
-            case InterfaceType::PUBLICATION:
-                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1671,7 +1672,8 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
             }
             case InterfaceType::PUBLICATION:
                 return gEmptyString;
-            case InterfaceType::ENDPOINT: {
+            case InterfaceType::ENDPOINT:
+            case InterfaceType::SINK:{
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
                 if (eptInfo != nullptr) {

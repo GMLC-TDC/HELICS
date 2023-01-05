@@ -382,8 +382,8 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
                 ActionMessage rem(CMD_REMOVE_PUBLICATION);
                 rem.setSource(pub->id);
                 rem.actionTime = time_granted;
-                for (auto& sub : pub->subscribers) {
-                    rem.setDestination(sub);
+                for (const auto& sub : pub->subscribers) {
+                    rem.setDestination(sub.first);
                     routeMessage(rem);
                 }
                 pub->subscribers.clear();
@@ -608,11 +608,15 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
 std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 {
     std::lock_guard<FederateState> fedlock(*this);
+    std::vector<GlobalHandle> subs;
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
-        return pubInfo->subscribers;
+        for (const auto& sub : pubInfo->subscribers)
+        {
+            subs.emplace_back(sub.first);
+        }
     }
-    return {};
+    return subs;
 }
 
 std::vector<std::pair<GlobalHandle, std::string_view>>
@@ -1656,7 +1660,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
-                if (pubI->addSubscriber(cmd.getSource())) {
+                if (pubI->addSubscriber(cmd.getSource(),cmd.name())) {
                     if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependent(cmd.source_id);
                     }
