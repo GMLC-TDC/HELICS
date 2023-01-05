@@ -590,6 +590,36 @@ TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias)
     EXPECT_TRUE(res);
 }
 
+TEST_F(filter, message_filter_function_two_stage_endpoint_target_alias_regex)
+{
+    //debugDiagnostic = true;
+    auto broker = AddBroker("test", 3);
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "filter2");
+    AddFederates<helics::MessageFederate>("test", 1, broker, 1.0, "message");
+
+    auto fFed = GetFederateAs<helics::MessageFederate>(0);
+    auto fFed2 = GetFederateAs<helics::MessageFederate>(1);
+    auto mFed = GetFederateAs<helics::MessageFederate>(2);
+
+    fFed2->addAlias("ff11", "fBBBEA");
+    broker->addAlias("ff22", "fBBBEB");
+    auto& p1 = mFed->registerEndpoint();
+    auto& p2 = mFed->registerGlobalEndpoint("port2");
+    p1.addSourceFilter("REGEX:fBBBE.");
+
+    auto& f1 = fFed->registerGlobalFilter("ff11");
+
+    EXPECT_TRUE(f1.getHandle().isValid());
+
+    auto& f2 = fFed2->registerGlobalFilter("ff22");
+
+    EXPECT_TRUE(f2.getHandle().isValid());
+
+    bool res = two_stage_filter_test(mFed, fFed, fFed2, p1, p2, f1, f2);
+    EXPECT_TRUE(res);
+}
+
 TEST_P(filter_single_type_test, message_filter_function_two_stage_endpoint_target_dest)
 {
     // debugDiagnostic = true;
