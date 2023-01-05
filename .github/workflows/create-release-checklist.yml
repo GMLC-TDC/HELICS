@@ -1,0 +1,45 @@
+name: Create release checklist
+
+on:
+  # Picking a workflow branch that is a tag, in combination with using the commit field is likely to fail for magic git clone/checkout reasons
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag to open the release checklist for (including `v` prefix, e.g. `v3.1.0`)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+  release:
+    types: published
+
+jobs:
+  create-release-checklist-issue:
+    name: Open release checklist issue
+    runs-on: ubuntu-latest
+    steps:
+    # Needed to get the checklist template
+    - name: Checkout release checklist template
+      uses: actions/checkout@v3
+    - name: Create issue
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        echo "$PWD"
+        if [[ "${{ inputs.version }}" ]]; then
+          HELICS_VERSION="${{ inputs.version }}"
+        else
+          HELICS_VERSION="${{ github.event.release.tag_name }}"
+        fi
+        export HELICS_VERSION
+        echo "HELICS_VERSION=${HELICS_VERSION}"
+        HELICS_VERSION_MAJ="$(echo "${HELICS_VERSION}" | cut -d "." --fields=1)"
+        HELICS_VERSION_MAJ_MIN="$(echo "${HELICS_VERSION}" | cut -d "." --fields=1,2)"
+        HELICS_PREV_VERSION=$(gh release list --limit 100 | grep -v "Pre-release" | cut -f3 | grep "${HELICS_VERSION_MAJ}" | head -n2 | tail -n1)
+        export HELICS_PREV_VERSION
+        echo "HELICS_PREV_VERSION=${HELICS_PREV_VERSION}"
+        RELEASE_CHECKLIST="$(envsubst < ./.github/RELEASE_CHECKLIST_TEMPLATE.md)"
+        gh issue create --title "${HELICS_VERSION} Release Checklist" --body "${RELEASE_CHECKLIST}"
