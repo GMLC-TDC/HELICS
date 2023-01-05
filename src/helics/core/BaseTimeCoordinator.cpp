@@ -101,15 +101,21 @@ void BaseTimeCoordinator::disconnect()
 
     } else {
         ActionMessage multi(CMD_MULTI_MESSAGE);
+        bool hasLocal{false};
         for (const auto& dep : dependencies) {
             if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
-                bye.dest_id = dep.fedID;
                 if (dep.fedID == mSourceId) {
-                    processTimeMessage(bye);
+                    hasLocal=true;
                 } else {
+                    bye.dest_id = dep.fedID;
                     appendMessage(multi, bye);
                 }
             }
+        }
+        if (hasLocal)
+        {
+            bye.dest_id = mSourceId;
+            processTimeMessage(bye);
         }
         sendMessageFunction(multi);
     }
