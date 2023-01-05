@@ -105,15 +105,14 @@ void BaseTimeCoordinator::disconnect()
         for (const auto& dep : dependencies) {
             if ((dep.dependency && dep.next < Time::maxVal()) || dep.dependent) {
                 if (dep.fedID == mSourceId) {
-                    hasLocal=true;
+                    hasLocal = true;
                 } else {
                     bye.dest_id = dep.fedID;
                     appendMessage(multi, bye);
                 }
             }
         }
-        if (hasLocal)
-        {
+        if (hasLocal) {
             bye.dest_id = mSourceId;
             processTimeMessage(bye);
         }

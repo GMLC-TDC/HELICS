@@ -2629,8 +2629,8 @@ void CoreBroker::findRegexMatch(const std::string& target,
                     flags |= make_flags(clone_flag);
                 }
             }
-            if (type == InterfaceType::ENDPOINT && (dest == nullptr || dest->handleType != InterfaceType::FILTER))
-            {
+            if (type == InterfaceType::ENDPOINT &&
+                (dest == nullptr || dest->handleType != InterfaceType::FILTER)) {
                 destFlags = toggle_flag(destFlags, destination_target);
             }
             connectInterfaces(*hnd,
