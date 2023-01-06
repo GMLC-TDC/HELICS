@@ -11,8 +11,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <cstdint>
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace helics {
 /** data class containing the information about a publication*/
