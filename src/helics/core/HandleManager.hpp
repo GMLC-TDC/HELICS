@@ -24,7 +24,7 @@ namespace helics {
 */
 class HandleManager {
   private:
-    using mapType = std::unordered_map<std::string_view, InterfaceHandle>;
+    using MapType = std::unordered_map<std::string_view, InterfaceHandle>;
     /** use deque here as there are several use cases which use two properties of a deque vs vector
     namely that references are not invalidated by emplace back, which is unlike a vector
     and that the memory growth is a stable and not subject to large copy operations
@@ -34,11 +34,11 @@ class HandleManager {
     container types so using deque reduce the amount of the code to maintain as well*/
     std::deque<BasicHandleInfo> handles;  //!< local handle information
     /// map of all local publications
-    mapType publications;
+    MapType publications;
     /// map of all local endpoints
-    mapType endpoints;
-    mapType inputs;  //!< map of all local endpoints
-    mapType filters;  //!< map of all local endpoints
+    MapType endpoints;
+    MapType inputs;  //!< map of all local endpoints
+    MapType filters;  //!< map of all local endpoints
     std::unordered_map<std::uint64_t, int32_t> unique_ids;  //!< map of identifiers
     /// set of all valid aliases <interface_name,aliases>
     std::unordered_map<std::string_view, std::vector<std::string_view>> aliases;
@@ -106,6 +106,9 @@ class HandleManager {
     auto begin() const { return handles.begin(); }
     auto end() const { return handles.end(); }
     auto size() const { return handles.size(); }
+    /* search for handles based on a regex string and type*/
+    std::vector<GlobalHandle> regexSearch(const std::string& regexExpression,
+                                          InterfaceType type) const;
 
   private:
     void addSearchFields(const BasicHandleInfo& handle, int32_t index);
@@ -123,6 +126,9 @@ class HandleManager {
     /// @param alias the new name used to refer to an interface
     /// @return true if there are multiple interacting aliases
     bool addAliasName(std::string_view interfaceName, std::string_view alias);
+    /** get the appropriate map based on type*/
+    MapType& getMap(InterfaceType type);
+    const MapType& getMap(InterfaceType type) const;
 };
 
 }  // namespace helics

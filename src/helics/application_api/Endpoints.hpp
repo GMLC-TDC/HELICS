@@ -24,6 +24,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
     int referenceIndex{-1};  //!< an index used for callback lookup
     void* dataReference{nullptr};  //!< pointer to a piece of containing data
     bool disableAssign{false};  //!< disable assignment for the object
+    bool receiveOnly{false};  //!< disable sending messages from this object
     std::string defDest;  //!< storage for a default destination
   public:
     /** default constructor*/
@@ -71,7 +72,7 @@ class HELICS_CXX_EXPORT Endpoint: public Interface {
             std::is_base_of<MessageFederate, std::remove_reference_t<decltype(*mFed)>>::value,
             "second argument must be a pointer to a MessageFederate");
     }
-    const std::string& getType() { return getExtractionType(); }
+    const std::string& getType() const { return getExtractionType(); }
     /** send a data block and length to the endpoint targets
     @param data pointer to data location
     @param data_size the length of the data

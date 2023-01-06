@@ -1494,6 +1494,9 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
+    if (checkActionFlag(*handleInfo, receive_only_flag)) {
+        throw(InvalidIdentifier("Interface is receive only and cannot have destination targets"));
+    }
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
     cmd.flags = handleInfo->flags;
@@ -1546,6 +1549,8 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                 cmd.setStringData(handleInfo->type, handleInfo->units);
             }
             break;
+        case InterfaceType::SINK:
+            throw(InvalidIdentifier("Data sinks cannot have destination targets"));
         case InterfaceType::INPUT:
         default:
             throw(InvalidIdentifier("inputs cannot have destination targets"));
@@ -1562,6 +1567,9 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
     if (handleInfo == nullptr) {
         throw(InvalidIdentifier("invalid handle"));
     }
+    if (checkActionFlag(*handleInfo, source_only_flag)) {
+        throw(InvalidIdentifier("Interface is receive only and cannot have destination targets"));
+    }
     ActionMessage cmd;
     cmd.setSource(handleInfo->handle);
     cmd.counter = static_cast<uint16_t>(handleInfo->handleType);
@@ -1569,6 +1577,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
     cmd.payload = targetName;
     switch (handleInfo->handleType) {
         case InterfaceType::ENDPOINT:
+        case InterfaceType::SINK:
             if (hint == InterfaceType::FILTER) {
                 cmd.setAction(CMD_ADD_NAMED_FILTER);
             } else if (hint == InterfaceType::PUBLICATION) {
@@ -1577,6 +1586,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
             }
             break;
+
         case InterfaceType::TRANSLATOR:
             switch (hint) {
                 case InterfaceType::PUBLICATION:
@@ -1620,16 +1630,16 @@ const std::string& CommonCore::getDestinationTargets(InterfaceHandle handle) con
     const auto* handleInfo = getHandleInfo(handle);
     if (handleInfo != nullptr) {
         switch (handleInfo->handleType) {
-            case InterfaceType::INPUT: {
+            case InterfaceType::INPUT:
+                return gEmptyString;
+            case InterfaceType::PUBLICATION: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
-                auto* inpInfo = fed->interfaces().getInput(handle);
-                if (inpInfo != nullptr) {
-                    return inpInfo->getTargets();
+                auto* pubInfo = fed->interfaces().getPublication(handle);
+                if (pubInfo != nullptr) {
+                    return pubInfo->getTargets();
                 }
                 break;
             }
-            case InterfaceType::PUBLICATION:
-                return gEmptyString;
             case InterfaceType::ENDPOINT: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
@@ -1661,7 +1671,8 @@ const std::string& CommonCore::getSourceTargets(InterfaceHandle handle) const
             }
             case InterfaceType::PUBLICATION:
                 return gEmptyString;
-            case InterfaceType::ENDPOINT: {
+            case InterfaceType::ENDPOINT:
+            case InterfaceType::SINK: {
                 auto* fed = getFederateAt(handleInfo->local_fed_id);
                 auto* eptInfo = fed->interfaces().getEndpoint(handle);
                 if (eptInfo != nullptr) {
@@ -1811,14 +1822,35 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
     return id;
 }
 
+InterfaceHandle CommonCore::registerDataSink(LocalFederateId federateID, std::string_view name)
+{
+    auto* fed = checkNewInterface(federateID, name, InterfaceType::SINK);
+    uint16_t sinkFlags = fed->getInterfaceFlags() | make_flags(receive_only_flag, targeted_flag);
+
+    const auto& handle = createBasicHandle(
+        fed->global_id, fed->local_id, InterfaceType::SINK, name, "sink", std::string{}, sinkFlags);
+
+    auto id = handle.getInterfaceHandle();
+    fed->createInterface(InterfaceType::SINK, id, name, "sink", gEmptyString, sinkFlags);
+    ActionMessage m(CMD_REG_DATASINK);
+    m.source_id = fed->global_id.load();
+    m.source_handle = id;
+    m.name(name);
+    m.setStringData("sink");
+    m.flags = handle.flags;
+    actionQueue.push(std::move(m));
+
+    return id;
+}
+
 InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
                                                      std::string_view name,
                                                      std::string_view type)
 {
     auto* fed = checkNewInterface(federateID, name, InterfaceType::ENDPOINT);
 
-    auto flags = fed->getInterfaceFlags();
-    flags |= (1U << targeted_flag);
+    auto flags = fed->getInterfaceFlags() | make_flags(targeted_flag);
+
     const auto& handle = createBasicHandle(
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
@@ -1839,6 +1871,16 @@ InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, std::string_
 {
     const auto* ept = handles.read(
         [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::ENDPOINT); });
+    if (ept->local_fed_id != federateID) {
+        return {};
+    }
+    return ept->handle.handle;
+}
+
+InterfaceHandle CommonCore::getDataSink(LocalFederateId federateID, std::string_view name) const
+{
+    const auto* ept = handles.read(
+        [&name](auto& hand) { return hand.getInterfaceHandle(name, InterfaceType::SINK); });
     if (ept->local_fed_id != federateID) {
         return {};
     }
@@ -2189,6 +2231,10 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
     }
     if (hndl->handleType != InterfaceType::ENDPOINT) {
         throw(InvalidIdentifier("handle does not point to an endpoint"));
+    }
+    if (checkActionFlag(*hndl, receive_only_flag)) {
+        throw(InvalidFunctionCall(
+            "Endpoint is receive only; no messages can be sent through this endpoint"));
     }
     ActionMessage m(std::move(message));
 
@@ -3577,6 +3623,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             break;
         case CMD_REG_INPUT:
         case CMD_REG_ENDPOINT:
+        case CMD_REG_DATASINK:
         case CMD_REG_PUB:
         case CMD_REG_FILTER:
         case CMD_REG_TRANSLATOR:
@@ -3767,6 +3814,7 @@ void CommonCore::registerInterface(ActionMessage& command)
         switch (command.action()) {
             case CMD_REG_INPUT:
             case CMD_REG_PUB:
+            case CMD_REG_DATASINK:
                 break;
             case CMD_REG_ENDPOINT:
                 if (globalTime) {

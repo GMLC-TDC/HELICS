@@ -495,6 +495,21 @@ class Core {
                                         std::string_view name) const = 0;
 
     /**
+    * Register a data sink which can only receive data from specific targets
+    @param federateID the federate to associate the endpoint with
+    @param name the name of the sink
+    @return a handle to identify the sink
+    */
+    virtual InterfaceHandle registerDataSink(LocalFederateId federateID, std::string_view name) = 0;
+
+    /** get an interface handle to a data sink
+    @param federateID the identifier for the federate
+    @param name the name of the data sink
+    @return a handle to identify the sink*/
+    virtual InterfaceHandle getDataSink(LocalFederateId federateID,
+                                        std::string_view name) const = 0;
+
+    /**
     * Register a cloning filter, a cloning filter operates on a copy of the message vs the actual
     message
     *

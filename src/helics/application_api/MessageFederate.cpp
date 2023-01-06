@@ -142,6 +142,11 @@ Endpoint& MessageFederate::registerGlobalTargetedEndpoint(std::string_view eptNa
     return mfManager->registerTargetedEndpoint(eptName, type);
 }
 
+Endpoint& MessageFederate::registerDataSink(std::string_view sinkName)
+{
+    return mfManager->registerDataSink(sinkName);
+}
+
 void MessageFederate::registerInterfaces(const std::string& configString)
 {
     registerMessageInterfaces(configString);
@@ -216,6 +221,14 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
             loadOptions(this, ept, epObj);
         }
     }
+    if (doc.isMember("datasinks")) {
+        for (const auto& ept : doc["datasinks"]) {
+            auto eptName = fileops::getName(ept);
+            Endpoint& epObj = registerDataSink(eptName);
+
+            loadOptions(this, ept, epObj);
+        }
+    }
 }
 
 void MessageFederate::registerMessageInterfacesToml(const std::string& tomlString)
@@ -242,6 +255,19 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
+
+            loadOptions(this, ept, epObj);
+        }
+    }
+    if (fileops::isMember(doc, "datasinks")) {
+        auto& epts = toml::find(doc, "datasinks");
+        if (!epts.is_array()) {
+            throw(helics::InvalidParameter("datasinks section in toml file must be an array"));
+        }
+        auto& eptArray = epts.as_array();
+        for (auto& ept : eptArray) {
+            auto key = fileops::getName(ept);
+            Endpoint& epObj = registerDataSink(key);
 
             loadOptions(this, ept, epObj);
         }
@@ -308,6 +334,11 @@ Endpoint& MessageFederate::getEndpoint(std::string_view eptName) const
         return mfManager->getEndpoint(localNameGenerator(eptName));
     }
     return id;
+}
+
+Endpoint& MessageFederate::getDataSink(std::string_view sinkName) const
+{
+    return mfManager->getDataSink(sinkName);
 }
 
 Endpoint& MessageFederate::getEndpoint(int index) const

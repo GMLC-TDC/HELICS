@@ -7,6 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "PublicationInfo.hpp"
 
+#include "../common/JsonGeneration.hpp"
 #include "helics_definitions.hpp"
 
 #include <algorithm>
@@ -36,20 +37,24 @@ bool PublicationInfo::CheckSetValue(const char* dataToCheck,
     return true;
 }
 
-bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber)
+bool PublicationInfo::addSubscriber(GlobalHandle newSubscriber, std::string_view subscriberName)
 {
     for (const auto& sub : subscribers) {
-        if (sub == newSubscriber) {
+        if (sub.first == newSubscriber) {
             return false;
         }
     }
-    subscribers.push_back(newSubscriber);
+    subscribers.emplace_back(newSubscriber, subscriberName);
     return true;
 }
 
 void PublicationInfo::removeSubscriber(GlobalHandle subscriberToRemove)
 {
-    subscribers.erase(std::remove(subscribers.begin(), subscribers.end(), subscriberToRemove),
+    subscribers.erase(std::remove_if(subscribers.begin(),
+                                     subscribers.end(),
+                                     [subscriberToRemove](const auto& val) {
+                                         return val.first == subscriberToRemove;
+                                     }),
                       subscribers.end());
 }
 
@@ -67,16 +72,16 @@ void PublicationInfo::setProperty(int32_t option, int32_t value)
             required = !bvalue;
             break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
-            required_connections = bvalue ? 1 : 0;
+            requiredConnections = bvalue ? 1 : 0;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            required_connections = !bvalue ? 0 : 1;
+            requiredConnections = !bvalue ? 0 : 1;
             break;
         case defs::Options::BUFFER_DATA:
             buffer_data = bvalue;
             break;
         case defs::Options::CONNECTIONS:
-            required_connections = value;
+            requiredConnections = value;
             break;
         case defs::Options::TIME_RESTRICTED:
             minTimeGap = Time(value, time_units::ms);
@@ -100,10 +105,10 @@ int32_t PublicationInfo::getProperty(int32_t option) const
             flagval = !required;
             break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
-            flagval = (required_connections == 1);
+            flagval = (requiredConnections == 1);
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
-            flagval = required_connections != 1;
+            flagval = requiredConnections != 1;
             break;
         case defs::Options::BUFFER_DATA:
             flagval = buffer_data;
@@ -116,5 +121,24 @@ int32_t PublicationInfo::getProperty(int32_t option) const
             break;
     }
     return flagval ? 1 : 0;
+}
+
+const std::string& PublicationInfo::getTargets() const
+{
+    if (destTargets.empty()) {
+        if (!subscribers.empty()) {
+            if (subscribers.size() == 1) {
+                destTargets = subscribers.front().second;
+            } else {
+                destTargets.push_back('[');
+                for (const auto& sub : subscribers) {
+                    destTargets.append(generateJsonQuotedString(sub.second));
+                    destTargets.push_back(',');
+                }
+                destTargets.back() = ']';
+            }
+        }
+    }
+    return destTargets;
 }
 }  // namespace helics

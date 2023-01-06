@@ -335,12 +335,25 @@ class CoreBroker: public Broker, public BrokerBase {
     int getCountableFederates() const;
     /** check if we can remove some dependencies*/
     void checkDependencies();
+
+    void connectInterfaces(
+        const BasicHandleInfo& source,
+        const BasicHandleInfo& dest,
+        uint32_t flags,
+        uint32_t flagsDest,
+        std::pair<action_message_def::action_t, action_message_def::action_t> actions);
+
     /** find any existing publishers for a subscription*/
     void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
     void findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
+
+    void findRegexMatch(const std::string& target,
+                        InterfaceType type,
+                        GlobalHandle handle,
+                        uint16_t flags);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/
@@ -392,6 +405,8 @@ class CoreBroker: public Broker, public BrokerBase {
     void addEndpoint(ActionMessage& m);
     void addFilter(ActionMessage& m);
     void addTranslator(ActionMessage& m);
+    void addDataSink(ActionMessage& m);
+
     bool checkInterfaceCreation(ActionMessage& m, InterfaceType type);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);

@@ -42,7 +42,7 @@ The priority of the inputs is only applicable if the default operation to retrie
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | ``helics_multi_input_or_operation``       | treat all inputs as boolean and perform an `or` operation                                                                                    |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
-|``helics_multi_input_sum_operation``       | sum all the inputs after converting to double vector                                                                                         |
+|``helics_multi_input_sum_operation``       | sum all the inputs after converting to double vector, except if input type is string then concatenate all inputs as a single string        |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+
 | ``helics_multi_input_diff_operation``     | if the input type is specified as a double subtract the sum of remaining values from the first, if it is a vector do a vector diff operation |
 +-------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+

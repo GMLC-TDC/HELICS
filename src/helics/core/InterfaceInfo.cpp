@@ -86,6 +86,12 @@ void InterfaceInfo::createEndpoint(InterfaceHandle handle,
     if (checkActionFlag(flags, single_connection_flag)) {
         ceHandle->back()->setProperty(defs::Options::SINGLE_CONNECTION_ONLY, 1);
     }
+    if (checkActionFlag(flags, source_only_flag)) {
+        ceHandle->back()->setProperty(defs::Options::SEND_ONLY, 1);
+    }
+    if (checkActionFlag(flags, receive_only_flag)) {
+        ceHandle->back()->setProperty(defs::Options::RECEIVE_ONLY, 1);
+    }
 }
 
 void InterfaceInfo::setChangeUpdateFlag(bool updateFlag)
@@ -283,9 +289,9 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                                                 pub->key));
             }
         }
-        if (pub->required_connections > 0) {
-            if (pub->subscribers.size() != static_cast<size_t>(pub->required_connections)) {
-                if (pub->required_connections == 1) {
+        if (pub->requiredConnections > 0) {
+            if (pub->subscribers.size() != static_cast<size_t>(pub->requiredConnections)) {
+                if (pub->requiredConnections == 1) {
                     issues.emplace_back(
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format(
@@ -296,7 +302,7 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
                         helics::defs::Errors::CONNECTION_FAILURE,
                         fmt::format("Publication {} requires {} connections but only {} are made",
                                     pub->key,
-                                    pub->required_connections,
+                                    pub->requiredConnections,
                                     pub->subscribers.size()));
                 }
             }
@@ -386,6 +392,7 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
                     Json::Value sid;
                     sid["federate"] = source.fed_id.baseValue();
                     sid["handle"] = source.handle.baseValue();
+
                     ibase["sources"].append(sid);
                 }
             }
@@ -407,8 +414,11 @@ void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
                 pbase["targets"] = Json::arrayValue;
                 for (auto& target : pub->subscribers) {
                     Json::Value sid;
-                    sid["federate"] = target.fed_id.baseValue();
-                    sid["handle"] = target.handle.baseValue();
+                    sid["federate"] = target.first.fed_id.baseValue();
+                    sid["handle"] = target.first.handle.baseValue();
+                    if (!target.second.empty()) {
+                        sid["key"] = target.second;
+                    }
                     pbase["targets"].append(sid);
                 }
             }
