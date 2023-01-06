@@ -309,6 +309,7 @@ void UnknownHandleManager::clearFilter(const std::string& newFilter)
 }
 
 // TODO(PT):  When move to C++20 use std::erase_if
+// remove_if doesn't work since this is used on maps
 template<typename ContainerT, typename PredicateT>
 void maperase_if(ContainerT& items, const PredicateT& predicate)
 {
