@@ -498,6 +498,7 @@ class Core {
     * Register a data sink which can only receive data from specific targets
     @param federateID the federate to associate the endpoint with
     @param name the name of the sink
+    @return a handle to identify the sink
     */
     virtual InterfaceHandle registerDataSink(LocalFederateId federateID, std::string_view name) = 0;
 

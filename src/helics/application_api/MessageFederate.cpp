@@ -259,10 +259,10 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
             loadOptions(this, ept, epObj);
         }
     }
-    if (fileops::isMember(doc, "datasink")) {
-        auto& epts = toml::find(doc, "datasink");
+    if (fileops::isMember(doc, "datasinks")) {
+        auto& epts = toml::find(doc, "datasinks");
         if (!epts.is_array()) {
-            throw(helics::InvalidParameter("datasink section in toml file must be an array"));
+            throw(helics::InvalidParameter("datasinks section in toml file must be an array"));
         }
         auto& eptArray = epts.as_array();
         for (auto& ept : eptArray) {

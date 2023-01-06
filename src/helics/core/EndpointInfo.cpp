@@ -316,8 +316,8 @@ void EndpointInfo::setProperty(int32_t option, int32_t value)
         case defs::Options::SEND_ONLY:
             sourceOnly = bvalue;
             break;
-        case defs::Options::RECIEVE_ONLY:
-            recieveOnly = bvalue;
+        case defs::Options::RECEIVE_ONLY:
+            receiveOnly = bvalue;
             break;
         case defs::Options::SINGLE_CONNECTION_ONLY:
             requiredConnections = bvalue ? 1 : 0;
@@ -349,8 +349,8 @@ int32_t EndpointInfo::getProperty(int32_t option) const
         case defs::Options::SEND_ONLY:
             flagval = sourceOnly;
             break;
-        case defs::Options::RECIEVE_ONLY:
-            flagval = recieveOnly;
+        case defs::Options::RECEIVE_ONLY:
+            flagval = receiveOnly;
             break;
         case defs::Options::MULTIPLE_CONNECTIONS_ALLOWED:
             flagval = (requiredConnections != 1);

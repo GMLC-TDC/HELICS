@@ -90,7 +90,7 @@ void InterfaceInfo::createEndpoint(InterfaceHandle handle,
         ceHandle->back()->setProperty(defs::Options::SEND_ONLY, 1);
     }
     if (checkActionFlag(flags, receive_only_flag)) {
-        ceHandle->back()->setProperty(defs::Options::RECIEVE_ONLY, 1);
+        ceHandle->back()->setProperty(defs::Options::RECEIVE_ONLY, 1);
     }
 }
 
