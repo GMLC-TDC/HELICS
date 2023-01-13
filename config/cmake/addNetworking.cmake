@@ -38,7 +38,8 @@ if(NOT TARGET gmlc::networking)
     hide_variable(GMLC_NETWORKING_CLANG_TIDY_OPTIONS)
     hide_variable(GMLC_NETWORKING_ENABLE_SUBMODULE_UPDATE)
     hide_variable(GMLC_NETWORKING_USE_EXTERNAL_JSON)
-
+    hide_variable(GMLC_NETWORKING_ENABLE_ENCRYPTION)
+    hide_variable(GMLC_NETWORKING_DISABLE_ASIO)
     set_target_properties(gmlc_networking PROPERTIES FOLDER Extern)
 
 endif()

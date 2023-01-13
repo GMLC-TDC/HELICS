@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~
 
-cmake_minimum_required(VERSION 3.11...3.24)
+cmake_minimum_required(VERSION 3.11...3.25)
 
 # Install dependencies using vcpkg if VCPKG_ROOT is set and no CMake Toolchain file is given vcpkg
 # installation on a system doesn't set VCPKG_ROOT, so setting it should be like an opt-in for users
