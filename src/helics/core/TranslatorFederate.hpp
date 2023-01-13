@@ -8,7 +8,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonBuilder.hpp"
 #include "Core.hpp"
-#include "GlobalFederateId.hpp"
+#include "FederateIdExtra.hpp"
 #include "TimeCoordinator.hpp"
 #include "TranslatorInfo.hpp"
 #include "gmlc/containers/AirLock.hpp"

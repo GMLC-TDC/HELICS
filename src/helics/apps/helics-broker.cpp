@@ -329,15 +329,15 @@ void remoteTerminalFunction(std::vector<std::string> args)
         std::cout << "connection has terminated\n";
     };
 
-    auto reConnect = [&](const std::vector<std::string>& args) {
+    auto reConnect = [&](const std::vector<std::string>& connectArgs) {
         if (!connection) {
             connection = std::make_unique<helics::apps::RestApiConnection>("local");
             std::cout << "connection has started\n";
         }
-        if (args.size() > 2) {
-            connection->connect(args[1], args[0]);
-        } else if (args.size() == 1) {
-            connection->connect(args[0], port);
+        if (connectArgs.size() > 2) {
+            connection->connect(connectArgs[1], connectArgs[0]);
+        } else if (connectArgs.size() == 1) {
+            connection->connect(connectArgs[0], port);
         } else {
             connection->connect(server, port);
         }
