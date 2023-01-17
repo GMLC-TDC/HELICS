@@ -8,4 +8,4 @@ fi
 docker build . -f config/Docker/Dockerfile-HELICS-apps --tag "helics/helics:$1" || rv=1
 docker push "helics/helics:$1" || rv=1
 
-exit "$rv"
+exit "${rv= 0}"
