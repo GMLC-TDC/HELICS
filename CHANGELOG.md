@@ -11,16 +11,16 @@ Everything within a major version number should be code compatible (with the exc
 
 ## [3.4.0][] - 2023-01-19
 
-Major release including full dynamic federation capability and wildcard based matching for interface connections
+Major release including full dynamic federation capability and wildcard based matching for interface connections.
 
 ### Fixed
 
 - Updated some out of date docker images to build automatically and fix some issues preventing the use of `-flto` option
-- fixed a few more sporadically failing testing cases and a rare bug in the use of `wait_for_current_time` flag when entering executing mode
+- Fixed a few more sporadically failing testing cases and a rare bug in the use of `wait_for_current_time` flag when entering executing mode
 
 ### Changed
 
-- test with boost 1.81 and CMake 3.25
+- Test with Boost 1.81 and CMake 3.25
 - Update the units library
 - Update Spdlog library
 - Update to release 2.3 of CLI11
@@ -31,11 +31,11 @@ Major release including full dynamic federation capability and wildcard based ma
 
 - Added the capability to link interfaces through a regex expression. `"REGEX: <regex>"` this format of string can be used in any place interface names can be used. This will not work on targets linked after initialization mode at present though this is expected to be relaxed in the future. Also if both sides are specified as strings at least one of them must be an actual name.
 - Added fully dynamic federation capability. Federates may be added dynamically if `--dynamic` flag is set on the root broker. Dynamic publications and endpoints are enabled by default but can be disabled.
-- Added automated workflow for generating checklist on version release
+- Added automated workflow for generating release task checklist on version release
 
 ### Deprecated
 
-- nearly all methods that use `Subscription` in the name have been deprecated in favor of equivalent version for input these are all 1:1 mappings to reduce confusion of use of subscription objects as they are Input objects
+- Nearly all methods that use `Subscription` in the name have been deprecated in favor of an equivalent version for `Input` to reduce confusion of use of subscription objects (which are just Input objects); these are all 1:1 mappings
   - `getSubscription(string target)` -> `getInputByTarget(string target)`
   - `getSubscription(int index)` -> `getInput(int index)`
   - `helicsSubscriptionGetTarget(inp)` -> `helicsInputGetTarget(inp)`
