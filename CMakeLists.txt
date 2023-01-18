@@ -24,7 +24,7 @@ project(HELICS VERSION 3.4.0)
 # -----------------------------------------------------------------------------
 set(HELICS_VERSION_BUILD)
 # use ISO date YYYY-MM-DD
-set(HELICS_DATE "2023-01-06")
+set(HELICS_DATE "2023-01-19")
 
 set(HELICS_VERSION_UNDERSCORE
     "${HELICS_VERSION_MAJOR}_${HELICS_VERSION_MINOR}_${HELICS_VERSION_PATCH}"
@@ -883,7 +883,7 @@ if(HELICS_ENABLE_PACKAGE_BUILD)
         "helics_app"
         "Helics app executable"
         "helics_recorder"
-        "Helics recorder"
+        "Helics Recorder"
         "helics_player"
         "Helics Player"
     )

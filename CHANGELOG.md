@@ -9,7 +9,39 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 A note on future revisions.
 Everything within a major version number should be code compatible (with the exception of experimental interfaces). The most notable example of an experimental interface is the support for multiple source inputs. The APIs to deal with this will change in future minor releases. Everything within a single minor release should be network compatible with other federates on the same minor release number. Compatibility across minor release numbers may be possible in some situations but we are not going to guarantee this as those components are subject to performance improvements and may need to be modified at some point. Patch releases will be limited to bug fixes and other improvements not impacting the public API or network compatibility. Check the [Public API](./docs/Public_API.md) for details on what is included and excluded from the public API and version stability.
 
-## [3.3.2][] ~ 2022-12-02
+## [3.4.0][] - 2023-01-19
+
+Major release including full dynamic federation capability and wildcard based matching for interface connections
+
+### Fixed
+
+- Updated some out of date docker images to build automatically and fix some issues preventing the use of `-flto` option
+- fixed a few more sporadically failing testing cases and a rare bug in the use of `wait_for_current_time` flag when entering executing mode
+
+### Changed
+
+- test with boost 1.81 and CMake 3.25
+- Update the units library
+- Update Spdlog library
+- Update to release 2.3 of CLI11
+- Split the application API tests in a set of 4 smaller tests to reduce test runtime and ease maintenance.
+- Update copyright to 2023
+
+### Added
+
+- Added the capability to link interfaces through a regex expression.  `"REGEX: <regex>"`  this format of string can be used in any place interface names can be used.  This will not work on targets linked after initialization mode at present though this is expected to be relaxed in the future. Also if both sides are specified as strings at least one of them must be an actual name.  
+- Added fully dynamic federation capability.  Federates may be added dynamically if `--dynamic` flag is set on the root broker.  Dynamic publications and endpoints are enabled by default but can be disabled. 
+- Added automated workflow for generating checklist on version release
+
+### Deprecated
+
+- nearly all methods that use `Subscription` in the name have been deprecated in favor of equivalent version for input these are all 1:1 mappings to reduce confusion of use of subscription objects as they are Input objects
+  - `getSubscription(string target)` -> `getInputByTarget(string target)`
+  - `getSubscription(int index)` -> `getInput(int index)`
+  - `helicsSubscriptionGetTarget(inp)` -> `helicsInputGetTarget(inp)`
+  - `helicsFederateGetSubscription(fed, string target)`->`helicsFederateGetInputByTarget(fed,string target)`
+
+## [3.3.2][] - 2022-12-02
 
 Patch release to fix some testing issues and add some network probing capabilities and remote terminal connections.
 
@@ -30,7 +62,7 @@ Patch release to fix some testing issues and add some network probing capabiliti
 - Added a probe app for testing some networking situations and connections.
 - Added tests for the tcp federate under various conditions.
 
-## [3.3.1][] ~ 2022-10-21
+## [3.3.1][] - 2022-10-21
 
 Patch release to fix some issues with using HELICS as a subproject, and fix a few bugs related to time barriers, and a few other timing issues.
 
@@ -111,7 +143,7 @@ The release also includes several bug fixes related to timing and iteration.
 - ghc::filesystem, since all minimum compilers have support for std::filesystem available.
 - Removed Travis CI related configuration and documentation
 
-## [3.2.1][] - 2022-06-17
+## [3.2.1][] - 2022-06-16
 
 The Matlab interface to HELICS has been moved to [matHELICS](https://www.github.com/GMLC-TDC/matHELICS), the C++ interface now uses `std::string_view` in nearly all places, and the translator C API, and the dataBuffer API to the C interface were fleshed out a bit more and will be finalized in the 3.3 release. Subsequent releases will change the minimum compiler requirements to build HELICS to Visual Studio 2019, GCC 8.0, Clang 7, Xcode 11.0, and CMake 3.11.
 
@@ -344,3 +376,4 @@ HELICS 3.0 is a major update to HELICS. The major features that have been added 
 [3.3.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.0
 [3.3.1]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.1
 [3.3.2]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.3.2
+[3.4.0]: https://github.com/GMLC-TDC/HELICS/releases/tag/v3.4.0
