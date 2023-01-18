@@ -66,7 +66,7 @@ You can also [Try HELICS online](https://mybinder.org/v2/gh/kdheepak/openmod-201
 
 Earlier we also created a series of roughly 10-minute mini-tutorial videos that discuss various design topics, concepts, and interfaces, including how to use the tool. They can be found on our [YouTube channel](https://www.youtube.com/channel/UCPa81c4BVXEYXt2EShTzbcg). These videos do not reflect recent HELICS advances but do introduce some basic concepts.
 
-Several examples of HELICS federates and projects are located in HELICS-Examples with corresponding documentation in the [User Guide](https://docs.helics.org/en/latest/user-guide/examples/examples_index.html). This repo provides a number of examples using the different libraries and interfaces, including those used in the user guide. 
+Several examples of HELICS federates and projects are located in HELICS-Examples with corresponding documentation in the [User Guide](https://docs.helics.org/en/latest/user-guide/examples/examples_index.html). This repo provides a number of examples using the different libraries and interfaces, including those used in the user guide.
 
 The [HELICS-Tutorial repository](https://github.com/GMLC-TDC/HELICS-Tutorial) provides a series of tutorials using HELICS to build a co-simulation using domain-specific external modeling tools that is built around an electric power system use case with integrated transmission-distribution-market-communication quasi-steady-state-timeseries (QSTS) simulation.
 
@@ -74,7 +74,7 @@ The [HELICS-Use-Cases repository](https://github.com/GMLC-TDC/HELICS-Use-Cases) 
 
 A [Tutorial](https://github.com/GMLC-TDC/pesgm-2019-helics-tutorial) was prepared for the IEEE PES General meeting in Atlanta. The example materials are available on Binder.
 
-The HELICS team holds office hours [every-other Thursday]( https://helics.org/HELICSOfficeHours.ics); bring your questions and get help from the development team.
+The HELICS team holds office hours [every-other Thursday](https://helics.org/HELICSOfficeHours.ics); bring your questions and get help from the development team.
 
 ### Language Bindings
 
