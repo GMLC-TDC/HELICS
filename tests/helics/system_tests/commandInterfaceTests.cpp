@@ -292,7 +292,7 @@ TEST_F(command_tests, federate_finalize_command)
     vFed1->enterExecutingModeComplete();
     vFed2->sendCommand(vFed1->getName(), "terminate");
     vFed1->sendCommand(vFed2->getName(), "terminate");
-    vFed1->query("root","flush");
+    vFed1->query("root", "flush");
     auto tres = vFed1->requestNextStep();
     EXPECT_GE(tres, cHelicsBigNumber);
     tres = vFed2->requestNextStep();
@@ -320,7 +320,7 @@ TEST_F(command_tests, federate_finalize_command_disable)
     vFed1->enterExecutingModeComplete();
     vFed2->sendCommand(vFed1->getName(), "terminate");
     vFed1->sendCommand(vFed2->getName(), "terminate");
-    vFed1->query("root","flush");
+    vFed1->query("root", "flush");
     vFed1->requestTimeAsync(0);
     auto tres = vFed2->requestNextStep();
     EXPECT_LT(tres, 1.0);
