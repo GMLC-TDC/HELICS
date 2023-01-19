@@ -87,8 +87,8 @@ The `encrypted` and `encryption_config` options can also be set from a federate 
 
 ```json
 {
-    "encrypted": true,
-    "encryption_config": "/home/username/example-directory/openssl.json"
+  "encrypted": true,
+  "encryption_config": "/home/username/example-directory/openssl.json"
 }
 ```
 
@@ -97,7 +97,7 @@ The `encrypted` and `encryption_config` options can also be set from a federate 
 Finally, it is also possible to set these options in the code of a federate (example shown in C++, but similar
 mechanisms can also be used from other language interfaces).
 
-Using a `FederateInfo` object named `fi`, this might look like: 
+Using a `FederateInfo` object named `fi`, this might look like:
 
 ```cpp
 fi.encrypted = true;
@@ -106,6 +106,7 @@ fi.encryptedConfig = "/home/username/example-directory/openssl.json";
 
 Or, the federate info args string can provide the settings in the form of a string matching the command-line arguments
 described earlier:
+
 ```cpp
 const std::string fedArgs =
     "--core_type=tcp --encrypted --encryption_config=" + std::string(TEST_BIN_DIR) +
@@ -146,12 +147,12 @@ And the corresponding input `openssl.json.in` file looks like:
 
 ```json
 {
-    "encrypted": true,
-    "verify_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/ca.pem",
-    "certificate_chain_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
-    "private_key_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
-    "tmp_dh_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/dh4096.pem",
-    "password": "test"
+  "encrypted": true,
+  "verify_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/ca.pem",
+  "certificate_chain_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
+  "private_key_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/server.pem",
+  "tmp_dh_file": "${CMAKE_CURRENT_SOURCE_DIR}/test_files/encryption_config/openssl_certs/dh4096.pem",
+  "password": "test"
 }
 ```
 
@@ -180,12 +181,12 @@ An example of what this might look like after being filled in is:
 
 ```json
 {
-    "encrypted": true,
-    "verify_file": "/home/username/openssl_certs/ca.pem",
-    "certificate_chain_file": "/home/username/openssl_certs/server.pem",
-    "private_key_file": "/home/username/openssl_certs/server.pem",
-    "tmp_dh_file": "/home/username/openssl_certs/dh4096.pem",
-    "password": "test"
+  "encrypted": true,
+  "verify_file": "/home/username/openssl_certs/ca.pem",
+  "certificate_chain_file": "/home/username/openssl_certs/server.pem",
+  "private_key_file": "/home/username/openssl_certs/server.pem",
+  "tmp_dh_file": "/home/username/openssl_certs/dh4096.pem",
+  "password": "test"
 }
 ```
 
@@ -300,11 +301,11 @@ An example of what this might look like after being filled in (assuming the priv
 
 ```json
 {
-    "verify_file": "root_ca.pem",
-    "certificate_chain_file": "machine1.pem",
-    "private_key_file": "machine1.pem",
-    "tmp_dh_file": "dh4096.pem",
-    "password": "test"
+  "verify_file": "root_ca.pem",
+  "certificate_chain_file": "machine1.pem",
+  "private_key_file": "machine1.pem",
+  "tmp_dh_file": "dh4096.pem",
+  "password": "test"
 }
 ```
 
@@ -324,4 +325,3 @@ be able to provide more insight into the underlying problem.
 To check what certificate the broker server is sending to clients when using an encrypted tcpss core, you can use
 `openssl s_client -connect localhost:33133 -showcerts` if you have the `openssl` command/package installed. This
 may be useful for confirming that it is sending the certificate that you expect.
-

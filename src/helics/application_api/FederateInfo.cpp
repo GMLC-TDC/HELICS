@@ -597,9 +597,10 @@ std::unique_ptr<helicsCLI11App> FederateInfo::makeCLIApp()
     auto* encrypt_group = app->add_option_group("encryption", "options related to encryption");
     encrypt_group->add_flag("--encrypted", encrypted, "enable encryption on the network")
         ->envname("HELICS_ENCRYPTION");
-    encrypt_group->add_option("--encryption_config",
-                              encryptionConfig,
-                              "set the configuration file for encryption options")
+    encrypt_group
+        ->add_option("--encryption_config",
+                     encryptionConfig,
+                     "set the configuration file for encryption options")
         ->envname("HELICS_ENCRYPTION_CONFIG");
 
     auto* rtgroup = app->add_option_group("realtime");
