@@ -32,6 +32,9 @@ Major release including full dynamic federation capability and wildcard based ma
 - Added the capability to link interfaces through a regex expression. `"REGEX: <regex>"` this format of string can be used in any place interface names can be used. This will not work on targets linked after initialization mode at present though this is expected to be relaxed in the future. Also if both sides are specified as strings at least one of them must be an actual name.
 - Added fully dynamic federation capability. Federates may be added dynamically if `--dynamic` flag is set on the root broker. Dynamic publications and endpoints are enabled by default but can be disabled.
 - Added automated workflow for generating release task checklist on version release
+- Added dependabot configuration for updating github-actions workflow dependencies
+- Added documentation on using encrypted communication in HELICS
+- Added support for using environment variables for enabling encryption instead of command line arguments for federates
 
 ### Deprecated
 
