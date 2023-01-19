@@ -1,6 +1,6 @@
 # Encrypted Communication
 
-WARNING: This guide is only meant to show how to use the encryption features in HELICS, and is not a subsitute for
+Note: This guide is only meant to show how to use the encryption features in HELICS, and is not a subsitute for
 getting help from a security expert to make sure the way you use the encryption features (generating keys, signing
 certificates, etc) is actually secure. In particular, any self-signed certificates or private key files you find
 online or in the HELICS repository **are for testing purposes only** and should not be used if secure communication
