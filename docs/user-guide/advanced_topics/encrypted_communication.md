@@ -2,7 +2,7 @@
 
 Some applications may exchange data between federates that requires encryption in order to ensure its confidentiality.
 This could be of particular concern when the federates are communicating over the public internet between different
-institutions, and restrictions on a data set or simulator don't allow sending it over to all be run within a private
+institutions, and restrictions on a data set or simulator prohibit the co-simulation from being executed within a private
 network at a single institution.
 
 The HELICS TCP and TCPSS cores support encryption using the OpenSSL library. By default peer verification is used
