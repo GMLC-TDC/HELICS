@@ -198,7 +198,12 @@ running the federates can have an impact on the security of communication for th
 to those issues, and you should seek outside help in the form of other resources on the topic and from security experts at your
 organization.
 
-Search terms to get started are: "Public Key Infrastructure (PKI)", "TLS fundamentals/basics", "secure private key management"
+Search terms to get started are: "Public Key Infrastructure (PKI)", "TLS fundamentals/basics", "secure private key management".
+Some of the resources out there (as of early 2023, check archive.org if the site goes offline in the future) include:
+
+- <https://opensource.com/article/19/6/cryptography-basics-openssl-part-1> at the section title "The hidden security pieces in the client program"
+- <https://geekflare.com/tls-101/> provides a decent overview, though website/browser related parts aren't relevant to HELICS
+- <https://www.internetsociety.org/deploy360/tls/basics/> also seems to be a decent source of information
 
 Courses provided at a local university or online can also be a good source of information on best practices, such as:
 
@@ -241,6 +246,8 @@ This section assumes you have the `openssl` command installed and working on a U
 
 If desired, a `openssl.cnf` file can be used to set some default values and provided to the following commands using the `-config` command
 line argument.
+
+The OpenSSL Essentials tutorial from Digital Ocean, which can be found at <https://www.digitalocean.com/community/tutorials/openssl-essentials-working-with-ssl-certificates-private-keys-and-csrs>, gives a good overview of the commands listed here and more.
 
 ### Creating a Root CA
 
