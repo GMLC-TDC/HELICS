@@ -286,7 +286,7 @@ Finally, the private key and the signed certificate file can be combined to form
 cat machine1.crt >> machine1.pem
 ```
 
-### Creating a temporary Diffie-Hellman key exchange parameters file:
+### Creating a temporary Diffie-Hellman key exchange parameters file
 
 If desired, the optional file containing temporary Diffie-Hellman key exchange parameters can be created with: `openssl dhparam -out dh4096.pem 4096`
 
