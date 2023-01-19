@@ -208,6 +208,7 @@ organization.
 Search terms to get started are: "Public Key Infrastructure (PKI)", "TLS fundamentals/basics", "secure private key management".
 Some of the resources out there (as of early 2023, check archive.org if the site goes offline in the future) include:
 
+- <https://github.com/ssllabs/research/wiki/SSL-and-TLS-Deployment-Best-Practices> covers a good number of the issues for using encryption securely
 - <https://opensource.com/article/19/6/cryptography-basics-openssl-part-1> at the section title "The hidden security pieces in the client program"
 - <https://geekflare.com/tls-101/> provides a decent overview, though website/browser related parts aren't relevant to HELICS
 - <https://www.internetsociety.org/deploy360/tls/basics/> also seems to be a decent source of information
