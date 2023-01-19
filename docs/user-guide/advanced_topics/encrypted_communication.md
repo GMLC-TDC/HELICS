@@ -157,7 +157,8 @@ And the corresponding input `openssl.json.in` file looks like:
 ```
 
 Another big point of CAUTION: do NOT use the example/test SSL certificates or private key files provided in the HELICS
-repository! By doing so, you might as well not be using any encryption at all.
+repository! These files are **for testing only** with data that does not require protection. By using them with a real
+use case, you might as well not be using any encryption at all.
 
 ## Configuring Encryption Settings for a Co-simulation
 
