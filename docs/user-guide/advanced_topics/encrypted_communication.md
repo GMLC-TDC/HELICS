@@ -1,12 +1,11 @@
 # Encrypted Communication
 
-
 > **Warning**
 > This guide is only meant to show how to use the encryption features in HELICS, and is not a substitute for
-getting help from a security expert to make sure the way you use the encryption features (generating keys, signing
-certificates, etc) is actually secure. In particular, any self-signed certificates or private key files you find
-online or in the HELICS repository **are for testing purposes only** and should not be used if secure communication
-is required.
+> getting help from a security expert to make sure the way you use the encryption features (generating keys, signing
+> certificates, etc) is actually secure. In particular, any self-signed certificates or private key files you find
+> online or in the HELICS repository **are for testing purposes only** and should not be used if secure communication
+> is required.
 
 Some applications may exchange data between federates that requires encryption in order to ensure its confidentiality.
 This could be of particular concern when the federates are communicating over the public internet between different
