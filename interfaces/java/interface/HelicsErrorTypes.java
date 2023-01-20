@@ -29,10 +29,6 @@ public final class HelicsErrorTypes {
    */
   public final static HelicsErrorTypes HELICS_USER_EXCEPTION = new HelicsErrorTypes("HELICS_USER_EXCEPTION", helicsJNI.HELICS_USER_EXCEPTION_get());
   /**
-   *  user system abort
-   */
-  public final static HelicsErrorTypes HELICS_ERROR_USER_ABORT = new HelicsErrorTypes("HELICS_ERROR_USER_ABORT", helicsJNI.HELICS_ERROR_USER_ABORT_get());
-  /**
    *  insufficient space is available to store requested data 
    */
   public final static HelicsErrorTypes HELICS_ERROR_INSUFFICIENT_SPACE = new HelicsErrorTypes("HELICS_ERROR_INSUFFICIENT_SPACE", helicsJNI.HELICS_ERROR_INSUFFICIENT_SPACE_get());
@@ -80,6 +76,14 @@ public final class HelicsErrorTypes {
    *  the function executed successfully 
    */
   public final static HelicsErrorTypes HELICS_OK = new HelicsErrorTypes("HELICS_OK", helicsJNI.HELICS_OK_get());
+  /**
+   *  user system abort to match typical SIGINT value
+   */
+  public final static HelicsErrorTypes HELICS_ERROR_USER_ABORT = new HelicsErrorTypes("HELICS_ERROR_USER_ABORT", helicsJNI.HELICS_ERROR_USER_ABORT_get());
+  /**
+   *  force termination to match typical SIGKILL value
+   */
+  public final static HelicsErrorTypes HELICS_ERROR_TERMINATED = new HelicsErrorTypes("HELICS_ERROR_TERMINATED", helicsJNI.HELICS_ERROR_TERMINATED_get());
 
   public final int swigValue() {
     return swigValue;
@@ -115,7 +119,7 @@ public final class HelicsErrorTypes {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsErrorTypes[] swigValues = { HELICS_ERROR_FATAL, HELICS_ERROR_EXTERNAL_TYPE, HELICS_ERROR_OTHER, HELICS_USER_EXCEPTION, HELICS_ERROR_USER_ABORT, HELICS_ERROR_INSUFFICIENT_SPACE, HELICS_ERROR_EXECUTION_FAILURE, HELICS_ERROR_INVALID_FUNCTION_CALL, HELICS_ERROR_INVALID_STATE_TRANSITION, HELICS_WARNING, HELICS_ERROR_SYSTEM_FAILURE, HELICS_ERROR_DISCARD, HELICS_ERROR_INVALID_ARGUMENT, HELICS_ERROR_INVALID_OBJECT, HELICS_ERROR_CONNECTION_FAILURE, HELICS_ERROR_REGISTRATION_FAILURE, HELICS_OK };
+  private static HelicsErrorTypes[] swigValues = { HELICS_ERROR_FATAL, HELICS_ERROR_EXTERNAL_TYPE, HELICS_ERROR_OTHER, HELICS_USER_EXCEPTION, HELICS_ERROR_INSUFFICIENT_SPACE, HELICS_ERROR_EXECUTION_FAILURE, HELICS_ERROR_INVALID_FUNCTION_CALL, HELICS_ERROR_INVALID_STATE_TRANSITION, HELICS_WARNING, HELICS_ERROR_SYSTEM_FAILURE, HELICS_ERROR_DISCARD, HELICS_ERROR_INVALID_ARGUMENT, HELICS_ERROR_INVALID_OBJECT, HELICS_ERROR_CONNECTION_FAILURE, HELICS_ERROR_REGISTRATION_FAILURE, HELICS_OK, HELICS_ERROR_USER_ABORT, HELICS_ERROR_TERMINATED };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

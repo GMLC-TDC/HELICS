@@ -12,8 +12,9 @@ package com.java.helics;
  * enumeration of possible federate states
  */
 public final class HelicsFederateState {
+  public final static HelicsFederateState HELICS_STATE_UNKNOWN = new HelicsFederateState("HELICS_STATE_UNKNOWN", helicsJNI.HELICS_STATE_UNKNOWN_get());
   /**
-   *  when created the federate is in startup state 
+   *  used when no information is available about the federate state when created the federate is in startup state 
    */
   public final static HelicsFederateState HELICS_STATE_STARTUP = new HelicsFederateState("HELICS_STATE_STARTUP", helicsJNI.HELICS_STATE_STARTUP_get());
   /**
@@ -91,7 +92,7 @@ public final class HelicsFederateState {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsFederateState[] swigValues = { HELICS_STATE_STARTUP, HELICS_STATE_INITIALIZATION, HELICS_STATE_EXECUTION, HELICS_STATE_FINALIZE, HELICS_STATE_ERROR, HELICS_STATE_PENDING_INIT, HELICS_STATE_PENDING_EXEC, HELICS_STATE_PENDING_TIME, HELICS_STATE_PENDING_ITERATIVE_TIME, HELICS_STATE_PENDING_FINALIZE, HELICS_STATE_FINISHED };
+  private static HelicsFederateState[] swigValues = { HELICS_STATE_UNKNOWN, HELICS_STATE_STARTUP, HELICS_STATE_INITIALIZATION, HELICS_STATE_EXECUTION, HELICS_STATE_FINALIZE, HELICS_STATE_ERROR, HELICS_STATE_PENDING_INIT, HELICS_STATE_PENDING_EXEC, HELICS_STATE_PENDING_TIME, HELICS_STATE_PENDING_ITERATIVE_TIME, HELICS_STATE_PENDING_FINALIZE, HELICS_STATE_FINISHED };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

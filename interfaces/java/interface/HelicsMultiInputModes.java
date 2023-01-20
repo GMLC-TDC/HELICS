@@ -25,7 +25,8 @@ public final class HelicsMultiInputModes {
    */
   public final static HelicsMultiInputModes HELICS_MULTI_INPUT_AND_OPERATION = new HelicsMultiInputModes("HELICS_MULTI_INPUT_AND_OPERATION", helicsJNI.HELICS_MULTI_INPUT_AND_OPERATION_get());
   /**
-   *  all inputs are assumed to be boolean and at least one must be true to return true
+   *  all inputs are assumed to be boolean and at least one must be true to return<br>
+   *                   true
    */
   public final static HelicsMultiInputModes HELICS_MULTI_INPUT_OR_OPERATION = new HelicsMultiInputModes("HELICS_MULTI_INPUT_OR_OPERATION", helicsJNI.HELICS_MULTI_INPUT_OR_OPERATION_get());
   /**
@@ -34,7 +35,7 @@ public final class HelicsMultiInputModes {
   public final static HelicsMultiInputModes HELICS_MULTI_INPUT_SUM_OPERATION = new HelicsMultiInputModes("HELICS_MULTI_INPUT_SUM_OPERATION", helicsJNI.HELICS_MULTI_INPUT_SUM_OPERATION_get());
   /**
    *  do a difference operation on the inputs, first-sum(rest)<br>
-   *     for double input, vector diff for vector input
+   *                for double input, vector diff for vector input
    */
   public final static HelicsMultiInputModes HELICS_MULTI_INPUT_DIFF_OPERATION = new HelicsMultiInputModes("HELICS_MULTI_INPUT_DIFF_OPERATION", helicsJNI.HELICS_MULTI_INPUT_DIFF_OPERATION_get());
   /**

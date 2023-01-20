@@ -30,16 +30,17 @@ public final class HelicsFilterTypes {
   public final static HelicsFilterTypes HELICS_FILTER_TYPE_RANDOM_DROP = new HelicsFilterTypes("HELICS_FILTER_TYPE_RANDOM_DROP", helicsJNI.HELICS_FILTER_TYPE_RANDOM_DROP_get());
   /**
    *  a filter type that reroutes a message to a different destination than originally<br>
-   *        specified
+   *                   specified
    */
   public final static HelicsFilterTypes HELICS_FILTER_TYPE_REROUTE = new HelicsFilterTypes("HELICS_FILTER_TYPE_REROUTE", helicsJNI.HELICS_FILTER_TYPE_REROUTE_get());
   /**
-   *  a filter type that duplicates a message and sends the copy to a different destination
+   *  a filter type that duplicates a message and sends the copy to a different<br>
+   *                   destination
    */
   public final static HelicsFilterTypes HELICS_FILTER_TYPE_CLONE = new HelicsFilterTypes("HELICS_FILTER_TYPE_CLONE", helicsJNI.HELICS_FILTER_TYPE_CLONE_get());
   /**
-   *  a customizable filter type that can perform different actions on a message based on<br>
-   *        firewall like rules
+   *  a customizable filter type that can perform different actions on a message based<br>
+   *                   on firewall like rules
    */
   public final static HelicsFilterTypes HELICS_FILTER_TYPE_FIREWALL = new HelicsFilterTypes("HELICS_FILTER_TYPE_FIREWALL", helicsJNI.HELICS_FILTER_TYPE_FIREWALL_get());
 
