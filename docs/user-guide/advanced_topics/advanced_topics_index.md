@@ -26,6 +26,7 @@
     aliases
     callbacks
     CallbackFederates
+    encrypted_communication
 ```
 
 Whereas the [Fundamental Topics](../fundamental_topics/fundamental_topics_index.md) provided a broad overview of co-simulation and a good step-by-step introduction to setting up a HELICS co-simulation, the
@@ -60,3 +61,4 @@ The Advanced Topics will cover:
 - [\*_Aliases_](./aliases.md) - HELICS 3.3 introduced the notion of aliases. Aliases allow a mapping of an interface key to a different string.
 - [\*_Callbacks_](./callbacks.md) - Over time a number of callbacks have been added for various operations and stages of the life cycle of a federate. This document describes the different callbacks available.
 - [\*_Callback Federates_](./CallbackFederate.md) - HELICS 3.3 introduced a beta test for callback federates which allow a federate to operate purely inline with a core based solely on callbacks. This can allow a much higher number of federates on a given system than was previously possible.
+- [**Encrypted Communication**](./encrypted_communication.md) - How to encrypt communication between HELICS brokers/federates.
