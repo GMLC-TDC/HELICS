@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -58,7 +58,9 @@ class BasicFedInfo {
     route_id route;  //!< the routing information for data to be sent to the federate
     GlobalBrokerId parent;  //!< the id of the parent broker/core
     ConnectionState state{ConnectionState::CONNECTED};
-    bool nonCounting{false};  // indicator the federate shouldn't count toward limits or total
+    bool nonCounting{false};  //!< indicator the federate shouldn't count toward limits or total
+    bool observer{false};  //!, indicator that the federate is an observer only
+    bool dynamic{false};  //!< indicator that the federate joined dynamically
     explicit BasicFedInfo(std::string_view fedname): name(fedname) {}
 };
 
@@ -333,12 +335,25 @@ class CoreBroker: public Broker, public BrokerBase {
     int getCountableFederates() const;
     /** check if we can remove some dependencies*/
     void checkDependencies();
+
+    void connectInterfaces(
+        const BasicHandleInfo& source,
+        const BasicHandleInfo& dest,
+        uint32_t flags,
+        uint32_t flagsDest,
+        std::pair<action_message_def::action_t, action_message_def::action_t> actions);
+
     /** find any existing publishers for a subscription*/
     void findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo, const std::string& key);
 
     void findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const std::string& key);
     void findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const std::string& key);
+
+    void findRegexMatch(const std::string& target,
+                        InterfaceType type,
+                        GlobalHandle handle,
+                        uint16_t flags);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** process an error message*/
@@ -390,6 +405,9 @@ class CoreBroker: public Broker, public BrokerBase {
     void addEndpoint(ActionMessage& m);
     void addFilter(ActionMessage& m);
     void addTranslator(ActionMessage& m);
+    void addDataSink(ActionMessage& m);
+
+    bool checkInterfaceCreation(ActionMessage& m, InterfaceType type);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
     /// @brief send an error response to broker registration

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -281,7 +281,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 fileops::replaceIfMember(sub, "target", name);
                 skipNameTarget = true;
             }
-            auto* subAct = &vfManager->getSubscription(name);
+            auto* subAct = &vfManager->getInputByTarget(name);
             if (!subAct->isValid()) {
                 auto type = fileops::getOrDefault(sub, "type", emptyStr);
                 auto units = fileops::getOrDefault(sub, "unit", emptyStr);
@@ -381,7 +381,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 fileops::replaceIfMember(sub, "target", name);
                 skipNameTarget = true;
             }
-            Input* id = &vfManager->getSubscription(name);
+            Input* id = &vfManager->getInputByTarget(name);
             if (!id->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "unit", emptyStr);
@@ -545,7 +545,7 @@ void ValueFederate::startupToInitializeStateTransition()
 {
     vfManager->startupToInitializeStateTransition();
 }
-void ValueFederate::initializeToExecuteStateTransition(IterationResult result)
+void ValueFederate::initializeToExecuteStateTransition(iteration_time result)
 {
     vfManager->initializeToExecuteStateTransition(result);
 }
@@ -604,14 +604,14 @@ const Input& ValueFederate::getInput(std::string_view name, int index1, int inde
                                std::to_string(index2));
 }
 
-const Input& ValueFederate::getSubscription(std::string_view target) const
+const Input& ValueFederate::getInputByTarget(std::string_view target) const
 {
-    return vfManager->getSubscription(target);
+    return vfManager->getInputByTarget(target);
 }
 
-Input& ValueFederate::getSubscription(std::string_view target)
+Input& ValueFederate::getInputByTarget(std::string_view target)
 {
-    return vfManager->getSubscription(target);
+    return vfManager->getInputByTarget(target);
 }
 
 Publication& ValueFederate::getPublication(std::string_view name)

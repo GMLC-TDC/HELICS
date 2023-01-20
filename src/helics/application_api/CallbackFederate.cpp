@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -95,7 +95,7 @@ IterationRequest CallbackFederate::initializeOperationsCallback()
     if (currentMode.load() == Modes::STARTUP) {
         enteringInitializingMode(IterationResult::NEXT_STEP);
     } else {
-        enteringExecutingMode(IterationResult::ITERATING);
+        enteringExecutingMode({timeZero, IterationResult::ITERATING});
     }
 
     return (initializationOperation) ? initializationOperation() : IterationRequest::NO_ITERATIONS;
@@ -104,7 +104,7 @@ IterationRequest CallbackFederate::initializeOperationsCallback()
 std::pair<Time, IterationRequest> CallbackFederate::operateCallback(iteration_time newTime)
 {
     if (newTime.grantedTime == timeZero && newTime.state == IterationResult::NEXT_STEP) {
-        enteringExecutingMode(newTime.state);
+        enteringExecutingMode(newTime);
     } else {
         postTimeRequestOperations(newTime.grantedTime, newTime.state == IterationResult::ITERATING);
     }

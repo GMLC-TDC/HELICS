@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -313,10 +313,9 @@ void ValueFederateManager::startupToInitializeStateTransition()
     inpHandle->apply([](auto& inp) { inp.loadSourceInformation(); });
 }
 
-void ValueFederateManager::initializeToExecuteStateTransition(IterationResult result)
+void ValueFederateManager::initializeToExecuteStateTransition(iteration_time result)
 {
-    Time ctime = result == IterationResult::NEXT_STEP ? timeZero : initializationTime;
-    updateTime(ctime, initializationTime);
+    updateTime(result.grantedTime, initializationTime);
 }
 
 std::string ValueFederateManager::localQuery(std::string_view queryStr) const
@@ -463,7 +462,7 @@ Input& ValueFederateManager::getInput(int index)
     return invalidIptNC;
 }
 
-const Input& ValueFederateManager::getSubscription(std::string_view key) const
+const Input& ValueFederateManager::getInputByTarget(std::string_view key) const
 {
     auto TIDhandle = targetIDs.lock_shared();
     auto res = TIDhandle->equal_range(std::string(key));
@@ -477,7 +476,7 @@ const Input& ValueFederateManager::getSubscription(std::string_view key) const
     return invalidIpt;
 }
 
-Input& ValueFederateManager::getSubscription(std::string_view key)
+Input& ValueFederateManager::getInputByTarget(std::string_view key)
 {
     auto TIDhandle = targetIDs.lock_shared();
     auto res = TIDhandle->equal_range(std::string(key));

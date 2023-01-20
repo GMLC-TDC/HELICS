@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -90,6 +90,10 @@ class BrokerBase {
     bool globalTime{false};
     /// flag indicating the use of async time keeping
     bool asyncTime{false};
+    /// @brief flag indicating that the broker supports dynamic federates
+    bool dynamicFederation{false};
+    /// @brief flag disabling dynamic data sources
+    bool disableDynamicSources{false};
 
   private:
     /// flag indicating that the main processing loop is running

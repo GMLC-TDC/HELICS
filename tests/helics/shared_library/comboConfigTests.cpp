@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -38,7 +38,7 @@ TEST_F(config_tests, control_file_test)
     EXPECT_STREQ(helicsFilterGetName(filt), "EV_Controller/filterEV3");
 
     auto ipt = helicsFederateGetInputByIndex(cfed, 4, &err);
-    EXPECT_STREQ(helicsSubscriptionGetTarget(ipt), "IEEE_123_feeder_0/charge_EV3");
+    EXPECT_STREQ(helicsInputGetTarget(ipt), "IEEE_123_feeder_0/charge_EV3");
 
     helicsFederateDestroy(cfed);
 }

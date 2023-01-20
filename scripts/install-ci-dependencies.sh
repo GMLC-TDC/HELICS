@@ -76,7 +76,7 @@ fi
 if [[ "$os_name" == "Linux" ]]; then
     # Install CMake
     if [[ ! -d "${cmake_install_path}" ]]; then
-        ./scripts/install-dependency.sh cmake ${cmake_version} "${cmake_install_path}"
+        ./scripts/install-dependency.sh cmake "${cmake_version}" "${cmake_install_path}"
     fi
 
     # Set path to CMake executable depending on OS
@@ -90,7 +90,7 @@ if [[ "$os_name" == "Linux" ]]; then
 
     # Install SWIG
     if [[ ! -d "${swig_install_path}" ]]; then
-        ./scripts/install-dependency.sh swig ${swig_version} "${swig_install_path}"
+        ./scripts/install-dependency.sh swig "${swig_version}" "${swig_install_path}"
     fi
     export PATH="${swig_install_path}/bin:${PATH}"
     echo "*** built swig successfully {$PATH}"
@@ -98,14 +98,14 @@ if [[ "$os_name" == "Linux" ]]; then
     # Install ZeroMQ
     if [[ ! -d "${zmq_install_path}" ]]; then
         echo "*** build libzmq"
-        ./scripts/install-dependency.sh zmq ${zmq_version} "${zmq_install_path}"
+        ./scripts/install-dependency.sh zmq "${zmq_version}" "${zmq_install_path}"
         echo "*** built zmq successfully"
     fi
 
     # Install Boost
     if [[ ! -d "${boost_install_path}" ]]; then
         echo "*** build boost"
-        ${WAIT_COMMAND} ./scripts/install-dependency.sh boost ${boost_version} "${boost_install_path}"
+        ${WAIT_COMMAND} ./scripts/install-dependency.sh boost "${boost_version}" "${boost_install_path}"
         echo "*** built boost successfully"
     fi
 
@@ -126,7 +126,7 @@ if [[ "$USE_MPI" ]]; then
     if [[ ! -d "${mpi_install_path}" ]]; then
         # if mpi_implementation isn't set, then the mpi implementation requested wasn't recognized
         if [[ -n "${mpi_implementation}" ]]; then
-            ${WAIT_COMMAND} ./scripts/install-dependency.sh ${mpi_implementation} ${mpi_version} "${mpi_install_path}"
+            ${WAIT_COMMAND} ./scripts/install-dependency.sh "${mpi_implementation}" "${mpi_version}" "${mpi_install_path}"
         fi
     fi
 fi

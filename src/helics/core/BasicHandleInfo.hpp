@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -32,6 +32,19 @@ class BasicHandleInfo {
         handleType(type_of_handle), key(key_name), type(type_name), units(unit_name), type_in(type),
         type_out(units)
 
+    {
+    }
+
+    BasicHandleInfo(GlobalFederateId federate_id,
+                    InterfaceHandle handle_id,
+                    InterfaceType type_of_handle) noexcept:
+        handle{federate_id, handle_id},
+        handleType(type_of_handle), type_in(type), type_out(units)
+    {
+    }
+
+    BasicHandleInfo(GlobalHandle gHandle, InterfaceType type_of_handle) noexcept:
+        handle{gHandle}, handleType(type_of_handle), type_in(type), type_out(units)
     {
     }
 

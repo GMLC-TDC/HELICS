@@ -1,17 +1,16 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
 
-#ifndef HELICS_CORE_TYPES_HEADER
-#    define HELICS_CORE_TYPES_HEADER
+#include "../helics_enums.h"
 
-#    include "../helics_enums.h"
+#include <string>
+#include <string_view>
 
-#    include <string>
 /** @file
 @details definitions of types an enumerations used in helics
 */
@@ -114,8 +113,11 @@ enum class InterfaceType : char {
     INPUT = 'i',  //!< handle to a input interface
     ENDPOINT = 'e',  //!< handle to an endpoint
     FILTER = 'f',  //!< handle to a filter
-    TRANSLATOR = 't'  //!< handle to a translator object
+    TRANSLATOR = 't',  //!< handle to a translator object
+    SINK = 's'  //!< handle to a data sink
 };
+
+std::string_view interfaceTypeName(InterfaceType type) noexcept;
 
 }  // namespace helics
 /// simplified alias to indicate that iterations have concluded
@@ -126,5 +128,3 @@ constexpr auto NO_ITERATION = helics::IterationRequest::NO_ITERATIONS;
 constexpr auto FORCE_ITERATION = helics::IterationRequest::FORCE_ITERATION;
 /// simplified alias to indicate that helics should iterate if warranted
 constexpr auto ITERATE_IF_NEEDED = helics::IterationRequest::ITERATE_IF_NEEDED;
-
-#endif

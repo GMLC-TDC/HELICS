@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -88,13 +88,12 @@ class HELICS_CXX_EXPORT MessageFederate:
 
   protected:
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition(IterationResult result) override;
+    virtual void initializeToExecuteStateTransition(iteration_time result) override;
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual std::string localQuery(std::string_view queryStr) const override;
 
   public:
     /** register an endpoint
-    @details call is only valid in startup mode
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     */
@@ -110,7 +109,6 @@ class HELICS_CXX_EXPORT MessageFederate:
                                        std::string_view type = std::string_view());
 
     /** register an endpoint directly without prepending the federate name
-    @details call is only valid in startup mode
     @param eptName the name of the endpoint
     @param type the defined type of the interface for endpoint checking if requested
     @return a Reference to an Endpoint Object
@@ -138,6 +136,12 @@ class HELICS_CXX_EXPORT MessageFederate:
     {
         return registerGlobalEndpoint(std::string(eptName) + '_' + std::to_string(index1), type);
     }
+
+    /** register a dataSink
+    @param sinkName the name of the endpoint
+    @return the data sink will function identically to an endpoint except it only receives
+    */
+    Endpoint& registerDataSink(std::string_view sinkName = std::string_view());
 
     virtual void registerInterfaces(const std::string& configString) override;
 
@@ -190,7 +194,7 @@ class HELICS_CXX_EXPORT MessageFederate:
     @return a unique_ptr to a Message object containing the message data*/
     std::unique_ptr<Message> getMessage();
 
-    /** get an endpoint by its name
+    /** get an endpoint or data sink by its name
     @param name the Endpoint
     @return an Endpoint*/
     Endpoint& getEndpoint(std::string_view name) const;
@@ -199,6 +203,11 @@ class HELICS_CXX_EXPORT MessageFederate:
     @param index the index of the endpoint to retrieve index is 0 based
     @return an Endpoint*/
     Endpoint& getEndpoint(int index) const;
+
+    /** get a data sink by its name
+    @param name the Data Sink
+    @return an Endpoint object representing the data sink*/
+    Endpoint& getDataSink(std::string_view name) const;
 
     /** register a callback for all endpoints
     @param callback the function to execute upon receipt of a message for any endpoint

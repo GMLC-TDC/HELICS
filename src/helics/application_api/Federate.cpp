@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -426,8 +426,9 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
             enterInitializingMode();
             [[fallthrough]];
         case Modes::INITIALIZING: {
-            res = coreObject->enterExecutingMode(fedID, iterate);
-            enteringExecutingMode(res);
+            auto ires = coreObject->enterExecutingMode(fedID, iterate);
+            enteringExecutingMode(ires);
+            res = ires.state;
             break;
         }
         case Modes::PENDING_EXEC:
@@ -450,16 +451,13 @@ IterationResult Federate::enterExecutingMode(IterationRequest iterate)
     return res;
 }
 
-void Federate::enteringExecutingMode(IterationResult res)
+void Federate::enteringExecutingMode(iteration_time res)
 {
-    switch (res) {
+    switch (res.state) {
         case IterationResult::NEXT_STEP:
             updateFederateMode(Modes::EXECUTING);
-            if (observerMode) {
-                mCurrentTime = coreObject->getCurrentTime(fedID);
-            } else {
-                mCurrentTime = timeZero;
-            }
+
+            mCurrentTime = res.grantedTime;
             if (timeUpdateCallback) {
                 timeUpdateCallback(mCurrentTime, false);
             }
@@ -471,7 +469,7 @@ void Federate::enteringExecutingMode(IterationResult res)
         case IterationResult::ITERATING:
             mCurrentTime = initializationTime;
 
-            enteringInitializingMode(res);
+            enteringInitializingMode(res.state);
 
             initializeToExecuteStateTransition(res);
             break;
@@ -547,7 +545,7 @@ IterationResult Federate::enterExecutingModeComplete()
             try {
                 auto res = asyncInfo->execFuture.get();
                 enteringExecutingMode(res);
-                return res;
+                return res.state;
             }
             catch (const std::exception&) {
                 updateFederateMode(Modes::ERROR_STATE);
@@ -897,6 +895,10 @@ Time Federate::requestTime(Time nextInternalTimeStep)
                 updateFederateMode(Modes::ERROR_STATE);
                 throw;
             }
+            catch (const RegistrationFailure&) {
+                updateFederateMode(Modes::ERROR_STATE);
+                throw;
+            }
             break;
         case Modes::FINALIZE:
         case Modes::FINISHED:
@@ -1113,7 +1115,7 @@ void Federate::startupToInitializeStateTransition()
 {
     // child classes may do something with this
 }
-void Federate::initializeToExecuteStateTransition(IterationResult /*unused*/)
+void Federate::initializeToExecuteStateTransition(iteration_time /*unused*/)
 {
     // child classes may do something with this
 }
@@ -1865,7 +1867,7 @@ const std::string& Interface::getDestinationTargets() const
 
 const std::string& Interface::getDisplayName() const
 {
-    return (mName.empty() ? getTarget() : mName);
+    return (mName.empty() ? getSourceTargets() : mName);
 }
 
 void Interface::close()

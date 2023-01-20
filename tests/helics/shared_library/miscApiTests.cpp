@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -88,7 +88,7 @@ TEST(misc_tests, misc_tests)
     auto pub1KeyString = helicsPublicationGetName(pub1);
     auto pub1TypeString = helicsPublicationGetType(pub1);
     auto pub1UnitsString = helicsPublicationGetUnits(pub1);
-    auto sub1KeyString = helicsSubscriptionGetTarget(sub1);
+    auto sub1KeyString = helicsInputGetTarget(sub1);
     auto sub1UnitsString = helicsInputGetUnits(sub1);
     EXPECT_STREQ("pub1", pub1KeyString);
     EXPECT_STREQ("double", pub1TypeString);

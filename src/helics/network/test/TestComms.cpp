@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -87,6 +87,7 @@ namespace testcore {
         if (!brokerName.empty()) {
             milliseconds totalSleep(0);
             while (!tbroker) {
+                int ecount{0};
                 auto broker = BrokerFactory::findBroker(brokerName);
                 tbroker = std::dynamic_pointer_cast<CoreBroker>(broker);
                 if (!tbroker) {
@@ -105,9 +106,20 @@ namespace testcore {
                     }
                 } else {
                     if (!tbroker->isOpenToNewFederates() && !observer) {
-                        logError("broker is not open to new federates " + brokerName);
+                        ++ecount;
+                        if (ecount == 1) {
+                            logError("broker is not open to new federates " + brokerName);
+                        }
                         tbroker = nullptr;
                         broker = nullptr;
+                        if (ecount >= 3) {
+                            setTxStatus(ConnectionStatus::ERRORED);
+                            setRxStatus(ConnectionStatus::ERRORED);
+                            return;
+                        }
+                        if (ecount == 1) {
+                            std::this_thread::sleep_for(milliseconds(200));
+                        }
                         BrokerFactory::cleanUpBrokers(milliseconds(200));
                         totalSleep += milliseconds(200);
                         if (totalSleep > milliseconds(connectionTimeout)) {

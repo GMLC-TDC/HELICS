@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -73,7 +73,7 @@ class HELICS_CXX_EXPORT CombinationFederate: public ValueFederate, public Messag
   protected:
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition(IterationResult result) override;
+    virtual void initializeToExecuteStateTransition(iteration_time result) override;
     virtual std::string localQuery(std::string_view queryStr) const override;
 
   public:

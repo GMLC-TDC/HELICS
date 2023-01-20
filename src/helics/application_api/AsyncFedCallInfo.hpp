@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -18,7 +18,7 @@ class AsyncFedCallInfo {
     /**future for the Enter initialization call*/
     std::future<bool> initFuture;
     /** future for the enter execution mode call*/
-    std::future<IterationResult> execFuture;
+    std::future<iteration_time> execFuture;
     /** future for the timeRequest call*/
     std::future<Time> timeRequestFuture;
     /** future for the time request iterative call*/

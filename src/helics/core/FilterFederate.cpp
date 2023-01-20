@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -242,7 +242,7 @@ void FilterFederate::acceptDestProcessReturn(GlobalFederateId fid, uint32_t pid)
 /** process a filter message return*/
 void FilterFederate::processFilterReturn(ActionMessage& cmd)
 {
-    auto* handle = mHandles->getEndpoint(cmd.dest_handle);
+    auto* handle = mHandles->getInterfaceHandle(cmd.dest_handle, InterfaceType::ENDPOINT);
     if (handle == nullptr) {
         return;
     }
@@ -296,7 +296,7 @@ void FilterFederate::processFilterReturn(ActionMessage& cmd)
 void FilterFederate::processDestFilterReturn(ActionMessage& command)
 {
     {
-        auto* handle = mHandles->getEndpoint(command.dest_handle);
+        auto* handle = mHandles->getInterfaceHandle(command.dest_handle, InterfaceType::ENDPOINT);
         if (handle == nullptr) {
             return;
         }
@@ -632,7 +632,8 @@ void FilterFederate::handleMessage(ActionMessage& command)
                     mCoord.addDependency(command.source_id);
                 }
             }
-            auto* filthandle = mHandles->getFilter(command.dest_handle);
+            auto* filthandle =
+                mHandles->getInterfaceHandle(command.dest_handle, InterfaceType::FILTER);
             if (filthandle != nullptr) {
                 filthandle->used = true;
             }
@@ -664,7 +665,8 @@ void FilterFederate::handleMessage(ActionMessage& command)
                 }
             }
 
-            auto* filthandle = mHandles->getFilter(command.dest_handle);
+            auto* filthandle =
+                mHandles->getInterfaceHandle(command.dest_handle, InterfaceType::FILTER);
             if (filthandle != nullptr) {
                 filthandle->used = true;
             }
@@ -782,7 +784,8 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
         }
 
         if (!FilterAlreadyPresent) {
-            auto* endhandle = mHandles->getEndpoint(command.dest_handle);
+            auto* endhandle =
+                mHandles->getInterfaceHandle(command.dest_handle, InterfaceType::ENDPOINT);
             if (endhandle != nullptr) {
                 setActionFlag(*endhandle, has_dest_filter_flag);
                 if ((!checkActionFlag(command, clone_flag)) && (filterC->hasDestFilters)) {
@@ -836,7 +839,8 @@ void FilterFederate::processFilterInfo(ActionMessage& command)
             }
             filterC->allSourceFilters.push_back(newFilter);
             filterC->hasSourceFilters = true;
-            auto* endhandle = mHandles->getEndpoint(command.dest_handle);
+            auto* endhandle =
+                mHandles->getInterfaceHandle(command.dest_handle, InterfaceType::ENDPOINT);
             if (endhandle != nullptr) {
                 setActionFlag(*endhandle, has_source_filter_flag);
             }
@@ -913,7 +917,7 @@ void FilterFederate::addFilteredEndpoint(Json::Value& block, GlobalFederateId fe
     block["endpoints"] = Json::arrayValue;
     for (const auto& filt : filterCoord) {
         auto* fc = filt.second.get();
-        const auto* ep = mHandles->getEndpoint(filt.first);
+        const auto* ep = mHandles->getInterfaceHandle(filt.first, InterfaceType::ENDPOINT);
         if (ep->getFederateId() != fed) {
             continue;
         }

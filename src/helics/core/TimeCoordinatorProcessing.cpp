@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -58,7 +58,8 @@ std::tuple<FederateStates, MessageProcessingResult, bool>
         }
         case CMD_INIT_GRANT:
             if (state == FederateStates::CREATED) {
-                if (checkActionFlag(cmd, observer_flag)) {
+                if (checkActionFlag(cmd, observer_flag) ||
+                    checkActionFlag(cmd, dynamic_join_flag)) {
                     timeCoord->setDynamicJoining();
                 }
                 if (checkActionFlag(cmd, iteration_requested_flag)) {

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -102,10 +102,10 @@ bool EmptyCore::enterInitializingMode(LocalFederateId /*federateID*/, IterationR
     return false;
 }
 
-IterationResult EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
-                                              IterationRequest /*iterate*/)
+iteration_time EmptyCore::enterExecutingMode(LocalFederateId /*federateID*/,
+                                             IterationRequest /*iterate*/)
 {
-    return IterationResult::HALTED;
+    return {Time::maxVal(), IterationResult::HALTED};
 }
 
 LocalFederateId EmptyCore::registerFederate(std::string_view /*name*/,
@@ -318,6 +318,18 @@ InterfaceHandle EmptyCore::registerTargetedEndpoint(LocalFederateId /*federateID
 }
 
 InterfaceHandle EmptyCore::getEndpoint(LocalFederateId /*federateID*/,
+                                       std::string_view /*name*/) const
+{
+    return {};
+}
+
+InterfaceHandle EmptyCore::registerDataSink(LocalFederateId /*federateID*/,
+                                            std::string_view /*name*/)
+{
+    return {};
+}
+
+InterfaceHandle EmptyCore::getDataSink(LocalFederateId /*federateID*/,
                                        std::string_view /*name*/) const
 {
     return {};

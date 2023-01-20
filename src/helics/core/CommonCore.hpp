@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -101,7 +101,7 @@ class CommonCore: public Core, public BrokerBase {
     virtual bool enterInitializingMode(LocalFederateId federateID,
                                        IterationRequest request) override final;
     virtual void setCoreReadyToInit() override final;
-    virtual IterationResult
+    virtual iteration_time
         enterExecutingMode(LocalFederateId federateID,
                            IterationRequest iterate = NO_ITERATION) override final;
     virtual LocalFederateId registerFederate(std::string_view name,
@@ -182,6 +182,13 @@ class CommonCore: public Core, public BrokerBase {
                                                      std::string_view type) override final;
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
                                         std::string_view name) const override final;
+
+    virtual InterfaceHandle registerDataSink(LocalFederateId federateID,
+                                             std::string_view name) override final;
+
+    virtual InterfaceHandle getDataSink(LocalFederateId federateID,
+                                        std::string_view name) const override final;
+
     virtual InterfaceHandle registerFilter(std::string_view filterName,
                                            std::string_view type_in,
                                            std::string_view type_out) override final;
@@ -393,7 +400,9 @@ class CommonCore: public Core, public BrokerBase {
     /** function for routing a message from based on the destination specified in the
      * ActionMessage*/
     void routeMessage(ActionMessage&& cmd);
-
+    /** check that a new interface is valid and is allowed to be created*/
+    FederateState*
+        checkNewInterface(LocalFederateId federateID, std::string_view key, InterfaceType type);
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** deal with a query response addressed to this core*/

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -384,6 +384,24 @@ static defV vectorDiff(const std::vector<defV>& vals)
     return X;
 }
 
+static defV sumOperation(const std::vector<defV>& vals)
+{
+    if (vals.empty()) {
+        return std::string{};
+    }
+    if (vals.front().index() == string_loc) {
+        std::string output;
+        for (const auto& v : vals) {
+            std::string valOutput;
+            valueExtract(v, valOutput);
+            output.append(valOutput);
+        }
+        return output;
+    } else {
+        return vectorSum(vals);
+    }
+}
+
 static bool changeDetected(const defV& prevValue, const defV& newVal, double deltaV)
 {
     auto visitor = [&](const auto& arg) { return changeDetected(prevValue, arg, deltaV); };
@@ -423,9 +441,19 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
         case MultiInputHandlingMethod::OR_OPERATION:
             type = DataType::HELICS_BOOL;
             break;
-        case MultiInputHandlingMethod::SUM_OPERATION:
         case MultiInputHandlingMethod::AVERAGE_OPERATION:
             type = DataType::HELICS_VECTOR;
+            break;
+        case MultiInputHandlingMethod::SUM_OPERATION:
+            switch (targetType) {
+                case DataType::HELICS_STRING:
+                case DataType::HELICS_CHAR:
+                    type = DataType::HELICS_STRING;
+                    break;
+                default:
+                    type = DataType::HELICS_VECTOR;
+                    break;
+            }
             break;
         case MultiInputHandlingMethod::VECTORIZE_OPERATION:
             switch (targetType) {
@@ -481,7 +509,7 @@ bool Input::vectorDataProcess(const std::vector<std::shared_ptr<const SmallBuffe
                 "0";
             break;
         case MultiInputHandlingMethod::SUM_OPERATION:
-            result = vectorSum(res);
+            result = sumOperation(res);
             break;
         case MultiInputHandlingMethod::AVERAGE_OPERATION:
             result = vectorAvg(res);

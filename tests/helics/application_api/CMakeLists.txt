@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2022, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2023, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -22,10 +22,11 @@ set(valueFederate_test_sources
     ValueFederateDualTransfer.cpp
     helicsTypeTests.cpp
     MultiInputTests.cpp
+    DynamicValueFederateTests.cpp
 )
 
 set(messageFederate_test_sources MessageFederateKeyTests.cpp MessageFederateAdditionalTests.cpp
-                                 CombinationFederateTests.cpp
+                                 CombinationFederateTests.cpp EndpointLinkingTests.cpp
 )
 
 set(filterTranslator_test_sources FilterTests.cpp TranslatorTests.cpp FilterAdditionalTests.cpp)
@@ -58,7 +59,7 @@ add_executable(
 )
 
 add_executable(
-    filterTranslatorTests ${filterTranslator_test_sources_test_sources} ${common_test_headers}
+    filterTranslatorTests ${filterTranslator_test_sources} ${common_test_headers}
                           ${common_test_sources}
 )
 

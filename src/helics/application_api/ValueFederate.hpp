@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -434,7 +434,7 @@ class HELICS_CXX_EXPORT ValueFederate:
   protected:
     virtual void updateTime(Time newTime, Time oldTime) override;
     virtual void startupToInitializeStateTransition() override;
-    virtual void initializeToExecuteStateTransition(IterationResult result) override;
+    virtual void initializeToExecuteStateTransition(iteration_time result) override;
     virtual std::string localQuery(std::string_view queryStr) const override;
 
   public:
@@ -472,15 +472,33 @@ class HELICS_CXX_EXPORT ValueFederate:
     const Input& getInput(std::string_view name, int index1, int index2) const;
 
     /** get the input id based on target
-    @return an invalid input object if the target is valid otherwise a reference to the
+    @return an invalid input object if the target is not valid, otherwise a reference to the
     corresponding input*/
-    const Input& getSubscription(std::string_view target) const;
+    [[deprecated("Use getInputByTarget")]] const Input&
+        getSubscription(std::string_view target) const
+    {
+        return getInputByTarget(target);
+    }
 
     /** get an input based on target
-    @details this will only get the first subscription with a specific target
-   @return an invalid input object if the target is valid otherwise a reference to the corresponding
-   input*/
-    Input& getSubscription(std::string_view target);
+    @details this will only get the first input with a specific target
+   @return an invalid input object if the target is not valid, otherwise a reference to the
+   corresponding input*/
+    [[deprecated("Use getInputByTarget")]] Input& getSubscription(std::string_view target)
+    {
+        return getInputByTarget(target);
+    }
+
+    /** get the input id based on target
+    @return an invalid input object if the target is not valid, otherwise a reference to the
+    corresponding input*/
+    const Input& getInputByTarget(std::string_view target) const;
+
+    /** get an input based on target
+    @details this will only get the first input with a specific target
+    @return an invalid input object if the target is not valid, otherwise a reference to the
+    corresponding input*/
+    Input& getInputByTarget(std::string_view target);
 
     /** get a publication from its name
     @param name the name of the publication

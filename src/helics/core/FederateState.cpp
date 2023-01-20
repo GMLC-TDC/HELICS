@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -365,6 +365,9 @@ void FederateState::createInterface(InterfaceType htype,
             interfaceInformation.createEndpoint(handle, key, type, flags);
 
             break;
+        case InterfaceType::SINK:
+            interfaceInformation.createEndpoint(handle, key, type, flags);
+            break;
         default:
             break;
     }
@@ -379,8 +382,8 @@ void FederateState::closeInterface(InterfaceHandle handle, InterfaceType type)
                 ActionMessage rem(CMD_REMOVE_PUBLICATION);
                 rem.setSource(pub->id);
                 rem.actionTime = time_granted;
-                for (auto& sub : pub->subscribers) {
-                    rem.setDestination(sub);
+                for (const auto& sub : pub->subscribers) {
+                    rem.setDestination(sub.first);
                     routeMessage(rem);
                 }
                 pub->subscribers.clear();
@@ -502,7 +505,7 @@ IterationResult FederateState::enterInitializingMode(IterationRequest request)
     return ret;
 }
 
-IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool sendRequest)
+iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool sendRequest)
 {
     if (try_lock()) {  // only enter this loop once per federate
         // timeCoord->enteringExecMode (iterate);
@@ -531,7 +534,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
             }
         }
 #endif
-        return static_cast<IterationResult>(ret);
+        return {time_granted, static_cast<IterationResult>(ret)};
     }
 
     // if this is not true then try again the core may have been handing something short so try
@@ -564,7 +567,7 @@ IterationResult FederateState::enterExecutingMode(IterationRequest iterate, bool
             ret = IterationResult::NEXT_STEP;
             break;
     }
-    return ret;
+    return {time_granted, ret};
 }
 
 void FederateState::updateDataForExecEntry(MessageProcessingResult result, IterationRequest iterate)
@@ -605,11 +608,14 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
 std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 {
     std::lock_guard<FederateState> fedlock(*this);
+    std::vector<GlobalHandle> subs;
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
-        return pubInfo->subscribers;
+        for (const auto& sub : pubInfo->subscribers) {
+            subs.emplace_back(sub.first);
+        }
     }
-    return {};
+    return subs;
 }
 
 std::vector<std::pair<GlobalHandle, std::string_view>>
@@ -1484,7 +1490,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
 
         case CMD_SEND_MESSAGE: {
             auto* epi = interfaceInformation.getEndpoint(cmd.dest_handle);
-            if (epi != nullptr) {
+            if (epi != nullptr && !epi->sourceOnly) {
                 // if (!epi->not_interruptible)
                 {
                     timeCoord->updateMessageTime(cmd.actionTime, !timeGranted_mode);
@@ -1653,7 +1659,7 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         case CMD_ADD_SUBSCRIBER: {
             auto* pubI = interfaceInformation.getPublication(cmd.dest_handle);
             if (pubI != nullptr) {
-                if (pubI->addSubscriber(cmd.getSource())) {
+                if (pubI->addSubscriber(cmd.getSource(), cmd.name())) {
                     if (timeMethod == TimeSynchronizationMethod::DISTRIBUTED) {
                         addDependent(cmd.source_id);
                     }

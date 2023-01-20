@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -309,3 +309,31 @@ bool matchingTypes(std::string_view type1, std::string_view type2)
 }
 
 }  // namespace helics::core
+
+namespace helics {
+
+std::string_view interfaceTypeName(InterfaceType type) noexcept
+{
+    static constexpr std::string_view pubType{"Publication"};
+    static constexpr std::string_view inpType{"Input"};
+    static constexpr std::string_view endType{"Endpoint"};
+    static constexpr std::string_view transType{"Translator"};
+    static constexpr std::string_view filtType{"Filter"};
+    static constexpr std::string_view otherType{"Interface"};
+
+    switch (type) {
+        case InterfaceType::PUBLICATION:
+            return pubType;
+        case InterfaceType::ENDPOINT:
+            return endType;
+        case InterfaceType::INPUT:
+            return inpType;
+        case InterfaceType::FILTER:
+            return filtType;
+        case InterfaceType::TRANSLATOR:
+            return transType;
+        default:
+            return otherType;
+    }
+}
+}  // namespace helics

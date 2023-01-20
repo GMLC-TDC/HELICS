@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -143,6 +143,7 @@ typedef enum {
     HELICS_PROPERTY_TIME_OUTPUT_DELAY = 150,
     HELICS_PROPERTY_TIME_STOPTIME = 152,
     HELICS_PROPERTY_TIME_GRANT_TIMEOUT = 161,
+    HELICS_PROPERTY_INT_CURRENT_ITERATION = 258,
     HELICS_PROPERTY_INT_MAX_ITERATIONS = 259,
     HELICS_PROPERTY_INT_LOG_LEVEL = 271,
     HELICS_PROPERTY_INT_FILE_LOG_LEVEL = 272,
@@ -519,7 +520,8 @@ HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* k
 HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int index, HelicsError* err);
 HelicsInput helicsFederateGetInput(HelicsFederate fed, const char* key, HelicsError* err);
 HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsError* err);
-HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err);
+HELICS_DEPRECATED HelicsInput helicsFederateGetSubscription(HelicsFederate fed, const char* key, HelicsError* err);
+HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* target, HelicsError* err);
 void helicsFederateClearUpdates(HelicsFederate fed);
 void helicsFederateRegisterFromPublicationJSON(HelicsFederate fed, const char* json, HelicsError* err);
 void helicsFederatePublishJSON(HelicsFederate fed, const char* json, HelicsError* err);
@@ -572,7 +574,8 @@ const char* helicsInputGetPublicationType(HelicsInput ipt);
 int helicsInputGetPublicationDataType(HelicsInput ipt);
 const char* helicsPublicationGetType(HelicsPublication pub);
 const char* helicsInputGetName(HelicsInput ipt);
-const char* helicsSubscriptionGetTarget(HelicsInput ipt);
+HELICS_DEPRECATED const char* helicsSubscriptionGetTarget(HelicsInput ipt);
+const char* helicsInputGetTarget(HelicsInput ipt);
 const char* helicsPublicationGetName(HelicsPublication pub);
 const char* helicsInputGetUnits(HelicsInput ipt);
 const char* helicsInputGetInjectionUnits(HelicsInput ipt);

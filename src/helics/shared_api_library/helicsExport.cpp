@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable Energy, LLC.  See the top-level NOTICE for
 additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -434,13 +434,19 @@ HelicsCore helicsCoreClone(HelicsCore core, HelicsError* err)
     if (coreObj == nullptr) {
         return nullptr;
     }
-    auto coreClone = std::make_unique<helics::CoreObject>();
-    coreClone->valid = gCoreValidationIdentifier;
-    coreClone->coreptr = coreObj->coreptr;
-    auto* retcore = reinterpret_cast<HelicsCore>(coreClone.get());
-    getMasterHolder()->addCore(std::move(coreClone));
+    try {
+        auto coreClone = std::make_unique<helics::CoreObject>();
+        coreClone->valid = gCoreValidationIdentifier;
+        coreClone->coreptr = coreObj->coreptr;
+        auto* retcore = reinterpret_cast<HelicsCore>(coreClone.get());
+        getMasterHolder()->addCore(std::move(coreClone));
 
-    return retcore;
+        return retcore;
+    }
+    catch (...) {
+        helicsErrorHandler(err);
+        return nullptr;
+    }
 }
 
 HelicsBool helicsCoreIsValid(HelicsCore core)
@@ -597,11 +603,11 @@ void helicsCoreAddAlias(HelicsCore core, const char* interfaceName, const char* 
     if (cr == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || interfaceName[0] == '/0') {
+    if (interfaceName == nullptr || interfaceName[0] == '\0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr || alias[0] == '/0') {
+    if (alias == nullptr || alias[0] == '\0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }
@@ -621,11 +627,11 @@ void helicsBrokerAddAlias(HelicsBroker broker, const char* interfaceName, const 
     if (brk == nullptr) {
         return;
     }
-    if (interfaceName == nullptr || interfaceName[0] == '/0') {
+    if (interfaceName == nullptr || interfaceName[0] == '\0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInterfaceName);
         return;
     }
-    if (alias == nullptr || alias[0] == '/0') {
+    if (alias == nullptr || alias[0] == '\0') {
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidAliasName);
         return;
     }
@@ -801,7 +807,14 @@ void helicsCoreSetGlobal(HelicsCore core, const char* valueName, const char* val
         assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidGlobalString);
         return;
     }
-    cr->setGlobal(valueName, AS_STRING_VIEW(value));
+    try {
+        cr->setGlobal(valueName, AS_STRING_VIEW(value));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsCoreSendCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -810,7 +823,14 @@ void helicsCoreSendCommand(HelicsCore core, const char* target, const char* comm
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string_view{}, HELICS_SEQUENCING_MODE_FAST);
+    try {
+        cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string_view{}, HELICS_SEQUENCING_MODE_FAST);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const char* command, HelicsError* err)
@@ -819,7 +839,14 @@ void helicsCoreSendOrderedCommand(HelicsCore core, const char* target, const cha
     if (cr == nullptr) {
         return;
     }
-    cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
+    try {
+        cr->sendCommand(AS_STRING_VIEW(target), AS_STRING_VIEW(command), std::string{}, HELICS_SEQUENCING_MODE_ORDERED);
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError* err)
@@ -828,7 +855,14 @@ void helicsCoreSetLogFile(HelicsCore core, const char* logFileName, HelicsError*
     if (cr == nullptr) {
         return;
     }
-    cr->setLogFile(AS_STRING_VIEW(logFileName));
+    try {
+        cr->setLogFile(AS_STRING_VIEW(logFileName));
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 const char* helicsBrokerGetIdentifier(HelicsBroker broker)
@@ -880,7 +914,14 @@ void helicsCoreSetReadyToInit(HelicsCore core, HelicsError* err)
     if (cr == nullptr) {
         return;
     }
-    cr->setCoreReadyToInit();
+    try {
+        cr->setCoreReadyToInit();
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+    }
+    // LCOV_EXCL_STOP
 }
 
 HelicsBool helicsCoreConnect(HelicsCore core, HelicsError* err)
@@ -924,8 +965,16 @@ HelicsBool helicsBrokerWaitForDisconnect(HelicsBroker broker, int msToWait, Heli
     if (brk == nullptr) {
         return HELICS_TRUE;
     }
-    bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
-    return res ? HELICS_TRUE : HELICS_FALSE;
+    try {
+        bool res = brk->waitForDisconnect(std::chrono::milliseconds(msToWait));
+        return res ? HELICS_TRUE : HELICS_FALSE;
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+        return HELICS_FALSE;
+    }
+    // LCOV_EXCL_STOP
 }
 
 HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsError* err)
@@ -934,8 +983,16 @@ HelicsBool helicsCoreWaitForDisconnect(HelicsCore core, int msToWait, HelicsErro
     if (cr == nullptr) {
         return HELICS_TRUE;
     }
-    bool res = cr->waitForDisconnect(std::chrono::milliseconds(msToWait));
-    return res ? HELICS_TRUE : HELICS_FALSE;
+    try {
+        bool res = cr->waitForDisconnect(std::chrono::milliseconds(msToWait));
+        return res ? HELICS_TRUE : HELICS_FALSE;
+    }
+    // LCOV_EXCL_START
+    catch (...) {
+        helicsErrorHandler(err);
+        return HELICS_FALSE;
+    }
+    // LCOV_EXCL_STOP
 }
 
 void helicsBrokerDisconnect(HelicsBroker broker, HelicsError* err)

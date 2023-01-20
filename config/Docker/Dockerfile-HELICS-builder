@@ -44,8 +44,8 @@ LABEL name="helics.builder"
 LABEL org.helics.description="HELICS builder base image"
 LABEL org.helics.vcs-ref=$GIT_COMMIT
 LABEL org.helics.vcs-url="https://github.com/GMLC-TDC/helics"
-LABEL version="3.2.1"
-LABEL date="2022-05-24"
+LABEL version="3.4.0"
+LABEL date="2023-01-19"
 
 # Copy the HELICS install from the builder image stage above to a location in the PATH env var
 COPY --from=builder /root/develop/helics-install /usr

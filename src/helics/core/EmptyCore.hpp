@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -41,8 +41,8 @@ class EmptyCore: public Core {
     virtual bool enterInitializingMode(LocalFederateId federateID,
                                        IterationRequest request) override;
     virtual void setCoreReadyToInit() override;
-    virtual IterationResult enterExecutingMode(LocalFederateId federateID,
-                                               IterationRequest iterate = NO_ITERATION) override;
+    virtual iteration_time enterExecutingMode(LocalFederateId federateID,
+                                              IterationRequest iterate = NO_ITERATION) override;
     virtual LocalFederateId registerFederate(std::string_view name,
                                              const CoreFederateInfo& info) override;
     virtual const std::string& getFederateName(LocalFederateId federateID) const override;
@@ -119,6 +119,13 @@ class EmptyCore: public Core {
                                                      std::string_view type) override;
     virtual InterfaceHandle getEndpoint(LocalFederateId federateID,
                                         std::string_view name) const override;
+
+    virtual InterfaceHandle registerDataSink(LocalFederateId federateID,
+                                             std::string_view name) override final;
+
+    virtual InterfaceHandle getDataSink(LocalFederateId federateID,
+                                        std::string_view name) const override final;
+
     virtual InterfaceHandle registerFilter(std::string_view filterName,
                                            std::string_view type_in,
                                            std::string_view type_out) override;

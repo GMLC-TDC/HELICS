@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -24,6 +24,8 @@ class combofed_single_type_tests:
 class combofed_type_tests:
     public ::testing::TestWithParam<const char*>,
     public FederateTestFixture {};
+
+class combofed: public ::testing::Test, public FederateTestFixture {};
 
 static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
     return std::string(parameter.param);
@@ -349,4 +351,43 @@ TEST(comboFederate, constructor3)
     EXPECT_NO_THROW(mf1.enterExecutingMode());
     mf1.disconnect();
     EXPECT_TRUE(cr.waitForDisconnect(std::chrono::milliseconds(500)));
+}
+
+TEST_F(combofed, regex_link_anon_inp)
+{
+    SetupTest<helics::CombinationFederate>("test", 1);
+    auto vFed1 = GetFederateAs<helics::CombinationFederate>(0);
+    ASSERT_TRUE(vFed1);
+    // register the publications
+    vFed1->addAlias("pub1", "publisher");
+
+    auto& inp1 = vFed1->registerDataSink("");
+
+    auto& pub1 = vFed1->registerPublication<std::string>("pub1");
+    auto& pub2 = vFed1->registerPublication<std::string>("pub2");
+    auto& pub3 = vFed1->registerPublication<std::string>("pub3");
+    auto& pub4 = vFed1->registerPublication<std::string>("pub4");
+
+    vFed1->setProperty(HELICS_PROPERTY_TIME_DELTA, 1.0);
+    inp1.subscribe("REGEX:fed0/.*");
+    inp1.setOption(HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD,
+                   HELICS_MULTI_INPUT_SUM_OPERATION);
+
+    vFed1->enterExecutingMode();
+    // publish string1 at time=0.0;
+    pub1.publish("string1");
+    pub2.publish("string2");
+    pub3.publish("string3");
+    pub4.publish("string4");
+
+    auto gtime = vFed1->requestTime(1.0);
+
+    EXPECT_EQ(gtime, 1.0);
+    // get the value
+    EXPECT_EQ(inp1.pendingMessageCount(), 4);
+
+    const auto& str = inp1.getSourceTargets();
+    EXPECT_NE(str.find("pub2"), std::string::npos);
+
+    vFed1->finalize();
 }

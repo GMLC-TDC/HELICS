@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -218,7 +218,7 @@ void CoreBroker::addAlias(std::string_view interfaceKey, std::string_view alias)
 route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 {
     const auto& endpointName = mess.getString(targetStringLoc);
-    auto* eptInfo = handles.getEndpoint(endpointName);
+    auto* eptInfo = handles.getInterfaceHandle(endpointName, InterfaceType::ENDPOINT);
     if (eptInfo != nullptr) {
         mess.setDestination(eptInfo->handle);
         return getRoute(eptInfo->handle.fed_id);
@@ -233,16 +233,25 @@ route_id CoreBroker::fillMessageRouteInformation(ActionMessage& mess)
 bool CoreBroker::isOpenToNewFederates() const
 {
     auto cstate = getBrokerState();
-    return (cstate != BrokerState::CREATED && cstate < BrokerState::OPERATING && !haltOperations &&
-            (maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
-             getCountableFederates() < maxFederateCount));
+    if (cstate > BrokerState::OPERATING) {
+        return false;
+    }
+    if ((maxFederateCount == (std::numeric_limits<int32_t>::max)() ||
+         getCountableFederates() < maxFederateCount) &&
+        !haltOperations) {
+        if (!dynamicFederation) {
+            return (cstate < BrokerState::OPERATING);
+        }
+        return true;
+    }
+    return false;
 }
 
 void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCode)
 {
     route_id newroute;
-    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     bool route_created = false;
+    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
         newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
         addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
@@ -255,6 +264,16 @@ void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCo
     badInit.source_id = global_broker_id_local;
     badInit.name(command.name());
     badInit.messageID = errorCode;
+    switch (errorCode) {
+        case broker_terminating:
+            badInit.setString(0, "broker is terminating");
+            break;
+        case mismatch_broker_key_error_code:
+            badInit.setString(0, "broker key does not match");
+            break;
+        default:
+            break;
+    }
     transmit(newroute, badInit);
 
     if (route_created) {
@@ -311,11 +330,11 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
         }
     } else if (currentBrokerState == BrokerState::OPERATING) {
         // we are initialized already
-        if (!checkActionFlag(command, observer_flag)) {
+        if (!checkActionFlag(command, observer_flag) && !dynamicFederation) {
             sendBrokerErrorAck(command, already_init_error_code);
             return;
         }
-        // can't add a non observer federate in OPERATING mode
+        // can't add a non observer federate in OPERATING mode unless this is a dynamicFederation
     } else {
         sendBrokerErrorAck(command, broker_terminating);
         return;
@@ -389,7 +408,6 @@ void CoreBroker::brokerRegistration(ActionMessage&& command)
             mBrokers.back()._disable_ping = true;
         }
         routing_table.emplace(global_brkid, route);
-        // don't bother with the broker_table for root broker
 
         // sending the response message
         ActionMessage brokerReply(CMD_BROKER_ACK);
@@ -450,6 +468,7 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
         return;
     }
     bool countable = !checkActionFlag(command, non_counting_flag);
+    bool dynamicFed{false};
     if (countable && getCountableFederates() >= maxFederateCount) {
         sendFedErrorAck(command, max_federate_count_exceeded);
         return;
@@ -461,11 +480,13 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             transmit(parent_route_id, noInit);
         }
     } else if (getBrokerState() == BrokerState::OPERATING) {
-        if (!checkActionFlag(command, observer_flag) && countable) {
+        bool allowed = dynamicFederation || !countable || checkActionFlag(command, observer_flag);
+        if (!allowed) {
             // we are initialized already
             sendFedErrorAck(command, already_init_error_code);
             return;
         }
+        dynamicFed = true;
     } else {
         // we are in an ERROR_STATE and terminating
         sendFedErrorAck(command, broker_terminating);
@@ -483,6 +504,10 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
     if (checkActionFlag(command, non_counting_flag)) {
         mFederates.back().nonCounting = true;
     }
+    if (checkActionFlag(command, observer_flag)) {
+        mFederates.back().observer = true;
+    }
+    mFederates.back().dynamic = dynamicFed;
     auto lookupIndex = mFederates.size() - 1;
     if (checkActionFlag(command, child_flag)) {
         mFederates.back().global_id = GlobalFederateId(command.getExtraData());
@@ -1365,6 +1390,13 @@ void CoreBroker::processCommand(ActionMessage&& command)
             }
             addTranslator(command);
             break;
+        case CMD_REG_DATASINK:
+            if ((!isRootc) && (command.dest_id != parent_broker_id)) {
+                routeMessage(command);
+                // break;
+            }
+            addDataSink(command);
+            break;
         case CMD_CLOSE_INTERFACE:
             if ((!isRootc) && (command.dest_id != parent_broker_id)) {
                 routeMessage(command);
@@ -1443,13 +1475,18 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             }
             brk->state = ConnectionState::INIT_REQUESTED;
 
-            if (brk->_observer && getBrokerState() >= BrokerState::OPERATING) {
+            if ((dynamicFederation || brk->_observer) &&
+                getBrokerState() >= BrokerState::OPERATING) {
                 if (isRootc) {
                     ActionMessage grant(CMD_INIT_GRANT, global_broker_id_local, cmd.source_id);
                     if (checkActionFlag(cmd, iteration_requested_flag)) {
                         setActionFlag(grant, iteration_requested_flag);
                     }
-                    setActionFlag(grant, observer_flag);
+                    if (brk->_observer) {
+                        setActionFlag(grant, observer_flag);
+                    } else {
+                        setActionFlag(grant, dynamic_join_flag);
+                    }
                     transmit(brk->route, grant);
                 } else {
                     transmit(parent_route_id, cmd);
@@ -1505,7 +1542,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
             }
         } break;
         case CMD_INIT_GRANT:
-            if (!checkActionFlag(cmd, observer_flag)) {
+            if (!(checkActionFlag(cmd, observer_flag) || checkActionFlag(cmd, dynamic_join_flag))) {
                 if (checkActionFlag(cmd, iteration_requested_flag)) {
                     executeInitializationOperations(true);
                 } else {
@@ -1598,7 +1635,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_ADD_NAMED_PUBLICATION: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 auto fed = mFederates.find(pub->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1623,7 +1660,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_INPUT: {
-            auto* inp = handles.getInput(command.name());
+            auto* inp = handles.getInterfaceHandle(command.name(), InterfaceType::INPUT);
             if (inp != nullptr) {
                 auto fed = mFederates.find(inp->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1652,7 +1689,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_FILTER: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.setAction(CMD_ADD_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1671,7 +1708,7 @@ void CoreBroker::checkForNamedInterface(ActionMessage& command)
             }
         } break;
         case CMD_ADD_NAMED_ENDPOINT: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 auto fed = mFederates.find(ept->getFederateId());
                 if (fed->state < ConnectionState::ERROR_STATE) {
@@ -1784,7 +1821,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
     bool foundInterface = false;
     switch (command.action()) {
         case CMD_REMOVE_NAMED_PUBLICATION: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 command.setAction(CMD_REMOVE_SUBSCRIBER);
                 command.setDestination(pub->handle);
@@ -1797,7 +1834,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_INPUT: {
-            auto* inp = handles.getInput(command.name());
+            auto* inp = handles.getInterfaceHandle(command.name(), InterfaceType::INPUT);
             if (inp != nullptr) {
                 command.setAction(CMD_REMOVE_PUBLICATION);
                 command.setDestination(inp->handle);
@@ -1810,7 +1847,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_FILTER: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.setAction(CMD_REMOVE_ENDPOINT);
                 command.setDestination(filt->handle);
@@ -1823,7 +1860,7 @@ void CoreBroker::removeNamedTarget(ActionMessage& command)
             }
         } break;
         case CMD_REMOVE_NAMED_ENDPOINT: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 command.setAction(CMD_REMOVE_FILTER);
                 command.setDestination(ept->handle);
@@ -1880,23 +1917,69 @@ void CoreBroker::propagateError(ActionMessage&& cmd)
     routeMessage(std::move(cmd));
 }
 
-void CoreBroker::addPublication(ActionMessage& m)
+bool CoreBroker::checkInterfaceCreation(ActionMessage& m, InterfaceType type)
 {
-    // detect duplicate publications
-    if (handles.getPublication(m.name()) != nullptr) {
+    bool existingName{false};
+    if (type == InterfaceType::TRANSLATOR) {
+        existingName =
+            (handles.getInterfaceHandle(m.name(), InterfaceType::ENDPOINT) != nullptr ||
+             handles.getInterfaceHandle(m.name(), InterfaceType::INPUT) != nullptr ||
+             handles.getInterfaceHandle(m.name(), InterfaceType::PUBLICATION) != nullptr);
+    } else {
+        existingName = (handles.getInterfaceHandle(m.name(), type) != nullptr);
+    }
+
+    // detect duplicate InterfaceName;
+    if (existingName) {
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
         eret.dest_handle = m.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate PUBLICATION names ({})", m.name());
+        eret.payload = fmt::format("Duplicate {} names ({})", interfaceTypeName(type), m.name());
         propagateError(std::move(eret));
+        return false;
+    }
+    if (disableDynamicSources && type != InterfaceType::INPUT) {
+        if (getBrokerState() == BrokerState::OPERATING) {
+            auto fed = mFederates.find(m.source_id);
+            if (fed == mFederates.end()) {
+                ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+                eret.dest_handle = m.source_handle;
+                eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+                eret.payload =
+                    fmt::format("Source {} not allowed after entering initializing mode ({})",
+                                interfaceTypeName(type),
+                                m.name());
+                propagateError(std::move(eret));
+                return false;
+            } else if (!(fed->observer ||
+                         (fed->dynamic && fed->state == ConnectionState::CONNECTED))) {
+                ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
+                eret.dest_handle = m.source_handle;
+                eret.messageID = defs::Errors::REGISTRATION_FAILURE;
+                eret.payload = fmt::format(
+                    "Source {} from {} not allowed after entering initializing mode ({})",
+                    interfaceTypeName(type),
+                    fed->name,
+                    m.name());
+                propagateError(std::move(eret));
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void CoreBroker::addPublication(ActionMessage& m)
+{
+    if (!checkInterfaceCreation(m, InterfaceType::PUBLICATION)) {
         return;
     }
     auto& pub = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::PUBLICATION,
                                   m.name(),
-                                  m.getString(0),
-                                  m.getString(1));
+                                  m.getString(typeStringLoc),
+                                  m.getString(unitStringLoc));
 
     addLocalInfo(pub, m);
     if (!isRootc) {
@@ -1907,21 +1990,15 @@ void CoreBroker::addPublication(ActionMessage& m)
 }
 void CoreBroker::addInput(ActionMessage& m)
 {
-    // detect duplicate publications
-    if (handles.getInput(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate input names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::INPUT)) {
         return;
     }
     auto& inp = handles.addHandle(m.source_id,
                                   m.source_handle,
                                   InterfaceType::INPUT,
                                   m.name(),
-                                  m.getString(0),
-                                  m.getString(1));
+                                  m.getString(typeStringLoc),
+                                  m.getString(unitStringLoc));
 
     addLocalInfo(inp, m);
     if (!isRootc) {
@@ -1933,13 +2010,7 @@ void CoreBroker::addInput(ActionMessage& m)
 
 void CoreBroker::addEndpoint(ActionMessage& m)
 {
-    // detect duplicate endpoints
-    if (handles.getEndpoint(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate endpoint names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::ENDPOINT)) {
         return;
     }
     auto& ept = handles.addHandle(m.source_id,
@@ -1972,16 +2043,9 @@ void CoreBroker::addEndpoint(ActionMessage& m)
 }
 void CoreBroker::addFilter(ActionMessage& m)
 {
-    // detect duplicate filters
-    if (handles.getFilter(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate filter names ({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::FILTER)) {
         return;
     }
-
     auto& filt = handles.addHandle(m.source_id,
                                    m.source_handle,
                                    InterfaceType::FILTER,
@@ -1999,17 +2063,9 @@ void CoreBroker::addFilter(ActionMessage& m)
 
 void CoreBroker::addTranslator(ActionMessage& m)
 {
-    // detect duplicate endpoints/pubs/inputs
-    if (handles.getEndpoint(m.name()) != nullptr || handles.getInput(m.name()) != nullptr ||
-        handles.getPublication(m.name()) != nullptr) {
-        ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
-        eret.dest_handle = m.source_handle;
-        eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate names for translator({})", m.name());
-        propagateError(std::move(eret));
+    if (!checkInterfaceCreation(m, InterfaceType::TRANSLATOR)) {
         return;
     }
-
     auto& trans = handles.addHandle(m.source_id,
                                     m.source_handle,
                                     InterfaceType::TRANSLATOR,
@@ -2038,18 +2094,40 @@ void CoreBroker::addTranslator(ActionMessage& m)
     }
 }
 
+void CoreBroker::addDataSink(ActionMessage& m)
+{
+    if (!checkInterfaceCreation(m, InterfaceType::SINK)) {
+        return;
+    }
+    auto& sink = handles.addHandle(m.source_id,
+                                   m.source_handle,
+                                   InterfaceType::SINK,
+                                   m.name(),
+                                   m.getString(typeStringLoc),
+                                   m.getString(unitStringLoc));
+    addLocalInfo(sink, m);
+
+    if (!isRootc) {
+        transmit(parent_route_id, m);
+    } else {
+        findAndNotifyInputTargets(sink, sink.key);
+        findAndNotifyEndpointTargets(sink, sink.key);
+    }
+}
+
 void CoreBroker::linkInterfaces(ActionMessage& command)
 {
     switch (command.action()) {
         case CMD_DATA_LINK: {
-            auto* pub = handles.getPublication(command.name());
+            auto* pub = handles.getInterfaceHandle(command.name(), InterfaceType::PUBLICATION);
             if (pub != nullptr) {
                 command.name(command.getString(targetStringLoc));
                 command.setAction(CMD_ADD_NAMED_INPUT);
                 command.setSource(pub->handle);
                 checkForNamedInterface(command);
             } else {
-                auto* input = handles.getInput(command.getString(targetStringLoc));
+                auto* input = handles.getInterfaceHandle(command.getString(targetStringLoc),
+                                                         InterfaceType::INPUT);
                 if (input == nullptr) {
                     if (isRootc) {
                         unknownHandles.addDataLink(command.name(),
@@ -2065,7 +2143,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_ENDPOINT_LINK: {
-            auto* ept = handles.getEndpoint(command.name());
+            auto* ept = handles.getInterfaceHandle(command.name(), InterfaceType::ENDPOINT);
             if (ept != nullptr) {
                 command.name(command.getString(targetStringLoc));
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -2074,7 +2152,8 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 command.setSource(ept->handle);
                 checkForNamedInterface(command);
             } else {
-                auto* target = handles.getEndpoint(command.getString(targetStringLoc));
+                auto* target = handles.getInterfaceHandle(command.getString(targetStringLoc),
+                                                          InterfaceType::ENDPOINT);
                 if (target == nullptr) {
                     if (isRootc) {
                         unknownHandles.addEndpointLink(command.name(),
@@ -2091,7 +2170,7 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
             }
         } break;
         case CMD_FILTER_LINK: {
-            auto* filt = handles.getFilter(command.name());
+            auto* filt = handles.getInterfaceHandle(command.name(), InterfaceType::FILTER);
             if (filt != nullptr) {
                 command.payload = command.getString(targetStringLoc);
                 command.setAction(CMD_ADD_NAMED_ENDPOINT);
@@ -2101,7 +2180,8 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
                 }
                 checkForNamedInterface(command);
             } else {
-                auto* ept = handles.getEndpoint(command.getString(targetStringLoc));
+                auto* ept = handles.getInterfaceHandle(command.getString(targetStringLoc),
+                                                       InterfaceType::ENDPOINT);
                 if (ept == nullptr) {
                     if (isRootc) {
                         if (checkActionFlag(command, destination_target)) {
@@ -2447,6 +2527,132 @@ void CoreBroker::broadcast(ActionMessage& cmd)
         }
     }
 }
+// get the action associated with an interfaceType
+static action_message_def::action_t getAction(InterfaceType type)
+{
+    switch (type) {
+        case InterfaceType::FILTER:
+            return CMD_ADD_FILTER;
+        case InterfaceType::PUBLICATION:
+            return CMD_ADD_PUBLISHER;
+        case InterfaceType::INPUT:
+            return CMD_ADD_SUBSCRIBER;
+        default:
+            return CMD_ADD_ENDPOINT;
+    }
+}
+
+// get the matching action associated with an interfaceType
+static action_message_def::action_t getMatchAction(InterfaceType type, InterfaceType destType)
+{
+    switch (type) {
+        case InterfaceType::FILTER:
+            return CMD_ADD_ENDPOINT;
+        case InterfaceType::PUBLICATION:
+            return CMD_ADD_SUBSCRIBER;
+        case InterfaceType::INPUT:
+            return CMD_ADD_PUBLISHER;
+        default:
+            return (destType == InterfaceType::FILTER) ? CMD_ADD_FILTER : CMD_ADD_ENDPOINT;
+    }
+}
+
+// get the matching type associated with an interfaceType
+static InterfaceType getMatchType(InterfaceType type)
+{
+    switch (type) {
+        case InterfaceType::FILTER:
+            return InterfaceType::ENDPOINT;
+        case InterfaceType::PUBLICATION:
+            return InterfaceType::INPUT;
+        case InterfaceType::INPUT:
+            return InterfaceType::PUBLICATION;
+        default:
+            return InterfaceType::ENDPOINT;
+    }
+}
+void CoreBroker::connectInterfaces(
+    const BasicHandleInfo& origin,
+    const BasicHandleInfo& target,
+    uint32_t flagsSource,
+    uint32_t flagsDest,
+    std::pair<action_message_def::action_t, action_message_def::action_t> actions)
+{
+    // notify the target about a source
+    ActionMessage m(actions.first);
+    m.setSource(origin.handle);
+    m.setDestination(target.handle);
+    m.flags = flagsSource;
+    m.name(origin.key);
+    if (!origin.type.empty()) {
+        m.setString(typeStringLoc, origin.type);
+    }
+    if (!origin.units.empty()) {
+        m.setString(unitStringLoc, origin.units);
+    }
+    transmit(getRoute(m.dest_id), m);
+
+    m.setAction(actions.second);
+    m.name(target.key);
+    m.clearStringData();
+    if (!target.type.empty()) {
+        m.setString(typeStringLoc, target.type);
+    }
+    if (!target.units.empty()) {
+        m.setString(unitStringLoc, target.units);
+    }
+
+    m.flags = flagsDest;
+
+    m.swapSourceDest();
+    transmit(getRoute(m.dest_id), m);
+}
+
+void CoreBroker::findRegexMatch(const std::string& target,
+                                InterfaceType type,
+                                GlobalHandle handle,
+                                uint16_t flags)
+{
+    const auto* dest = handles.findHandle(handle);
+
+    try {
+        auto matches = handles.regexSearch(target, type);
+        for (auto& mtch : matches) {
+            const auto* hnd = handles.findHandle(mtch);
+            if (hnd == nullptr) {
+                continue;
+            }
+            auto destFlags = flags;
+            if (dest != nullptr && dest->handleType == InterfaceType::FILTER) {
+                if (checkActionFlag(*dest, clone_flag)) {
+                    destFlags |= make_flags(clone_flag);
+                    flags |= make_flags(clone_flag);
+                }
+            }
+            if (type == InterfaceType::ENDPOINT &&
+                (dest == nullptr || dest->handleType != InterfaceType::FILTER)) {
+                destFlags = toggle_flag(destFlags, destination_target);
+            }
+            connectInterfaces(*hnd,
+                              (dest != nullptr) ? *dest :
+                                                  BasicHandleInfo(handle, getMatchType(type)),
+                              flags,
+                              destFlags,
+                              std::make_pair(getAction(type),
+                                             getMatchAction(type,
+                                                            (dest != nullptr) ?
+                                                                dest->handleType :
+                                                                getMatchType(type))));
+        }
+    }
+    catch (const std::invalid_argument& ia) {
+        LOG_WARNING(global_id.load(),
+                    getIdentifier(),
+                    fmt::format("invalid regular expression processing {}", ia.what()));
+    }
+}
+
+static constexpr auto regexKey = "REGEX:";
 
 void CoreBroker::executeInitializationOperations(bool iterating)
 {
@@ -2478,107 +2684,92 @@ void CoreBroker::executeInitializationOperations(bool iterating)
     if (unknownHandles.hasUnknowns()) {
         std::vector<std::vector<std::string>> foundAliasHandles;
         foundAliasHandles.resize(4);
-        unknownHandles.processUnknowns([this, &foundAliasHandles](const std::string& target,
-                                                                  char type,
-                                                                  GlobalHandle /*handle*/) {
-            switch (type) {
-                case 'p': {
-                    const auto* p = handles.getPublication(target);
-                    if (p != nullptr) {
+        bool useRegex{false};
+        unknownHandles.processUnknowns(
+            [this, &foundAliasHandles, &useRegex](const std::string& target,
+                                                  InterfaceType type,
+                                                  UnknownHandleManager::TargetInfo /*target*/) {
+                const auto* p = handles.getInterfaceHandle(target, type);
+                if (p == nullptr) {
+                    if (!useRegex) {
+                        if (target.compare(0, 6, regexKey) == 0) {
+                            useRegex = true;
+                        }
+                    }
+                    return;
+                }
+                switch (type) {
+                    case InterfaceType::PUBLICATION:
                         foundAliasHandles[0].emplace_back(target);
-                    }
-                } break;
-                case 'i': {
-                    const auto* p = handles.getInput(target);
-                    if (p != nullptr) {
+                        break;
+                    case InterfaceType::INPUT:
                         foundAliasHandles[1].emplace_back(target);
-                    }
-                } break;
-                case 'e': {
-                    const auto* p = handles.getEndpoint(target);
-                    if (p != nullptr) {
+                        break;
+                    case InterfaceType::ENDPOINT:
                         foundAliasHandles[2].emplace_back(target);
-                    }
-                } break;
-                case 'f': {
-                    const auto* p = handles.getFilter(target);
-                    if (p != nullptr) {
+                        break;
+                    case InterfaceType::FILTER:
                         foundAliasHandles[3].emplace_back(target);
-                    }
-                } break;
-                default:
-                    break;
-            }
-        });
+                        break;
+                    default:
+                        break;
+                }
+            });
         if (!foundAliasHandles[0].empty()) {
             for (const auto& target : foundAliasHandles[0]) {
-                auto* p = handles.getPublication(target);
+                auto* p = handles.getInterfaceHandle(target, InterfaceType::PUBLICATION);
                 findAndNotifyPublicationTargets(*p, target);
             }
         }
         if (!foundAliasHandles[1].empty()) {
             for (const auto& target : foundAliasHandles[1]) {
-                auto* p = handles.getInput(target);
+                auto* p = handles.getInterfaceHandle(target, InterfaceType::INPUT);
                 findAndNotifyInputTargets(*p, target);
             }
         }
         if (!foundAliasHandles[2].empty()) {
             for (const auto& target : foundAliasHandles[2]) {
-                auto* p = handles.getEndpoint(target);
+                auto* p = handles.getInterfaceHandle(target, InterfaceType::ENDPOINT);
                 findAndNotifyEndpointTargets(*p, target);
             }
         }
         if (!foundAliasHandles[3].empty()) {
             for (const auto& target : foundAliasHandles[3]) {
-                auto* p = handles.getFilter(target);
+                auto* p = handles.getInterfaceHandle(target, InterfaceType::FILTER);
                 findAndNotifyFilterTargets(*p, target);
             }
+        }
+        if (useRegex) {
+            unknownHandles.processUnknowns([this](const std::string& target,
+                                                  InterfaceType type,
+                                                  UnknownHandleManager::TargetInfo tinfo) {
+                if (target.compare(0, 6, regexKey) == 0) {
+                    findRegexMatch(target, type, tinfo.first, tinfo.second);
+                }
+            });
+            unknownHandles.clearUnknownsIf([this](const std::string& target,
+                                                  InterfaceType /*type*/,
+                                                  UnknownHandleManager::TargetInfo /*tinfo*/) {
+                return (target.compare(0, 6, regexKey) == 0);
+            });
         }
         if (unknownHandles.hasNonOptionalUnknowns()) {
             if (unknownHandles.hasRequiredUnknowns()) {
                 ActionMessage eMiss(CMD_ERROR);
                 eMiss.source_id = global_broker_id_local;
                 eMiss.messageID = defs::Errors::CONNECTION_FAILURE;
-                unknownHandles.processRequiredUnknowns([this, &eMiss](const std::string& target,
-                                                                      char type,
-                                                                      GlobalHandle handle) {
-                    switch (type) {
-                        case 'p':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required publication target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'i':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required input target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'f':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required filter target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        case 'e':
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required endpoint target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                        default:
-                            // LCOV_EXCL_START
-                            eMiss.payload =
-                                fmt::format("Unable to connect to required unknown target {}",
-                                            target);
-                            LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
-                            break;
-                            // LCOV_EXCL_STOP
-                    }
-                    eMiss.setDestination(handle);
-                    routeMessage(eMiss);
-                });
+                unknownHandles.processRequiredUnknowns(
+                    [this, &eMiss](const std::string& target,
+                                   InterfaceType type,
+                                   UnknownHandleManager::TargetInfo tinfo) {
+                        eMiss.payload = fmt::format("Unable to connect to required {} target {}",
+                                                    interfaceTypeName(type),
+                                                    target);
+                        LOG_ERROR(parent_broker_id, getIdentifier(), eMiss.payload.to_string());
+
+                        eMiss.setDestination(tinfo.first);
+                        routeMessage(eMiss);
+                    });
                 eMiss.payload = "Missing required connections";
                 eMiss.dest_handle = InterfaceHandle{};
                 broadcast(eMiss);
@@ -2589,40 +2780,18 @@ void CoreBroker::executeInitializationOperations(bool iterating)
             ActionMessage wMiss(CMD_WARNING);
             wMiss.source_id = global_broker_id_local;
             wMiss.messageID = defs::Errors::CONNECTION_FAILURE;
-            unknownHandles.processNonOptionalUnknowns([this, &wMiss](const std::string& target,
-                                                                     char type,
-                                                                     GlobalHandle handle) {
-                switch (type) {
-                    case 'p':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to publication target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'i':
-                        wMiss.payload = fmt::format("Unable to connect to input target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'f':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to filter target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    case 'e':
-                        wMiss.payload =
-                            fmt::format("Unable to connect to endpoint target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                    default:
-                        // LCOV_EXCL_START
-                        wMiss.payload =
-                            fmt::format("Unable to connect to undefined target {}", target);
-                        LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
-                        break;
-                        // LCOV_EXCL_STOP
-                }
-                wMiss.setDestination(handle);
-                routeMessage(wMiss);
-            });
+            unknownHandles.processNonOptionalUnknowns(
+                [this, &wMiss](const std::string& target,
+                               InterfaceType type,
+                               UnknownHandleManager::TargetInfo tinfo) {
+                    wMiss.payload = fmt::format("Unable to connect to {} target {}",
+                                                interfaceTypeName(type),
+                                                target);
+                    LOG_WARNING(parent_broker_id, getIdentifier(), wMiss.payload.to_string());
+
+                    wMiss.setDestination(tinfo.first);
+                    routeMessage(wMiss);
+                });
         }
     }
 
@@ -2642,26 +2811,22 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
 {
     auto Handles = unknownHandles.checkForInputs(key);
     for (auto& target : Handles) {
-        // notify the publication about its subscriber
-        ActionMessage m(CMD_ADD_SUBSCRIBER);
-
-        m.setDestination(target.first);
-        m.setSource(handleInfo.handle);
-        m.payload = key;
-        m.flags = handleInfo.flags;
-        transmit(getRoute(m.dest_id), m);
-
-        // notify the subscriber about its publisher
-        m.setAction(CMD_ADD_PUBLISHER);
-        m.setSource(target.first);
-        m.setDestination(handleInfo.handle);
-        m.flags = target.second;
         auto* pub = handles.findHandle(target.first);
-        if (pub != nullptr) {
-            m.setStringData(pub->type, pub->units);
+        if (pub == nullptr) {
+            connectInterfaces(handleInfo,
+                              BasicHandleInfo(target.first.fed_id,
+                                              target.first.handle,
+                                              InterfaceType::PUBLICATION),
+                              handleInfo.flags,
+                              target.second,
+                              std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
+        } else {
+            connectInterfaces(handleInfo,
+                              *pub,
+                              handleInfo.flags,
+                              target.second,
+                              std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
         }
-
-        transmit(getRoute(m.dest_id), std::move(m));
     }
     if (!Handles.empty()) {
         unknownHandles.clearInput(key);
@@ -2673,22 +2838,11 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
 {
     auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
-        // notify the publication about its subscriber
-        ActionMessage m(CMD_ADD_SUBSCRIBER);
-        m.setSource(sub.first);
-        m.setDestination(handleInfo.handle);
-        m.flags = sub.second;
-
-        transmit(getRoute(m.dest_id), m);
-
-        // notify the subscriber about its publisher
-        m.setAction(CMD_ADD_PUBLISHER);
-        m.setDestination(sub.first);
-        m.setSource(handleInfo.handle);
-        m.payload = key;
-        m.flags = handleInfo.flags;
-        m.setStringData(handleInfo.type, handleInfo.units);
-        transmit(getRoute(m.dest_id), std::move(m));
+        connectInterfaces(handleInfo,
+                          BasicHandleInfo(sub.first.fed_id, sub.first.handle, InterfaceType::INPUT),
+                          sub.second,
+                          handleInfo.flags,
+                          std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
     }
 
     auto Pubtargets = unknownHandles.checkForLinks(key);
@@ -2707,33 +2861,20 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
 {
     auto Handles = unknownHandles.checkForEndpoints(key);
     for (const auto& target : Handles) {
-        // notify the filter or endpoint about its target
-        ActionMessage m(CMD_ADD_ENDPOINT);
-        m.setSource(handleInfo.handle);
-        m.setDestination(target.first);
-        m.flags = target.second;
-        m.name(key);
-        if (!handleInfo.type.empty()) {
-            m.setString(typeStringLoc, handleInfo.type);
-        }
-        transmit(getRoute(m.dest_id), m);
-
         const auto* iface = handles.findHandle(target.first);
+        auto destFlags = target.second;
         if (iface->handleType != InterfaceType::FILTER) {
-            // notify the endpoint about its endpoint
-            m.setAction(CMD_ADD_ENDPOINT);
-            m.name(iface->key);
-            if (!iface->type.empty()) {
-                m.setString(typeStringLoc, iface->type);
-            }
-            toggleActionFlag(m, destination_target);
-        } else {
-            // notify the endpoint about its filter
-            m.setAction(CMD_ADD_FILTER);
+            destFlags = toggle_flag(destFlags, destination_target);
         }
 
-        m.swapSourceDest();
-        transmit(getRoute(m.dest_id), m);
+        connectInterfaces(handleInfo,
+                          *iface,
+                          target.second,
+                          destFlags,
+                          std::make_pair(CMD_ADD_ENDPOINT,
+                                         (iface->handleType != InterfaceType::FILTER) ?
+                                             CMD_ADD_ENDPOINT :
+                                             CMD_ADD_FILTER));
     }
     auto EptTargets = unknownHandles.checkForEndpointLinks(key);
     for (const auto& ept : EptTargets) {
@@ -2754,24 +2895,17 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
 {
     auto Handles = unknownHandles.checkForFilters(key);
     for (const auto& target : Handles) {
-        // notify the endpoint about a filter
-        ActionMessage m(CMD_ADD_FILTER);
-        m.setSource(handleInfo.handle);
-        m.flags = target.second;
+        auto flags = target.second;
         if (checkActionFlag(handleInfo, clone_flag)) {
-            setActionFlag(m, clone_flag);
+            flags |= make_flags(clone_flag);
         }
-        m.setDestination(target.first);
-        if ((!handleInfo.type_in.empty()) || (!handleInfo.type_out.empty())) {
-            m.setStringData(handleInfo.type_in, handleInfo.type_out);
-        }
-        transmit(getRoute(m.dest_id), m);
-
-        // notify the filter about an endpoint
-        m.setAction(CMD_ADD_ENDPOINT);
-        m.swapSourceDest();
-        m.clearStringData();
-        transmit(getRoute(m.dest_id), m);
+        connectInterfaces(handleInfo,
+                          BasicHandleInfo(target.first.fed_id,
+                                          target.first.handle,
+                                          InterfaceType::ENDPOINT),
+                          flags,
+                          flags,
+                          std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
     }
 
     auto FiltDestTargets = unknownHandles.checkForFilterDestTargets(key);

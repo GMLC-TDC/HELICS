@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -447,10 +447,16 @@ bool TimeDependencies::checkIfAllDependenciesArePastExec(bool iterating) const
     auto minstate =
         iterating ? TimeState::time_requested_require_iteration : TimeState::time_requested;
 
-    return std::none_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
-        return (dep.dependency && dep.connection != ConnectionType::SELF &&
-                (dep.mTimeState < minstate));
+    return std::all_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
+        return ((!dep.dependency) || (dep.connection == ConnectionType::SELF) ||
+                (dep.mTimeState >= minstate) ||
+                (dep.mTimeState == TimeState::time_granted && dep.next > timeZero));
     });
+
+    /* return std::none_of(dependencies.begin(), dependencies.end(), [minstate](const auto& dep) {
+         return (dep.dependency && dep.connection != ConnectionType::SELF &&
+                 (dep.mTimeState < minstate));
+     });*/
 }
 
 bool TimeDependencies::checkIfReadyForExecEntry(bool iterating, bool waiting) const

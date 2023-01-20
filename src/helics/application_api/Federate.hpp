@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -734,7 +734,7 @@ received
     void enteringInitializingMode(IterationResult iterating);
 
     /** function to run required operations for entering executing Mode*/
-    void enteringExecutingMode(IterationResult res);
+    void enteringExecutingMode(iteration_time res);
     /** function tor run required operations when finalizing*/
     void finalizeOperations();
     void preTimeRequestOperations(Time nextStep, bool iterating);
@@ -746,7 +746,7 @@ received
     virtual void startupToInitializeStateTransition();
     /** function to deal with any operations that need to occur on the transition from startup to
      * initialize*/
-    virtual void initializeToExecuteStateTransition(IterationResult iterate);
+    virtual void initializeToExecuteStateTransition(iteration_time iterate);
     /** function to handle any disconnect operations*/
     virtual void disconnectTransition();
     /** function to generate results for a local Query
@@ -871,7 +871,7 @@ class HELICS_CXX_EXPORT Interface {
     @details the name is the local name if given, key is the full key name*/
     const std::string& getName() const;
     /** get an associated target*/
-    const std::string& getTarget() const;
+    [[deprecated]] const std::string& getTarget() const;
     /** add a source of information to an interface*/
     void addSourceTarget(std::string_view newTarget, InterfaceType hint = InterfaceType::UNKNOWN);
     /** add destination for data sent via the interface*/

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -54,6 +54,29 @@ Endpoint& MessageFederateManager::registerEndpoint(std::string_view name, std::s
         }
     }
     throw(RegistrationFailure("Unable to register Endpoint"));
+}
+
+Endpoint& MessageFederateManager::registerDataSink(std::string_view name)
+{
+    auto handle = coreObject->registerDataSink(fedID, name);
+    if (handle.isValid()) {
+        auto eptHandle = mLocalEndpoints.lock();
+        auto loc = eptHandle->insert(name, handle, mFed, name, handle);
+        if (loc) {
+            auto& ref = eptHandle->back();
+            ref.receiveOnly = true;
+            auto datHandle = eptData.lock();
+            auto& edat = datHandle->emplace_back();
+
+            // non-owning pointer
+            ref.dataReference = &edat;
+            datHandle.unlock();
+            ref.referenceIndex = static_cast<int>(*loc);
+
+            return ref;
+        }
+    }
+    throw(RegistrationFailure("Unable to register Data Sink"));
 }
 
 Endpoint& MessageFederateManager::registerTargetedEndpoint(std::string_view name,
@@ -192,10 +215,9 @@ void MessageFederateManager::updateTime(Time newTime, Time /*oldTime*/)
 
 void MessageFederateManager::startupToInitializeStateTransition() {}
 
-void MessageFederateManager::initializeToExecuteStateTransition(IterationResult result)
+void MessageFederateManager::initializeToExecuteStateTransition(iteration_time result)
 {
-    Time ctime = result == IterationResult::NEXT_STEP ? timeZero : initializationTime;
-    updateTime(ctime, initializationTime);
+    updateTime(result.grantedTime, initializationTime);
 }
 
 std::string MessageFederateManager::localQuery(std::string_view queryStr) const
@@ -224,6 +246,31 @@ const Endpoint& MessageFederateManager::getEndpoint(std::string_view name) const
     auto sharedEpt = mLocalEndpoints.lock_shared();
     auto ept = sharedEpt->find(name);
     return (ept != sharedEpt.end()) ? (*ept) : invalidEpt;
+}
+
+Endpoint& MessageFederateManager::getDataSink(std::string_view name)
+{
+    auto sharedEpt = mLocalEndpoints.lock();
+    auto ept = sharedEpt->find(name);
+    if (ept == sharedEpt.end()) {
+        return invalidEptNC;
+    }
+    if (ept->getType() != "sink") {
+        return invalidEptNC;
+    }
+    return *ept;
+}
+const Endpoint& MessageFederateManager::getDataSink(std::string_view name) const
+{
+    auto sharedEpt = mLocalEndpoints.lock();
+    auto ept = sharedEpt->find(name);
+    if (ept == sharedEpt.end()) {
+        return invalidEpt;
+    }
+    if (ept->getType() != "sink") {
+        return invalidEptNC;
+    }
+    return *ept;
 }
 
 Endpoint& MessageFederateManager::getEndpoint(int index)

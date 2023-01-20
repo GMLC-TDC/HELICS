@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2017-2022,
+Copyright (c) 2017-2023,
 Battelle Memorial Institute; Lawrence Livermore National Security, LLC; Alliance for Sustainable
 Energy, LLC.  See the top-level NOTICE for additional details. All rights reserved.
 SPDX-License-Identifier: BSD-3-Clause
@@ -101,14 +101,13 @@ TEST_F(vfed_single_tests, subscription_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsSubscriptionGetTarget(subid);
-    auto sv2 = helicsSubscriptionGetTarget(subid2);
+    auto sv = helicsInputGetTarget(subid);
+    auto sv2 = helicsInputGetTarget(subid2);
     EXPECT_STREQ(sv, "sub1");
     EXPECT_STREQ(sv2, "sub2");
 
-    auto sub3name = helicsSubscriptionGetTarget(subid3);
+    auto sub3name = helicsInputGetTarget(subid3);
 
-    // vFed1->addSubscriptionShortcut (subid, "Shortcut");
     EXPECT_STREQ(sub3name, "sub3");
 
     auto units = helicsInputGetUnits(subid3);
@@ -116,11 +115,6 @@ TEST_F(vfed_single_tests, subscription_registration)
 
     CE(helicsInputSetTag(subid3, "tag1", "tagvalue", &err));
     EXPECT_STREQ(helicsInputGetTag(subid3, "tag1"), "tagvalue");
-
-    // EXPECT_TRUE (vFed1->getSubscriptionId ("sub1") == subid);
-    // EXPECT_TRUE (vFed1->getSubscriptionId ("sub2") == subid2);
-
-    // EXPECT_TRUE (vFed1->getSubscriptionId ("Shortcut") == subid);
 
     CE(helicsFederateFinalize(vFed1, &err));
 
@@ -152,20 +146,20 @@ TEST_F(vfed_single_tests, subscription_and_publication_registration)
     CE(state = helicsFederateGetState(vFed1, &err));
     EXPECT_TRUE(state == HELICS_STATE_EXECUTION);
 
-    auto sv = helicsSubscriptionGetTarget(subid);
-    auto sv2 = helicsSubscriptionGetTarget(subid2);
+    auto sv = helicsInputGetTarget(subid);
+    auto sv2 = helicsInputGetTarget(subid2);
 
     EXPECT_STREQ(sv, "sub1");
     EXPECT_STREQ(sv2, "sub2");
-    auto sub3name = helicsSubscriptionGetTarget(subid3);
+    auto sub3name = helicsInputGetTarget(subid3);
     EXPECT_STREQ(sub3name, "sub3");
 
     auto units = helicsInputGetUnits(subid3);
     EXPECT_STREQ(units, "V");
 
-    // check the getSubscription function
-    auto subid_b = helicsFederateGetSubscription(vFed1, "sub1", &err);
-    const char* tmp = helicsSubscriptionGetTarget(subid_b);
+    // check the getInputByTarget function
+    auto subid_b = helicsFederateGetInputByTarget(vFed1, "sub1", &err);
+    const char* tmp = helicsInputGetTarget(subid_b);
     EXPECT_STREQ(tmp, "sub1");
     // check the getSubscriptionByIndex function
     auto subid_c = helicsFederateGetInputByIndex(vFed1, 2, &err);
@@ -1078,12 +1072,12 @@ TEST_P(vfed_type_tests, subscriber_and_publisher_registration)
     CE(helicsFederateEnterExecutingMode(vFed, &err));
 
     // check subscriptions
-    const char* subname = helicsSubscriptionGetTarget(subid);
-    const char* subname2 = helicsSubscriptionGetTarget(subid2);
+    const char* subname = helicsInputGetTarget(subid);
+    const char* subname2 = helicsInputGetTarget(subid2);
 
     EXPECT_STREQ(subname, "sub1");
     EXPECT_STREQ(subname2, "sub2");
-    const char* subname3 = helicsSubscriptionGetTarget(subid3);
+    const char* subname3 = helicsInputGetTarget(subid3);
     EXPECT_STREQ(subname3, "sub3");
 
     // subtype=helicsInputGetType (subid);
