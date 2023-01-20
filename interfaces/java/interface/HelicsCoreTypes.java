@@ -29,13 +29,14 @@ public final class HelicsCoreTypes {
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_TEST = new HelicsCoreTypes("HELICS_CORE_TYPE_TEST", helicsJNI.HELICS_CORE_TYPE_TEST_get());
   /**
-   *  interprocess uses memory mapped files to transfer data (for use when all federates are<br>
-   *         on the same machine 
+   *  interprocess uses memory mapped files to transfer data (for use when all<br>
+   *                   federates are on the same machine 
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_INTERPROCESS = new HelicsCoreTypes("HELICS_CORE_TYPE_INTERPROCESS", helicsJNI.HELICS_CORE_TYPE_INTERPROCESS_get());
   /**
-   *  interprocess uses memory mapped files to transfer data (for use when all federates are<br>
-   *         on the same machine ipc is the same as /ref HELICS_CORE_TYPE_interprocess
+   *  interprocess uses memory mapped files to transfer data (for use when all<br>
+   *                   federates are on the same machine ipc is the same as /ref<br>
+   *                   HELICS_CORE_TYPE_interprocess
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_IPC = new HelicsCoreTypes("HELICS_CORE_TYPE_IPC", helicsJNI.HELICS_CORE_TYPE_IPC_get());
   /**
@@ -68,17 +69,18 @@ public final class HelicsCoreTypes {
   public final static HelicsCoreTypes HELICS_CORE_TYPE_WEBSOCKET = new HelicsCoreTypes("HELICS_CORE_TYPE_WEBSOCKET", helicsJNI.HELICS_CORE_TYPE_WEBSOCKET_get());
   /**
    *  an in process core type for handling communications in shared<br>
-   *                                      memory it is pretty similar to the test core but stripped from<br>
-   *                                      the "test" components
+   *                                                 memory it is pretty similar to the test core but<br>
+   *                   stripped from the "test" components
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_INPROC = new HelicsCoreTypes("HELICS_CORE_TYPE_INPROC", helicsJNI.HELICS_CORE_TYPE_INPROC_get());
   /**
    *  an explicit core type that is recognized but explicitly doesn't<br>
-   *                                   exist, for testing and a few other assorted reasons
+   *                                              exist, for testing and a few other assorted reasons
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_NULL = new HelicsCoreTypes("HELICS_CORE_TYPE_NULL", helicsJNI.HELICS_CORE_TYPE_NULL_get());
   /**
-   *  an explicit core type exists but does nothing but return empty values or sink calls
+   *  an explicit core type exists but does nothing but return empty values or sink<br>
+   *                   calls
    */
   public final static HelicsCoreTypes HELICS_CORE_TYPE_EMPTY = new HelicsCoreTypes("HELICS_CORE_TYPE_EMPTY", helicsJNI.HELICS_CORE_TYPE_EMPTY_get());
 

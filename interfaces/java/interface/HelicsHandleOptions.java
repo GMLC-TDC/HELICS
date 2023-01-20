@@ -13,13 +13,13 @@ package com.java.helics;
  */
 public final class HelicsHandleOptions {
   /**
-   *  specify that a connection is required for an interface and will generate an error if not<br>
-   *        available
+   *  specify that a connection is required for an interface and will generate an error<br>
+   *                   if not available
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_CONNECTION_REQUIRED = new HelicsHandleOptions("HELICS_HANDLE_OPTION_CONNECTION_REQUIRED", helicsJNI.HELICS_HANDLE_OPTION_CONNECTION_REQUIRED_get());
   /**
-   *  specify that a connection is NOT required for an interface and will only be made if<br>
-   *        available no warning will be issues if not available
+   *  specify that a connection is NOT required for an interface and will only be made<br>
+   *                   if available no warning will be issues if not available
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL = new HelicsHandleOptions("HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL", helicsJNI.HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL_get());
   /**
@@ -31,7 +31,8 @@ public final class HelicsHandleOptions {
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED = new HelicsHandleOptions("HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED", helicsJNI.HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED_get());
   /**
-   *  specify that the last data should be buffered and sent on subscriptions after init
+   *  specify that the last data should be buffered and sent on subscriptions after<br>
+   *                   init
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_BUFFER_DATA = new HelicsHandleOptions("HELICS_HANDLE_OPTION_BUFFER_DATA", helicsJNI.HELICS_HANDLE_OPTION_BUFFER_DATA_get());
   /**
@@ -39,12 +40,20 @@ public final class HelicsHandleOptions {
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING = new HelicsHandleOptions("HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING", helicsJNI.HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING_get());
   /**
+   *  specify that the handle is receive only
+   */
+  public final static HelicsHandleOptions HELICS_HANDLE_OPTION_RECEIVE_ONLY = new HelicsHandleOptions("HELICS_HANDLE_OPTION_RECEIVE_ONLY", helicsJNI.HELICS_HANDLE_OPTION_RECEIVE_ONLY_get());
+  /**
+   *  specify that the handle is source only
+   */
+  public final static HelicsHandleOptions HELICS_HANDLE_OPTION_SOURCE_ONLY = new HelicsHandleOptions("HELICS_HANDLE_OPTION_SOURCE_ONLY", helicsJNI.HELICS_HANDLE_OPTION_SOURCE_ONLY_get());
+  /**
    *  specify that the mismatching units should be ignored
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH = new HelicsHandleOptions("HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH", helicsJNI.HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH_get());
   /**
    *  specify that an interface will only transmit on change(only applicable to<br>
-   *        publications)
+   *                   publications)
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE = new HelicsHandleOptions("HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE", helicsJNI.HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE_get());
   /**
@@ -68,9 +77,14 @@ public final class HelicsHandleOptions {
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST = new HelicsHandleOptions("HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST", helicsJNI.HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST_get());
   /**
-   *  specify the required number of connections or get the actual number of connections
+   *  specify the required number of connections or get the actual number of<br>
+   *                   connections
    */
   public final static HelicsHandleOptions HELICS_HANDLE_OPTION_CONNECTIONS = new HelicsHandleOptions("HELICS_HANDLE_OPTION_CONNECTIONS", helicsJNI.HELICS_HANDLE_OPTION_CONNECTIONS_get());
+  /**
+   *  specify that the interface only sends or receives data at specified intervals
+   */
+  public final static HelicsHandleOptions HELICS_HANDLE_OPTION_TIME_RESTRICTED = new HelicsHandleOptions("HELICS_HANDLE_OPTION_TIME_RESTRICTED", helicsJNI.HELICS_HANDLE_OPTION_TIME_RESTRICTED_get());
 
   public final int swigValue() {
     return swigValue;
@@ -106,7 +120,7 @@ public final class HelicsHandleOptions {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsHandleOptions[] swigValues = { HELICS_HANDLE_OPTION_CONNECTION_REQUIRED, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY, HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED, HELICS_HANDLE_OPTION_BUFFER_DATA, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING, HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH, HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE, HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE, HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS, HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD, HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION, HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST, HELICS_HANDLE_OPTION_CONNECTIONS };
+  private static HelicsHandleOptions[] swigValues = { HELICS_HANDLE_OPTION_CONNECTION_REQUIRED, HELICS_HANDLE_OPTION_CONNECTION_OPTIONAL, HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY, HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED, HELICS_HANDLE_OPTION_BUFFER_DATA, HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING, HELICS_HANDLE_OPTION_RECEIVE_ONLY, HELICS_HANDLE_OPTION_SOURCE_ONLY, HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH, HELICS_HANDLE_OPTION_ONLY_TRANSMIT_ON_CHANGE, HELICS_HANDLE_OPTION_ONLY_UPDATE_ON_CHANGE, HELICS_HANDLE_OPTION_IGNORE_INTERRUPTS, HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD, HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION, HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST, HELICS_HANDLE_OPTION_CONNECTIONS, HELICS_HANDLE_OPTION_TIME_RESTRICTED };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;

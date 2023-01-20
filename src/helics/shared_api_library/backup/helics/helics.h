@@ -381,6 +381,10 @@ typedef enum { /* NOLINT */
                HELICS_HANDLE_OPTION_BUFFER_DATA = 411,
                /** specify that the types should be checked strictly for pub/sub and filters*/
                HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING = 414,
+               /** specify that the handle is receive only*/
+               HELICS_HANDLE_OPTION_RECEIVE_ONLY = 422,
+               /** specify that the handle is source only*/
+               HELICS_HANDLE_OPTION_SOURCE_ONLY = 423,
                /** specify that the mismatching units should be ignored*/
                HELICS_HANDLE_OPTION_IGNORE_UNIT_MISMATCH = 447,
                /** specify that an interface will only transmit on change(only applicable to
@@ -2574,7 +2578,7 @@ HELICS_EXPORT HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed,
  * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication the global publication key will be prepended with the federate name.
+ * @param key The identifier for the publication the global publication key will be prepended with the federate name (may be NULL).
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the publication (may be NULL).
  *
@@ -2593,8 +2597,8 @@ HELICS_EXPORT HelicsPublication
  * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication.
- * @param type A string labeling the type of the publication.
+ * @param key The identifier for the publication (may be NULL).
+ * @param type A string labeling the type of the publication (may be NULL).
  * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2612,7 +2616,7 @@ HELICS_EXPORT HelicsPublication
  * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication.
+ * @param key The identifier for the publication (may be NULL).
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the publication (may be NULL).
  *
@@ -2631,8 +2635,8 @@ HELICS_EXPORT HelicsPublication
  * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication.
- * @param type A string describing the expected type of the publication.
+ * @param key The identifier for the publication (may be NULL).
+ * @param type A string describing the expected type of the publication (may be NULL).
  * @param units A string listing the units of the publication (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2650,7 +2654,7 @@ HELICS_EXPORT HelicsPublication
  * functions for inputs, and publications.
  *
  * @param fed The federate object in which to create an input.
- * @param key The identifier for the publication the global input key will be prepended with the federate name.
+ * @param key The identifier for the publication the global input key will be prepended with the federate name (may be NULL).
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
  * @param units A string listing the units of the input (may be NULL).
  *
@@ -2669,8 +2673,8 @@ HELICS_EXPORT HelicsInput
  * functions for inputs, and publications.
  *
  * @param fed The federate object in which to create an input.
- * @param key The identifier for the input.
- * @param type A string describing the expected type of the input.
+ * @param key The identifier for the input (may be NULL).
+ * @param type A string describing the expected type of the input (may be NULL).
  * @param units A string listing the units of the input maybe NULL.
  *
  * @param[in,out] err A pointer to an error object for catching errors.
@@ -2688,33 +2692,31 @@ HELICS_EXPORT HelicsInput
  * functions for inputs and publications.
  *
  * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication.
+ * @param key The identifier for the input (may be NULL).
  * @param type A code identifying the type of the input see /ref HelicsDataTypes for available options.
- * @param units A string listing the units of the input maybe NULL.
+ * @param units A string listing the units of the input (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
 
  *
- * @return An object containing the publication.
+ * @return An object containing the input.
  */
 HELICS_EXPORT HelicsPublication
     helicsFederateRegisterGlobalInput(HelicsFederate fed, const char* key, HelicsDataTypes type, const char* units, HelicsError* err);
 
 /**
- * Register a global publication with an arbitrary type.
+ * Register an input with an arbitrary type.
  *
- * @details The publication becomes part of the federate and is destroyed when the federate is freed so there are no separate free
- * functions for inputs and publications.
+ * @details The input becomes part of the federate and is destroyed when the federate is freed so there are no separate free
+ * functions for interfaces.
  *
- * @param fed The federate object in which to create a publication.
- * @param key The identifier for the publication.
- * @param type A string defining the type of the input.
- * @param units A string listing the units of the input maybe NULL.
+ * @param fed The federate object in which to create an input.
+ * @param key The identifier for the input (may be NULL).
+ * @param type A string defining the type of the input (may be NULL).
+ * @param units A string listing the units of the input (may be NULL).
  *
  * @param[in,out] err A pointer to an error object for catching errors.
-
- *
- * @return An object containing the publication.
+ * @return An object containing the input.
  */
 HELICS_EXPORT HelicsPublication
     helicsFederateRegisterGlobalTypeInput(HelicsFederate fed, const char* key, const char* type, const char* units, HelicsError* err);
@@ -2775,7 +2777,7 @@ HELICS_EXPORT HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int 
 
 /**
 * Get an input object from a subscription target.
-* DEPRECATED: use helicsFederateInputByTarget instead
+* DEPRECATED: use helicsFederateGetInputByTarget instead
 *
 * @param fed The value federate object to use to get the publication.
 * @param key The name of the publication that a subscription is targeting.
@@ -2791,7 +2793,7 @@ HELICS_EXPORT HELICS_DEPRECATED HelicsInput helicsFederateGetSubscription(Helics
 /**
 * Get an input object from a target.
 *
-* @param fed The value federate object to use to get the publication.
+* @param fed The value federate object to use to get the input.
 * @param target The name of the publication that an input is targeting.
 *
 * @param[in,out] err The error object to complete if there is an error.

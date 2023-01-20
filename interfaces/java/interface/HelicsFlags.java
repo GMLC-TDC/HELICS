@@ -14,13 +14,14 @@ package com.java.helics;
 public final class HelicsFlags {
   /**
    *  flag specifying that a federate, core, or broker may be slow to respond to pings<br>
-   *         If the federate goes offline there is no good way to detect it so use with caution
+   *                    If the federate goes offline there is no good way to detect it so use with<br>
+   *                   caution
    */
   public final static HelicsFlags HELICS_FLAG_SLOW_RESPONDING = new HelicsFlags("HELICS_FLAG_SLOW_RESPONDING", helicsJNI.HELICS_FLAG_SLOW_RESPONDING_get());
   /**
-   *  flag specifying the federate/core/broker is operating in a user debug mode so deadlock<br>
-   *     timers and timeout are disabled this flag is a combination of slow_responding and disabling of<br>
-   *     some timeouts
+   *  flag specifying the federate/core/broker is operating in a user debug mode so<br>
+   *                deadlock timers and timeout are disabled this flag is a combination of<br>
+   *                slow_responding and disabling of some timeouts
    */
   public final static HelicsFlags HELICS_FLAG_DEBUGGING = new HelicsFlags("HELICS_FLAG_DEBUGGING", helicsJNI.HELICS_FLAG_DEBUGGING_get());
   /**
@@ -43,6 +44,16 @@ public final class HelicsFlags {
    *  flag trigger for generating a profiling marker
    */
   public final static HelicsFlags HELICS_FLAG_PROFILING_MARKER = new HelicsFlags("HELICS_FLAG_PROFILING_MARKER", helicsJNI.HELICS_FLAG_PROFILING_MARKER_get());
+  /**
+   *  specify that the federate/core/broker should allow some remote control operations<br>
+   *                   such as finalize
+   */
+  public final static HelicsFlags HELICS_FLAG_ALLOW_REMOTE_CONTROL = new HelicsFlags("HELICS_FLAG_ALLOW_REMOTE_CONTROL", helicsJNI.HELICS_FLAG_ALLOW_REMOTE_CONTROL_get());
+  /**
+   *  specify that the federate/core/broker should *NOT* allow some remote control<br>
+   *                   operations such as finalize
+   */
+  public final static HelicsFlags HELICS_FLAG_DISABLE_REMOTE_CONTROL = new HelicsFlags("HELICS_FLAG_DISABLE_REMOTE_CONTROL", helicsJNI.HELICS_FLAG_DISABLE_REMOTE_CONTROL_get());
 
   public final int swigValue() {
     return swigValue;
@@ -78,7 +89,7 @@ public final class HelicsFlags {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsFlags[] swigValues = { HELICS_FLAG_SLOW_RESPONDING, HELICS_FLAG_DEBUGGING, HELICS_FLAG_TERMINATE_ON_ERROR, HELICS_FLAG_FORCE_LOGGING_FLUSH, HELICS_FLAG_DUMPLOG, HELICS_FLAG_PROFILING, HELICS_FLAG_PROFILING_MARKER };
+  private static HelicsFlags[] swigValues = { HELICS_FLAG_SLOW_RESPONDING, HELICS_FLAG_DEBUGGING, HELICS_FLAG_TERMINATE_ON_ERROR, HELICS_FLAG_FORCE_LOGGING_FLUSH, HELICS_FLAG_DUMPLOG, HELICS_FLAG_PROFILING, HELICS_FLAG_PROFILING_MARKER, HELICS_FLAG_ALLOW_REMOTE_CONTROL, HELICS_FLAG_DISABLE_REMOTE_CONTROL };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
