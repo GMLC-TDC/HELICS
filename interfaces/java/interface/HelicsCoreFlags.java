@@ -13,7 +13,8 @@ package com.java.helics;
  */
 public final class HelicsCoreFlags {
   /**
-   *  used to delay a core from entering initialization mode even if it would otherwise be ready
+   *  used to delay a core from entering initialization mode even if it would otherwise<br>
+   *                   be ready
    */
   public final static HelicsCoreFlags HELICS_FLAG_DELAY_INIT_ENTRY = new HelicsCoreFlags("HELICS_FLAG_DELAY_INIT_ENTRY", helicsJNI.HELICS_FLAG_DELAY_INIT_ENTRY_get());
   /**

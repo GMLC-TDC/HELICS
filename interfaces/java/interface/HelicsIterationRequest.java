@@ -24,6 +24,14 @@ public final class HelicsIterationRequest {
    *  only return an iteration if necessary 
    */
   public final static HelicsIterationRequest HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED = new HelicsIterationRequest("HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED", helicsJNI.HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED_get());
+  /**
+   *  halt the federate
+   */
+  public final static HelicsIterationRequest HELICS_ITERATION_REQUEST_HALT_OPERATIONS = new HelicsIterationRequest("HELICS_ITERATION_REQUEST_HALT_OPERATIONS", helicsJNI.HELICS_ITERATION_REQUEST_HALT_OPERATIONS_get());
+  /**
+   *  indicate there was an error 
+   */
+  public final static HelicsIterationRequest HELICS_ITERATION_REQUEST_ERROR = new HelicsIterationRequest("HELICS_ITERATION_REQUEST_ERROR", helicsJNI.HELICS_ITERATION_REQUEST_ERROR_get());
 
   public final int swigValue() {
     return swigValue;
@@ -59,7 +67,7 @@ public final class HelicsIterationRequest {
     swigNext = this.swigValue+1;
   }
 
-  private static HelicsIterationRequest[] swigValues = { HELICS_ITERATION_REQUEST_NO_ITERATION, HELICS_ITERATION_REQUEST_FORCE_ITERATION, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED };
+  private static HelicsIterationRequest[] swigValues = { HELICS_ITERATION_REQUEST_NO_ITERATION, HELICS_ITERATION_REQUEST_FORCE_ITERATION, HELICS_ITERATION_REQUEST_ITERATE_IF_NEEDED, HELICS_ITERATION_REQUEST_HALT_OPERATIONS, HELICS_ITERATION_REQUEST_ERROR };
   private static int swigNext = 0;
   private final int swigValue;
   private final String swigName;
