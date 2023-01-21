@@ -41,18 +41,14 @@ jobs:
       with:
         extra_args: clang-format --files src/helics/shared_api_library/backup/helics/helics.h src/helics/shared_api_library/backup/helics/helics_api.h
 
-    - name: Stage changed interface files
-      shell: bash --noprofile --norc {0}
-      run: git add interfaces/ src/helics/shared_api_library/backup/
-
-    - uses: gmlc-tdc/create-pr-action@v0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v4
       with:
-        COMMIT_MSG: "Automated update to generated interface files"
-        PR_TITLE: "Automated update to generated interface files"
-        PR_BODY: "Automated update to generated interface files from commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}."
-        GIT_NAME: "github-actions[bot]"
-        GIT_EMAIL: "41898282+github-actions[bot]@users.noreply.github.com"
-        BRANCH_PREFIX: "interface-gen/"
-        DISABLE_STAGING: true
+        commit-message: Automated update to generated interface files
+        author: GitHub <noreply@github.com>
+        title: Automated update to generated interface files
+        body: Automated update to generated interface files from commit https://github.com/${{ github.repository }}/commit/${{ github.sha }}.
+        branch: interface-gen/update-${{ github.head_ref }}${{ github.ref_name }}
+        add-paths: |
+          interfaces/*
+          src/helics/shared_api_library/backup/*

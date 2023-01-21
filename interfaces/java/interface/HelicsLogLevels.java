@@ -38,7 +38,7 @@ public final class HelicsLogLevels {
   public final static HelicsLogLevels HELICS_LOG_LEVEL_SUMMARY = new HelicsLogLevels("HELICS_LOG_LEVEL_SUMMARY", helicsJNI.HELICS_LOG_LEVEL_SUMMARY_get());
   /**
    *  summary+ notices about federate and broker connections +messages about network<br>
-   *        connections
+   *                   connections
    */
   public final static HelicsLogLevels HELICS_LOG_LEVEL_CONNECTIONS = new HelicsLogLevels("HELICS_LOG_LEVEL_CONNECTIONS", helicsJNI.HELICS_LOG_LEVEL_CONNECTIONS_get());
   /**
