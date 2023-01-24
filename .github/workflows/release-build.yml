@@ -351,7 +351,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       
     - name: Get all submodules archive
       uses: actions/download-artifact@v1
