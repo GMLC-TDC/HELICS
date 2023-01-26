@@ -25,7 +25,7 @@ jobs:
     - uses: gmlc-tdc/helics-action/update-swig-interfaces@main
      
     # Run pre-commit docker-clang-format hook
-    - uses: actions/setup-python@v2
+    - uses: actions/setup-python@v4
     - name: set PY
       run: echo "PY=$(python --version --version | sha256sum | cut -d' ' -f1)" >> $GITHUB_ENV
     - uses: actions/cache@v3
