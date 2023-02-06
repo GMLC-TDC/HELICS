@@ -31,7 +31,6 @@ def create_broker():
 
 
 def create_federate(deltat=1.0, fedinitstring="--federates=1"):
-
     fedinfo = h.helicsFederateInfoCreate()
 
     status = h.helicsFederateInfoSetFederateName(fedinfo, "Combination Federate")
@@ -68,7 +67,6 @@ def destroy_federate(fed):
 
 
 if __name__ == "__main__":
-
     broker = create_broker()
     # fed = create_federate()
 
@@ -159,7 +157,6 @@ if __name__ == "__main__":
     #########################################   Starting Co-simulation  ####################################################
 
     for t in range(0, total_inteval, pf_interval):
-
         ############################   Publishing Voltage to GridLAB-D #######################################################
 
         voltage_gld = complex(voltage_cosim_bus * 1000)

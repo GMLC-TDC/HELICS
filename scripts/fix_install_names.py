@@ -10,7 +10,6 @@ DEPENDENCIES = os.path.abspath(os.path.join(CURRENT_DIRECTORY, "../dependencies/
 
 
 def get_libraries(executable, substring):
-
     output = subprocess.check_output(shlex.split("otool -L {}".format(executable))).decode("utf-8")
 
     print(output)
@@ -28,7 +27,6 @@ def get_libraries(executable, substring):
 
 
 def fix_install_name(executable, with_rpath=True):
-
     BOOST_LIBRARIES = get_libraries(executable, "boost")
 
     for library in BOOST_LIBRARIES:
@@ -46,7 +44,6 @@ def fix_install_name(executable, with_rpath=True):
         subprocess.call(shlex.split(cmd))
 
     if with_rpath is True:
-
         rpaths = []
         for d in ["zmq", "boost"]:
             rpaths.append("{}".format(os.path.abspath(os.path.join(DEPENDENCIES, d, "lib"))))
@@ -57,7 +54,6 @@ def fix_install_name(executable, with_rpath=True):
 
 
 def main(executable_directory=None):
-
     print("Fixing install names ...")
 
     if executable_directory is None:
@@ -70,13 +66,11 @@ def main(executable_directory=None):
         if filename.startswith("helics_") and os.access(
             os.path.abspath(os.path.join(APPS, filename)), os.X_OK
         ):
-
             print("Fixing for {}".format(filename))
             fix_install_name(os.path.abspath(os.path.join(APPS, filename)))
 
 
 if __name__ == "__main__":
-
     import sys
 
     try:

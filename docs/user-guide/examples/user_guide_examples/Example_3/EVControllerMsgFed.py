@@ -128,7 +128,6 @@ if __name__ == "__main__":
 
     t = grantedtime
     while t < total_interval:
-
         for j in range(0, len(enddest_EVsoc)):
             # 1. Receive SOC
             # print('endpt name: ',h.helicsEndpointGetName(end_EVsoc[j]))
