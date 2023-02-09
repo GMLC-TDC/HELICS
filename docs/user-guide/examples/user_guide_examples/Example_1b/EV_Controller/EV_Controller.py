@@ -23,7 +23,6 @@ def destroy_federate(fed):
 
 
 if __name__ == "__main__":
-
     #################################  Registering  federate from json  ########################################
 
     fed = h.helicsCreateCombinationFederateFromConfig("Control.json")
@@ -68,7 +67,6 @@ if __name__ == "__main__":
     feeder_real_power = []
     feeder_imag_power = []
     for t in range(0, total_inteval, update_interval):
-
         while grantedtime < t:
             grantedtime = h.helicsFederateRequestTime(fed, t)
         time.sleep(0.1)

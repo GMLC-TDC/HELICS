@@ -183,7 +183,6 @@ if __name__ == "__main__":
     print("time power")
     next_time = []
     while t < total_interval:
-
         for j in range(0, len(enddest_EVsoc)):
             # 1. Receive instructions
             if h.helicsEndpointHasMessage(end_EVsoc[j]):
