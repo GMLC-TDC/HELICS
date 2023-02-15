@@ -4,7 +4,6 @@ dirname = os.path.realpath(os.path.dirname(__file__))
 
 
 def get_version():
-
     with open(os.path.join(dirname, "../CMakeLists.txt")) as f:
         data = f.read()
 
@@ -16,7 +15,6 @@ def get_version():
 
 
 def main():
-
     helics_version = get_version()
     current_source_dir = os.path.abspath(os.path.join(dirname, "../"))
     output_dir = os.path.abspath(os.path.join(dirname, "../build-doxygen/docs"))
@@ -38,5 +36,4 @@ def main():
 
 
 if __name__ == "__main__":
-
     main()

@@ -106,7 +106,6 @@ def SendFile(FILENAME, CLONE, RELEASE, TOKEN, CLIENTID, CLIENTSECRET):
 # main program
 ##
 def main():
-
     # Setup arguments
     DESCRIPTION = """
     Store an extraneous binary file code in the github release page.
@@ -173,7 +172,6 @@ def main():
     # Clone repository into ./HELICS by default
     #
     if CLONE is not None:
-
         if TOPATH is None:
             TOPATH = "./HELICS"
             if os.path.exists(TOPATH):

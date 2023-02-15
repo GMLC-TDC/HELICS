@@ -31,7 +31,6 @@ def create_broker():
 
 
 def create_federate(deltat=1.0, fedinitstring="--federates=1"):
-
     fedinfo = h.helicsFederateInfoCreate()
 
     status = h.helicsFederateInfoSetFederateName(fedinfo, "Combination Federate")
@@ -68,7 +67,6 @@ def destroy_federate(fed):
 
 
 if __name__ == "__main__":
-
     broker = create_broker()
     # fed = create_federate()
 
