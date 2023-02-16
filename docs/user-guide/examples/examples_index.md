@@ -20,5 +20,5 @@ These two learning tracks each start with a "base" model, which should also be c
 
     fundamental_examples/fundamental_examples_index
     advanced_examples/advanced_examples_index
-    supported_language_examples_index
+    supported_languages_examples/supported_languages_examples_index
 ```
