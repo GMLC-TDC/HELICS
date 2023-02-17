@@ -18,7 +18,7 @@ pip install 'helics[cli]'
 
 The second version with the "[cli]" additionally installs additional tools that provides an easy method for launching co-simulations that is used in the [HELICS User Guide Examples](../examples/examples_index.md) and is recommended.
 
-If you are on an unsupported OS or Python version, you will need to install a copy of HELICS first.
+If you are on an unsupported OS or CPU architecture, you may need to install a copy of HELICS first.
 Depending on your OS, there could be a copy in the package manager, or you may need to build HELICS from source.
 From there, you can use `pip install helics` as above.
 The [source distributions section of the PyPI page](https://pypi.org/project/helics/) has some additional useful information on this process.
