@@ -23,7 +23,6 @@ Integration of federates requires definition of the message topology (who is pas
 
 This section introduces the simplest broker topology for integrating federates into a federation, and the basics for integrating federates with a JSON and with API calls.
 
-
 ```{eval-rst}
 .. toctree::
     :maxdepth: 1

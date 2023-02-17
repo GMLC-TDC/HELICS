@@ -4,7 +4,7 @@
 
 Install Python with pip. Upgrade pip to a recent version using `python -m pip install --upgrade`.
 
-If you're on a supported version of Windows, macOS, or Linux (see the [HELICS PyPI page](https://pypi.org/project/helics/) for details) you can then use `pip` to install the HELICS Python interface and helics-apps. 
+If you're on a supported version of Windows, macOS, or Linux (see the [HELICS PyPI page](https://pypi.org/project/helics/) for details) you can then use `pip` to install the HELICS Python interface and helics-apps.
 
 ```bash
 pip install 'helics'
