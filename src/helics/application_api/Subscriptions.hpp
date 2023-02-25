@@ -20,7 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-
 /** class to handle a Vector Subscription
 @tparam X the class of the value associated with the vector subscription
 */
