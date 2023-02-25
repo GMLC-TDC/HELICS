@@ -75,7 +75,7 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
     target_compile_options(compile_flags_target INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall>)
     if(NOT WIN32)
         # to support clang-cl which doesn't support these options
-        target_compile_options(compile_flags_target INTERFACE -pedantic -pedantic-errors)
+        target_compile_options(compile_flags_target INTERFACE -pedantic)
 
     endif()
     target_compile_options(
