@@ -1952,8 +1952,7 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& m, InterfaceType type)
                 propagateError(std::move(eret));
                 return false;
             }
-            if (!(fed->observer ||
-                         (fed->dynamic && fed->state == ConnectionState::CONNECTED))) {
+            if (!(fed->observer || (fed->dynamic && fed->state == ConnectionState::CONNECTED))) {
                 ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, m.source_id);
                 eret.dest_handle = m.source_handle;
                 eret.messageID = defs::Errors::REGISTRATION_FAILURE;
@@ -2635,10 +2634,10 @@ void CoreBroker::findRegexMatch(const std::string& target,
                 destFlags = toggle_flag(destFlags, destination_target);
             }
             connectInterfaces(*hnd,
-                flags,
+                              flags,
                               (dest != nullptr) ? *dest :
                                                   BasicHandleInfo(handle, getMatchType(type)),
-                              
+
                               destFlags,
                               std::make_pair(getAction(type),
                                              getMatchAction(type,
@@ -2816,18 +2815,18 @@ void CoreBroker::findAndNotifyInputTargets(BasicHandleInfo& handleInfo, const st
         auto* pub = handles.findHandle(target.first);
         if (pub == nullptr) {
             connectInterfaces(handleInfo,
-                handleInfo.flags,
+                              handleInfo.flags,
                               BasicHandleInfo(target.first.fed_id,
                                               target.first.handle,
                                               InterfaceType::PUBLICATION),
-                              
+
                               target.second,
                               std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
         } else {
             connectInterfaces(handleInfo,
-                handleInfo.flags,
+                              handleInfo.flags,
                               *pub,
-                              
+
                               target.second,
                               std::make_pair(CMD_ADD_SUBSCRIBER, CMD_ADD_PUBLISHER));
         }
@@ -2843,9 +2842,9 @@ void CoreBroker::findAndNotifyPublicationTargets(BasicHandleInfo& handleInfo,
     auto subHandles = unknownHandles.checkForPublications(key);
     for (const auto& sub : subHandles) {
         connectInterfaces(handleInfo,
-            sub.second,
+                          sub.second,
                           BasicHandleInfo(sub.first.fed_id, sub.first.handle, InterfaceType::INPUT),
-                          
+
                           handleInfo.flags,
                           std::make_pair(CMD_ADD_PUBLISHER, CMD_ADD_SUBSCRIBER));
     }
@@ -2873,9 +2872,9 @@ void CoreBroker::findAndNotifyEndpointTargets(BasicHandleInfo& handleInfo, const
         }
 
         connectInterfaces(handleInfo,
-            target.second,
+                          target.second,
                           *iface,
-                          
+
                           destFlags,
                           std::make_pair(CMD_ADD_ENDPOINT,
                                          (iface->handleType != InterfaceType::FILTER) ?
@@ -2906,11 +2905,11 @@ void CoreBroker::findAndNotifyFilterTargets(BasicHandleInfo& handleInfo, const s
             flags |= make_flags(clone_flag);
         }
         connectInterfaces(handleInfo,
-            flags,
+                          flags,
                           BasicHandleInfo(target.first.fed_id,
                                           target.first.handle,
                                           InterfaceType::ENDPOINT),
-                          
+
                           flags,
                           std::make_pair(CMD_ADD_FILTER, CMD_ADD_ENDPOINT));
     }
