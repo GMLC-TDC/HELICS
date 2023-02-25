@@ -871,17 +871,15 @@ HELICS is able to do some levels of unit conversion, currently only on double ty
 
 ### `buffer_data` | `bufferdata` | `bufferData` [false]
 
-_API:_ `helicsInputSetOption`
-[C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
-| [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
-| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Subscription,Union{Int64,%20HELICS.Lib.helics_handle_options},Bool})
+_API:_ `helicsPublicationSetOption`
+[C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga130db298b7a422b4df546313a8e07208)
+| [C](api-reference/C_API.md#publication)
+| [Python](https://python.helics.org/api/capi-py/#helicsPublicationSetOption)
+| [Julia](https://julia.helics.org/latest/api/#HELICS.helicsPublicationSetOption-Tuple{HELICS.Publication,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_BUFFER_DATA` [411]
 
-*Inputs and subscriptions* - Setting this flag will buffer the last value sent during the initialization phase of HELICS co-simulations. When the execution phase begins, that value will be resent to the receiving handle.
-
-*Outputs and publications* - Setting this flag will buffer the last output and make it available for any federate that subscribes to it after the start of executing mode. This is useful for dynamic federations where the publication and subscription topology can change during the co-simulation proper and it maintains the persistence of published values at the cost of a slight increase in memory footprint of the federate.
+Setting this flag will buffer the last output and make it available for any federate that subscribes to it after the start of executing mode. This is useful for dynamic federations where the publication and subscription topology can change during the co-simulation proper and it maintains the persistence of published values at the cost of a slight increase in memory footprint of the federate.
 
 ---
 
