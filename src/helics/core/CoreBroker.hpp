@@ -337,10 +337,10 @@ class CoreBroker: public Broker, public BrokerBase {
     void checkDependencies();
 
     void connectInterfaces(
-        const BasicHandleInfo& source,
-        const BasicHandleInfo& dest,
-        uint32_t flags,
-        uint32_t flagsDest,
+        const BasicHandleInfo& origin,
+        uint32_t originFlags,
+        const BasicHandleInfo& target,
+        uint32_t targetFlags,
         std::pair<action_message_def::action_t, action_message_def::action_t> actions);
 
     /** find any existing publishers for a subscription*/
