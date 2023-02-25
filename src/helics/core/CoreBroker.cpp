@@ -2747,7 +2747,7 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                     findRegexMatch(target, type, tinfo.first, tinfo.second);
                 }
             });
-            unknownHandles.clearUnknownsIf([this](const std::string& target,
+            unknownHandles.clearUnknownsIf([](const std::string& target,
                                                   InterfaceType /*type*/,
                                                   UnknownHandleManager::TargetInfo /*tinfo*/) {
                 return (target.compare(0, 6, regexKey) == 0);

@@ -1205,7 +1205,7 @@ FederateState* CommonCore::checkNewInterface(LocalFederateId federateID,
     }
     if (!key.empty()) {
         const auto* ci = handles.read(
-            [&key, type, &tname](auto& hand) { return hand.getInterfaceHandle(key, type); });
+            [&key, type](auto& hand) { return hand.getInterfaceHandle(key, type); });
         if (ci != nullptr) {  // this key is already found
             throw(RegistrationFailure(fmt::format("named {} already exists", tname)));
         }

@@ -28,9 +28,6 @@ SPDX-License-Identifier: BSD-3-Clause
 class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 
-static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
-    return std::string(parameter.param);
-};
 
 TEST_F(mfed_tests, regex1)
 {

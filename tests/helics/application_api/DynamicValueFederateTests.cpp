@@ -29,9 +29,6 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class dynFed: public ::testing::Test, public FederateTestFixture {};
 
-static const auto testNamer = [](const ::testing::TestParamInfo<const char*>& parameter) {
-    return std::string(parameter.param);
-};
 
 TEST_F(dynFed, initPubSubs)
 {
