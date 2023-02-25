@@ -29,7 +29,6 @@ SPDX-License-Identifier: BSD-3-Clause
  */
 class dynFed: public ::testing::Test, public FederateTestFixture {};
 
-
 TEST_F(dynFed, initPubSubs)
 {
     SetupTest<helics::ValueFederate>("test", 1, 1.0);

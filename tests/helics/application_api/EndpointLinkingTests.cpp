@@ -28,7 +28,6 @@ SPDX-License-Identifier: BSD-3-Clause
 class mfed_tests: public ::testing::Test, public FederateTestFixture {};
 /** test simple creation and destruction*/
 
-
 TEST_F(mfed_tests, regex1)
 {
     SetupTest<helics::MessageFederate>("test", 3, 1.0);

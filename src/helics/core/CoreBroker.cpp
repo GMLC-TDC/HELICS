@@ -2748,8 +2748,8 @@ void CoreBroker::executeInitializationOperations(bool iterating)
                 }
             });
             unknownHandles.clearUnknownsIf([](const std::string& target,
-                                                  InterfaceType /*type*/,
-                                                  UnknownHandleManager::TargetInfo /*tinfo*/) {
+                                              InterfaceType /*type*/,
+                                              UnknownHandleManager::TargetInfo /*tinfo*/) {
                 return (target.compare(0, 6, regexKey) == 0);
             });
         }
