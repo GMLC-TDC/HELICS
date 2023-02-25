@@ -39,12 +39,6 @@ constexpr Time cBigTime = Time{static_cast<int64_t>(HELICS_BIG_NUMBER * 1000000)
 /** common definition of currentTime in initialization mode*/
 constexpr Time initializationTime = negEpsilon;
 
-/** user defined literal for a time variable*/
-// constexpr Time operator"" _t(long double val)
-//{
-//     return {static_cast<double>(val)};
-// }  // NOLINT
-
 /** simple structure with the time and completion marker for iterations or dense time steps*/
 struct iteration_time {
     Time grantedTime;  //!< the time of the granted step
