@@ -23,10 +23,6 @@ Integration of federates requires definition of the message topology (who is pas
 
 This section introduces the simplest broker topology for integrating federates into a federation, and the basics for integrating federates with a JSON and with API calls.
 
-**todo: fix toc to be direct links**
-
-**todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
-
 ```{eval-rst}
 .. toctree::
     :maxdepth: 1
@@ -113,7 +109,7 @@ import helics as h
 
 ### Federate Information
 
-Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](../deprecated/FederateFlags.md).
+Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found in the [Configurations Options Reference](../../references/configuration_options_reference.md).
 
 ### Publications, Subscriptions and Endpoints
 
@@ -161,7 +157,7 @@ Additionally, there are ways to create and configure the federate directly throu
 fi = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../deprecated/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fi, 6, True)

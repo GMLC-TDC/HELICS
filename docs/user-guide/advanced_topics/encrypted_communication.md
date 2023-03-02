@@ -174,7 +174,7 @@ methods, there are a few settings that the encryption configuration file should 
 
 The general outline of what the file looks is:
 
-```json
+```text
 {
     "encrypted": <true|false; this setting is optional and sort of an alternative to the --encrypted flag so can be omitted>,
     "verify_file": "<path to certificate authority (CA) file to verify connecting federates>",
