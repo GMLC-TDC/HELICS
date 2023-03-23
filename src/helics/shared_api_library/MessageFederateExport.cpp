@@ -16,16 +16,41 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <memory>
 #include <mutex>
 #include <vector>
+#include <algorithm>
 
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
+
+static auto endpointSearch=[](helics::InterfaceHandle &hnd,const auto &testEndpoint){return hnd<testInput->eptPtr->getHandle();};
+
+
+static HelicsEndpoint findEndpoint(HelicsFederate fed, helics::InterfaceHandle handle)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    auto ind=std::upper_bound(fedObj->epts.begin(),fedObj->epts.end(),handle,endpointSearch);
+    if ((*ind)->endPtr->getHandle() == handle)
+    {
+        HelicsEndpoint hend=ind->get();
+        return hend;
+    }
+    return nullptr;
+}
 
 static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     ept->valid = EndpointValidationIdentifier;
     HelicsEndpoint hept = ept.get();
-    fedObj->epts.push_back(std::move(ept));
+
+    if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle())
+    {
+        fedObj->epts.push_back(std::move(ept));
+    }
+    else
+    {
+        auto ind=std::upper_bound(fedObj->epts.begin(),fedObj->epts.end(),ept->endPtr->getHandle(),endpointSearch);
+        fedObj->epts.insert(ind,std::move(ept));
+    }
     return hept;
 }
 
