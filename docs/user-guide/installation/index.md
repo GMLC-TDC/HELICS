@@ -69,6 +69,10 @@ graph LR
 
 [Build from source](./build_from_source.md)
 
+### Python via pip install
+
+[`pip install helics`](https://python.helics.org/)
+
 ### matHELICS install
 
 Installation instructions are available in the [matHELICS repository README](https://github.com/GMLC-TDC/matHELICS/blob/main/README.md)
@@ -76,10 +80,6 @@ Installation instructions are available in the [matHELICS repository README](htt
 ### Julia install
 
 [`pkg> add HELICS`](https://github.com/GMLC-TDC/HELICS.jl/blob/master/README.md)
-
-### pip install
-
-[`pip install helics`](https://python.helics.org/)
 
 ### jHELICS
 
