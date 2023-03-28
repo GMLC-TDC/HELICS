@@ -189,7 +189,7 @@ void terminalFunction(std::vector<std::string> args)
                 broker->forceTerminate();
                 broker = nullptr;
                 broker = std::make_unique<helics::BrokerApp>(args);
-                std::cout << "broker was forceably terminated and restarted\n";
+                std::cout << "broker was forcibly terminated and restarted\n";
             } else {
                 std::cout << "broker is currently running unable to restart\n";
             }
@@ -232,7 +232,7 @@ void terminalFunction(std::vector<std::string> args)
         ->callback([&cmdcont]() { cmdcont = false; });
     termProg.add_subcommand("terminate", "terminate the broker")->callback(closeBroker);
 
-    termProg.add_subcommand("terminate!", "forceably terminate the broker and exit")
+    termProg.add_subcommand("terminate!", "forcibly terminate the broker and exit")
         ->callback([closeBroker, &cmdcont]() {
             cmdcont = false;
             closeBroker();
@@ -246,7 +246,7 @@ void terminalFunction(std::vector<std::string> args)
     });
 
     auto* frestart =
-        termProg.add_subcommand("restart!", "forceably terminate the broker and restart it")
+        termProg.add_subcommand("restart!", "forcibly terminate the broker and restart it")
             ->allow_extras();
     frestart->callback(
         [restartBroker, &restart]() { restartBroker(restart->remaining_for_passthrough(), true); });
