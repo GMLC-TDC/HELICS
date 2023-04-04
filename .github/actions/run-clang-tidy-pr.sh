@@ -14,7 +14,7 @@ if ((filecount > 0 && filecount <= 20)); then
     echo "====Run clang-tidy===="
     while read -r line; do
         if echo "$line" | grep -E '\.(cpp|hpp|c|h)$'; then
-            python3 /usr/share/clang/run-clang-tidy.py "$line" -p build -quiet
+            /usr/bin/run-clang-tidy "$line" -p build -quiet
             rc=$?
             echo "clang-tidy exit code: $rc"
             if [[ "$rc" != "0" ]]; then
