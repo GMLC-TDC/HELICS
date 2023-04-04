@@ -315,7 +315,7 @@ CheckOptions:
   - key: readability-identifier-naming.MethodSuffix
     value: ""
   - key: readability-identifier-naming.NamespaceCase
-    value: lowercase
+    value: lower_case
   - key: readability-identifier-naming.NamespacePrefix
     value: ""
   - key: readability-identifier-naming.NamespaceSuffix
@@ -434,6 +434,8 @@ CheckOptions:
     value: ""
   - key: readability-identifier-naming.VirtualMethodSuffix
     value: ""
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 85
   - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
     value: "0"
   - key: readability-simplify-boolean-expr.ChainedConditionalReturn

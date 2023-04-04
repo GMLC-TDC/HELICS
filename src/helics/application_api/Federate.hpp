@@ -112,24 +112,24 @@ class HELICS_CXX_EXPORT Federate {
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    Federate(std::string_view fedname, const FederateInfo& fi);
+    Federate(std::string_view fedname, const FederateInfo& fedInfo);
     /**constructor taking a core and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a shared pointer to a core object, the pointer will be copied
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     Federate(std::string_view fedname,
              const std::shared_ptr<Core>& core,
-             const FederateInfo& fi = FederateInfo{});
+             const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core core connect to.
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi = FederateInfo{});
+    Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fedInfo = FederateInfo{});
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */
@@ -823,11 +823,11 @@ received
     void completeOperation();
 
   private:
-    void getCore(const FederateInfo& fi);
+    void getCore(const FederateInfo& fedInfo);
     /** function to get the core into a valid state*/
     void verifyCore();
     /** function to register the federate with the core*/
-    void registerFederate(const FederateInfo& fi);
+    void registerFederate(const FederateInfo& fedInfo);
 
     /** function to deal with any operations that occur on a mode switch*/
     void updateFederateMode(Modes newMode);

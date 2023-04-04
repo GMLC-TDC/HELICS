@@ -42,37 +42,37 @@ void cleanupHelicsLibrary()
     BrokerFactory::cleanUpBrokers(100ms);
 }
 
-Federate::Federate(std::string_view fedName, const FederateInfo& fi): mName(fedName)
+Federate::Federate(std::string_view fedName, const FederateInfo& fedInfo): mName(fedName)
 {
     if (mName.empty()) {
-        mName = fi.defName;
+        mName = fedInfo.defName;
     }
 
-    getCore(fi);
+    getCore(fedInfo);
 
     verifyCore();
 
-    registerFederate(fi);
+    registerFederate(fedInfo);
 }
 
-Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi):
-    Federate(fedname, core.getCopyofCorePointer(), fi)
+Federate::Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fedInfo):
+    Federate(fedname, core.getCopyofCorePointer(), fedInfo)
 {
 }
 
 Federate::Federate(std::string_view fedName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fi):
+                   const FederateInfo& fedInfo):
     coreObject(core),
     mName(fedName)
 {
     if (mName.empty()) {
-        mName = fi.defName;
+        mName = fedInfo.defName;
     }
-    getCore(fi);
+    getCore(fedInfo);
     verifyCore();
 
-    registerFederate(fi);
+    registerFederate(fedInfo);
 }
 
 Federate::Federate(std::string_view fedName, const std::string& configString):
@@ -140,16 +140,16 @@ Federate::~Federate()
     }
 }
 
-void Federate::getCore(const FederateInfo& fi)
+void Federate::getCore(const FederateInfo& fedInfo)
 {
-    singleThreadFederate = fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE, false);
+    singleThreadFederate = fedInfo.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE, false);
     if (coreObject) {
         return;
     }
 
-    if (fi.coreName.empty()) {
-        if (!fi.forceNewCore) {
-            coreObject = CoreFactory::findJoinableCoreOfType(fi.coreType);
+    if (fedInfo.coreName.empty()) {
+        if (!fedInfo.forceNewCore) {
+            coreObject = CoreFactory::findJoinableCoreOfType(fedInfo.coreType);
         }
         if (!coreObject) {
             if (!mName.empty()) {
@@ -163,29 +163,29 @@ void Federate::getCore(const FederateInfo& fi)
                 }
                 try {
                     coreObject =
-                        CoreFactory::create(fi.coreType, cname, generateFullCoreInitString(fi));
+                        CoreFactory::create(fedInfo.coreType, cname, generateFullCoreInitString(fedInfo));
                 }
                 catch (const helics::RegistrationFailure&) {
                     // there is a possibility of race condition here in the naming resulting a
                     // failure this catches and reverts to previous naming which is fully randomly
                     // generated
-                    coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+                    coreObject = CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
                 }
             } else {
-                coreObject = CoreFactory::create(fi.coreType, generateFullCoreInitString(fi));
+                coreObject = CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
             }
         }
     } else {
-        if (!fi.forceNewCore) {
+        if (!fedInfo.forceNewCore) {
             coreObject =
-                CoreFactory::FindOrCreate(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
+                CoreFactory::FindOrCreate(fedInfo.coreType, fedInfo.coreName, generateFullCoreInitString(fedInfo));
             if (!coreObject->isOpenToNewFederates()) {
                 coreObject = nullptr;
                 logWarningMessage("found core object is not open");
                 CoreFactory::cleanUpCores(200ms);
-                coreObject = CoreFactory::FindOrCreate(fi.coreType,
-                                                       fi.coreName,
-                                                       generateFullCoreInitString(fi));
+                coreObject = CoreFactory::FindOrCreate(fedInfo.coreType,
+                                                       fedInfo.coreName,
+                                                       generateFullCoreInitString(fedInfo));
                 if (!coreObject->isOpenToNewFederates()) {
                     throw(RegistrationFailure(
                         "Unable to connect to specified core: core is not open to new Federates"));
@@ -193,7 +193,7 @@ void Federate::getCore(const FederateInfo& fi)
             }
         } else {
             coreObject =
-                CoreFactory::create(fi.coreType, fi.coreName, generateFullCoreInitString(fi));
+                CoreFactory::create(fedInfo.coreType, fedInfo.coreName, generateFullCoreInitString(fedInfo));
         }
     }
 }
@@ -215,19 +215,19 @@ void Federate::verifyCore()
     }
 }
 /** function to register the federate with the core*/
-void Federate::registerFederate(const FederateInfo& fi)
+void Federate::registerFederate(const FederateInfo& fedInfo)
 {
     // this call will throw an error on failure
-    fedID = coreObject->registerFederate(mName, fi);
+    fedID = coreObject->registerFederate(mName, fedInfo);
     if (mName.find("${") != std::string::npos) {
         mName = coreObject->getFederateName(fedID);
     }
 
-    nameSegmentSeparator = fi.separator;
-    strictConfigChecking = fi.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
+    nameSegmentSeparator = fedInfo.separator;
+    strictConfigChecking = fedInfo.checkFlagProperty(defs::Flags::STRICT_CONFIG_CHECKING, true);
 
-    useJsonSerialization = fi.useJsonSerialization;
-    observerMode = fi.observer;
+    useJsonSerialization = fedInfo.useJsonSerialization;
+    observerMode = fedInfo.observer;
     mCurrentTime = coreObject->getCurrentTime(fedID);
     if (!singleThreadFederate) {
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
