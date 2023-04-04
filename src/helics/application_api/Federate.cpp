@@ -71,8 +71,7 @@ Federate::Federate(std::string_view fedName,
     }
     getCore(fi);
     verifyCore();
-    
-    
+
     registerFederate(fi);
 }
 
@@ -144,8 +143,7 @@ Federate::~Federate()
 void Federate::getCore(const FederateInfo& fi)
 {
     singleThreadFederate = fi.checkFlagProperty(defs::Flags::SINGLE_THREAD_FEDERATE, false);
-    if (coreObject)
-    {
+    if (coreObject) {
         return;
     }
 
@@ -157,11 +155,11 @@ void Federate::getCore(const FederateInfo& fi)
             if (!mName.empty()) {
                 std::string cname =
                     fmt::format("{}_core_{}", mName, gmlc::utilities::randomString(6));
-                auto loc=mName.find("${");
-                if (loc != std::string::npos)
-                {
-                    cname =
-                        fmt::format("{}_core_{}", mName.substr(0,loc), gmlc::utilities::randomString(8));
+                auto loc = mName.find("${");
+                if (loc != std::string::npos) {
+                    cname = fmt::format("{}_core_{}",
+                                        mName.substr(0, loc),
+                                        gmlc::utilities::randomString(8));
                 }
                 try {
                     coreObject =
@@ -186,8 +184,8 @@ void Federate::getCore(const FederateInfo& fi)
                 logWarningMessage("found core object is not open");
                 CoreFactory::cleanUpCores(200ms);
                 coreObject = CoreFactory::FindOrCreate(fi.coreType,
-                    fi.coreName,
-                    generateFullCoreInitString(fi));
+                                                       fi.coreName,
+                                                       generateFullCoreInitString(fi));
                 if (!coreObject->isOpenToNewFederates()) {
                     throw(RegistrationFailure(
                         "Unable to connect to specified core: core is not open to new Federates"));
@@ -235,10 +233,9 @@ void Federate::registerFederate(const FederateInfo& fi)
         asyncCallInfo = std::make_unique<shared_guarded_m<AsyncFedCallInfo>>();
     }
     cManager = std::make_unique<ConnectorFederateManager>(coreObject.get(),
-        this,
-        fedID,
-        singleThreadFederate);
-
+                                                          this,
+                                                          fedID,
+                                                          singleThreadFederate);
 }
 
 void Federate::enterInitializingMode()

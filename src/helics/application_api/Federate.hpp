@@ -823,11 +823,11 @@ received
     void completeOperation();
 
   private:
-      void getCore(const FederateInfo& fi);
-      /** function to get the core into a valid state*/
-      void verifyCore();
-      /** function to register the federate with the core*/
-      void registerFederate(const FederateInfo& fi);
+    void getCore(const FederateInfo& fi);
+    /** function to get the core into a valid state*/
+    void verifyCore();
+    /** function to register the federate with the core*/
+    void registerFederate(const FederateInfo& fi);
 
     /** function to deal with any operations that occur on a mode switch*/
     void updateFederateMode(Modes newMode);
