@@ -79,7 +79,7 @@ Federate::Federate(std::string_view fedName, const std::string& configString):
     Federate(fedName, loadFederateInfo(configString))
 {
     if (looksLikeFile(configString)) {
-        registerInterfaces(configString);
+        registerConnectorInterfaces(configString);
     }
 }
 
@@ -1136,6 +1136,12 @@ void Federate::disconnectTransition()
 
 void Federate::registerInterfaces(const std::string& configString)
 {
+    // this will be deprecated at some point in the future
+    registerConnectorInterfaces(configString);
+}
+
+void Federate::registerConnectorInterfaces(const std::string& configString)
+{
     if (fileops::hasTomlExtension(configString)) {
         registerConnectorInterfacesToml(configString);
     } else {
@@ -1146,12 +1152,7 @@ void Federate::registerInterfaces(const std::string& configString)
             throw(helics::InvalidParameter(e.what()));
         }
     }
-}
 
-void Federate::registerFilterInterfaces(const std::string& configString)
-{
-    // this will be deprecated at some point in the future
-    registerInterfaces(configString);
 }
 
 static Filter& generateFilter(Federate* fed,
