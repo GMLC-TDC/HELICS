@@ -777,7 +777,10 @@ received
     @param configString  the location of the file or config String to load to generate the
     interfaces
     */
-    void registerFilterInterfaces(const std::string& configString) { registerConnectorInterfaces(configString); }
+    void registerFilterInterfaces(const std::string& configString)
+    {
+        registerConnectorInterfaces(configString);
+    }
     /** get the underlying federateID for the core*/
     auto getID() const noexcept { return fedID; }
     /** get the current state of the federate*/

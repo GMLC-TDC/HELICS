@@ -1152,7 +1152,6 @@ void Federate::registerConnectorInterfaces(const std::string& configString)
             throw(helics::InvalidParameter(e.what()));
         }
     }
-
 }
 
 static Filter& generateFilter(Federate* fed,
