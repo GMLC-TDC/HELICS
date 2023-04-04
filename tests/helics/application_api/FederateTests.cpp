@@ -96,12 +96,18 @@ TEST(federate, renamer)
     auto fed2 = std::make_shared<helics::Federate>("test_${#}", fi);
     EXPECT_EQ("test_2", fed2->getName());
 
+    auto fed3 = std::make_shared<helics::Federate>("test_${#}",fed->getCorePointer(), fi);
+    EXPECT_EQ("test_3", fed3->getName());
+
     fed->enterInitializingModeAsync();
+    fed3->enterInitializingModeAsync();
     fed2->enterInitializingMode();
     fed->enterInitializingModeComplete();
+    fed3->enterInitializingModeComplete();
 
     fed = nullptr;  // force the destructor
     fed2 = nullptr;
+    fed3 = nullptr;
 }
 
 TEST(federate_tests, federate_initialize_iterate)
