@@ -162,23 +162,27 @@ void Federate::getCore(const FederateInfo& fedInfo)
                                         gmlc::utilities::randomString(8));
                 }
                 try {
-                    coreObject =
-                        CoreFactory::create(fedInfo.coreType, cname, generateFullCoreInitString(fedInfo));
+                    coreObject = CoreFactory::create(fedInfo.coreType,
+                                                     cname,
+                                                     generateFullCoreInitString(fedInfo));
                 }
                 catch (const helics::RegistrationFailure&) {
                     // there is a possibility of race condition here in the naming resulting a
                     // failure this catches and reverts to previous naming which is fully randomly
                     // generated
-                    coreObject = CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
+                    coreObject =
+                        CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
                 }
             } else {
-                coreObject = CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
+                coreObject =
+                    CoreFactory::create(fedInfo.coreType, generateFullCoreInitString(fedInfo));
             }
         }
     } else {
         if (!fedInfo.forceNewCore) {
-            coreObject =
-                CoreFactory::FindOrCreate(fedInfo.coreType, fedInfo.coreName, generateFullCoreInitString(fedInfo));
+            coreObject = CoreFactory::FindOrCreate(fedInfo.coreType,
+                                                   fedInfo.coreName,
+                                                   generateFullCoreInitString(fedInfo));
             if (!coreObject->isOpenToNewFederates()) {
                 coreObject = nullptr;
                 logWarningMessage("found core object is not open");
@@ -192,8 +196,9 @@ void Federate::getCore(const FederateInfo& fedInfo)
                 }
             }
         } else {
-            coreObject =
-                CoreFactory::create(fedInfo.coreType, fedInfo.coreName, generateFullCoreInitString(fedInfo));
+            coreObject = CoreFactory::create(fedInfo.coreType,
+                                             fedInfo.coreName,
+                                             generateFullCoreInitString(fedInfo));
         }
     }
 }
