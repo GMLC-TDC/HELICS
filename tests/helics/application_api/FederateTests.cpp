@@ -188,10 +188,10 @@ TEST(federate_tests, federate_initialize_iteration_multiple)
     EXPECT_TRUE(Fed2->getCurrentMode() == helics::Federate::Modes::PENDING_ITERATIVE_INIT ||
                 Fed2->getCurrentMode() == helics::Federate::Modes::STARTUP);
     std::this_thread::yield();
-    int ii{0};
+    int count{0};
     while (!Fed2->isAsyncOperationCompleted()) {
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        if (++ii > 20) {
+        if (++count > 20) {
             break;
         }
     }
@@ -620,11 +620,11 @@ TEST(federate, multiple_federates_async_calls)
     Fed2->enterInitializingMode();
     EXPECT_NO_THROW(Fed2->enterInitializingMode());
 
-    auto c1 = Fed1->getCorePointer();
-    auto c2 = Fed2->getCorePointer();
-    EXPECT_EQ(c1->getIdentifier(), c2->getIdentifier());
-    c1.reset();
-    c2.reset();
+    auto core1 = Fed1->getCorePointer();
+    auto core2 = Fed2->getCorePointer();
+    EXPECT_EQ(core1->getIdentifier(), core2->getIdentifier());
+    core1.reset();
+    core2.reset();
 
     Fed1->enterInitializingModeComplete();
 
@@ -723,10 +723,10 @@ TEST(federate, from_string)
         "fed1", "--coretype=TEST --corename core_init --coreinitstring='-f 1 --autobroker'");
     Fed1->enterExecutingMode();
 
-    auto c1 = Fed1->getCorePointer();
-    EXPECT_EQ(c1->getIdentifier(), "core_init");
+    auto core = Fed1->getCorePointer();
+    EXPECT_EQ(core->getIdentifier(), "core_init");
     Fed1->finalize();
-    c1.reset();
+    core.reset();
 }
 
 TEST(federate, from_file1)

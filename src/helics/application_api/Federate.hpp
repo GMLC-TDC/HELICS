@@ -685,9 +685,9 @@ received
     The FilterOperator gets called when there is a message to filter, There is no order or state to
     this messages can come in any order.
     @param filt the filter object to set the operation on
-    @param op a shared_ptr to a \ref FilterOperator
+    @param filtOp a shared_ptr to a \ref FilterOperator
     */
-    void setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op);
+    void setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp);
 
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
@@ -722,9 +722,9 @@ received
     The TranslatorOperator gets called when there is a message or value to translate, there is no
     order or state to this as messages can come in any order.
     @param trans the translator object to set the operation on
-    @param op a shared_ptr to a \ref TranslatorOperator
+    @param transOp a shared_ptr to a \ref TranslatorOperator
     */
-    void setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op);
+    void setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> trasnOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;

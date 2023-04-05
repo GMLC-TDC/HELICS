@@ -1217,19 +1217,17 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     addTargets(data, "destination_targets", adest);
 }
 
-static void arrayPairProcess(Json::Value doc,
-                             const std::string& key,
-                             const std::function<void(std::string_view, std::string_view)>& op)
+static void arrayPairProcess(Json::Value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& pairOp)
 {
     if (doc.isMember(key)) {
         if (doc[key].isArray()) {
             for (auto& val : doc[key]) {
-                op(val[0].asString(), val[1].asString());
+                pairOp(val[0].asString(), val[1].asString());
             }
         } else {
             auto members = doc[key].getMemberNames();
             for (auto& val : members) {
-                op(val, doc[key][val].asString());
+                pairOp(val, doc[key][val].asString());
             }
         }
     }
@@ -1246,7 +1244,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool cloningflag = getOrDefault(filt, "cloning", false);
-            const bool useTypes = !((inputType.empty()) && (outputType.empty()));
+             const  bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
             const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
@@ -1342,21 +1340,19 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
     });
 }
 
-static void arrayPairProcess(toml::value doc,
-                             const std::string& key,
-                             const std::function<void(std::string_view, std::string_view)>& op)
+static void arrayPairProcess(toml::value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& pairOp)
 {
     using fileops::isMember;
     if (isMember(doc, key)) {
         auto info = toml::find(doc, key);
         if (info.is_array()) {
             for (auto& val : info.as_array()) {
-                op(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                   static_cast<std::string_view>(val.as_array()[1].as_string()));
+                pairOp(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                    static_cast<std::string_view>(val.as_array()[1].as_string()));
             }
         } else {
             for (const auto& val : info.as_table()) {
-                op(val.first, static_cast<std::string_view>(val.second.as_string()));
+                pairOp(val.first, static_cast<std::string_view>(val.second.as_string()));
             }
         }
     }
@@ -1728,9 +1724,9 @@ int Federate::getFilterCount() const
     return cManager->getFilterCount();
 }
 
-void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op)
+void Federate::setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp)
 {
-    coreObject->setFilterOperator(filt.getHandle(), std::move(op));
+    coreObject->setFilterOperator(filt.getHandle(), std::move(filtOp));
 }
 
 const Translator& Federate::getTranslator(std::string_view translatorName) const
