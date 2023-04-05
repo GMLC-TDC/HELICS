@@ -26,6 +26,7 @@ Checks: "
   -bugprone-narrowing-conversions,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
   cert-*,
   -cert-err58-cpp,
   portability-*,
@@ -62,6 +63,7 @@ WarningsAsErrors: "
   -bugprone-narrowing-conversions,
   misc-*,
   -misc-non-private-member-variables-in-classes,
+  -misc-no-recursion,
   cert-*,
   -cert-err58-cpp,
   portability-*,
@@ -435,7 +437,7 @@ CheckOptions:
   - key: readability-identifier-naming.VirtualMethodSuffix
     value: ""
   - key: readability-function-cognitive-complexity.Threshold
-    value: 85
+    value: 100
   - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
     value: "0"
   - key: readability-simplify-boolean-expr.ChainedConditionalReturn

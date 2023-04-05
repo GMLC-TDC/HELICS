@@ -245,8 +245,8 @@ void Federate::registerFederate(const FederateInfo& fedInfo)
 
 void Federate::enterInitializingMode()
 {
-    auto cm = currentMode.load();
-    switch (cm) {
+    auto cmode = currentMode.load();
+    switch (cmode) {
         case Modes::STARTUP:
             try {
                 if (coreObject->enterInitializingMode(fedID)) {
@@ -286,17 +286,17 @@ void Federate::enterInitializingModeAsync()
         throw(InvalidFunctionCall(
             "Async function calls and methods are not allowed for single thread federates"));
     }
-    auto cm = currentMode.load();
-    if (cm == Modes::STARTUP) {
+    auto cmode = currentMode.load();
+    if (cmode == Modes::STARTUP) {
         auto asyncInfo = asyncCallInfo->lock();
-        if (currentMode.compare_exchange_strong(cm, Modes::PENDING_INIT)) {
+        if (currentMode.compare_exchange_strong(cmode, Modes::PENDING_INIT)) {
             asyncInfo->initFuture = std::async(std::launch::async, [this]() {
                 return coreObject->enterInitializingMode(fedID);
             });
         }
-    } else if (cm == Modes::PENDING_INIT) {
+    } else if (cmode == Modes::PENDING_INIT) {
         return;
-    } else if (cm != Modes::INITIALIZING) {
+    } else if (cmode != Modes::INITIALIZING) {
         // if we are already in initialization do nothing
         throw(InvalidFunctionCall("cannot transition from current mode to initializing mode"));
     }
@@ -338,8 +338,7 @@ void Federate::enterInitializingModeComplete()
         case Modes::PENDING_INIT: {
             auto asyncInfo = asyncCallInfo->lock();
             try {
-                bool res = asyncInfo->initFuture.get();
-                if (res) {
+                if (asyncInfo->initFuture.get()) {
                     enteringInitializingMode(IterationResult::NEXT_STEP);
                 }
             }
@@ -362,8 +361,8 @@ void Federate::enterInitializingModeComplete()
 
 void Federate::enterInitializingModeIterative()
 {
-    auto cm = currentMode.load();
-    switch (cm) {
+    auto cmode = currentMode.load();
+    switch (cmode) {
         case Modes::STARTUP:
             try {
                 coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
@@ -383,15 +382,15 @@ void Federate::enterInitializingModeIterative()
 
 void Federate::enterInitializingModeIterativeAsync()
 {
-    auto cm = currentMode.load();
-    if (cm == Modes::STARTUP) {
+    auto cmode = currentMode.load();
+    if (cmode == Modes::STARTUP) {
         auto asyncInfo = asyncCallInfo->lock();
-        if (currentMode.compare_exchange_strong(cm, Modes::PENDING_ITERATIVE_INIT)) {
+        if (currentMode.compare_exchange_strong(cmode, Modes::PENDING_ITERATIVE_INIT)) {
             asyncInfo->initIterativeFuture = std::async(std::launch::async, [this]() {
                 coreObject->enterInitializingMode(fedID, IterationRequest::FORCE_ITERATION);
             });
         }
-    } else if (cm == Modes::PENDING_ITERATIVE_INIT) {
+    } else if (cmode == Modes::PENDING_ITERATIVE_INIT) {
         return;
     } else {
         // everything else is an error
@@ -860,13 +859,13 @@ void Federate::completeOperation()
 
 void Federate::localError(int errorcode)
 {
-    std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + mName;
+    const std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + mName;
     localError(errorcode, errorString);
 }
 
 void Federate::globalError(int errorcode)
 {
-    std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + mName;
+    const std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + mName;
     globalError(errorcode, errorString);
 }
 
@@ -1047,7 +1046,7 @@ iteration_time Federate::requestTimeIterativeComplete()
 
 void Federate::updateFederateMode(Modes newMode)
 {
-    Modes oldMode = currentMode.load();
+    const Modes oldMode = currentMode.load();
     currentMode.store(newMode);
     if (newMode == oldMode) {
         return;
@@ -1162,7 +1161,7 @@ static Filter& generateFilter(Federate* fed,
                               const std::string& inputType,
                               const std::string& outputType)
 {
-    bool useTypes = !((inputType.empty()) && (outputType.empty()));
+    const bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
         if (cloning) {
             return (global) ? fed->registerGlobalCloningFilter(name, inputType, outputType) :
@@ -1186,7 +1185,7 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
 {
     addTargets(data, "flags", [&filt, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
-        int val = (target.front() != '-') ? 1 : 0;
+        const int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a recognized flag");
             return;

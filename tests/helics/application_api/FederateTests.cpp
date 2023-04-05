@@ -918,8 +918,8 @@ TEST(federate, enterExecAfterFinal)
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     auto iterating = Fed1->enterExecutingMode();
     EXPECT_EQ(iterating, helics::IterationResult::HALTED);
@@ -935,8 +935,8 @@ TEST(federate, enterExecAfterFinalAsync)
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterInitializingMode();
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     Fed1->enterExecutingModeAsync();
     auto iterating = Fed1->enterExecutingModeComplete();
@@ -954,8 +954,8 @@ TEST(federate, iterativeTimeRequestHalt)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
 
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     auto itTime = Fed1->requestTimeIterative(2.0, helics::IterationRequest::FORCE_ITERATION);
     EXPECT_EQ(itTime.state, helics::IterationResult::HALTED);
@@ -973,8 +973,8 @@ TEST(federate, iterativeTimeRequestAsyncHalt)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
 
-    auto cr = Fed1->getCorePointer();
-    cr->disconnect();
+    auto core = Fed1->getCorePointer();
+    core->disconnect();
 
     Fed1->requestTimeIterativeAsync(2.0, helics::IterationRequest::FORCE_ITERATION);
     auto itTime = Fed1->requestTimeIterativeComplete();
@@ -1061,8 +1061,8 @@ TEST(federate, enterRequestTimeAsyncIterativeFinalize)
     Fed1->requestTimeIterativeAsync(1.0, helics::IterationRequest::FORCE_ITERATION);
     EXPECT_NO_THROW(Fed1->finalize());
     // check time results after finalize
-    auto tm = Fed1->requestTime(3.0);
-    EXPECT_EQ(tm, helics::Time::maxVal());
+    auto time = Fed1->requestTime(3.0);
+    EXPECT_EQ(time, helics::Time::maxVal());
 }
 
 TEST(federate, enterRequestTimeAsyncFinalize)
@@ -1155,8 +1155,8 @@ TEST(federate, enterExecPendingTimeIterative)
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
     Fed1->enterExecutingMode();
     Fed1->requestTimeIterativeAsync(2.0, helics::IterationRequest::FORCE_ITERATION);
-    auto it = Fed1->enterExecutingMode();
-    EXPECT_EQ(it, helics::IterationResult::NEXT_STEP);
+    auto result = Fed1->enterExecutingMode();
+    EXPECT_EQ(result, helics::IterationResult::NEXT_STEP);
     Fed1->finalizeComplete();
     EXPECT_EQ(Fed1->getCurrentMode(), helics::Federate::Modes::FINALIZE);
 }
@@ -1300,12 +1300,12 @@ TEST(federate, queryTest1)
     auto qres = Fed1->query("name");
     EXPECT_EQ(qres, "\"fed_q\"");
     qres = Fed1->query("corename");
-    auto cr = Fed1->getCorePointer();
-    EXPECT_EQ(qres, std::string("\"") + cr->getIdentifier() + '"');
+    auto core = Fed1->getCorePointer();
+    EXPECT_EQ(qres, std::string("\"") + core->getIdentifier() + '"');
     qres = Fed1->query("federate", "name");
     EXPECT_EQ(qres, "\"fed_q\"");
 
-    cr.reset();
+    core.reset();
     Fed1->disconnect();
     qres = Fed1->query("corename");
     // core name should be empty after disconnect
@@ -1363,26 +1363,26 @@ TEST(federate, error_after_disconnect)
     fedInfo.coreInitString = "-f 1 --autobroker";
 
     auto Fed1 = std::make_shared<helics::Federate>("fed1", fedInfo);
-    auto& f1 = Fed1->registerGlobalFilter("filt1", "type1", "type2");
+    auto& filt1 = Fed1->registerGlobalFilter("filt1", "type1", "type2");
     Fed1->enterExecutingMode();
     Fed1->disconnect();
 
     const auto& Fedref = *Fed1;
-    auto& fb = Fedref.getFilter(0);
+    auto& filt = Fedref.getFilter(0);
     auto& fb2 = Fedref.getFilter("filt1");
     auto& fb3 = Fedref.getFilter("notafilter");
     auto& fb4 = Fed1->getFilter("filt1");
-    EXPECT_EQ(fb.getName(), f1.getName());
-    EXPECT_EQ(fb2.getName(), f1.getName());
-    EXPECT_EQ(fb4.getName(), f1.getName());
+    EXPECT_EQ(filt.getName(), filt1.getName());
+    EXPECT_EQ(fb2.getName(), filt1.getName());
+    EXPECT_EQ(fb4.getName(), filt1.getName());
     EXPECT_FALSE(fb3.isValid());
 
     EXPECT_NO_THROW(Fed1->setGlobal("global1", "global1"));
-    EXPECT_THROW(f1.addSourceTarget("ept"), helics::InvalidFunctionCall);
+    EXPECT_THROW(filt1.addSourceTarget("ept"), helics::InvalidFunctionCall);
     EXPECT_NO_THROW(Fed1->addDependency("otherFed"));
 
-    EXPECT_THROW(f1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
-    EXPECT_NO_THROW(Fed1->setFilterOperator(f1, {}));
+    EXPECT_THROW(filt1.addDestinationTarget("ept"), helics::InvalidFunctionCall);
+    EXPECT_NO_THROW(Fed1->setFilterOperator(filt1, {}));
 
     EXPECT_THROW(Fed1->localError(99), helics::FederateError);
     EXPECT_THROW(Fed1->globalError(99), helics::FederateError);
@@ -1441,9 +1441,9 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     fedInfo.coreName = "core_global4";
     auto Fed2 = std::make_shared<helics::Federate>("fed2", fedInfo);
 
-    auto cr = Fed1->getCorePointer();
+    auto core = Fed1->getCorePointer();
     auto testFile = std::string(TEST_DIR) + GetParam();
-    cr->makeConnections(testFile);
+    core->makeConnections(testFile);
     Fed1->enterInitializingModeAsync();
     Fed2->enterInitializingMode();
 
@@ -1453,7 +1453,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = Fed2->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
-    str1 = cr->query("global_value", "global1", HELICS_SEQUENCING_MODE_FAST);
+    str1 = core->query("global_value", "global1", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is a global1 value");
     str1 = brk->query("global_value", "global1");
     EXPECT_EQ(str1, "this is a global1 value");
@@ -1462,7 +1462,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_EQ(str1, "this is another global value");
     str1 = Fed2->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
-    str1 = cr->query("global_value", "global2", HELICS_SEQUENCING_MODE_FAST);
+    str1 = core->query("global_value", "global2", HELICS_SEQUENCING_MODE_FAST);
     EXPECT_EQ(str1, "this is another global value");
     str1 = brk->query("global_value", "global2");
     EXPECT_EQ(str1, "this is another global value");
@@ -1474,7 +1474,7 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     EXPECT_NE(str3, "#invalid");
     Fed1->finalize();
     Fed2->finalize();
-    cr = nullptr;
+    core = nullptr;
     brk->waitForDisconnect();
 }
 
