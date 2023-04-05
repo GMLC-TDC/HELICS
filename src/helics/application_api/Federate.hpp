@@ -861,9 +861,9 @@ class HELICS_CXX_EXPORT Interface {
     std::string mName;  //!< the name or key of the interface
   public:
     Interface() = default;
-    Interface(Federate* federate, InterfaceHandle id, std::string_view actName);
-    Interface(Core* core, InterfaceHandle id, std::string_view actName):
-        cr(core), handle(id), mName(actName)
+    Interface(Federate* federate, InterfaceHandle hid, std::string_view actName);
+    Interface(Core* core, InterfaceHandle hid, std::string_view actName):
+        cr(core), handle(hid), mName(actName)
     {
     }
     virtual ~Interface() = default;

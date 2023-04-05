@@ -1392,9 +1392,9 @@ static constexpr const char* simple_global_files[] = {"example_globals1.json",
                                                       "example_globals1.toml",
                                                       "example_globals2.json"};
 
-class federate_global_files: public ::testing::TestWithParam<const char*> {};
+class FederateGlobalFiles: public ::testing::TestWithParam<const char*> {};
 
-TEST_P(federate_global_files, global_file_ci_skip)
+TEST_P(FederateGlobalFiles, global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "b1", "-f 2");
     brk->connect();
@@ -1428,7 +1428,7 @@ TEST_P(federate_global_files, global_file_ci_skip)
     brk->waitForDisconnect();
 }
 
-TEST_P(federate_global_files, core_global_file_ci_skip)
+TEST_P(FederateGlobalFiles, core_global_file_ci_skip)
 {
     auto brk = helics::BrokerFactory::create(helics::CoreType::TEST, "b1", "-f2");
     brk->connect();
@@ -1478,4 +1478,4 @@ TEST_P(federate_global_files, core_global_file_ci_skip)
     brk->waitForDisconnect();
 }
 
-INSTANTIATE_TEST_SUITE_P(federate, federate_global_files, ::testing::ValuesIn(simple_global_files));
+INSTANTIATE_TEST_SUITE_P(federate, FederateGlobalFiles, ::testing::ValuesIn(simple_global_files));

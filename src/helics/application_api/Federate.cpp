@@ -1217,6 +1217,22 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     addTargets(data, "destination_targets", adest);
 }
 
+static void arrayPairProcess(Json::Value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& op)
+{
+    if (doc.isMember(key)) {
+        if (doc[key].isArray()) {
+            for (auto& val : doc[key]) {
+                op(val[0].asString(), val[1].asString());
+            }
+        } else {
+            auto members = doc[key].getMemberNames();
+            for (auto& val : members) {
+                op(val, doc[key][val].asString());
+            }
+        }
+    }
+}
+
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     using fileops::getOrDefault;
@@ -1224,13 +1240,13 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 
     if (doc.isMember("filters")) {
         for (const auto& filt : doc["filters"]) {
-            std::string key = getOrDefault(filt, "name", emptyStr);
-            std::string inputType = getOrDefault(filt, "inputType", emptyStr);
-            std::string outputType = getOrDefault(filt, "outputType", emptyStr);
-            bool cloningflag = getOrDefault(filt, "cloning", false);
-            bool useTypes = !((inputType.empty()) && (outputType.empty()));
+            const std::string key = getOrDefault(filt, "name", emptyStr);
+            const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
+            const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
+            const bool cloningflag = getOrDefault(filt, "cloning", false);
+             const  bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
-            std::string operation = getOrDefault(filt, "operation", std::string("custom"));
+            const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if ((useTypes) && (operation != "custom")) {
@@ -1247,7 +1263,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             if (!useTypes) {
                 if (opType == FilterTypes::UNRECOGNIZED) {
                     if (strictConfigChecking) {
-                        std::string emessage =
+                        const std::string emessage =
                             fmt::format("unrecognized filter operation:{}", operation);
                         logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
@@ -1312,35 +1328,30 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             }
         }
     }
-    if (doc.isMember("globals")) {
-        if (doc["globals"].isArray()) {
-            for (auto& val : doc["globals"]) {
-                setGlobal(val[0].asString(), val[1].asString());
-            }
-        } else {
-            auto members = doc["globals"].getMemberNames();
-            for (auto& val : members) {
-                setGlobal(val, doc["globals"][val].asString());
-            }
-        }
-    }
-
-    if (doc.isMember("aliases")) {
-        if (doc["aliases"].isArray()) {
-            for (auto& val : doc["aliases"]) {
-                addAlias(val[0].asString(), val[1].asString());
-            }
-        } else {
-            auto members = doc["aliases"].getMemberNames();
-            for (auto& val : members) {
-                addAlias(val, doc["aliases"][val].asString());
-            }
-        }
-    }
+    arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {setGlobal(key, val); });
+    arrayPairProcess(doc, "aliases", [this](std::string_view key, std::string_view val) {addAlias(key, val); });
 
     loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
+}
+
+static void arrayPairProcess(toml::value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& op)
+{
+    using fileops::isMember;
+    if (isMember(doc, key)) {
+        auto info = toml::find(doc, key);
+        if (info.is_array()) {
+            for (auto& val : info.as_array()) {
+                op(static_cast<std::string_view>(val.as_array()[0].as_string()),
+                    static_cast<std::string_view>(val.as_array()[1].as_string()));
+            }
+        } else {
+            for (const auto& val : info.as_table()) {
+                op(val.first, static_cast<std::string_view>(val.second.as_string()));
+            }
+        }
+    }
 }
 
 void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
@@ -1363,11 +1374,11 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         }
         auto& filtArray = filts.as_array();
         for (const auto& filt : filtArray) {
-            std::string key = getOrDefault(filt, "name", emptyStr);
-            bool cloningflag = getOrDefault(filt, "cloning", false);
-            std::string inputType = getOrDefault(filt, "inputType", emptyStr);
-            std::string outputType = getOrDefault(filt, "outputType", emptyStr);
-            bool useTypes = !((inputType.empty()) && (outputType.empty()));
+            const std::string key = getOrDefault(filt, "name", emptyStr);
+            const bool cloningflag = getOrDefault(filt, "cloning", false);
+            const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
+            const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
+            const bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
             std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
@@ -1412,7 +1423,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     for (const auto& prop : propArray) {
                         std::string propname;
                         propname = toml::find_or(prop, "name", propname);
-                        toml::value uVal;
+                        const toml::value uVal;
                         auto propval = toml::find_or(prop, "value", uVal);
 
                         if ((propname.empty()) || (propval.is_uninitialized())) {
@@ -1463,33 +1474,10 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             }
         }
     }
-    if (isMember(doc, "globals")) {
-        auto globals = toml::find(doc, "globals");
-        if (globals.is_array()) {
-            for (auto& val : globals.as_array()) {
-                setGlobal(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                          static_cast<std::string_view>(val.as_array()[1].as_string()));
-            }
-        } else {
-            for (const auto& val : globals.as_table()) {
-                setGlobal(val.first, static_cast<std::string_view>(val.second.as_string()));
-            }
-        }
-    }
 
-    if (isMember(doc, "aliases")) {
-        auto globals = toml::find(doc, "aliases");
-        if (globals.is_array()) {
-            for (auto& val : globals.as_array()) {
-                addAlias(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                         static_cast<std::string_view>(val.as_array()[1].as_string()));
-            }
-        } else {
-            for (const auto& val : globals.as_table()) {
-                addAlias(val.first, static_cast<std::string_view>(val.second.as_string()));
-            }
-        }
-    }
+    arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {setGlobal(key, val); });
+    arrayPairProcess(doc, "aliases", [this](std::string_view key, std::string_view val) {addAlias(key, val); });
+    
     loadTags(doc, [this](std::string_view tagname, std::string_view tagvalue) {
         this->setTag(tagname, tagvalue);
     });
@@ -1752,9 +1740,9 @@ Translator& Federate::getTranslator(std::string_view translatorName)
 }
 
 void Federate::setTranslatorOperator(const Translator& trans,
-                                     std::shared_ptr<TranslatorOperator> op)
+                                     std::shared_ptr<TranslatorOperator> transOps)
 {
-    coreObject->setTranslatorOperator(trans.getHandle(), std::move(op));
+    coreObject->setTranslatorOperator(trans.getHandle(), std::move(transOps));
 }
 
 int Federate::getTranslatorCount() const
@@ -1773,8 +1761,8 @@ void Federate::logMessage(int level, std::string_view message) const
     }
 }
 
-Interface::Interface(Federate* federate, InterfaceHandle id, std::string_view actName):
-    handle(id), mName(actName)
+Interface::Interface(Federate* federate, InterfaceHandle hid, std::string_view actName):
+    handle(hid), mName(actName)
 {
     if (federate != nullptr) {
         const auto& crp = federate->getCorePointer();
