@@ -56,7 +56,7 @@ static helics::PublicationObject* verifyPublication(HelicsPublication pub, Helic
     return pubObj;
 }
 
-static auto inputSearch=[](helics::InterfaceHandle &hnd,const auto &testInput){return hnd<testInput->inputPtr->getHandle();};
+static auto inputSearch=[](const helics::InterfaceHandle &hnd,const auto &testInput){return hnd<testInput->inputPtr->getHandle();};
 
 static HelicsInput findInput(HelicsFederate fed, helics::InterfaceHandle handle)
 {
@@ -87,7 +87,7 @@ static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::I
     return hinp;
 }
 
-static auto pubSearch=[](helics::InterfaceHandle &hnd,const auto &testPub){return hnd<testInput->pubPtr->getHandle();};
+static auto pubSearch=[](const helics::InterfaceHandle &hnd,const auto &testPub){return hnd<testPub->pubPtr->getHandle();};
 
 static HelicsPublication findPublication(HelicsFederate fed, helics::InterfaceHandle handle)
 {
@@ -388,7 +388,7 @@ HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* k
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubName);
             return nullptr;
         }
-        auto hPub=findInput(fed,pub.getHandle());
+        auto hPub=findPublication(fed,pub.getHandle());
         if (hPub == nullptr)
         {
             auto pubObj = std::make_unique<helics::PublicationObject>();
@@ -420,7 +420,7 @@ HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int in
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubIndex);
             return nullptr;
         }
-        auto hPub=findInput(fed,pub.getHandle());
+        auto hPub=findPublication(fed,pub.getHandle());
         if (hPub == nullptr)
         {
             auto pubObj = std::make_unique<helics::PublicationObject>();

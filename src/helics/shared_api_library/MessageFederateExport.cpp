@@ -21,7 +21,7 @@ SPDX-License-Identifier: BSD-3-Clause
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
-static auto endpointSearch=[](helics::InterfaceHandle &hnd,const auto &testEndpoint){return hnd<testInput->eptPtr->getHandle();};
+static auto endpointSearch=[](const helics::InterfaceHandle &hnd,const auto &testEndpoint){return hnd<testEndpoint->endPtr->getHandle();};
 
 
 static HelicsEndpoint findEndpoint(HelicsFederate fed, helics::InterfaceHandle handle)
