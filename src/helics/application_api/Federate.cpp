@@ -1217,7 +1217,9 @@ static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
     addTargets(data, "destination_targets", adest);
 }
 
-static void arrayPairProcess(Json::Value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& pairOp)
+static void arrayPairProcess(Json::Value doc,
+                             const std::string& key,
+                             const std::function<void(std::string_view, std::string_view)>& pairOp)
 {
     if (doc.isMember(key)) {
         if (doc[key].isArray()) {
@@ -1244,7 +1246,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool cloningflag = getOrDefault(filt, "cloning", false);
-             const  bool useTypes = !((inputType.empty()) && (outputType.empty()));
+            const bool useTypes = !((inputType.empty()) && (outputType.empty()));
 
             const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
@@ -1340,7 +1342,9 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
     });
 }
 
-static void arrayPairProcess(toml::value doc, const std::string &key, const std::function<void(std::string_view, std::string_view)>& pairOp)
+static void arrayPairProcess(toml::value doc,
+                             const std::string& key,
+                             const std::function<void(std::string_view, std::string_view)>& pairOp)
 {
     using fileops::isMember;
     if (isMember(doc, key)) {
@@ -1348,7 +1352,7 @@ static void arrayPairProcess(toml::value doc, const std::string &key, const std:
         if (info.is_array()) {
             for (auto& val : info.as_array()) {
                 pairOp(static_cast<std::string_view>(val.as_array()[0].as_string()),
-                    static_cast<std::string_view>(val.as_array()[1].as_string()));
+                       static_cast<std::string_view>(val.as_array()[1].as_string()));
             }
         } else {
             for (const auto& val : info.as_table()) {
