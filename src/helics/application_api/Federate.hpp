@@ -725,7 +725,7 @@ received
     @param transOp a shared_ptr to a \ref TranslatorOperator
     */
     void setTranslatorOperator(const Translator& trans,
-                               std::shared_ptr<TranslatorOperator> trasnOp);
+                               std::shared_ptr<TranslatorOperator> transOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;
