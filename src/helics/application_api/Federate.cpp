@@ -859,13 +859,15 @@ void Federate::completeOperation()
 
 void Federate::localError(int errorcode)
 {
-    const std::string errorString = "local error " + std::to_string(errorcode) + " in federate " + mName;
+    const std::string errorString =
+        "local error " + std::to_string(errorcode) + " in federate " + mName;
     localError(errorcode, errorString);
 }
 
 void Federate::globalError(int errorcode)
 {
-    const std::string errorString = "global error " + std::to_string(errorcode) + " in federate " + mName;
+    const std::string errorString =
+        "global error " + std::to_string(errorcode) + " in federate " + mName;
     globalError(errorcode, errorString);
 }
 
