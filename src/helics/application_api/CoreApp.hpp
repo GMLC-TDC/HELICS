@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT CoreApp {
     /** check if the broker is ready to accept new federates or cores
      */
     bool isOpenToNewFederates() const;
-    /** forceably disconnect the core*/
+    /** forcibly disconnect the core*/
     void forceTerminate();
     /** wait for the core to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));

@@ -87,7 +87,7 @@ class HELICS_CXX_EXPORT BrokerApp {
      */
     bool isOpenToNewFederates() const;
 
-    /** forceably disconnect the broker*/
+    /** forcibly disconnect the broker*/
     void forceTerminate();
     /** wait for the broker to normally disconnect for a certain amount of time*/
     bool waitForDisconnect(std::chrono::milliseconds waitTime = std::chrono::milliseconds(0));
