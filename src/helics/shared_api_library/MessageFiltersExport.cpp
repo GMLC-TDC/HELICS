@@ -20,16 +20,16 @@ static constexpr char invalidFilterString[] = "The given filter object is not va
 /** this is a random identifier put in place for validating filters*/
 static const int filterValidationIdentifier = 0xEC26'0127;
 
-
-static auto filterSearch=[](const helics::InterfaceHandle &hnd,const auto &testFilter){return hnd<testFilter->filtPtr->getHandle();};
+static auto filterSearch = [](const helics::InterfaceHandle& hnd, const auto& testFilter) {
+    return hnd < testFilter->filtPtr->getHandle();
+};
 
 static HelicsFilter findFederateFilter(HelicsFederate fed, helics::InterfaceHandle handle)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind=std::upper_bound(fedObj->filters.begin(),fedObj->filters.end(),handle,filterSearch);
-    if ((*ind)->filtPtr->getHandle() == handle)
-    {
-        HelicsFilter hfilt=ind->get();
+    auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), handle, filterSearch);
+    if ((*ind)->filtPtr->getHandle() == handle) {
+        HelicsFilter hfilt = ind->get();
         return hfilt;
     }
     return nullptr;
@@ -53,14 +53,11 @@ static inline HelicsFilter federateAddFilter(HelicsFederate fed, std::unique_ptr
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     filt->valid = filterValidationIdentifier;
     HelicsFilter hfilt = filt.get();
-    if (fedObj->filters.empty() || filt->filtPtr->getHandle() > fedObj->filters.back()->filtPtr->getHandle())
-    {
+    if (fedObj->filters.empty() || filt->filtPtr->getHandle() > fedObj->filters.back()->filtPtr->getHandle()) {
         fedObj->filters.push_back(std::move(filt));
-    }
-    else
-    {
-        auto ind=std::upper_bound(fedObj->filters.begin(),fedObj->filters.end(),filt->filtPtr->getHandle(),filterSearch);
-        fedObj->filters.insert(ind,std::move(filt));
+    } else {
+        auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
+        fedObj->filters.insert(ind, std::move(filt));
     }
     return hfilt;
 }
@@ -80,21 +77,17 @@ static helics::FilterObject* getFilterObj(HelicsFilter filt, HelicsError* err)
     return fObj;
 }
 
-
 // core is assumed to be valid here
 static inline HelicsFilter coreAddFilter(HelicsCore core, std::unique_ptr<helics::FilterObject> filt)
 {
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
     filt->valid = filterValidationIdentifier;
     HelicsFilter hfilt = filt.get();
-    if (coreObj->filters.empty() || filt->filtPtr->getHandle() > coreObj->filters.back()->filtPtr->getHandle())
-    {
+    if (coreObj->filters.empty() || filt->filtPtr->getHandle() > coreObj->filters.back()->filtPtr->getHandle()) {
         coreObj->filters.push_back(std::move(filt));
-    }
-    else
-    {
-        auto ind=std::upper_bound(coreObj->filters.begin(),coreObj->filters.end(),filt->filtPtr->getHandle(),filterSearch);
-        coreObj->filters.insert(ind,std::move(filt));
+    } else {
+        auto ind = std::upper_bound(coreObj->filters.begin(), coreObj->filters.end(), filt->filtPtr->getHandle(), filterSearch);
+        coreObj->filters.insert(ind, std::move(filt));
     }
     return hfilt;
 }
@@ -241,9 +234,8 @@ HelicsFilter helicsFederateGetFilter(HelicsFederate fed, const char* name, Helic
             err->message = invalidFiltName;
             return nullptr;
         }
-        auto hFilt=findFederateFilter(fed,id.getHandle());
-        if (hFilt == nullptr)
-        {
+        auto hFilt = findFederateFilter(fed, id.getHandle());
+        if (hFilt == nullptr) {
             auto filt = std::make_unique<helics::FilterObject>();
             filt->filtPtr = &id;
             filt->cloning = id.isCloningFilter();
@@ -282,9 +274,8 @@ HelicsFilter helicsFederateGetFilterByIndex(HelicsFederate fed, int index, Helic
             err->message = invalidFiltIndex;
             return nullptr;
         }
-        auto hFilt=findFederateFilter(fed,id.getHandle());
-        if (hFilt == nullptr)
-        {
+        auto hFilt = findFederateFilter(fed, id.getHandle());
+        if (hFilt == nullptr) {
             auto filt = std::make_unique<helics::FilterObject>();
             filt->filtPtr = &id;
             filt->cloning = id.isCloningFilter();

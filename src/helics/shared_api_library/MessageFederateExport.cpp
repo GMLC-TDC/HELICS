@@ -12,25 +12,25 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helicsCore.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
 #include <cstring>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <algorithm>
 
 // random integer for validation purposes of endpoints
 static constexpr int EndpointValidationIdentifier = 0xB453'94C2;
 
-static auto endpointSearch=[](const helics::InterfaceHandle &hnd,const auto &testEndpoint){return hnd<testEndpoint->endPtr->getHandle();};
-
+static auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& testEndpoint) {
+    return hnd < testEndpoint->endPtr->getHandle();
+};
 
 static HelicsEndpoint findEndpoint(HelicsFederate fed, helics::InterfaceHandle handle)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind=std::upper_bound(fedObj->epts.begin(),fedObj->epts.end(),handle,endpointSearch);
-    if ((*ind)->endPtr->getHandle() == handle)
-    {
-        HelicsEndpoint hend=ind->get();
+    auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
+    if ((*ind)->endPtr->getHandle() == handle) {
+        HelicsEndpoint hend = ind->get();
         return hend;
     }
     return nullptr;
@@ -40,17 +40,14 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     ept->valid = EndpointValidationIdentifier;
-    ept->fed=fedObj;
+    ept->fed = fedObj;
     HelicsEndpoint hept = ept.get();
 
-    if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle())
-    {
+    if (fedObj->epts.empty() || ept->endPtr->getHandle() > fedObj->epts.back()->endPtr->getHandle()) {
         fedObj->epts.push_back(std::move(ept));
-    }
-    else
-    {
-        auto ind=std::upper_bound(fedObj->epts.begin(),fedObj->epts.end(),ept->endPtr->getHandle(),endpointSearch);
-        fedObj->epts.insert(ind,std::move(ept));
+    } else {
+        auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), ept->endPtr->getHandle(), endpointSearch);
+        fedObj->epts.insert(ind, std::move(ept));
     }
     return hept;
 }
@@ -168,17 +165,14 @@ HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndName);
             return nullptr;
         }
-        auto hEnd=findEndpoint(fed,id.getHandle());
-        if (hEnd == nullptr)
-        {
+        auto hEnd = findEndpoint(fed, id.getHandle());
+        if (hEnd == nullptr) {
             auto end = std::make_unique<helics::EndpointObject>();
             end->endPtr = &id;
             end->fedptr = std::move(fedObj);
             return addEndpoint(fed, std::move(end));
         }
         return hEnd;
-
-        
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -200,9 +194,8 @@ HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndIndex);
             return nullptr;
         }
-        auto hEnd=findEndpoint(fed,id.getHandle());
-        if (hEnd == nullptr)
-        {
+        auto hEnd = findEndpoint(fed, id.getHandle());
+        if (hEnd == nullptr) {
             auto end = std::make_unique<helics::EndpointObject>();
             end->endPtr = &id;
             end->fedptr = std::move(fedObj);

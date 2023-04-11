@@ -9,12 +9,12 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.h"
 #include "internal/api_objects.h"
 
+#include <algorithm>
 #include <cstring>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <vector>
-#include <algorithm>
 
 /** random integer for validation purposes of inputs */
 static constexpr int InputValidationIdentifier = 0x3456'E052;
@@ -56,15 +56,14 @@ static helics::PublicationObject* verifyPublication(HelicsPublication pub, Helic
     return pubObj;
 }
 
-static auto inputSearch=[](const helics::InterfaceHandle &hnd,const auto &testInput){return hnd<testInput->inputPtr->getHandle();};
+static auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
 
 static HelicsInput findInput(HelicsFederate fed, helics::InterfaceHandle handle)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind=std::upper_bound(fedObj->inputs.begin(),fedObj->inputs.end(),handle,inputSearch);
-    if ((*ind)->inputPtr->getHandle() == handle)
-    {
-        HelicsInput hinp=ind->get();
+    auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
+    if ((*ind)->inputPtr->getHandle() == handle) {
+        HelicsInput hinp = ind->get();
         return hinp;
     }
     return nullptr;
@@ -75,27 +74,23 @@ static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::I
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     inp->valid = InputValidationIdentifier;
     HelicsInput hinp = inp.get();
-    if (fedObj->inputs.empty() || inp->inputPtr->getHandle() > fedObj->inputs.back()->inputPtr->getHandle())
-    {
+    if (fedObj->inputs.empty() || inp->inputPtr->getHandle() > fedObj->inputs.back()->inputPtr->getHandle()) {
         fedObj->inputs.push_back(std::move(inp));
-    }
-    else
-    {
-        auto ind=std::upper_bound(fedObj->inputs.begin(),fedObj->inputs.end(),inp->inputPtr->getHandle(),inputSearch);
-        fedObj->inputs.insert(ind,std::move(inp));
+    } else {
+        auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), inp->inputPtr->getHandle(), inputSearch);
+        fedObj->inputs.insert(ind, std::move(inp));
     }
     return hinp;
 }
 
-static auto pubSearch=[](const helics::InterfaceHandle &hnd,const auto &testPub){return hnd<testPub->pubPtr->getHandle();};
+static auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
 
 static HelicsPublication findPublication(HelicsFederate fed, helics::InterfaceHandle handle)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind=std::upper_bound(fedObj->pubs.begin(),fedObj->pubs.end(),handle,pubSearch);
-    if ((*ind)->pubPtr->getHandle() == handle)
-    {
-        HelicsPublication hpub=ind->get();
+    auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
+    if ((*ind)->pubPtr->getHandle() == handle) {
+        HelicsPublication hpub = ind->get();
         return hpub;
     }
     return nullptr;
@@ -106,16 +101,13 @@ static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_p
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     pub->valid = PublicationValidationIdentifier;
     HelicsPublication hpub = pub.get();
-    if (fedObj->pubs.empty() || pub->pubPtr->getHandle() > fedObj->pubs.back()->pubPtr->getHandle())
-    {
+    if (fedObj->pubs.empty() || pub->pubPtr->getHandle() > fedObj->pubs.back()->pubPtr->getHandle()) {
         fedObj->pubs.push_back(std::move(pub));
+    } else {
+        auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), pub->pubPtr->getHandle(), pubSearch);
+        fedObj->pubs.insert(ind, std::move(pub));
     }
-    else
-    {
-        auto ind=std::upper_bound(fedObj->pubs.begin(),fedObj->pubs.end(),pub->pubPtr->getHandle(),pubSearch);
-        fedObj->pubs.insert(ind,std::move(pub));
-    }
-    
+
     return hpub;
 }
 
@@ -388,17 +380,14 @@ HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* k
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubName);
             return nullptr;
         }
-        auto hPub=findPublication(fed,pub.getHandle());
-        if (hPub == nullptr)
-        {
+        auto hPub = findPublication(fed, pub.getHandle());
+        if (hPub == nullptr) {
             auto pubObj = std::make_unique<helics::PublicationObject>();
             pubObj->pubPtr = &pub;
             pubObj->fedptr = std::move(fedObj);
             return addPublication(fed, std::move(pubObj));
         }
         return hPub;
-
-        
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -420,9 +409,8 @@ HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int in
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubIndex);
             return nullptr;
         }
-        auto hPub=findPublication(fed,pub.getHandle());
-        if (hPub == nullptr)
-        {
+        auto hPub = findPublication(fed, pub.getHandle());
+        if (hPub == nullptr) {
             auto pubObj = std::make_unique<helics::PublicationObject>();
             pubObj->pubPtr = &pub;
             pubObj->fedptr = std::move(fedObj);
@@ -454,15 +442,14 @@ HelicsInput helicsFederateGetInput(HelicsFederate fed, const char* key, HelicsEr
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputName);
             return nullptr;
         }
-        auto hInp=findInput(fed,id.getHandle());
-        if (hInp == nullptr)
-        {
+        auto hInp = findInput(fed, id.getHandle());
+        if (hInp == nullptr) {
             auto inp = std::make_unique<helics::InputObject>();
             inp->inputPtr = &id;
             inp->fedptr = std::move(fedObj);
-            hInp=addInput(fed, std::move(inp));
+            hInp = addInput(fed, std::move(inp));
         }
-        return hInp; 
+        return hInp;
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -484,13 +471,12 @@ HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsE
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputIndex);
             return nullptr;
         }
-        auto hInp=findInput(fed,id.getHandle());
-        if (hInp == nullptr)
-        {
+        auto hInp = findInput(fed, id.getHandle());
+        if (hInp == nullptr) {
             auto inp = std::make_unique<helics::InputObject>();
             inp->inputPtr = &id;
             inp->fedptr = std::move(fedObj);
-            hInp=addInput(fed, std::move(inp));
+            hInp = addInput(fed, std::move(inp));
         }
         return hInp;
     }
@@ -522,15 +508,14 @@ HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* targe
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTargetKey);
             return nullptr;
         }
-        auto hInp=findInput(fed,id.getHandle());
-        if (hInp == nullptr)
-        {
+        auto hInp = findInput(fed, id.getHandle());
+        if (hInp == nullptr) {
             auto inp = std::make_unique<helics::InputObject>();
             inp->inputPtr = &id;
             inp->fedptr = std::move(fedObj);
-            hInp=addInput(fed, std::move(inp));
+            hInp = addInput(fed, std::move(inp));
         }
-        return hInp; 
+        return hInp;
     }
     // LCOV_EXCL_START
     catch (...) {
