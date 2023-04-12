@@ -72,10 +72,10 @@ static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::I
     return hinp;
 }
 
-static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input &input)
+static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input& input)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    const auto handle=input.getHandle();
+    const auto handle = input.getHandle();
     auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
     if ((*ind)->inputPtr->getHandle() == handle) {
         HelicsInput hinp = ind->get();
@@ -83,7 +83,7 @@ static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input &input)
     }
     auto inp = std::make_unique<helics::InputObject>();
     inp->inputPtr = &input;
-    inp->fedptr = getValueFedSharedPtr(fed,nullptr);
+    inp->fedptr = getValueFedSharedPtr(fed, nullptr);
     return addInput(fed, std::move(inp));
 }
 
@@ -104,10 +104,10 @@ static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_p
     return hpub;
 }
 
-static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication &pub)
+static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication& pub)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    const auto handle=pub.getHandle();
+    const auto handle = pub.getHandle();
     auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
     if ((*ind)->pubPtr->getHandle() == handle) {
         HelicsPublication hpub = ind->get();
@@ -115,11 +115,9 @@ static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Pub
     }
     auto pubObj = std::make_unique<helics::PublicationObject>();
     pubObj->pubPtr = &pub;
-    pubObj->fedptr = getValueFedSharedPtr(fed,nullptr);
+    pubObj->fedptr = getValueFedSharedPtr(fed, nullptr);
     return addPublication(fed, std::move(pubObj));
 }
-
-
 
 /* input/pub registration */
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err)
@@ -391,7 +389,6 @@ HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* k
             return nullptr;
         }
         return findOrCreatePublication(fed, pub);
-        
     }
     // LCOV_EXCL_START
     catch (...) {

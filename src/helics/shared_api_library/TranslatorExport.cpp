@@ -42,10 +42,10 @@ static inline HelicsTranslator federateAddTranslator(HelicsFederate fed, std::un
     return hTrans;
 }
 
-static HelicsTranslator findOrCreateFederateTranslator(HelicsFederate fed, helics::Translator &translator)
+static HelicsTranslator findOrCreateFederateTranslator(HelicsFederate fed, helics::Translator& translator)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    const auto handle=translator.getHandle();
+    const auto handle = translator.getHandle();
     auto ind = std::upper_bound(fedObj->translators.begin(), fedObj->translators.end(), handle, translatorSearch);
     if ((*ind)->transPtr->getHandle() == handle) {
         HelicsTranslator hTrans = ind->get();
@@ -53,7 +53,7 @@ static HelicsTranslator findOrCreateFederateTranslator(HelicsFederate fed, helic
     }
     auto trans = std::make_unique<helics::TranslatorObject>();
     trans->transPtr = &translator;
-    trans->fedptr = getFedSharedPtr(fed,nullptr);
+    trans->fedptr = getFedSharedPtr(fed, nullptr);
     return federateAddTranslator(fed, std::move(trans));
 }
 
@@ -84,8 +84,6 @@ static helics::TranslatorObject* getTranslatorObj(HelicsTranslator trans, Helics
     }
     return tObj;
 }
-
-
 
 // core is assumed to be valid here
 static inline HelicsTranslator coreAddTranslator(HelicsCore core, std::unique_ptr<helics::TranslatorObject> trans)
@@ -219,7 +217,7 @@ HelicsTranslator helicsFederateGetTranslatorByIndex(HelicsFederate fed, int inde
             err->message = invalidTransIndex;
             return nullptr;
         }
-       return findOrCreateFederateTranslator(fed, id);
+        return findOrCreateFederateTranslator(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
