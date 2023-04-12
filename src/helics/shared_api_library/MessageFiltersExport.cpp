@@ -43,7 +43,7 @@ static HelicsFilter findOrCreateFederateFilter(HelicsFederate fed, helics::Filte
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle = filter.getHandle();
     auto ind = std::upper_bound(fedObj->filters.begin(), fedObj->filters.end(), handle, filterSearch);
-    if (ind!=fedObj->filters.end() && (*ind)->filtPtr->getHandle() == handle) {
+    if (ind != fedObj->filters.end() && (*ind)->filtPtr->getHandle() == handle) {
         HelicsFilter hfilt = ind->get();
         return hfilt;
     }

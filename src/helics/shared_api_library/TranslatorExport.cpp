@@ -47,7 +47,7 @@ static HelicsTranslator findOrCreateFederateTranslator(HelicsFederate fed, helic
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle = translator.getHandle();
     auto ind = std::upper_bound(fedObj->translators.begin(), fedObj->translators.end(), handle, translatorSearch);
-    if (ind!=fedObj->translators.end() && (*ind)->transPtr->getHandle() == handle) {
+    if (ind != fedObj->translators.end() && (*ind)->transPtr->getHandle() == handle) {
         HelicsTranslator hTrans = ind->get();
         return hTrans;
     }
