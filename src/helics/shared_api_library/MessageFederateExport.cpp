@@ -25,17 +25,6 @@ static auto endpointSearch = [](const helics::InterfaceHandle& hnd, const auto& 
     return hnd < testEndpoint->endPtr->getHandle();
 };
 
-static HelicsEndpoint findEndpoint(HelicsFederate fed, helics::InterfaceHandle handle)
-{
-    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
-    if ((*ind)->endPtr->getHandle() == handle) {
-        HelicsEndpoint hend = ind->get();
-        return hend;
-    }
-    return nullptr;
-}
-
 static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<helics::EndpointObject> ept)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
@@ -51,6 +40,23 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
     }
     return hept;
 }
+
+static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint &endp)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle=endp.getHandle();
+    auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
+    if ((*ind)->endPtr->getHandle() == handle) {
+        HelicsEndpoint hend = ind->get();
+        return hend;
+    }
+    auto end = std::make_unique<helics::EndpointObject>();
+    end->endPtr = &endp;
+    end->fedptr = getMessageFedSharedPtr(fed,nullptr);
+    return addEndpoint(fed, std::move(end));
+}
+
+
 
 static constexpr char nullcstr[] = "";
 
@@ -165,14 +171,7 @@ HelicsEndpoint helicsFederateGetEndpoint(HelicsFederate fed, const char* name, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndName);
             return nullptr;
         }
-        auto hEnd = findEndpoint(fed, id.getHandle());
-        if (hEnd == nullptr) {
-            auto end = std::make_unique<helics::EndpointObject>();
-            end->endPtr = &id;
-            end->fedptr = std::move(fedObj);
-            return addEndpoint(fed, std::move(end));
-        }
-        return hEnd;
+        return findOrCreateEndpoint(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -194,13 +193,7 @@ HelicsEndpoint helicsFederateGetEndpointByIndex(HelicsFederate fed, int index, H
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidEndIndex);
             return nullptr;
         }
-        auto hEnd = findEndpoint(fed, id.getHandle());
-        if (hEnd == nullptr) {
-            auto end = std::make_unique<helics::EndpointObject>();
-            end->endPtr = &id;
-            end->fedptr = std::move(fedObj);
-            return addEndpoint(fed, std::move(end));
-        }
+        return findOrCreateEndpoint(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {

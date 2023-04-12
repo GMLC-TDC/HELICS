@@ -58,17 +58,6 @@ static helics::PublicationObject* verifyPublication(HelicsPublication pub, Helic
 
 static auto inputSearch = [](const helics::InterfaceHandle& hnd, const auto& testInput) { return hnd < testInput->inputPtr->getHandle(); };
 
-static HelicsInput findInput(HelicsFederate fed, helics::InterfaceHandle handle)
-{
-    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
-    if ((*ind)->inputPtr->getHandle() == handle) {
-        HelicsInput hinp = ind->get();
-        return hinp;
-    }
-    return nullptr;
-}
-
 static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::InputObject> inp)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
@@ -83,18 +72,22 @@ static inline HelicsInput addInput(HelicsFederate fed, std::unique_ptr<helics::I
     return hinp;
 }
 
-static auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
-
-static HelicsPublication findPublication(HelicsFederate fed, helics::InterfaceHandle handle)
+static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input &input)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
-    if ((*ind)->pubPtr->getHandle() == handle) {
-        HelicsPublication hpub = ind->get();
-        return hpub;
+    const auto handle=input.getHandle();
+    auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
+    if ((*ind)->inputPtr->getHandle() == handle) {
+        HelicsInput hinp = ind->get();
+        return hinp;
     }
-    return nullptr;
+    auto inp = std::make_unique<helics::InputObject>();
+    inp->inputPtr = &input;
+    inp->fedptr = getValueFedSharedPtr(fed,nullptr);
+    return addInput(fed, std::move(inp));
 }
+
+static auto pubSearch = [](const helics::InterfaceHandle& hnd, const auto& testPub) { return hnd < testPub->pubPtr->getHandle(); };
 
 static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_ptr<helics::PublicationObject> pub)
 {
@@ -110,6 +103,23 @@ static inline HelicsPublication addPublication(HelicsFederate fed, std::unique_p
 
     return hpub;
 }
+
+static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Publication &pub)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle=pub.getHandle();
+    auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
+    if ((*ind)->pubPtr->getHandle() == handle) {
+        HelicsPublication hpub = ind->get();
+        return hpub;
+    }
+    auto pubObj = std::make_unique<helics::PublicationObject>();
+    pubObj->pubPtr = &pub;
+    pubObj->fedptr = getValueFedSharedPtr(fed,nullptr);
+    return addPublication(fed, std::move(pubObj));
+}
+
+
 
 /* input/pub registration */
 HelicsInput helicsFederateRegisterSubscription(HelicsFederate fed, const char* key, const char* units, HelicsError* err)
@@ -380,14 +390,8 @@ HelicsPublication helicsFederateGetPublication(HelicsFederate fed, const char* k
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubName);
             return nullptr;
         }
-        auto hPub = findPublication(fed, pub.getHandle());
-        if (hPub == nullptr) {
-            auto pubObj = std::make_unique<helics::PublicationObject>();
-            pubObj->pubPtr = &pub;
-            pubObj->fedptr = std::move(fedObj);
-            return addPublication(fed, std::move(pubObj));
-        }
-        return hPub;
+        return findOrCreatePublication(fed, pub);
+        
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -409,14 +413,7 @@ HelicsPublication helicsFederateGetPublicationByIndex(HelicsFederate fed, int in
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidPubIndex);
             return nullptr;
         }
-        auto hPub = findPublication(fed, pub.getHandle());
-        if (hPub == nullptr) {
-            auto pubObj = std::make_unique<helics::PublicationObject>();
-            pubObj->pubPtr = &pub;
-            pubObj->fedptr = std::move(fedObj);
-            return addPublication(fed, std::move(pubObj));
-        }
-        return hPub;
+        return findOrCreatePublication(fed, pub);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -442,14 +439,7 @@ HelicsInput helicsFederateGetInput(HelicsFederate fed, const char* key, HelicsEr
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputName);
             return nullptr;
         }
-        auto hInp = findInput(fed, id.getHandle());
-        if (hInp == nullptr) {
-            auto inp = std::make_unique<helics::InputObject>();
-            inp->inputPtr = &id;
-            inp->fedptr = std::move(fedObj);
-            hInp = addInput(fed, std::move(inp));
-        }
-        return hInp;
+        return findOrCreateInput(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -471,14 +461,7 @@ HelicsInput helicsFederateGetInputByIndex(HelicsFederate fed, int index, HelicsE
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidInputIndex);
             return nullptr;
         }
-        auto hInp = findInput(fed, id.getHandle());
-        if (hInp == nullptr) {
-            auto inp = std::make_unique<helics::InputObject>();
-            inp->inputPtr = &id;
-            inp->fedptr = std::move(fedObj);
-            hInp = addInput(fed, std::move(inp));
-        }
-        return hInp;
+        return findOrCreateInput(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -508,14 +491,7 @@ HelicsInput helicsFederateGetInputByTarget(HelicsFederate fed, const char* targe
             assignError(err, HELICS_ERROR_INVALID_ARGUMENT, invalidTargetKey);
             return nullptr;
         }
-        auto hInp = findInput(fed, id.getHandle());
-        if (hInp == nullptr) {
-            auto inp = std::make_unique<helics::InputObject>();
-            inp->inputPtr = &id;
-            inp->fedptr = std::move(fedObj);
-            hInp = addInput(fed, std::move(inp));
-        }
-        return hInp;
+        return findOrCreateInput(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
