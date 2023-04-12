@@ -41,10 +41,10 @@ static inline HelicsEndpoint addEndpoint(HelicsFederate fed, std::unique_ptr<hel
     return hept;
 }
 
-static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint &endp)
+static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint& endp)
 {
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    const auto handle=endp.getHandle();
+    const auto handle = endp.getHandle();
     auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
     if (ind!=fedObj->epts.end() && (*ind)->endPtr->getHandle() == handle) {
         HelicsEndpoint hend = ind->get();
@@ -52,11 +52,9 @@ static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint 
     }
     auto end = std::make_unique<helics::EndpointObject>();
     end->endPtr = &endp;
-    end->fedptr = getMessageFedSharedPtr(fed,nullptr);
+    end->fedptr = getMessageFedSharedPtr(fed, nullptr);
     return addEndpoint(fed, std::move(end));
 }
-
-
 
 static constexpr char nullcstr[] = "";
 
