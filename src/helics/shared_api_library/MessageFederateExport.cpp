@@ -46,7 +46,7 @@ static HelicsEndpoint findOrCreateEndpoint(HelicsFederate fed, helics::Endpoint 
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle=endp.getHandle();
     auto ind = std::upper_bound(fedObj->epts.begin(), fedObj->epts.end(), handle, endpointSearch);
-    if ((*ind)->endPtr->getHandle() == handle) {
+    if (ind!=fedObj->epts.end() && (*ind)->endPtr->getHandle() == handle) {
         HelicsEndpoint hend = ind->get();
         return hend;
     }

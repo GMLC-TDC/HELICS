@@ -77,7 +77,7 @@ static HelicsInput findOrCreateInput(HelicsFederate fed, helics::Input &input)
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle=input.getHandle();
     auto ind = std::upper_bound(fedObj->inputs.begin(), fedObj->inputs.end(), handle, inputSearch);
-    if ((*ind)->inputPtr->getHandle() == handle) {
+    if (ind!=fedObj->inputs.end() && (*ind)->inputPtr->getHandle() == handle) {
         HelicsInput hinp = ind->get();
         return hinp;
     }
@@ -109,7 +109,7 @@ static HelicsPublication findOrCreatePublication(HelicsFederate fed, helics::Pub
     auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
     const auto handle=pub.getHandle();
     auto ind = std::upper_bound(fedObj->pubs.begin(), fedObj->pubs.end(), handle, pubSearch);
-    if ((*ind)->pubPtr->getHandle() == handle) {
+    if (ind!=fedObj->pubs.end() && (*ind)->pubPtr->getHandle() == handle) {
         HelicsPublication hpub = ind->get();
         return hpub;
     }
