@@ -22,6 +22,54 @@ static constexpr char invalidTranslatorString[] = "The given translator object i
 /** this is a random identifier for validating translators*/
 static const int translatorValidationIdentifier = 0xB37C'352E;
 
+static auto translatorSearch = [](const helics::InterfaceHandle& hnd, const auto& testTranslator) {
+    return hnd < testTranslator->transPtr->getHandle();
+};
+
+// fed is assumed to be valid here
+static inline HelicsTranslator federateAddTranslator(HelicsFederate fed, std::unique_ptr<helics::TranslatorObject> trans)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    trans->valid = translatorValidationIdentifier;
+    HelicsTranslator hTrans = trans.get();
+    if (fedObj->translators.empty() || trans->transPtr->getHandle() > fedObj->translators.back()->transPtr->getHandle()) {
+        fedObj->translators.push_back(std::move(trans));
+    } else {
+        auto ind = std::upper_bound(fedObj->translators.begin(), fedObj->translators.end(), trans->transPtr->getHandle(), translatorSearch);
+        fedObj->translators.insert(ind, std::move(trans));
+    }
+
+    return hTrans;
+}
+
+static HelicsTranslator findOrCreateFederateTranslator(HelicsFederate fed, helics::Translator& translator)
+{
+    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
+    const auto handle = translator.getHandle();
+    auto ind = std::upper_bound(fedObj->translators.begin(), fedObj->translators.end(), handle, translatorSearch);
+    if (ind != fedObj->translators.end() && (*ind)->transPtr->getHandle() == handle) {
+        HelicsTranslator hTrans = ind->get();
+        return hTrans;
+    }
+    auto trans = std::make_unique<helics::TranslatorObject>();
+    trans->transPtr = &translator;
+    trans->fedptr = getFedSharedPtr(fed, nullptr);
+    return federateAddTranslator(fed, std::move(trans));
+}
+
+/*
+static HelicsTranslator findOrCreateCoreTranslator(HelicsCore core, helics::InterfaceHandle handle)
+{
+    auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
+    auto ind = std::upper_bound(coreObj->translators.begin(), coreObj->translators.end(), handle, translatorSearch);
+    if ((*ind)->transPtr->getHandle() == handle) {
+        HelicsTranslator hTrans = ind->get();
+        return hTrans;
+    }
+    return nullptr;
+}
+*/
+
 static helics::TranslatorObject* getTranslatorObj(HelicsTranslator trans, HelicsError* err)
 {
     HELICS_ERROR_CHECK(err, nullptr);
@@ -37,24 +85,21 @@ static helics::TranslatorObject* getTranslatorObj(HelicsTranslator trans, Helics
     return tObj;
 }
 
-// fed is assumed to be valid here
-static inline HelicsTranslator federateAddTranslator(HelicsFederate fed, std::unique_ptr<helics::TranslatorObject> trans)
-{
-    auto* fedObj = reinterpret_cast<helics::FedObject*>(fed);
-    trans->valid = translatorValidationIdentifier;
-    HelicsTranslator ret = trans.get();
-    fedObj->translators.push_back(std::move(trans));
-    return ret;
-}
-
 // core is assumed to be valid here
 static inline HelicsTranslator coreAddTranslator(HelicsCore core, std::unique_ptr<helics::TranslatorObject> trans)
 {
     auto* coreObj = reinterpret_cast<helics::CoreObject*>(core);
     trans->valid = translatorValidationIdentifier;
-    HelicsTranslator ret = trans.get();
-    coreObj->translators.push_back(std::move(trans));
-    return ret;
+    HelicsTranslator hTrans = trans.get();
+    if (coreObj->translators.empty() || trans->transPtr->getHandle() > coreObj->translators.back()->transPtr->getHandle()) {
+        coreObj->translators.push_back(std::move(trans));
+    } else {
+        auto ind =
+            std::upper_bound(coreObj->translators.begin(), coreObj->translators.end(), trans->transPtr->getHandle(), translatorSearch);
+        coreObj->translators.insert(ind, std::move(trans));
+    }
+
+    return hTrans;
 }
 
 HELICS_EXPORT HelicsTranslator helicsFederateRegisterTranslator(HelicsFederate fed,
@@ -140,10 +185,7 @@ HelicsTranslator helicsFederateGetTranslator(HelicsFederate fed, const char* nam
             err->message = invalidTransName;
             return nullptr;
         }
-        auto trans = std::make_unique<helics::TranslatorObject>();
-        trans->transPtr = &id;
-        trans->fedptr = std::move(fedObj);
-        return federateAddTranslator(fed, std::move(trans));
+        return findOrCreateFederateTranslator(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
@@ -175,10 +217,7 @@ HelicsTranslator helicsFederateGetTranslatorByIndex(HelicsFederate fed, int inde
             err->message = invalidTransIndex;
             return nullptr;
         }
-        auto trans = std::make_unique<helics::TranslatorObject>();
-        trans->transPtr = &id;
-        trans->fedptr = std::move(fedObj);
-        return federateAddTranslator(fed, std::move(trans));
+        return findOrCreateFederateTranslator(fed, id);
     }
     // LCOV_EXCL_START
     catch (...) {
