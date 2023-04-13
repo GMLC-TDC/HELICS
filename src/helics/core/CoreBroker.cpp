@@ -2578,7 +2578,7 @@ void CoreBroker::connectInterfaces(
     uint32_t targetFlags,
     std::pair<action_message_def::action_t, action_message_def::action_t> actions)
 {
-    // notify the target about a origin
+    // notify the target about an origin
     ActionMessage m(actions.first);
     m.setSource(origin.handle);
     m.setDestination(target.handle);
