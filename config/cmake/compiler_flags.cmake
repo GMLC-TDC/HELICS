@@ -72,9 +72,12 @@ target_compile_options(compile_flags_target INTERFACE ${${PROJECT_NAME}_EXTRA_CO
 target_compile_options(build_flags_target INTERFACE ${${PROJECT_NAME}_EXTRA_BUILD_FLAGS})
 
 if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
-    target_compile_options(
-        compile_flags_target INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall -pedantic>
-    )
+    target_compile_options(compile_flags_target INTERFACE $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall>)
+    if(NOT WIN32)
+        # to support clang-cl which doesn't support these options
+        target_compile_options(compile_flags_target INTERFACE -pedantic)
+
+    endif()
     target_compile_options(
         compile_flags_target
         INTERFACE $<$<COMPILE_LANGUAGE:CXX>:$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wextra
@@ -129,9 +132,13 @@ if(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
                                                -Wunused-but-set-variable
             )
         endif()
+
     endif()
 endif(${PROJECT_NAME}_ENABLE_EXTRA_COMPILER_WARNINGS)
 
+if(WIN32 AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(compile_flags_target INTERFACE -Wno-reserved-identifier)
+endif()
 # -------------------------------------------------------------
 # Extra definitions for visual studio
 # -------------------------------------------------------------

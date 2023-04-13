@@ -12,8 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fstream>
 #include <thread>
 
-using helics::operator"" _t;
-helics::Time tend = 3600.0_t;  // simulation end time
+helics::Time tend = 3600.0;  // simulation end time
 
 /** class implementing a single heat transfer block*/
 class HeatUnitBlock {
@@ -72,7 +71,7 @@ class HeatUnitBlock {
 
     void mainLoop()
     {
-        auto cTime = 0.0_t;
+        auto cTime = helics::timeZero;
         while (cTime < tend) {
             auto T0 = sub[0]->getValue<double>();
 
