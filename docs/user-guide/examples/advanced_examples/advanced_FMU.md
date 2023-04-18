@@ -67,6 +67,6 @@ The FMU has been designed to replicate the model used in this example suite and 
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!
