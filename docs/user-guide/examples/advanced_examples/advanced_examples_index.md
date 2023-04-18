@@ -14,6 +14,7 @@
     advanced_multi_input
     advanced_orchestration
     advanced_iteration
+    advanced_FMU
 
 ```
 
