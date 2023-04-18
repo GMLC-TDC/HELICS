@@ -38,6 +38,7 @@ if(NOT TARGET fmt::fmt)
         add_subdirectory(ThirdParty/fmtlib)
 
         set_target_properties(fmt PROPERTIES FOLDER Extern)
+
         hide_variable(FMT_DOC)
         hide_variable(FMT_INSTALL)
         hide_variable(FMT_PEDANTIC)

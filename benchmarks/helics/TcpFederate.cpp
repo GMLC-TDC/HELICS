@@ -5,8 +5,6 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 
-#pragma once
-
 #include "gmlc/networking/AsioContextManager.h"
 #include "gmlc/networking/TcpHelperClasses.h"
 #include "helics/network/networkDefaults.hpp"
