@@ -79,7 +79,7 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 ### pip install
 
-[`pip install helics`](https://python.helics.org/)
+[`pip install 'helics[cli]'`](https://python.helics.org/) (Includes the optional but recommended helics_cli tool.)
 
 ### jHELICS
 
