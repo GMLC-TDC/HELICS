@@ -41,7 +41,7 @@ Where is the code?
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
 
-**TODO: UPDATE IMAGE**
+     **TODO: UPDATE IMAGE**
 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
@@ -136,11 +136,11 @@ Federates with infinite time
 
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
-**TODO: Get rid of fake_max_time**
+    **TODO: Get rid of fake_max_time**
 
-**why do we divide helics_time_maxtime by 1000?**
+    **why do we divide helics_time_maxtime by 1000?**
 
-**shouldn't we also show how this federate is configured? where is best for that?**
+    **shouldn't we also show how this federate is configured? where is best for that?**
 
 ```python
 hours = 24 * 7  # one week
@@ -165,7 +165,7 @@ As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV
 
 If the early time steps of the simulation are not as important (a model warm up period), then ensuring each federate has a default value it will provide when the input is null (and assuming the controller dynamics are not overly aggressive) will allow the models to bootstrap and through several iterations reach a consistent state. If this is not the case then HELICS does have a provision for getting models into a consistent state prior to the start of execution: initialization mode. **TODO: link to documentation or example on initialization mode.** This mode allows for this same iteration between models with no simulated time passing. It is the responsibility of the modeler to make sure there is a method to reach and detect convergence of the models and when such conditions are met, enter execution mode as would normally be done.
 
-**todo: add examples for where this is inserted in the code**
+    **todo: add examples for where this is inserted in the code**
 
 <a name="examples-covered-in-advanced-examples">
 <strong>
