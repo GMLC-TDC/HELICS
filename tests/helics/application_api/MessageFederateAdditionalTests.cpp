@@ -655,7 +655,8 @@ TEST(messageFederate, constructor4)
 
 TEST(messageFederate, constructorWithSpaceInFilename)
 {
-    helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example message fed with space.json");
+    helics::MessageFederate mf1("fed1",
+                                std::string(TEST_DIR) + "example message fed with space.json");
 
     mf1.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
 

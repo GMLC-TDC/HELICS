@@ -647,7 +647,8 @@ TEST(valuefed_json_tests, file_loadb)
 
 TEST(valuefed_json_tests, file_loadb_with_space)
 {
-    helics::ValueFederate vFed(std::string(TEST_DIR) + "folder with space/example_value_fed_testb.json");
+    helics::ValueFederate vFed(std::string(TEST_DIR) +
+                               "folder with space/example_value_fed_testb.json");
 
     EXPECT_EQ(vFed.getName(), "valueFed2");
 
