@@ -1368,14 +1368,14 @@ TEST(federate, error_after_disconnect)
     Fed1->disconnect();
 
     const auto& Fedref = *Fed1;
-    auto& filt = Fedref.getFilter(0);
-    auto& fb2 = Fedref.getFilter("filt1");
-    auto& fb3 = Fedref.getFilter("notafilter");
-    auto& fb4 = Fed1->getFilter("filt1");
-    EXPECT_EQ(filt.getName(), filt1.getName());
-    EXPECT_EQ(fb2.getName(), filt1.getName());
-    EXPECT_EQ(fb4.getName(), filt1.getName());
-    EXPECT_FALSE(fb3.isValid());
+    auto& filt1ref1 = Fedref.getFilter(0);
+    auto& filt1ref2 = Fedref.getFilter("filt1");
+    auto& filt1ref3 = Fedref.getFilter("notafilter");
+    auto& filt1ref4 = Fed1->getFilter("filt1");
+    EXPECT_EQ(filt1ref1.getName(), filt1.getName());
+    EXPECT_EQ(filt1ref2.getName(), filt1.getName());
+    EXPECT_EQ(filt1ref4.getName(), filt1.getName());
+    EXPECT_FALSE(filt1ref3.isValid());
 
     EXPECT_NO_THROW(Fed1->setGlobal("global1", "global1"));
     EXPECT_THROW(filt1.addSourceTarget("ept"), helics::InvalidFunctionCall);
