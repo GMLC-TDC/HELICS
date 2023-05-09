@@ -653,6 +653,19 @@ TEST(messageFederate, constructor4)
     mf1.finalize();
 }
 
+TEST(messageFederate, constructorWithSpaceInFilename)
+{
+    helics::MessageFederate mf1("fed1", std::string(TEST_DIR) + "example message fed with space.json");
+
+    mf1.setProperty(HELICS_PROPERTY_INT_LOG_LEVEL, HELICS_LOG_LEVEL_ERROR);
+
+    mf1.registerGlobalFilter("filt1");
+    mf1.registerGlobalFilter("filt2");
+
+    EXPECT_NO_THROW(mf1.enterExecutingMode());
+    mf1.finalize();
+}
+
 TEST(messageFederate, constructor5)
 {
     helics::MessageFederate mf1("--coretype=test --autobroker --corename=mfc5 --name=fedmd");
