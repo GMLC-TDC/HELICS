@@ -152,6 +152,23 @@ TEST_F(vfed2_tests, file_load)
     helicsFederateFree(vFed);
 }
 
+TEST_F(vfed2_tests, file_load_with_space)
+{
+    HelicsFederate vFed;
+    // fi = helicsCreateFederateInfo();
+    // path of the JSON file is hardcoded for now
+    vFed = helicsCreateValueFederateFromConfig(TEST_DIR "/folder with space/example_value_fed.json",
+                                               &err);
+    EXPECT_EQ(err.error_code, HELICS_OK);
+    ASSERT_FALSE(vFed == nullptr);
+    const char* s = helicsFederateGetName(vFed);
+    EXPECT_STREQ(s, "valueFed");
+    EXPECT_EQ(helicsFederateGetInputCount(vFed), 3);
+    EXPECT_EQ(helicsFederateGetPublicationCount(vFed), 2);
+    CE(helicsFederateFinalize(vFed, &err));
+    helicsFederateFree(vFed);
+}
+
 TEST(valuefederate, fedAlias)
 {
     auto fi = helicsCreateFederateInfo();
