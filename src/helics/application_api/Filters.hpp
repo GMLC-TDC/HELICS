@@ -86,6 +86,9 @@ class HELICS_CXX_EXPORT Filter: public Interface {
 
     void addTarget(std::string_view target) { addSourceTarget(target); }
 
+    /** set the type of operations specifying how the filter should operate*/
+    void setFilterType(std::int32_t type);
+
   protected:
     /** set a filter operations object */
     void setFilterOperations(std::shared_ptr<FilterOperations> filterOps);
