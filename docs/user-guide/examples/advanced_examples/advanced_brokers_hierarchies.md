@@ -11,7 +11,7 @@ This example shows how to configure a HELICS co-simulation to allow the use of m
 
 - [Where is the code?](#where-is-the-code)
 - [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-  - [Differences Compared to the Advanced Default Example](#differences-compared-to-the-advanced-default-example)
+  - [Differences Compared to the Advanced Default Example](#differences-compared-to-advanced-default-example)
     - [HELICS Differences](#helics-differences)
   - [HELICS Components](#helics-components)
 - [Execution and Results](#execution-and-results)
