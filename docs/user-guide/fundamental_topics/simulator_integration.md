@@ -43,7 +43,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 
