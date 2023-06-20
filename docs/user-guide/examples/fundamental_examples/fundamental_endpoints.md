@@ -6,8 +6,8 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Federate Communication with Endpoints](#federate-communication-with-endpoints)
-  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+  - [When to use pub/subs vs endpoints](#when-to-use-pubsubs-vs-endpoints)
+  - [Translation from pub/sub to endpoints](#translation-from-pubsub-to-endpoints)
     - [Config Files](#config-files)
     - [Simulators](#simulators)
   - [Co-simulation Execution](#co-simulation-execution)
