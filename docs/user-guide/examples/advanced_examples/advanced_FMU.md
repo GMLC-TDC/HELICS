@@ -13,7 +13,7 @@ This demonstrates the use of HELICS-FMI to integrate an FMU into a HELICS-based 
 - [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
 - [HELICS components](#helics-components)
 - [Building the FMU](#building-the-fmu)
-- [Configuring the co-simulation](#setting-up-the-co-simulation)
+- [Configuring the co-simulation](#configuring-the-co-simulation)
 - [Execution and Results](#execution-and-results)
 
 ## Where is the code?
