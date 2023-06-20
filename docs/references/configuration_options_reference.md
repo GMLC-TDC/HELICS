@@ -27,17 +27,17 @@ Which method you use to configure your federate and co-simulation significantly 
   - `helicsCreateValueFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#ad5dc3f4a7034ae800c67946faf2ce839)
     | [C](api-reference/C_API.md#creation)
-    | [Python](https://python.helics.org/api/capi-py.html#helicsCreateValueFederateFromConfig)
+    | [Python](https://python.helics.org/api/capi-py/#helicsCreateValueFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateValueFederateFromConfig-Tuple{String})
   - `helicsCreateMessageFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a8d992360400e996c083c0b3a1d75b8f0)
     | [C](api-reference/C_API.md#creation)
-    | [Python](https://python.helics.org/api/capi-py.html#helicsCreateMessageFederateFromConfig)
+    | [Python](https://python.helics.org/api/capi-py/#helicsCreateMessageFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateMessageFederateFromConfig-Tuple{String})
   - `helicsCreateCombinationFederateFromConfig`
     [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a758381aad8bd5f9d0925a8b13ee04a1d)
     | [C](api-reference/C_API.md#creation)
-    | [Python](https://python.helics.org/api/capi-py.html#helicsCreateCombinationFederateFromConfig)
+    | [Python](https://python.helics.org/api/capi-py/#helicsCreateCombinationFederateFromConfig)
     | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsCreateCombinationFederateFromConfig-Tuple{String})
 - **JSON configuration produces a natural artifact that defines the co-simulation** - Another advantage of the external configuration in the JSON file is that it is a human-readable artifact that can be distributed separately from the source code that provides a lot of information about how the co-simulation was run. In fact, its possible to just look at the configuration files of a federation and do some high-level debugging (checking to see that the subscriptions and publications are aligned, for example).
 - **New federates in ill-defined use cases may benefit from API configuration** - The modularity that the JSON config provides may not offer many benefits if the federate is newly integrated into HELICS and/or is part of an evolving analysis. During these times the person(s) doing the integration may just want to make direct API calls instead of having to mess with writing the federate code and a configuration file. There will likely be a point in the future when the software is more codified and switching to a JSON configuration makes more sense.
@@ -222,7 +222,7 @@ There are a number of flags which control how a federate acts with respect to ti
 _API:_ `helicsFederateInfoSetCoreName`
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1fc4b4563bd06ac54d9569d1df5f8d0c)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetCoreName)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreName)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreName-Tuple{HELICS.FederateInfo,%20String})
 
 Every federate must have a unique name across the entire federation; this is functionally the address of the federate and is used to determine where HELICS messages are sent. An error will be generated if the federate name is not unique.
@@ -234,7 +234,7 @@ Every federate must have a unique name across the entire federation; this is fun
 _API:_ `helicsFederateInfoSetCoreTypeFromString`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelicscpp_1_1FederateInfo.html#a94654cba67de8d4aaf47cd99bbbd5d60)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetCoreTypeFromString)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreTypeFromString)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreType-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsCoreTypes}})
 
 There are a number of technologies or message buses that can be used to send HELICS messages among federates. Every HELICS enabled simulator has code in it that creates a core which connects to a HELICS broker using one of these messaging technologies. ZeroMQ (zmq) is the default core type and most commonly used but there are also cores that use TCP and UDP networking protocols directly (forgoing ZMQ's guarantee of delivery and reconnection functions), IPC (uses Boost's interprocess communication for fast in-memory message-passing but only works if all federates are running on the same physical computer), and MPI (for use on HPC clusters where MPI is installed). See the [User Guide page on core types](../user-guide/advanced_topics/CoreTypes.md) for more details.
@@ -246,7 +246,7 @@ There are a number of technologies or message buses that can be used to send HEL
 _API:_ helicsFederateInfoSetCoreName
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1fc4b4563bd06ac54d9569d1df5f8d0c)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetCoreName)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreName)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreName-Tuple{HELICS.FederateInfo,%20String})
 
 Only applicable for `ipc` and `test` core types; otherwise can be left undefined.
@@ -258,7 +258,7 @@ Only applicable for `ipc` and `test` core types; otherwise can be left undefined
 _API:_ `helicsFederateInfoSetCoreInitString`
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a472ea0a8ff1a57d91bfa01b04137e2a8)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetCoreInitString)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetCoreInitString)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetCoreInitString-Tuple{HELICS.FederateInfo,%20String})
 
 A command-line-like string that specifies options for the core as it connects to the federation. These options are:
@@ -290,7 +290,7 @@ Automatically generate a broker if one cannot be connected to. For federations w
 _API:_ `helicsFederateInfoSetBrokerInitString`
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#a1f145624be99cd3261d4ad1314785e2c)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetBrokerInitString)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetBrokerInitString)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetBrokerInitString-Tuple{HELICS.FederateInfo,%20String})
 
 String used to define the configuration of the broker if one is autogenerated. Such configuration typically includes things like broker IP addresses and port numbers. Again, if this is a co-simulation running on a single computer (and is the only HELICS co-simulation running on said computer) the default option is likely to be sufficient. The following options are available for this string:
@@ -343,7 +343,7 @@ String used to define the configuration of the broker if one is autogenerated. S
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_TERMINATE_ON_ERROR` [72]
@@ -357,7 +357,7 @@ If the `terminate_on_error` flag is set then a federate encountering an internal
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_SOURCE_ONLY` [4]
@@ -371,7 +371,7 @@ Used to indicate to the federation that this federate is only producing data and
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_OBSERVER` [0]
@@ -400,7 +400,7 @@ Setting a broker key only allows federates that have the same broker key to be p
 _API:_ `helicsFederateSetLogFile`
 [C++](https://docs.helics.org/en/latest/doxygen/helics_8h.html#abde89169985b8a18c2d1b8fa803e5169)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateSetLogFile)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateSetLogFile)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsBrokerSetLogFile-Tuple{HELICS.Broker,%20String})
 
 Specifies the name of the log file where logging messages will be written.
@@ -412,7 +412,7 @@ Specifies the name of the log file where logging messages will be written.
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_LEVEL` [271]
@@ -441,7 +441,7 @@ Determines the level of detail for log messages. In the list above, the keywords
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_FILE_LOG_LEVEL` [272]
@@ -457,7 +457,7 @@ Allows a distinct log level for the written log file to be specified. By default
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_CONSOLE_LOG_LEVEL` [274]
@@ -473,7 +473,7 @@ Allows a distinct log level for the written log file to be specified. By default
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_FORCE_LOGGING_FLUSH` [88]
@@ -487,7 +487,7 @@ Setting this option forces HELICS logging messages to be flushed to file after e
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_DUMPLOG` [89]
@@ -501,7 +501,7 @@ When set, a record of all messages is captured and written out to the log file a
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_LOG_BUFFER` [276]
@@ -529,7 +529,7 @@ When set to a number greater than 0 will modify the internal federateId codes. V
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_IGNORE_TIME_MISMATCH_WARNINGS` [67]
@@ -543,7 +543,7 @@ If certain timing options (_i.e._ `period`, or `minTimeDelta`) are used it is po
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_UNINTERRUPTIBLE` [1]
@@ -557,7 +557,7 @@ Normally, a federate will be granted a time earlier than it requested when it re
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_TIME_PERIOD` [140]
@@ -571,7 +571,7 @@ Many time-based simulators have a minimum time-resolution or a user-configurable
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_TIME_OFFSET` [141]
@@ -585,7 +585,7 @@ There may be cases where it is preferable to have a simulator receive time grant
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_TIME_DELTA` [137]
@@ -599,7 +599,7 @@ timeDelta has some similarities to `period`; where `period` constrained the gran
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INPUT_TIME_DELAY` [148]
@@ -613,7 +613,7 @@ _Property's enumerated name:_ `HELICS_PROPERTY_INPUT_TIME_DELAY` [148]
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_TIME_PROPERTY_OUTPUT_TIME_DELAY` [150]
@@ -627,7 +627,7 @@ _Property's enumerated name:_ `HELICS_TIME_PROPERTY_OUTPUT_TIME_DELAY` [150]
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,Union{Int64,%20HELICS.Lib.helics_federate_flags},Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_REALTIME` [16]
@@ -642,7 +642,7 @@ If the federate is running faster than real time this will insert additional del
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_TIME_RT_LAG` [143] and `HELICS_PROPERTY_TIME_RT_LEAD` [144]
@@ -656,7 +656,7 @@ Defines "real-time" for HELICS by setting tolerances for HELICS to use when runn
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_TIME_RT_TOLERANCE` [145]
@@ -670,7 +670,7 @@ Implements the same functionality of `rt_lag` and `rt_lead` but does so by using
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_WAIT_FOR_CURRENT_TIME_UPDATE` [10]
@@ -684,7 +684,7 @@ If set to true, a federate will not be granted the requested time until all othe
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_RESTRICTIVE_TIME_POLICY` [11]
@@ -702,7 +702,7 @@ Only applicable to Named Input interfaces ([see section on value federate interf
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_SLOW_RESPONDING` [29]
@@ -718,7 +718,7 @@ If applied to a core or broker (`--slow_responding` in the `core_init_string` or
 _API:_ `helicsFederateInfoSetTimeProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Core.html#aef32f6cb11188baf60cc8826914a4b6f)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetTimeProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetTimeProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetTimeProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Union{Float64,%20Int64}})
 
 _Property's enumerated name:_ `HELICS_FLAG_EVENT_TRIGGERED` [81]
@@ -732,7 +732,7 @@ For federates that are event-driven rather than timing driven, this flag must be
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_FORWARD_COMPUTE` [14]
@@ -746,7 +746,7 @@ Indicates to the broker and the rest of the federation that this federate comput
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_ROLLBACK` [12]
@@ -760,7 +760,7 @@ Indicates to the broker and the rest of the federation that this federate can/do
 _API:_ `helicsFederateInfoSetIntegerProperty`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CommonCore.html#ad6a898deb8df83ee31d62eccbb202aef)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetIntegerProperty)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetIntegerProperty)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetIntegerProperty-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsProperties},%20Int64})
 
 _Property's enumerated name:_ `HELICS_PROPERTY_INT_MAX_ITERATIONS` [259]
@@ -776,7 +776,7 @@ These options can be set globally for all subscriptions, inputs and publications
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_ONLY_UPDATE_ON_CHANGE` [454] and `HELICS_FLAG_ONLY_TRANSMIT_ON_CHANGE` [452]
@@ -790,7 +790,7 @@ Setting these flags prevents new value signals with the same value from being re
 _API:_ `helicsPublicationSetMinimumChange` and `helicsInputSetMinimumChange`
 [C++ input](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a55056ac9dd2895270f575827dd9951c7) and [C++ publication](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Publication.html#ab66f5680bb4a5e062314f6f8e5dea846)
 | [C input](api-reference/C_API.md#input) and [C publication](api-reference/C_API.md#publication)
-| [Python input](https://python.helics.org/api/capi-py.html#helicsInputSetMinimumChange) and [Python publication](https://python.helics.org/api/capi-py.html#helicsPublicationSetMinimumChange)
+| [Python input](https://python.helics.org/api/capi-py/#helicsInputSetMinimumChange) and [Python publication](https://python.helics.org/api/capi-py/#helicsPublicationSetMinimumChange)
 | [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsPublicationSetMinimumChange-Tuple{HELICS.Publication,%20Float64}) and [Julia publication](https://julia.helics.org/latest/api/#HELICS.helicsInputSetMinimumChange-Tuple{HELICS.Input,%20Float64})
 
 This option allows the specific numerical definition of "change" when using the `only_update_on_change` and `only_transmit_on_change` options.
@@ -802,7 +802,7 @@ This option allows the specific numerical definition of "change" when using the 
 _API:_ `helicsInputSetDefaultX`
 [C++ input](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a55056ac9dd2895270f575827dd9951c7)
 | [C input](api-reference/C_API.md#input)
-| [Python input](https://python.helics.org/api/capi-py.html#helicsInputSetDefault)
+| [Python input](https://python.helics.org/api/capi-py/#helicsInputSetDefault)
 | [Julia input](https://julia.helics.org/latest/api/#HELICS.helicsInputSetDefaultBoolean-Tuple{HELICS.Input,%20Bool})
 
 This option allows specifying the default value used when no publication has been received. Each datatype has its own API call such as:
@@ -830,7 +830,7 @@ Though they are not as obviously named, the following two APIs do provide a mean
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTION_REQUIRED` [397]
@@ -847,7 +847,7 @@ When a federate is initialized, one of its tasks is to make sure the recipients 
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECITON_OPTIONAL` [402]
@@ -861,19 +861,19 @@ These options are valid for subscriptions, inputs, and/or publications (generica
 `helicsFederateRegisterPublication`
 [C++](https://docs.helics.org/en/latest/doxygen/ValueFederate_8h.html#ac00c4e17aeb9e20fdf0f42fb8bc63d29)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateRegisterPublication)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterPublication)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterPublication)
 
 `helicsFederateRegisterSubscription`
 [C++](https://docs.helics.org/en/latest/doxygen/ValueFederate_8h.html#ab30020ca06ad37548691f313df42e15f)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateRegisterSubscription)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterSubscription)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterSubscription)
 
 `helicsFederateRegisterInput`
 [C++](https://docs.helics.org/en/latest/doxygen/ValueFederate_8h.html#aa41b313f5e527055444bf915c8da3258)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateRegisterInput)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterInput)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterInput)
 
 ### `key` (required)
@@ -907,7 +907,7 @@ HELICS is able to do some levels of unit conversion, currently only on double ty
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_BUFFER_DATA` [411]
@@ -928,7 +928,7 @@ Under normal operation, handles that are connected (value signals flowing betwee
 _API:_ `helicsInputSetInfo`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga8117e8d7c987b3fb27e065b6693116e6)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetInfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetInfo)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetInfo-Tuple{HELICS.Input,%20String})
 The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example.
 
@@ -939,7 +939,7 @@ The `info` field is entirely ignored by HELICS and is used as a mechanism to pas
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_STRICT_TYPE_CHECKING` [414]
@@ -954,7 +954,7 @@ Generally, HELICS does [data type conversions where supported](../developer-guid
 
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Publication.html#abb36f297be67589f7a73c4c1fc39240b)
 | [C](api-reference/C_API.md#publication)
-| [Python](https://python.helics.org/api/capi-py.html#helicsPublicationAddTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsPublicationAddTarget)
 | [Julia](https://julia.helics.org/latest/api/#Publication)
 
 Used to specify which inputs should receive the values from this output. This can be a list of output keys/names.
@@ -967,7 +967,7 @@ Inputs can receive values from multiple sending handles and the means by which t
 
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Input.html#a017ad953343ac7758fbf1f45ea54d1eb)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputAddTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputAddTarget)
 | [Julia](https://julia.helics.org/latest/api/#Input)
 
 Inputs can specify which outputs (typically publications) they should be pulling from. This is similar to subscriptions but inputs can allow multiple outputs to feed to the same input. This can be a list of output keys/names.
@@ -979,7 +979,7 @@ Inputs can specify which outputs (typically publications) they should be pulling
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CONNECTIONS` [522]
@@ -993,7 +993,7 @@ Allows an integer number of connections to be considered value for this input ha
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga5cb76ace18e1fa7cedd1d5ed8a56f3d1)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_INPUT_PRIORITY_LOCATION` [510]
@@ -1007,7 +1007,7 @@ When receiving values from multiple sending handles, when the values are receive
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga5cb76ace18e1fa7cedd1d5ed8a56f3d1)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_CLEAR_PRIORITY_LIST` [512]
@@ -1021,7 +1021,7 @@ When receiving values from multiple sending handles, when the values are receive
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga5cb76ace18e1fa7cedd1d5ed8a56f3d1)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_SINGLE_CONNECTION_ONLY` [407]
@@ -1034,7 +1034,7 @@ When set, this forces the input handle to have only one sending handle it will r
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga5cb76ace18e1fa7cedd1d5ed8a56f3d1)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_MULTIPLE_CONNECTIONS_ALLOWED` [409]
@@ -1048,7 +1048,7 @@ When set, this flag allows the input handle to receive valuesfrom multiple other
 _API:_ `helicsInputSetOption`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Information.html#ga5cb76ace18e1fa7cedd1d5ed8a56f3d1)
 | [C](api-reference/C_API.md#input)
-| [Python](https://python.helics.org/api/capi-py.html#helicsInputSetOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsInputSetOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsInputSetOption-Tuple{HELICS.Input,%20Union{Int64,%20HELICS.Lib.HelicsHandleOptions},%20Bool})
 
 _Property's enumerated name:_ `HELICS_HANDLE_OPTION_MULTI_INPUT_HANDLING_METHOD` [507]
@@ -1075,7 +1075,7 @@ As in the value handles, the registration of endpoints is done through a single 
 _API:_ `helicsFederateRegisterEndpoint`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFederate_8h.html#a2eb3f4680791a817b7654f0b6ca97d4d)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateRegisterEndpoint)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterEndpoint)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterEndpoint-Tuple{HELICS.Federate,%20String,%20String})
 
 ### `name` (required)
@@ -1097,7 +1097,7 @@ HELICS supports data types and data type conversion ([as best it can](https://ww
 _API:_ `helicsEndpointSetDefaultDestination`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFederate_8h.html#a4d32466958d0b47ded8825380275d787)
 | [C](api-reference/C_API.md#endpoint)
-| [Python](https://python.helics.org/api/capi-py.html#helicsEndpointSetDefaultDestination)
+| [Python](https://python.helics.org/api/capi-py/#helicsEndpointSetDefaultDestination)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsEndpointSetDefaultDestination-Tuple{HELICS.Endpoint,%20String})
 
 Defines the default destination for a message sent from this endpoint.
@@ -1117,7 +1117,7 @@ Creates a local alias for a handle that may have a long name.
 _API:_ `helicsEndpointSubscribe`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFederate_8h.html#ae7ab88b9e49dc6c3ef5f2042b1890a45)
 | [C](api-reference/C_API.md#endpoint)
-| [Python](https://python.helics.org/api/capi-py.html#helicsEndpointSubscribe)
+| [Python](https://python.helics.org/api/capi-py/#helicsEndpointSubscribe)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsEndpointSubscribe-Tuple{HELICS.Endpoint,%20String})
 
 ---
@@ -1133,7 +1133,7 @@ See section on Filter Options.
 _API:_ `helicsEndpointSetInfo`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFederate_8h.html#acb58eb5e9fca5c05451592d4a76de524)
 | [C](api-reference/C_API.md#endpoint)
-| [Python](https://python.helics.org/api/capi-py.html#helicsEndpointSetInfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsEndpointSetInfo)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsEndpointSetInfo-Tuple{HELICS.Endpoint,%20String})
 The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example.
 
@@ -1157,12 +1157,12 @@ _API:_ `helicsFederateRegisterFilter`
 to create/register the filter and then `helicsFilterAddSourceTarget`
 ([C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#ae3c07304f81645db5f92fd4a3b9e53ce)
 | [C](api-reference/C_API.md#filter)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddSourceTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsFilterAddSourceTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String}))
 or `helicsFilterAddDestinationTarget`
 ([C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#a664e4b45227a9e1070951376836eb8d6)
 | [C](api-reference/C_API.md#filter)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddDestinationTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsFilterAddDestinationTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddDestinationTarget-Tuple{HELICS.Filter,%20String}))
 to associate it with a specific endpoint
 
@@ -1179,7 +1179,7 @@ Name of the filter; must be unique to a federate.
 _API:_ `helicsFilterAddSourceTarget`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#a40d2017f51dca63c1b034df70c35c655)
 | [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddSourceTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsFilterAddSourceTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddSourceTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
@@ -1191,7 +1191,7 @@ Acts on previously registered filter and associated with a specific endpoint of 
 _API:_ `helicsFilterAddDestinationTarget`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#aa197abc9f9c07f9d8fbe39aef588965f)
 | [C](https://docs.helics.org/en/latest/references/api-reference/C_API.html#filter)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFilterAddDestinationTarget)
+| [Python](https://python.helics.org/api/capi-py/#helicsFilterAddDestinationTarget)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterAddDestinationTarget-Tuple{HELICS.Filter,%20String})
 
 Acts on previously registered filter and associated with a specific endpoint of the federate.
@@ -1203,7 +1203,7 @@ Acts on previously registered filter and associated with a specific endpoint of 
 _API:_ `helicsFilterSetInfo`
 [C++](https://docs.helics.org/en/latest/doxygen/group__Clone.html#gaf8d846ddb206fdbc7c22769f4a2b2f9b)
 | [C](api-reference/C_API.md#filter)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFilterSetInfo)
+| [Python](https://python.helics.org/api/capi-py/#helicsFilterSetInfo)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFilterSetInfo-Tuple{HELICS.Filter,%20String})
 The `info` field is entirely ignored by HELICS and is used as a mechanism to pass configuration information to the federate so that it can properly integrate into the federation. Thus, there is no standard content or format for this field; it is entirely up to the individual simulators to decide how the data in this field (if any) should be used. Often it is used by simulators to map the HELICS names into internal variable names as shown in the above example.
 
@@ -1214,7 +1214,7 @@ The `info` field is entirely ignored by HELICS and is used as a mechanism to pas
 _API:_ `helicsFederateRegisterFilter`
 [C++](https://docs.helics.org/en/latest/doxygen/MessageFilters_8h.html#ae51e3c5dc5a974b3f1ec4c37e4901580)
 | [C](api-reference/C_API.md#federate)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateRegisterFilter)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateRegisterFilter)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateRegisterFilter-Tuple{HELICS.Federate,%20Union{Int64,%20HELICS.Lib.HelicsFilterTypes},%20String})
 
 Filters have a predefined set of operations they can perform. The following list defines the valid operations for filters. Most filters require additional specifications in properties data structure, an example of which is shown for each filter type.
@@ -1437,7 +1437,7 @@ HELICS 2.8 and v3.0.1 have a profiling capability that allows users to measure t
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_PROFILING` [93]
@@ -1457,7 +1457,7 @@ Turns on profiling for the federate and allows the specification of the log file
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_LOCAL_PROFILING_CAPTURE` [96]
@@ -1471,7 +1471,7 @@ Setting this flag sends the profiling messages to the local federate log rather 
 _API:_ `helicsFederateInfoSetFlagOption`
 [C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1CoreFederateInfo.html#a63efa7762fdc8a9d9869bbed6939448e)
 | [C](api-reference/C_API.md#federateinfo)
-| [Python](https://python.helics.org/api/capi-py.html#helicsFederateInfoSetFlagOption)
+| [Python](https://python.helics.org/api/capi-py/#helicsFederateInfoSetFlagOption)
 | [Julia](https://julia.helics.org/latest/api/#HELICS.helicsFederateInfoSetFlagOption-Tuple{HELICS.FederateInfo,%20Union{Int64,%20HELICS.Lib.HelicsFederateFlags},%20Bool})
 
 _Property's enumerated name:_ `HELICS_FLAG_PROFILING_MARKER` [95]
