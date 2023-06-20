@@ -126,7 +126,7 @@ myst_enable_extensions = [
 ]
 myst_dmath_double_inline = True
 
-myst_heading_anchors = 4
+myst_heading_anchors = 5
 
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
