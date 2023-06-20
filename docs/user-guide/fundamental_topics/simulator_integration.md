@@ -1,3 +1,5 @@
+# Simulator Integration
+
 A "simulator" is the executable program. As soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate". Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
 
 **Federate name** - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
@@ -10,7 +12,7 @@ A "simulator" is the executable program. As soon as one particular instance of t
 
 **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second).
 
-# Integration of Federates
+## Integration of Federates
 
 A co-simulation is, in some sense, a simulation of simulations. There will be two types of configuration required:
 
@@ -23,15 +25,6 @@ Integration of federates requires definition of the message topology (who is pas
 
 This section introduces the simplest broker topology for integrating federates into a federation, and the basics for integrating federates with a JSON and with API calls.
 
-**todo: fix toc to be direct links**
-
-**todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
-
-```{eval-rst}
-.. toctree::
-    :maxdepth: 1
-
-```
 
 ## Broker Topology
 

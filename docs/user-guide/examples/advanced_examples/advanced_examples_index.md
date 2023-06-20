@@ -134,18 +134,11 @@ Federates with infinite time
 
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
-    **TODO: Get rid of fake_max_time**
-
-    **why do we divide helics_time_maxtime by 1000?**
-
-    **shouldn't we also show how this federate is configured? where is best for that?**
-
 ```python
 hours = 24 * 7  # one week
 total_interval = int(60 * 60 * hours)
 grantedtime = 0
-fake_max_time = int(h.HELICS_TIME_MAXTIME / 1000)
-starttime = fake_max_time
+starttime = int(h.HELICS_TIME_MAXTIME)
 logger.debug(f"Requesting initial time {starttime}")
 grantedtime = h.helicsFederateRequestTime(fed, starttime)
 logger.debug(f"Granted time {grantedtime}")
