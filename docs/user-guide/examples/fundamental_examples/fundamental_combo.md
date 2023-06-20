@@ -6,8 +6,6 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Combination Federates](#combination-federates)
-  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
   - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
