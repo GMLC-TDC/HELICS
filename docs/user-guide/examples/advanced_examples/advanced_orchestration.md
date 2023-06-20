@@ -190,7 +190,7 @@ The final result of the default Monte Carlo co-simulation is shown below.
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/MonteCarlo_Manual_small.png)
 
-This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.html#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
+This is a time series density plot. Each simulation is a green line, and the blue solid line is the median of all simulations. From this plot, we can see that (after the system [initializes](../../fundamental_topics/stages.md#initialization), after a few hours) the maximum demand from EVs in the garage will be roughly 125 kW. We could improve the analysis by conducting an initialization step and by running the simulation for a longer time period. This type of analysis provides the engineer with information about the probability that demand for power from N EVs will be X kW. The most commonly demanded power is less than 50 kW -- does the engineer want to size the power conduit to provide median power, or maximum power?
 
 ### Merlin Orchestration Execution
 
