@@ -5,7 +5,7 @@ Logging in HELICS provides a way to understand the operation of a federate and i
 - [Log Levels](#log-levels)
 - [Setting up the Simulator for Logging](#setting-up-the-simulator-for-logging)
 - [Setting up the Federate for Logging](#setting-up-the-federate-for-logging)
-- [Setting up the Core/Broker for Logging](#setting-up-the-core-broker-for-logging)
+- [Setting up the Core/Broker for Logging](#setting-up-the-core-or-broker-for-logging)
 
 ## Log Levels
 
@@ -120,7 +120,7 @@ Or with the API interface functions for each federate:
 h.helicsFederateInfoSetIntegerProperty(fed, h.HELICS_PROPERTY_INT_LOG_LEVEL, 1)
 ```
 
-## Setting up the Core/Broker for Logging
+## Setting up the Core or Broker for Logging
 
 It is possible to specify a log file to use on a core.
 This can be specified through the coreinit string `--logfile logfile.txt`
