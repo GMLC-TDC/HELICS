@@ -16,15 +16,15 @@ The Fundamental examples are meant to build in complexity -- if you are new to H
 
 This page describes the model -- what is the research question addressed, and what are the components to a simple HELICS co-simulation:
 
-- [Where is the code?](#where-is-the-code)
-- [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-- [HELICS Components](#helics-components)
-  - [Register and Configure Federates](#register-and-configure-federates)
-  - [Enter Execution Mode](#enter-execution-mode)
-  - [Define Time Variables](#define-time-variables)
-  - [Initiate Time Steps for the Time Loop](#initiate-time-steps-for-the-time-loop)
-  - [Send/Receive Communication between Federates](#send-receive-communication-between-federates)
-  - [Finalize Co-simulation](#finalize-co-simulation)
+- <a href="#where-is-the-code">Where is the Code?</a>
+- <a href="#what-is-this-co-simulation-doing">What is this Co-simulation Doing?</a>
+- <a href="#helics-components">HELICS Components</a>
+	- <a href="#register-and-configure-federates">Register and Configure Federates</a>
+	- <a href="#enter-execution-mode">Enter Execution Mode</a>
+	- <a href="#define-time-variables">Define Time Variables</a>
+	- <a href="#initiate-time-steps-for-the-time-loop">Initiate Time Steps for the Time Loop</a>
+	- <a href="#Send/Receive Communication between Federates">#send-receive-communication-between-federates</a>
+	- <a href="#finalize-co-simulation">Finalize Co-simulation</a>
 
 <a name="where-is-the-code">
 <strong>
