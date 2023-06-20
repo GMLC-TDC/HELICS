@@ -23,7 +23,7 @@ This page describes the model -- what is the research question addressed, and wh
 	- <a href="#enter-execution-mode">Enter Execution Mode</a>
 	- <a href="#define-time-variables">Define Time Variables</a>
 	- <a href="#initiate-time-steps-for-the-time-loop">Initiate Time Steps for the Time Loop</a>
-	- <a href="#Send/Receive Communication between Federates">#send-receive-communication-between-federates</a>
+	- <a href="#send-receive-communication-between-federates">Send/Receive Communication between Federates</a>
 	- <a href="#finalize-co-simulation">Finalize Co-simulation</a>
 
 <a name="where-is-the-code">
