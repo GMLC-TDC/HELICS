@@ -5,7 +5,7 @@ This custom filter federate example expands the [combination federation example]
 This tutorial is organized as follows:
 
 - [Example files](#example-files)
-- [HELICS Filters](#HELICS-filters)
+- [HELICS Filters](#helics-filters)
 - [Co-simulation Execution](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
