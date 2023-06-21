@@ -935,8 +935,9 @@ std::string generateFullCoreInitString(const FederateInfo& fi)
         res.append(fi.key);
     }
     if (!fi.fileInUse.empty()) {  // we used the file, specify a core section
-        res += " --config_section=core --config-file=";
+        res += " --config_section=core --config-file='";
         res.append(fi.fileInUse);
+        res.push_back('\'');
     }
     return res;
 }

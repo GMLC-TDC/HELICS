@@ -294,7 +294,8 @@ INSTANTIATE_TEST_SUITE_P(combofed_tests,
                          testNamer);
 
 static constexpr const char* combo_config_files[] = {"example_combo_fed.json",
-                                                     "example_combo_fed.toml"};
+                                                     "example_combo_fed.toml",
+                                                     "folder with space/example_combo_fed.toml"};
 
 class combofed_file_load_tests:
     public ::testing::TestWithParam<const char*>,
