@@ -18,7 +18,7 @@ These two learning tracks each start with a "base" model, which should also be c
 
 All (or almost all ) of the HELICS User Guide examples utilize a common tool and command for launching the co-simulation:
 
-`helics run --path=runner.json` 
+`helics run --path=runner.json`
 
 This utilizes a tool we call `helics_cli` that is (optionally) [installed with the Python language binding](../installation/index). Not only does HELICS CLI take care of launching the co-simulation, it also manages the logging and error/warning messages that are often printed to console when running code in a stand-alone manner. Generally, using HELICS CLI is the recommended way to run a federation but if there are particular needs you have that HELICS CLI can't meet, all federations can simply be run by launching each individual federate sequentially. The contents of the HELICS CLI runner.json shows the commands it uses to launch each federate and those can simply be copied and pasted into a set of command-line prompts manually launch the co-simulation.
 
