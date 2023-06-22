@@ -1418,7 +1418,7 @@ Connects the specified input to the translator's publication (output) or adds th
 
 ## Profiling
 
-HELICS 2.8 and v3.0.1 have a profiling capability that allows users to measure the time spent waiting for HELICS to grant it time and how much time is spent executing native code. These measurements are the foundation to understanding how to improve computation performance in a federation. Further details are provided in the [Profiling page in the User Guide.](../user-guide/advanced_topics/profiling.md) When enabling profiling at the federate level there are a few APIs that can be utilized.
+HELICS has a profiling capability that allows users to measure the time spent waiting for HELICS to grant it time and how much time is spent executing native code. These measurements are the foundation to understanding how to improve computation performance in a federation. Further details are provided in the [Profiling page in the User Guide.](../user-guide/advanced_topics/profiling.md) When enabling profiling at the federate level there are a few APIs that can be utilized.
 
 ### `profiling` [false]
 
