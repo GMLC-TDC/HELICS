@@ -1342,7 +1342,7 @@ This filter will copy a message and send it to the original destination plus a n
 
 ## Translator Options
 
-Translators are used to bridge the gap between the value and message interfaces allowing publications to be sent to endpoints and endpoints to be published out as values. Each translator has one input, one publication (output), and one endpoint that any other federates can connect to. Further details can be found on the [documentation page covering translators](../user-guide/advanced_topics/translators).
+Translators are used to bridge the gap between the value and message interfaces allowing publications to be sent to endpoints and endpoint messages to be sent to inputs as values. A translator functions as publication, input, and endpoint that other interfaces including filters can connect to. Further details can be found on the [documentation page covering translators](../user-guide/advanced_topics/translators).
 
 _API:_ `helicsCoreRegisterTranslator`
 ([C++](https://docs.helics.org/en/latest/doxygen/classhelics_1_1Translator.html#a34a960d2259756912ad1dd6e70609416)
