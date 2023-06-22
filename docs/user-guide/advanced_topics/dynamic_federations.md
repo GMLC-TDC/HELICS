@@ -8,7 +8,7 @@ Dynamic federations can be thought of as being composed of features in increasin
 
 1. Allowing the additional of subscriptions to an existing federate publication by existing members of the federation.
 2. Allowing federates that only receive information ("observers") to join the federation after execution has begun. As a part of joining the co-simulation the observer would need the functionality in level one to successfully subscribe to the necessary publications of other federates.
-3. Allowing the creation of new publications, endpoints, or filters by existing federates which other members of the federation could then subscribe to.
+3. Allowing the creation of new publications, endpoints, or filters by existing federates which other members of the federation could then connect to as targets.
 4. Allowing federates to join the co-simulation after execution has begun and create arbitrary interfaces (publications, subscriptions, endpoints, etc). This relies on all previous levels of complexity being implemented.
 
 HELICS v3.1 supported levels 1 and 2. HELICS v3.4 supports full dynamic federations (level 4).
