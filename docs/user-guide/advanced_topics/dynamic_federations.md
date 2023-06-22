@@ -21,7 +21,7 @@ In many use cases, this lack of visibility to previously published values is a p
 
 ## Dynamic Observer Federates
 
-A federate may declare itself to be an observer in the FederateInfo structure when a federate is declared. This can be done via the command line (`--observer`) or through a HELICS federate flag as shown below.
+A federate may declare itself to be an observer in the FederateInfo structure when a federate is declared. This can be done via the command line (`--observer`) or through a HELICS federate flag as shown below.  This declares that the federate will only be receiving data, not sending any so there is no time dependency of any other federate to this one.
 
 C++:
 
