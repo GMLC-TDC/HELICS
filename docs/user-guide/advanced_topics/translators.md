@@ -23,8 +23,8 @@ for example:
 
 ```json
 {
-    "type": "double",
-    "value": 56.78943
+  "type": "double",
+  "value": 56.78943
 }
 ```
 
