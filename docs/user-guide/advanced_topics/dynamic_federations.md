@@ -38,9 +38,9 @@ helicsFederateInfoSetFlagOption(fi, HELICS_FLAG_OBSERVER,HELICS_TRUE,&err);
 
 Python:
 
-
 ```python
 import helics as h
+
 fi = h.helicsCreateFederateInfo()
 h.helicsFederateInfoSetFlagOption(fi, h.HELICS_FLAG_OBSERVER, True)
 ```
