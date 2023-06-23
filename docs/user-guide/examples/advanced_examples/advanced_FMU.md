@@ -26,7 +26,7 @@ Note that this code contains a component (the FMU) that has been compiled for Wi
 
 This example shows you how to take an existing FMU and incorporate it into a HELICS-based co-simulation. This effectively allows FMUs to act as HELICS federates.
 
-The [Functional Mock-up Interface (FMI)](https://fmi-standard.org/) is a modeling language popularly implemented by the commercial tool [Modelon](https://modelon.com/) (_nee_ Modelica) but also has an open-source implementation (OpenModelica)[https://openmodelica.org/]. The modeling language allows for a black-box description of a model's interfaces to support co-simulation of various modeled entities through the creation of an FMU. The FMU, when used for co-simulation, consists of two main components: 1. An XML file describing the data exchange interfaces 2. Binary version of the model with callable FMI-defined functions that simulate the model.
+The [Functional Mock-up Interface (FMI)](https://fmi-standard.org/) is a modeling language popularly implemented by the commercial tool [Modelon](https://modelon.com/) (_nee_ Modelica) but also has an open-source implementation [OpenModelica](https://openmodelica.org/). The modeling language allows for a black-box description of a model's interfaces to support co-simulation of various modeled entities through the creation of an FMU. The FMU, when used for co-simulation, consists of two main components: 1. An XML file describing the data exchange interfaces 2. Binary version of the model with callable FMI-defined functions that simulate the model.
 
 FMI effectively defines another means of performing a co-simulation using FMUs and the HELICS team has created a means by which these FMUs can join a HELICS-based co-simulation. To integrate the FMU into the example, HELICS-FMI acts as a bridge that is able to execute the "SimpleBattery.fmu" FMU. HELICS-FMI takes care of executing the FMU using the inputs from the rest of the co-simulation and providing the outputs on its behalf.
 
@@ -54,7 +54,7 @@ With helics_fmi and FMU built, all that remains is providing command line option
 
 To execute this example, use the provided runner file:
 
-```
+```shell
 helics run --path=runner.json
 ```
 

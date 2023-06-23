@@ -12,7 +12,7 @@ Translators come in three types that determine how the data is translated betwee
 
 That leaves the JSON translator type, where the message coming out of or going into the endpoint being structured as a simple JSON formatted as:
 
-```
+```text
 {
     "type": <HELICS data type>,
     "value": <value>
@@ -21,7 +21,7 @@ That leaves the JSON translator type, where the message coming out of or going i
 
 for example:
 
-```
+```json
 {
     "type": "double",
     "value": 56.78943
@@ -38,15 +38,15 @@ Translators can add their own sources and destinations for their interfaces but 
 
 Just like inputs, publications, endpoints, and filter, translators can be defined via JSON configuration by any federate as follows:
 
-```
+```text
   "translators": [
      {
        "name": "test translator",
        "type": "JSON",
        "global": true,
        "info": "",
-       "source_target": name or key, (string, can be lists)
-       "destination_target: name or key, (string, can be lists)
+       "source_target": <name or key, (string, can be lists)>
+       "destination_target: <name or key, (string, can be lists)>
      }
   ]
 ```

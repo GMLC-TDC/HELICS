@@ -38,7 +38,8 @@ helicsFederateInfoSetFlagOption(fi, HELICS_FLAG_OBSERVER,HELICS_TRUE,&err);
 
 Python:
 
-```
+
+```python
 import helics as h
 fi = h.helicsCreateFederateInfo()
 h.helicsFederateInfoSetFlagOption(fi, h.HELICS_FLAG_OBSERVER, True)
@@ -58,11 +59,11 @@ Dynamic publications and endpoints are implemented as of HELICS v3.4. For any la
 
 Given the above limitations, as of HELICS v3.4 fully dynamic federations are supported. By setting the `--dynamic` flag on the root broker of a federation, federates may join the federation late. (HELICS have always been able to leave a federation early.) And as with observer federates, after calling `helicsFederateEnterExecutingMode()`
 
-# Example
+## Example
 
 An example of dynamic federation operation is under development though HELICS makes it very easy to support a dynamic federation. Simply add `--dynamic` to the broker initialization string for the root broker (if you are employing a [broker hierarchy](./broker_hierarchies.md)). For example, in a federation with four federates (one of which will be joining late), the call to start the broker is
 
-```
+```shell
 $ helics_broker -f3 --dynamic
 ```
 
