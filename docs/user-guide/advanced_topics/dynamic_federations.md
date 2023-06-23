@@ -8,7 +8,7 @@ Dynamic federations can be thought of as being composed of features in increasin
 
 1. Allowing the additional of subscriptions to an existing federate publication by existing members of the federation.
 2. Allowing federates that only receive information ("observers") to join the federation after execution has begun. As a part of joining the co-simulation the observer would need the functionality in level one to successfully subscribe to the necessary publications of other federates.
-3. Allowing the creation of new publications, endpoints, or filters by existing federates which other members of the federation could then subscribe to.
+3. Allowing the creation of new publications, endpoints, or filters by existing federates which other members of the federation could then connect to as targets.
 4. Allowing federates to join the co-simulation after execution has begun and create arbitrary interfaces (publications, subscriptions, endpoints, etc). This relies on all previous levels of complexity being implemented.
 
 HELICS v3.1 supported levels 1 and 2. HELICS v3.4 supports full dynamic federations (level 4).
@@ -17,11 +17,11 @@ HELICS v3.1 supported levels 1 and 2. HELICS v3.4 supports full dynamic federati
 
 In the normal case, the `helicsFederateRegisterInput()`, `helicsFederateRegisterSubscription()`, or `helicsFederateregisterTargetedEndpoint()` methods are called in the creation phase of co-simulation to allow for the creation of the data exchanges between federates prior to the start of co-simulation. If these calls are made after the `helicsFederateEnterInitializingMode()` call, the topology of the data exchanges between federates is altered and with it the timing dependencies. In non-dynamic federations, data published in the initialization phase is available to all subscribers of that publication as soon as as any other federate enters executing mode or makes a time request. In a dynamic federation, subscription data by default is not sent to the new (dynamically added) subscriber (or subscription) until a new publication is made after a time request or `helicsFederateEnterExecutingMode()` call has been made by the subscriber. For example, let's say Federate A publishes a value at simulation time zero and never after that point. If Federate B joins the co-simulation late and enters executing mode at simulation time five, it will not see the value published by Federate A.
 
-In many use cases, this lack of visibility to previously published values is a problem. For example, if the published value is a voltage, it would make sense that this value would be available to all federates even if they join late; the voltage always exists and thus should conceptually always be accessible for use by the model inside the federate. To provide persistence in this data for dynamic co-simulations, each publication can set a `bufferData` flag that retains the last value published so that any late-joining federates can access it. This buffer is disabled by default as it does slightly increase the memory footprint of each federates using it. It is anticipated that for dynamic federations, many use cases will want to employ this flag to preserve the "always available" concept of published values.
+In many use cases, this lack of visibility to previously published values is a problem. For example, if the published value is a voltage, it would make sense that this value would be available to all federates even if they join late; the voltage always exists and thus should conceptually always be accessible for use by the model inside the federate. To provide persistence in this data for dynamic co-simulations, each publication can set a `bufferData` flag that retains the last value published so that any late-joining federates can access it, and this value will be sent immediately when the connection is made. This buffer is disabled by default as it does slightly increase the memory footprint of each federates using it. It is anticipated that for dynamic federations, many use cases will want to employ this flag to preserve the "always available" concept of published values. The flag can be set at the federate level so all created publications have the flag set automatically.
 
 ## Dynamic Observer Federates
 
-A federate may declare itself to be an observer in the FederateInfo structure when a federate is declared. This can be done via the command line (`--observer`) or through a HELICS federate flag as shown below.
+A federate may declare itself to be an observer in the FederateInfo structure when a federate is declared. This can be done via the command line (`--observer`) or through a HELICS federate flag as shown below. This declares that the federate will only be receiving data, not sending any so there is no time dependency of any other federate to this one.
 
 C++:
 
@@ -57,7 +57,7 @@ Dynamic publications and endpoints are implemented as of HELICS v3.4. For any la
 
 ## Full Dynamic Federations
 
-Given the above limitations, as of HELICS v3.4 fully dynamic federations are supported. By setting the `--dynamic` flag on the root broker of a federation, federates may join the federation late. (HELICS have always been able to leave a federation early.) And as with observer federates, after calling `helicsFederateEnterExecutingMode()`
+Given the above limitations, as of HELICS v3.4 fully dynamic federations are supported. By setting the `--dynamic` flag on the root broker of a federation and any intermediate brokers or cores to which dynamic federates may be added, federates may join the federation late. (HELICS have always been able to leave a federation early.) And as with observer federates, after calling `helicsFederateEnterExecutingMode()`
 
 ## Example
 
