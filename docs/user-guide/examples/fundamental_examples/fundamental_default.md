@@ -149,7 +149,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 2. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
 3. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
 
-The final step is to launch our Base Example with the HELICS runner from the command line:
+The final step is to launch our Base Example with the HELICS runner from the command line (making sure you've [installed the HELICS cli extension](../../installation/index.md)):
 
 ```shell
 helics run --path=fundamental_default_runner.json
