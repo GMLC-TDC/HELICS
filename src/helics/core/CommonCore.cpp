@@ -4323,29 +4323,29 @@ void CommonCore::processQueryResponse(const ActionMessage& m)
     }
     if (isValidIndex(m.counter, mapBuilders)) {
         auto& builder = std::get<0>(mapBuilders[m.counter]);
-        auto& requestors = std::get<1>(mapBuilders[m.counter]);
+        auto& requesters = std::get<1>(mapBuilders[m.counter]);
         if (builder.addComponent(std::string(m.payload.to_string()), m.messageID)) {
             auto str = builder.generate();
             if (m.counter == GLOBAL_FLUSH) {
                 str = "{\"status\":true}";
             }
-            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
-                if (requestors[ii].dest_id == global_broker_id_local) {
-                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
+            for (int ii = 0; ii < static_cast<int>(requesters.size()) - 1; ++ii) {
+                if (requesters[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requesters[ii].messageID, str);
                 } else {
-                    requestors[ii].payload = str;
-                    routeMessage(std::move(requestors[ii]));
+                    requesters[ii].payload = str;
+                    routeMessage(std::move(requesters[ii]));
                 }
             }
-            if (requestors.back().dest_id == global_broker_id_local ||
-                requestors.back().dest_id == gDirectCoreId) {
-                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+            if (requesters.back().dest_id == global_broker_id_local ||
+                requesters.back().dest_id == gDirectCoreId) {
+                activeQueries.setDelayedValue(requesters.back().messageID, std::move(str));
             } else {
-                requestors.back().payload = std::move(str);
-                routeMessage(std::move(requestors.back()));
+                requesters.back().payload = std::move(str);
+                routeMessage(std::move(requesters.back()));
             }
 
-            requestors.clear();
+            requesters.clear();
             if (std::get<2>(mapBuilders[m.counter]) == QueryReuse::DISABLED) {
                 builder.reset();
             } else {
@@ -5219,28 +5219,28 @@ void CommonCore::checkInFlightQueriesForDisconnect()
 {
     for (auto& mb : mapBuilders) {
         auto& builder = std::get<0>(mb);
-        auto& requestors = std::get<1>(mb);
+        auto& requesters = std::get<1>(mb);
         if (builder.isCompleted()) {
             return;
         }
         if (builder.clearComponents()) {
             auto str = builder.generate();
-            for (int ii = 0; ii < static_cast<int>(requestors.size()) - 1; ++ii) {
-                if (requestors[ii].dest_id == global_broker_id_local) {
-                    activeQueries.setDelayedValue(requestors[ii].messageID, str);
+            for (int ii = 0; ii < static_cast<int>(requesters.size()) - 1; ++ii) {
+                if (requesters[ii].dest_id == global_broker_id_local) {
+                    activeQueries.setDelayedValue(requesters[ii].messageID, str);
                 } else {
-                    requestors[ii].payload = str;
-                    routeMessage(std::move(requestors[ii]));
+                    requesters[ii].payload = str;
+                    routeMessage(std::move(requesters[ii]));
                 }
             }
-            if (requestors.back().dest_id == global_broker_id_local) {
-                activeQueries.setDelayedValue(requestors.back().messageID, std::move(str));
+            if (requesters.back().dest_id == global_broker_id_local) {
+                activeQueries.setDelayedValue(requesters.back().messageID, std::move(str));
             } else {
-                requestors.back().payload = std::move(str);
-                routeMessage(std::move(requestors.back()));
+                requesters.back().payload = std::move(str);
+                routeMessage(std::move(requesters.back()));
             }
 
-            requestors.clear();
+            requesters.clear();
             if (std::get<2>(mb) == QueryReuse::DISABLED) {
                 builder.reset();
             }
