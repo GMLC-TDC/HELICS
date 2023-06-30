@@ -6,7 +6,7 @@ The Advanced Base Example tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Co-simulation Setup](#co-simulation-setup)
-  - [Messages + Values](#messages-values)
+  - [Messages + Values](#messages-and-values)
   - [Co-simulation Execution and Results](#co-simulation-execution-and-results)
 - [Questions and Help](#questions-and-help)
 
@@ -25,7 +25,7 @@ The files include:
 
 ## Co-simulation Setup
 
-### Messages + Values
+### Messages and Values
 
 As you may or may not have read in the [User Guide](../../fundamental_topics/message_federates.md), one of the key differences between value exchange and the message exchange is that value exchange paths are defined once the federation has been initialized but message exchanges are dynamic and can travel from any endpoint to any endpoint throughout the co-simulation. The diagram below shows the three federates used in this example with the representative handles for both the value and message exchanges.
 
@@ -63,6 +63,6 @@ The data shown in the power graph is arguably the point of the analysis. It show
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

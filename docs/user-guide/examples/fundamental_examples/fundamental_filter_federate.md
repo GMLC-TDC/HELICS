@@ -24,9 +24,9 @@ All files necessary to run the Federate Integration Example can be found in the 
 - (Bonus Python program where the Filter Federate does no filtering and forwards on all received messages)
 - HELICS runner JSON to enable execution of the co-simulation
 
-## Filter Federate
+## Filter Federates
 
-For situations that require filtering beyond what native HELICS filters can provide, it is possible to create a custom filter federate that acts in specific ways on the messages that receives and forwards on. Not only is it possible to re-create the native helix filter functions such as delay or dropped message but it is also possible act on the payloads of the messages themselves. Some of these functionalities (such as dropped or delayed messages) can be achieved through existing simulation tools such as an [ns-3](https://www.nsnam.org). Even in an ns-3, though custom functionality that would modify message payloads would require writing custom applications in at the industry codebase. Though this example custom filter federate example doesn't implement many of the detailed networking models in an ns-3 such as TCP and IP addressing, it's simplicity is a virtue in that it demonstrates how to implement a custom filter federate to act on HELICS messages an arbitrary manner.
+For situations that require filtering beyond what native HELICS filters can provide, it is possible to create a custom filter federate that acts in specific, user-define ways. Not only is it possible to re-create the native HELICS filter functions (_e.g._ delaying or randomly dropping messages) but it is also possible act on the payloads of the messages themselves. Some of these functionalities (such as dropped or delayed messages) can be achieved through existing simulation tools such as an [ns-3](https://www.nsnam.org). Even in an ns-3, though custom functionality that would modify message payloads would require writing custom applications and compiling them into ns-3. Though this example custom filter federate doesn't implement many of the detailed networking models in an ns-3 such as TCP and IP addressing, it's simplicity is a virtue in that it demonstrates how to implement a custom filter federate to act on HELICS messages an arbitrary manner.
 
 Here is our new federation using a custom filter federate:
 
@@ -109,6 +109,6 @@ When comparing to the results from the [previous example without any filters](./
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

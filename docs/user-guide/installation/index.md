@@ -79,7 +79,7 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 ### pip install
 
-[`pip install helics`](https://python.helics.org/)
+[`pip install 'helics[cli]'`](https://python.helics.org/) (Includes the optional but recommended helics_cli tool.)
 
 ### jHELICS
 
@@ -109,4 +109,4 @@ Previously a separate executable, `helics_cli` was used to provide functionality
 helics run --path=<path to HELICS runner JSON>
 ```
 
-This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install helics` as described above) to gain the runner and web interface functionality.
+This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install 'helics[cli]'` as described above) to gain the runner and web interface functionality.

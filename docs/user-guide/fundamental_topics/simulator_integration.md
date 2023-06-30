@@ -1,3 +1,5 @@
+# Simulator Integration
+
 A "simulator" is the executable program. As soon as one particular instance of that simulator begins running in a co-simulation it is considered a "federate". Every federate (instance of a simulator) will require configuration of the way it will communicate (send signals) to other federates in the federation. For simulators that already have HELICS support, the configuration takes the form of a JSON (or TOML) file; bespoke simulators can be configured with the HELICS APIs in the code or via a JSON file. The essential information that HELICS configuration defines is:
 
 **Federate name** - The unique name this federate will be known as throughout the federation. It is essential this name is unique so that HELICS messages can route properly.
@@ -10,7 +12,7 @@ A "simulator" is the executable program. As soon as one particular instance of t
 
 **Time step size** - This value defines the resolution of the simulator to prevent HELICS from telling the simulator to step to a time of which it has no concept (e.g. trying to simulate the time of 1.5 seconds when the simulator has a resolution of one second).
 
-# Integration of Federates
+## Integration of Federates
 
 A co-simulation is, in some sense, a simulation of simulations. There will be two types of configuration required:
 
@@ -23,16 +25,6 @@ Integration of federates requires definition of the message topology (who is pas
 
 This section introduces the simplest broker topology for integrating federates into a federation, and the basics for integrating federates with a JSON and with API calls.
 
-**todo: fix toc to be direct links**
-
-**todo: make link/reference to tools with HELICS support -- these will need to be configured with json**
-
-```{eval-rst}
-.. toctree::
-    :maxdepth: 1
-
-```
-
 ## Broker Topology
 
 Broker topology is somewhat optional for simple co-simulations, but offers an increase in performance if it is possible to identify groups of federates that interact often with each other but rarely with the rest of the federation. In such cases, assigning that group of federates their own broker will remove the congestion their messages cause with the federation as a whole. The Fundamental Topics and Examples are built with a single broker.
@@ -43,7 +35,7 @@ The figure below shows the most common architecture for HELICS co-simulation. Ea
 
 ## Configuring the federate
 
-Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#Using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
+Let's look at a generic JSON configuration file as an example with the more common parameters shown. As we'll see [later in this section](#using-a-config-file), this file is loaded by the federate using a specific API, allowing the same simulator to be used to create many federates that are all unique without having the modify the source code of the simulator. There are many, many more configuration parameters that this file could include; a relatively comprehensive list along with explanations of the functionality they provide can be found in the [federate configuration](../../references/configuration_options_reference.md) guide.
 
 ### Sample federate JSON configuration file
 

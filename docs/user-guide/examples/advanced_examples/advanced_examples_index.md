@@ -14,6 +14,7 @@
     advanced_multi_input
     advanced_orchestration
     advanced_iteration
+    advanced_FMU
 
 ```
 
@@ -21,14 +22,14 @@ The Advanced Examples are modular, each building upon the [base example](./advan
 
 This page describes the model for the Advanced Examples. This model is topically the same as the Fundamental Examples, but more complex in its execution. This allows the research question to become more nuanced and for the user to define new components to a HELICS co-simulation.
 
-- [Where is the code?](#where-is-the-code)
-- [What is this Co-simulation doing?](#what-is-this-co-simulation-doing)
-  - [Differences Compared to the Fundamental Examples](#differences-compared-to-the-fundamental-examples)
-    - [HELICS Differences](#helics-differences)
-    - [Research Question Complexity Differences](#research-question-complexity-differences)
-- [HELICS Components](#helics-components)
-  - [Federates with infinite time](#federates-with-infinite-time)
-  - [Initial time requests and model initialization](#initial-time-requests-and-model-initialization)
+- <a href="#where-is-the-code">Where is the Code?</a>
+- <a href="#what-is-this-co-simulation-doing">What is this Co-simulation Doing?</a>
+  - <a href="#differences-compared-to-the-fundamental-examples">Differences Compared to the Fundamental Examples</a>
+    - <a href="#helics-differences">HELICS Differences</a>
+    - <a href="#research-question-complexity-differences">Research Question Complexity Differences</a>
+- <a href="#helics-components">HELICS Components</a>
+  - <a href="#federates-with-infinite-time">Federates with infinite time</a>
+  - <a href="#initial-time-requests-and-model-initialization">Initial time requests and model initialization</a>
 
 <a name="where-is-the-code">
 <strong>
@@ -39,8 +40,6 @@ Where is the code?
 </a>
 
 The code for the [Advanced examples](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced) can be found in the HELICS-Examples repository on github. If you have issues navigating the examples, visit the HELICS [Gitter page](https://gitter.im/GMLC-TDC/HELICS) or the [user forum on GitHub](https://github.com/GMLC-TDC/HELICS/discussions).
-
-**TODO: UPDATE IMAGE**
 
 [![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/advanced_examples_github.png)](https://github.com/GMLC-TDC/HELICS-Examples/tree/main/user_guide_examples/advanced)
 
@@ -135,18 +134,11 @@ Federates with infinite time
 
 Federates which are abstractions of reality (e.g., controllers) do not need regular time interval updates. These types of federates can be set up to request `HELICS_TIME_MAXTIME` (effectively infinite time) and only update when a new message arrives for it to process. This component is placed prior to the main time loop.
 
-**TODO: Get rid of fake_max_time**
-
-**why do we divide helics_time_maxtime by 1000?**
-
-**shouldn't we also show how this federate is configured? where is best for that?**
-
 ```python
 hours = 24 * 7  # one week
 total_interval = int(60 * 60 * hours)
 grantedtime = 0
-fake_max_time = int(h.HELICS_TIME_MAXTIME / 1000)
-starttime = fake_max_time
+starttime = int(h.HELICS_TIME_MAXTIME)
 logger.debug(f"Requesting initial time {starttime}")
 grantedtime = h.helicsFederateRequestTime(fed, starttime)
 logger.debug(f"Granted time {grantedtime}")
@@ -162,9 +154,7 @@ Initial time requests and model initialization
 
 As in the [Base Example](../fundamental_examples/fundamental_default.md), the EV batteries are assumed connected to the chargers at the beginning of the simulation and information exchange is initiated by the Charger federate sending the charging voltage to the Battery federate. In the Advanced Examples, this is a convenient choice as the charging voltage is constant and thus is never a function of the charging current. In a more realistic model, it's easy to imagine that the charger has an algorithm that adjusts the charging voltage based on the charging current to, say, ensure the battery is charged at a particular power level. In that case, **the dependency of the models is circular**; this is common component that needs to be addressed.
 
-If the early time steps of the simulation are not as important (a model warm up period), then ensuring each federate has a default value it will provide when the input is null (and assuming the controller dynamics are not overly aggressive) will allow the models to bootstrap and through several iterations reach a consistent state. If this is not the case then HELICS does have a provision for getting models into a consistent state prior to the start of execution: initialization mode. **TODO: link to documentation or example on initialization mode.** This mode allows for this same iteration between models with no simulated time passing. It is the responsibility of the modeler to make sure there is a method to reach and detect convergence of the models and when such conditions are met, enter execution mode as would normally be done.
-
-**todo: add examples for where this is inserted in the code**
+If the early time steps of the simulation are not as important (a model warm up period), then ensuring each federate has a default value it will provide when the input is null (and assuming the controller dynamics are not overly aggressive) will allow the models to bootstrap and through several iterations reach a consistent state. If this is not the case then HELICS does have a provision for getting models into a consistent state prior to the start of execution: initialization mode (see an example in Battery.py of the [query example](./advanced_query.md) to see the use of the initialization mode API). This mode allows for this same iteration between models with no simulated time passing. It is the responsibility of the modeler to make sure there is a method to reach and detect convergence of the models and when such conditions are met, enter execution mode as would normally be done. We've put together an [example on iteration](advanced_iteration.md) to demonstrate one way of managing convergence.
 
 <a name="examples-covered-in-advanced-examples">
 <strong>

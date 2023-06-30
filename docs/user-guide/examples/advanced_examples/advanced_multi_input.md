@@ -19,7 +19,7 @@ This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HEL
 
 This example shows how to use inputs, allowing multiple publications to arrive at the same input handle (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
 
-### Difference compared to the Advanced Default example
+### Differences compared to the Advanced Default example
 
 This example deviates fairly significantly from the [Advanced Default example](./advanced_default.md) in that it only has a Battery and Charger federate. The Charger federate was modeled with one charging terminal that branches out to the five Battery terminals. That is, from the Charger federates perspective, there is only one charging voltage and one charging current even though the federation is still constructed to charge five batteries.
 
@@ -127,6 +127,6 @@ As the batteries are not replaced during charging, the initial charging power wi
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

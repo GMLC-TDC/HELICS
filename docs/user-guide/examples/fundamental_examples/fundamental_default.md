@@ -6,9 +6,9 @@ The Base Example tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Default Setup](#default-setup)
-  - [Messages + Communication: pub sub](#messages-communication-pub-sub)
+  - [Messages + Communication: pub sub](#messages-and-communication-pubsub)
   - [Simulator Integration: External JSON](#simulator-integration-external-json)
-  - [Co-simulation Execution:](#co-simulation-execution-helics-cli)
+  - [Co-simulation Execution:](#co-simulation-execution)
 - [Questions and Help](#questions-and-help)
 
 ## Example files
@@ -27,7 +27,7 @@ The files include:
 
 The default setup, used in the Base Example, integrates the federate configurations with external JSON files. The message and communication configurations are publications and subscriptions. This section introduces federate configuration of publications (pubs) and subscriptions (subs) with JSON files and how to launch the co-simulation with the HELICS runner.
 
-### Messages + Communication: pub/sub
+### Messages and Communication: pub/sub
 
 In the Base Example, the information being passed between the `Battery.py` federate and the `Charger.py` federate is the **voltage** applied to the battery, and the **current** measured across the battery and fed back to the charger. Voltage and current are both physical quantities, meaning that unless we act on these quantities to change them, they will retain their values. For this reason, in HELICS, physical quantities are called **values**. Values are sent via publication and subscription -- a federate can publish its value(s), and another federate can subscribe this value(s).
 
@@ -98,7 +98,7 @@ This federate is configured with pubs and subs, so it will need an option to ind
 
 This pub and sub configuration is telling us that the `Battery.py` federate is publishing in units of amps (`A`) for current from the named handle (`key`) `Battery/EV1_current`. This federate is also subscribing to information from the `Charger.py` federate. It has subscribed to a value in units of volts (`V`) at the named handle (`key`) `Charger/EV1_voltage`.
 
-As discussed in [Register and Configure Federates](#register-and-configure-federates), the federate registration and configuration with JSON files in the python federate is done with one line of code:
+As discussed in ["Simulator Integration: External JSON""](#simulator-integration-external-json), the federate registration and configuration with JSON files in the python federate is done with one line of code:
 
 ```python
 fed = h.helicsCreateValueFederateFromConfig("BatteryConfig.json")
@@ -149,7 +149,7 @@ This runner tells `helics_broker` that there are three federates and to take a s
 2. Launch the `Charger.py` federate in the current directory: `python -u Charger.py 1`
 3. Launch the `Battery.py` federate in the current directory: `python -u Battery.py 1`
 
-The final step is to launch our Base Example with the HELICS runner from the command line:
+The final step is to launch our Base Example with the HELICS runner from the command line (making sure you've [installed the HELICS cli extension](../../installation/index.md)):
 
 ```shell
 helics run --path=fundamental_default_runner.json
@@ -166,6 +166,6 @@ We can see the state of charge of each battery over the duration of the co-simul
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

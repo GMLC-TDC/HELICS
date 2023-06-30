@@ -7,4 +7,4 @@ breathe==4.34.0
 sphinxcontrib-svg2pdfconverter==1.2.2
 requests==2.28.2
 gmlc-tdc-sphinxcontrib-redoc==1.6.1a1
-sphinxcontrib-mermaid==0.8.0
+sphinxcontrib-mermaid==0.8.1

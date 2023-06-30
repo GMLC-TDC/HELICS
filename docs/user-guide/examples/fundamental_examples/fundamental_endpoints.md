@@ -6,8 +6,8 @@ This tutorial is organized as follows:
 
 - [Example files](#example-files)
 - [Federate Communication with Endpoints](#federate-communication-with-endpoints)
-  - [When to use pub/subs vs endpoints](#when-to-use-pub-subs-vs-endpoints)
-  - [Translation from pub/sub to endpoints](#translation-from-pub-sub-to-endpoints)
+  - [When to use pub/subs vs endpoints](#when-to-use-pubsubs-vs-endpoints)
+  - [Translation from pub/sub to endpoints](#translation-from-pubsub-to-endpoints)
     - [Config Files](#config-files)
     - [Simulators](#simulators)
   - [Co-simulation Execution](#co-simulation-execution)
@@ -323,6 +323,6 @@ Armed now with the knowledge of endpoints and messages, how could you change the
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

@@ -19,7 +19,7 @@ This example on [Iteration](https://github.com/GMLC-TDC/HELICS-Examples/tree/mai
 
 This example shows how to use set up the iteration calls that support state convergence across federates. This is discussed in more detail in the [User Guide](../../advanced_topics/iteration.md).
 
-### Differences compared to the Default example
+### Differences Compared to the Advanced Default Example
 
 This example changes the model of the default example so that the charger voltage is a function of the battery current: $V_{ch}(I_{b})$. Conversely, battery current is a function of charger voltage: $I_{b}(V_{ch})$.
 As a result, each time step requires some iteration to find the converged fixed-point, where both models are in a consistent state.
@@ -413,6 +413,6 @@ The point is, that the specific charger control architecture is not of interest 
 
 Do you have questions about HELICS or need help?
 
-1. Come to [office hours](mailto:helicsteam@helics.org)!
+1. Come to [office hours](https://helics.org/HELICSOfficeHours.ics)!
 2. Post on the [gitter](https://gitter.im/GMLC-TDC/HELICS)!
 3. Place your question on the [github forum](https://github.com/GMLC-TDC/HELICS/discussions)!

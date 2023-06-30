@@ -126,6 +126,8 @@ myst_enable_extensions = [
 ]
 myst_dmath_double_inline = True
 
+myst_heading_anchors = 5
+
 breathe_projects = {
     "helics": os.path.abspath(os.path.join(current_directory, "./../build-doxygen/docs/xml")),
 }
@@ -158,7 +160,7 @@ release = ""
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
