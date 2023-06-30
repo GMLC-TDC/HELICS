@@ -44,11 +44,11 @@ Distributed with the example is the [source code for the FMU battery model](http
 
 With helics_fmi and FMU built, all that remains is providing command line options for helics_fmi. Looking at the [runner JSON for this example](https://github.com/GMLC-TDC/HELICS-Examples/blob/main/user_guide_examples/advanced/advanced_fmu/runner.json), the following options are used:
 
-    - `stoptime` - The simulated time in seconds for ending the FMU simulation
-    - `step` - Simulation step size, equivalent to `period` in HELICS configuration
-    - `name` - Federate name
-    - `flags` - Special runtime flags to address particular FMU needs
-    - `set` - Allow for interaction with the interface values defined by the FMU. In this case it is used to define initialization values.
+- `stoptime` - The simulated time in seconds for ending the FMU simulation
+- `step` - Simulation step size, equivalent to `period` in HELICS configuration
+- `name` - Federate name
+- `flags` - Special runtime flags to address particular FMU needs
+- `set` - Allow for interaction with the interface values defined by the FMU. In this case it is used to define initialization values.
 
 ## Execution and Results
 
