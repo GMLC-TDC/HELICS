@@ -119,7 +119,7 @@ Studio version should match the version of the Boost libraries you are using.
 
 If you installed Boost into the root of the C or D drives with the
 default location (or the `BOOST_INSTALL_PATH` environment variable has been set), CMake should automatically detect their location. Otherwise the
-location will need to be manually given to CMake.
+location will need to be manually given to CMake. Also set `Boost_INCLUDE_DIR` to the location of the Boost folder.
 NOTE: CMake 3.14 and later separate the architecture into a separate field for the generator
 
 A basic call with `cmake` using Visual Studio 2022 on a 64bit Windows machine and installing to a folder called `install` inside the repository would be:
