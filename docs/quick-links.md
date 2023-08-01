@@ -7,7 +7,7 @@
     references/configuration_options_reference
     user-guide/advanced_topics/queries
     user-guide/advanced_topics/environment_variables
-    references/api-reference/C_API
+    references/api-reference/index
     user-guide/installation/helics_cmake_options
     references/apps/index
 

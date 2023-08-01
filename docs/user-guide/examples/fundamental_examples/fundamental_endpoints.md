@@ -143,7 +143,7 @@ As with the Base Example, configuration can be done with JSON files. The first c
 ]
 ```
 
-If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-0) that the `period` controls the minimum time resolution for a federate.
+If you have run the Base Example, you will have seen that the information passed between the federates occurs at the same HELICS time; both federates have `"period": 60` in their config files. Recall from the [Configuration Options Reference](../../../references/configuration_options_reference.md#period-1ns) that the `period` controls the minimum time resolution for a federate.
 
 We have a federation sending messages at the same time (`"period": 60`), and HELICS doesn't know which message arrives first. We need to introduce an `offset` to the config file of one of the federates to force it to wait until the message has been received. We also need to keep `"uninterruptible": false`, so that the federate will be granted the time at which it has received a message (which will be `"period": 60`).
 

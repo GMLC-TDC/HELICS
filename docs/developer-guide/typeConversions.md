@@ -145,32 +145,32 @@ Similar to getDoubleFromString in conversion of vectors. It will convert most re
 
 ### Conversion from vector double
 
-- INT -> trunc(vectorNorm(val)) [^1]
+- INT -> trunc(vectorNorm(val)) [^3]
 - DOUBLE -> vectorNorm(val)
 - COMPLEX -> val[0]+val[1]j
 - VECTOR -> val
 - COMPLEX_VECTOR -> [val[0],val[1],...,val[N]]
-- STRING -> vectorString(val) [^2]
-- NAMED_POINT -> {vectorString(val), NaN} [^3]
+- STRING -> vectorString(val) [^4]
+- NAMED_POINT -> {vectorString(val), NaN} [^5]
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
-[^1]: vectorNorm is the sqrt of the inner product of the vector.
-[^2]: vectorString is comma-separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
-[^3]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
+[^3]: vectorNorm is the sqrt of the inner product of the vector.
+[^4]: vectorString is comma-separated string of the numerical values enclosed in `[]`, for example `[45.7,22.7,17.8]`. This is a JSON compatible string format.
+[^5]: if the vector is a single element the NAMED_POINT translation is equivalent to a double translation.
 
 ### Conversion from Complex Vector
 
 - INT -> trunc(vectorNorm(val))
 - DOUBLE -> vectorNorm(val)
 - COMPLEX -> val[0]
-- VECTOR -> [abs(val[0]),abs(val[1]),...abs(val[N])][^1]
+- VECTOR -> [abs(val[0]),abs(val[1]),...abs(val[N])][^6]
 - COMPLEX_VECTOR -> val
 - NAMED_POINT -> {vectorString(val), NaN}
 - STRING -> complexVectorString(val)
 - BOOL -> (vectorNorm(val)!=0)?"1":"0"
 
 See [Conversion from vector double](#conversion-from-vector-double) for definitions of vectorNorm.
-[^1]: if the imaginary part of these values is 0, then the real part is used; otherwise it uses the absolute value.
+[^6]: if the imaginary part of these values is 0, then the real part is used; otherwise it uses the absolute value.
 
 ### Conversion from Complex
 
