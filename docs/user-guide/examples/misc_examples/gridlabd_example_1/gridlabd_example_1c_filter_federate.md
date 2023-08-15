@@ -22,7 +22,7 @@ The figure below is an example of a representation of the message topology of a 
 
 ## Example 1c - EV charge controller with HELICS filters
 
-To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](../../../fundamental_topics/message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs.
+To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](../../../fundamental_topics/message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs. ([Model files for this example can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/a8334177c28a520e4809219ce97377c7fcf3cb6a/user_guide_examples/misc/gridlabd_example_1/Example_1c).)
 
 ![Ex. 1c signal topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1c_Message_topology.png)
 

@@ -30,7 +30,7 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 ## Example 1a - Basic transmission and distribution powerflow
 
-To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS/tree/helics3/examples/user_guide_examples/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
+To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS-Examples/tree/a8334177c28a520e4809219ce97377c7fcf3cb6a/user_guide_examples/misc/gridlabd_example_1/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
 
 1.  [HELICS](../../../installation/index.md)
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
