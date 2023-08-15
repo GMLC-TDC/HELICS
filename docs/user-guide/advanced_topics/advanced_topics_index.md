@@ -27,6 +27,7 @@
     simultaneous_cosimulations
     targeted_endpoints
     timeouts
+    timingOptimization
     translators
     webserver
 
@@ -69,5 +70,6 @@ The Advanced Topics will cover:
 - [**Simultaneous co-simulations**](./simultaneous_cosimulations.md) - Options for running multiple independent co-simulations on a single system.
 - [**Targeted Endpoints**](./targeted_endpoints.md) - details on the new targeted endpoints in HELICS 3.
 - [**Timeouts**](./timeouts.md) - HELICS includes a number of timeouts to prevent failed operations from continuing indefinitely, the various timeout options are discussed in this document.
+- [**Timing Optimization**](./timingOptimization.md) - Guidance and recommendation on how to configure and set-up timing to optimize federation performance.
 - [**Translators**](./translators.md) - Translators provide a means of HELICS message interfaces to communicate with HELICS value interfaces and vice versa.
 - [**Webserver API**](./webserver.md) - How to interact with a running co-simulation using a REST-based web API.
