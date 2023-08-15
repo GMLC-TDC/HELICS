@@ -27,7 +27,6 @@ The topics considered "fundamental" to building a co-simualtion with HELICS are:
   - [Value Federates](./value_federates.md)
   - [Message Federates](./message_federates.md)
   - [Filters](./filters.md)
-  - [Value Types](./value_types.md)
 - [**Federate Interface Configuration**](./interface_configuration.md) - How to connect an existing simulator with HELICS
   - [**With JSON config file**](./interface_configuration.md#json-configuration)
   - [**With HELICS APIs**](./interface_configuration.md#api-configuration)

@@ -7,7 +7,6 @@
 
     value_federates
     message_federates
-    value_types
     filters
 
 ```
