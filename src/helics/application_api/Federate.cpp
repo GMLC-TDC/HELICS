@@ -1146,13 +1146,27 @@ void Federate::registerFilterInterfaces(const std::string& configString)
     }
 }
 
+static Translator& generateTranslator(Federate* fed,
+    bool global,
+    std::string_view name,
+    TranslatorTypes ttype,std::string_view endpointType,std::string_view units)
+{
+    Translator & trans=(global) ? fed->registerGlobalTranslator(name,endpointType,units) :
+        fed->registerTranslator(name, endpointType, units);
+    if (ttype!=TranslatorTypes::CUSTOM)
+    {
+       trans.setTranslatorType(static_cast<std::int32_t>(ttype));
+    }
+    return trans;
+}
+
 static Filter& generateFilter(Federate* fed,
                               bool global,
                               bool cloning,
-                              const std::string& name,
+                              std::string_view name,
                               FilterTypes operation,
-                              const std::string& inputType,
-                              const std::string& outputType)
+                              std::string_view inputType,
+                              std::string_view outputType)
 {
     bool useTypes = !((inputType.empty()) && (outputType.empty()));
     if (useTypes) {
@@ -1164,42 +1178,52 @@ static Filter& generateFilter(Federate* fed,
                           fed->registerFilter(name, inputType, outputType);
     }
     if (cloning) {
-        return (global) ? make_cloning_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
-                          make_cloning_filter(operation, fed, name);
+        Filter & filt=(global) ? fed->registerGlobalCloningFilter(name) :
+            fed->registerCloningFilter(name);
+        if (operation!=FilterTypes::CUSTOM)
+        {
+            filt.setFilterType(static_cast<std::int32_t>(operation));
+        }
+        return filt;
     }
-    return (global) ? make_filter(InterfaceVisibility::GLOBAL, operation, fed, name) :
-                      make_filter(operation, fed, name);
+    Filter & filt=(global) ? fed->registerCloningFilter(name) :
+        fed->registerFilter(name);
+    if (operation!=FilterTypes::CUSTOM)
+    {
+        filt.setFilterType(static_cast<std::int32_t>(operation));
+    }
+    return filt;
 }
 
 static constexpr std::string_view emptyStr;
 
-template<class Inp>
-static void loadOptions(Federate* fed, const Inp& data, Filter& filt)
+template<class Inp, class INTERFACE>
+static void loadOptions(Federate* fed, const Inp& data, INTERFACE& iface)
 {
-    addTargets(data, "flags", [&filt, fed](const std::string& target) {
+    addTargets(data, "flags", [&iface, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
         int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a recognized flag");
             return;
         }
-        filt.setOption(oindex, val);
+        iface.setOption(oindex, val);
     });
     processOptions(
         data,
         [](const std::string& option) { return getOptionIndex(option); },
         [](const std::string& value) { return getOptionValue(value); },
-        [&filt](int32_t option, int32_t value) { filt.setOption(option, value); });
+        [&iface](int32_t option, int32_t value) { iface.setOption(option, value); });
 
     auto info = fileops::getOrDefault(data, "info", emptyStr);
     if (!info.empty()) {
-        filt.setInfo(info);
+        iface.setInfo(info);
     }
-    loadTags(data, [&filt](std::string_view tagname, std::string_view tagvalue) {
-        filt.setTag(tagname, tagvalue);
+    loadTags(data, [&iface](std::string_view tagname, std::string_view tagvalue) {
+        iface.setTag(tagname, tagvalue);
     });
-    auto asrc = [&filt](const std::string& target) { filt.addSourceTarget(target); };
-    auto adest = [&filt](const std::string& target) { filt.addDestinationTarget(target); };
+    auto asrc = [&iface](const std::string& target) { iface.addSourceTarget(target); };
+    auto adest = [&iface](const std::string& target) {iface.addDestinationTarget(target); };
     addTargets(data, "sourcetargets", asrc);
     addTargets(data, "sourceTargets", asrc);
     addTargets(data, "source_targets", asrc);
@@ -1213,6 +1237,9 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
     using fileops::getOrDefault;
     auto doc = fileops::loadJson(jsonString);
 
+    bool defaultGlobal = false;
+    fileops::replaceIfMember(doc, "defaultglobal", defaultGlobal);
+
     if (doc.isMember("filters")) {
         for (const auto& filt : doc["filters"]) {
             std::string key = getOrDefault(filt, "name", emptyStr);
@@ -1220,7 +1247,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             bool cloningflag = getOrDefault(filt, "cloning", false);
             bool useTypes = !((inputType.empty()) && (outputType.empty()));
-
+            bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
             std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
@@ -1250,7 +1277,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                 }
             }
             auto& filter =
-                generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
             loadOptions(this, filt, filter);
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
@@ -1303,6 +1330,80 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             }
         }
     }
+    if (doc.isMember("translators")) {
+        for (const auto& trans : doc["translators"]) {
+            std::string key = getOrDefault(trans, "name", emptyStr);
+
+            std::string ttype = getOrDefault(trans, "type", std::string("custom"));
+            auto opType = translatorTypeFromString(ttype);
+            auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
+            auto units = fileops::getOrDefault(trans, "unit", emptyStr);
+            fileops::replaceIfMember(trans, "units", units);
+            bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
+            
+           
+
+                if (opType == TranslatorTypes::UNRECOGNIZED) {
+                    if (strictConfigChecking) {
+                        std::string emessage =
+                            fmt::format("unrecognized translator type:{}", ttype);
+                        logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
+
+                        throw(InvalidParameter(emessage));
+                    }
+                    logMessage(HELICS_LOG_LEVEL_WARNING,
+                        fmt::format("unrecognized filter operation:{}", ttype));
+                    continue;
+                }
+            auto& translator =
+                generateTranslator(this, global, key, opType, etype, units);
+            loadOptions(this, trans, translator);
+
+            if (trans.isMember("properties")) {
+                auto props = trans["properties"];
+                if (props.isArray()) {
+                    for (const auto& prop : props) {
+                        if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
+                            if (strictConfigChecking) {
+                                logMessage(
+                                    HELICS_LOG_LEVEL_ERROR,
+                                    R"(translator properties require "name" and "value" fields)");
+
+                                throw(InvalidParameter(
+                                    R"(translator properties require "name" and "value" fields)"));
+                            }
+                            logMessage(HELICS_LOG_LEVEL_WARNING,
+                                R"(translator properties require "name" and "value" fields)");
+                            continue;
+                        }
+                        if (prop["value"].isDouble()) {
+                            translator.set(prop["name"].asString(), prop["value"].asDouble());
+                        } else {
+                            translator.setString(prop["name"].asString(), prop["value"].asString());
+                        }
+                    }
+                } else {
+                    if ((!props.isMember("name")) || (!props.isMember("value"))) {
+                        if (strictConfigChecking) {
+                            logMessage(HELICS_LOG_LEVEL_ERROR,
+                                R"(translator properties require "name" and "value" fields)");
+
+                            throw(InvalidParameter(
+                                R"(translator properties require "name" and "value" fields)"));
+                        }
+                        logMessage(HELICS_LOG_LEVEL_WARNING,
+                            R"(translator properties require "name" and "value" fields)");
+                        continue;
+                    }
+                    if (props["value"].isDouble()) {
+                        translator.set(props["name"].asString(), props["value"].asDouble());
+                    } else {
+                        translator.setString(props["name"].asString(), props["value"].asString());
+                    }
+                }
+            }
+        }
+    }
     if (doc.isMember("globals")) {
         if (doc["globals"].isArray()) {
             for (auto& val : doc["globals"]) {
@@ -1338,6 +1439,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 {
     using fileops::getOrDefault;
     using fileops::isMember;
+    using fileops::replaceIfMember;
 
     toml::value doc;
     try {
@@ -1346,6 +1448,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
     catch (const std::invalid_argument& ia) {
         throw(helics::InvalidParameter(ia.what()));
     }
+    bool defaultGlobal = false;
+    replaceIfMember(doc, "defaultglobal", defaultGlobal);
 
     if (isMember(doc, "filters")) {
         auto filts = toml::find(doc, "filters");
@@ -1359,7 +1463,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             bool useTypes = !((inputType.empty()) && (outputType.empty()));
-
+            bool global = getOrDefault(filt, "global", defaultGlobal);
             std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
@@ -1387,7 +1491,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                 }
             }
             auto& filter =
-                generateFilter(this, false, cloningflag, key, opType, inputType, outputType);
+                generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
 
             loadOptions(this, filt, filter);
 
@@ -1449,6 +1553,98 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     } else {
                         filter.setString(propname,
                                          static_cast<std::string_view>(propval.as_string()));
+                    }
+                }
+            }
+        }
+    }
+    if (isMember(doc,"translators")) {
+        auto transs = toml::find(doc, "translators");
+        if (!transs.is_array()) {
+            throw(helics::InvalidParameter("translators section in toml file must be an array"));
+        }
+        auto& transArray = transs.as_array();
+        for (const auto& trans : transArray) {
+            std::string key = getOrDefault(trans, "name", emptyStr);
+
+            std::string ttype = getOrDefault(trans, "type", std::string("custom"));
+            auto opType = translatorTypeFromString(ttype);
+            auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
+            auto units = fileops::getOrDefault(trans, "unit", emptyStr);
+            fileops::replaceIfMember(trans, "units", units);
+            bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
+
+
+
+            if (opType == TranslatorTypes::UNRECOGNIZED) {
+                if (strictConfigChecking) {
+                    std::string emessage =
+                        fmt::format("unrecognized translator type:{}", ttype);
+                    logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
+
+                    throw(InvalidParameter(emessage));
+                }
+                logMessage(HELICS_LOG_LEVEL_WARNING,
+                    fmt::format("unrecognized filter operation:{}", ttype));
+                continue;
+            }
+            auto& translator =
+                generateTranslator(this, global, key, opType, etype, units);
+            loadOptions(this, trans, translator);
+
+            if (isMember(trans, "properties")) {
+                auto props = toml::find(trans, "properties");
+                if (props.is_array()) {
+                    auto& propArray = props.as_array();
+                    for (const auto& prop : propArray) {
+                        std::string propname;
+                        propname = toml::find_or(prop, "name", propname);
+                        toml::value uVal;
+                        auto propval = toml::find_or(prop, "value", uVal);
+
+                        if ((propname.empty()) || (propval.is_uninitialized())) {
+                            if (strictConfigChecking) {
+                                logMessage(
+                                    HELICS_LOG_LEVEL_ERROR,
+                                    R"(translator properties require "name" and "value" fields)");
+
+                                throw(InvalidParameter(
+                                    R"(translator properties require "name" and "value" fields)"));
+                            }
+                            logMessage(HELICS_LOG_LEVEL_WARNING,
+                                R"(translator properties require "name" and "value" fields)");
+                            continue;
+                        }
+                        if (propval.is_floating()) {
+                            translator.set(propname, propval.as_floating());
+                        } else {
+                            translator.setString(propname,
+                                static_cast<std::string_view>(propval.as_string()));
+                        }
+                    }
+                } else {
+                    std::string propname;
+                    propname = toml::find_or(props, "name", propname);
+                    toml::value uVal;
+                    auto propval = toml::find_or(props, "value", uVal);
+
+                    if ((propname.empty()) || (propval.is_uninitialized())) {
+                        if (strictConfigChecking) {
+                            logMessage(HELICS_LOG_LEVEL_ERROR,
+                                R"(translator properties require "name" and "value" fields)");
+
+                            throw(InvalidParameter(
+                                R"(translator properties require "name" and "value" fields)"));
+                        }
+                        logMessage(HELICS_LOG_LEVEL_WARNING,
+                            R"(translator properties require "name" and "value" fields)");
+                        continue;
+                    }
+                    if (propval.is_floating()) {
+                        translator.set(propname, propval.as_floating());
+                    } else {
+                        translator.setString(propname,
+                            static_cast<std::string_view>(propval.as_string()));
                     }
                 }
             }
