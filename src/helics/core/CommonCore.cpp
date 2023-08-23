@@ -1523,8 +1523,13 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                     throw(InvalidIdentifier(
                         "translators cannot have publications as destination targets"));
                     break;
-                case InterfaceType::ENDPOINT:
                 default:
+                    //translators have two outputs
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    addActionMessage(cmd);
+                    cmd.setAction(CMD_ADD_NAMED_INPUT);
+                    break;
+                case InterfaceType::ENDPOINT:
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
                 case InterfaceType::FILTER:
@@ -1590,8 +1595,13 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
         case InterfaceType::TRANSLATOR:
             switch (hint) {
                 case InterfaceType::PUBLICATION:
-                default:
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    break;
+                default:
+                    //translators can have two inputs
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    addActionMessage(std::move(cmd));
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
                 case InterfaceType::INPUT:
                     throw(InvalidIdentifier("translators cannot have inputs as a source"));
