@@ -1231,14 +1231,9 @@ static void loadOptions(Federate* fed, const Inp& data, INTERFACE& iface)
     loadTags(data, [&iface](std::string_view tagname, std::string_view tagvalue) {
         iface.setTag(tagname, tagvalue);
     });
-    auto asrc = [&iface](const std::string& target) { iface.addSourceTarget(target); };
-    auto adest = [&iface](const std::string& target) {iface.addDestinationTarget(target); };
-    addTargets(data, "sourcetargets", asrc);
-    addTargets(data, "sourceTargets", asrc);
-    addTargets(data, "source_targets", asrc);
-    addTargets(data, "destinationTargets", adest);
-    addTargets(data, "destinationtargets", adest);
-    addTargets(data, "destination_targets", adest);
+
+    addTargetVariations(data,"source","targets",[&iface](const std::string& target) { iface.addSourceTarget(target); });
+    addTargetVariations(data,"destination","targets",[&iface](const std::string& target) { iface.addDestinationTarget(target);});
 }
 
 static void arrayPairProcess(Json::Value doc,
@@ -1385,6 +1380,13 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             auto& translator =
                 generateTranslator(this, global, key, opType, etype, units);
             loadOptions(this, trans, translator);
+
+            addTargetVariations(trans,"source","endpoints",[&translator](const std::string& target) { translator.addSourceEndpoint(target); });
+            addTargetVariations(trans,"destination","endpoints",[&translator](const std::string& target) { translator.addDestinationEndpoint(target); });
+            addTargetVariations(trans,"source","publications",[&translator](const std::string& target) { translator.addPublication(target); });
+            addTargetVariations(trans,"destination","inputs",[&translator](const std::string& target) { translator.addInputTarget(target); });
+            addTargetVariations(trans,"source","filters",[&translator](const std::string& target) { translator.addSourceFilter(target); });
+            addTargetVariations(trans,"destination","filters",[&translator](const std::string& target) { translator.addDestinationFilter(target); });
 
             if (trans.isMember("properties")) {
                 auto props = trans["properties"];
@@ -1619,6 +1621,14 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             auto& translator =
                 generateTranslator(this, global, key, opType, etype, units);
             loadOptions(this, trans, translator);
+
+            addTargetVariations(trans,"source","endpoints",[&translator](const std::string& target) { translator.addSourceEndpoint(target); });
+            addTargetVariations(trans,"destination","endpoints",[&translator](const std::string& target) { translator.addDestinationEndpoint(target); });
+            addTargetVariations(trans,"source","publications",[&translator](const std::string& target) { translator.addPublication(target); });
+            addTargetVariations(trans,"destination","inputs",[&translator](const std::string& target) { translator.addInputTarget(target); });
+            addTargetVariations(trans,"source","filters",[&translator](const std::string& target) { translator.addSourceFilter(target); });
+            addTargetVariations(trans,"destination","filters",[&translator](const std::string& target) { translator.addDestinationFilter(target); });
+
 
             if (isMember(trans, "properties")) {
                 auto props = toml::find(trans, "properties");
