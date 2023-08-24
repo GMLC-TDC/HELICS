@@ -430,17 +430,12 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
                 Json::Value tran;
                 tran["id"] = trans->id.handle.baseValue();
                 tran["name"] = trans->key;
-                /*
-                tran["source_targets"] = generateStringVector(filt->sourceTargets, [](auto& dep) {
-                    return std::to_string(dep.fed_id.baseValue()) +
-                        "::" + std::to_string(dep.handle.baseValue());
-                });
-                tran["dest_targets"] = generateStringVector(filt->destTargets, [](auto& dep) {
-                    return std::to_string(dep.fed_id.baseValue()) +
-                        "::" + std::to_string(dep.handle.baseValue());
-                });
-                */
-                tran["translators"].append(std::move(tran));
+        
+                tran["source_endpoints"] = trans->getEndpointInfo()->getSourceTargets();
+                tran["destination_endpoints"] = trans->getEndpointInfo()->getDestinationTargets();
+                tran["source_publications"] = trans->getPubInfo()->getTargets();
+                tran["destination_inputs"] = trans->getInputInfo()->getTargets();
+                base["translators"].append(std::move(tran));
             }
         }
         return fileops::generateJsonString(base);
