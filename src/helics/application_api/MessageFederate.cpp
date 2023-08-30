@@ -193,16 +193,22 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     });
     addTargets(data, "subscriptions", [&ept](std::string_view sub) { ept.subscribe(sub); });
     addTargets(data, "filters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
-    addTargets(data, "sourceFilters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
+    addTargetVariations(data, "source", "inputs", [&ept](std::string_view ipt) { ept.subscribe(ipt); });
+    addTargetVariations(data, "source", "filters", [&ept](std::string_view filt) { ept.addSourceFilter(filt); });
+    addTargetVariations(data, "destination","filters", [&ept](std::string_view filt) { ept.addDestinationFilter(filt); });
+    addTargetVariations(data, "source", "endpoints", [&ept](std::string_view endpoint) { ept.addSourceEndpoint(endpoint); });
+    addTargetVariations(data, "destination","endpoints", [&ept](std::string_view endpoint) { ept.addDestinationEndpoint(endpoint); });
     addTargets(data, "destFilters", [&ept](std::string_view filt) {
         ept.addDestinationFilter(filt);
-    });
+        });
 
-    auto defTarget = getOrDefault(data, "target", emptyStr);
+    auto defTarget = fileops::getOrDefault(data, "target", emptyStr);
     fileops::replaceIfMember(data, "destination", defTarget);
     if (!defTarget.empty()) {
         ept.setDefaultDestination(defTarget);
     }
+
+    
 }
 
 void MessageFederate::registerMessageInterfacesJson(const std::string& jsonString)
