@@ -430,7 +430,7 @@ std::string TranslatorFederate::query(std::string_view queryStr) const
                 Json::Value tran;
                 tran["id"] = trans->id.handle.baseValue();
                 tran["name"] = trans->key;
-        
+
                 tran["source_endpoints"] = trans->getEndpointInfo()->getSourceTargets();
                 tran["destination_endpoints"] = trans->getEndpointInfo()->getDestinationTargets();
                 tran["source_publications"] = trans->getPubInfo()->getTargets();

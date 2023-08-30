@@ -1524,7 +1524,7 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                         "translators cannot have publications as destination targets"));
                     break;
                 default:
-                    //translators have two outputs
+                    // translators have two outputs
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     addActionMessage(cmd);
                     cmd.setAction(CMD_ADD_NAMED_INPUT);
@@ -1598,7 +1598,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
                     break;
                 default:
-                    //translators can have two inputs
+                    // translators can have two inputs
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
                     addActionMessage(std::move(cmd));
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
