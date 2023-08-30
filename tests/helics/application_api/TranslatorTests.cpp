@@ -895,27 +895,26 @@ TEST_F(translator, translator_multiinput)
     FullDisconnect();
 }
 
-
 TEST_F(translator, translator_config)
 {
     auto broker = AddBroker("test", 1);
 
-    auto cFed1=std::make_shared<helics::CombinationFederate>(std::string(TEST_DIR) + "ControllerConfig.json");
-
+    auto cFed1 = std::make_shared<helics::CombinationFederate>(std::string(TEST_DIR) +
+                                                               "ControllerConfig.json");
 
     EXPECT_NO_THROW(cFed1->enterExecutingMode());
 
-    EXPECT_EQ(cFed1->getTranslatorCount(),5U);
-    EXPECT_EQ(cFed1->getInputCount(),5U);
+    EXPECT_EQ(cFed1->getTranslatorCount(), 5U);
+    EXPECT_EQ(cFed1->getInputCount(), 5U);
 
-    auto &trans1=cFed1->getTranslator(0);
+    auto& trans1 = cFed1->getTranslator(0);
 
-    EXPECT_EQ(trans1.getName(),"EV_1_translator");
+    EXPECT_EQ(trans1.getName(), "EV_1_translator");
 
-    cFed1->query("broker","global_flush");
-    auto dflow=cFed1->query("broker","data_flow_graph");
-    auto fnd=dflow.find("EV_2_translator");
-    EXPECT_NE(fnd,std::string::npos);
+    cFed1->query("broker", "global_flush");
+    auto dflow = cFed1->query("broker", "data_flow_graph");
+    auto fnd = dflow.find("EV_2_translator");
+    EXPECT_NE(fnd, std::string::npos);
     cFed1->finalize();
 
     FullDisconnect();

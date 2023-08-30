@@ -52,7 +52,7 @@
       "name": "trans2", //translators can have names (optional)
       "sourcetargets": ["filterFed/ept2"], //this is a key field specifying the source targets can be an array
       //"dest":["dest targets"],  // field specifying destination targets
-      "type": "json", //currently valid types are "json","binary","custom"
-    },
+      "type": "json" //currently valid types are "json","binary","custom"
+    }
   ]
 }

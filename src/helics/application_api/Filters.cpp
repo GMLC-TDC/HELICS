@@ -44,10 +44,9 @@ FilterTypes filterTypeFromString(std::string_view filterType) noexcept
     return FilterTypes::UNRECOGNIZED;
 }
 
-
 void Filter::setFilterType(std::int32_t type)
 {
-    addOperations(this, static_cast<FilterTypes>(type),nullptr);
+    addOperations(this, static_cast<FilterTypes>(type), nullptr);
 }
 
 void addOperations(Filter* filt, FilterTypes type, Core* /*cptr*/)
