@@ -21,11 +21,12 @@ endif()
 
 if(COMMAND cotire AND "1.7.9" VERSION_LESS "${COTIRE_CMAKE_MODULE_VERSION}")
     set(ucm_with_cotire 1)
-    option(UCM_UNITY_BUILD          "Enable unity build for targets registered with the ucm_add_target() macro"                     OFF)
-    option(UCM_NO_COTIRE_FOLDER     "Do not use a cotire folder in the solution explorer for all unity and cotire related targets"  ON)
 else()
     set(ucm_with_cotire 0)
 endif()
+
+option(UCM_UNITY_BUILD          "Enable unity build for targets registered with the ucm_add_target() macro"                     OFF)
+option(UCM_NO_COTIRE_FOLDER     "Do not use a cotire folder in the solution explorer for all unity and cotire related targets"  ON)
 
 # ucm_add_flags
 # Adds compiler flags to CMAKE_<LANG>_FLAGS or to a specific config
@@ -74,6 +75,38 @@ endmacro()
 # Sets the CMAKE_<LANG>_FLAGS compiler flags or for a specific config
 macro(ucm_set_flags)
     ucm_add_flags(CLEAR_OLD ${ARGN})
+endmacro()
+
+# ucm_remove_flags
+# Removes compiler flags from CMAKE_<LANG>_FLAGS or from a specific config
+macro(ucm_remove_flags)
+    cmake_parse_arguments(ARG "C;CXX" "" "CONFIG" ${ARGN})
+
+    if(NOT ARG_CONFIG)
+        set(ARG_CONFIG " ")
+    endif()
+
+    foreach(CONFIG ${ARG_CONFIG})
+        # determine from which flags to remove
+        if(NOT ${CONFIG} STREQUAL " ")
+            string(TOUPPER ${CONFIG} CONFIG)
+            set(CXX_FLAGS CMAKE_CXX_FLAGS_${CONFIG})
+            set(C_FLAGS CMAKE_C_FLAGS_${CONFIG})
+        else()
+            set(CXX_FLAGS CMAKE_CXX_FLAGS)
+            set(C_FLAGS CMAKE_C_FLAGS)
+        endif()
+
+        # remove all the passed flags
+        foreach(flag ${ARG_UNPARSED_ARGUMENTS})
+            if("${ARG_CXX}" OR NOT "${ARG_C}")
+                string(REGEX REPLACE "${flag}" "" ${CXX_FLAGS} "${${CXX_FLAGS}}")
+            endif()
+            if("${ARG_C}" OR NOT "${ARG_CXX}")
+                string(REGEX REPLACE "${flag}" "" ${C_FLAGS} "${${C_FLAGS}}")
+            endif()
+        endforeach()
+    endforeach()
 endmacro()
 
 # ucm_add_linker_flags
