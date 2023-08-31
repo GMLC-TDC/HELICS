@@ -100,10 +100,10 @@ void Probe::runProbe()
     while (endpoint.hasMessage()) {
         auto m = endpoint.getMessage();
         fed->logInfoMessage(
-            fmt::format("Message from {} at Time {}: [{}]", m->source, ctime, m->to_string()));
+            fmt::format("Message from {} at Time {}: [{}]", m->source, static_cast<double>(ctime), m->to_string()));
         ++messagesReceived;
     }
-    endpoint.send(fmt::format("message from {},time {}", fed->getName(), ctime));
+    endpoint.send(fmt::format("message from {},time {}", fed->getName(), static_cast<double>(ctime)));
 }
 
 }  // namespace helics::apps

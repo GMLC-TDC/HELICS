@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "helics_definitions.hpp"
 // #include "core/core-data.hpp"
-#include "../common/fmt_format.h"
 
 #include <algorithm>
 #include <cstring>
+#include <fmt/format.h>
 #include <memory>
 #include <set>
 #include <utility>

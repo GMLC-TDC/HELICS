@@ -12,7 +12,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/ValueFederate.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
+
 #include "../core/helicsCLI11.hpp"
 #include "../core/helicsVersion.hpp"
 #include "PrecHelper.hpp"
@@ -20,6 +20,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <iostream>
+#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <regex>
@@ -256,21 +257,21 @@ namespace apps {
                     if (val.size() < 150) {
                         if (iteration > 0) {
                             valstr = fmt::format(
-                                "[{}:{}]value {}={}", currentTime, iteration, sub.getTarget(), val);
+                                "[{}:{}]value {}={}", static_cast<double>(currentTime), iteration, sub.getTarget(), val);
                         } else {
                             valstr =
-                                fmt::format("[{}]value {}={}", currentTime, sub.getTarget(), val);
+                                fmt::format("[{}]value {}={}", static_cast<double>(currentTime), sub.getTarget(), val);
                         }
                     } else {
                         if (iteration > 0) {
                             valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                                                 currentTime,
+                                static_cast<double>(currentTime),
                                                  iteration,
                                                  sub.getTarget(),
                                                  val.size());
                         } else {
                             valstr = fmt::format("[{}]value {}=block[{}]",
-                                                 currentTime,
+                                static_cast<double>(currentTime),
                                                  sub.getTarget(),
                                                  val.size());
                         }
@@ -294,13 +295,13 @@ namespace apps {
                     std::string messstr;
                     if (mess->data.size() < 50) {
                         messstr = fmt::format("[{}]message from {} to {}::{}",
-                                              currentTime,
+                            static_cast<double>(currentTime),
                                               mess->source,
                                               mess->dest,
                                               mess->data.to_string());
                     } else {
                         messstr = fmt::format("[{}]message from {} to {}:: size {}",
-                                              currentTime,
+                            static_cast<double>(currentTime),
                                               mess->source,
                                               mess->dest,
                                               mess->data.size());
@@ -325,13 +326,13 @@ namespace apps {
                     std::string messstr;
                     if (mess->data.size() < 50) {
                         messstr = fmt::format("[{}]message from {} to {}::{}",
-                                              currentTime,
+                            static_cast<double>(currentTime),
                                               mess->source,
                                               mess->original_dest,
                                               mess->data.to_string());
                     } else {
                         messstr = fmt::format("[{}]message from %s to %s:: size %d",
-                                              currentTime,
+                            static_cast<double>(currentTime),
                                               mess->source,
                                               mess->original_dest,
                                               mess->data.size());

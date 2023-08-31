@@ -11,7 +11,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/frozen_map.h"
 #include "ValueConverter.hpp"
-#include "fmt/format.h"
+#include <fmt/format.h>
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
@@ -38,7 +38,7 @@ struct fmt::formatter<std::complex<double>> {
     {
         // ctx.out() is an output iterator to write to.
         // return format(ctx.out(), "[{},{}]",p.real(), p.imag());
-        return fmt::vformat_to(ctx.out(), "[{},{}]", fmt::make_format_args(p.real(), p.imag()));
+        return fmt::format_to(ctx.out(), "[{},{}]", p.real(), p.imag());
     }
 };
 

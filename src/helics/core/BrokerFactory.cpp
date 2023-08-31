@@ -15,10 +15,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/concurrency/DelayedDestructor.hpp"
 #include "gmlc/concurrency/SearchableObjectHolder.hpp"
 #include "gmlc/concurrency/TripWire.hpp"
-#include "helics/common/fmt_format.h"
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <fmt/format.h>
 #include <tuple>
 #include <utility>
 

@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BaseTimeCoordinator.hpp"
 
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
@@ -17,6 +16,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <set>
 #include <string>
 #include <vector>
+#include <fmt/format.h>
 
 namespace helics {
 

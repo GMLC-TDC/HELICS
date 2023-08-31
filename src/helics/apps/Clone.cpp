@@ -10,8 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
-#include "../common/fmt_ostream.h"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
@@ -20,6 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <map>
 #include <regex>
 #include <set>
@@ -236,21 +236,21 @@ namespace apps {
                     if (val.size() < 150) {
                         if (iteration > 0) {
                             valstr = fmt::format(
-                                "[{}:{}]value {}={}", currentTime, iteration, sub.getTarget(), val);
+                                "[{}:{}]value {}={}", static_cast<double>(currentTime), iteration, sub.getTarget(), val);
                         } else {
                             valstr =
-                                fmt::format("[{}]value {}={}", currentTime, sub.getTarget(), val);
+                                fmt::format("[{}]value {}={}", static_cast<double>(currentTime), sub.getTarget(), val);
                         }
                     } else {
                         if (iteration > 0) {
                             valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                                                 currentTime,
+                                static_cast<double>(currentTime),
                                                  iteration,
                                                  sub.getTarget(),
                                                  val.size());
                         } else {
                             valstr = fmt::format("[{}]value {}=block[{}]",
-                                                 currentTime,
+                                static_cast<double>(currentTime),
                                                  sub.getTarget(),
                                                  val.size());
                         }
