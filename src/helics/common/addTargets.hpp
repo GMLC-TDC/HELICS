@@ -72,7 +72,7 @@ bool addTargets(const Json::Value& section, std::string targetName, Callable cal
 
 template<typename Block, typename Callable>
 void addTargetVariations(const Block& section,
-                         std::string name1,
+                         const std::string &name1,
                          std::string name2,
                          Callable callback)
 {
