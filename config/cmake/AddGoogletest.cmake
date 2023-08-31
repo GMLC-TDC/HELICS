@@ -12,7 +12,7 @@
 # output on failed tests without having to set an environment variable.
 #
 
-set(gtest_version release-1.12.1)
+set(gtest_version v1.14.0)
 
 string(TOLOWER "googletest" gtName)
 
