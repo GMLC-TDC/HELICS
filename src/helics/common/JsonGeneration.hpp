@@ -5,10 +5,11 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #pragma once
-#include "fmt_format.h"
 
 #include "json/json.h"
 #include "json/writer.h"
+
+#include <fmt/format.h>
 #include <string>
 
 namespace helics {

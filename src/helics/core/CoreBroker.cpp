@@ -9,7 +9,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "../common/JsonGeneration.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
 #include "../common/logging.hpp"
 #include "BaseTimeCoordinator.hpp"
 #include "BrokerFactory.hpp"
@@ -28,6 +27,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <iostream>
 #include <limits>
 #include <set>
+#include <fmt/format.h>
 #include <string>
 #include <utility>
 #include <vector>

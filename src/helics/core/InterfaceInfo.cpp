@@ -7,10 +7,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "InterfaceInfo.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
+#include <fmt/format.h>
 #include <sstream>
 #include <string>
 #include <utility>

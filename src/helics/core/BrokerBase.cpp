@@ -7,7 +7,7 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include "../common/fmt_format.h"
+#include <fmt/format.h>
 #include "../common/logging.hpp"
 #include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
@@ -59,6 +59,8 @@ static inline std::string genId()
 }
 
 namespace helics {
+
+
 BrokerBase::BrokerBase(bool DisableQueue) noexcept:
     queueDisabled(DisableQueue), mLogManager(std::make_shared<LogManager>())
 {
@@ -390,7 +392,7 @@ bool BrokerBase::sendToLogger(GlobalFederateId federateID,
             timeString.append(brokerStateName(getBrokerState()));
             timeString.push_back(']');
         } else {
-            timeString = fmt::format("[t={}]", currentTime);
+            timeString = fmt::format("[t={}]", static_cast<double>(currentTime));
         }
         header = fmt::format("{} ({}){}", name, federateID.baseValue(), timeString);
     }

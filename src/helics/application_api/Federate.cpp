@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "../common/addTargets.hpp"
 #include "../common/configFileHelpers.hpp"
-#include "../common/fmt_format.h"
 #include "../core/BrokerFactory.hpp"
 #include "../core/Core.hpp"
 #include "../core/CoreFactory.hpp"
@@ -26,6 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/helics-config.h"
 
 #include <cassert>
+#include <fmt/format.h>
 #include <iostream>
 #include <string>
 #include <utility>

@@ -41,7 +41,8 @@ class MessageTimer {};
 }  // namespace helics
 #endif
 
-#include "../common/fmt_format.h"
+#include <fmt/format.h>
+
 // NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
@@ -1404,10 +1405,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 allowed_send_time = timeCoord->allowedSendTime();
                 if (cmd.action() == CMD_FORCE_TIME_GRANT) {
                     if (!ignore_time_mismatch_warnings) {
-                        LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
+                        LOG_WARNING(fmt::format("forced Granted Time={}", static_cast<double>(time_granted)));
                     }
                 } else {
-                    LOG_TIMING(fmt::format("Granted Time={}", time_granted));
+                    LOG_TIMING(fmt::format("Granted Time={}", static_cast<double>(time_granted)));
                 }
             }
             return (std::get<1>(proc_result));
@@ -1501,8 +1502,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     LOG_WARNING(
                         fmt::format("received message {} at time({}) earlier than granted time({})",
                                     prettyPrintString(cmd),
-                                    cmd.actionTime,
-                                    time_granted));
+                                    static_cast<double>(cmd.actionTime),
+                                    static_cast<double>(time_granted)));
                     auto qres = processQueryActual("global_time_debugging");
                     qres.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(qres);
@@ -1529,8 +1530,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         LOG_WARNING(fmt::format(
                             "received message {} at time({}) earlier than granted time({})",
                             prettyPrintString(cmd),
-                            cmd.actionTime,
-                            time_granted));
+                            static_cast<double>(cmd.actionTime),
+                            static_cast<double>(time_granted)));
                     }
                     auto mess = std::make_unique<Message>();
                     mess->data = std::move(cmd.payload);
@@ -1596,10 +1597,10 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto blockFed = timeCoord->getMinGrantedDependency();
                 if (blockFed.first.isValid()) {
                     LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
-                                            time_granted,
+                                            static_cast<double>(time_granted),
                                             blockFed.first.baseValue()));
                 } else {
-                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", time_granted));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", static_cast<double>(time_granted)));
                 }
 
             } else if (cmd.counter == 3) {
