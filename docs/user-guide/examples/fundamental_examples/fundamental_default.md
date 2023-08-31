@@ -119,13 +119,9 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
 
 ```json
 {
+  "name": "fundamental_default",
+  "broker": true,
   "federates": [
-    {
-      "directory": ".",
-      "exec": "helics_broker -f 2 --loglevel=7",
-      "host": "localhost",
-      "name": "broker"
-    },
     {
       "directory": ".",
       "exec": "python -u Charger.py 1",
@@ -138,9 +134,9 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
       "host": "localhost",
       "name": "Battery"
     }
-  ],
-  "name": "fundamental_default"
+  ]
 }
+
 ```
 
 This runner tells `helics_broker` that there are three federates and to take a specific action for each federate:
