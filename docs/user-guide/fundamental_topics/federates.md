@@ -54,16 +54,16 @@ Value federates have direct fixed connections through interfaces to other federa
 
 - Publications
   - Sending interface
-  - Handle named with `"key"` in configuration
-  - Recipient handle of value is not necessary, however it can be specified with `"targets"` in configuration
+  - Interface named with `"key"` in configuration
+  - Recipient interface value is not necessary, however it can be specified with `"targets"` in configuration
 - Subscriptions (Unnamed Inputs)
   - Receiving interface
   - Not "named" (no identifier to the rest of the federation)
-  - Source of value handle is specified with `"key"` in configuration
+  - Source of value interface is specified with `"key"` in configuration
 - Named Inputs
   - Receiving interface
-  - Handle named with `"key"` in configuration
-  - Source handle of value is not necessary, however it can be specified with `"targets"` -- Named Inputs can receive values from multiple `"targets"`
+  - Interface named with `"key"` in configuration
+  - Source interface of value is not necessary, however it can be specified with `"targets"` -- Named Inputs can receive values from multiple `"targets"`
 
 The most commonly used of these fixed interfaces are publications and subscriptions. In the [Fundamental Example](../examples/fundamental_examples/fundamental_examples_index.md), the Battery federate and the Charger federate have fixed pub/sub connections. In the figure below, publishing interfaces are in <span style="color:red;">**red**</span> and the subscription interfaces are in <span style="color:orange;">**yellow**</span>. The Battery federate **publishes** the current flowing into the battery from the publication interface named `EV_Battery/EV_current` and does not specify the intended recipient. The Charger federate **subscribes** to the amps from the Battery with the subscription interface named `EV_Battery/EV_current` -- the receiving interface only specifies the sender.
 
@@ -94,11 +94,11 @@ Message federates interact with the federation through endpoints interfaces. Mes
 
 Endpoints are interfaces used to pass packetized data blocks (messages) to another federate. Message federates interact with the federation by defining an endpoint that acts as their address to send and receive messages. Message federates are typically sending and receiving measurements, control signals, commands, and other signal data with HELICS acting as a perfect communication system (infinite bandwidth, no latency, guaranteed delivery).
 
-In the figure below, Federate A and B are message federates with endpoints epA and epB. They do not have a fixed communication pathway; they have unique addresses (endpoints) to which messages can be sent. An endpoint can send data to any other endpoint in the system -- it just needs the "address" (endpoint handle).
+In the figure below, Federate A and B are message federates with endpoints epA and epB. They do not have a fixed communication pathway; they have unique addresses (endpoints) to which messages can be sent. An endpoint can send data to any other endpoint in the system -- it just needs the "address" (endpoint interface).
 
 ![](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/ep_connection.png)
 
-Endpoints can have a `"type"` which is a user defined string. HELICS currently does not recognize any predefined types. The data consists of raw binary data and optionally a send time. Messages are delivered first by time order, then federate id number, then handle id, then by order of arrival.
+Endpoints can have a `"type"` which is a user defined string. HELICS currently does not recognize any predefined types. The data consists of raw binary data and optionally a send time. Messages are delivered first by time order, then federate ID number, then interface ID, then by order of arrival.
 
 Unlike HELICS values which are persistent (meaning they are continuously available throughout the co-simulation), HELICS messages are only readable once when collected from an endpoint. Once that collection is made, the message only exists within the memory of the collecting message federate. If another message federate needs the information, a new message must be created and sent to the appropriate endpoint.
 

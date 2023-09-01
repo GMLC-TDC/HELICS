@@ -6,7 +6,7 @@ As soon as one particular instance of a simulator begins running in a co-simulat
 
 **Core type** - The core manages interfaces between the federation and the federate; there are several messaging technologies supported by HELICS.
 
-**Publications and Inputs** - Publication configuration contains a listing of source handle, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
+**Publications and Inputs** - Publication configuration contains a listing of source interface, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
 
 **Endpoints** - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate.
 
@@ -99,11 +99,11 @@ Below is a sample JSON configuration file with some of the more common options. 
 - **`wait_for_current_time_update`** - There are times when HELICS will grant the same simulated time to a number of federates simultaneously. There is a possibility of this leading to unexpected co-simulation results if federates are unexpectedly operating on old data. Using this flag, HELICS uses this option to provide the ability for one federate to always be granted this time last, after all other federates that have been granted this time have requested a later time. This ensures that the federate with this flag set will have all the latest information from all other federates before it begins execution at the granted time.
 - **`federate_init_string`** - This option provides a way of passing in a large number of configuration options that a federate needs during initialization. You can consult the [Configuration Options Reference](../../references/configuration_options_reference.md#broker_init_string--null) page for a more complete list but there are a few worth bringing up specifically. `--broker_address=<IP address>` and `--port=<port number>`- Allows you to specify the IP address and port number of the broker to which you want this federate to connect. You can consult the [Advanced Topics section of the User Guide](../advanced_topics/advanced_topics_index.md) to see further explanation of how to handle more complex broker configuration.
 - **`endpoints`**
-  - `name` - The string in this field is the unique identifier/handle for the endpoint interface.
+  - `name` - The string in this field is the unique identifier for the endpoint interface.
   - `destination` - This option can be used to set a default destination for the messages sent from this endpoint. The default destination is allowed to be rerouted or changed during run time.
   - `global` - Just as in value federates, `global` allows for the identifier of the endpoint to be declared unique for the entire federation.
 - **`publications`**
-  - `key` - The string in this field is the unique identifier/handle (at the federate level) for the value that will be published to the federation. In the example above, `global` is set to `true`, meaning the `key` must be unique to the entire federation.
+  - `key` - The string in this field is the unique identifier (at the federate level) for the value that will be published to the federation. In the example above, `global` is set to `true`, meaning the `key` must be unique to the entire federation.
   - `global` - Indicates that the value in `key` will be used as a global name when other federates are subscribing to the message. This requires that the user ensure that the name is used only once across all federates. Setting `global` to `true` is handy for federations with a small number of federates and a small number of message exchanges as it allows the `key` string to be short and simple. For larger federations, it is likely to be easier to set the flag to `false`.
   - `required` - At least one federate must subscribe to the publications.
   - `type` - Data type, such as integer, double, complex.

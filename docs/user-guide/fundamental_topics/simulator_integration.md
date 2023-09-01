@@ -6,7 +6,7 @@ A "simulator" is the executable program. As soon as one particular instance of t
 
 **Core type** - The core manages interfaces between the federation and the federate; there are several messaging technologies supported by HELICS.
 
-**Publications and Inputs** - Publication configuration contains a listing of source handle, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
+**Publications and Inputs** - Publication configuration contains a listing of source interface name, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
 
 **Endpoints** - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate.
 
@@ -203,7 +203,7 @@ pub = h.helicsFederateGetPublicationByIndex(fed, index)
 pub_key = h.helicsPublicationGetKey(pub)
 ```
 
-The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the handle used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
+The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the interface object used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
 
 ### Federate Execution
 
