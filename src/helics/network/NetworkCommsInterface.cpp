@@ -5,8 +5,6 @@ Energy, LLC.  See the top-level NOTICE for additional details. All rights reserv
 SPDX-License-Identifier: BSD-3-Clause
 */
 #include "NetworkCommsInterface.hpp"
-
-#include "../common/fmt_format.h"
 #include "NetworkBrokerData.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
@@ -15,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #endif
 #include <memory>
 #include <string>
+#include <fmt/format.h>
 
 namespace helics {
 static constexpr char localHostString[] = "localhost";

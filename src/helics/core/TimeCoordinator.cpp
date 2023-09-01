@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "TimeCoordinator.hpp"
 
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
 #include "json/json.h"
 #include <algorithm>
 #include <iostream>
+#include <fmt/format.h>
 #include <set>
 #include <string>
 #include <utility>
