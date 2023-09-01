@@ -112,24 +112,24 @@ class HELICS_CXX_EXPORT Federate {
   public:
     /**constructor taking a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    Federate(std::string_view fedname, const FederateInfo& fi);
+    Federate(std::string_view fedname, const FederateInfo& fedInfo);
     /**constructor taking a core and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a shared pointer to a core object, the pointer will be copied
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
     Federate(std::string_view fedname,
              const std::shared_ptr<Core>& core,
-             const FederateInfo& fi = FederateInfo{});
+             const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a CoreApp and a federate information structure
     @param fedname the name of the federate can be empty to use a name from the federateInfo
     @param core a CoreApp with the core core connect to.
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-    Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fi = FederateInfo{});
+    Federate(std::string_view fedname, CoreApp& core, const FederateInfo& fedInfo = FederateInfo{});
     /**constructor taking a file with the required information
     @param configString can be either a JSON file or a string containing JSON code or a TOML file
     */
@@ -685,9 +685,9 @@ received
     The FilterOperator gets called when there is a message to filter, There is no order or state to
     this messages can come in any order.
     @param filt the filter object to set the operation on
-    @param op a shared_ptr to a \ref FilterOperator
+    @param filtOp a shared_ptr to a \ref FilterOperator
     */
-    void setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> op);
+    void setFilterOperator(const Filter& filt, std::shared_ptr<FilterOperator> filtOp);
 
     /** get the number of filters registered through this federate*/
     int getFilterCount() const;
@@ -722,9 +722,10 @@ received
     The TranslatorOperator gets called when there is a message or value to translate, there is no
     order or state to this as messages can come in any order.
     @param trans the translator object to set the operation on
-    @param op a shared_ptr to a \ref TranslatorOperator
+    @param transOp a shared_ptr to a \ref TranslatorOperator
     */
-    void setTranslatorOperator(const Translator& trans, std::shared_ptr<TranslatorOperator> op);
+    void setTranslatorOperator(const Translator& trans,
+                               std::shared_ptr<TranslatorOperator> transOp);
 
     /** get the number of translators registered through this federate*/
     int getTranslatorCount() const;
@@ -771,8 +772,16 @@ received
     @param configString  the location of the file or config String to load to generate the
     interfaces
     */
-    void registerFilterInterfaces(const std::string& configString);
-
+    void registerConnectorInterfaces(const std::string& configString);
+    /** register filter/translator interfaces defined in a file or string
+    @details call is only valid in startup mode will be deprecated
+    @param configString  the location of the file or config String to load to generate the
+    interfaces
+    */
+    void registerFilterInterfaces(const std::string& configString)
+    {
+        registerConnectorInterfaces(configString);
+    }
     /** get the underlying federateID for the core*/
     auto getID() const noexcept { return fedID; }
     /** get the current state of the federate*/
@@ -823,6 +832,12 @@ received
     void completeOperation();
 
   private:
+    void getCore(const FederateInfo& fedInfo);
+    /** function to get the core into a valid state*/
+    void verifyCore();
+    /** function to register the federate with the core*/
+    void registerFederate(const FederateInfo& fedInfo);
+
     /** function to deal with any operations that occur on a mode switch*/
     void updateFederateMode(Modes newMode);
     /** function to deal with any operations that need to occur on a time update*/
@@ -847,9 +862,9 @@ class HELICS_CXX_EXPORT Interface {
     std::string mName;  //!< the name or key of the interface
   public:
     Interface() = default;
-    Interface(Federate* federate, InterfaceHandle id, std::string_view actName);
-    Interface(Core* core, InterfaceHandle id, std::string_view actName):
-        cr(core), handle(id), mName(actName)
+    Interface(Federate* federate, InterfaceHandle hid, std::string_view actName);
+    Interface(Core* core, InterfaceHandle hid, std::string_view actName):
+        cr(core), handle(hid), mName(actName)
     {
     }
     virtual ~Interface() = default;
