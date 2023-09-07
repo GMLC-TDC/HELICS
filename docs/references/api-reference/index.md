@@ -9,6 +9,7 @@
     rest_queries_api
 
 ```
+
 ## [C API](./C_API)
 
 ## [Python API](https://python.helics.org/api/)

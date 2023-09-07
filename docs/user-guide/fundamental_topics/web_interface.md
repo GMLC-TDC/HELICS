@@ -49,4 +49,3 @@ Just like writing code, it is not unusual for a co-simulation to not quite work 
 2. Enter a simulated time of interest and press the "Run to next grant" button (number 4 in the above diagram)
 3. Check the state of the federation - When the co-simulation stops at the indicated time, check that all federates of interest have been granted and are requesting expected times. Check the message table and verify that all messages of interest have published with reasonable/expected values.
 4. As necessary, proceed to subsequent or later time steps to hunt down the particular problem of interest.
-

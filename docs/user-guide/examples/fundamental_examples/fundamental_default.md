@@ -136,7 +136,6 @@ The runner JSON for the Base Example is called `fundamental_default_runner.json`
     }
   ]
 }
-
 ```
 
 This runner tells `helics_broker` that there are three federates and to take a specific action for each federate:

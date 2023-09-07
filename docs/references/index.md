@@ -10,9 +10,7 @@ This section is most useful for those that are acting as integrators, getting a 
    configuration_options_reference
    Tools_using_HELICS
    apps/index
-   
+
 
 
 ```
-
-

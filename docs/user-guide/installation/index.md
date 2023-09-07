@@ -101,9 +101,9 @@ Installation instructions are available in the [matHELICS repository README](htt
 
 [`spack install helics`](./spack.md)
 
-## Running an Example 
+## Running an Example
 
-The [Quick Start guide](../../quick_start/quick_start_index.md) walks through the steps of running the first Python-based User Guide example and serves as a good way to test your (Python) installation. 
+The [Quick Start guide](../../quick_start/quick_start_index.md) walks through the steps of running the first Python-based User Guide example and serves as a good way to test your (Python) installation.
 
 ## HELICS runner
 
@@ -114,5 +114,3 @@ helics run --path=<path to HELICS runner JSON>
 ```
 
 This functionality still exists but has been moved to the [PyHELICS code base](https://python.helics.org/) and the `helics_cli` repository has been deprecated. Thus, it is recommended that all users install PyHELICS (via `pip install 'helics[cli]'` as described above) to gain the runner and web interface functionality.
-
-

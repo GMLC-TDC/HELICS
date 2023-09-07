@@ -9,8 +9,7 @@ This example is from an old version of the User Guide and shows how GridLAB-D ca
     gridlabd_example_1a_value_federate
     gridlabd_example_1b_message_federate
     gridlabd_example_1c_filter_federate
-    
-    
+
+
 
 ```
-

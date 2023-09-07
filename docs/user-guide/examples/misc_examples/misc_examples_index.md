@@ -7,7 +7,6 @@ This section provides a collection of miscellaneous examples that we hope will h
     :maxdepth: 1
 
     gridlabd_example_1/gridlabd_example_1_index
-    
+
 
 ```
-
