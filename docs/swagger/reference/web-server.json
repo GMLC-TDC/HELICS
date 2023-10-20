@@ -3,7 +3,6 @@
   "info": {
     "title": "web server",
     "version": "1.0",
-    "summary": "HELICS web server API",
     "description": "Description of the services from a Helics web server for broker management",
     "contact": {
       "name": "Philip Top"
@@ -24,16 +23,6 @@
         "summary": "Get Index page",
         "operationId": "index",
         "description": "Get the index page no properties",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {}
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK",
@@ -85,7 +74,18 @@
           },
           "description": "Post the necessary fields for the API to create a new broker."
         },
-        "description": "Create a new broker"
+        "description": "Create a new broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "broker_id",
+            "in": "path",
+            "required": true,
+            "description": "name of the broker"
+          }
+        ]
       },
       "get": {
         "summary": "run a query on a broker",
@@ -118,41 +118,13 @@
             "schema": {
               "type": "string"
             },
-            "in": "query",
-            "name": "target",
-            "description": "query target"
-          },
-          {
-            "schema": {
-              "type": "string"
-            },
-            "in": "query",
-            "name": "query",
-            "description": "name of the query"
+            "name": "broker_id",
+            "in": "path",
+            "required": true,
+            "description": "name of the broker"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../models/webQueryInfo.yaml"
-              }
-            }
-          },
-          "description": "additional information including targets and query string for the target"
-        }
+        ]
       },
-      "parameters": [
-        {
-          "schema": {
-            "type": "string"
-          },
-          "name": "broker_id",
-          "in": "path",
-          "required": true,
-          "description": "name of the broker"
-        }
-      ],
       "delete": {
         "summary": "",
         "operationId": "delete-broker_id",
@@ -161,7 +133,18 @@
             "description": "OK"
           }
         },
-        "description": "remove a broker"
+        "description": "remove a broker",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "name": "broker_id",
+            "in": "path",
+            "required": true,
+            "description": "name of the broker"
+          }
+        ]
       }
     },
     "/{broker_id}/{target_id}/{query}": {
@@ -307,16 +290,6 @@
         },
         "operationId": "get-broker_id-query",
         "description": "make a query on a specific broker or target on the default broker  equivalent to broker/target, target/query",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../models/webQueryInfo.yaml"
-              }
-            }
-          },
-          "description": "This is supplying 2 parameters in the address,  the parameters can also be supplied as a qeury parameter or in the body"
-        },
         "parameters": [
           {
             "schema": {
@@ -390,16 +363,7 @@
           }
         },
         "operationId": "get-search-target_id",
-        "description": "search for a specific object or broker and get its information",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../models/webQueryInfo.yaml"
-              }
-            }
-          }
-        }
+        "description": "search for a specific object or broker and get its information"
       }
     },
     "/{broker_id}/barrier": {
@@ -777,22 +741,7 @@
             "name": "uuid",
             "description": "uuid of the broker"
           }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "../models/webQueryInfo.yaml"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": ""
-              }
-            }
-          },
-          "description": ""
-        }
+        ]
       }
     },
     "/healthcheck": {
