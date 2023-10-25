@@ -50,24 +50,23 @@ HELICS provides a method which allows the federate to check if a specific endpoi
 If a value change is not guaranteed every time the simulator is granted time, or if multiple values are being updated in lockstep with a change on one indicating many have changed, a call to the `isUpdated` method prior to asking for the latest value can significantly reduce total computation time, and net substantial performance benefits.
 
 ```python
+...
+hFed = helics.helicsCreateValueFederateFromConfig(helicsConfig)
+subLMP = helics.helicsFederateGetInputByTarget(hFed, tso_federate + "/LMP_" + bus)
+...
+
+# ==================== Time step looping under HELICS ===========================
+helics.helicsFederateEnterExecutingMode(hFed)
+
+while time_granted < time_stop:
     ...
-    hFed = helics.helicsCreateValueFederateFromConfig(helicsConfig)
-    subLMP = helics.helicsFederateGetInputByTarget(hFed, tso_federate + '/LMP_' + bus)
+    time_granted = int(helics.helicsFederateRequestTime(hFed, nextHELICSTime))
+    # Faster to check than to always grab the input every time the federate
+    #   is granted time
+    if helics.helicsInputIsUpdated(subLMP):
+        LMP = helics.helicsInputGetDouble(subLMP)
+        aucObj.set_lmp(LMP)
     ...
-
-    # ==================== Time step looping under HELICS ===========================
-    helics.helicsFederateEnterExecutingMode(hFed)
-
-    while time_granted < time_stop:
-        ...
-        time_granted = int(helics.helicsFederateRequestTime(hFed, nextHELICSTime))
-        # Faster to check than to always grab the input every time the federate
-        #   is granted time
-        if helics.helicsInputIsUpdated(subLMP):
-            LMP = helics.helicsInputGetDouble(subLMP)
-            aucObj.set_lmp(LMP)
-        ...
-
 ```
 
 ## `onlyUpdateOnChange`
