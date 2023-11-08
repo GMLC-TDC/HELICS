@@ -41,7 +41,7 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
     return static_cast<HelicsDataBuffer>(ptr);
 }
 
-static helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
+helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
 {
     auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
     return (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) ? ptr : nullptr;

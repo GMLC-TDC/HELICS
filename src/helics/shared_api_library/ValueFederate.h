@@ -509,6 +509,16 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
 
 /**
+* Get a copy of the raw data in a data buffer
+*
+* @param inp The input to get the data for.
+*
+* @param[in,out] err A pointer to an error object for catching errors.
+* @return A HelicsDataBuffer object
+*/
+HELICS_EXPORT HelicsDataBuffer helicsInputGetBuffer(HelicsInput inp, HelicsError* err);
+
+/**
  * Get the size of a value for an input assuming return as a string.
  *
  * @return The size of the string.

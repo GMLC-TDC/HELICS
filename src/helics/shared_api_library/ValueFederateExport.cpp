@@ -9,6 +9,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ValueFederate.h"
 #include "internal/api_objects.h"
 
+#include "helicsData.h"
+
 #include <algorithm>
 #include <cstring>
 #include <map>
@@ -737,6 +739,17 @@ bool checkOutputArgString(const char* outputString, int maxlen, HelicsError* err
         return false;
     }
     return true;
+}
+
+HelicsDataBuffer helicsInputGetBuffer(HelicsInput inp, HelicsError* err)
+{
+    auto* inpObj = verifyInput(inp, err);
+    if (inpObj == nullptr) {
+        return (nullptr);
+    }
+    helics::data_view dv=inpObj->inputPtr->getBytes();
+    auto* ptr = new helics::SmallBuffer(dv.string_view());
+    return createAPIDataBuffer(*ptr);
 }
 
 void helicsInputGetBytes(HelicsInput inp, void* data, int maxDatalen, int* actualSize, HelicsError* err)

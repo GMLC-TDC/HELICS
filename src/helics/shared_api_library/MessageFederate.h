@@ -603,6 +603,15 @@ HELICS_EXPORT void helicsMessageGetBytes(HelicsMessage message, void* data, int 
 HELICS_EXPORT void* helicsMessageGetBytesPointer(HelicsMessage message);
 
 /**
+* Get a data buffer to the message object
+*
+* @param message A message object to get the dataBuffer for
+*
+* @return A HelicsDataBuffer object to the data in a message.  Modifying the buffer will directly modify the message contents.
+*/
+HELICS_EXPORT HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err);
+
+/**
  * A check if the message contains a valid payload.
  *
  * @param message The message object in question.
@@ -736,6 +745,16 @@ HELICS_EXPORT void helicsMessageSetString(HelicsMessage message, const char* dat
  * @param[in,out] err An error object to fill out in case of an error.
  */
 HELICS_EXPORT void helicsMessageSetData(HelicsMessage message, const void* data, int inputDataLength, HelicsError* err);
+
+/**
+* Set the data payload of a message from a HelicsDataBuffer Object
+*
+* @param message The message object in question.
+* @param data the dataBuffer containing the appropriate data, if null will clear the message payload
+*
+* @param[in,out] err An error object to fill out in case of an error.
+*/
+HELICS_EXPORT void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, HelicsError* err)
 
 /**
  * Append data to the payload.
