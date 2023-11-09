@@ -1179,15 +1179,6 @@ HelicsMessage helicsMessageClone(HelicsMessage message, HelicsError* err)
     return mess_clone;
 }
 
-HelicsDataBuffer helicsMessageDataBuffer(HelicsMessage message, HelicsError* err)
-{
-    auto* mess = getMessageObj(message, err);
-    if (mess == nullptr) {
-        return nullptr;
-    }
-    return createAPIDataBuffer(mess->data);
-}
-
 void helicsMessageFree(HelicsMessage message)
 {
     auto* mess = getMessageObj(message, nullptr);

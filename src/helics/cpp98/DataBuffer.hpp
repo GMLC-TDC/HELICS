@@ -20,24 +20,24 @@ class DataBuffer {
     DataBuffer() HELICS_NOTHROW: buff(helicsCreateDataBuffer(0)) {}
     explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {}
 
-    void toBytes(double val) { helicsDoubleToBytes(val, buff); }
-    void toBytes(int64_t val) { helicsIntegerToBytes(val, buff); }
-    void toBytes(const std::string& val) { helicsStringToBytes(val.c_str(), buff); }
+    void toBytes(double val) { helicsDataBufferFromDouble(buff, val); }
+    void toBytes(int64_t val) { helicsDataBufferFromInteger(buff, val); }
+    void toBytes(const std::string& val) { helicsDataBufferFromString(buff, val.c_str()); }
     void toBytes(const std::vector<double>& val)
     {
-        helicsVectorToBytes(val.data(), static_cast<int>(val.size()), buff);
+        helicsDataBufferFromVector(buff, val.data(), static_cast<int>(val.size()));
     }
     void toBytes(const std::complex<double> val)
     {
-        helicsComplexToBytes(val.real(), val.imag(), buff);
+        helicsDataBufferFromComplex(buff, val.real(), val.imag());
     }
-    void toBytes(const double* vals, int size) { helicsVectorToBytes(vals, size, buff); }
+    void toBytes(const double* vals, int size) { helicsDataBufferFromVector(buff, vals, size); }
     void toBytes(const std::string& name, double val)
     {
-        helicsNamedPointToBytes(name.c_str(), val, buff);
+        helicsDataBufferFromNamedPoint(buff, name.c_str(), val);
     }
-    void toBytes(bool val) { helicsBooleanToBytes(val ? HELICS_TRUE : HELICS_FALSE, buff); }
-    void toBytes(char val) { helicsCharToBytes(val, buff); }
+    void toBytes(bool val) { helicsDataBufferFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
+    void toBytes(char val) { helicsDataBufferFromChar(buff, val); }
 
     /** get the size of the raw value */
     int size() { return helicsDataBufferSize(buff); }

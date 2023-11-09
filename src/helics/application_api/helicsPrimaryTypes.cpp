@@ -607,8 +607,10 @@ void valueExtract(const data_view& dv, DataType baseType, std::string& val)
         }
         case DataType::HELICS_STRING:
         case DataType::HELICS_CHAR:
-        default:
             val = ValueConverter<std::string_view>::interpret(dv);
+            break;
+        case DataType::HELICS_UNKNOWN:
+            val=dv.string();
             break;
         case DataType::HELICS_NAMED_POINT: {
             auto npv = ValueConverter<NamedPoint>::interpret(dv);

@@ -44,13 +44,23 @@ HelicsDataBuffer helicsWrapDataInBuffer(void* data, int dataSize, int dataCapaci
 helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
 {
     auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
-    return (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) ? ptr : nullptr;
+    if (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) {
+        return ptr;
+    }
+    auto *message= getMessageObj(data, nullptr);
+    if (message != nullptr)
+    {
+        return &message->data;
+    }
+    return nullptr;
 }
 
 void helicsDataBufferFree(HelicsDataBuffer data)
 {
-    auto* ptr = getBuffer(data);
-    delete ptr;
+    auto* ptr = reinterpret_cast<helics::SmallBuffer*>(data);
+    if (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) {
+        delete ptr;
+    }
 }
 
 HelicsBool helicsDataBufferIsValid(HelicsDataBuffer data)
@@ -103,7 +113,7 @@ HelicsDataBuffer helicsDataBufferClone(HelicsDataBuffer data)
     return static_cast<HelicsDataBuffer>(newptr);
 }
 
-HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFromInteger(HelicsDataBuffer data, int64_t value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -119,7 +129,7 @@ HELICS_EXPORT int32_t helicsIntegerToBytes(int64_t value, HelicsDataBuffer data)
 }
 
 /** convert a double to serialized bytes*/
-HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFromDouble(HelicsDataBuffer data, double value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -135,7 +145,7 @@ HELICS_EXPORT int32_t helicsDoubleToBytes(double value, HelicsDataBuffer data)
 }
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFromString(HelicsDataBuffer data, const char* str)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -151,7 +161,7 @@ HELICS_EXPORT int32_t helicsStringToBytes(const char* str, HelicsDataBuffer data
 }
 
 /** convert a string to serialized bytes*/
-HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, HelicsDataBuffer data)
+HELICS_EXPORT int32_t helicsDataBufferFromRawString(HelicsDataBuffer data, const char* str, int stringSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -166,7 +176,7 @@ HELICS_EXPORT int32_t helicsRawStringToBytes(const char* str, int stringSize, He
     }
 }
 
-int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data)
+int32_t helicsDataBufferFromBoolean(HelicsDataBuffer data, HelicsBool value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -183,7 +193,7 @@ int32_t helicsBooleanToBytes(HelicsBool value, HelicsDataBuffer data)
 }
 
 /** convert a char to serialized bytes*/
-int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
+int32_t helicsDataBufferFromChar(HelicsDataBuffer data, char value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -199,7 +209,7 @@ int32_t helicsCharToBytes(char value, HelicsDataBuffer data)
 }
 
 /** convert a HelicsTime to serialized bytes*/
-int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
+int32_t helicsDataBufferFromTime(HelicsDataBuffer data, HelicsTime value)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -214,7 +224,7 @@ int32_t helicsTimeToBytes(HelicsTime value, HelicsDataBuffer data)
     }
 }
 
-int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
+int32_t helicsDataBufferFromComplex(HelicsDataBuffer data, double real, double imag)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -229,7 +239,7 @@ int32_t helicsComplexToBytes(double real, double imag, HelicsDataBuffer data)
     }
 }
 
-int32_t helicsNamedPointToBytes(const char* name, double val, HelicsDataBuffer data)
+int32_t helicsDataBufferFromNamedPoint(HelicsDataBuffer data, const char* name, double val)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -244,12 +254,12 @@ int32_t helicsNamedPointToBytes(const char* name, double val, HelicsDataBuffer d
     }
 }
 
-int32_t helicsComplexObjectToBytes(HelicsComplex value, HelicsDataBuffer data)
+int32_t helicsDataBufferFromComplexObject(HelicsDataBuffer data, HelicsComplex value)
 {
-    return helicsComplexToBytes(value.real, value.imag, data);
+    return helicsDataBufferFromComplex(data, value.real, value.imag);
 }
 
-int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+int32_t helicsDataBufferFromVector(HelicsDataBuffer data, const double* value, int dataSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
@@ -270,7 +280,7 @@ int32_t helicsVectorToBytes(const double* value, int dataSize, HelicsDataBuffer 
 // std::complex is explicitly allowed to alias like this in the standard
 #endif
 
-int32_t helicsComplexVectorToBytes(const double* value, int dataSize, HelicsDataBuffer data)
+int32_t helicsDataBufferFromComplexVector(HelicsDataBuffer data, const double* value, int dataSize)
 {
     auto* ptr = getBuffer(data);
     if (ptr == nullptr) {
