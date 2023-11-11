@@ -1,4 +1,4 @@
-# Filters
+# Example 1c: Filters and their Impacts on HELICS Messages
 
 As was introduced in the [introductory section on federates](../../../fundamental_topics/federates.md), message federates (and combo federates) are used to send messages (control signals, measurements, anything traveling over some kind of communication network) via HELICS to other federates. Though they seem very similar, the way messages and values are handled by HELICS is very different and is motivated by the underlying reality they are being used to model.
 
@@ -22,52 +22,14 @@ The figure below is an example of a representation of the message topology of a 
 
 ## Example 1c - EV charge controller with HELICS filters
 
-To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](../../../fundamental_topics/message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 600 second delay to the control messages sent from the EV charge controller to each of the EVs. ([Model files for this example can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/a8334177c28a520e4809219ce97377c7fcf3cb6a/user_guide_examples/misc/gridlabd_example_1/Example_1c).)
+To demonstrate the effects of filters, let's take the same model we were working with in the [previous example](../../../fundamental_topics/message_federates.md), and add a filter to the controller. Specifically, let's assume a very, very poor communication system and add a 3600 second delay to the control messages sent from the EV charge controller to each of the EVs. ([Model files for this example can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1).)
 
 ![Ex. 1c signal topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1c_Message_topology.png)
 
-Let's run [this co-simulation](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1c/) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
+Let's run [this co-simulation](https://github.com/GMLC-TDC/HELICS-Examples/blob/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1/1c_cosim_runner.json) and capture the same data as last time for direct comparison: total substation load and EV charging behavior, both as a function of time.
 
-![Ex. 1c total feeder load](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1c_Feeder_consumption.png)
+![Ex. 1c total feeder load and voltage](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1c_transmission_plot.png?raw=true)
 
-![Ex. 1c EV charge pattern](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1c_EV_outputs.png)
+![Ex. 1c EV charge pattern](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1c_EV_plot.png?raw=true)
 
 Granted that the charge controller communication system is ridiculously poor, this example does show that communication system effects can have a significant impact on system operation. For more realistic example, the HELICS Use Case repository has [an example](https://github.com/GMLC-TDC/HELICS-Use-Cases/tree/main/PNNL-Wide-Area-Control) of frequency control using real-time PMU measurements that shows the impact of imperfect communication systems.
-
-## Explicit Communication System Modeling
-
-HELICS filters are a simple, easy step to add a touch of realism to messages in the HELICS co-simulation. The simplicity of filters, though, may be inadequate at times. Real-world communication networks have dynamic delays and data loss rates, protocol effects, and more complex topologies. Sometimes, these effects are important (or may even be the point of the co-simulation) and an explicit communication system model is required to capture these effects.
-
-The wonderful thing about the software architecture of HELICS is that simulators that have been properly modified to allow HELICS integration will seamlessly slide into the role of filters without having to reconfigure the sending and receiving federates. The move from native HELICS filters to full-blown communication system models is invisible. This is achieved by allowing user-defined nodes in a communication system model to be designated the filter for a given endpoint. All HELICS messages coming from that endpoint enter the communication system federate at that node and message being sent to that endpoint exit the communication system federate at that node. Conceptually, the change looks something like the figure below:
-
-![Replacing native HELICS filters with explicit communication network simulator](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/filter_federate_example.png)
-
-### Example 1d - EV charge controller with an ns-3 model
-
-For this co-simulation, we're going to use [ns-3](https://www.nsnam.org) as our communication system model. Like many other detailed simulators, ns-3 is a complicated simulator, more complicated than can easily be explained in any detail here. If you're so interested, the [ns-3 tutorial](https://www.nsnam.org/docs/release/3.29/tutorial/html/index.html) is excellent and is the best place to start to understand how it is used to model and simulate communication systems. For those not wanting to dig into that, here's the three sentence version: ns-3 models the communication system topology as a collection of nodes and communication channels connecting them. Depending on the type of channel used, various properties (e.g. delay) can be assigned to them. On top of this network, various protocols can be assigned to build up the protocol stack with applications at the top of the stack.
-
-When using HELICS and ns-3 together, the application that is installed is the bridge between the communication network and the rest of the HELICS federation. For each endpoint that is modeled in the communication network, a HELICS filter ns-3 application is installed at a corresponding node in the ns-3 model.
-
-The specific ns-3 model built for this example uses the CSMA model built into ns-3 as a stand-in for a power-line carrier (PLC) communication system. Both CSMA and PLC use a bus topology with all transmitters attached to a common, shared communication channel. Each EV in the electrical network will be represented by a corresponding communication node. Older PLC implementations were known to be quite slow and we'll abuse and stretch this fact to force the average of the communication delays through the network to match that of the previous example. We'll also set the receiver at the substation to have a corresponding receive error rate.
-
-First, you'll need to install [ns-3](https://www.nsnam.org/docs/release/3.29/tutorial/html/getting-started.html#downloading-ns-3-using-git) and add the [HELICS module](https://github.com/GMLC-TDC/helics-ns3). As the README indicates, HELICS for ns-3 is an extension that is simply plopped into the standard ns-3 distribution `contrib` folder and the configured with a few extra switches and compiled.
-
-**EXAMPLE USING NS-3 AND HELICS IS UNDER DEVELOPMENT**
-
-<!--
-Touhid is developing the ns-3 model
-
-First, to make sure the model is working as intended, let's verify that performance of the communication system model is different when using the native HELICS filters vs a stand-alone communication network simulator.
-
-(xxxxxxx - histogram of delay times for one communication burst)
-
-We can see that when using the native HELICS filters the arrival times of all the messages (ignoring those that were randomly dropped) is exactly xxxxxxx seconds. The arrival times for the messages flowing through the ns-3 model, though, are much more varied as we might expect from a more fully represented communication system model.
-
-What impact does this model have on the performance of the system?
-
-(xxxxxxx - graphs: Substation load (using results from 1b, 1c, 1d) vs time; Number of EVs charging (using results from 1b, 1c, 1d) vs time)
-
-(xxxxxxx - Graph showing impact at transmission level due to communication system effects.)
-
-As you can see, xxxxxxx
--->

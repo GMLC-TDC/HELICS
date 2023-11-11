@@ -30,7 +30,9 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 ## Example 1a - Basic transmission and distribution powerflow
 
-To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS-Examples/tree/a8334177c28a520e4809219ce97377c7fcf3cb6a/user_guide_examples/misc/gridlabd_example_1/Example_1a) but to use them you'll need to get some specific software installed; here are the instructions:
+To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS-Examples/tree/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1) but to use them you'll need to get some specific software installed; here are the instructions:
+
+
 
 1.  [HELICS](../../../installation/index.md)
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
@@ -58,22 +60,22 @@ To run this simulation, the HELICS team has also developed a standardized means 
 
 ```json
 {
-  "broker": false,
-  "federates": [
-    {
-      "directory": "./Transmission/",
-      "exec": "python Transmission_simulator.py",
-      "host": "localhost",
-      "name": "PythonCombinationFederate"
-    },
-    {
-      "directory": "./Distribution/",
-      "exec": "gridlabd IEEE_123_feeder_0.glm",
-      "host": "localhost",
-      "name": "GridLABDFederate"
-    }
-  ],
-  "name": "Example-1a-T-D-Cosimulation-HELICSRunner"
+    "broker": true,
+    "federates":[
+        {
+            "directory":".",
+            "exec":"python 1abc_Transmission_simulator.py -c 1a",
+            "host":"localhost",
+            "name":"1a_Transmission"
+        },
+        {
+            "directory":".",
+            "exec":"gridlabd 1a_IEEE_123_feeder.glm",
+            "host":"localhost",
+            "name":"1a_GridLABD"
+        }
+    ],
+    "name":"1a-T-D-Cosimulation-HELICSRunner"
 }
 ```
 
@@ -84,18 +86,14 @@ Briefly, it's easy to guess what a few of these parameters do:
 
 With a properly written configuration file, launching the co-simulation becomes very straightforward:
 
-`helics run --path <path to HELICS runner JSON configuration file>`
+`helics run --path=<path to HELICS runner JSON configuration file>`
 
 ### Experiment and Results
 
 To show the difference between running these two simulators in a stand-alone analysis and as a co-simulation, modify the federate JSON configurations and use `helics run ...` in both cases to run the analysis. To run the two as a co-simulation, leave publication and subscription entries in the federate JSON configuration. To run them as stand-alone federates with no interaction, delete the publications and subscriptions from both JSON configuration files. By removing the information transfer between the two they become disconnected but are still able to be executed as if they were participating in the federation.
 
-The figure below shows the total load on the transmission node to which the distribution system model is attached over the course of the simulated day, both when operating stand-alone and when running in a co-simulation with the distribution system.
+The figure below shows the total load on the transmission node to which the distribution system model is attached and the transmission system voltage at the same node over the course of the simulated day.
 
-![Ex. 1a  transmission bus voltage](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Bus_voltage_118.png)
+![Ex. 1a  transmission bus voltage](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1a_transmission_plot.png?raw=true)
 
-As can be seen, the impacts of co-simulation are relatively modest in this case. Even when the transmission system provides a dynamic high-side substation voltage (rather than just assuming a fixed value) and even with loads that have been created to be very voltage sensitive, the changing substation voltage doesn't impact the load substantially and change the voltage profiles significantly. (If you're curious to see an even bigger impact, you can disable the voltage regulators in GridLAB-D by editing the `regulator_configuration` objects so that the `Control` parameter is set to `MANUAL`. This will lock the regulators into place and allow the substation voltage to propagate through the circuit unregulated.) (xxxxxxx - double-check this.)
-
-The load of the distribution circuit as seen by the transmission model with and without co-simulation is similarly muted.
-
-![Ex. 1a  distribution system load](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1a_Feeder_consumption.png)
+As can be seen, the load and voltage are correlated as expected but the correlation is relatively weak; big changes in load have minimal impacts on the transmission voltage. This is what we would expect for a simple transmission and distribution co-simulation.

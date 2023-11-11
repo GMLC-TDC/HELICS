@@ -26,11 +26,11 @@ This feature offers the convenience of allowing a message federate to receive me
 
 ## Example 1b - Distribution system EV charge controller
 
-To demonstrate how a message federate interacts with the federation, let's take the previous example and add two things to it: electric vehicle (EV) loads in the distribution system, and a centralized EV charge control manager. [Models files for this example can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/a8334177c28a520e4809219ce97377c7fcf3cb6a/user_guide_examples/misc/gridlabd_example_1/Example_1b).
+To demonstrate how a message federate interacts with the federation, let's take the previous example and add two things to it: add electric vehicle (EV) loads in the distribution system, and a centralized EV charge control manager. [Models files for this example can be found here](https://github.com/GMLC-TDC/HELICS-Examples/tree/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1).
 
 Keeping in mind that this a model for demonstration purposes (which is to say, don't take this too seriously), let's make the following assumptions and definitions to simplify the behavior of the EV charge controller:
 
-- All EVs are very large (200kW; level 2 charging is rated up to 20kW)
+- All EVs are very large (200kW; level 2 charging is rated up to 20kW so these are effective HVDC chargers)
 - All EVs have infinite battery capacity
 - All EVs will be at home all day, desiring to charge all day if they can.
 - All EVs charge at the same power level.
@@ -45,47 +45,32 @@ The message topology (including the endpoints) and the not very interesting brok
 
 ![Ex. 1b broker topology](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1b_Broker_topology.png)
 
-Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/EV_Controller/Control.json) we can learn important details about how the controller works.
+Taking these assumptions and specifications, it is not too difficult to write a simple charge controller as a Python script. And just by opening the [JSON configuration file](https://github.com/GMLC-TDC/HELICS-Examples/blob/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1/1b_cosim_runner.json) we can learn important details about how the controller works.
 
 ```json
 {
-  "name": "EV_Controller",
-  "loglevel": 5,
-  "coreType": "zmq",
-  "timeDelta": 1.0,
-  "uninterruptible": true,
-
-  "endpoints": [
-    {
-      "name": "EV_Controller/EV6",
-      "destination": "IEEE_123_feeder_0/EV6",
-      "type": "genmessage",
-      "global": true
-    },
-    {
-      "name": "EV_Controller/EV5",
-      "destination": "IEEE_123_feeder_0/EV5",
-      "type": "genmessage",
-      "global": true
-    }
-  ],
-  "subscriptions": [
-    {
-      "key": "IEEE_123_feeder_0/totalLoad",
-      "type": "complex",
-      "required": true
-    },
-    {
-      "key": "IEEE_123_feeder_0/charge_EV6",
-      "type": "complex",
-      "required": true
-    },
-    {
-      "key": "IEEE_123_feeder_0/charge_EV5",
-      "type": "complex",
-      "required": true
-    }
-  ]
+    "broker": true,
+    "federates":[
+        {
+            "directory":".",
+            "exec":"python 1abc_Transmission_simulator.py -c 1b",
+            "host":"localhost",
+            "name":"1b_Transmission"
+        },
+        {
+            "directory":".",
+            "exec":"python 1bc_EV_Controller.py -c 1b",
+            "host":"localhost",
+            "name":"1b_Controller"
+        },
+        {
+            "directory":".",
+            "exec":"gridlabd.sh 1b_IEEE_123_feeder.glm",
+            "host":"localhost",
+            "name":"1b_GridLABD"
+        }
+    ],
+    "name":"1b-T-D-Cosimulation-HELICSRunner"
 }
 ```
 
@@ -95,61 +80,55 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
 
 ```json
 {
-    "name" : "DistributionSim",
-    "loglevel": 5,
+    "coreInit": "--federates=1",
+    "coreName": "Distribution Federate",
     "coreType": "zmq",
-    "period" : 1.0,
+    "name": "DistributionSim",
+    "offset": 0.0,
+    "period": 60,
+    "timeDelta": 1.0,
+    "logfile": "output.log",
+    "log_level": "warning",
     "publications" : [
           {
                "global" : true,
                "key" : "IEEE_123_feeder_0/totalLoad",
                "type" : "complex",
                "unit" : "VA",
-               "info" : "{
-                    \"object\" : \"network_node\",
-                    \"property\" : \"distribution_load\"
-               }"
-          },
-          {
-               "global" : true,
-               "key" : "IEEE_123_feeder_0/charge_EV6",
-               "type" : "complex",
-               "unit" : "VA",
-               "info" : "{
-                    \"object\" : \"EV6\",
-                    \"property\" : \"constant_power_A\"
-               }"
-          },
-          {
-               "global" : true,
-               "key" : "IEEE_123_feeder_0/charge_EV5",
-               "type" : "complex",
-               "unit" : "VA",
-               "info" : "{
-                    \"object\" : \"EV5\",
-                    \"property\" : \"constant_power_B\"
-               }"
+               "info" : {
+                    "object" : "network_node",
+                    "property" : "distribution_load"
+               }
           }
-          ],
+     ],
+     "subscriptions" : [
+          {
+               "required": true,
+               "key" : "TransmissionSim/transmission_voltage",
+               "type" : "complex",
+               "unit" : "V",
+               "info" : {
+                    "object" : "network_node",
+                    "property" : "positive_sequence_voltage"
+                    }
+          }
+     ],
      "endpoints" : [
         {
             "global" : true,
-            "name" : "IEEE_123_feeder_0/EV6",
-            "type" : "complex",
-            "info" : "{
-                \"object\" : \"EV6\",
-                \"property\" : \"constant_power_A\"
-            }"
+            "key" : "IEEE_123_feeder_0/EV6",
+            "destination": "EV_Controller/EV6",
+            "info" : {
+                "publication_info": {
+                  "object": "EV6",
+                  "property": "constant_power_A"
+                },
+                "subscription_info": {
+                  "object": "EV6",
+                  "property": "constant_power_A"
+              }
+            }
         },
-        {
-            "global" : true,
-            "name" : "IEEE_123_feeder_0/EV5",
-            "type" : "complex",
-            "info" : "{
-                \"object\" : \"EV5\",
-                \"property\" : \"constant_power_B\"
-            }"
-        }
     ]
 }
 
@@ -157,12 +136,11 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
 
 GridLAB-D is publishing out the total load on the feeder as well as the individual EV charging loads. It also has endpoints set up for each of the EV chargers to receive messages from the controller. Based on the strings in the `info` field it appears that the received messages are used to define the EV charge power.
 
-Running [the example](https://github.com/GMLC-TDC/HELICS/tree/319de2b125fe5e36818f0434ac3d0a82ccc46534/examples/user_guide_examples/Example_1b/) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
+Running [the example](https://github.com/GMLC-TDC/HELICS-Examples/blob/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1/1b_cosim_runner.json) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
 
-![Ex. 1b total feeder load](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1b_Feeder_consumption.png)
 
-![Ex. 1b EV charge pattern](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1b_EV_outputs.png)
+![Ex. 1b EV charge pattern](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1b_EV_plot.png?raw=true)
 
-Given the relatively dramatic changes in load, you might expect the voltage on the transmission system to be impacted. You would be right:
+Given the relatively dramatic changes in load, you might expect the voltage on the transmission system to be impacted.
 
-![Ex. 1b transmission system voltage magnitude](https://github.com/GMLC-TDC/helics_doc_resources/raw/main/user_guide/Ex1b_Bus_voltage_118.png)
+![Ex. 1b transmission system voltage and load magnitude](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1b_transmission_plot.png?raw=true)
