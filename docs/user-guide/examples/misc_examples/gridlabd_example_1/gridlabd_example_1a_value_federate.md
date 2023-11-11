@@ -32,8 +32,6 @@ Let's look at a generic JSON configuration file as an example with the more comm
 
 To demonstrate how a to build a co-simulation, an example of a simple integrated transmission system and distribution system powerflow can be built; all the necessary files are found [HERE](https://github.com/GMLC-TDC/HELICS-Examples/tree/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1) but to use them you'll need to get some specific software installed; here are the instructions:
 
-
-
 1.  [HELICS](../../../installation/index.md)
 2.  [GridLAB-D](https://github.com/gridlab-d/gridlab-d/tree/develop) - Enable HELICS, see instructions [here](http://gridlab-d.shoutwiki.com/wiki/Connection:helics_msg)
 3.  [Python](https://www.anaconda.com/download/) - Anaconda installation, if you don't already have Python installed. You may need to also install the following Python packages (`conda install` ...)
@@ -60,22 +58,22 @@ To run this simulation, the HELICS team has also developed a standardized means 
 
 ```json
 {
-    "broker": true,
-    "federates":[
-        {
-            "directory":".",
-            "exec":"python 1abc_Transmission_simulator.py -c 1a",
-            "host":"localhost",
-            "name":"1a_Transmission"
-        },
-        {
-            "directory":".",
-            "exec":"gridlabd 1a_IEEE_123_feeder.glm",
-            "host":"localhost",
-            "name":"1a_GridLABD"
-        }
-    ],
-    "name":"1a-T-D-Cosimulation-HELICSRunner"
+  "broker": true,
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python 1abc_Transmission_simulator.py -c 1a",
+      "host": "localhost",
+      "name": "1a_Transmission"
+    },
+    {
+      "directory": ".",
+      "exec": "gridlabd 1a_IEEE_123_feeder.glm",
+      "host": "localhost",
+      "name": "1a_GridLABD"
+    }
+  ],
+  "name": "1a-T-D-Cosimulation-HELICSRunner"
 }
 ```
 

@@ -49,28 +49,28 @@ Taking these assumptions and specifications, it is not too difficult to write a 
 
 ```json
 {
-    "broker": true,
-    "federates":[
-        {
-            "directory":".",
-            "exec":"python 1abc_Transmission_simulator.py -c 1b",
-            "host":"localhost",
-            "name":"1b_Transmission"
-        },
-        {
-            "directory":".",
-            "exec":"python 1bc_EV_Controller.py -c 1b",
-            "host":"localhost",
-            "name":"1b_Controller"
-        },
-        {
-            "directory":".",
-            "exec":"gridlabd.sh 1b_IEEE_123_feeder.glm",
-            "host":"localhost",
-            "name":"1b_GridLABD"
-        }
-    ],
-    "name":"1b-T-D-Cosimulation-HELICSRunner"
+  "broker": true,
+  "federates": [
+    {
+      "directory": ".",
+      "exec": "python 1abc_Transmission_simulator.py -c 1b",
+      "host": "localhost",
+      "name": "1b_Transmission"
+    },
+    {
+      "directory": ".",
+      "exec": "python 1bc_EV_Controller.py -c 1b",
+      "host": "localhost",
+      "name": "1b_Controller"
+    },
+    {
+      "directory": ".",
+      "exec": "gridlabd.sh 1b_IEEE_123_feeder.glm",
+      "host": "localhost",
+      "name": "1b_GridLABD"
+    }
+  ],
+  "name": "1b-T-D-Cosimulation-HELICSRunner"
 }
 ```
 
@@ -80,64 +80,62 @@ Looking at the [GridLAB-D JSON configuration file](https://github.com/GMLC-TDC/H
 
 ```json
 {
-    "coreInit": "--federates=1",
-    "coreName": "Distribution Federate",
-    "coreType": "zmq",
-    "name": "DistributionSim",
-    "offset": 0.0,
-    "period": 60,
-    "timeDelta": 1.0,
-    "logfile": "output.log",
-    "log_level": "warning",
-    "publications" : [
-          {
-               "global" : true,
-               "key" : "IEEE_123_feeder_0/totalLoad",
-               "type" : "complex",
-               "unit" : "VA",
-               "info" : {
-                    "object" : "network_node",
-                    "property" : "distribution_load"
-               }
-          }
-     ],
-     "subscriptions" : [
-          {
-               "required": true,
-               "key" : "TransmissionSim/transmission_voltage",
-               "type" : "complex",
-               "unit" : "V",
-               "info" : {
-                    "object" : "network_node",
-                    "property" : "positive_sequence_voltage"
-                    }
-          }
-     ],
-     "endpoints" : [
-        {
-            "global" : true,
-            "key" : "IEEE_123_feeder_0/EV6",
-            "destination": "EV_Controller/EV6",
-            "info" : {
-                "publication_info": {
-                  "object": "EV6",
-                  "property": "constant_power_A"
-                },
-                "subscription_info": {
-                  "object": "EV6",
-                  "property": "constant_power_A"
-              }
-            }
+  "coreInit": "--federates=1",
+  "coreName": "Distribution Federate",
+  "coreType": "zmq",
+  "name": "DistributionSim",
+  "offset": 0.0,
+  "period": 60,
+  "timeDelta": 1.0,
+  "logfile": "output.log",
+  "log_level": "warning",
+  "publications": [
+    {
+      "global": true,
+      "key": "IEEE_123_feeder_0/totalLoad",
+      "type": "complex",
+      "unit": "VA",
+      "info": {
+        "object": "network_node",
+        "property": "distribution_load"
+      }
+    }
+  ],
+  "subscriptions": [
+    {
+      "required": true,
+      "key": "TransmissionSim/transmission_voltage",
+      "type": "complex",
+      "unit": "V",
+      "info": {
+        "object": "network_node",
+        "property": "positive_sequence_voltage"
+      }
+    }
+  ],
+  "endpoints": [
+    {
+      "global": true,
+      "key": "IEEE_123_feeder_0/EV6",
+      "destination": "EV_Controller/EV6",
+      "info": {
+        "publication_info": {
+          "object": "EV6",
+          "property": "constant_power_A"
         },
-    ]
+        "subscription_info": {
+          "object": "EV6",
+          "property": "constant_power_A"
+        }
+      }
+    }
+  ]
 }
-
 ```
 
 GridLAB-D is publishing out the total load on the feeder as well as the individual EV charging loads. It also has endpoints set up for each of the EV chargers to receive messages from the controller. Based on the strings in the `info` field it appears that the received messages are used to define the EV charge power.
 
 Running [the example](https://github.com/GMLC-TDC/HELICS-Examples/blob/160409d079d5a95bc08d37e7eef76d4748f8e9a8/user_guide_examples/misc/gridlabd_example_1/1b_cosim_runner.json) and looking at the results, as the total load on the feeder exceeded the pre-defined maximum loading of the feeder (red line in the graph), the EV controller disconnected an additional EV load. Conversely, as the load dipped to the lower limit (green line), the controller reconnected the EV load. Looking at a graph of the EV charge power for each EV shows the timing of the EV charging for each load.
-
 
 ![Ex. 1b EV charge pattern](https://github.com/GMLC-TDC/helics_doc_resources/blob/db4e8a9edeb5602c6463ff147b8bc72e6119532e/user_guide/1b_EV_plot.png?raw=true)
 
