@@ -837,7 +837,7 @@ TEST(federate, from_file10)
 
     auto fstr2 = std::string(LONG_TEST_NAME);
     if (fstr2.size() < FILENAME_MAX) {
-        // this test would fail if the file name exceeeds the max filename length
+        // this test would fail if the file name exceeds the max filename length
         std::shared_ptr<helics::Federate> Fed1;
         EXPECT_NO_THROW(Fed1 = std::make_shared<helics::Federate>(fstr2));
         if (Fed1) {
