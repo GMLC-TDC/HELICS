@@ -49,7 +49,7 @@ TEST(data, toFromInt)
     auto buff = helicsCreateDataBuffer(500);
 
     int64_t v1 = 35;
-    auto cnt = helicsDataBufferFromInteger(buff, v1);
+    auto cnt = helicsDataBufferFillFromInteger(buff, v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_INT);
     EXPECT_GT(cnt, 0);
     int64_t v2 = helicsDataBufferToInteger(buff);
@@ -62,7 +62,7 @@ TEST(data, toFromDouble)
     auto buff = helicsCreateDataBuffer(500);
 
     double v1 = 35.7;
-    auto cnt = helicsDataBufferFromDouble(buff, v1);
+    auto cnt = helicsDataBufferFillFromDouble(buff, v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
     double v2 = helicsDataBufferToDouble(buff);
@@ -75,7 +75,7 @@ TEST(data, toFromChar)
     auto buff = helicsCreateDataBuffer(500);
 
     char v1 = 'q';
-    auto cnt = helicsDataBufferFromChar(buff, v1);
+    auto cnt = helicsDataBufferFillFromChar(buff, v1);
     EXPECT_GT(cnt, 0);
     double v2 = helicsDataBufferToChar(buff);
     EXPECT_EQ(v1, v2);
@@ -87,7 +87,7 @@ TEST(data, toFromTime)
     auto buff = helicsCreateDataBuffer(500);
 
     HelicsTime v1 = 12.77;
-    auto cnt = helicsDataBufferFromTime(buff, v1);
+    auto cnt = helicsDataBufferFillFromTime(buff, v1);
     EXPECT_GT(cnt, 0);
     HelicsTime v2 = helicsDataBufferToTime(buff);
     EXPECT_EQ(v1, v2);
@@ -99,7 +99,7 @@ TEST(data, toFromString)
     auto buff = helicsCreateDataBuffer(500);
 
     std::string v1 = "this is an interesting string";
-    auto cnt = helicsDataBufferFromString(buff, v1.c_str());
+    auto cnt = helicsDataBufferFillFromString(buff, v1.c_str());
     EXPECT_GT(cnt, 0);
     std::string v2;
     v2.resize(100);
@@ -126,7 +126,7 @@ TEST(data, toFromRawString)
     std::string v1 = "this is an interesting";
     v1.push_back('\0');
     v1.append(" string ");
-    auto cnt = helicsDataBufferFromRawString(buff, v1.c_str(), static_cast<int>(v1.size()));
+    auto cnt = helicsDataBufferFillFromRawString(buff, v1.c_str(), static_cast<int>(v1.size()));
     EXPECT_GT(cnt, 0);
     std::string v2;
     v2.resize(100);
@@ -144,7 +144,7 @@ TEST(data, toFromVector)
     auto buff = helicsCreateDataBuffer(500);
 
     std::vector<double> v1{34.7, -99.99999, 0, 43.7e231, std::nan("0")};
-    auto cnt = helicsDataBufferFromVector(buff, v1.data(), static_cast<int>(v1.size()));
+    auto cnt = helicsDataBufferFillFromVector(buff, v1.data(), static_cast<int>(v1.size()));
     EXPECT_GT(cnt, 0);
     std::vector<double> v2;
     v2.resize(5);
@@ -177,7 +177,7 @@ TEST(data, toFromComplexVector)
                        cv{0, 0},
                        cv{43.7e231, -19.3e-88},
                        cv{std::nan("0"), 0}};
-    auto cnt = helicsDataBufferFromComplexVector(buff, reinterpret_cast<double*>(v1.data()),
+    auto cnt = helicsDataBufferFillFromComplexVector(buff, reinterpret_cast<double*>(v1.data()),
                                           static_cast<int>(v1.size()));
     EXPECT_GT(cnt, 0);
     std::vector<double> v2;
@@ -208,7 +208,7 @@ TEST(data, toFromNamedPoint)
 {
     auto buff = helicsCreateDataBuffer(500);
 
-    auto cnt = helicsDataBufferFromNamedPoint(buff, "string_thing", 45.7);
+    auto cnt = helicsDataBufferFillFromNamedPoint(buff, "string_thing", 45.7);
     EXPECT_GT(cnt, 0);
     std::string v2name;
     double v2val;
@@ -227,7 +227,7 @@ TEST(data, converter)
     auto buff = helicsCreateDataBuffer(500);
 
     double v1 = 35.7;
-    auto cnt = helicsDataBufferFromDouble(buff,v1);
+    auto cnt = helicsDataBufferFillFromDouble(buff,v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
     bool res = helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT) != HELICS_FALSE;
@@ -244,7 +244,7 @@ TEST(data, clone)
     auto buff = helicsCreateDataBuffer(500);
 
     double v1 = 35.7;
-    auto cnt = helicsDataBufferFromDouble(buff,v1);
+    auto cnt = helicsDataBufferFillFromDouble(buff,v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
     auto newbuff = helicsDataBufferClone(buff);

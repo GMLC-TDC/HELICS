@@ -20,24 +20,24 @@ class DataBuffer {
     DataBuffer() HELICS_NOTHROW: buff(helicsCreateDataBuffer(0)) {}
     explicit DataBuffer(int capacity): buff(helicsCreateDataBuffer(capacity)) {}
 
-    void toBytes(double val) { helicsDataBufferFromDouble(buff, val); }
-    void toBytes(int64_t val) { helicsDataBufferFromInteger(buff, val); }
-    void toBytes(const std::string& val) { helicsDataBufferFromString(buff, val.c_str()); }
-    void toBytes(const std::vector<double>& val)
+    void fill(double val) { helicsDataBufferFillFromDouble(buff, val); }
+    void fill(int64_t val) { helicsDataBufferFillFromInteger(buff, val); }
+    void fill(const std::string& val) { helicsDataBufferFillFromString(buff, val.c_str()); }
+    void fill(const std::vector<double>& val)
     {
-        helicsDataBufferFromVector(buff, val.data(), static_cast<int>(val.size()));
+        helicsDataBufferFillFromVector(buff, val.data(), static_cast<int>(val.size()));
     }
-    void toBytes(const std::complex<double> val)
+    void fill(const std::complex<double> val)
     {
-        helicsDataBufferFromComplex(buff, val.real(), val.imag());
+        helicsDataBufferFillFromComplex(buff, val.real(), val.imag());
     }
-    void toBytes(const double* vals, int size) { helicsDataBufferFromVector(buff, vals, size); }
-    void toBytes(const std::string& name, double val)
+    void fill(const double* vals, int size) { helicsDataBufferFillFromVector(buff, vals, size); }
+    void fill(const std::string& name, double val)
     {
-        helicsDataBufferFromNamedPoint(buff, name.c_str(), val);
+        helicsDataBufferFillFromNamedPoint(buff, name.c_str(), val);
     }
-    void toBytes(bool val) { helicsDataBufferFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
-    void toBytes(char val) { helicsDataBufferFromChar(buff, val); }
+    void fill(bool val) { helicsDataBufferFillFromBoolean(buff, val ? HELICS_TRUE : HELICS_FALSE); }
+    void fill(char val) { helicsDataBufferFillFromChar(buff, val); }
 
     /** get the size of the raw value */
     int size() { return helicsDataBufferSize(buff); }

@@ -335,7 +335,7 @@ void toVC(HelicsMessage message, HelicsDataBuffer value, void* /*userData*/)
     const auto* str = helicsMessageGetString(message);
     char* ptr{nullptr};
     double v = strtod(str, &ptr) + 9.0;
-    helicsDataBufferFromDouble(value,v);
+    helicsDataBufferFillFromDouble(value,v);
 }
 
 TEST_F(translator, custom_translator)
