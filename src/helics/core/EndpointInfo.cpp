@@ -133,6 +133,11 @@ int32_t EndpointInfo::availableMessages() const
     return mAvailableMessages;
 }
 
+bool EndpointInfo::hasConnection() const
+{
+    return !(targetInformation.empty() && sourceInformation.empty());
+}
+
 int32_t EndpointInfo::queueSize(Time maxTime) const
 {
     auto handle = message_queue.lock_shared();

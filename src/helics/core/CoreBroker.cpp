@@ -3389,6 +3389,7 @@ static const std::set<std::string> querySet{"isinit",
                                             "global_state",
                                             "global_flush",
                                             "current_state",
+                                            "unconnected_interfaces",
                                             "logs"};
 
 static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> mapIndex{
@@ -3401,6 +3402,7 @@ static const std::map<std::string_view, std::pair<std::uint16_t, QueryReuse>> ma
     {"global_time_debugging", {GLOBAL_TIME_DEBUGGING, QueryReuse::DISABLED}},
     {"global_status", {GLOBAL_STATUS, QueryReuse::DISABLED}},
     {"barriers", {BARRIERS, QueryReuse::DISABLED}},
+    {"unconnected_interfaces", {UNCONNECTED_INTERFACES, QueryReuse::DISABLED}},
     {"global_flush", {GLOBAL_FLUSH, QueryReuse::DISABLED}}};
 
 std::string CoreBroker::quickBrokerQueries(std::string_view request) const
@@ -3797,6 +3799,16 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
             if (timeCoord && !timeCoord->empty()) {
                 base["time"] = Json::Value();
                 timeCoord->generateDebuggingTimeInfo(base["time"]);
+            }
+            break;
+        case UNCONNECTED_INTERFACES:
+            if (!global_values.empty())
+            {
+                Json::Value tagBlock = Json::objectValue;
+                for (const auto& tg : global_values) {
+                    tagBlock[tg.first] = tg.second;
+                }
+                base["tags"]=tagBlock;
             }
             break;
     }

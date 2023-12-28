@@ -317,6 +317,47 @@ std::vector<std::pair<int, std::string>> InterfaceInfo::checkInterfacesForIssues
     return issues;
 }
 
+void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
+{
+    auto ihandle = inputs.lock_shared();
+    if (ihandle->size() > 0) {
+        base["inputs"] = Json::arrayValue;
+        for (const auto& ipt : ihandle) {
+            if (!ipt->key.empty()) {
+                if (!ipt->has_target) {
+                    base["inputs"].append(ipt->key);
+                }
+            }
+        }
+    }
+    ihandle.unlock();
+    auto phandle = publications.lock();
+    if (phandle->size() > 0) {
+        base["publications"] = Json::arrayValue;
+        for (const auto& pub : phandle) {
+            if (!pub->key.empty()) {
+                if (pub->subscribers.empty()) {
+                    base["publications"].append(pub->key);
+                }
+            }
+        }
+    }
+    phandle.unlock();
+
+    auto ehandle = endpoints.lock_shared();
+    if (ehandle->size() > 0) {
+        base["endpoints"] = Json::arrayValue;
+        for (const auto& ept : ehandle) {
+            if (!ept->key.empty()) {
+                if (!ept->hasConnection()) {
+                    base["endpoints"].append(ept->key);
+                }
+            }
+        }
+    }
+    ehandle.unlock();
+}
+
 void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
@@ -370,11 +411,11 @@ void InterfaceInfo::generateInferfaceConfig(Json::Value& base) const
             }
         }
     }
-    phandle.unlock();
+    ehandle.unlock();
     base["extra"] = "configuration";
 }
 
-void InterfaceInfo::GenerateDataFlowGraph(Json::Value& base) const
+void InterfaceInfo::generateDataFlowGraph(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {

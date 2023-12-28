@@ -31,7 +31,8 @@ enum Subqueries : std::uint16_t {
     GLOBAL_TIME_DEBUGGING = 7,
     GLOBAL_FLUSH = 8,
     GLOBAL_STATUS = 9,
-    BARRIERS = 11
+    BARRIERS = 11,
+    UNCONNECTED_INTERFACES=14
 };
 
 /// Enumeration of if query result is reusable

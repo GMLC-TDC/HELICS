@@ -24,6 +24,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         Clone.hpp
         CoreApp.hpp
         Probe.hpp
+        Connector.hpp
         BrokerApp.hpp
     )
 
@@ -44,6 +45,7 @@ if(HELICS_BUILD_APP_LIBRARY)
         helicsApp.cpp
         Clone.cpp
         Probe.cpp
+        Connector.cpp
     )
 
     set(helics_apps_broker_files MultiBroker.cpp BrokerServer.cpp zmqBrokerServer.cpp
@@ -111,6 +113,14 @@ if(HELICS_BUILD_APP_LIBRARY)
         set_target_properties(helics_recorder PROPERTIES FOLDER apps)
         target_link_libraries(helics_recorder PRIVATE compile_flags_target)
         install(TARGETS helics_recorder ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
+                COMPONENT applications
+        )
+        
+        add_executable(helics_connector connectorMain.cpp)
+        target_link_libraries(helics_connector PUBLIC HELICS::apps)
+        target_link_libraries(helics_connector PRIVATE compile_flags_target)
+        set_target_properties(helics_connector PROPERTIES FOLDER apps)
+        install(TARGETS helics_connector ${HELICS_EXPORT_COMMAND} DESTINATION ${CMAKE_INSTALL_BINDIR}
                 COMPONENT applications
         )
 

@@ -401,7 +401,7 @@ std::string generateInterfaceQueryResults(std::string_view request,
         info.generateInferfaceConfig(base);
         return fileops::generateJsonString(base);
     }
-
+   
     return std::string{};
 }
 

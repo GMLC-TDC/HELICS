@@ -83,7 +83,9 @@ class InterfaceInfo {
     /** generate a configuration script for the interfaces*/
     void generateInferfaceConfig(Json::Value& base) const;
     /** load a dependency graph for the interfaces*/
-    void GenerateDataFlowGraph(Json::Value& base) const;
+    void generateDataFlowGraph(Json::Value& base) const;
+    /** generate a list of unconnected interfaces*/
+    void getUnconnectedInterfaces(Json::Value& base) const;
 
   private:
     std::atomic<GlobalFederateId> global_id;

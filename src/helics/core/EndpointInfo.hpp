@@ -79,6 +79,8 @@ class EndpointInfo {
     */
     bool updateTimeInclusive(Time newTime);
 
+    /** check if the endpoint has any target information */
+    bool hasConnection() const;
     /** update current data to get all data through the first iteration at newTime
     @param newTime the time to move the subscription to
     @return true if the value has changed
