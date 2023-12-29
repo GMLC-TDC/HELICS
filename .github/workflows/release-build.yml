@@ -354,25 +354,25 @@ jobs:
     - uses: actions/checkout@v4
       
     - name: Get all submodules archive
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: all-submodules-archive
         path: artifacts
         
     - name: Get Windows installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Windows-installers
         path: artifacts
         
     - name: Get macOS installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: macOS-installers
         path: artifacts
         
     - name: Get Linux installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Linux-installers
         path: artifacts
