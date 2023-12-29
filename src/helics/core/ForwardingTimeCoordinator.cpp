@@ -73,8 +73,9 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
                 dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
             DependencyInfo dependency;
             dependency.update(td);
-            auto upd_delayed =
-                generateTimeRequest(dependency, downstream.minFed, dependency.responseSequenceCounter);
+            auto upd_delayed = generateTimeRequest(dependency,
+                                                   downstream.minFed,
+                                                   dependency.responseSequenceCounter);
             if (sendMessageFunction) {
                 sendMessageFunction(upd_delayed);
             }
@@ -90,8 +91,9 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed, 0);
         DependencyInfo dependency;
         dependency.update(minTimeUpstream);
-        auto upd_delayed =
-            generateTimeRequest(dependency, mTimeDownstream.minFed, dependency.responseSequenceCounter);
+        auto upd_delayed = generateTimeRequest(dependency,
+                                               mTimeDownstream.minFed,
+                                               dependency.responseSequenceCounter);
         if (sendMessageFunction) {
             sendMessageFunction(upd_delayed);
         }

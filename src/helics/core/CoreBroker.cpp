@@ -480,7 +480,8 @@ void CoreBroker::fedRegistration(ActionMessage&& command)
             transmit(parent_route_id, noInit);
         }
     } else if (getBrokerState() == BrokerState::OPERATING) {
-        const bool allowed = dynamicFederation || !countable || checkActionFlag(command, observer_flag);
+        const bool allowed =
+            dynamicFederation || !countable || checkActionFlag(command, observer_flag);
         if (!allowed) {
             // we are initialized already
             sendFedErrorAck(command, already_init_error_code);
@@ -688,22 +689,22 @@ void CoreBroker::processPriorityCommand(ActionMessage&& command)
                     LOG_WARNING(global_broker_id_local, identifier, "repeated broker acks");
                     return;
                 }
-                broker->global_id = GlobalBrokerId{ command.dest_id };
+                broker->global_id = GlobalBrokerId{command.dest_id};
                 auto route = broker->route;
-                mBrokers.addSearchTerm(GlobalBrokerId{ command.dest_id }, broker->name);
+                mBrokers.addSearchTerm(GlobalBrokerId{command.dest_id}, broker->name);
                 routing_table.emplace(broker->global_id, route);
                 command.source_id = global_broker_id_local;  // we want the intermediate broker to
                                                              // change the source_id
                 transmit(route, command);
             } else {
-                mBrokers.insert(command.name(), GlobalBrokerId{ command.dest_id }, command.name());
+                mBrokers.insert(command.name(), GlobalBrokerId{command.dest_id}, command.name());
                 mBrokers.back().route = getRoute(command.source_id);
-                mBrokers.back().global_id = GlobalBrokerId{ command.dest_id };
+                mBrokers.back().global_id = GlobalBrokerId{command.dest_id};
                 routing_table.emplace(broker->global_id, mBrokers.back().route);
             }
         } break;
         case CMD_PRIORITY_DISCONNECT: {
-            auto* brk = getBrokerById(GlobalBrokerId{ command.source_id });
+            auto* brk = getBrokerById(GlobalBrokerId{command.source_id});
             if (brk != nullptr) {
                 brk->state = ConnectionState::DISCONNECTED;
             }
@@ -1535,7 +1536,7 @@ void CoreBroker::processInitCommand(ActionMessage& cmd)
                 }
                 transmit(parent_route_id, cmd);
             }
-            auto* brk = getBrokerById(GlobalBrokerId{ cmd.source_id });
+            auto* brk = getBrokerById(GlobalBrokerId{cmd.source_id});
             if (brk != nullptr) {
                 brk->state = ConnectionState::CONNECTED;
                 brk->initIterating = false;
@@ -1934,7 +1935,8 @@ bool CoreBroker::checkInterfaceCreation(ActionMessage& message, InterfaceType ty
         ActionMessage eret(CMD_LOCAL_ERROR, global_broker_id_local, message.source_id);
         eret.dest_handle = message.source_handle;
         eret.messageID = defs::Errors::REGISTRATION_FAILURE;
-        eret.payload = fmt::format("Duplicate {} names ({})", interfaceTypeName(type), message.name());
+        eret.payload =
+            fmt::format("Duplicate {} names ({})", interfaceTypeName(type), message.name());
         propagateError(std::move(eret));
         return false;
     }
@@ -2214,7 +2216,8 @@ void CoreBroker::linkInterfaces(ActionMessage& command)
 }
 
 CoreBroker::CoreBroker(bool setAsRootBroker) noexcept:
-    _isRoot(setAsRootBroker), isRootc(setAsRootBroker), timeoutMon(std::make_unique<TimeoutMonitor>())
+    _isRoot(setAsRootBroker), isRootc(setAsRootBroker),
+    timeoutMon(std::make_unique<TimeoutMonitor>())
 {
 }
 
@@ -2969,7 +2972,7 @@ void CoreBroker::processError(ActionMessage& command)
         return;
     }
 
-    auto* brk = getBrokerById(GlobalBrokerId{ command.source_id });
+    auto* brk = getBrokerById(GlobalBrokerId{command.source_id});
     if (brk == nullptr) {
         auto fed = mFederates.find(command.source_id);
         if (fed != mFederates.end()) {
@@ -3638,7 +3641,8 @@ std::string CoreBroker::generateGlobalStatus(fileops::JsonMapBuilder& builder)
             }
         }
     }
-    std::string tste = (minTime >= timeZero) ? std::string("operating") : std::string("init_requested");
+    std::string tste =
+        (minTime >= timeZero) ? std::string("operating") : std::string("init_requested");
 
     Json::Value json;
 
@@ -3925,7 +3929,8 @@ void CoreBroker::processQuery(ActionMessage& message)
         queryResp.messageID = message.messageID;
         queryResp.payload = getNameList(message.payload.to_string());
         if (queryResp.dest_id == global_broker_id_local) {
-            activeQueries.setDelayedValue(message.messageID, std::string(queryResp.payload.to_string()));
+            activeQueries.setDelayedValue(message.messageID,
+                                          std::string(queryResp.payload.to_string()));
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
@@ -3960,7 +3965,8 @@ void CoreBroker::processQuery(ActionMessage& message)
                 generateJsonErrorResponse(JsonErrorCodes::NOT_FOUND, "Global value not found");
         }
         if (queryResp.dest_id == global_broker_id_local) {
-            activeQueries.setDelayedValue(message.messageID, std::string(queryResp.payload.to_string()));
+            activeQueries.setDelayedValue(message.messageID,
+                                          std::string(queryResp.payload.to_string()));
         } else {
             transmit(getRoute(queryResp.dest_id), queryResp);
         }
@@ -4049,7 +4055,8 @@ void CoreBroker::checkQueryTimeouts()
     if (!queryTimeouts.empty()) {
         auto ctime = std::chrono::steady_clock::now();
         for (auto& qtimeout : queryTimeouts) {
-            if (activeQueries.isRecognized(qtimeout.first) && !activeQueries.isCompleted(qtimeout.first)) {
+            if (activeQueries.isRecognized(qtimeout.first) &&
+                !activeQueries.isCompleted(qtimeout.first)) {
                 if (Time(ctime - qtimeout.second) > queryTimeout) {
                     activeQueries.setDelayedValue(
                         qtimeout.first,
