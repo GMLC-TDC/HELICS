@@ -371,23 +371,23 @@ class CoreBroker: public Broker, public BrokerBase {
     /** handle the processing for a query command*/
     void processQueryCommand(ActionMessage& cmd);
     /** answer a query or route the message the appropriate location*/
-    void processQuery(ActionMessage& m);
+    void processQuery(ActionMessage& message);
     /** process and init related command*/
     void processInitCommand(ActionMessage& cmd);
     /** manage query timeouts*/
     void checkQueryTimeouts();
     /** answer a query or route the message the appropriate location*/
-    void processQueryResponse(const ActionMessage& m);
+    void processQueryResponse(const ActionMessage& message);
     /** generate an answer to a local query*/
-    void processLocalQuery(const ActionMessage& m);
+    void processLocalQuery(const ActionMessage& message);
     /** generate an actual response string to a query*/
     std::string generateQueryAnswer(std::string_view request, bool force_ordering);
     /** run queries that are not dependent on the main loop to be running*/
     std::string quickBrokerQueries(std::string_view request) const;
     /** process a command instruction message*/
-    void processCommandInstruction(ActionMessage& m);
+    void processCommandInstruction(ActionMessage& message);
     /** process a command instruction targeted at this broker*/
-    void processLocalCommandInstruction(ActionMessage& m);
+    void processLocalCommandInstruction(ActionMessage& message);
     /** generate a list of names of interfaces from a list of global_ids in a string*/
     std::string getNameList(std::string_view gidString) const;
     /** locate the route to take to a particular federate*/
@@ -399,15 +399,15 @@ class CoreBroker: public Broker, public BrokerBase {
 
     BasicBrokerInfo* getBrokerById(GlobalBrokerId brokerid);
 
-    void addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& m);
-    void addPublication(ActionMessage& m);
-    void addInput(ActionMessage& m);
-    void addEndpoint(ActionMessage& m);
-    void addFilter(ActionMessage& m);
-    void addTranslator(ActionMessage& m);
-    void addDataSink(ActionMessage& m);
+    void addLocalInfo(BasicHandleInfo& handleInfo, const ActionMessage& message);
+    void addPublication(ActionMessage& message);
+    void addInput(ActionMessage& message);
+    void addEndpoint(ActionMessage& message);
+    void addFilter(ActionMessage& message);
+    void addTranslator(ActionMessage& message);
+    void addDataSink(ActionMessage& message);
 
-    bool checkInterfaceCreation(ActionMessage& m, InterfaceType type);
+    bool checkInterfaceCreation(ActionMessage& message, InterfaceType type);
     // Handle the registration of new brokers
     void brokerRegistration(ActionMessage&& command);
     /// @brief send an error response to broker registration
@@ -440,11 +440,11 @@ class CoreBroker: public Broker, public BrokerBase {
     void labelAsDisconnected(GlobalBrokerId brkid);
 
     /** process message for the time monitor*/
-    void processTimeMonitorMessage(ActionMessage& m);
+    void processTimeMonitorMessage(ActionMessage& message);
     /** load up the monitor federate*/
     void loadTimeMonitor(bool firstLoad, std::string_view newFederate);
     /** generate a time barrier request*/
-    void generateTimeBarrier(ActionMessage& m);
+    void generateTimeBarrier(ActionMessage& message);
     int generateMapObjectCounter() const;
     /** handle the renaming operation*/
     std::string generateRename(std::string_view name);

@@ -71,10 +71,10 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             }
             auto td = generateMinTimeUpstream(
                 dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
-            DependencyInfo di;
-            di.update(td);
+            DependencyInfo dependency;
+            dependency.update(td);
             auto upd_delayed =
-                generateTimeRequest(di, downstream.minFed, di.responseSequenceCounter);
+                generateTimeRequest(dependency, downstream.minFed, dependency.responseSequenceCounter);
             if (sendMessageFunction) {
                 sendMessageFunction(upd_delayed);
             }
@@ -86,12 +86,12 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     } else if (dependencies.hasDelayedDependency() &&
                mTimeDownstream.minFed == dependencies.delayedDependency() && executionMode) {
-        auto td = generateMinTimeUpstream(
+        auto minTimeUpstream = generateMinTimeUpstream(
             dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed, 0);
-        DependencyInfo di;
-        di.update(td);
+        DependencyInfo dependency;
+        dependency.update(minTimeUpstream);
         auto upd_delayed =
-            generateTimeRequest(di, mTimeDownstream.minFed, di.responseSequenceCounter);
+            generateTimeRequest(dependency, mTimeDownstream.minFed, dependency.responseSequenceCounter);
         if (sendMessageFunction) {
             sendMessageFunction(upd_delayed);
         }

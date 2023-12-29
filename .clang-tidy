@@ -71,6 +71,7 @@ WarningsAsErrors: "
   readability-*,
   -readability-magic-numbers,
   -readability-identifier-naming,
+  -readability-identifier-length,
   performance-*
   -performance-unnecessary-value-param
   "
