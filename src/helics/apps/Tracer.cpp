@@ -111,16 +111,16 @@ namespace apps {
         }
         auto sourceClone = doc["sourceclone"];
         if (sourceClone.isArray()) {
-            for (const auto& sc : sourceClone) {
-                addSourceEndpointClone(sc.asString());
+            for (const auto& clone : sourceClone) {
+                addSourceEndpointClone(clone.asString());
             }
         } else if (sourceClone.isString()) {
             addSourceEndpointClone(sourceClone.asString());
         }
         auto destClone = doc["destclone"];
         if (destClone.isArray()) {
-            for (const auto& dc : destClone) {
-                addDestEndpointClone(dc.asString());
+            for (const auto& clone : destClone) {
+                addDestEndpointClone(clone.asString());
             }
         } else if (destClone.isString()) {
             addDestEndpointClone(destClone.asString());
@@ -151,14 +151,14 @@ namespace apps {
         App::loadTextFile(textFile);
         std::ifstream infile(textFile);
         std::string str;
-        int lc = 0;
+        int lineCount = 0;
         while (std::getline(infile, str)) {
-            ++lc;
+            ++lineCount;
             if (str.empty()) {
                 continue;
             }
-            auto fc = str.find_first_not_of(" \t\n\r\0");
-            if ((fc == std::string::npos) || (str[fc] == '#') || (str[fc] == '!')) {
+            auto firstChar = str.find_first_not_of(" \t\n\r\0");
+            if ((firstChar == std::string::npos) || (str[firstChar] == '#') || (str[firstChar] == '!')) {
                 continue;
             }
             auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
@@ -185,7 +185,7 @@ namespace apps {
                         addSourceEndpointClone(removeQuotes(blk[1]));
                         addDestEndpointClone(removeQuotes(blk[1]));
                     } else {
-                        std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                        std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                     }
                     break;
                 case 3:
@@ -195,10 +195,10 @@ namespace apps {
                         } else if ((blk[1] == "dest") || (blk[1] == "destination")) {
                             addDestEndpointClone(removeQuotes(blk[2]));
                         } else {
-                            std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                            std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                         }
                     } else {
-                        std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                        std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                     }
                     break;
                 default:
@@ -372,7 +372,7 @@ namespace apps {
         try {
             int iteration = 0;
             while (true) {
-                helics::Time T;
+                helics::Time grantedTime;
 
                 if (allow_iteration) {
                     auto ItRes =
@@ -380,18 +380,18 @@ namespace apps {
                     if (ItRes.state == IterationResult::NEXT_STEP) {
                         iteration = 0;
                     }
-                    T = ItRes.grantedTime;
-                    captureForCurrentTime(T, iteration);
+                    grantedTime = ItRes.grantedTime;
+                    captureForCurrentTime(grantedTime, iteration);
                     ++iteration;
                 } else {
-                    T = fed->requestTime(runToTime);
-                    captureForCurrentTime(T);
+                    grantedTime = fed->requestTime(runToTime);
+                    captureForCurrentTime(grantedTime);
                 }
-                if (T >= runToTime) {
+                if (grantedTime >= runToTime) {
                     break;
                 }
-                if (T >= nextPrintTime) {
-                    std::cout << "processed for time " << static_cast<double>(T) << "\n";
+                if (grantedTime >= nextPrintTime) {
+                    std::cout << "processed for time " << static_cast<double>(grantedTime) << "\n";
                     nextPrintTime += 10.0;
                 }
             }

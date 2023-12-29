@@ -406,7 +406,7 @@ class CommonCore: public Core, public BrokerBase {
     /** check if we can remove some dependencies*/
     void checkDependencies();
     /** deal with a query response addressed to this core*/
-    void processQueryResponse(const ActionMessage& m);
+    void processQueryResponse(const ActionMessage& message);
     /** manage query timeouts*/
     void checkQueryTimeouts();
     /** handle command with the core itself as a destination at the core*/

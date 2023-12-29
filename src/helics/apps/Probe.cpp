@@ -38,8 +38,8 @@ Probe::Probe(std::string_view name, const std::string& configString): App(name, 
 
 void Probe::initialize()
 {
-    auto md = fed->getCurrentMode();
-    if (md != Federate::Modes::STARTUP) {
+    auto currentMode = fed->getCurrentMode();
+    if (currentMode != Federate::Modes::STARTUP) {
         return;
     }
     auto period = fed->getTimeProperty(HELICS_PROPERTY_TIME_PERIOD);
@@ -77,12 +77,12 @@ void Probe::initialize()
 
 void Probe::runTo(Time stopTime_input)
 {
-    auto md = fed->getCurrentMode();
-    if (md == Federate::Modes::STARTUP) {
+    auto currentMode = fed->getCurrentMode();
+    if (currentMode == Federate::Modes::STARTUP) {
         initialize();
     }
 
-    if (md < Federate::Modes::EXECUTING) {
+    if (currentMode < Federate::Modes::EXECUTING) {
         fed->enterExecutingMode();
     }
 
@@ -98,11 +98,9 @@ void Probe::runProbe()
 {
     auto ctime = fed->getCurrentTime();
     while (endpoint.hasMessage()) {
-        auto m = endpoint.getMessage();
-        fed->logInfoMessage(fmt::format("Message from {} at Time {}: [{}]",
-                                        m->source,
-                                        static_cast<double>(ctime),
-                                        m->to_string()));
+        auto message = endpoint.getMessage();
+        fed->logInfoMessage(
+            fmt::format("Message from {} at Time {}: [{}]", message->source, static_cast<double>(ctime), message->to_string()));
         ++messagesReceived;
     }
     endpoint.send(

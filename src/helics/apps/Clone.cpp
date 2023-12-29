@@ -39,8 +39,7 @@ static std::string encode(std::string_view str2encode)
         ']';
 }
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     Clone::Clone(std::string_view appName, FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
@@ -124,18 +123,18 @@ namespace apps {
         }
         if (!points.empty()) {
             doc["points"] = Json::Value(Json::arrayValue);
-            for (auto& v : points) {
-                Json::Value point;
-                point["key"] = subscriptions[v.index].getTarget();
-                point["value"] = v.value;
-                point["time"] = static_cast<double>(v.time);
-                if (v.iteration > 0) {
-                    point["iteration"] = v.iteration;
+            for (auto& point : points) {
+                Json::Value pointData;
+                pointData["key"] = subscriptions[point.index].getTarget();
+                pointData["value"] = point.value;
+                pointData["time"] = static_cast<double>(point.time);
+                if (point.iteration > 0) {
+                    pointData["iteration"] = point.iteration;
                 }
-                if (v.first) {
-                    point["type"] = subscriptions[v.index].getPublicationType();
+                if (point.first) {
+                    pointData["type"] = subscriptions[point.index].getPublicationType();
                 }
-                doc["points"].append(point);
+                doc["points"].append(pointData);
             }
         }
 
@@ -170,8 +169,8 @@ namespace apps {
             }
         }
 
-        std::ofstream o(filename);
-        o << doc << std::endl;
+        std::ofstream outfile(filename);
+        outfile << doc << std::endl;
         fileSaved = true;
     }
 
@@ -226,8 +225,8 @@ namespace apps {
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
-                int ii = subids[sub.getHandle()];
-                points.emplace_back(currentTime, ii, val);
+                const int subid = subids[sub.getHandle()];
+                points.emplace_back(currentTime, subid, val);
                 if (iteration > 0) {
                     points.back().iteration = iteration;
                 }
@@ -262,10 +261,10 @@ namespace apps {
                     }
                     spdlog::info(valstr);
                 }
-                if (pubPointCount[ii] == 0) {
+                if (pubPointCount[subid] == 0) {
                     points.back().first = true;
                 }
-                ++pubPointCount[ii];
+                ++pubPointCount[subid];
             }
         }
 
@@ -286,26 +285,26 @@ namespace apps {
         try {
             int iteration = 0;
             while (true) {
-                helics::Time T;
+                helics::Time grantedTime;
                 if (allow_iteration) {
                     auto ItRes =
                         fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
                     if (ItRes.state == IterationResult::NEXT_STEP) {
                         iteration = 0;
                     }
-                    T = ItRes.grantedTime;
-                    captureForCurrentTime(T, iteration);
+                    grantedTime = ItRes.grantedTime;
+                    captureForCurrentTime(grantedTime, iteration);
                     ++iteration;
                 } else {
-                    T = fed->requestTime(runToTime);
-                    captureForCurrentTime(T);
+                    grantedTime = fed->requestTime(runToTime);
+                    captureForCurrentTime(grantedTime);
                 }
 
-                if (T >= runToTime) {
+                if (grantedTime >= runToTime) {
                     break;
                 }
-                if ((T >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
-                    std::cout << "processed for time " << static_cast<double>(T) << "\n";
+                if ((grantedTime >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
+                    std::cout << "processed for time " << static_cast<double>(grantedTime) << "\n";
                     nextPrintTime += nextPrintTimeStep;
                 }
             }
@@ -320,8 +319,8 @@ namespace apps {
         if ((res == subkeys.end()) || (res->second == -1)) {
             subscriptions.emplace_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
-            auto id = subscriptions.back().getHandle();
-            subids[id] = index;  // this is a new element
+            auto subid = subscriptions.back().getHandle();
+            subids[subid] = index;  // this is a new element
             subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
         }
     }
@@ -376,4 +375,3 @@ namespace apps {
     }
 
 }  // namespace apps
-}  // namespace helics

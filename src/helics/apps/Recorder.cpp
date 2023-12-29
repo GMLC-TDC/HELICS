@@ -233,18 +233,18 @@ void Recorder::writeJsonFile(const std::string& filename)
     Json::Value doc;
     if (!points.empty()) {
         doc["points"] = Json::Value(Json::arrayValue);
-        for (auto& v : points) {
-            Json::Value point;
-            point["key"] = subscriptions[v.index].getTarget();
-            point["value"] = v.value;
-            point["time"] = static_cast<double>(v.time);
-            if (v.iteration > 0) {
-                point["iteration"] = v.iteration;
+        for (auto& point : points) {
+            Json::Value pointData;
+            pointData["key"] = subscriptions[point.index].getTarget();
+            pointData["value"] = point.value;
+            pointData["time"] = static_cast<double>(point.time);
+            if (point.iteration > 0) {
+                pointData["iteration"] = point.iteration;
             }
-            if (v.first) {
-                point["type"] = subscriptions[v.index].getPublicationType();
+            if (point.first) {
+                pointData["type"] = subscriptions[point.index].getPublicationType();
             }
-            doc["points"].append(point);
+            doc["points"].append(pointData);
         }
     }
 
@@ -289,44 +289,44 @@ void Recorder::writeTextFile(const std::string& filename)
     if (!points.empty()) {
         outFile << "#time \ttag\t type*\t value\n";
     }
-    for (auto& v : points) {
-        if (v.first) {
-            outFile << static_cast<double>(v.time) << "\t\t" << subscriptions[v.index].getTarget()
-                    << '\t' << subscriptions[v.index].getPublicationType() << '\t'
-                    << Json::valueToQuotedString(v.value.c_str()) << '\n';
+    for (auto& point : points) {
+        if (point.first) {
+            outFile << static_cast<double>(point.time) << "\t\t" << subscriptions[point.index].getTarget()
+                    << '\t' << subscriptions[point.index].getPublicationType() << '\t'
+                    << Json::valueToQuotedString(point.value.c_str()) << '\n';
         } else {
-            if (v.iteration > 0) {
-                outFile << static_cast<double>(v.time) << ':' << v.iteration << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(v.value.c_str()) << '\n';
+            if (point.iteration > 0) {
+                outFile << static_cast<double>(point.time) << ':' << point.iteration << "\t\t"
+                        << subscriptions[point.index].getTarget() << '\t'
+                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
             } else {
-                outFile << static_cast<double>(v.time) << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(v.value.c_str()) << '\n';
+                outFile << static_cast<double>(point.time) << "\t\t"
+                        << subscriptions[point.index].getTarget() << '\t'
+                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
             }
         }
     }
     if (!messages.empty()) {
         outFile << "# m\t time \tsource\t dest\t message\n";
     }
-    for (auto& m : messages) {
-        outFile << "m\t" << static_cast<double>(m->time) << '\t' << m->source << '\t';
-        if ((m->dest.size() < 7) || (m->dest.compare(m->dest.size() - 6, 6, "cloneE") != 0)) {
-            outFile << m->dest;
+    for (auto& mess : messages) {
+        outFile << "m\t" << static_cast<double>(mess->time) << '\t' << mess->source << '\t';
+        if ((mess->dest.size() < 7) || (mess->dest.compare(mess->dest.size() - 6, 6, "cloneE") != 0)) {
+            outFile << mess->dest;
         } else {
-            outFile << m->original_dest;
+            outFile << mess->original_dest;
         }
-        if (isBinaryData(m->data)) {
-            if (isEscapableData(m->data)) {
+        if (isBinaryData(mess->data)) {
+            if (isEscapableData(mess->data)) {
                 outFile << "\t"
-                        << Json::valueToQuotedString(std::string(m->data.to_string()).c_str())
+                        << Json::valueToQuotedString(std::string(mess->data.to_string()).c_str())
                         << "\n";
             } else {
-                outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                outFile << "\t\"" << encode(mess->data.to_string()) << "\"\n";
             }
 
         } else {
-            outFile << "\t\"" << m->data.to_string() << "\"\n";
+            outFile << "\t\"" << mess->data.to_string() << "\"\n";
         }
     }
 }
@@ -379,8 +379,8 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
     for (auto& sub : subscriptions) {
         if (sub.isUpdated()) {
             auto val = sub.getValue<std::string>();
-            int ii = subids[sub.getHandle()];
-            points.emplace_back(currentTime, ii, val);
+            int subId = subids[sub.getHandle()];
+            points.emplace_back(currentTime, subId, val);
             if (iteration > 0) {
                 points.back().iteration = iteration;
             }
@@ -415,12 +415,12 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
                 }
                 spdlog::info(valstr);
             }
-            if (vStat[ii].cnt == 0) {
+            if (vStat[subId].cnt == 0) {
                 points.back().first = true;
             }
-            ++vStat[ii].cnt;
-            vStat[ii].lastVal = val;
-            vStat[ii].time = -1.0;
+            ++vStat[subId].cnt;
+            vStat[subId].lastVal = val;
+            vStat[subId].time = -1.0;
         }
     }
 
@@ -481,19 +481,19 @@ void Recorder::runTo(Time runToTime)
     try {
         int iteration = 0;
         while (true) {
-            helics::Time T;
+            helics::Time grantedTime;
             if (allow_iteration) {
                 auto ItRes =
                     fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
                 if (ItRes.state == IterationResult::NEXT_STEP) {
                     iteration = 0;
                 }
-                T = ItRes.grantedTime;
-                captureForCurrentTime(T, iteration);
+                grantedTime = ItRes.grantedTime;
+                captureForCurrentTime(grantedTime, iteration);
                 ++iteration;
             } else {
-                T = fed->requestTime(runToTime);
-                captureForCurrentTime(T);
+                grantedTime = fed->requestTime(runToTime);
+                captureForCurrentTime(grantedTime);
             }
             if (!mapfile.empty()) {
                 std::ofstream out(mapfile);
@@ -507,11 +507,11 @@ void Recorder::runTo(Time runToTime)
                 }
                 out.flush();
             }
-            if (T >= runToTime) {
+            if (grantedTime >= runToTime) {
                 break;
             }
-            if ((T >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
-                std::cout << "processed for time " << static_cast<double>(T) << "\n";
+            if ((grantedTime >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
+                std::cout << "processed for time " << static_cast<double>(grantedTime) << "\n";
                 nextPrintTime += nextPrintTimeStep;
             }
         }
@@ -527,8 +527,8 @@ void Recorder::addSubscription(std::string_view key)
         subscriptions.emplace_back(fed->registerSubscription(key));
         targets.emplace_back(key);
         auto index = static_cast<int>(subscriptions.size()) - 1;
-        auto id = subscriptions.back().getHandle();
-        subids[id] = index;  // this is a new element
+        auto subId = subscriptions.back().getHandle();
+        subids[subId] = index;  // this is a new element
         subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
     }
 }
@@ -539,8 +539,8 @@ void Recorder::addEndpoint(std::string_view endpoint)
     if ((res == eptNames.end()) || (res->second == -1)) {
         endpoints.emplace_back(InterfaceVisibility::GLOBAL, fed.get(), endpoint);
         auto index = static_cast<int>(endpoints.size()) - 1;
-        auto id = endpoints.back().getHandle();
-        eptids.emplace(id, index);  // this is a new element
+        auto endpointId = endpoints.back().getHandle();
+        eptids.emplace(endpointId, index);  // this is a new element
         eptNames[endpoints.back().getName()] = index;  // this is a potential replacement
     }
 }
