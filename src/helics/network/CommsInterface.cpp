@@ -27,7 +27,8 @@ namespace CommFactory {
       public:
         using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
-        static void addBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
+        static void
+            addBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
         {
             instance()->builders.emplace_back(code, name, std::move(builder));
         }

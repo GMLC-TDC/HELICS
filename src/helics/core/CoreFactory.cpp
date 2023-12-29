@@ -366,10 +366,10 @@ void abortAllCores(int errorCode, std::string_view errorString)
     auto cores = searchableCores.getObjects();
     for (auto& core : cores) {
         core->globalError(gLocalCoreId,
-                        errorCode,
-                        fmt::format("{} sent abort message: '{}'",
-                                    core->getIdentifier(),
-                                    errorString));
+                          errorCode,
+                          fmt::format("{} sent abort message: '{}'",
+                                      core->getIdentifier(),
+                                      errorString));
 
         core->disconnect();
     }
