@@ -25,17 +25,18 @@ namespace CommFactory {
        things that call it so it needs to be a static member of function call*/
     class MasterCommBuilder {
       public:
-        using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
+        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
-        static void addBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
+        static void
+            addBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
         {
-            instance()->builders.emplace_back(code, name, std::move(cb));
+            instance()->builders.emplace_back(code, name, std::move(builder));
         }
         static const std::shared_ptr<CommBuilder>& getBuilder(int code)
         {
-            for (auto& bb : instance()->builders) {
-                if (std::get<0>(bb) == code) {
-                    return std::get<2>(bb);
+            for (auto& builder : instance()->builders) {
+                if (std::get<0>(builder) == code) {
+                    return std::get<2>(builder);
                 }
             }
             throw(HelicsException("comm type is not available"));
@@ -43,9 +44,9 @@ namespace CommFactory {
 
         static const std::shared_ptr<CommBuilder>& getBuilder(std::string_view type)
         {
-            for (auto& bb : instance()->builders) {
-                if (std::get<1>(bb) == type) {
-                    return std::get<2>(bb);
+            for (auto& builder : instance()->builders) {
+                if (std::get<1>(builder) == type) {
+                    return std::get<2>(builder);
                 }
             }
             throw(HelicsException("comm type is not available"));
@@ -60,7 +61,7 @@ namespace CommFactory {
         }
         static const std::shared_ptr<MasterCommBuilder>& instance()
         {
-            static std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
+            static const std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
             return iptr;
         }
 
@@ -68,12 +69,12 @@ namespace CommFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCommBuilder() = default;
-        std::vector<BuildT> builders;  //!< container for the different builders
+        std::vector<BuilderData> builders;  //!< container for the different builders
     };
 
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
+    void defineCommBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
     {
-        MasterCommBuilder::addBuilder(std::move(cb), name, code);
+        MasterCommBuilder::addBuilder(std::move(builder), name, code);
     }
 
     std::unique_ptr<CommsInterface> create(CoreType type)
@@ -187,19 +188,19 @@ void CommsInterface::transmit(route_id rid, ActionMessage&& cmd)
 
 void CommsInterface::addRoute(route_id rid, std::string_view routeInfo)
 {
-    ActionMessage rt(CMD_PROTOCOL_PRIORITY);
-    rt.payload = routeInfo;
-    rt.messageID = NEW_ROUTE;
-    rt.setExtraData(rid.baseValue());
-    transmit(control_route, std::move(rt));
+    ActionMessage route(CMD_PROTOCOL_PRIORITY);
+    route.payload = routeInfo;
+    route.messageID = NEW_ROUTE;
+    route.setExtraData(rid.baseValue());
+    transmit(control_route, std::move(route));
 }
 
 void CommsInterface::removeRoute(route_id rid)
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = REMOVE_ROUTE;
-    rt.setExtraData(rid.baseValue());
-    transmit(control_route, rt);
+    ActionMessage route(CMD_PROTOCOL);
+    route.messageID = REMOVE_ROUTE;
+    route.setExtraData(rid.baseValue());
+    transmit(control_route, route);
 }
 
 void CommsInterface::setTxStatus(ConnectionStatus status)
@@ -457,7 +458,7 @@ void CommsInterface::disconnect()
 
 void CommsInterface::join_tx_rx_thread()
 {
-    std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    const std::lock_guard<std::mutex> syncLock(threadSyncLock);
     if (!singleThread) {
         if (queue_watcher.joinable()) {
             queue_watcher.join();
@@ -589,9 +590,9 @@ void CommsInterface::logError(std::string_view message) const
 
 void CommsInterface::closeTransmitter()
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = DISCONNECT;
-    transmit(control_route, rt);
+    ActionMessage close(CMD_PROTOCOL);
+    close.messageID = DISCONNECT;
+    transmit(control_route, close);
 }
 
 void CommsInterface::closeReceiver()
@@ -603,9 +604,9 @@ void CommsInterface::closeReceiver()
 
 void CommsInterface::reconnectTransmitter()
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = RECONNECT_TRANSMITTER;
-    transmit(control_route, rt);
+    ActionMessage reconnect(CMD_PROTOCOL);
+    reconnect.messageID = RECONNECT_TRANSMITTER;
+    transmit(control_route, reconnect);
 }
 
 void CommsInterface::reconnectReceiver()

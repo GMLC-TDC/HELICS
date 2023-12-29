@@ -81,5 +81,5 @@ trigger:
       - refs/heads/main
       - refs/heads/develop
       - refs/heads/helics2
-      - 'refs/pull/**'
-      - 'refs/tags/**'
+      - "refs/pull/**"
+      - "refs/tags/**"
