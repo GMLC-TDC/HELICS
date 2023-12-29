@@ -1824,7 +1824,8 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
 InterfaceHandle CommonCore::registerDataSink(LocalFederateId federateID, std::string_view name)
 {
     auto* fed = checkNewInterface(federateID, name, InterfaceType::SINK);
-    const uint16_t sinkFlags = fed->getInterfaceFlags() | make_flags(receive_only_flag, targeted_flag);
+    const uint16_t sinkFlags =
+        fed->getInterfaceFlags() | make_flags(receive_only_flag, targeted_flag);
 
     const auto& handle = createBasicHandle(
         fed->global_id, fed->local_id, InterfaceType::SINK, name, "sink", std::string{}, sinkFlags);
@@ -2269,9 +2270,8 @@ void CommonCore::sendMessage(InterfaceHandle sourceHandle, std::unique_ptr<Messa
             auto targets = fed->getMessageDestinations(sourceHandle);
             auto res = std::find_if(targets.begin(),
                                     targets.end(),
-                                    [destination = mess.getString(targetStringLoc)](const auto& val) {
-                                        return (val.second == destination);
-                                    });
+                                    [destination = mess.getString(targetStringLoc)](
+                                        const auto& val) { return (val.second == destination); });
             if (res == targets.end()) {
                 throw(InvalidParameter("targeted endpoint destination not in target list"));
             }
@@ -2768,7 +2768,8 @@ void CommonCore::initializeMapBuilder(std::string_view request,
             }
         }
         if (filterFed != nullptr) {
-            const int brkindex = builder.generatePlaceHolder("federates", filterFedID.load().baseValue());
+            const int brkindex =
+                builder.generatePlaceHolder("federates", filterFedID.load().baseValue());
             const std::string ret = filterFed->query(request);
             builder.addComponent(ret, brkindex);
         }
@@ -3182,13 +3183,13 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                     LOG_ERROR(parent_broker_id, identifier, estring);
                     break;
                 }
-                global_id = GlobalBrokerId{ command.dest_id };
-                global_broker_id_local = GlobalBrokerId{ command.dest_id };
+                global_id = GlobalBrokerId{command.dest_id};
+                global_broker_id_local = GlobalBrokerId{command.dest_id};
                 filterFedID = getSpecialFederateId(global_broker_id_local, 0);
                 translatorFedID = getSpecialFederateId(global_broker_id_local, 1);
                 timeCoord->setSourceId(global_broker_id_local);
 
-                higher_broker_id = GlobalBrokerId{ command.source_id };
+                higher_broker_id = GlobalBrokerId{command.source_id};
                 transmitDelayedMessages();
                 timeoutMon->setParentId(higher_broker_id);
                 if (checkActionFlag(command, slow_responding_flag)) {
@@ -3483,7 +3484,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             [[fallthrough]];
         case CMD_EXEC_REQUEST:
-            if (isLocal(GlobalBrokerId{ command.source_id })) {
+            if (isLocal(GlobalBrokerId{command.source_id})) {
                 if (hasTimeBlock(command.source_id)) {
                     delayedTimingMessages[command.source_id.baseValue()].push_back(command);
                     break;
@@ -3897,9 +3898,13 @@ void CommonCore::generateTranslatorFederate()
     translatorFedID.store(fid);
 
     translatorFed->setCallbacks([this](const ActionMessage& message) { addActionMessage(message); },
-                                [this](ActionMessage&& message) { addActionMessage(std::move(message)); },
+                                [this](ActionMessage&& message) {
+                                    addActionMessage(std::move(message));
+                                },
                                 [this](const ActionMessage& message) { routeMessage(message); },
-                                [this](ActionMessage&& message) { routeMessage(std::move(message)); });
+                                [this](ActionMessage&& message) {
+                                    routeMessage(std::move(message));
+                                });
 
     translatorFed->setHandleManager(&loopHandles);
     translatorFed->setLogger([this](int level, std::string_view name, std::string_view message) {
@@ -3929,7 +3934,9 @@ void CommonCore::generateFilterFederate()
     filterFedID.store(fid);
 
     filterFed->setCallbacks([this](const ActionMessage& message) { addActionMessage(message); },
-                            [this](ActionMessage&& message) { addActionMessage(std::move(message)); },
+                            [this](ActionMessage&& message) {
+                                addActionMessage(std::move(message));
+                            },
                             [this](const ActionMessage& message) { routeMessage(message); },
                             [this](ActionMessage&& message) { routeMessage(std::move(message)); });
     hasFilters = true;
@@ -4295,7 +4302,8 @@ void CommonCore::checkQueryTimeouts()
     if (!queryTimeouts.empty()) {
         auto ctime = std::chrono::steady_clock::now();
         for (auto& timeout : queryTimeouts) {
-            if (activeQueries.isRecognized(timeout.first) && !activeQueries.isCompleted(timeout.first)) {
+            if (activeQueries.isRecognized(timeout.first) &&
+                !activeQueries.isCompleted(timeout.first)) {
                 if (Time(ctime - timeout.second) > queryTimeout) {
                     activeQueries.setDelayedValue(
                         timeout.first,
@@ -4685,7 +4693,8 @@ void CommonCore::processDisconnectCommand(ActionMessage& cmd)
                     timeCoord->generateDebuggingTimeInfo(base["time"]);
                     base["federates"] = Json::arrayValue;
                     for (const auto& fed : loopFederates) {
-                        const std::string ret = federateQuery(fed.fed, "global_time_debugging", false);
+                        const std::string ret =
+                            federateQuery(fed.fed, "global_time_debugging", false);
                         if (ret == "#wait") {
                             if (fed->getState() <= FederateStates::EXECUTING) {
                                 cmd.dest_id = fed->global_id.load();
@@ -4894,8 +4903,8 @@ void CommonCore::processCoreConfigureCommands(ActionMessage& cmd)
                     try {
                         auto* fed = getFederateCore(cmd.source_id);
                         if (fed != nullptr) {
-                            auto fedop =
-                                std::any_cast<std::shared_ptr<FederateOperator>>(std::move(*locker));
+                            auto fedop = std::any_cast<std::shared_ptr<FederateOperator>>(
+                                std::move(*locker));
                             fed->setCallbackOperator(std::move(fedop));
                         }
                     }

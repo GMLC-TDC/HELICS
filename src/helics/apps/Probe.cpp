@@ -99,8 +99,10 @@ void Probe::runProbe()
     auto ctime = fed->getCurrentTime();
     while (endpoint.hasMessage()) {
         auto message = endpoint.getMessage();
-        fed->logInfoMessage(
-            fmt::format("Message from {} at Time {}: [{}]", message->source, static_cast<double>(ctime), message->to_string()));
+        fed->logInfoMessage(fmt::format("Message from {} at Time {}: [{}]",
+                                        message->source,
+                                        static_cast<double>(ctime),
+                                        message->to_string()));
         ++messagesReceived;
     }
     endpoint.send(

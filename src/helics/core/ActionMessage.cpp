@@ -191,9 +191,9 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 
     std::byte* dataStart = data;
 
-    *data = static_cast<std::byte>( littleEndian );
-    data[1] = static_cast<std::byte>( ssize >> 16U );
-    data[2] = static_cast<std::byte>( (ssize >> 8U) & 0xFFU );
+    *data = static_cast<std::byte>(littleEndian);
+    data[1] = static_cast<std::byte>(ssize >> 16U);
+    data[2] = static_cast<std::byte>((ssize >> 8U) & 0xFFU);
     data[3] = static_cast<std::byte>(ssize & 0xFFU);
     data += sizeof(uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t*>(data) = messageAction;

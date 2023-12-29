@@ -291,8 +291,9 @@ void Recorder::writeTextFile(const std::string& filename)
     }
     for (auto& point : points) {
         if (point.first) {
-            outFile << static_cast<double>(point.time) << "\t\t" << subscriptions[point.index].getTarget()
-                    << '\t' << subscriptions[point.index].getPublicationType() << '\t'
+            outFile << static_cast<double>(point.time) << "\t\t"
+                    << subscriptions[point.index].getTarget() << '\t'
+                    << subscriptions[point.index].getPublicationType() << '\t'
                     << Json::valueToQuotedString(point.value.c_str()) << '\n';
         } else {
             if (point.iteration > 0) {
@@ -311,7 +312,8 @@ void Recorder::writeTextFile(const std::string& filename)
     }
     for (auto& mess : messages) {
         outFile << "m\t" << static_cast<double>(mess->time) << '\t' << mess->source << '\t';
-        if ((mess->dest.size() < 7) || (mess->dest.compare(mess->dest.size() - 6, 6, "cloneE") != 0)) {
+        if ((mess->dest.size() < 7) ||
+            (mess->dest.compare(mess->dest.size() - 6, 6, "cloneE") != 0)) {
             outFile << mess->dest;
         } else {
             outFile << mess->original_dest;

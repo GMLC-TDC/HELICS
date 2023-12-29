@@ -158,7 +158,8 @@ namespace apps {
                 continue;
             }
             auto firstChar = str.find_first_not_of(" \t\n\r\0");
-            if ((firstChar == std::string::npos) || (str[firstChar] == '#') || (str[firstChar] == '!')) {
+            if ((firstChar == std::string::npos) || (str[firstChar] == '#') ||
+                (str[firstChar] == '!')) {
                 continue;
             }
             auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
@@ -195,7 +196,8 @@ namespace apps {
                         } else if ((blk[1] == "dest") || (blk[1] == "destination")) {
                             addDestEndpointClone(removeQuotes(blk[2]));
                         } else {
-                            std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
+                            std::cerr << "Unable to process line " << lineCount << ':' << str
+                                      << '\n';
                         }
                     } else {
                         std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
