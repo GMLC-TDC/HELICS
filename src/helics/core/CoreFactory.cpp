@@ -36,7 +36,7 @@ static constexpr std::string_view gHelicsEmptyString;
 that call it so it needs to be a static member of function call*/
 class MasterCoreBuilder {
   public:
-    using BuildT = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
+    using BuilderData = std::tuple<int, std::string, std::shared_ptr<CoreBuilder>>;
 
     static void addBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)
     {
@@ -82,7 +82,7 @@ class MasterCoreBuilder {
     /** private constructor since we only really want one of them
     accessed through the instance static member*/
     MasterCoreBuilder() = default;
-    std::vector<BuildT> builders;  //!< container for the different builders
+    std::vector<BuilderData> builders;  //!< container for the different builders
 };
 
 void defineCoreBuilder(std::shared_ptr<CoreBuilder> cb, std::string_view name, int code)

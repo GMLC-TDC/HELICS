@@ -29,7 +29,7 @@ namespace helics::BrokerFactory {
 things that call it so it needs to be a static member of function call*/
 class MasterBrokerBuilder {
   public:
-    using BuildT = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
+    using BuilderData = std::tuple<int, std::string, std::shared_ptr<BrokerBuilder>>;
 
     static void addBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)
     {
@@ -77,7 +77,7 @@ class MasterBrokerBuilder {
     /** private constructor since we only really want one of them
     accessed through the instance static member*/
     MasterBrokerBuilder() = default;
-    std::vector<BuildT> builders;  //!< container for the builders
+    std::vector<BuilderData> builders;  //!< container for the builders
 };
 
 void defineBrokerBuilder(std::shared_ptr<BrokerBuilder> cb, std::string_view name, int code)

@@ -25,7 +25,7 @@ namespace CommFactory {
        things that call it so it needs to be a static member of function call*/
     class MasterCommBuilder {
       public:
-        using BuildT = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
+        using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
         static void addBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
         {
@@ -68,7 +68,7 @@ namespace CommFactory {
         /** private constructor since we only really want one of them
         accessed through the instance static member*/
         MasterCommBuilder() = default;
-        std::vector<BuildT> builders;  //!< container for the different builders
+        std::vector<BuilderData> builders;  //!< container for the different builders
     };
 
     void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)

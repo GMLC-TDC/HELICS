@@ -30,7 +30,7 @@ The ZMQ_SS core also uses ZMQ for the underlying messaging technology but was de
 
 ## UDP
 
-UDP cores sends IP messages and caries with it the traditional limitation of UDP messging: no guaranteed delivery or order of received messages. It may be faster in cases with highly reliable networking. It's primary use is for performance testing and the UDP core uses [asio](https://think-async.com/Asio/) for networking.
+UDP cores sends IP messages and caries with it the traditional limitation of UDP messaging: no guaranteed delivery or order of received messages. It may be faster in cases with highly reliable networking. It's primary use is for performance testing and the UDP core uses [asio](https://think-async.com/Asio/) for networking.
 
 ## TCP
 
