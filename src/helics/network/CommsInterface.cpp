@@ -27,15 +27,15 @@ namespace CommFactory {
       public:
         using BuilderData = std::tuple<int, std::string, std::shared_ptr<CommBuilder>>;
 
-        static void addBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
+        static void addBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
         {
-            instance()->builders.emplace_back(code, name, std::move(cb));
+            instance()->builders.emplace_back(code, name, std::move(builder));
         }
         static const std::shared_ptr<CommBuilder>& getBuilder(int code)
         {
-            for (auto& bb : instance()->builders) {
-                if (std::get<0>(bb) == code) {
-                    return std::get<2>(bb);
+            for (auto& builder : instance()->builders) {
+                if (std::get<0>(builder) == code) {
+                    return std::get<2>(builder);
                 }
             }
             throw(HelicsException("comm type is not available"));
@@ -43,9 +43,9 @@ namespace CommFactory {
 
         static const std::shared_ptr<CommBuilder>& getBuilder(std::string_view type)
         {
-            for (auto& bb : instance()->builders) {
-                if (std::get<1>(bb) == type) {
-                    return std::get<2>(bb);
+            for (auto& builder : instance()->builders) {
+                if (std::get<1>(builder) == type) {
+                    return std::get<2>(builder);
                 }
             }
             throw(HelicsException("comm type is not available"));
@@ -60,7 +60,7 @@ namespace CommFactory {
         }
         static const std::shared_ptr<MasterCommBuilder>& instance()
         {
-            static std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
+            static const std::shared_ptr<MasterCommBuilder> iptr(new MasterCommBuilder());
             return iptr;
         }
 
@@ -71,9 +71,9 @@ namespace CommFactory {
         std::vector<BuilderData> builders;  //!< container for the different builders
     };
 
-    void defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view name, int code)
+    void defineCommBuilder(std::shared_ptr<CommBuilder> builder, std::string_view name, int code)
     {
-        MasterCommBuilder::addBuilder(std::move(cb), name, code);
+        MasterCommBuilder::addBuilder(std::move(builder), name, code);
     }
 
     std::unique_ptr<CommsInterface> create(CoreType type)
@@ -589,9 +589,9 @@ void CommsInterface::logError(std::string_view message) const
 
 void CommsInterface::closeTransmitter()
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = DISCONNECT;
-    transmit(control_route, rt);
+    ActionMessage close(CMD_PROTOCOL);
+    close.messageID = DISCONNECT;
+    transmit(control_route, close);
 }
 
 void CommsInterface::closeReceiver()
@@ -603,9 +603,9 @@ void CommsInterface::closeReceiver()
 
 void CommsInterface::reconnectTransmitter()
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = RECONNECT_TRANSMITTER;
-    transmit(control_route, rt);
+    ActionMessage reconnect(CMD_PROTOCOL);
+    reconnect.messageID = RECONNECT_TRANSMITTER;
+    transmit(control_route, reconnect);
 }
 
 void CommsInterface::reconnectReceiver()
