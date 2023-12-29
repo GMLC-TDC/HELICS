@@ -25,6 +25,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <tuple>
 #include <utility>
 
+// NOLINTNEXTLINE
 DECLARE_TRIPLINE()
 
 namespace helics::CoreFactory {

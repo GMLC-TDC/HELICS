@@ -212,7 +212,7 @@ namespace CommFactory {
 
     /** define a new Comm Builder from the builder give a name and build code*/
     void
-        defineCommBuilder(std::shared_ptr<CommBuilder> cb, std::string_view commTypeName, int code);
+        defineCommBuilder(std::shared_ptr<CommBuilder> builder, std::string_view commTypeName, int code);
 
     /** template function to create a builder and link it into the library*/
     template<class CommTYPE>

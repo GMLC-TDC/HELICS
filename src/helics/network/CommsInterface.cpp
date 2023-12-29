@@ -188,19 +188,19 @@ void CommsInterface::transmit(route_id rid, ActionMessage&& cmd)
 
 void CommsInterface::addRoute(route_id rid, std::string_view routeInfo)
 {
-    ActionMessage rt(CMD_PROTOCOL_PRIORITY);
-    rt.payload = routeInfo;
-    rt.messageID = NEW_ROUTE;
-    rt.setExtraData(rid.baseValue());
-    transmit(control_route, std::move(rt));
+    ActionMessage route(CMD_PROTOCOL_PRIORITY);
+    route.payload = routeInfo;
+    route.messageID = NEW_ROUTE;
+    route.setExtraData(rid.baseValue());
+    transmit(control_route, std::move(route));
 }
 
 void CommsInterface::removeRoute(route_id rid)
 {
-    ActionMessage rt(CMD_PROTOCOL);
-    rt.messageID = REMOVE_ROUTE;
-    rt.setExtraData(rid.baseValue());
-    transmit(control_route, rt);
+    ActionMessage route(CMD_PROTOCOL);
+    route.messageID = REMOVE_ROUTE;
+    route.setExtraData(rid.baseValue());
+    transmit(control_route, route);
 }
 
 void CommsInterface::setTxStatus(ConnectionStatus status)
@@ -458,7 +458,7 @@ void CommsInterface::disconnect()
 
 void CommsInterface::join_tx_rx_thread()
 {
-    std::lock_guard<std::mutex> syncLock(threadSyncLock);
+    const std::lock_guard<std::mutex> syncLock(threadSyncLock);
     if (!singleThread) {
         if (queue_watcher.joinable()) {
             queue_watcher.join();
