@@ -321,11 +321,16 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
 {
     auto ihandle = inputs.lock_shared();
     if (ihandle->size() > 0) {
-        base["inputs"] = Json::arrayValue;
+        base["unconnected_inputs"] = Json::arrayValue;
+        base["connected_inputs"] = Json::arrayValue;
         for (const auto& ipt : ihandle) {
             if (!ipt->key.empty()) {
                 if (!ipt->has_target) {
-                    base["inputs"].append(ipt->key);
+                    base["unconnected_inputs"].append(ipt->key);
+                }
+                else
+                {
+                    base["connected_inputs"].append(ipt->key);
                 }
             }
         }
@@ -333,11 +338,16 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
     ihandle.unlock();
     auto phandle = publications.lock();
     if (phandle->size() > 0) {
-        base["publications"] = Json::arrayValue;
+        base["unconnected_publications"] = Json::arrayValue;
+        base["connected_publications"] = Json::arrayValue;
         for (const auto& pub : phandle) {
             if (!pub->key.empty()) {
                 if (pub->subscribers.empty()) {
-                    base["publications"].append(pub->key);
+                    base["unconnected_publications"].append(pub->key);
+                }
+                else
+                {
+                    base["connected_publications"].append(pub->key);
                 }
             }
         }
@@ -346,11 +356,16 @@ void InterfaceInfo::getUnconnectedInterfaces(Json::Value& base) const
 
     auto ehandle = endpoints.lock_shared();
     if (ehandle->size() > 0) {
-        base["endpoints"] = Json::arrayValue;
+        base["unconnected_endpoints"] = Json::arrayValue;
+        base["connected_endpoints"] = Json::arrayValue;
         for (const auto& ept : ehandle) {
-            if (!ept->key.empty()) {
+            if (!ept->key.empty() && ept->targetedEndpoint) {
                 if (!ept->hasConnection()) {
-                    base["endpoints"].append(ept->key);
+                    base["unconnected_endpoints"].append(ept->key);
+                }
+                else
+                {
+                    base["connected_endpoints"].append(ept->key);
                 }
             }
         }
