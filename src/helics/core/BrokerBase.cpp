@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "BrokerBase.hpp"
 
-#include <fmt/format.h>
 #include "../common/logging.hpp"
 #include "AsyncTimeCoordinator.hpp"
 #include "ForwardingTimeCoordinator.hpp"
@@ -23,6 +22,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "helics/core/helicsCLI11JsonConfig.hpp"
 #include "helicsCLI11.hpp"
 #include "loggingHelper.hpp"
+
+#include <fmt/format.h>
 
 #ifndef HELICS_DISABLE_ASIO
 #    include "gmlc/networking/AsioContextManager.h"
@@ -59,7 +60,6 @@ static inline std::string genId()
 }
 
 namespace helics {
-
 
 BrokerBase::BrokerBase(bool DisableQueue) noexcept:
     queueDisabled(DisableQueue), mLogManager(std::make_shared<LogManager>())

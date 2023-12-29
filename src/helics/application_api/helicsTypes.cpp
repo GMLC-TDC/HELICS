@@ -11,13 +11,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonProcessingFunctions.hpp"
 #include "../common/frozen_map.h"
 #include "ValueConverter.hpp"
-#include <fmt/format.h>
 #include "gmlc/utilities/demangle.hpp"
 #include "gmlc/utilities/stringConversion.h"
 #include "gmlc/utilities/stringOps.h"
 #include "gmlc/utilities/string_viewConversion.h"
 
 #include <algorithm>
+#include <fmt/format.h>
 #include <functional>
 #include <numeric>
 #include <regex>

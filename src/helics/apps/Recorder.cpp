@@ -10,17 +10,16 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <regex>
 #include <set>
@@ -389,21 +388,27 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
                 std::string valstr;
                 if (val.size() < 150) {
                     if (iteration > 0) {
-                        valstr = fmt::format(
-                            "[{}:{}]value {}={}", static_cast<double>(currentTime), iteration, sub.getTarget(), val);
+                        valstr = fmt::format("[{}:{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             iteration,
+                                             sub.getTarget(),
+                                             val);
                     } else {
-                        valstr = fmt::format("[{}]value {}={}", static_cast<double>(currentTime), sub.getTarget(), val);
+                        valstr = fmt::format("[{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             sub.getTarget(),
+                                             val);
                     }
                 } else {
                     if (iteration > 0) {
                         valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                            static_cast<double>(currentTime),
+                                             static_cast<double>(currentTime),
                                              iteration,
                                              sub.getTarget(),
                                              val.size());
                     } else {
                         valstr = fmt::format("[{}]value {}=block[{}]",
-                            static_cast<double>(currentTime),
+                                             static_cast<double>(currentTime),
                                              sub.getTarget(),
                                              val.size());
                     }
@@ -426,13 +431,13 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
                 std::string messstr;
                 if (mess->data.size() < 50) {
                     messstr = fmt::format("[{}]message from {} to {}::{}",
-                        static_cast<double>(currentTime),
+                                          static_cast<double>(currentTime),
                                           mess->source,
                                           mess->dest,
                                           mess->data.to_string());
                 } else {
                     messstr = fmt::format("[{}]message from {} to {}:: size {}",
-                        static_cast<double>(currentTime),
+                                          static_cast<double>(currentTime),
                                           mess->source,
                                           mess->dest,
                                           mess->data.size());

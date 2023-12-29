@@ -8,7 +8,6 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "json/json.h"
 #include "json/writer.h"
-
 #include <fmt/format.h>
 #include <string>
 

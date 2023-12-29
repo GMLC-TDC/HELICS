@@ -13,14 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
-
 #include "flagOperations.hpp"
 #include "gmlc/utilities/base64.h"
 
 #include <algorithm>
 #include <complex>
-#include <fmt/format.h>
 #include <cstring>
+#include <fmt/format.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
 #include <ostream>

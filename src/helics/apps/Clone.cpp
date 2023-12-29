@@ -16,10 +16,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
-#include <fstream>
-#include <iostream>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <regex>
 #include <set>
@@ -235,22 +235,27 @@ namespace apps {
                     std::string valstr;
                     if (val.size() < 150) {
                         if (iteration > 0) {
-                            valstr = fmt::format(
-                                "[{}:{}]value {}={}", static_cast<double>(currentTime), iteration, sub.getTarget(), val);
+                            valstr = fmt::format("[{}:{}]value {}={}",
+                                                 static_cast<double>(currentTime),
+                                                 iteration,
+                                                 sub.getTarget(),
+                                                 val);
                         } else {
-                            valstr =
-                                fmt::format("[{}]value {}={}", static_cast<double>(currentTime), sub.getTarget(), val);
+                            valstr = fmt::format("[{}]value {}={}",
+                                                 static_cast<double>(currentTime),
+                                                 sub.getTarget(),
+                                                 val);
                         }
                     } else {
                         if (iteration > 0) {
                             valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                                static_cast<double>(currentTime),
+                                                 static_cast<double>(currentTime),
                                                  iteration,
                                                  sub.getTarget(),
                                                  val.size());
                         } else {
                             valstr = fmt::format("[{}]value {}=block[{}]",
-                                static_cast<double>(currentTime),
+                                                 static_cast<double>(currentTime),
                                                  sub.getTarget(),
                                                  val.size());
                         }

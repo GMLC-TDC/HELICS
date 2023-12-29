@@ -1405,7 +1405,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 allowed_send_time = timeCoord->allowedSendTime();
                 if (cmd.action() == CMD_FORCE_TIME_GRANT) {
                     if (!ignore_time_mismatch_warnings) {
-                        LOG_WARNING(fmt::format("forced Granted Time={}", static_cast<double>(time_granted)));
+                        LOG_WARNING(fmt::format("forced Granted Time={}",
+                                                static_cast<double>(time_granted)));
                     }
                 } else {
                     LOG_TIMING(fmt::format("Granted Time={}", static_cast<double>(time_granted)));
@@ -1600,7 +1601,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                                             static_cast<double>(time_granted),
                                             blockFed.first.baseValue()));
                 } else {
-                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", static_cast<double>(time_granted)));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}",
+                                            static_cast<double>(time_granted)));
                 }
 
             } else if (cmd.counter == 3) {

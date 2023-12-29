@@ -24,10 +24,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "loggingHelper.hpp"
 #include "queryHelpers.hpp"
 
+#include <fmt/format.h>
 #include <iostream>
 #include <limits>
 #include <set>
-#include <fmt/format.h>
 #include <string>
 #include <utility>
 #include <vector>

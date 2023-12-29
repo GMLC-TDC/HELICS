@@ -39,8 +39,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <algorithm>
 #include <cassert>
 #include <cstring>
-#include <fstream>
 #include <fmt/format.h>
+#include <fstream>
 #include <functional>
 #include <iostream>
 #include <limits>
