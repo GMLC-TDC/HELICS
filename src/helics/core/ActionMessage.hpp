@@ -80,7 +80,8 @@ class ActionMessage {
     /** move assignment*/
     ActionMessage& operator=(ActionMessage&& act) noexcept;
     /** move assignment from multiMessage data into the actionMessage
-    @details take ownership of the multiMessage and move the contents out then destroy the multiMessage shell
+    @details take ownership of the multiMessage and move the contents out then destroy the
+    multiMessage shell
     @param multiMessage the multiMessage to move.
     */
     ActionMessage& operator=(std::unique_ptr<Message> message) noexcept;
@@ -212,13 +213,13 @@ inline bool operator<(const ActionMessage& cmd, const ActionMessage& cmd2)
     return (cmd.actionTime < cmd2.actionTime);
 }
 
-/** create a new multiMessage object that copies all the information from the ActionMessage into newly
- * allocated memory for the multiMessage
+/** create a new multiMessage object that copies all the information from the ActionMessage into
+ * newly allocated memory for the multiMessage
  */
 std::unique_ptr<Message> createMessageFromCommand(const ActionMessage& cmd);
 
-/** create a new multiMessage object that moves all the information from the ActionMessage into newly
- * allocated memory for the multiMessage
+/** create a new multiMessage object that moves all the information from the ActionMessage into
+ * newly allocated memory for the multiMessage
  */
 std::unique_ptr<Message> createMessageFromCommand(ActionMessage&& cmd);
 

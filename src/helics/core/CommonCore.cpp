@@ -4619,8 +4619,8 @@ void CommonCore::processTimingTick(ActionMessage& cmd)
         auto now = std::chrono::steady_clock::now();
         if (now - disconnectTime > (3 * tickTimer).to_ms()) {
             LOG_WARNING(global_broker_id_local,
-                getIdentifier(),
-                " disconnect Timer expired forcing disconnect");
+                        getIdentifier(),
+                        " disconnect Timer expired forcing disconnect");
             ActionMessage bye(CMD_DISCONNECT_FED_ACK);
             bye.source_id = parent_broker_id;
             for (auto fed : loopFederates) {
@@ -4636,79 +4636,78 @@ void CommonCore::processTimingTick(ActionMessage& cmd)
 
 void CommonCore::processInitRequest(ActionMessage& cmd)
 {
-    switch (cmd.action())
-    {
-    case CMD_INIT: {
-        auto* fed = getFederateCore(cmd.source_id);
-        if (fed == nullptr) {
-            break;
-        }
-
-        fed->init_transmitted = true;
-
-        if (allInitReady()) {
-            if (transitionBrokerState(BrokerState::CONNECTED,
-                BrokerState::INITIALIZING)) {  // make sure we only
-                // do this once
-                if (initIterations) {
-                    setActionFlag(cmd, iteration_requested_flag);
-                } else {
-                    checkDependencies();
-                }
-                cmd.source_id = global_broker_id_local;
-                transmit(parent_route_id, cmd);
-            } else if (checkActionFlag(cmd, observer)) {
-                cmd.source_id = global_broker_id_local;
-                transmit(parent_route_id, cmd);
+    switch (cmd.action()) {
+        case CMD_INIT: {
+            auto* fed = getFederateCore(cmd.source_id);
+            if (fed == nullptr) {
+                break;
             }
-        }
 
-    } break;
-    case CMD_INIT_GRANT:
-        if (checkActionFlag(cmd, iteration_requested_flag)) {
-            if (initIterations) {
-                if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
-                    loopFederates.apply([&cmd](auto& fed) {
-                        if (fed->initIterating.load()) {
-                            fed->addAction(cmd);
-                        }
+            fed->init_transmitted = true;
+
+            if (allInitReady()) {
+                if (transitionBrokerState(BrokerState::CONNECTED,
+                                          BrokerState::INITIALIZING)) {  // make sure we only
+                    // do this once
+                    if (initIterations) {
+                        setActionFlag(cmd, iteration_requested_flag);
+                    } else {
+                        checkDependencies();
+                    }
+                    cmd.source_id = global_broker_id_local;
+                    transmit(parent_route_id, cmd);
+                } else if (checkActionFlag(cmd, observer)) {
+                    cmd.source_id = global_broker_id_local;
+                    transmit(parent_route_id, cmd);
+                }
+            }
+
+        } break;
+        case CMD_INIT_GRANT:
+            if (checkActionFlag(cmd, iteration_requested_flag)) {
+                if (initIterations) {
+                    if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
+                        loopFederates.apply([&cmd](auto& fed) {
+                            if (fed->initIterating.load()) {
+                                fed->addAction(cmd);
+                            }
                         });
+                    } else if (checkActionFlag(cmd, observer_flag) ||
+                               checkActionFlag(cmd, dynamic_join_flag)) {
+                        routeMessage(cmd);
+                    }
+                    initIterations.store(false);
+                }
+            } else {
+                if (transitionBrokerState(
+                        BrokerState::INITIALIZING,
+                        BrokerState::OPERATING)) {  // forward the grant to all federates
+                    if (filterFed != nullptr) {
+                        filterFed->organizeFilterOperations();
+                    }
+
+                    loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
+                    if (filterFed != nullptr && (filterTiming || globalTime)) {
+                        filterFed->handleMessage(cmd);
+                    }
+                    if (translatorFed != nullptr) {
+                        translatorFed->handleMessage(cmd);
+                    }
+                    timeCoord->enteringExecMode();
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == MessageProcessingResult::NEXT_STEP) {
+                        enteredExecutionMode = true;
+                    }
+                    if (!timeCoord->hasActiveTimeDependencies()) {
+                        timeCoord->disconnect();
+                    }
                 } else if (checkActionFlag(cmd, observer_flag) ||
-                    checkActionFlag(cmd, dynamic_join_flag)) {
+                           checkActionFlag(cmd, dynamic_join_flag)) {
                     routeMessage(cmd);
                 }
-                initIterations.store(false);
             }
-        } else {
-            if (transitionBrokerState(
-                BrokerState::INITIALIZING,
-                BrokerState::OPERATING)) {  // forward the grant to all federates
-                if (filterFed != nullptr) {
-                    filterFed->organizeFilterOperations();
-                }
 
-                loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
-                if (filterFed != nullptr && (filterTiming || globalTime)) {
-                    filterFed->handleMessage(cmd);
-                }
-                if (translatorFed != nullptr) {
-                    translatorFed->handleMessage(cmd);
-                }
-                timeCoord->enteringExecMode();
-                auto res = timeCoord->checkExecEntry();
-                if (res == MessageProcessingResult::NEXT_STEP) {
-                    enteredExecutionMode = true;
-                }
-                if (!timeCoord->hasActiveTimeDependencies()) {
-                    timeCoord->disconnect();
-                }
-            } else if (checkActionFlag(cmd, observer_flag) ||
-                checkActionFlag(cmd, dynamic_join_flag)) {
-                routeMessage(cmd);
-            }
-        }
-
-        break;
+            break;
     }
 }
 
