@@ -3390,33 +3390,7 @@ void CommonCore::processCommand(ActionMessage&& command)
         case CMD_IGNORE:
             break;
         case CMD_TICK:
-            if (isReasonForTick(command.messageID, TickForwardingReasons::PING_RESPONSE) ||
-                isReasonForTick(command.messageID, TickForwardingReasons::NO_COMMS)) {
-                if (getBrokerState() == BrokerState::OPERATING) {
-                    timeoutMon->tick(this);
-                    LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
-                }
-            }
-            if (isReasonForTick(command.messageID, TickForwardingReasons::QUERY_TIMEOUT)) {
-                checkQueryTimeouts();
-            }
-            if (isReasonForTick(command.messageID, TickForwardingReasons::DISCONNECT_TIMEOUT)) {
-                auto now = std::chrono::steady_clock::now();
-                if (now - disconnectTime > (3 * tickTimer).to_ms()) {
-                    LOG_WARNING(global_broker_id_local,
-                                getIdentifier(),
-                                " disconnect Timer expired forcing disconnect");
-                    ActionMessage bye(CMD_DISCONNECT_FED_ACK);
-                    bye.source_id = parent_broker_id;
-                    for (auto fed : loopFederates) {
-                        if (fed->getState() != FederateStates::FINISHED) {
-                            bye.dest_id = fed->global_id.load();
-                            fed->addAction(bye);
-                        }
-                    }
-                    addActionMessage(CMD_STOP);
-                }
-            }
+            processTimingTick(command);
             break;
         case CMD_PING:
         case CMD_BROKER_PING:  // broker ping for core is the same as core
@@ -3484,30 +3458,7 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             [[fallthrough]];
         case CMD_EXEC_REQUEST:
-            if (isLocal(GlobalBrokerId{command.source_id})) {
-                if (hasTimeBlock(command.source_id)) {
-                    delayedTimingMessages[command.source_id.baseValue()].push_back(command);
-                    break;
-                }
-            }
-            if (command.dest_id == global_broker_id_local) {
-                timeCoord->processTimeMessage(command);
-                if (!enteredExecutionMode) {
-                    auto res = timeCoord->checkExecEntry();
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
-                        LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
-                    } else {
-                        timeCoord->updateTimeFactors();
-                    }
-                }
-            } else if (!command.dest_id.isValid() && command.source_id == global_broker_id_local) {
-                for (auto& dep : timeCoord->getDependents()) {
-                    routeMessage(command, dep);
-                }
-            } else {
-                routeMessage(command);
-            }
+            processExecRequest(command);
             break;
         case CMD_TIME_GRANT:
             if (command.source_id == keyFed) {
@@ -4651,6 +4602,144 @@ void CommonCore::processLogAndErrorCommand(ActionMessage& cmd)
             break;
     }
 }
+
+void CommonCore::processTimingTick(ActionMessage& cmd)
+{
+    if (isReasonForTick(cmd.messageID, TickForwardingReasons::PING_RESPONSE) ||
+        isReasonForTick(cmd.messageID, TickForwardingReasons::NO_COMMS)) {
+        if (getBrokerState() == BrokerState::OPERATING) {
+            timeoutMon->tick(this);
+            LOG_SUMMARY(global_broker_id_local, getIdentifier(), " core tick");
+        }
+    }
+    if (isReasonForTick(cmd.messageID, TickForwardingReasons::QUERY_TIMEOUT)) {
+        checkQueryTimeouts();
+    }
+    if (isReasonForTick(cmd.messageID, TickForwardingReasons::DISCONNECT_TIMEOUT)) {
+        auto now = std::chrono::steady_clock::now();
+        if (now - disconnectTime > (3 * tickTimer).to_ms()) {
+            LOG_WARNING(global_broker_id_local,
+                getIdentifier(),
+                " disconnect Timer expired forcing disconnect");
+            ActionMessage bye(CMD_DISCONNECT_FED_ACK);
+            bye.source_id = parent_broker_id;
+            for (auto fed : loopFederates) {
+                if (fed->getState() != FederateStates::FINISHED) {
+                    bye.dest_id = fed->global_id.load();
+                    fed->addAction(bye);
+                }
+            }
+            addActionMessage(CMD_STOP);
+        }
+    }
+}
+
+void CommonCore::processInitRequest(ActionMessage& cmd)
+{
+    switch (cmd.action())
+    {
+    case CMD_INIT: {
+        auto* fed = getFederateCore(cmd.source_id);
+        if (fed == nullptr) {
+            break;
+        }
+
+        fed->init_transmitted = true;
+
+        if (allInitReady()) {
+            if (transitionBrokerState(BrokerState::CONNECTED,
+                BrokerState::INITIALIZING)) {  // make sure we only
+                // do this once
+                if (initIterations) {
+                    setActionFlag(cmd, iteration_requested_flag);
+                } else {
+                    checkDependencies();
+                }
+                cmd.source_id = global_broker_id_local;
+                transmit(parent_route_id, cmd);
+            } else if (checkActionFlag(cmd, observer)) {
+                cmd.source_id = global_broker_id_local;
+                transmit(parent_route_id, cmd);
+            }
+        }
+
+    } break;
+    case CMD_INIT_GRANT:
+        if (checkActionFlag(cmd, iteration_requested_flag)) {
+            if (initIterations) {
+                if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
+                    loopFederates.apply([&cmd](auto& fed) {
+                        if (fed->initIterating.load()) {
+                            fed->addAction(cmd);
+                        }
+                        });
+                } else if (checkActionFlag(cmd, observer_flag) ||
+                    checkActionFlag(cmd, dynamic_join_flag)) {
+                    routeMessage(cmd);
+                }
+                initIterations.store(false);
+            }
+        } else {
+            if (transitionBrokerState(
+                BrokerState::INITIALIZING,
+                BrokerState::OPERATING)) {  // forward the grant to all federates
+                if (filterFed != nullptr) {
+                    filterFed->organizeFilterOperations();
+                }
+
+                loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
+                if (filterFed != nullptr && (filterTiming || globalTime)) {
+                    filterFed->handleMessage(cmd);
+                }
+                if (translatorFed != nullptr) {
+                    translatorFed->handleMessage(cmd);
+                }
+                timeCoord->enteringExecMode();
+                auto res = timeCoord->checkExecEntry();
+                if (res == MessageProcessingResult::NEXT_STEP) {
+                    enteredExecutionMode = true;
+                }
+                if (!timeCoord->hasActiveTimeDependencies()) {
+                    timeCoord->disconnect();
+                }
+            } else if (checkActionFlag(cmd, observer_flag) ||
+                checkActionFlag(cmd, dynamic_join_flag)) {
+                routeMessage(cmd);
+            }
+        }
+
+        break;
+    }
+}
+
+void CommonCore::processExecRequest(ActionMessage& cmd)
+{
+    if (isLocal(GlobalBrokerId{cmd.source_id})) {
+        if (hasTimeBlock(cmd.source_id)) {
+            delayedTimingMessages[cmd.source_id.baseValue()].push_back(cmd);
+            return;
+        }
+    }
+    if (cmd.dest_id == global_broker_id_local) {
+        timeCoord->processTimeMessage(cmd);
+        if (!enteredExecutionMode) {
+            auto res = timeCoord->checkExecEntry();
+            if (res == MessageProcessingResult::NEXT_STEP) {
+                enteredExecutionMode = true;
+                LOG_TIMING(global_broker_id_local, getIdentifier(), "entering Exec Mode");
+            } else {
+                timeCoord->updateTimeFactors();
+            }
+        }
+    } else if (!cmd.dest_id.isValid() && cmd.source_id == global_broker_id_local) {
+        for (auto& dep : timeCoord->getDependents()) {
+            routeMessage(cmd, dep);
+        }
+    } else {
+        routeMessage(cmd);
+    }
+}
+
 void CommonCore::processDisconnectCommand(ActionMessage& cmd)
 {
     switch (cmd.action()) {
