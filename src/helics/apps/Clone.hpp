@@ -46,7 +46,9 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fedInfo  a federate information structure
     */
-        Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
+        Clone(std::string_view appName,
+              const std::shared_ptr<Core>& core,
+              const FederateInfo& fedInfo);
 
         /**constructor taking a federate information structure and using the given core
     @param appName the name of the federate (can be empty to use defaults from fedInfo)

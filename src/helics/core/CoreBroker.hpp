@@ -357,9 +357,9 @@ class CoreBroker: public Broker, public BrokerBase {
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
     /** handle disconnect timing */
-    void disconnectTiming(ActionMessage &command);
+    void disconnectTiming(ActionMessage& command);
     /** processBrokerDisconnect  */
-    void processBrokerDisconnect(ActionMessage &command, BasicBrokerInfo *brk);
+    void processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo* brk);
     /** process an error message*/
     void processError(ActionMessage& command);
     /** disconnect a broker/core*/

@@ -3019,8 +3019,7 @@ void CoreBroker::disconnectTiming(ActionMessage& command)
     if (hasTimeDependency) {
         if (!enteredExecutionMode) {
             if (getBrokerState() >= BrokerState::OPERATING) {
-                if (timeCoord->processTimeMessage(command) !=
-                    TimeProcessingResult::NOT_PROCESSED) {
+                if (timeCoord->processTimeMessage(command) != TimeProcessingResult::NOT_PROCESSED) {
                     auto res = timeCoord->checkExecEntry();
                     if (res == MessageProcessingResult::NEXT_STEP) {
                         enteredExecutionMode = true;
@@ -3028,21 +3027,18 @@ void CoreBroker::disconnectTiming(ActionMessage& command)
                 }
             }
         } else {
-            if (timeCoord->processTimeMessage(command) !=
-                TimeProcessingResult::NOT_PROCESSED) {
+            if (timeCoord->processTimeMessage(command) != TimeProcessingResult::NOT_PROCESSED) {
                 timeCoord->updateTimeFactors();
             }
         }
     }
 }
 
-void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo *brk)
+void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo* brk)
 {
     if (!isRootc) {
         if (command.source_id == higher_broker_id) {
-            LOG_CONNECTIONS(parent_broker_id,
-                getIdentifier(),
-                "got disconnect from parent");
+            LOG_CONNECTIONS(parent_broker_id, getIdentifier(), "got disconnect from parent");
             sendDisconnect(CMD_GLOBAL_DISCONNECT);
             addActionMessage(CMD_STOP);
             return;
@@ -3051,10 +3047,10 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
 
     if (brk != nullptr) {
         LOG_CONNECTIONS(parent_broker_id,
-            getIdentifier(),
-            fmt::format("got disconnect from {}({})",
-                brk->name,
-                command.source_id.baseValue()));
+                        getIdentifier(),
+                        fmt::format("got disconnect from {}({})",
+                                    brk->name,
+                                    command.source_id.baseValue()));
         disconnectBroker(*brk);
     }
 
@@ -3068,7 +3064,7 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
             if ((brk != nullptr) && (!brk->_nonLocal)) {
                 if (!checkActionFlag(command, error_flag)) {
                     ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
-                        CMD_DISCONNECT_BROKER_ACK);
+                                                     CMD_DISCONNECT_BROKER_ACK);
                     dis.source_id = global_broker_id_local;
                     dis.dest_id = brk->global_id;
                     transmit(brk->route, dis);
@@ -3082,23 +3078,21 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
         if ((brk != nullptr) && (!brk->_nonLocal)) {
             if (!checkActionFlag(command, error_flag)) {
                 ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
-                    CMD_DISCONNECT_BROKER_ACK);
+                                                 CMD_DISCONNECT_BROKER_ACK);
                 dis.source_id = global_broker_id_local;
                 dis.dest_id = brk->global_id;
                 transmit(brk->route, dis);
             }
             brk->_sent_disconnect_ack = true;
             if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
-                command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
-                    CMD_DISCONNECT_BROKER);
+                command.setAction((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
                 transmit(parent_route_id, command);
             }
             removeRoute(brk->route);
         } else {
             if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
                 if (brk != nullptr) {
-                    command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
-                        CMD_DISCONNECT_BROKER);
+                    command.setAction((brk->_core) ? CMD_DISCONNECT_CORE : CMD_DISCONNECT_BROKER);
                     transmit(parent_route_id, command);
                 }
             }
@@ -3108,7 +3102,7 @@ void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo
 
 void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
-    auto* brk = getBrokerById(GlobalBrokerId{ command.source_id });
+    auto* brk = getBrokerById(GlobalBrokerId{command.source_id});
     switch (command.action()) {
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
@@ -3116,7 +3110,7 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
                 // deal with the time implications of the message
                 disconnectTiming(command);
             } else if (command.dest_id == parent_broker_id) {
-                processBrokerDisconnect(command,brk);
+                processBrokerDisconnect(command, brk);
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
@@ -3825,7 +3819,8 @@ void CoreBroker::processLocalQuery(const ActionMessage& message)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(message.payload.to_string()).first]).push_back(queryRep);
+        std::get<1>(mapBuilders[mapIndex.at(message.payload.to_string()).first])
+            .push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
         activeQueries.setDelayedValue(message.messageID, std::string(queryRep.payload.to_string()));
     } else {
@@ -3961,8 +3956,9 @@ void CoreBroker::processQuery(ActionMessage& message)
                 queryResp.payload = fileops::generateJsonString(json);
             }
         } else if (message.payload.to_string() == "list") {
-            queryResp.payload =
-                generateStringVector(global_values, [](const auto& globalValue) { return globalValue.first; });
+            queryResp.payload = generateStringVector(global_values, [](const auto& globalValue) {
+                return globalValue.first;
+            });
         } else if (message.payload.to_string() == "all") {
             fileops::JsonMapBuilder globalSet;
             auto& json = globalSet.getJValue();

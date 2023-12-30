@@ -70,7 +70,9 @@ void Clone::processArgs()
     }
 }
 
-Clone::Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+Clone::Clone(std::string_view appName,
+             const std::shared_ptr<Core>& core,
+             const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);

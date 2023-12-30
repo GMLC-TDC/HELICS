@@ -24,7 +24,9 @@ Probe::Probe(std::vector<std::string> args): App("probe_${#}", std::move(args)) 
 
 Probe::Probe(std::string_view appName, const FederateInfo& fedInfo): App(appName, fedInfo) {}
 
-Probe::Probe(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+Probe::Probe(std::string_view appName,
+             const std::shared_ptr<Core>& core,
+             const FederateInfo& fedInfo):
     App(appName, core, fedInfo)
 {
 }

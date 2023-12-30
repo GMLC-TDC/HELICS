@@ -45,7 +45,9 @@ namespace apps {
     @param core a pointer to core object which the federate can join
     @param fedInfo  a federate information structure
     */
-        Recorder(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo);
+        Recorder(std::string_view name,
+                 const std::shared_ptr<Core>& core,
+                 const FederateInfo& fedInfo);
         /**constructor taking a federate information structure and using the given core
     @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
