@@ -184,8 +184,8 @@ void EndpointInfo::addSource(GlobalHandle source,
                              std::string_view sourceName,
                              std::string_view sourceType)
 {
-    for (const auto& si : sourceInformation) {
-        if (si.id == source) {
+    for (const auto& info : sourceInformation) {
+        if (info.id == source) {
             return;
         }
     }

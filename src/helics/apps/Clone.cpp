@@ -40,7 +40,7 @@ static std::string encode(std::string_view str2encode)
 }
 
 namespace helics::apps {
-Clone::Clone(std::string_view appName, FederateInfo& fi): App(appName, fi)
+Clone::Clone(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -70,14 +70,14 @@ void Clone::processArgs()
     }
 }
 
-Clone::Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Clone::Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }

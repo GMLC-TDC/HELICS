@@ -30,8 +30,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 #include <vector>
 
-namespace helics {
-namespace apps {
+namespace helics::apps {
     Tracer::Tracer(std::string_view appName, FederateInfo& fi): App(appName, fi)
     {
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
@@ -529,4 +528,3 @@ namespace apps {
     }
 
 }  // namespace apps
-}  // namespace helics

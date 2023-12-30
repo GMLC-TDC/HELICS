@@ -251,7 +251,7 @@ void CoreBroker::sendBrokerErrorAck(ActionMessage& command, std::int32_t errorCo
 {
     route_id newroute;
     bool route_created = false;
-    bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
+    const bool jsonReply = checkActionFlag(command, use_json_serialization_flag);
     if ((!command.source_id.isValid()) || (command.source_id == parent_broker_id)) {
         newroute = generateRouteId(jsonReply ? json_route_code : 0, routeCount++);
         addRoute(newroute, command.getExtraData(), command.getString(targetStringLoc));
@@ -3014,99 +3014,109 @@ void CoreBroker::processError(ActionMessage& command)
     }
 }
 
+void CoreBroker::disconnectTiming(ActionMessage& command)
+{
+    if (hasTimeDependency) {
+        if (!enteredExecutionMode) {
+            if (getBrokerState() >= BrokerState::OPERATING) {
+                if (timeCoord->processTimeMessage(command) !=
+                    TimeProcessingResult::NOT_PROCESSED) {
+                    auto res = timeCoord->checkExecEntry();
+                    if (res == MessageProcessingResult::NEXT_STEP) {
+                        enteredExecutionMode = true;
+                    }
+                }
+            }
+        } else {
+            if (timeCoord->processTimeMessage(command) !=
+                TimeProcessingResult::NOT_PROCESSED) {
+                timeCoord->updateTimeFactors();
+            }
+        }
+    }
+}
+
+void CoreBroker::processBrokerDisconnect(ActionMessage& command, BasicBrokerInfo *brk)
+{
+    if (!isRootc) {
+        if (command.source_id == higher_broker_id) {
+            LOG_CONNECTIONS(parent_broker_id,
+                getIdentifier(),
+                "got disconnect from parent");
+            sendDisconnect(CMD_GLOBAL_DISCONNECT);
+            addActionMessage(CMD_STOP);
+            return;
+        }
+    }
+
+    if (brk != nullptr) {
+        LOG_CONNECTIONS(parent_broker_id,
+            getIdentifier(),
+            fmt::format("got disconnect from {}({})",
+                brk->name,
+                command.source_id.baseValue()));
+        disconnectBroker(*brk);
+    }
+
+    if ((getAllConnectionState() >= ConnectionState::DISCONNECTED)) {
+        timeCoord->disconnect();
+        if (!isRootc) {
+            ActionMessage dis(CMD_DISCONNECT);
+            dis.source_id = global_broker_id_local;
+            transmit(parent_route_id, dis);
+        } else {
+            if ((brk != nullptr) && (!brk->_nonLocal)) {
+                if (!checkActionFlag(command, error_flag)) {
+                    ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
+                        CMD_DISCONNECT_BROKER_ACK);
+                    dis.source_id = global_broker_id_local;
+                    dis.dest_id = brk->global_id;
+                    transmit(brk->route, dis);
+                }
+                brk->_sent_disconnect_ack = true;
+                removeRoute(brk->route);
+            }
+            addActionMessage(CMD_STOP);
+        }
+    } else {
+        if ((brk != nullptr) && (!brk->_nonLocal)) {
+            if (!checkActionFlag(command, error_flag)) {
+                ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
+                    CMD_DISCONNECT_BROKER_ACK);
+                dis.source_id = global_broker_id_local;
+                dis.dest_id = brk->global_id;
+                transmit(brk->route, dis);
+            }
+            brk->_sent_disconnect_ack = true;
+            if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
+                command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
+                    CMD_DISCONNECT_BROKER);
+                transmit(parent_route_id, command);
+            }
+            removeRoute(brk->route);
+        } else {
+            if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
+                if (brk != nullptr) {
+                    command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
+                        CMD_DISCONNECT_BROKER);
+                    transmit(parent_route_id, command);
+                }
+            }
+        }
+    }
+}
+
 void CoreBroker::processDisconnectCommand(ActionMessage& command)
 {
-    auto* brk = getBrokerById(GlobalBrokerId(command.source_id));
+    auto* brk = getBrokerById(GlobalBrokerId{ command.source_id });
     switch (command.action()) {
         case CMD_DISCONNECT:
         case CMD_PRIORITY_DISCONNECT:
             if (command.dest_id == global_broker_id_local) {
                 // deal with the time implications of the message
-                if (hasTimeDependency) {
-                    if (!enteredExecutionMode) {
-                        if (getBrokerState() >= BrokerState::OPERATING) {
-                            if (timeCoord->processTimeMessage(command) !=
-                                TimeProcessingResult::NOT_PROCESSED) {
-                                auto res = timeCoord->checkExecEntry();
-                                if (res == MessageProcessingResult::NEXT_STEP) {
-                                    enteredExecutionMode = true;
-                                }
-                            }
-                        }
-                    } else {
-                        if (timeCoord->processTimeMessage(command) !=
-                            TimeProcessingResult::NOT_PROCESSED) {
-                            timeCoord->updateTimeFactors();
-                        }
-                    }
-                }
+                disconnectTiming(command);
             } else if (command.dest_id == parent_broker_id) {
-                if (!isRootc) {
-                    if (command.source_id == higher_broker_id) {
-                        LOG_CONNECTIONS(parent_broker_id,
-                                        getIdentifier(),
-                                        "got disconnect from parent");
-                        sendDisconnect(CMD_GLOBAL_DISCONNECT);
-                        addActionMessage(CMD_STOP);
-                        return;
-                    }
-                }
-
-                if (brk != nullptr) {
-                    LOG_CONNECTIONS(parent_broker_id,
-                                    getIdentifier(),
-                                    fmt::format("got disconnect from {}({})",
-                                                brk->name,
-                                                command.source_id.baseValue()));
-                    disconnectBroker(*brk);
-                }
-
-                if ((getAllConnectionState() >= ConnectionState::DISCONNECTED)) {
-                    timeCoord->disconnect();
-                    if (!isRootc) {
-                        ActionMessage dis(CMD_DISCONNECT);
-                        dis.source_id = global_broker_id_local;
-                        transmit(parent_route_id, dis);
-                    } else {
-                        if ((brk != nullptr) && (!brk->_nonLocal)) {
-                            if (!checkActionFlag(command, error_flag)) {
-                                ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
-                                                                 CMD_DISCONNECT_BROKER_ACK);
-                                dis.source_id = global_broker_id_local;
-                                dis.dest_id = brk->global_id;
-                                transmit(brk->route, dis);
-                            }
-                            brk->_sent_disconnect_ack = true;
-                            removeRoute(brk->route);
-                        }
-                        addActionMessage(CMD_STOP);
-                    }
-                } else {
-                    if ((brk != nullptr) && (!brk->_nonLocal)) {
-                        if (!checkActionFlag(command, error_flag)) {
-                            ActionMessage dis((brk->_core) ? CMD_DISCONNECT_CORE_ACK :
-                                                             CMD_DISCONNECT_BROKER_ACK);
-                            dis.source_id = global_broker_id_local;
-                            dis.dest_id = brk->global_id;
-                            transmit(brk->route, dis);
-                        }
-                        brk->_sent_disconnect_ack = true;
-                        if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
-                            command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
-                                                             CMD_DISCONNECT_BROKER);
-                            transmit(parent_route_id, command);
-                        }
-                        removeRoute(brk->route);
-                    } else {
-                        if ((!isRootc) && (getBrokerState() < BrokerState::OPERATING)) {
-                            if (brk != nullptr) {
-                                command.setAction((brk->_core) ? CMD_DISCONNECT_CORE :
-                                                                 CMD_DISCONNECT_BROKER);
-                                transmit(parent_route_id, command);
-                            }
-                        }
-                    }
-                }
+                processBrokerDisconnect(command,brk);
             } else if (command.dest_id == mTimeMonitorLocalFederateId) {
                 processTimeMonitorMessage(command);
             } else {
@@ -3129,9 +3139,9 @@ void CoreBroker::processDisconnectCommand(ActionMessage& command)
 
 void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
 {
-    for (auto& mb : mapBuilders) {
-        auto& builder = std::get<0>(mb);
-        auto& requesters = std::get<1>(mb);
+    for (auto& builderData : mapBuilders) {
+        auto& builder = std::get<0>(builderData);
+        auto& requesters = std::get<1>(builderData);
         if (builder.isCompleted()) {
             return;
         }
@@ -3153,7 +3163,7 @@ void CoreBroker::checkInFlightQueries(GlobalBrokerId brkid)
             }
 
             requesters.clear();
-            if (std::get<2>(mb) == QueryReuse::DISABLED) {
+            if (std::get<2>(builderData) == QueryReuse::DISABLED) {
                 builder.reset();
             }
         }
@@ -3541,20 +3551,20 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
     }
     if (request == "global_status") {
         if (!isConnected()) {
-            Json::Value gs;
-            addBaseInformation(gs, !isRootc);
-            gs["status"] = "disconnected";
-            gs["timestep"] = -1;
-            return fileops::generateJsonString(gs);
+            Json::Value json;
+            addBaseInformation(json, !isRootc);
+            json["status"] = "disconnected";
+            json["timestep"] = -1;
+            return fileops::generateJsonString(json);
         }
     }
     if (request.compare(0, 7, "rename:") == 0) {
         return generateRename(request.substr(7));
     }
-    auto mi = mapIndex.find(request);
-    if (mi != mapIndex.end()) {
-        auto index = mi->second.first;
-        if (isValidIndex(index, mapBuilders) && mi->second.second == QueryReuse::ENABLED) {
+    auto mapping = mapIndex.find(request);
+    if (mapping != mapIndex.end()) {
+        auto index = mapping->second.first;
+        if (isValidIndex(index, mapBuilders) && mapping->second.second == QueryReuse::ENABLED) {
             auto& builder = std::get<0>(mapBuilders[index]);
             if (builder.isCompleted()) {
                 auto center = generateMapObjectCounter();
@@ -3568,9 +3578,9 @@ std::string CoreBroker::generateQueryAnswer(std::string_view request, bool force
             }
         }
 
-        initializeMapBuilder(request, index, mi->second.second, force_ordering);
+        initializeMapBuilder(request, index, mapping->second.second, force_ordering);
         if (std::get<0>(mapBuilders[index]).isCompleted()) {
-            if (mi->second.second == QueryReuse::ENABLED) {
+            if (mapping->second.second == QueryReuse::ENABLED) {
                 auto center = generateMapObjectCounter();
                 std::get<0>(mapBuilders[index]).setCounterCode(center);
             }
@@ -3798,16 +3808,16 @@ void CoreBroker::initializeMapBuilder(std::string_view request,
     }
 }
 
-void CoreBroker::processLocalQuery(const ActionMessage& m)
+void CoreBroker::processLocalQuery(const ActionMessage& message)
 {
-    bool force_ordered =
-        (m.action() == CMD_QUERY_ORDERED || m.action() == CMD_BROKER_QUERY_ORDERED);
+    const bool force_ordered =
+        (message.action() == CMD_QUERY_ORDERED || message.action() == CMD_BROKER_QUERY_ORDERED);
     ActionMessage queryRep(force_ordered ? CMD_QUERY_REPLY_ORDERED : CMD_QUERY_REPLY);
     queryRep.source_id = global_broker_id_local;
-    queryRep.dest_id = m.source_id;
-    queryRep.messageID = m.messageID;
-    queryRep.payload = generateQueryAnswer(m.payload.to_string(), force_ordered);
-    queryRep.counter = m.counter;
+    queryRep.dest_id = message.source_id;
+    queryRep.messageID = message.messageID;
+    queryRep.payload = generateQueryAnswer(message.payload.to_string(), force_ordered);
+    queryRep.counter = message.counter;
     if (queryRep.payload.to_string() == "#wait") {
         if (queryRep.dest_id == global_broker_id_local) {
             if (queryTimeouts.empty()) {
@@ -3815,11 +3825,11 @@ void CoreBroker::processLocalQuery(const ActionMessage& m)
             }
             queryTimeouts.emplace_back(queryRep.messageID, std::chrono::steady_clock::now());
         }
-        std::get<1>(mapBuilders[mapIndex.at(m.payload.to_string()).first]).push_back(queryRep);
+        std::get<1>(mapBuilders[mapIndex.at(message.payload.to_string()).first]).push_back(queryRep);
     } else if (queryRep.dest_id == global_broker_id_local) {
-        activeQueries.setDelayedValue(m.messageID, std::string(queryRep.payload.to_string()));
+        activeQueries.setDelayedValue(message.messageID, std::string(queryRep.payload.to_string()));
     } else {
-        routeMessage(std::move(queryRep), m.source_id);
+        routeMessage(std::move(queryRep), message.source_id);
     }
 }
 
@@ -3952,7 +3962,7 @@ void CoreBroker::processQuery(ActionMessage& message)
             }
         } else if (message.payload.to_string() == "list") {
             queryResp.payload =
-                generateStringVector(global_values, [](const auto& gv) { return gv.first; });
+                generateStringVector(global_values, [](const auto& globalValue) { return globalValue.first; });
         } else if (message.payload.to_string() == "all") {
             fileops::JsonMapBuilder globalSet;
             auto& json = globalSet.getJValue();

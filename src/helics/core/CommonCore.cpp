@@ -4301,15 +4301,15 @@ void CommonCore::checkQueryTimeouts()
 {
     if (!queryTimeouts.empty()) {
         auto ctime = std::chrono::steady_clock::now();
-        for (auto& timeout : queryTimeouts) {
-            if (activeQueries.isRecognized(timeout.first) &&
-                !activeQueries.isCompleted(timeout.first)) {
-                if (Time(ctime - timeout.second) > queryTimeout) {
+        for (auto& qTimeout : queryTimeouts) {
+            if (activeQueries.isRecognized(qTimeout.first) &&
+                !activeQueries.isCompleted(qTimeout.first)) {
+                if (Time(ctime - qTimeout.second) > queryTimeout) {
                     activeQueries.setDelayedValue(
-                        timeout.first,
+                        qTimeout.first,
                         generateJsonErrorResponse(JsonErrorCodes::GATEWAY_TIMEOUT,
                                                   "query timeout"));
-                    timeout.first = 0;
+                    qTimeout.first = 0;
                 }
             }
         }

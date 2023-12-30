@@ -347,13 +347,13 @@ std::string prettyPrintString(const ActionMessage& command);
 
 /** stream operator for a command
  */
-std::ostream& operator<<(std::ostream& os, const ActionMessage& command);
+std::ostream& operator<<(std::ostream& out, const ActionMessage& command);
 
 /** append a message to multi message container
-@param m the message to add the extra message to
+@param message the message to add the extra message to
 @param newMessage the message to append
 @return the integer location of the message in the stringData section*/
-int appendMessage(ActionMessage& m, const ActionMessage& newMessage);
+int appendMessage(ActionMessage& message, const ActionMessage& newMessage);
 
 /** generate a string representing an error from an ActionMessage
 @param command the command to generate the error string for

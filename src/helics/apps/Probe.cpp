@@ -22,15 +22,15 @@ Probe::Probe(int argc, char* argv[]): App("probe_${#}", argc, argv) {}
 
 Probe::Probe(std::vector<std::string> args): App("probe_${#}", std::move(args)) {}
 
-Probe::Probe(std::string_view appName, const FederateInfo& fi): App(appName, fi) {}
+Probe::Probe(std::string_view appName, const FederateInfo& fedInfo): App(appName, fedInfo) {}
 
-Probe::Probe(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Probe::Probe(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
 }
 
-Probe::Probe(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Probe::Probe(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
 }
 

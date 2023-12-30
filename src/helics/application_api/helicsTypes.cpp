@@ -920,8 +920,8 @@ SmallBuffer typeConvertComplex(DataType type, const double* vals, size_t size)
         case DataType::HELICS_INT:
             return ValueConverter<int64_t>::convert(static_cast<int64_t>(vectorNorm(vals, size)));
         case DataType::HELICS_COMPLEX: {
-            std::complex<double> V(vals[0], vals[1]);
-            return ValueConverter<std::complex<double>>::convert(V);
+            const std::complex<double> cval(vals[0], vals[1]);
+            return ValueConverter<std::complex<double>>::convert(cval);
         }
         case DataType::HELICS_BOOL:
             return ValueConverter<std::string_view>::convert((vectorNorm(vals, size) != 0.0) ? "1" :
@@ -1198,11 +1198,11 @@ SmallBuffer typeConvert(DataType type, char val)
             return ValueConverter<NamedPoint>::convert(np);
         }
         case DataType::HELICS_COMPLEX_VECTOR: {
-            std::complex<double> v2(static_cast<double>(val), 0.0);
-            return ValueConverter<std::complex<double>>::convert(&v2, 1);
+            const std::complex<double> cvec(static_cast<double>(val), 0.0);
+            return ValueConverter<std::complex<double>>::convert(&cvec, 1);
         }
         case DataType::HELICS_VECTOR: {
-            auto v2 = static_cast<double>(val);
+            const auto v2 = static_cast<double>(val);
             return ValueConverter<double>::convert(&v2, 1);
         }
         case DataType::HELICS_JSON: {
@@ -1248,8 +1248,8 @@ SmallBuffer typeConvert(DataType type, Time val)
             return ValueConverter<std::vector<std::complex<double>>>::convert(cv);
         }
         case DataType::HELICS_VECTOR: {
-            std::vector<double> V{static_cast<double>(val)};
-            return ValueConverter<std::vector<double>>::convert(V);
+            const std::vector<double> vec{static_cast<double>(val)};
+            return ValueConverter<std::vector<double>>::convert(vec);
         }
         case DataType::HELICS_JSON: {
             Json::Value json;

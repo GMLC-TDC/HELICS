@@ -633,17 +633,17 @@ static bool haltTimer(activeProtector& active, asio::steady_timer& tickTimer)
             TimerRunning = false;
         }
     }
-    int ii = 0;
+    int timerLoopCount = 0;
     while (TimerRunning) {
-        if (ii % 4 != 3) {
+        if (timerLoopCount % 4 != 3) {
             std::this_thread::yield();
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(40));
         }
         auto res = active.load();
         TimerRunning = res.second;
-        ++ii;
-        if (ii == 100) {
+        ++timerLoopCount;
+        if (timerLoopCount == 100) {
             // assume the timer was never started so just exit and hope it doesn't somehow get
             // called later and generate a seg fault.
             return false;

@@ -40,7 +40,7 @@ static std::string encode(std::string_view str2encode)
 }
 
 namespace helics::apps {
-Recorder::Recorder(std::string_view appName, FederateInfo& fi): App(appName, fi)
+Recorder::Recorder(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -72,14 +72,14 @@ void Recorder::processArgs()
 
 Recorder::Recorder(std::string_view appName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fi):
-    App(appName, core, fi)
+                   const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -132,16 +132,16 @@ void Recorder::loadJsonFile(const std::string& jsonString)
     }
     auto sourceClone = doc["sourceclone"];
     if (sourceClone.isArray()) {
-        for (const auto& sc : sourceClone) {
-            addSourceEndpointClone(sc.asString());
+        for (const auto& clone : sourceClone) {
+            addSourceEndpointClone(clone.asString());
         }
     } else if (sourceClone.isString()) {
         addSourceEndpointClone(sourceClone.asString());
     }
     auto destClone = doc["destclone"];
     if (destClone.isArray()) {
-        for (const auto& dc : destClone) {
-            addDestEndpointClone(dc.asString());
+        for (const auto& clone : destClone) {
+            addDestEndpointClone(clone.asString());
         }
     } else if (destClone.isString()) {
         addDestEndpointClone(destClone.asString());
@@ -172,14 +172,14 @@ void Recorder::loadTextFile(const std::string& textFile)
 
     std::ifstream infile(textFile);
     std::string str;
-    int lc = 0;
+    int lineCount = 0;
     while (std::getline(infile, str)) {
-        ++lc;
+        ++lineCount;
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#')) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if ((firstChar == std::string::npos) || (str[firstChar] == '#')) {
             continue;
         }
         auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
@@ -205,7 +205,7 @@ void Recorder::loadTextFile(const std::string& textFile)
                     addSourceEndpointClone(removeQuotes(blk[1]));
                     addDestEndpointClone(removeQuotes(blk[1]));
                 } else {
-                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                    std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                 }
                 break;
             case 3:
@@ -215,10 +215,10 @@ void Recorder::loadTextFile(const std::string& textFile)
                     } else if ((blk[1] == "dest") || (blk[1] == "destination")) {
                         addDestEndpointClone(removeQuotes(blk[2]));
                     } else {
-                        std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                        std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                     }
                 } else {
-                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                    std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                 }
                 break;
             default:
@@ -279,8 +279,8 @@ void Recorder::writeJsonFile(const std::string& filename)
         }
     }
 
-    std::ofstream o(filename);
-    o << doc << std::endl;
+    std::ofstream out(filename);
+    out << doc << std::endl;
 }
 
 void Recorder::writeTextFile(const std::string& filename)
@@ -381,7 +381,7 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
     for (auto& sub : subscriptions) {
         if (sub.isUpdated()) {
             auto val = sub.getValue<std::string>();
-            int subId = subids[sub.getHandle()];
+            const int subId = subids[sub.getHandle()];
             points.emplace_back(currentTime, subId, val);
             if (iteration > 0) {
                 points.back().iteration = iteration;

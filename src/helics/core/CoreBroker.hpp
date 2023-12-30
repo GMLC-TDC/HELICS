@@ -356,6 +356,10 @@ class CoreBroker: public Broker, public BrokerBase {
                         uint16_t flags);
     /** process a disconnect message*/
     void processDisconnectCommand(ActionMessage& command);
+    /** handle disconnect timing */
+    void disconnectTiming(ActionMessage &command);
+    /** processBrokerDisconnect  */
+    void processBrokerDisconnect(ActionMessage &command, BasicBrokerInfo *brk);
     /** process an error message*/
     void processError(ActionMessage& command);
     /** disconnect a broker/core*/

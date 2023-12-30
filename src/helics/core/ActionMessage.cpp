@@ -922,12 +922,12 @@ std::ostream& operator<<(std::ostream& out, const ActionMessage& command)
     return out;
 }
 
-int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
+int appendMessage(ActionMessage& message, const ActionMessage& newMessage)
 {
-    if (m.action() == CMD_MULTI_MESSAGE) {
-        if (m.counter < 255) {
-            m.setString(m.counter++, newMessage.to_string());
-            return m.counter;
+    if (message.action() == CMD_MULTI_MESSAGE) {
+        if (message.counter < 255) {
+            message.setString(message.counter++, newMessage.to_string());
+            return message.counter;
         }
     }
     return (-1);
