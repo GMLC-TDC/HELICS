@@ -1765,7 +1765,7 @@ const std::shared_ptr<const SmallBuffer>& CommonCore::getValue(InterfaceHandle h
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    const std::lock_guard<FederateState> lk(fed);
+    const std::lock_guard<FederateState> lock(fed);
     return fed.getValue(handle, inputIndex);
 }
 
@@ -1781,7 +1781,7 @@ const std::vector<std::shared_ptr<const SmallBuffer>>&
         throw(InvalidIdentifier("Handle does not identify an input"));
     }
     auto& fed = *getFederateAt(handleInfo->local_fed_id);
-    const std::lock_guard<FederateState> lk(fed);
+    const std::lock_guard<FederateState> lock(fed);
     return fed.getAllValues(handle);
 }
 
@@ -1807,18 +1807,18 @@ InterfaceHandle CommonCore::registerEndpoint(LocalFederateId federateID,
                                            std::string{},
                                            fed->getInterfaceFlags());
 
-    auto id = handle.getInterfaceHandle();
+    auto hid = handle.getInterfaceHandle();
     fed->createInterface(
-        InterfaceType::ENDPOINT, id, name, type, gEmptyString, fed->getInterfaceFlags());
+        InterfaceType::ENDPOINT, hid, name, type, gEmptyString, fed->getInterfaceFlags());
     ActionMessage reg(CMD_REG_ENDPOINT);
     reg.source_id = fed->global_id.load();
-    reg.source_handle = id;
+    reg.source_handle = hid;
     reg.name(name);
     reg.setStringData(type);
     reg.flags = handle.flags;
     actionQueue.push(std::move(reg));
 
-    return id;
+    return hid;
 }
 
 InterfaceHandle CommonCore::registerDataSink(LocalFederateId federateID, std::string_view name)
@@ -1854,17 +1854,17 @@ InterfaceHandle CommonCore::registerTargetedEndpoint(LocalFederateId federateID,
     const auto& handle = createBasicHandle(
         fed->global_id, fed->local_id, InterfaceType::ENDPOINT, name, type, std::string{}, flags);
 
-    auto id = handle.getInterfaceHandle();
-    fed->createInterface(InterfaceType::ENDPOINT, id, name, type, gEmptyString, flags);
+    auto hid = handle.getInterfaceHandle();
+    fed->createInterface(InterfaceType::ENDPOINT, hid, name, type, gEmptyString, flags);
     ActionMessage reg(CMD_REG_ENDPOINT);
     reg.source_id = fed->global_id.load();
-    reg.source_handle = id;
+    reg.source_handle = hid;
     reg.name(name);
     reg.setStringData(type);
     reg.flags = handle.flags;
     actionQueue.push(std::move(reg));
 
-    return id;
+    return hid;
 }
 
 InterfaceHandle CommonCore::getEndpoint(LocalFederateId federateID, std::string_view name) const
@@ -1896,17 +1896,17 @@ InterfaceHandle CommonCore::registerFilter(std::string_view filterName,
 
     const auto& handle = createBasicHandle(
         fid, LocalFederateId(), InterfaceType::FILTER, filterName, type_in, type_out);
-    auto id = handle.getInterfaceHandle();
+    auto hid = handle.getInterfaceHandle();
 
     ActionMessage reg(CMD_REG_FILTER);
     reg.source_id = fid;
-    reg.source_handle = id;
+    reg.source_handle = hid;
     reg.name(handle.key);
     if ((!type_in.empty()) || (!type_out.empty())) {
         reg.setStringData(type_in, type_out);
     }
     actionQueue.push(std::move(reg));
-    return id;
+    return hid;
 }
 
 InterfaceHandle CommonCore::registerCloningFilter(std::string_view filterName,
@@ -3145,7 +3145,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 command.source_id = global_broker_id_local;
                 transmit(parent_route_id, std::move(command));
             } else {
-                // this will get processed when this core is assigned a global id
+                // this will get processed when this core is assigned a global hid
                 delayTransmitQueue.push(std::move(command));
             }
             break;
@@ -3290,7 +3290,7 @@ void CommonCore::processPriorityCommand(ActionMessage&& command)
                 command.source_id = global_broker_id_local;
                 transmit(parent_route_id, std::move(command));
             } else {
-                // this will get processed when this core is assigned a global id
+                // this will get processed when this core is assigned a global hid
                 delayTransmitQueue.push(std::move(command));
             }
             break;
@@ -3630,76 +3630,9 @@ void CommonCore::processCommand(ActionMessage&& command)
             }
             break;
         }
-        case CMD_INIT: {
-            auto* fed = getFederateCore(command.source_id);
-            if (fed == nullptr) {
-                break;
-            }
-
-            fed->init_transmitted = true;
-
-            if (allInitReady()) {
-                if (transitionBrokerState(BrokerState::CONNECTED,
-                                          BrokerState::INITIALIZING)) {  // make sure we only
-                                                                         // do this once
-                    if (initIterations) {
-                        setActionFlag(command, iteration_requested_flag);
-                    } else {
-                        checkDependencies();
-                    }
-                    command.source_id = global_broker_id_local;
-                    transmit(parent_route_id, command);
-                } else if (checkActionFlag(command, observer)) {
-                    command.source_id = global_broker_id_local;
-                    transmit(parent_route_id, command);
-                }
-            }
-
-        } break;
+        case CMD_INIT:
         case CMD_INIT_GRANT:
-            if (checkActionFlag(command, iteration_requested_flag)) {
-                if (initIterations) {
-                    if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
-                        loopFederates.apply([&command](auto& fed) {
-                            if (fed->initIterating.load()) {
-                                fed->addAction(command);
-                            }
-                        });
-                    } else if (checkActionFlag(command, observer_flag) ||
-                               checkActionFlag(command, dynamic_join_flag)) {
-                        routeMessage(command);
-                    }
-                    initIterations.store(false);
-                }
-            } else {
-                if (transitionBrokerState(
-                        BrokerState::INITIALIZING,
-                        BrokerState::OPERATING)) {  // forward the grant to all federates
-                    if (filterFed != nullptr) {
-                        filterFed->organizeFilterOperations();
-                    }
-
-                    loopFederates.apply([&command](auto& fed) { fed->addAction(command); });
-                    if (filterFed != nullptr && (filterTiming || globalTime)) {
-                        filterFed->handleMessage(command);
-                    }
-                    if (translatorFed != nullptr) {
-                        translatorFed->handleMessage(command);
-                    }
-                    timeCoord->enteringExecMode();
-                    auto res = timeCoord->checkExecEntry();
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
-                    }
-                    if (!timeCoord->hasActiveTimeDependencies()) {
-                        timeCoord->disconnect();
-                    }
-                } else if (checkActionFlag(command, observer_flag) ||
-                           checkActionFlag(command, dynamic_join_flag)) {
-                    routeMessage(command);
-                }
-            }
-
+            processInitRequest(command);
             break;
 
         case CMD_SEND_MESSAGE:
@@ -4619,8 +4552,8 @@ void CommonCore::processTimingTick(ActionMessage& cmd)
         auto now = std::chrono::steady_clock::now();
         if (now - disconnectTime > (3 * tickTimer).to_ms()) {
             LOG_WARNING(global_broker_id_local,
-                        getIdentifier(),
-                        " disconnect Timer expired forcing disconnect");
+                getIdentifier(),
+                " disconnect Timer expired forcing disconnect");
             ActionMessage bye(CMD_DISCONNECT_FED_ACK);
             bye.source_id = parent_broker_id;
             for (auto fed : loopFederates) {
@@ -4637,77 +4570,79 @@ void CommonCore::processTimingTick(ActionMessage& cmd)
 void CommonCore::processInitRequest(ActionMessage& cmd)
 {
     switch (cmd.action()) {
-        case CMD_INIT: {
-            auto* fed = getFederateCore(cmd.source_id);
-            if (fed == nullptr) {
-                break;
-            }
+    case CMD_INIT: {
+        auto* fed = getFederateCore(cmd.source_id);
+        if (fed == nullptr) {
+            break;
+        }
 
-            fed->init_transmitted = true;
+        fed->init_transmitted = true;
 
-            if (allInitReady()) {
-                if (transitionBrokerState(BrokerState::CONNECTED,
-                                          BrokerState::INITIALIZING)) {  // make sure we only
-                    // do this once
-                    if (initIterations) {
-                        setActionFlag(cmd, iteration_requested_flag);
-                    } else {
-                        checkDependencies();
-                    }
-                    cmd.source_id = global_broker_id_local;
-                    transmit(parent_route_id, cmd);
-                } else if (checkActionFlag(cmd, observer)) {
-                    cmd.source_id = global_broker_id_local;
-                    transmit(parent_route_id, cmd);
-                }
-            }
-
-        } break;
-        case CMD_INIT_GRANT:
-            if (checkActionFlag(cmd, iteration_requested_flag)) {
+        if (allInitReady()) {
+            if (transitionBrokerState(BrokerState::CONNECTED,
+                BrokerState::INITIALIZING)) {  // make sure we only
+                // do this once
                 if (initIterations) {
-                    if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
-                        loopFederates.apply([&cmd](auto& fed) {
-                            if (fed->initIterating.load()) {
-                                fed->addAction(cmd);
-                            }
-                        });
-                    } else if (checkActionFlag(cmd, observer_flag) ||
-                               checkActionFlag(cmd, dynamic_join_flag)) {
-                        routeMessage(cmd);
-                    }
-                    initIterations.store(false);
+                    setActionFlag(cmd, iteration_requested_flag);
+                } else {
+                    checkDependencies();
                 }
-            } else {
-                if (transitionBrokerState(
-                        BrokerState::INITIALIZING,
-                        BrokerState::OPERATING)) {  // forward the grant to all federates
-                    if (filterFed != nullptr) {
-                        filterFed->organizeFilterOperations();
-                    }
+                cmd.source_id = global_broker_id_local;
+                transmit(parent_route_id, cmd);
+            } else if (checkActionFlag(cmd, observer)) {
+                cmd.source_id = global_broker_id_local;
+                transmit(parent_route_id, cmd);
+            }
+        }
 
-                    loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
-                    if (filterFed != nullptr && (filterTiming || globalTime)) {
-                        filterFed->handleMessage(cmd);
-                    }
-                    if (translatorFed != nullptr) {
-                        translatorFed->handleMessage(cmd);
-                    }
-                    timeCoord->enteringExecMode();
-                    auto res = timeCoord->checkExecEntry();
-                    if (res == MessageProcessingResult::NEXT_STEP) {
-                        enteredExecutionMode = true;
-                    }
-                    if (!timeCoord->hasActiveTimeDependencies()) {
-                        timeCoord->disconnect();
-                    }
+    } break;
+    case CMD_INIT_GRANT:
+        if (checkActionFlag(cmd, iteration_requested_flag)) {
+            if (initIterations) {
+                if (transitionBrokerState(BrokerState::INITIALIZING, BrokerState::CONNECTED)) {
+                    loopFederates.apply([&cmd](auto& fed) {
+                        if (fed->initIterating.load()) {
+                            fed->addAction(cmd);
+                        }
+                        });
                 } else if (checkActionFlag(cmd, observer_flag) ||
-                           checkActionFlag(cmd, dynamic_join_flag)) {
+                    checkActionFlag(cmd, dynamic_join_flag)) {
                     routeMessage(cmd);
                 }
+                initIterations.store(false);
             }
+        } else {
+            if (transitionBrokerState(
+                BrokerState::INITIALIZING,
+                BrokerState::OPERATING)) {  // forward the grant to all federates
+                if (filterFed != nullptr) {
+                    filterFed->organizeFilterOperations();
+                }
 
-            break;
+                loopFederates.apply([&cmd](auto& fed) { fed->addAction(cmd); });
+                if (filterFed != nullptr && (filterTiming || globalTime)) {
+                    filterFed->handleMessage(cmd);
+                }
+                if (translatorFed != nullptr) {
+                    translatorFed->handleMessage(cmd);
+                }
+                timeCoord->enteringExecMode();
+                auto res = timeCoord->checkExecEntry();
+                if (res == MessageProcessingResult::NEXT_STEP) {
+                    enteredExecutionMode = true;
+                }
+                if (!timeCoord->hasActiveTimeDependencies()) {
+                    timeCoord->disconnect();
+                }
+            } else if (checkActionFlag(cmd, observer_flag) ||
+                checkActionFlag(cmd, dynamic_join_flag)) {
+                routeMessage(cmd);
+            }
+        }
+
+        break;
+    default:
+        break;
     }
 }
 
@@ -5082,7 +5017,7 @@ void CommonCore::processQueryCommand(ActionMessage& cmd)
                     cmd.source_id = global_broker_id_local;
                     transmit(parent_route_id, std::move(cmd));
                 } else {
-                    // this will get processed when this core is assigned a global id
+                    // this will get processed when this core is assigned a global hid
                     cmd.source_id = gDirectCoreId;
                     delayTransmitQueue.push(std::move(cmd));
                 }

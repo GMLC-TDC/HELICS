@@ -46,8 +46,8 @@ void Probe::initialize()
     }
     auto period = fed->getTimeProperty(HELICS_PROPERTY_TIME_PERIOD);
     if (period <= Time::epsilon()) {
-        auto td = fed->getTimeProperty(HELICS_PROPERTY_TIME_DELTA);
-        if (td <= Time::epsilon()) {
+        auto delta = fed->getTimeProperty(HELICS_PROPERTY_TIME_DELTA);
+        if (delta <= Time::epsilon()) {
             fed->setProperty(HELICS_PROPERTY_TIME_PERIOD, 1.0);
         }
     }

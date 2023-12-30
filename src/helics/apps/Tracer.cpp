@@ -31,7 +31,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <vector>
 
 namespace helics::apps {
-Tracer::Tracer(std::string_view appName, FederateInfo& fi): App(appName, fi)
+Tracer::Tracer(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -60,14 +60,14 @@ void Tracer::processArgs()
         std::cout << app->help();
     }
 }
-Tracer::Tracer(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Tracer::Tracer(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Tracer::Tracer(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Tracer::Tracer(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
