@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2019-2023, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2019-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -19,7 +19,7 @@ else()
     set(zmq_shared_build ON)
 endif()
 
-set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.4)
+set(${PROJECT_NAME}_LIBZMQ_VERSION v4.3.5)
 
 string(TOLOWER "libzmq" lcName)
 
@@ -120,6 +120,8 @@ hide_variable(ENABLE_ANALYSIS)
 hide_variable(ENABLE_ASAN)
 hide_variable(ENABLE_RADIX_TREE)
 hide_variable(ENABLE_EVENTFD)
+hide_variable(ENABLE_LIBSODIUM_RANDOMBYTES_CLOSE)
+hide_variable(ENABLE_NO_EXPORT)
 hide_variable(ZMQ_CV_IMPL)
 hide_variable(BUILD_TESTS)
 hide_variable(ENABLE_INTRINSICS)

@@ -29,7 +29,7 @@ git checkout develop
 To switch to a tagged release, you can type the following:
 
 ```bash
-git checkout v3.0.1
+git checkout v3.3.1
 ```
 
 You will not need a full understanding of how `git` works for installing HELICS, but if you are interested you can find a good `git` resource in [this page](https://git-scm.com/book/en/v2).
