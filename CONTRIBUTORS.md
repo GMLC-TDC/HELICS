@@ -138,7 +138,7 @@ Boost is used in a few places in the code. The IPC core uses the Boost.Interproc
 
 #### [zmq](http://www.zeromq.org)
 
-ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.5. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [MPL](https://github.com/zeromq/libzmq/blob/master/LICENSE) 
+ZeroMQ is one of many backends that can be used by HELICS for message passing (ZMQ core networking). The automatic download currently uses version 4.3.5. No ZMQ library code is included in the HELICS source. HELICS installers include ZeroMQ binary libraries. ZeroMQ is licensed under [MPL](https://github.com/zeromq/libzmq/blob/master/LICENSE)
 Previous versions(prior to 4.3.5) were under LGPL with a modification to allow for linking and in various forms and distribution of the binary under different terms if the library was not modified. Clarification on static linking being okay can be found in [this github issue](https://github.com/zeromq/libzmq/issues/3787). No modification of the ZMQ library or any of the ZeroMQ source files is included in the HELICS source code. Currently the Windows installers and shared library builds static link ZeroMQ. When building from source it is an optional component and can be excluded by setting `HELICS_ENABLE_ZMQ_CORE` to `OFF`
 
 ### [Google Test](https://github.com/google/googletest)
