@@ -7,12 +7,12 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "AsyncTimeCoordinator.hpp"
 
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
 #include "json/json.h"
 #include <algorithm>
+#include <fmt/format.h>
 #include <iostream>
 #include <set>
 #include <string>

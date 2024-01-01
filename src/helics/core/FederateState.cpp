@@ -41,7 +41,8 @@ class MessageTimer {};
 }  // namespace helics
 #endif
 
-#include "../common/fmt_format.h"
+#include <fmt/format.h>
+
 // NOLINTNEXTLINE
 static const std::string gHelicsEmptyStr;
 #define LOG_ERROR(message) logMessage(HELICS_LOG_LEVEL_ERROR, gHelicsEmptyStr, message)
@@ -118,7 +119,7 @@ FederateState::FederateState(const std::string& fedName, const CoreFederateInfo&
         setOptionFlag(prop.first, prop.second);
     }
     mLogManager->setTransmitCallback(
-        [this](ActionMessage&& m) { mParent->addActionMessage(std::move(m)); });
+        [this](ActionMessage&& message) { mParent->addActionMessage(std::move(message)); });
     maxLogLevel = mLogManager->getMaxLevel();
 }
 
@@ -183,7 +184,7 @@ int32_t FederateState::getCurrentIteration() const
 
 bool FederateState::checkAndSetValue(InterfaceHandle pub_id, const char* data, uint64_t len)
 {
-    std::lock_guard<FederateState> plock(*this);
+    const std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     auto* pub = interfaceInformation.getPublication(pub_id);
     auto res = pub->CheckSetValue(data, len, time_granted, only_transmit_on_change);
@@ -206,9 +207,9 @@ void FederateState::generateConfig(Json::Value& base) const
     }
 }
 
-uint64_t FederateState::getQueueSize(InterfaceHandle id) const
+uint64_t FederateState::getQueueSize(InterfaceHandle hid) const
 {
-    const auto* epI = interfaceInformation.getEndpoint(id);
+    const auto* epI = interfaceInformation.getEndpoint(hid);
     return (epI != nullptr) ? epI->availableMessages() : 0;
 }
 
@@ -227,25 +228,25 @@ void FederateState::setLogger(
     mLogManager->setLoggerFunction(std::move(logFunction));
 }
 
-std::unique_ptr<Message> FederateState::receive(InterfaceHandle id)
+std::unique_ptr<Message> FederateState::receive(InterfaceHandle hid)
 {
-    auto* epI = interfaceInformation.getEndpoint(id);
+    auto* epI = interfaceInformation.getEndpoint(hid);
     if (epI != nullptr) {
         return epI->getMessage(time_granted);
     }
     return nullptr;
 }
 
-std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& id)
+std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& hid)
 {
     Time earliest_time = Time::maxVal();
     EndpointInfo* endpointI = nullptr;
     auto elock = interfaceInformation.getEndpoints();
     // Find the end point with the earliest message time
     for (const auto& end_point : elock) {
-        auto t = end_point->firstMessageTime();
-        if (t < earliest_time) {
-            earliest_time = t;
+        auto firstTime = end_point->firstMessageTime();
+        if (firstTime < earliest_time) {
+            earliest_time = firstTime;
             endpointI = end_point.get();
         }
     }
@@ -255,11 +256,11 @@ std::unique_ptr<Message> FederateState::receiveAny(InterfaceHandle& id)
     // Return the message found and remove from the queue
     if (earliest_time <= time_granted) {
         auto result = endpointI->getMessage(time_granted);
-        id = (result) ? endpointI->id.handle : InterfaceHandle{};
+        hid = (result) ? endpointI->id.handle : InterfaceHandle{};
 
         return result;
     }
-    id = InterfaceHandle();
+    hid = InterfaceHandle();
     return nullptr;
 }
 
@@ -341,7 +342,7 @@ void FederateState::createInterface(InterfaceType htype,
                                     std::string_view units,
                                     uint16_t flags)
 {
-    std::lock_guard<FederateState> plock(*this);
+    const std::lock_guard<FederateState> plock(*this);
     // this function could be called externally in a multi-threaded context
     switch (htype) {
         case InterfaceType::PUBLICATION:
@@ -362,9 +363,6 @@ void FederateState::createInterface(InterfaceType htype,
             }
             break;
         case InterfaceType::ENDPOINT:
-            interfaceInformation.createEndpoint(handle, key, type, flags);
-
-            break;
         case InterfaceType::SINK:
             interfaceInformation.createEndpoint(handle, key, type, flags);
             break;
@@ -447,7 +445,7 @@ IterationResult FederateState::waitSetup()
     }
     // this function can fail try_lock gracefully
 
-    std::lock_guard<FederateState> fedlock(*this);
+    const std::lock_guard<FederateState> fedlock(*this);
     IterationResult ret;
     switch (getState()) {
         case FederateStates::CREATED: {  // we are still in the created state
@@ -549,7 +547,7 @@ iteration_time FederateState::enterExecutingMode(IterationRequest iterate, bool 
     // the following code is for a situation in which this method has been called multiple times
     // from different threads, which really shouldn't be done but it isn't really an error so we
     // need to deal with it.
-    std::lock_guard<FederateState> plock(*this);
+    const std::lock_guard<FederateState> plock(*this);
     IterationResult ret;
     switch (getState()) {
         case FederateStates::ERRORED:
@@ -607,7 +605,7 @@ void FederateState::updateDataForExecEntry(MessageProcessingResult result, Itera
 
 std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 {
-    std::lock_guard<FederateState> fedlock(*this);
+    const std::lock_guard<FederateState> fedlock(*this);
     std::vector<GlobalHandle> subs;
     auto* pubInfo = interfaceInformation.getPublication(handle);
     if (pubInfo != nullptr) {
@@ -621,7 +619,7 @@ std::vector<GlobalHandle> FederateState::getSubscribers(InterfaceHandle handle)
 std::vector<std::pair<GlobalHandle, std::string_view>>
     FederateState::getMessageDestinations(InterfaceHandle handle)
 {
-    std::lock_guard<FederateState> fedlock(*this);
+    const std::lock_guard<FederateState> fedlock(*this);
     const auto* eptInfo = interfaceInformation.getEndpoint(handle);
     if (eptInfo != nullptr) {
         return eptInfo->getTargets();
@@ -731,7 +729,7 @@ iteration_time FederateState::requestTime(Time nextTime, IterationRequest iterat
     LOG_WARNING("duplicate locking attempted");
     // this would not be good practice to get into this part of the function
     // but the area must protect itself against the possibility and should return something sensible
-    std::lock_guard<FederateState> fedlock(*this);
+    const std::lock_guard<FederateState> fedlock(*this);
     IterationResult ret = iterating ? IterationResult::ITERATING : IterationResult::NEXT_STEP;
     if (state == FederateStates::FINISHED) {
         ret = IterationResult::HALTED;
@@ -785,14 +783,12 @@ void FederateState::fillEventVectorUpTo(Time currentTime)
     events.clear();
     eventMessages.clear();
     for (const auto& ipt : interfaceInformation.getInputs()) {
-        bool updated = ipt->updateTimeUpTo(currentTime);
-        if (updated) {
+        if (ipt->updateTimeUpTo(currentTime)) {
             events.push_back(ipt->id.handle);
         }
     }
     for (const auto& ept : interfaceInformation.getEndpoints()) {
-        bool updated = ept->updateTimeUpTo(currentTime);
-        if (updated) {
+        if (ept->updateTimeUpTo(currentTime)) {
             eventMessages.push_back(ept->id.handle);
         }
     }
@@ -802,15 +798,13 @@ void FederateState::fillEventVectorInclusive(Time currentTime)
 {
     events.clear();
     for (const auto& ipt : interfaceInformation.getInputs()) {
-        bool updated = ipt->updateTimeInclusive(currentTime);
-        if (updated) {
+        if (ipt->updateTimeInclusive(currentTime)) {
             events.push_back(ipt->id.handle);
         }
     }
     eventMessages.clear();
     for (const auto& ept : interfaceInformation.getEndpoints()) {
-        bool updated = ept->updateTimeInclusive(currentTime);
-        if (updated) {
+        if (ept->updateTimeInclusive(currentTime)) {
             eventMessages.push_back(ept->id.handle);
         }
     }
@@ -820,15 +814,13 @@ void FederateState::fillEventVectorNextIteration(Time currentTime)
 {
     events.clear();
     for (const auto& ipt : interfaceInformation.getInputs()) {
-        bool updated = ipt->updateTimeNextIteration(currentTime);
-        if (updated) {
+        if (ipt->updateTimeNextIteration(currentTime)) {
             events.push_back(ipt->id.handle);
         }
     }
     eventMessages.clear();
     for (const auto& ept : interfaceInformation.getEndpoints()) {
-        bool updated = ept->updateTimeNextIteration(currentTime);
-        if (updated) {
+        if (ept->updateTimeNextIteration(currentTime)) {
             eventMessages.push_back(ept->id.handle);
         }
     }
@@ -945,8 +937,8 @@ MessageProcessingResult FederateState::processDelayQueue() noexcept
     delayedFederates.clear();
     auto ret_code = MessageProcessingResult::CONTINUE_PROCESSING;
     if (!delayQueues.empty()) {
-        for (auto& dQ : delayQueues) {
-            auto& tempQueue = dQ.second;
+        for (auto& dqueue : delayQueues) {
+            auto& tempQueue = dqueue.second;
             ret_code = MessageProcessingResult::CONTINUE_PROCESSING;
             // we specifically want to stop the loop on a delay_message return
             while ((ret_code == MessageProcessingResult::CONTINUE_PROCESSING) &&
@@ -971,19 +963,19 @@ MessageProcessingResult FederateState::processDelayQueue() noexcept
     return ret_code;
 }
 
-void FederateState::addFederateToDelay(GlobalFederateId id)
+void FederateState::addFederateToDelay(GlobalFederateId gid)
 {
-    if ((delayedFederates.empty()) || (id > delayedFederates.back())) {
-        delayedFederates.push_back(id);
+    if ((delayedFederates.empty()) || (gid > delayedFederates.back())) {
+        delayedFederates.push_back(gid);
         return;
     }
-    auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), id);
+    auto res = std::lower_bound(delayedFederates.begin(), delayedFederates.end(), gid);
     if (res == delayedFederates.end()) {
-        delayedFederates.push_back(id);
+        delayedFederates.push_back(gid);
         return;
     }
-    if (*res != id) {
-        delayedFederates.insert(res, id);
+    if (*res != gid) {
+        delayedFederates.insert(res, gid);
     }
 }
 
@@ -1009,7 +1001,7 @@ void FederateState::generateProfilingMarker()
 {
     auto ctime = std::chrono::steady_clock::now();
     auto gtime = std::chrono::system_clock::now();
-    std::string message = fmt::format(
+    const std::string message = fmt::format(
         "<PROFILING>{}[{}]({})MARKER<{}|{}>[t={}]</PROFILING>",
         name,
         global_id.load().baseValue(),
@@ -1034,7 +1026,7 @@ void FederateState::generateProfilingMessage(bool enterHelicsCode)
     auto ctime = std::chrono::steady_clock::now();
     static constexpr std::string_view entry_string("ENTRY");
     static constexpr std::string_view exit_string("EXIT");
-    std::string message = fmt::format(
+    const std::string message = fmt::format(
         "<PROFILING>{}[{}]({})HELICS CODE {}<{}>[t={}]</PROFILING>",
         name,
         global_id.load().baseValue(),
@@ -1271,7 +1263,7 @@ MessageProcessingResult FederateState::processQueue() noexcept
     }
     auto initError = (state == FederateStates::ERRORED);
     bool error_cmd{false};
-    bool profilerActive{mProfilerActive};
+    const bool profilerActive{mProfilerActive};
     queueProcessing.store(true);
     if (profilerActive) {
         generateProfilingMessage(true);
@@ -1404,10 +1396,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 allowed_send_time = timeCoord->allowedSendTime();
                 if (cmd.action() == CMD_FORCE_TIME_GRANT) {
                     if (!ignore_time_mismatch_warnings) {
-                        LOG_WARNING(fmt::format("forced Granted Time={}", time_granted));
+                        LOG_WARNING(fmt::format("forced Granted Time={}",
+                                                static_cast<double>(time_granted)));
                     }
                 } else {
-                    LOG_TIMING(fmt::format("Granted Time={}", time_granted));
+                    LOG_TIMING(fmt::format("Granted Time={}", static_cast<double>(time_granted)));
                 }
             }
             return (std::get<1>(proc_result));
@@ -1501,8 +1494,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                     LOG_WARNING(
                         fmt::format("received message {} at time({}) earlier than granted time({})",
                                     prettyPrintString(cmd),
-                                    cmd.actionTime,
-                                    time_granted));
+                                    static_cast<double>(cmd.actionTime),
+                                    static_cast<double>(time_granted)));
                     auto qres = processQueryActual("global_time_debugging");
                     qres.insert(0, "TIME DEBUGGING::");
                     LOG_WARNING(qres);
@@ -1529,8 +1522,8 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                         LOG_WARNING(fmt::format(
                             "received message {} at time({}) earlier than granted time({})",
                             prettyPrintString(cmd),
-                            cmd.actionTime,
-                            time_granted));
+                            static_cast<double>(cmd.actionTime),
+                            static_cast<double>(time_granted)));
                     }
                     auto mess = std::make_unique<Message>();
                     mess->data = std::move(cmd.payload);
@@ -1596,10 +1589,11 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 auto blockFed = timeCoord->getMinGrantedDependency();
                 if (blockFed.first.isValid()) {
                     LOG_WARNING(fmt::format("grant timeout exceeded sim time {} waiting on {}",
-                                            time_granted,
+                                            static_cast<double>(time_granted),
                                             blockFed.first.baseValue()));
                 } else {
-                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}", time_granted));
+                    LOG_WARNING(fmt::format("grant timeout exceeded sim time {}",
+                                            static_cast<double>(time_granted)));
                 }
 
             } else if (cmd.counter == 3) {
@@ -1666,13 +1660,13 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
                 }
                 if (getState() > FederateStates::CREATED) {
                     if (!pubI->data.empty() && pubI->lastPublishTime > Time::minVal()) {
-                        ActionMessage mv(CMD_PUB);
-                        mv.setSource(pubI->id);
-                        mv.setDestination(cmd.getSource());
-                        mv.counter = static_cast<uint16_t>(getCurrentIteration());
-                        mv.payload = pubI->data;
-                        mv.actionTime = pubI->lastPublishTime;
-                        routeMessage(std::move(mv));
+                        ActionMessage pub(CMD_PUB);
+                        pub.setSource(pubI->id);
+                        pub.setDestination(cmd.getSource());
+                        pub.counter = static_cast<uint16_t>(getCurrentIteration());
+                        pub.payload = pubI->data;
+                        pub.actionTime = pubI->lastPublishTime;
+                        routeMessage(std::move(pub));
                     }
                 }
             }
@@ -1774,7 +1768,6 @@ MessageProcessingResult FederateState::processActionMessage(ActionMessage& cmd)
         } break;
         case CMD_QUERY_ORDERED:
         case CMD_QUERY: {
-            std::string repStr;
             ActionMessage queryResp(cmd.action() == CMD_QUERY ? CMD_QUERY_REPLY :
                                                                 CMD_QUERY_REPLY_ORDERED);
             queryResp.dest_id = cmd.source_id;
@@ -2248,8 +2241,8 @@ Time FederateState::nextValueTime() const
 Time FederateState::nextMessageTime() const
 {
     auto firstMessageTime = Time::maxVal();
-    for (const auto& ep : interfaceInformation.getEndpoints()) {
-        auto messageTime = ep->firstMessageTime();
+    for (const auto& endpoint : interfaceInformation.getEndpoints()) {
+        auto messageTime = endpoint->firstMessageTime();
         if (messageTime < time_granted) {
             messageTime = time_granted;
         }
@@ -2276,11 +2269,11 @@ void FederateState::logMessage(int level,
         return;
     }
     std::string header;
-    auto t = grantedTime();
+    auto currentTime = grantedTime();
     std::string timeString;
-    if (t < timeZero) {
+    if (currentTime < timeZero) {
         timeString = fmt::format("[{}]", fedStateString(getState()));
-    } else if (t == Time::maxVal()) {
+    } else if (currentTime == Time::maxVal()) {
         timeString = "[MAXTIME]";
     } else {
         timeString = fmt::format("[{}]", static_cast<double>(grantedTime()));
@@ -2298,7 +2291,7 @@ void FederateState::logMessage(int level,
 
 const std::string& fedStateString(FederateStates state)
 {
-    static const std::string c1{"created"};
+    static const std::string created{"created"};
     static const std::string estate{"error"};
     static const std::string init{"initializing"};
     static const std::string dis{"disconnected"};
@@ -2308,7 +2301,7 @@ const std::string& fedStateString(FederateStates state)
 
     switch (state) {
         case FederateStates::CREATED:
-            return c1;
+            return created;
         case FederateStates::INITIALIZING:
             return init;
         case FederateStates::EXECUTING:
@@ -2489,17 +2482,17 @@ std::string FederateState::processQueryActual(std::string_view query) const
         return "{\"status\":true}";
     }
     if (query == "subscriptions") {
-        std::ostringstream s;
-        s << "[";
+        std::ostringstream subs;
+        subs << "[";
         auto ipts = interfaceInformation.getInputs();
         for (const auto& ipt : ipts) {
             for (const auto& isrc : ipt->input_sources) {
-                s << isrc.fed_id << ':' << isrc.handle << ';';
+                subs << isrc.fed_id << ':' << isrc.handle << ';';
             }
         }
         ipts.unlock();
         unlock();
-        auto str = s.str();
+        auto str = subs.str();
         if (str.back() == ';') {
             str.pop_back();
         }
@@ -2528,10 +2521,10 @@ std::string FederateState::processQueryActual(std::string_view query) const
         addHeader(base);
 
         base["barriers"] = Json::arrayValue;
-        for (const auto& br : timeCoord->getBarriers()) {
+        for (const auto& barrier : timeCoord->getBarriers()) {
             Json::Value br1 = Json::objectValue;
-            br1["id"] = br.second;
-            br1["time"] = static_cast<double>(br.first);
+            br1["id"] = barrier.second;
+            br1["time"] = static_cast<double>(barrier.first);
             base["barriers"].append(std::move(br1));
         }
         return fileops::generateJsonString(base);
@@ -2568,17 +2561,17 @@ std::string FederateState::processQueryActual(std::string_view query) const
     }
     if (query == "tags") {
         Json::Value tagBlock = Json::objectValue;
-        for (const auto& tg : tags) {
-            tagBlock[tg.first] = tg.second;
+        for (const auto& tag : tags) {
+            tagBlock[tag.first] = tag.second;
         }
         return fileops::generateJsonString(tagBlock);
     }
     if (query.compare(0, 4, "tag/") == 0) {
-        std::string_view tag = query;
-        tag.remove_prefix(4);
-        for (const auto& tg : tags) {
-            if (tag == tg.first) {
-                return Json::valueToQuotedString(tg.second.c_str());
+        std::string_view keyTag = query;
+        keyTag.remove_prefix(4);
+        for (const auto& tag : tags) {
+            if (keyTag == tag.first) {
+                return Json::valueToQuotedString(tag.second.c_str());
             }
         }
         return "\"\"";
@@ -2627,9 +2620,9 @@ std::string FederateState::processQueryActual(std::string_view query) const
         }
     }
     // check tag value for a matching string
-    for (const auto& tg : tags) {
-        if (tg.first == query) {
-            return Json::valueToQuotedString(tg.second.c_str());
+    for (const auto& tag : tags) {
+        if (tag.first == query) {
+            return Json::valueToQuotedString(tag.second.c_str());
         }
     }
     return generateJsonErrorResponse(JsonErrorCodes::BAD_REQUEST, "unrecognized Federate query");
@@ -2677,13 +2670,13 @@ void FederateState::setTag(std::string_view tag, std::string_view value)
     unlock();
 }
 
-const std::string& FederateState::getTag(std::string_view tag) const
+const std::string& FederateState::getTag(std::string_view keyTag) const
 {
     spinlock();
-    for (const auto& tg : tags) {
-        if (tg.first == tag) {
+    for (const auto& tag : tags) {
+        if (tag.first == keyTag) {
             unlock();
-            return tg.second;
+            return tag.second;
         }
     }
     unlock();

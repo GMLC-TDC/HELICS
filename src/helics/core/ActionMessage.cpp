@@ -13,13 +13,13 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "ActionMessage.hpp"
 
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "gmlc/utilities/base64.h"
 
 #include <algorithm>
 #include <complex>
 #include <cstring>
+#include <fmt/format.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
 #include <ostream>
@@ -169,7 +169,7 @@ void ActionMessage::setString(int index, std::string_view str)
 static inline std::uint8_t isLittleEndian()
 {
     static std::int32_t test{1};
-    return (*reinterpret_cast<std::int8_t*>(&test) == 1) ? std::uint8_t(1) : 0;
+    return (*reinterpret_cast<std::int8_t*>(&test) == 1) ? static_cast<std::uint8_t>(1) : 0;
 }
 
 // action_message_base_size= 7 header fields(7*4 bytes)+flags(2 bytes)+counter(2 bytes)+time(8
@@ -191,10 +191,10 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
 
     std::byte* dataStart = data;
 
-    *data = std::byte{littleEndian};
-    data[1] = std::byte(ssize >> 16U);
-    data[2] = std::byte((ssize >> 8U) & 0xFFU);
-    data[3] = std::byte(ssize & 0xFFU);
+    *data = static_cast<std::byte>(littleEndian);
+    data[1] = static_cast<std::byte>(ssize >> 16U);
+    data[2] = static_cast<std::byte>((ssize >> 8U) & 0xFFU);
+    data[3] = static_cast<std::byte>(ssize & 0xFFU);
     data += sizeof(uint32_t);  // 4
     *reinterpret_cast<action_message_def::action_t*>(data) = messageAction;
     data += sizeof(action_message_def::action_t);
@@ -214,19 +214,19 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     data += sizeof(uint16_t);  // 28
     *reinterpret_cast<int32_t*>(data) = sequenceID;
     data += sizeof(int32_t);  // 32
-    auto bt = actionTime.getBaseTimeCode();
-    std::memcpy(data, &(bt), sizeof(Time::baseType));
+    auto baseTimeCode = actionTime.getBaseTimeCode();
+    std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
     data += sizeof(Time::baseType);  // 40
 
     if (messageAction == CMD_TIME_REQUEST) {
-        bt = Te.getBaseTimeCode();
-        std::memcpy(data, &(bt), sizeof(Time::baseType));
+        baseTimeCode = Te.getBaseTimeCode();
+        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
         data += sizeof(Time::baseType);
-        bt = Tdemin.getBaseTimeCode();
-        std::memcpy(data, &(bt), sizeof(Time::baseType));
+        baseTimeCode = Tdemin.getBaseTimeCode();
+        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
         data += sizeof(Time::baseType);
-        bt = Tso.getBaseTimeCode();
-        std::memcpy(data, &(bt), sizeof(Time::baseType));
+        baseTimeCode = Tso.getBaseTimeCode();
+        std::memcpy(data, &(baseTimeCode), sizeof(Time::baseType));
         data += sizeof(Time::baseType);
         *data = std::byte{0};
         ++data;
@@ -242,7 +242,7 @@ int ActionMessage::toByteArray(std::byte* data, std::size_t buffer_size) const
     //      *data = 0;
     //     ++data;
     // } else {
-    *data = std::byte(stringData.size());
+    *data = static_cast<std::byte>(stringData.size());
     ++data;
     ssize += action_message_base_size;
     for (const auto& str : stringData) {
@@ -287,9 +287,9 @@ std::string ActionMessage::to_string() const
     if (checkActionFlag(*this, use_json_serialization_flag)) {
         data = to_json_string();
     } else {
-        auto sz = serializedByteCount();
-        data.resize(sz);
-        toByteArray(reinterpret_cast<std::byte*>(&(data[0])), sz);
+        auto size = serializedByteCount();
+        data.resize(size);
+        toByteArray(reinterpret_cast<std::byte*>(data.data()), size);
     }
     return data;
 }
@@ -352,9 +352,9 @@ std::string ActionMessage::packetize_json() const
 
 void ActionMessage::packetize(std::string& data) const
 {
-    auto sz = serializedByteCount();
-    data.resize(sizeof(uint32_t) + static_cast<size_t>(sz));
-    toByteArray(reinterpret_cast<std::byte*>(&(data[4])), sz);
+    auto size = serializedByteCount();
+    data.resize(sizeof(uint32_t) + static_cast<size_t>(size));
+    toByteArray(reinterpret_cast<std::byte*>(&(data[4])), size);
 
     data[0] = LEADING_CHAR;
     // now generate a length header
@@ -369,31 +369,31 @@ void ActionMessage::packetize(std::string& data) const
 std::vector<char> ActionMessage::to_vector() const
 {
     std::vector<char> data;
-    auto sz = serializedByteCount();
-    data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte*>(data.data()), sz);
+    auto size = serializedByteCount();
+    data.resize(size);
+    toByteArray(reinterpret_cast<std::byte*>(data.data()), size);
     return data;
 }
 
 void ActionMessage::to_vector(std::vector<char>& data) const
 {
-    auto sz = serializedByteCount();
-    data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte*>(data.data()), sz);
+    auto size = serializedByteCount();
+    data.resize(size);
+    toByteArray(reinterpret_cast<std::byte*>(data.data()), size);
 }
 
 void ActionMessage::to_string(std::string& data) const
 {
-    auto sz = serializedByteCount();
-    data.resize(sz);
-    toByteArray(reinterpret_cast<std::byte*>(&(data[0])), sz);
+    auto size = serializedByteCount();
+    data.resize(size);
+    toByteArray(reinterpret_cast<std::byte*>(data.data()), size);
 }
 
 template<std::size_t DataSize>
 inline void swap_bytes(std::uint8_t* data)
 {
-    for (std::size_t i = 0, end = DataSize / 2; i < end; ++i) {
-        std::swap(data[i], data[DataSize - i - 1]);
+    for (std::size_t ii = 0, end = DataSize / 2; ii < end; ++ii) {
+        std::swap(data[ii], data[DataSize - ii - 1]);
     }
 }
 
@@ -405,7 +405,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         messageAction = CMD_INVALID;
         return (0);
     }
-    if (data[0] == std::byte(LEADING_CHAR)) {
+    if (data[0] == static_cast<std::byte>(LEADING_CHAR)) {
         auto res = depacketize(data, buffer_size);
         if (res > 0) {
             return static_cast<int>(res);
@@ -415,14 +415,14 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
     if (data[0] == std::byte{'{'}) {
         return 0;
     }
-    std::size_t sz = 256 * 256 * (std::to_integer<std::size_t>(data[1])) +
-        256 * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
-    tsize += sz;
+    const std::size_t size = 256UL * 256UL * (std::to_integer<std::size_t>(data[1])) +
+        256UL * std::to_integer<std::size_t>(data[2]) + std::to_integer<std::size_t>(data[3]);
+    tsize += size;
     if (buffer_size < tsize) {
         messageAction = CMD_INVALID;
         return (0);
     }
-    bool swap = (data[0] != std::byte{littleEndian});
+    const bool swap = (data[0] != static_cast<std::byte>(littleEndian));
     data += sizeof(uint32_t);
     memcpy(&messageAction, data, sizeof(action_message_def::action_t));
     // messageAction = *reinterpret_cast<const action_message_def::action_t *> (data);
@@ -480,9 +480,9 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
         Tdemin = timeZero;
         Tso = timeZero;
     }
-    if (sz > 0) {
-        payload.assign(data, sz);
-        data += sz;
+    if (size > 0) {
+        payload.assign(data, size);
+        data += size;
     }
     auto stringCount = std::to_integer<std::size_t>(*data);
     ++data;
@@ -542,7 +542,7 @@ std::size_t ActionMessage::fromByteArray(const std::byte* data, std::size_t buff
 std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size)
 {
     const auto* bytes = reinterpret_cast<const std::byte*>(data);
-    if (bytes[0] != std::byte(LEADING_CHAR)) {
+    if (bytes[0] != static_cast<std::byte>(LEADING_CHAR)) {
         return 0;
     }
     if (buffer_size < 6) {
@@ -556,10 +556,10 @@ std::size_t ActionMessage::depacketize(const void* data, std::size_t buffer_size
     if (buffer_size < (static_cast<size_t>(message_size) + 2)) {
         return 0;
     }
-    if (bytes[message_size] != std::byte(TAIL_CHAR1)) {
+    if (bytes[message_size] != static_cast<std::byte>(TAIL_CHAR1)) {
         return 0;
     }
-    if (bytes[message_size + 1] != std::byte(TAIL_CHAR2)) {
+    if (bytes[message_size + 1] != static_cast<std::byte>(TAIL_CHAR2)) {
         return 0;
     }
 
@@ -620,7 +620,7 @@ bool ActionMessage::from_json_string(std::string_view data)
 
 std::size_t ActionMessage::from_vector(const std::vector<char>& data)
 {
-    std::size_t bytesUsed =
+    const std::size_t bytesUsed =
         fromByteArray(reinterpret_cast<const std::byte*>(data.data()), data.size());
     if (bytesUsed == 0 && !data.empty() && data.front() == '{') {
         if (from_json_string(std::string_view(data.data(), data.size()))) {
@@ -845,8 +845,8 @@ std::string errorMessageString(const ActionMessage& command)
 
 std::string prettyPrintString(const ActionMessage& command)
 {
-    std::string ret(actionMessageType(command.action()));
-    if (std::string_view(ret) == std::string_view(unknownStr)) {
+    std::string ret{actionMessageType(command.action())};
+    if (std::string_view{ret} == std::string_view{unknownStr}) {
         ret.push_back(' ');
         ret.append(std::to_string(static_cast<int>(command.action())));
         return ret;
@@ -916,18 +916,18 @@ std::string prettyPrintString(const ActionMessage& command)
     return ret;
 }
 
-std::ostream& operator<<(std::ostream& os, const ActionMessage& command)
+std::ostream& operator<<(std::ostream& out, const ActionMessage& command)
 {
-    os << prettyPrintString(command);
-    return os;
+    out << prettyPrintString(command);
+    return out;
 }
 
-int appendMessage(ActionMessage& m, const ActionMessage& newMessage)
+int appendMessage(ActionMessage& multiMessage, const ActionMessage& newMessage)
 {
-    if (m.action() == CMD_MULTI_MESSAGE) {
-        if (m.counter < 255) {
-            m.setString(m.counter++, newMessage.to_string());
-            return m.counter;
+    if (multiMessage.action() == CMD_MULTI_MESSAGE) {
+        if (multiMessage.counter < 255) {
+            multiMessage.setString(multiMessage.counter++, newMessage.to_string());
+            return multiMessage.counter;
         }
     }
     return (-1);

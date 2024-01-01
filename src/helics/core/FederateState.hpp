@@ -161,7 +161,7 @@ class FederateState {
     /** check if a message should be delayed*/
     bool messageShouldBeDelayed(const ActionMessage& cmd) const;
     /** add a federate to the delayed list*/
-    void addFederateToDelay(GlobalFederateId id);
+    void addFederateToDelay(GlobalFederateId gid);
     /** generate a component of json config string*/
     void generateConfig(Json::Value& base) const;
 
@@ -180,7 +180,7 @@ class FederateState {
     const InterfaceInfo& interfaces() const { return interfaceInformation; }
 
     /** get the size of a message queue for a specific endpoint or filter handle*/
-    uint64_t getQueueSize(InterfaceHandle id) const;
+    uint64_t getQueueSize(InterfaceHandle hid) const;
     /** get the sum of all message queue sizes i.e. the total number of messages available in all
      * endpoints*/
     uint64_t getQueueSize() const;
@@ -191,10 +191,10 @@ class FederateState {
     /** get the next available message for an endpoint
     @param id the handle of an endpoint or filter
     @return a pointer to a message -the ownership of the message is transferred to the caller*/
-    std::unique_ptr<Message> receive(InterfaceHandle id);
+    std::unique_ptr<Message> receive(InterfaceHandle hid);
     /** get any message ready for reception
     @param[out] id the endpoint related to the message*/
-    std::unique_ptr<Message> receiveAny(InterfaceHandle& id);
+    std::unique_ptr<Message> receiveAny(InterfaceHandle& hid);
     /**
      * Return the data for the specified handle or the latest input
      */
@@ -276,7 +276,7 @@ class FederateState {
     /** set a tag (key-value pair)*/
     void setTag(std::string_view tag, std::string_view value);
     /** search for a tag by name*/
-    const std::string& getTag(std::string_view tag) const;
+    const std::string& getTag(std::string_view keyTag) const;
     /** get a tag (key-value pair) by index*/
     const std::pair<std::string, std::string>& getTagByIndex(size_t index) const
     {

@@ -7,13 +7,13 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include "ForwardingTimeCoordinator.hpp"
 
-#include "../common/fmt_format.h"
 #include "flagOperations.hpp"
 #include "helics_definitions.hpp"
 
-#include "json/json.h"
 #include <algorithm>
+#include <fmt/format.h>
 #include <iostream>
+#include <json/json.h>
 #include <set>
 #include <string>
 #include <vector>
@@ -71,10 +71,11 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
             }
             auto td = generateMinTimeUpstream(
                 dependencies, restrictive_time_policy, mSourceId, downstream.minFed, 0);
-            DependencyInfo di;
-            di.update(td);
-            auto upd_delayed =
-                generateTimeRequest(di, downstream.minFed, di.responseSequenceCounter);
+            DependencyInfo dependency;
+            dependency.update(td);
+            auto upd_delayed = generateTimeRequest(dependency,
+                                                   downstream.minFed,
+                                                   dependency.responseSequenceCounter);
             if (sendMessageFunction) {
                 sendMessageFunction(upd_delayed);
             }
@@ -86,12 +87,13 @@ bool ForwardingTimeCoordinator::updateTimeFactors()
         }
     } else if (dependencies.hasDelayedDependency() &&
                mTimeDownstream.minFed == dependencies.delayedDependency() && executionMode) {
-        auto td = generateMinTimeUpstream(
+        auto minTimeUpstream = generateMinTimeUpstream(
             dependencies, restrictive_time_policy, mSourceId, mTimeDownstream.minFed, 0);
-        DependencyInfo di;
-        di.update(td);
-        auto upd_delayed =
-            generateTimeRequest(di, mTimeDownstream.minFed, di.responseSequenceCounter);
+        DependencyInfo dependency;
+        dependency.update(minTimeUpstream);
+        auto upd_delayed = generateTimeRequest(dependency,
+                                               mTimeDownstream.minFed,
+                                               dependency.responseSequenceCounter);
         if (sendMessageFunction) {
             sendMessageFunction(upd_delayed);
         }

@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(gbenchmark_version v1.5.0)
+set(gbenchmark_version v1.8.3)
 
 string(TOLOWER "gbenchmark" gbName)
 

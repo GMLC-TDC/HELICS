@@ -30,9 +30,9 @@ namespace apps {
         /** construct from a FederateInfo structure
     @param appName the name of the Recorder, can be left empty for the default or to pull from the
     federateInfo object
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Clone(std::string_view appName, FederateInfo& fi);
+        Clone(std::string_view appName, FederateInfo& fedInfo);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -44,16 +44,18 @@ namespace apps {
     @param appName the name of the Recorder, can be left empty for the default or to pull from the
     federateInfo object
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Clone(std::string_view appName, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Clone(std::string_view appName,
+              const std::shared_ptr<Core>& core,
+              const FederateInfo& fedInfo);
 
         /**constructor taking a federate information structure and using the given core
-    @param appName the name of the federate (can be empty to use defaults from fi)
+    @param appName the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Clone(std::string_view appName, CoreApp& core, const FederateInfo& fi);
+        Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo);
 
         /**constructor taking a file with the required information
     @param appName the name of the app

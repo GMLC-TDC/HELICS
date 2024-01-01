@@ -6,13 +6,13 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "NetworkCommsInterface.hpp"
 
-#include "../common/fmt_format.h"
 #include "NetworkBrokerData.hpp"
 #include "helics/core/ActionMessage.hpp"
 #include "helics/helics-config.h"
 #ifndef HELICS_ENABLE_ENCRYPTION
 #    include <iostream>
 #endif
+#include <fmt/format.h>
 #include <memory>
 #include <string>
 

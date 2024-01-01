@@ -26,7 +26,7 @@ namespace apps {
     class HELICS_CXX_EXPORT Tracer: public App {
       public:
         /** construct from a FederateInfo structure*/
-        explicit Tracer(std::string_view name, FederateInfo& fi);
+        explicit Tracer(std::string_view name, FederateInfo& fedInfo);
         /** construct from command line arguments in a vector
    @param args the command line arguments to pass in a reverse vector
    */
@@ -36,18 +36,20 @@ namespace apps {
         Tracer(int argc, char* argv[]);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the tracer object, if empty it tries to figure it out from fi
+    @param name the name of the tracer object, if empty it tries to figure it out from fedInfo
     @param core a pointer to core object which the federate can join
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Tracer(std::string_view name, const std::shared_ptr<Core>& core, const FederateInfo& fi);
+        Tracer(std::string_view name,
+               const std::shared_ptr<Core>& core,
+               const FederateInfo& fedInfo);
 
         /**constructor taking a federate information structure and using the given core
-    @param name the name of the federate (can be empty to use defaults from fi)
+    @param name the name of the federate (can be empty to use defaults from fedInfo)
     @param core a coreApp object that can be joined
-    @param fi  a federate information structure
+    @param fedInfo  a federate information structure
     */
-        Tracer(std::string_view name, CoreApp& core, const FederateInfo& fi);
+        Tracer(std::string_view name, CoreApp& core, const FederateInfo& fedInfo);
 
         /**constructor taking a file with the required information
     @param name the name of the app may be empty to pull name from the file

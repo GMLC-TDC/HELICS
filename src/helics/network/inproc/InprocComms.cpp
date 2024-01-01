@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "InprocComms.h"
 
-#include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../../core/BrokerFactory.hpp"
 #include "../../core/CommonCore.hpp"
@@ -14,6 +13,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../../core/CoreFactory.hpp"
 #include "../NetworkBrokerData.hpp"
 
+#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <string>

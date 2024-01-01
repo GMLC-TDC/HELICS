@@ -6,7 +6,6 @@ SPDX-License-Identifier: BSD-3-Clause
 */
 #include "IpcComms.h"
 
-#include "../../common/fmt_format.h"
 #include "../../core/ActionMessage.hpp"
 #include "../../core/helics_definitions.hpp"
 #include "IpcQueueHelper.h"
@@ -16,6 +15,7 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <boost/interprocess/shared_memory_object.hpp>
 #include <boost/interprocess/sync/interprocess_mutex.hpp>
 #include <cctype>
+#include <fmt/format.h>
 #include <map>
 #include <memory>
 #include <string>

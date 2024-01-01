@@ -9,10 +9,10 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../common/JsonGeneration.hpp"
 #include "helics_definitions.hpp"
 // #include "core/core-data.hpp"
-#include "../common/fmt_format.h"
 
 #include <algorithm>
 #include <cstring>
+#include <fmt/format.h>
 #include <memory>
 #include <set>
 #include <utility>
@@ -24,14 +24,14 @@ bool EndpointInfo::updateTimeUpTo(Time newTime)
     int index{0};
     auto handle = message_queue.lock();
 
-    auto cv = handle.begin();
+    auto message = handle.begin();
     auto it_final = handle.end();
-    while (cv != it_final) {
-        if ((*cv)->time >= newTime) {
+    while (message != it_final) {
+        if ((*message)->time >= newTime) {
             break;
         }
         ++index;
-        ++cv;
+        ++message;
     }
     if (index != mAvailableMessages.load()) {
         mAvailableMessages.store(index);
@@ -45,14 +45,14 @@ bool EndpointInfo::updateTimeNextIteration(Time newTime)
     int index{0};
     auto handle = message_queue.lock();
 
-    auto cv = handle.begin();
+    auto message = handle.begin();
     auto it_final = handle.end();
-    while (cv != it_final) {
-        if ((*cv)->time > newTime) {
+    while (message != it_final) {
+        if ((*message)->time > newTime) {
             break;
         }
         ++index;
-        ++cv;
+        ++message;
     }
     if (index != mAvailableMessages.load()) {
         mAvailableMessages.store(index);
@@ -66,14 +66,14 @@ bool EndpointInfo::updateTimeInclusive(Time newTime)
     int index{0};
     auto handle = message_queue.lock();
 
-    auto cv = handle.begin();
+    auto message = handle.begin();
     auto it_final = handle.end();
-    while (cv != it_final) {
-        if ((*cv)->time > newTime) {
+    while (message != it_final) {
+        if ((*message)->time > newTime) {
             break;
         }
         ++index;
-        ++cv;
+        ++message;
     }
     if (index != mAvailableMessages.load()) {
         mAvailableMessages.store(index);
@@ -108,10 +108,11 @@ Time EndpointInfo::firstMessageTime() const
 }
 
 // this is the function which determines message order
-static auto msgSorter = [](const auto& m1, const auto& m2) {
+static auto msgSorter = [](const auto& message1, const auto& message2) {
     // first by time
-    return (m1->time != m2->time) ? (m1->time < m2->time) :
-                                    (m1->original_source < m2->original_source);
+    return (message1->time != message2->time) ?
+        (message1->time < message2->time) :
+        (message1->original_source < message2->original_source);
 };
 
 void EndpointInfo::addMessage(std::unique_ptr<Message> message)
@@ -136,7 +137,7 @@ int32_t EndpointInfo::queueSize(Time maxTime) const
 {
     auto handle = message_queue.lock_shared();
     int32_t cnt = 0;
-    for (auto& msg : *handle) {
+    for (const auto& msg : *handle) {
         if (msg->time <= maxTime) {
             ++cnt;
         } else {
@@ -150,7 +151,7 @@ int32_t EndpointInfo::queueSizeUpTo(Time maxTime) const
 {
     auto handle = message_queue.lock_shared();
     int32_t cnt = 0;
-    for (auto& msg : *handle) {
+    for (const auto& msg : *handle) {
         if (msg->time < maxTime) {
             ++cnt;
         } else {
@@ -164,8 +165,8 @@ void EndpointInfo::addDestination(GlobalHandle dest,
                                   std::string_view destName,
                                   std::string_view destType)
 {
-    for (const auto& ti : targetInformation) {
-        if (ti.id == dest) {
+    for (const auto& tinfo : targetInformation) {
+        if (tinfo.id == dest) {
             return;
         }
     }
@@ -173,8 +174,8 @@ void EndpointInfo::addDestination(GlobalHandle dest,
     /** now update the target information*/
     targets.reserve(targetInformation.size());
     targets.clear();
-    for (const auto& ti : targetInformation) {
-        targets.emplace_back(ti.id, ti.key);
+    for (const auto& tinfo : targetInformation) {
+        targets.emplace_back(tinfo.id, tinfo.key);
     }
 }
 
@@ -183,8 +184,8 @@ void EndpointInfo::addSource(GlobalHandle source,
                              std::string_view sourceName,
                              std::string_view sourceType)
 {
-    for (const auto& si : sourceInformation) {
-        if (si.id == source) {
+    for (const auto& info : sourceInformation) {
+        if (info.id == source) {
             return;
         }
     }
@@ -194,10 +195,10 @@ void EndpointInfo::addSource(GlobalHandle source,
 /** remove a target from connection*/
 void EndpointInfo::removeTarget(GlobalHandle targetId)
 {
-    auto ti = targetInformation.begin();
-    while (ti != targetInformation.end()) {
-        if (ti->id == targetId) {
-            targetInformation.erase(ti);
+    auto tinfo = targetInformation.begin();
+    while (tinfo != targetInformation.end()) {
+        if (tinfo->id == targetId) {
+            targetInformation.erase(tinfo);
             targets.clear();
             for (const auto& targetInfo : targetInformation) {
                 targets.emplace_back(targetInfo.id, targetInfo.key);
@@ -205,10 +206,10 @@ void EndpointInfo::removeTarget(GlobalHandle targetId)
             break;
         }
     }
-    auto si = sourceInformation.begin();
-    while (si != sourceInformation.end()) {
-        if (si->id == targetId) {
-            sourceInformation.erase(si);
+    auto sinfo = sourceInformation.begin();
+    while (sinfo != sourceInformation.end()) {
+        if (sinfo->id == targetId) {
+            sourceInformation.erase(sinfo);
             return;
         }
     }
@@ -305,7 +306,7 @@ void EndpointInfo::checkInterfacesForIssues(std::vector<std::pair<int, std::stri
 
 void EndpointInfo::setProperty(int32_t option, int32_t value)
 {
-    bool bvalue = (value != 0);
+    const bool bvalue = (value != 0);
     switch (option) {
         case defs::Options::CONNECTION_REQUIRED:
             required = bvalue;

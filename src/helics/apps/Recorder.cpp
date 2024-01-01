@@ -10,14 +10,14 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "../application_api/Filters.hpp"
 #include "../application_api/queryFunctions.hpp"
 #include "../common/JsonProcessingFunctions.hpp"
-#include "../common/fmt_format.h"
-#include "../common/fmt_ostream.h"
 #include "../core/helicsCLI11.hpp"
 #include "PrecHelper.hpp"
 #include "gmlc/utilities/base64.h"
 #include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -40,7 +40,7 @@ static std::string encode(std::string_view str2encode)
 }
 
 namespace helics::apps {
-Recorder::Recorder(std::string_view appName, FederateInfo& fi): App(appName, fi)
+Recorder::Recorder(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -72,14 +72,14 @@ void Recorder::processArgs()
 
 Recorder::Recorder(std::string_view appName,
                    const std::shared_ptr<Core>& core,
-                   const FederateInfo& fi):
-    App(appName, core, fi)
+                   const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
 
-Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-    App(appName, core, fi)
+Recorder::Recorder(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
 {
     fed->setFlagOption(HELICS_FLAG_OBSERVER);
 }
@@ -132,16 +132,16 @@ void Recorder::loadJsonFile(const std::string& jsonString)
     }
     auto sourceClone = doc["sourceclone"];
     if (sourceClone.isArray()) {
-        for (const auto& sc : sourceClone) {
-            addSourceEndpointClone(sc.asString());
+        for (const auto& clone : sourceClone) {
+            addSourceEndpointClone(clone.asString());
         }
     } else if (sourceClone.isString()) {
         addSourceEndpointClone(sourceClone.asString());
     }
     auto destClone = doc["destclone"];
     if (destClone.isArray()) {
-        for (const auto& dc : destClone) {
-            addDestEndpointClone(dc.asString());
+        for (const auto& clone : destClone) {
+            addDestEndpointClone(clone.asString());
         }
     } else if (destClone.isString()) {
         addDestEndpointClone(destClone.asString());
@@ -172,14 +172,14 @@ void Recorder::loadTextFile(const std::string& textFile)
 
     std::ifstream infile(textFile);
     std::string str;
-    int lc = 0;
+    int lineCount = 0;
     while (std::getline(infile, str)) {
-        ++lc;
+        ++lineCount;
         if (str.empty()) {
             continue;
         }
-        auto fc = str.find_first_not_of(" \t\n\r\0");
-        if ((fc == std::string::npos) || (str[fc] == '#')) {
+        auto firstChar = str.find_first_not_of(" \t\n\r\0");
+        if ((firstChar == std::string::npos) || (str[firstChar] == '#')) {
             continue;
         }
         auto blk = splitlineQuotes(str, ",\t ", default_quote_chars, delimiter_compression::on);
@@ -205,7 +205,7 @@ void Recorder::loadTextFile(const std::string& textFile)
                     addSourceEndpointClone(removeQuotes(blk[1]));
                     addDestEndpointClone(removeQuotes(blk[1]));
                 } else {
-                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                    std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                 }
                 break;
             case 3:
@@ -215,10 +215,10 @@ void Recorder::loadTextFile(const std::string& textFile)
                     } else if ((blk[1] == "dest") || (blk[1] == "destination")) {
                         addDestEndpointClone(removeQuotes(blk[2]));
                     } else {
-                        std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                        std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                     }
                 } else {
-                    std::cerr << "Unable to process line " << lc << ':' << str << '\n';
+                    std::cerr << "Unable to process line " << lineCount << ':' << str << '\n';
                 }
                 break;
             default:
@@ -233,18 +233,18 @@ void Recorder::writeJsonFile(const std::string& filename)
     Json::Value doc;
     if (!points.empty()) {
         doc["points"] = Json::Value(Json::arrayValue);
-        for (auto& v : points) {
-            Json::Value point;
-            point["key"] = subscriptions[v.index].getTarget();
-            point["value"] = v.value;
-            point["time"] = static_cast<double>(v.time);
-            if (v.iteration > 0) {
-                point["iteration"] = v.iteration;
+        for (auto& point : points) {
+            Json::Value pointData;
+            pointData["key"] = subscriptions[point.index].getTarget();
+            pointData["value"] = point.value;
+            pointData["time"] = static_cast<double>(point.time);
+            if (point.iteration > 0) {
+                pointData["iteration"] = point.iteration;
             }
-            if (v.first) {
-                point["type"] = subscriptions[v.index].getPublicationType();
+            if (point.first) {
+                pointData["type"] = subscriptions[point.index].getPublicationType();
             }
-            doc["points"].append(point);
+            doc["points"].append(pointData);
         }
     }
 
@@ -279,8 +279,8 @@ void Recorder::writeJsonFile(const std::string& filename)
         }
     }
 
-    std::ofstream o(filename);
-    o << doc << std::endl;
+    std::ofstream out(filename);
+    out << doc << std::endl;
 }
 
 void Recorder::writeTextFile(const std::string& filename)
@@ -289,44 +289,46 @@ void Recorder::writeTextFile(const std::string& filename)
     if (!points.empty()) {
         outFile << "#time \ttag\t type*\t value\n";
     }
-    for (auto& v : points) {
-        if (v.first) {
-            outFile << static_cast<double>(v.time) << "\t\t" << subscriptions[v.index].getTarget()
-                    << '\t' << subscriptions[v.index].getPublicationType() << '\t'
-                    << Json::valueToQuotedString(v.value.c_str()) << '\n';
+    for (auto& point : points) {
+        if (point.first) {
+            outFile << static_cast<double>(point.time) << "\t\t"
+                    << subscriptions[point.index].getTarget() << '\t'
+                    << subscriptions[point.index].getPublicationType() << '\t'
+                    << Json::valueToQuotedString(point.value.c_str()) << '\n';
         } else {
-            if (v.iteration > 0) {
-                outFile << static_cast<double>(v.time) << ':' << v.iteration << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(v.value.c_str()) << '\n';
+            if (point.iteration > 0) {
+                outFile << static_cast<double>(point.time) << ':' << point.iteration << "\t\t"
+                        << subscriptions[point.index].getTarget() << '\t'
+                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
             } else {
-                outFile << static_cast<double>(v.time) << "\t\t"
-                        << subscriptions[v.index].getTarget() << '\t'
-                        << Json::valueToQuotedString(v.value.c_str()) << '\n';
+                outFile << static_cast<double>(point.time) << "\t\t"
+                        << subscriptions[point.index].getTarget() << '\t'
+                        << Json::valueToQuotedString(point.value.c_str()) << '\n';
             }
         }
     }
     if (!messages.empty()) {
         outFile << "# m\t time \tsource\t dest\t message\n";
     }
-    for (auto& m : messages) {
-        outFile << "m\t" << static_cast<double>(m->time) << '\t' << m->source << '\t';
-        if ((m->dest.size() < 7) || (m->dest.compare(m->dest.size() - 6, 6, "cloneE") != 0)) {
-            outFile << m->dest;
+    for (auto& mess : messages) {
+        outFile << "m\t" << static_cast<double>(mess->time) << '\t' << mess->source << '\t';
+        if ((mess->dest.size() < 7) ||
+            (mess->dest.compare(mess->dest.size() - 6, 6, "cloneE") != 0)) {
+            outFile << mess->dest;
         } else {
-            outFile << m->original_dest;
+            outFile << mess->original_dest;
         }
-        if (isBinaryData(m->data)) {
-            if (isEscapableData(m->data)) {
+        if (isBinaryData(mess->data)) {
+            if (isEscapableData(mess->data)) {
                 outFile << "\t"
-                        << Json::valueToQuotedString(std::string(m->data.to_string()).c_str())
+                        << Json::valueToQuotedString(std::string(mess->data.to_string()).c_str())
                         << "\n";
             } else {
-                outFile << "\t\"" << encode(m->data.to_string()) << "\"\n";
+                outFile << "\t\"" << encode(mess->data.to_string()) << "\"\n";
             }
 
         } else {
-            outFile << "\t\"" << m->data.to_string() << "\"\n";
+            outFile << "\t\"" << mess->data.to_string() << "\"\n";
         }
     }
 }
@@ -379,8 +381,8 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
     for (auto& sub : subscriptions) {
         if (sub.isUpdated()) {
             auto val = sub.getValue<std::string>();
-            int ii = subids[sub.getHandle()];
-            points.emplace_back(currentTime, ii, val);
+            const int subId = subids[sub.getHandle()];
+            points.emplace_back(currentTime, subId, val);
             if (iteration > 0) {
                 points.back().iteration = iteration;
             }
@@ -388,33 +390,39 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
                 std::string valstr;
                 if (val.size() < 150) {
                     if (iteration > 0) {
-                        valstr = fmt::format(
-                            "[{}:{}]value {}={}", currentTime, iteration, sub.getTarget(), val);
+                        valstr = fmt::format("[{}:{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             iteration,
+                                             sub.getTarget(),
+                                             val);
                     } else {
-                        valstr = fmt::format("[{}]value {}={}", currentTime, sub.getTarget(), val);
+                        valstr = fmt::format("[{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             sub.getTarget(),
+                                             val);
                     }
                 } else {
                     if (iteration > 0) {
                         valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                                             currentTime,
+                                             static_cast<double>(currentTime),
                                              iteration,
                                              sub.getTarget(),
                                              val.size());
                     } else {
                         valstr = fmt::format("[{}]value {}=block[{}]",
-                                             currentTime,
+                                             static_cast<double>(currentTime),
                                              sub.getTarget(),
                                              val.size());
                     }
                 }
                 spdlog::info(valstr);
             }
-            if (vStat[ii].cnt == 0) {
+            if (vStat[subId].cnt == 0) {
                 points.back().first = true;
             }
-            ++vStat[ii].cnt;
-            vStat[ii].lastVal = val;
-            vStat[ii].time = -1.0;
+            ++vStat[subId].cnt;
+            vStat[subId].lastVal = val;
+            vStat[subId].time = -1.0;
         }
     }
 
@@ -425,13 +433,13 @@ void Recorder::captureForCurrentTime(Time currentTime, int iteration)
                 std::string messstr;
                 if (mess->data.size() < 50) {
                     messstr = fmt::format("[{}]message from {} to {}::{}",
-                                          currentTime,
+                                          static_cast<double>(currentTime),
                                           mess->source,
                                           mess->dest,
                                           mess->data.to_string());
                 } else {
                     messstr = fmt::format("[{}]message from {} to {}:: size {}",
-                                          currentTime,
+                                          static_cast<double>(currentTime),
                                           mess->source,
                                           mess->dest,
                                           mess->data.size());
@@ -475,19 +483,19 @@ void Recorder::runTo(Time runToTime)
     try {
         int iteration = 0;
         while (true) {
-            helics::Time T;
+            helics::Time grantedTime;
             if (allow_iteration) {
                 auto ItRes =
                     fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
                 if (ItRes.state == IterationResult::NEXT_STEP) {
                     iteration = 0;
                 }
-                T = ItRes.grantedTime;
-                captureForCurrentTime(T, iteration);
+                grantedTime = ItRes.grantedTime;
+                captureForCurrentTime(grantedTime, iteration);
                 ++iteration;
             } else {
-                T = fed->requestTime(runToTime);
-                captureForCurrentTime(T);
+                grantedTime = fed->requestTime(runToTime);
+                captureForCurrentTime(grantedTime);
             }
             if (!mapfile.empty()) {
                 std::ofstream out(mapfile);
@@ -501,11 +509,11 @@ void Recorder::runTo(Time runToTime)
                 }
                 out.flush();
             }
-            if (T >= runToTime) {
+            if (grantedTime >= runToTime) {
                 break;
             }
-            if ((T >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
-                std::cout << "processed for time " << static_cast<double>(T) << "\n";
+            if ((grantedTime >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
+                std::cout << "processed for time " << static_cast<double>(grantedTime) << "\n";
                 nextPrintTime += nextPrintTimeStep;
             }
         }
@@ -521,8 +529,8 @@ void Recorder::addSubscription(std::string_view key)
         subscriptions.emplace_back(fed->registerSubscription(key));
         targets.emplace_back(key);
         auto index = static_cast<int>(subscriptions.size()) - 1;
-        auto id = subscriptions.back().getHandle();
-        subids[id] = index;  // this is a new element
+        auto subId = subscriptions.back().getHandle();
+        subids[subId] = index;  // this is a new element
         subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
     }
 }
@@ -533,8 +541,8 @@ void Recorder::addEndpoint(std::string_view endpoint)
     if ((res == eptNames.end()) || (res->second == -1)) {
         endpoints.emplace_back(InterfaceVisibility::GLOBAL, fed.get(), endpoint);
         auto index = static_cast<int>(endpoints.size()) - 1;
-        auto id = endpoints.back().getHandle();
-        eptids.emplace(id, index);  // this is a new element
+        auto endpointId = endpoints.back().getHandle();
+        eptids.emplace(endpointId, index);  // this is a new element
         eptNames[endpoints.back().getName()] = index;  // this is a potential replacement
     }
 }
