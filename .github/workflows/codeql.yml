@@ -12,6 +12,7 @@
 name: "CodeQL"
 
 on:
+  workflow_dispatch:
   push:
     branches: [ "main", "develop" ]
   pull_request:
@@ -27,8 +28,18 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners
     # Consider using larger runners for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
-    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    runs-on: ubuntu-latest
+    container: helics/buildenv:ubuntu22.04-default-builder
+    timeout-minutes: 60
+    defaults:
+      run:
+        shell: bash
+    env:
+      CMAKE_GENERATOR: Unix Makefiles
+      MAKEFLAGS: '-j 4'
+      DISABLE_INTERFACES: 'Java'
+      DISABLE_EXAMPLES: 'true'
+      DISABLE_CXX_SHARED: 'true'
     permissions:
       actions: read
       contents: read
@@ -60,20 +71,19 @@ jobs:
         # queries: security-extended,security-and-quality
 
 
-    # Autobuild attempts to build any compiled languages (C/C++, C#, Go, Java, or Swift).
-    # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
 
     #   If the Autobuild fails above, remove it and uncomment the following three lines.
     #   modify them (or add more) to build your code if your project, please refer to the EXAMPLE below for guidance.
 
-    # - run: |
-    #     echo "Run, Build Application using script"
-    #     ./location_of_script_within_repo/buildscript.sh
+    - run: |
+        echo "Run, Build Application using script"
+        unset VCPKG_ROOT
+        git config --global --add safe.directory ${GITHUB_WORKSPACE}
+        source scripts/setup-helics-ci-options.sh
+        mkdir -p build && cd build
+        ../scripts/ci-build.sh
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
