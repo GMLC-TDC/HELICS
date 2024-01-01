@@ -14,6 +14,7 @@ mark_as_advanced(BOOST_INSTALL_PATH)
 if(WIN32 AND NOT UNIX_LIKE)
 
     set(boost_versions
+        boost_1_84_0
         boost_1_83_0
         boost_1_82_0
         boost_1_81_0
