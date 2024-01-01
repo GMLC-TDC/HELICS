@@ -214,8 +214,9 @@ class VectorSubscription2d {
         static_assert(
             std::is_base_of<ValueFederate, std::remove_reference_t<decltype(*valueFed)>>::value,
             "Second argument must be a pointer to a ValueFederate");
-        ids.reserve(count_x * count_y);
-        vals.resize(count_x * count_y, defValue);
+        std::size_t arrayCount=static_cast<std::size_t>(count_x) * static_cast<std::size_t>(count_y);
+        ids.reserve(arrayCount);
+        vals.resize(arrayCount, defValue);
 
         for (auto ind_x = startIndex_x; ind_x < startIndex_x + count_x; ++ind_x) {
             for (auto ind_y = startIndex_y; ind_y < startIndex_y + count_y; ++ind_y) {

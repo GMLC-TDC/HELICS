@@ -304,7 +304,7 @@ namespace detail {
                 // making use of array oriented access for complex numbers
                 // See https://en.cppreference.com/w/cpp/numeric/complex
                 checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v));
-                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v) + sizeof(double));
+                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v) + 8);
             }
         }
     }
