@@ -264,8 +264,8 @@ namespace helics::detail {
             std::memcpy(val.data(), data + 8, size * sizeof(double));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
-            for (auto& v : val) {
-                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v));
+            for (auto& element : val) {
+                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&element));
             }
         }
     }
@@ -334,7 +334,7 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
         const Json::Value json = fileops::loadJsonStr(str);
         if (json.isArray()) {
             val.reserve(json.size());
-            for (auto& arrayVal : json) {
+            for (const auto& arrayVal : json) {
                 val.emplace_back(arrayVal.asString());
             }
         } else {
