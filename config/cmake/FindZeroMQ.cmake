@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -60,6 +60,7 @@ if(MSVC)
 
     if(${ZeroMQ_NAME} MATCHES "registry") # if key was not found, the string "registry" is returned
         set(_ZeroMQ_VERSIONS
+            "4_3_5"
             "4_3_4"
             "4_3_3"
             "4_3_2"
@@ -71,13 +72,6 @@ if(MSVC)
             "4_2_2"
             "4_2_1"
             "4_2_0"
-            "4_1_5"
-            "4_1_4"
-            "4_0_4"
-            "4_0_3"
-            "4_0_2"
-            "4_0_1"
-            "4_0_0"
         )
         set(ZeroMQ_LIBRARY_NAME)
         foreach(ver ${_ZeroMQ_VERSIONS})
