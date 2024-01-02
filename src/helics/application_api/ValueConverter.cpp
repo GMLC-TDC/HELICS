@@ -13,9 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <complex>
 #include <vector>
 
-namespace helics {
+namespace helics::detail {
 
-namespace detail {
     namespace checks {
         /*! This code in checks namespace exerpted from cereal portable binary archives
         code is modified slightly to fit name conventions and make use of C++17
@@ -88,10 +87,10 @@ namespace detail {
         std::memset(data, 0, 8);
         data[0] = code;
         data[3] = littleEndianCode;
-        data[4] = std::byte((size >> 24U) & 0xFFU);
-        data[5] = std::byte((size >> 16U) & 0xFFU);
-        data[6] = std::byte((size >> 8U) & 0xFFU);
-        data[7] = std::byte((size & 0xFFU));
+        data[4] = static_cast<std::byte>((size >> 24U) & 0xFFU);
+        data[5] = static_cast<std::byte>((size >> 16U) & 0xFFU);
+        data[6] = static_cast<std::byte>((size >> 8U) & 0xFFU);
+        data[7] = static_cast<std::byte>((size & 0xFFU));
     }
 
     size_t convertToBinary(std::byte* data, double val)
@@ -229,27 +228,27 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, std::string& val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         val.assign(reinterpret_cast<const char*>(data) + 8,
                    reinterpret_cast<const char*>(data) + 8 + size);
     }
 
     void convertFromBinary(const std::byte* data, std::string_view& val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         val = std::string_view(reinterpret_cast<const char*>(data) + 8, size);
     }
 
     void convertFromBinary(const std::byte* data, char* val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         memcpy(val, data + 8, size);
     }
 
     void convertFromBinary(const std::byte* data, NamedPoint& val)
     {
         std::memcpy(&val.value, data + 8, 8);
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         val.name.assign(reinterpret_cast<const char*>(data) + 16U,
                         reinterpret_cast<const char*>(data) + 16U + size);
         if ((data[0] & endianMask) != littleEndianCode) {
@@ -259,7 +258,7 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, std::vector<double>& val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         val.resize(size);
         if (size > 0) {
             std::memcpy(val.data(), data + 8, size * sizeof(double));
@@ -273,15 +272,15 @@ namespace detail {
 
     void convertFromBinary(const std::byte* data, double* val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         if (val != nullptr && size > 0) {
             std::memcpy(val, data + 8, size * sizeof(double));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
-            double* v = val;
-            double* end = val + size;
-            while (v != end) {
-                checks::swapBytes<8>(reinterpret_cast<std::byte*>(v++));
+            double* currentVal = val;
+            double* end = currentVal + size;
+            while (currentVal != end) {
+                checks::swapBytes<8>(reinterpret_cast<std::byte*>(currentVal++));
             }
         }
     }
@@ -292,7 +291,7 @@ namespace detail {
 #endif
     void convertFromBinary(const std::byte* data, std::vector<std::complex<double>>& val)
     {
-        std::size_t size = getDataSize(data);
+        const std::size_t size = getDataSize(data);
         val.resize(size);
         if (size > 0) {
             std::memcpy(reinterpret_cast<double*>(val.data()),
@@ -300,11 +299,11 @@ namespace detail {
                         size * sizeof(std::complex<double>));
         }
         if ((data[0] & endianMask) != littleEndianCode) {
-            for (auto& v : val) {
+            for (auto& value : val) {
                 // making use of array oriented access for complex numbers
                 // See https://en.cppreference.com/w/cpp/numeric/complex
-                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v));
-                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&v) + 8);
+                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&value));
+                checks::swapBytes<8>(reinterpret_cast<std::byte*>(&value) + 8);
             }
         }
     }
@@ -313,14 +312,15 @@ namespace detail {
 #endif
 }  // namespace detail
 
+namespace helics{
 void ValueConverter<std::vector<std::string>>::convert(const std::vector<std::string>& val,
                                                        SmallBuffer& store)
 {
-    Json::Value V(Json::arrayValue);
+    Json::Value json(Json::arrayValue);
     for (const auto& str : val) {
-        V.append(str);
+        json.append(str);
     }
-    auto strgen = fileops::generateJsonString(V);
+    auto strgen = fileops::generateJsonString(json);
     return ValueConverter<std::string_view>::convert(strgen, store);
 }
 
@@ -331,11 +331,11 @@ void ValueConverter<std::vector<std::string>>::interpret(const data_view& block,
     val.clear();
     auto str = ValueConverter<std::string_view>::interpret(block);
     try {
-        Json::Value V = fileops::loadJsonStr(str);
-        if (V.isArray()) {
-            val.reserve(V.size());
-            for (auto& av : V) {
-                val.emplace_back(av.asString());
+        const Json::Value json = fileops::loadJsonStr(str);
+        if (json.isArray()) {
+            val.reserve(json.size());
+            for (auto& arrayVal : json) {
+                val.emplace_back(arrayVal.asString());
             }
         } else {
             val.emplace_back(str);
