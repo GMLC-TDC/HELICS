@@ -166,10 +166,14 @@ Examples Covered in Advanced Examples
 
 Using the [Advanced Default Example](./advanced_default.md) as the starting point, the following examples have also been constructed:
 
-- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value handle.
-- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- [**Iteration**](./advanced_iteration) - Setting up federates so that they can iterate without advancing simulation time to achieve a more consistent state.
+- [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
 - **Multiple Brokers**
   - [**Connecting Multiple Core Types (Multi-Protocol Broker)**](./advanced_brokers_multibroker.md) - Demonstration of how to configure a multi-protocol broker
   - [**Broker Hierarchies**](./advanced_brokers_hierarchies.md) - Purpose of broker hierarchies and how to configure a HELICS co-simulation to implement one.
   - [**Simultaneous co-simulations**](./advanced_brokers_simultaneous.md) - Demonstration of how to run multiple independent federations simultaneously on a single compute node.
+  - [**Multi-Protocol Brokers (Multi-broker) for Multiple Core Types)**](advanced_brokers_multibroker) What to do when one type of communication isn't sufficient.
+  - [**Multi-compute-node Co-simulation**](advanced_brokers_multicomputer) - Executing a co-simulation across multiple compute nodes.
+- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value interface.
 - [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.

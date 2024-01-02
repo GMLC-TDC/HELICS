@@ -41,7 +41,7 @@ graph LR
     end
     subgraph Package Manager/Precompiled
         languageChoice(What language are <br/> you using?)
-        languageChoice -->|Python| python[Use pip: <br><br> pip install helics]
+        languageChoice -->|Python| python["Use pip: <br><br> pip install 'helics[cli]'"]
         languageChoice -->|MATLAB| matlab[Follow instructions in <br> the matHELICS repository]
         languageChoice -->|julia| julia[Use pkg: <br><br> pck> add helics]
         languageChoice -->|Java| java[Build from source with the <br> Java CMAKE option set <br><br>HELICS_BUILD_JAVA_INTERFACE=ON]
@@ -100,6 +100,10 @@ Installation instructions are available in the [matHELICS repository README](htt
 ### spack install
 
 [`spack install helics`](./spack.md)
+
+## Running an Example
+
+The [Quick Start guide](../../quick_start/quick_start_index.md) walks through the steps of running the first Python-based User Guide example and serves as a good way to test your (Python) installation.
 
 ## HELICS runner
 

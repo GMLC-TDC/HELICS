@@ -16,7 +16,7 @@ These two learning tracks each start with a "base" model, which should also be c
 
 <span style="font-size:larger;">**A Word on HELICS CLI**</span>
 
-All (or almost all ) of the HELICS User Guide examples utilize a common tool and command for launching the co-simulation:
+All (or almost all) of the HELICS User Guide examples utilize a common tool and command for launching the co-simulation:
 
 `helics run --path=runner.json`
 
@@ -29,4 +29,5 @@ This utilizes a tool we call `helics_cli` that is (optionally) [installed with t
     fundamental_examples/fundamental_examples_index
     advanced_examples/advanced_examples_index
     supported_language_examples_index
+    misc_examples/misc_examples_index
 ```

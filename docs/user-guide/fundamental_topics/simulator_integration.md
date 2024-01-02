@@ -6,7 +6,7 @@ A "simulator" is the executable program. As soon as one particular instance of t
 
 **Core type** - The core manages interfaces between the federation and the federate; there are several messaging technologies supported by HELICS.
 
-**Publications and Inputs** - Publication configuration contains a listing of source handle, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
+**Publications and Inputs** - Publication configuration contains a listing of source interface name, data types, and units being sent by the federate; input configuration does the same for values being received by the federate. If supported by the simulator (e.g., [a Python simulator](../examples/fundamental_examples/fundamental_default.md)), these values can be mapped to internal variables of the simulator from the configuration file.
 
 **Endpoints** - Endpoints are sending and receiving points for HELICS messages to and from message federates. They are declared and defined for each federate.
 
@@ -105,7 +105,7 @@ import helics as h
 
 ### Federate Information
 
-Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](../deprecated/FederateFlags.md).
+Each federate has a core set of configuration information and metadata associated with it, which will either need to be set within your code or will be set based on defaults. When creating a new federate, only one piece of metadata is actually required, and that is the federate name, which must be unique within the federation. However, there are many other configuration options that can be set for the federate, including whether the federate can be interrupted between its native time steps, a minimum time step for its execution and the level to use when the federate logs information. Information on all of these configuration options, including default settings, can be found [here](../../references/configuration_options_reference.md).
 
 ### Publications, Subscriptions and Endpoints
 
@@ -153,7 +153,7 @@ Additionally, there are ways to create and configure the federate directly throu
 fi = h.helicsCreateFederateInfo()
 ```
 
-Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../deprecated/FederateFlags.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
+Once the federate info object exists, HELICS API calls can be used to set the [configuration parameters](../../references/configuration_options_reference.md) as appropriate. For example, to set the the only_transmit_on_change flag to true, you would use the following API call:
 
 ```python
 h.helicsFederateInfoSetFlagOption(fi, 6, True)
@@ -203,7 +203,7 @@ pub = h.helicsFederateGetPublicationByIndex(fed, index)
 pub_key = h.helicsPublicationGetKey(pub)
 ```
 
-The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the handle used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
+The object returned when the helicsFederateGetPublicationByIndex() method is invoked is the interface object used for retrieving other publication metadata (as in the helicsPublicationGetKey() method) and when publishing data to HELICS (as described in the execution section below).
 
 ### Federate Execution
 

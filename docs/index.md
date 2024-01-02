@@ -21,7 +21,7 @@ Motivation: Energy systems and their associated information and communication te
 .. toctree::
    :maxdepth: 2
 
-
+   quick_start/quick_start_index
    user-guide/index
    developer-guide/index
    references/index

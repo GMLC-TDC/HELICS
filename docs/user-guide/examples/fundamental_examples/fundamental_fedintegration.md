@@ -187,7 +187,7 @@ Notice that we pass to this API the `fedinfo` set by all preceding API calls.
 
 ### Dynamic Pub/Subs with API calls
 
-In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate handles needed to be explicitly defined for a predetermined number of connections:
+In the Base Example, we configured the pubs and subs with an external JSON file, where _each_ publication and subscription between federate interfaces needed to be explicitly defined for a predetermined number of connections:
 
 ```json
 "publications":[
