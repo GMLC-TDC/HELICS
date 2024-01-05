@@ -1522,17 +1522,18 @@ void CommonCore::addDestinationTarget(InterfaceHandle handle,
                     throw(InvalidIdentifier(
                         "translators cannot have publications as destination targets"));
                     break;
-                default:
-                    // translators have two outputs
-                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    addActionMessage(cmd);
-                    cmd.setAction(CMD_ADD_NAMED_INPUT);
-                    break;
                 case InterfaceType::ENDPOINT:
                     cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
+                default:
+                    // translators have two outputs
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
+                    // need to send 2 messages then one now and one at the end
+                    addActionMessage(cmd);
+                    cmd.setAction(CMD_ADD_NAMED_INPUT);
                     break;
             }
             break;
@@ -1596,12 +1597,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 case InterfaceType::PUBLICATION:
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
                     break;
-                default:
-                    // translators can have two inputs
-                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
-                    addActionMessage(std::move(cmd));
-                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
-                    break;
+               
                 case InterfaceType::INPUT:
                     throw(InvalidIdentifier("translators cannot have inputs as a source"));
                     break;
@@ -1610,6 +1606,12 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                     break;
                 case InterfaceType::FILTER:
                     cmd.setAction(CMD_ADD_NAMED_FILTER);
+                    break;
+                default:
+                    // translators can have two inputs
+                    cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
+                    addActionMessage(cmd);
+                    cmd.setAction(CMD_ADD_NAMED_ENDPOINT);
                     break;
             }
             break;

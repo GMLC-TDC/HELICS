@@ -39,7 +39,7 @@
   "translators": [
     {
       "name": "tname", //translators can have names (optional)
-      "sourcetargets": "ept1", // source target for the translator
+      "sourcetarget": "ept1", // source target for the translator
       "type": "reroute3", //this should produce a warning
       "info": "this is an information string for use by the application",
       //additional properties for translators are specified in a property array or object if there is just a single one

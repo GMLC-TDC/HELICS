@@ -145,6 +145,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
       "connection_optional": true,
       "connection_required": false,
       "tolerance": -1,
+      // for targets can be singular or plural, if an array must use plural form
       "targets": "",
       "buffer_data":  false, indication the publication should buffer data
       "strict_input_type_checking": false,
@@ -172,6 +173,7 @@ An example of one publication, subscription, named input, endpoint, and filter i
       "single_connection_only": false,
       "multiple_connections_allowed": false
       "multi_input_handling_method": "average",
+      // for targets can be singular or plural, if an array must use plural form
       "targets": ["pub1", "pub2"]
       "default": 5.5,
     }
@@ -204,7 +206,8 @@ An example of one publication, subscription, named input, endpoint, and filter i
   "translators": [
     {
       "name": "translator name",
-      "source_targets": "publication name",
+      // can use singular form if only a single target
+      "source_target": "publication name",
       "destination_targets": "endpoint name",
       "info": "",
       "type": "JSON",
