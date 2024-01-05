@@ -925,7 +925,7 @@ TEST_F(translator, translator_config_json)
     auto broker = AddBroker("test", 1);
 
     auto cFed1 = std::make_shared<helics::CombinationFederate>(std::string(TEST_DIR) +
-        "example_translators.json");
+                                                               "example_translators.json");
 
     EXPECT_NO_THROW(cFed1->enterExecutingMode());
 
@@ -945,13 +945,12 @@ TEST_F(translator, translator_config_json)
     FullDisconnect();
 }
 
-
 TEST_F(translator, translator_config_toml)
 {
     auto broker = AddBroker("test", 1);
 
     auto cFed1 = std::make_shared<helics::CombinationFederate>(std::string(TEST_DIR) +
-        "example_translators.toml");
+                                                               "example_translators.toml");
 
     EXPECT_NO_THROW(cFed1->enterExecutingMode());
 

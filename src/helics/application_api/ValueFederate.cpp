@@ -270,9 +270,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             }
 
             loadOptions(this, pub, *pubAct);
-            auto dt=[pubAct](const std::string& target) { pubAct->addDestinationTarget(target); };
-            addTargetVariations(pub,"destination","inputs",dt);
-            addTargetVariations(pub,"destination","targets",dt);
+            auto dt = [pubAct](const std::string& target) { pubAct->addDestinationTarget(target); };
+            addTargetVariations(pub, "destination", "inputs", dt);
+            addTargetVariations(pub, "destination", "targets", dt);
         }
     }
     if (doc.isMember("subscriptions")) {
@@ -300,9 +300,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 subAct->setDefault(defStr);
             }
             loadOptions(this, sub, *subAct);
-            auto st=[subAct](const std::string& target) { subAct->addSourceTarget(target); };
-            addTargetVariations(sub,"source","publications",st);
-            addTargetVariations(sub,"source","targets",st);
+            auto st = [subAct](const std::string& target) { subAct->addSourceTarget(target); };
+            addTargetVariations(sub, "source", "publications", st);
+            addTargetVariations(sub, "source", "targets", st);
         }
     }
     if (doc.isMember("inputs")) {
@@ -327,9 +327,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 inp->setDefault(defStr);
             }
             loadOptions(this, ipt, *inp);
-            auto st=[inp](const std::string& target) { inp->addSourceTarget(target); };
-            addTargetVariations(ipt,"source","publications",st);
-            addTargetVariations(ipt,"source","targets",st);
+            auto st = [inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(ipt, "source", "publications", st);
+            addTargetVariations(ipt, "source", "targets", st);
         }
     }
 }
@@ -372,9 +372,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 }
             }
             loadOptions(this, pub, *pubObj);
-            auto dt=[pubObj](const std::string& target) { pubObj->addDestinationTarget(target); };
-            addTargetVariations(pub,"destination","inputs",dt);
-            addTargetVariations(pub,"destination","targets",dt);
+            auto dt = [pubObj](const std::string& target) { pubObj->addDestinationTarget(target); };
+            addTargetVariations(pub, "destination", "inputs", dt);
+            addTargetVariations(pub, "destination", "targets", dt);
         }
     }
     if (isMember(doc, "subscriptions")) {
@@ -410,9 +410,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 id->setDefault(defStr);
             }
             loadOptions(this, sub, *id);
-            auto dt=[id](const std::string& target) { id->addSourceTarget(target); };
-            addTargetVariations(sub,"source","publications",dt);
-            addTargetVariations(sub,"source","targets",dt);
+            auto dt = [id](const std::string& target) { id->addSourceTarget(target); };
+            addTargetVariations(sub, "source", "publications", dt);
+            addTargetVariations(sub, "source", "targets", dt);
         }
     }
     if (isMember(doc, "inputs")) {
@@ -442,9 +442,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 id->setDefault(defStr);
             }
             loadOptions(this, ipt, *id);
-            auto dt=[id](const std::string& target) { id->addSourceTarget(target); };
-            addTargetVariations(ipt,"source","publications",dt);
-            addTargetVariations(ipt,"source","targets",dt);
+            auto dt = [id](const std::string& target) { id->addSourceTarget(target); };
+            addTargetVariations(ipt, "source", "publications", dt);
+            addTargetVariations(ipt, "source", "targets", dt);
         }
     }
 }

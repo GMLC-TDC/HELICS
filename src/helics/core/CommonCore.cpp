@@ -1597,7 +1597,7 @@ void CommonCore::addSourceTarget(InterfaceHandle handle,
                 case InterfaceType::PUBLICATION:
                     cmd.setAction(CMD_ADD_NAMED_PUBLICATION);
                     break;
-               
+
                 case InterfaceType::INPUT:
                     throw(InvalidIdentifier("translators cannot have inputs as a source"));
                     break;

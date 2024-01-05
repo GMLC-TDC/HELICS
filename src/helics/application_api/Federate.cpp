@@ -68,7 +68,7 @@ Federate::Federate(std::string_view fedName,
 {
     if (mName.empty()) {
         mName = fedInfo.defName;
-            }
+    }
     getCore(fedInfo);
     verifyCore();
 
@@ -1304,8 +1304,15 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                 generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
             loadOptions(this, filt, filter);
 
-            addTargetVariations(filt,"source","endpoints",[&filter](const std::string& target) { filter.addSourceTarget(target); });
-            addTargetVariations(filt,"destination","endpoints",[&filter](const std::string& target) { filter.addDestinationTarget(target);});
+            addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
+                filter.addSourceTarget(target);
+            });
+            addTargetVariations(filt,
+                                "destination",
+                                "endpoints",
+                                [&filter](const std::string& target) {
+                                    filter.addDestinationTarget(target);
+                                });
 
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
@@ -1558,8 +1565,15 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                 generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
 
             loadOptions(this, filt, filter);
-            addTargetVariations(filt,"source","endpoints",[&filter](const std::string& target) { filter.addSourceTarget(target); });
-            addTargetVariations(filt,"destination","endpoints",[&filter](const std::string& target) { filter.addDestinationTarget(target);});
+            addTargetVariations(filt, "source", "endpoints", [&filter](const std::string& target) {
+                filter.addSourceTarget(target);
+            });
+            addTargetVariations(filt,
+                                "destination",
+                                "endpoints",
+                                [&filter](const std::string& target) {
+                                    filter.addDestinationTarget(target);
+                                });
             if (cloningflag) {
                 addTargets(filt, "delivery", [&filter](const std::string& target) {
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);

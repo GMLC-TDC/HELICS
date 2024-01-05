@@ -3,7 +3,7 @@
   "core_type": "test",
   "time_delta": 1,
   "terminate_on_error": true,
-  "defaultglobal":true,
+  "defaultglobal": true,
   "translators": [
     {
       "name": "EV_1_translator",
