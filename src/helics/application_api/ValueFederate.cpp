@@ -25,36 +25,36 @@ SPDX-License-Identifier: BSD-3-Clause
 namespace helics {
 /**constructor taking a core engine and federate info structure
  */
-ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fi):
-    Federate(fedName, fi)
+ValueFederate::ValueFederate(std::string_view fedName, const FederateInfo& fedInfo):
+    Federate(fedName, fedInfo)
 {
     // the core object get instantiated in the Federate constructor
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
                                                        this,
                                                        getID(),
                                                        singleThreadFederate);
-    vfManager->useJsonSerialization = fi.useJsonSerialization;
+    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
 }
 ValueFederate::ValueFederate(std::string_view fedName,
                              const std::shared_ptr<Core>& core,
-                             const FederateInfo& fi):
-    Federate(fedName, core, fi)
+                             const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
                                                        this,
                                                        getID(),
                                                        singleThreadFederate);
-    vfManager->useJsonSerialization = fi.useJsonSerialization;
+    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
 }
 
-ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
-    Federate(fedName, core, fi)
+ValueFederate::ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
     vfManager = std::make_unique<ValueFederateManager>(coreObject.get(),
                                                        this,
                                                        getID(),
                                                        singleThreadFederate);
-    vfManager->useJsonSerialization = fi.useJsonSerialization;
+    vfManager->useJsonSerialization = fedInfo.useJsonSerialization;
 }
 
 ValueFederate::ValueFederate(std::string_view fedName, const std::string& configString):
@@ -104,7 +104,7 @@ void ValueFederate::disconnect()
 ValueFederate& ValueFederate::operator=(ValueFederate&& fed) noexcept
 {
     vfManager = std::move(fed.vfManager);
-    if (getID() != fed.getID()) {  // the id won't be moved, as it is copied so use it as a test if
+    if (getID() != fed.getID()) {  // the inp won't be moved, as it is copied so use it as a test if
                                    // it has moved already
         Federate::operator=(std::move(fed));
     }
@@ -213,7 +213,7 @@ static void loadOptions(ValueFederate* fed, const Inp& data, Obj& objUpdate)
 
     addTargets(data, "flags", [&objUpdate, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
-        int val = (target.front() != '-') ? 1 : 0;
+        const int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a valid flag");
             return;
@@ -261,7 +261,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 auto type = fileops::getOrDefault(pub, "type", emptyStr);
                 auto units = fileops::getOrDefault(pub, "unit", emptyStr);
                 fileops::replaceIfMember(pub, "units", units);
-                bool global = fileops::getOrDefault(pub, "global", defaultGlobal);
+                const bool global = fileops::getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubAct = &registerGlobalPublication(name, type, units);
                 } else {
@@ -270,9 +270,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             }
 
             loadOptions(this, pub, *pubAct);
-            auto dt = [pubAct](const std::string& target) { pubAct->addDestinationTarget(target); };
-            addTargetVariations(pub, "destination", "inputs", dt);
-            addTargetVariations(pub, "destination", "targets", dt);
+            auto addDestTarget=[pubAct](const std::string& target) { pubAct->addDestinationTarget(target); };
+            addTargetVariations(pub,"destination","inputs",addDestTarget);
+            addTargetVariations(pub,"destination","targets",addDestTarget);
         }
     }
     if (doc.isMember("subscriptions")) {
@@ -300,9 +300,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 subAct->setDefault(defStr);
             }
             loadOptions(this, sub, *subAct);
-            auto st = [subAct](const std::string& target) { subAct->addSourceTarget(target); };
-            addTargetVariations(sub, "source", "publications", st);
-            addTargetVariations(sub, "source", "targets", st);
+            auto addSourceTarget=[subAct](const std::string& target) { subAct->addSourceTarget(target); };
+            addTargetVariations(sub,"source","publications",addSourceTarget);
+            addTargetVariations(sub,"source","targets",addSourceTarget);
         }
     }
     if (doc.isMember("inputs")) {
@@ -315,7 +315,7 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 auto type = fileops::getOrDefault(ipt, "type", emptyStr);
                 auto units = fileops::getOrDefault(ipt, "unit", emptyStr);
                 fileops::replaceIfMember(ipt, "units", units);
-                bool global = fileops::getOrDefault(ipt, "global", defaultGlobal);
+                const bool global = fileops::getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     inp = &registerGlobalInput(name, type, units);
                 } else {
@@ -327,9 +327,9 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 inp->setDefault(defStr);
             }
             loadOptions(this, ipt, *inp);
-            auto st = [inp](const std::string& target) { inp->addSourceTarget(target); };
-            addTargetVariations(ipt, "source", "publications", st);
-            addTargetVariations(ipt, "source", "targets", st);
+            auto addSourceTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(ipt,"source","publications",addSourceTarget);
+            addTargetVariations(ipt,"source","targets",addSourceTarget);
         }
     }
 }
@@ -364,7 +364,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 auto type = getOrDefault(pub, "type", emptyStr);
                 auto units = getOrDefault(pub, "unit", emptyStr);
                 replaceIfMember(pub, "units", units);
-                bool global = getOrDefault(pub, "global", defaultGlobal);
+                const bool global = getOrDefault(pub, "global", defaultGlobal);
                 if (global) {
                     pubObj = &registerGlobalPublication(name, type, units);
                 } else {
@@ -372,9 +372,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 }
             }
             loadOptions(this, pub, *pubObj);
-            auto dt = [pubObj](const std::string& target) { pubObj->addDestinationTarget(target); };
-            addTargetVariations(pub, "destination", "inputs", dt);
-            addTargetVariations(pub, "destination", "targets", dt);
+            auto addDestTarget=[pubObj](const std::string& target) { pubObj->addDestinationTarget(target); };
+            addTargetVariations(pub,"destination","inputs",addDestTarget);
+            addTargetVariations(pub,"destination","targets",addDestTarget);
         }
     }
     if (isMember(doc, "subscriptions")) {
@@ -393,26 +393,26 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 fileops::replaceIfMember(sub, "target", name);
                 skipNameTarget = true;
             }
-            Input* id = &vfManager->getInputByTarget(name);
-            if (!id->isValid()) {
+            Input* inp = &vfManager->getInputByTarget(name);
+            if (!inp->isValid()) {
                 auto type = getOrDefault(sub, "type", emptyStr);
                 auto units = getOrDefault(sub, "unit", emptyStr);
                 replaceIfMember(sub, "units", units);
 
-                id = &registerInput(emptyStr, type, units);
+                inp = &registerInput(emptyStr, type, units);
                 if (!skipNameTarget) {
                     // this check is to prevent some warnings since targets get added later
-                    id->addTarget(name);
+                    inp->addTarget(name);
                 }
             }
             auto defStr = fileops::getOrDefault(sub, "default", emptyStr);
             if (!defStr.empty()) {
-                id->setDefault(defStr);
+                inp->setDefault(defStr);
             }
-            loadOptions(this, sub, *id);
-            auto dt = [id](const std::string& target) { id->addSourceTarget(target); };
-            addTargetVariations(sub, "source", "publications", dt);
-            addTargetVariations(sub, "source", "targets", dt);
+            loadOptions(this, sub, *inp);
+            auto addDestTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(sub,"source","publications",addDestTarget);
+            addTargetVariations(sub,"source","targets",addDestTarget);
         }
     }
     if (isMember(doc, "inputs")) {
@@ -425,26 +425,26 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
         for (const auto& ipt : iptArray) {
             auto name = fileops::getName(ipt);
 
-            Input* id = &vfManager->getInput(name);
-            if (!id->isValid()) {
+            Input* inp = &vfManager->getInput(name);
+            if (!inp->isValid()) {
                 auto type = getOrDefault(ipt, "type", emptyStr);
                 auto units = getOrDefault(ipt, "unit", emptyStr);
                 replaceIfMember(ipt, "units", units);
                 bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
-                    id = &registerGlobalInput(name, type, units);
+                    inp = &registerGlobalInput(name, type, units);
                 } else {
-                    id = &registerInput(name, type, units);
+                    inp = &registerInput(name, type, units);
                 }
             }
             auto defStr = fileops::getOrDefault(ipt, "default", emptyStr);
             if (!defStr.empty()) {
-                id->setDefault(defStr);
+                inp->setDefault(defStr);
             }
-            loadOptions(this, ipt, *id);
-            auto dt = [id](const std::string& target) { id->addSourceTarget(target); };
-            addTargetVariations(ipt, "source", "publications", dt);
-            addTargetVariations(ipt, "source", "targets", dt);
+            loadOptions(this, ipt, *inp);
+            auto addDestTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(ipt,"source","publications",addDestTarget);
+            addTargetVariations(ipt,"source","targets",addDestTarget);
         }
     }
 }
@@ -476,8 +476,7 @@ static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          char separator,
                          Json::Value val)
 {
-    auto mn = val.getMemberNames();
-    for (auto& name : mn) {
+    for (auto& name : val.getMemberNames()) {
         auto& so = val[name];
         if (so.isObject()) {
             generateData(vpairs, prefix + name + separator, separator, so);
@@ -493,7 +492,7 @@ static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
 
 void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 {
-    auto jv = [&]() {
+    auto json = [&]() {
         try {
             return fileops::loadJson(jsonString);
         }
@@ -503,14 +502,14 @@ void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
     }();
 
     std::vector<std::pair<std::string, dvalue>> vpairs;
-    generateData(vpairs, "", nameSegmentSeparator, jv);
+    generateData(vpairs, "", nameSegmentSeparator, json);
 
-    for (auto& vp : vpairs) {
+    for (auto& value : vpairs) {
         try {
-            if (vp.second.index() == 0) {
-                registerPublication<double>(vp.first);
+            if (value.second.index() == 0) {
+                registerPublication<double>(value.first);
             } else {
-                registerPublication<std::string>(vp.first);
+                registerPublication<std::string>(value.first);
             }
         }
         catch (const helics::RegistrationFailure&) {
@@ -521,7 +520,7 @@ void ValueFederate::registerFromPublicationJSON(const std::string& jsonString)
 
 void ValueFederate::publishJSON(const std::string& jsonString)
 {
-    auto jv = [&]() {
+    auto json = [&]() {
         try {
             return fileops::loadJson(jsonString);
         }
@@ -530,15 +529,15 @@ void ValueFederate::publishJSON(const std::string& jsonString)
         }
     }();
     std::vector<std::pair<std::string, dvalue>> vpairs;
-    generateData(vpairs, "", nameSegmentSeparator, jv);
+    generateData(vpairs, "", nameSegmentSeparator, json);
 
-    for (auto& vp : vpairs) {
-        auto& pub = getPublication(vp.first);
+    for (auto& value : vpairs) {
+        auto& pub = getPublication(value.first);
         if (pub.isValid()) {
-            if (vp.second.index() == 0) {
-                pub.publish(std::get<double>(vp.second));
+            if (value.second.index() == 0) {
+                pub.publish(std::get<double>(value.second));
             } else {
-                pub.publish(std::get<std::string>(vp.second));
+                pub.publish(std::get<std::string>(value.second));
             }
         }
     }
