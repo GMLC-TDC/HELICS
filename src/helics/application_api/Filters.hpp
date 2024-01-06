@@ -68,7 +68,7 @@ class HELICS_CXX_EXPORT Filter: public Interface {
     /** check if the filter is a cloning filter*/
     bool isCloningFilter() const { return cloning; }
     /** set a message operator to process the message*/
-    void setOperator(std::shared_ptr<FilterOperator> mo);
+    void setOperator(std::shared_ptr<FilterOperator> filterOp);
 
     virtual const std::string& getDisplayName() const override { return getName(); }
 

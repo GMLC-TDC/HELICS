@@ -485,14 +485,14 @@ static void generateData(std::vector<std::pair<std::string, dvalue>>& vpairs,
                          Json::Value val)
 {
     for (auto& name : val.getMemberNames()) {
-        auto& so = val[name];
-        if (so.isObject()) {
-            generateData(vpairs, prefix + name + separator, separator, so);
+        auto& field = val[name];
+        if (field.isObject()) {
+            generateData(vpairs, prefix + name + separator, separator, field);
         } else {
-            if (so.isDouble()) {
-                vpairs.emplace_back(prefix + name, so.asDouble());
+            if (field.isDouble()) {
+                vpairs.emplace_back(prefix + name, field.asDouble());
             } else {
-                vpairs.emplace_back(prefix + name, so.asString());
+                vpairs.emplace_back(prefix + name, field.asString());
             }
         }
     }

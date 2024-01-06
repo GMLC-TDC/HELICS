@@ -43,12 +43,12 @@ void addOperations(Translator* trans, TranslatorTypes type)
         default:
             break;
         case TranslatorTypes::JSON: {
-            auto op = std::make_shared<JsonTranslatorOperation>();
-            trans->setTranslatorOperations(std::move(op));
+            auto operation = std::make_shared<JsonTranslatorOperation>();
+            trans->setTranslatorOperations(std::move(operation));
         } break;
         case TranslatorTypes::BINARY: {
-            auto op = std::make_shared<BinaryTranslatorOperation>();
-            trans->setTranslatorOperations(std::move(op));
+            auto operation = std::make_shared<BinaryTranslatorOperation>();
+            trans->setTranslatorOperations(std::move(operation));
         } break;
     }
 }
@@ -71,10 +71,10 @@ Translator::Translator(Core* core, const std::string_view translatorName):
     }
 }
 
-void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
+void Translator::setOperator(std::shared_ptr<TranslatorOperator> operation)
 {
-    if (mo) {
-        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(std::move(mo)));
+    if (operation) {
+        setTranslatorOperations(std::make_shared<CustomTranslatorOperation>(std::move(operation)));
     } else {
         setTranslatorOperations(nullptr);
     }

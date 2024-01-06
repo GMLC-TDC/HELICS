@@ -13,8 +13,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 namespace helics {
 
-Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle id):
-    Interface(mFed, id, name), fed(mFed)
+Endpoint::Endpoint(MessageFederate* mFed, std::string_view name, InterfaceHandle hid):
+    Interface(mFed, hid, name), fed(mFed)
 {
 }
 

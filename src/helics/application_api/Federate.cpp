@@ -1558,7 +1558,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
             const bool global = getOrDefault(filt, "global", defaultGlobal);
-            std::string operation = getOrDefault(filt, "operation", std::string("custom"));
+            const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
             if (!checkValidFilterType(useTypes, opType, operation)) {
@@ -1592,7 +1592,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
         }
         auto& transArray = transs.as_array();
         for (const auto& trans : transArray) {
-            std::string key = getOrDefault(trans, "name", emptyStr);
+            const std::string key = getOrDefault(trans, "name", emptyStr);
 
             std::string ttype = getOrDefault(trans, "type", std::string("custom"));
             auto opType = translatorTypeFromString(ttype);
@@ -1603,7 +1603,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 
             if (opType == TranslatorTypes::UNRECOGNIZED) {
                 if (strictConfigChecking) {
-                    std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
+                    const std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
                     logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
                     throw(InvalidParameter(emessage));
