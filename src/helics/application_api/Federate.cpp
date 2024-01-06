@@ -1603,7 +1603,8 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
 
             if (opType == TranslatorTypes::UNRECOGNIZED) {
                 if (strictConfigChecking) {
-                    const std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
+                    const std::string emessage =
+                        fmt::format("unrecognized translator type:{}", ttype);
                     logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
                     throw(InvalidParameter(emessage));
