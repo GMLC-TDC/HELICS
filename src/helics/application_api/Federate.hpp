@@ -856,7 +856,8 @@ received
     /** check if a filter type and operation is valid
     if strict is true throw an error
     */
-    bool checkValidFilterType(bool useTypes,FilterTypes opType, const std::string& operation) const;
+    bool
+        checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const;
 };
 
 /** base class for the interface objects*/

@@ -1256,7 +1256,9 @@ static void arrayPairProcess(Json::Value doc,
     }
 }
 
-bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const
+bool Federate::checkValidFilterType(bool useTypes,
+                                    FilterTypes opType,
+                                    const std::string& operation) const
 {
     if ((useTypes) && (operation != "custom")) {
         if (strictConfigChecking) {
@@ -1286,25 +1288,23 @@ bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std
     return true;
 }
 
-template <class INTERFACE>
-static void loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Value& json, bool strict)
+template<class INTERFACE>
+static void
+    loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Value& json, bool strict)
 {
-    static constexpr std::string_view errorMessage=R"(interface properties require "name" and "value" fields)";
+    static constexpr std::string_view errorMessage =
+        R"(interface properties require "name" and "value" fields)";
     if (json.isMember("properties")) {
         auto props = json["properties"];
         if (props.isArray()) {
             for (const auto& prop : props) {
                 if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
                     if (strict) {
-                        fed->logMessage(
-                            HELICS_LOG_LEVEL_ERROR,
-                            errorMessage);
+                        fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
-                        throw(InvalidParameter(
-                            errorMessage));
+                        throw(InvalidParameter(errorMessage));
                     }
-                    fed->logMessage(HELICS_LOG_LEVEL_WARNING,
-                        errorMessage);
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
                     continue;
                 }
                 if (prop["value"].isDouble()) {
@@ -1316,17 +1316,12 @@ static void loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Valu
         } else {
             if ((!props.isMember("name")) || (!props.isMember("value"))) {
                 if (strict) {
-                    fed->logMessage(HELICS_LOG_LEVEL_ERROR,
-                        errorMessage);
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
-                    throw(InvalidParameter(
-                        errorMessage));
+                    throw(InvalidParameter(errorMessage));
                 }
-                fed->logMessage(HELICS_LOG_LEVEL_WARNING,
-                    errorMessage);
-            }
-            else
-            {
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+            } else {
                 if (props["value"].isDouble()) {
                     iface.set(props["name"].asString(), props["value"].asDouble());
                 } else {
@@ -1379,7 +1374,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                 });
             }
 
-            loadPropertiesJson(this,filter,filt,strictConfigChecking);
+            loadPropertiesJson(this, filter, filt, strictConfigChecking);
         }
     }
     if (doc.isMember("translators")) {
@@ -1395,7 +1390,8 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 
             if (opType == TranslatorTypes::UNRECOGNIZED) {
                 if (strictConfigChecking) {
-                    const std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
+                    const std::string emessage =
+                        fmt::format("unrecognized translator type:{}", ttype);
                     logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
                     throw(InvalidParameter(emessage));
@@ -1443,7 +1439,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                                 [&translator](const std::string& target) {
                                     translator.addDestinationFilter(target);
                                 });
-            loadPropertiesJson(this,translator,trans,strictConfigChecking);
+            loadPropertiesJson(this, translator, trans, strictConfigChecking);
         }
     }
     arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
@@ -1478,11 +1474,12 @@ static void arrayPairProcess(toml::value doc,
     }
 }
 
-
-template <class INTERFACE>
-static void loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::value& data, bool strict)
+template<class INTERFACE>
+static void
+    loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::value& data, bool strict)
 {
-    static constexpr std::string_view errorMessage=R"(interface properties require "name" and "value" fields)";
+    static constexpr std::string_view errorMessage =
+        R"(interface properties require "name" and "value" fields)";
     if (fileops::isMember(data, "properties")) {
         auto props = toml::find(data, "properties");
         if (props.is_array()) {
@@ -1495,22 +1492,17 @@ static void loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::valu
 
                 if ((propname.empty()) || (propval.is_uninitialized())) {
                     if (strict) {
-                        fed->logMessage(
-                            HELICS_LOG_LEVEL_ERROR,
-                            errorMessage);
+                        fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
-                        throw(InvalidParameter(
-                            errorMessage));
+                        throw(InvalidParameter(errorMessage));
                     }
-                    fed->logMessage(HELICS_LOG_LEVEL_WARNING,
-                        errorMessage);
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
                     continue;
                 }
                 if (propval.is_floating()) {
                     iface.set(propname, propval.as_floating());
                 } else {
-                    iface.setString(propname,
-                        static_cast<std::string_view>(propval.as_string()));
+                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
                 }
             }
         } else {
@@ -1521,25 +1513,18 @@ static void loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::valu
 
             if ((propname.empty()) || (propval.is_uninitialized())) {
                 if (strict) {
-                    fed->logMessage(HELICS_LOG_LEVEL_ERROR,
-                        errorMessage);
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR, errorMessage);
 
-                    throw(InvalidParameter(
-                        errorMessage));
+                    throw(InvalidParameter(errorMessage));
                 }
-                fed->logMessage(HELICS_LOG_LEVEL_WARNING,
-                    errorMessage);
-            }
-            else
-            {
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING, errorMessage);
+            } else {
                 if (propval.is_floating()) {
                     iface.set(propname, propval.as_floating());
                 } else {
-                    iface.setString(propname,
-                        static_cast<std::string_view>(propval.as_string()));
+                    iface.setString(propname, static_cast<std::string_view>(propval.as_string()));
                 }
             }
-            
         }
     }
 }
@@ -1597,7 +1582,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-            loadPropertiesToml(this,filter,filt,strictConfigChecking);
+            loadPropertiesToml(this, filter, filt, strictConfigChecking);
         }
     }
     if (isMember(doc, "translators")) {
@@ -1666,7 +1651,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                                 [&translator](const std::string& target) {
                                     translator.addDestinationFilter(target);
                                 });
-            loadPropertiesToml(this,translator,trans,strictConfigChecking);
+            loadPropertiesToml(this, translator, trans, strictConfigChecking);
         }
     }
     if (isMember(doc, "globals")) {
