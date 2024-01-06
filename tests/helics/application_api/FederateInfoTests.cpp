@@ -65,11 +65,11 @@ TEST(federateInfo, loadArgs1)
         argv[ii] = args[ii].data();
     }
 
-    helics::FederateInfo f1;
-    f1.loadInfoFromArgs(7, argv);
-    EXPECT_EQ(f1.coreType, helics::CoreType::ZMQ);
-    EXPECT_EQ(f1.defName, "f2");
-    EXPECT_EQ(f1.flagProps.size(), 3U);
+    helics::FederateInfo fedInfo;
+    fedInfo.loadInfoFromArgs(7, argv);
+    EXPECT_EQ(fedInfo.coreType, helics::CoreType::ZMQ);
+    EXPECT_EQ(fedInfo.defName, "f2");
+    EXPECT_EQ(fedInfo.flagProps.size(), 3U);
 }
 
 TEST(federateInfo, constructor3)

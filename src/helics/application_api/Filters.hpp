@@ -162,23 +162,23 @@ HELICS_CXX_EXPORT Filter& make_filter(InterfaceVisibility locality,
 
 /** create a filter
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, Core* cr, std::string_view name = EMPTY_STRING);
+    make_filter(FilterTypes type, Core* core, std::string_view name = EMPTY_STRING);
 
 /** create a filter
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
 the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<Filter>
-    make_filter(FilterTypes type, CoreApp& cr, std::string_view name = EMPTY_STRING);
+    make_filter(FilterTypes type, CoreApp& core, std::string_view name = EMPTY_STRING);
 
 /** create a  filter
 @param type the type of filter to create
@@ -210,7 +210,7 @@ HELICS_CXX_EXPORT CloningFilter& make_cloning_filter(InterfaceVisibility localit
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
@@ -218,13 +218,13 @@ the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
-                        Core* cr,
+                        Core* core,
                         std::string_view delivery,
                         std::string_view name = EMPTY_STRING);
 
 /** create a cloning filter with a delivery location
 @param type the type of filter to create
-@param cr the core to create the filter through
+@param core the core to create the filter through
 @param delivery the endpoint to deliver the cloned message to
 @param name the name of the filter (optional)
 @return a unique pointer to a source Filter object,  note destroying the object does not deactivate
@@ -232,7 +232,7 @@ the filter
 */
 HELICS_CXX_EXPORT std::unique_ptr<CloningFilter>
     make_cloning_filter(FilterTypes type,
-                        CoreApp& cr,
+                        CoreApp& core,
                         std::string_view delivery,
                         std::string_view name = EMPTY_STRING);
 

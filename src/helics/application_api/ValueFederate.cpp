@@ -438,7 +438,7 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 auto type = getOrDefault(ipt, "type", emptyStr);
                 auto units = getOrDefault(ipt, "unit", emptyStr);
                 replaceIfMember(ipt, "units", units);
-                bool global = getOrDefault(ipt, "global", defaultGlobal);
+                const bool global = getOrDefault(ipt, "global", defaultGlobal);
                 if (global) {
                     inp = &registerGlobalInput(name, type, units);
                 } else {

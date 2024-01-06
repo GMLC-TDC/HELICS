@@ -537,17 +537,17 @@ TEST_F(TranslatorFixture, translator_to_message)
     auto tres = cFed1->requestTime(2.0);
     EXPECT_LT(tres, 2.0);
     EXPECT_TRUE(endpoint1.hasMessage());
-    auto m = endpoint1.getMessage();
+    auto message = endpoint1.getMessage();
 
     cFed1->finalize();
-    ASSERT_TRUE(m);
+    ASSERT_TRUE(message);
 
-    auto b = helics::fileops::loadJsonStr(m->data.to_string());
+    auto json = helics::fileops::loadJsonStr(message->data.to_string());
 
-    ASSERT_TRUE(b.isMember("value"));
-    ASSERT_TRUE(b.isMember("type"));
-    EXPECT_DOUBLE_EQ(b["value"].asDouble(), 20.7);
-    EXPECT_STREQ(b["type"].asCString(), "double");
+    ASSERT_TRUE(json.isMember("value"));
+    ASSERT_TRUE(json.isMember("type"));
+    EXPECT_DOUBLE_EQ(json["value"].asDouble(), 20.7);
+    EXPECT_STREQ(json["type"].asCString(), "double");
     FullDisconnect();
 }
 

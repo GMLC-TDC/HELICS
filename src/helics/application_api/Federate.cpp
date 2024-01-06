@@ -1256,7 +1256,7 @@ static void arrayPairProcess(Json::Value doc,
     }
 }
 
-bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation)
+bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation) const
 {
     if ((useTypes) && (operation != "custom")) {
         if (strictConfigChecking) {
@@ -1284,6 +1284,57 @@ bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std
         }
     }
     return true;
+}
+
+template <class INTERFACE>
+static void loadPropertiesJson(Federate* fed, INTERFACE& iface, const Json::Value& json, bool strict)
+{
+    static constexpr std::string_view errorMessage=R"(interface properties require "name" and "value" fields)";
+    if (json.isMember("properties")) {
+        auto props = json["properties"];
+        if (props.isArray()) {
+            for (const auto& prop : props) {
+                if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
+                    if (strict) {
+                        fed->logMessage(
+                            HELICS_LOG_LEVEL_ERROR,
+                            errorMessage);
+
+                        throw(InvalidParameter(
+                            errorMessage));
+                    }
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING,
+                        errorMessage);
+                    continue;
+                }
+                if (prop["value"].isDouble()) {
+                    iface.set(prop["name"].asString(), prop["value"].asDouble());
+                } else {
+                    iface.setString(prop["name"].asString(), prop["value"].asString());
+                }
+            }
+        } else {
+            if ((!props.isMember("name")) || (!props.isMember("value"))) {
+                if (strict) {
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR,
+                        errorMessage);
+
+                    throw(InvalidParameter(
+                        errorMessage));
+                }
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING,
+                    errorMessage);
+            }
+            else
+            {
+                if (props["value"].isDouble()) {
+                    iface.set(props["name"].asString(), props["value"].asDouble());
+                } else {
+                    iface.setString(props["name"].asString(), props["value"].asString());
+                }
+            }
+        }
+    }
 }
 
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
@@ -1328,49 +1379,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                 });
             }
 
-            if (filt.isMember("properties")) {
-                auto props = filt["properties"];
-                if (props.isArray()) {
-                    for (const auto& prop : props) {
-                        if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(filter properties require "name" and "value" fields)");
-
-                                throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
-                            }
-                            logMessage(HELICS_LOG_LEVEL_WARNING,
-                                       R"(filter properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (prop["value"].isDouble()) {
-                            filter.set(prop["name"].asString(), prop["value"].asDouble());
-                        } else {
-                            filter.setString(prop["name"].asString(), prop["value"].asString());
-                        }
-                    }
-                } else {
-                    if ((!props.isMember("name")) || (!props.isMember("value"))) {
-                        if (strictConfigChecking) {
-                            logMessage(HELICS_LOG_LEVEL_ERROR,
-                                       R"(filter properties require "name" and "value" fields)");
-
-                            throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(filter properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (props["value"].isDouble()) {
-                        filter.set(props["name"].asString(), props["value"].asDouble());
-                    } else {
-                        filter.setString(props["name"].asString(), props["value"].asString());
-                    }
-                }
-            }
+            loadPropertiesJson(this,filter,filt,strictConfigChecking);
         }
     }
     if (doc.isMember("translators")) {
@@ -1382,17 +1391,17 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
             auto units = fileops::getOrDefault(trans, "unit", emptyStr);
             fileops::replaceIfMember(trans, "units", units);
-            bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
 
             if (opType == TranslatorTypes::UNRECOGNIZED) {
                 if (strictConfigChecking) {
-                    std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
+                    const std::string emessage = fmt::format("unrecognized translator type:{}", ttype);
                     logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
 
                     throw(InvalidParameter(emessage));
                 }
                 logMessage(HELICS_LOG_LEVEL_WARNING,
-                           fmt::format("unrecognized filter operation:{}", ttype));
+                           fmt::format("unrecognized translator operation:{}", ttype));
                 continue;
             }
             auto& translator = generateTranslator(this, global, key, opType, etype, units);
@@ -1434,52 +1443,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
                                 [&translator](const std::string& target) {
                                     translator.addDestinationFilter(target);
                                 });
-
-            if (trans.isMember("properties")) {
-                auto props = trans["properties"];
-                if (props.isArray()) {
-                    for (const auto& prop : props) {
-                        if ((!prop.isMember("name")) || (!prop.isMember("value"))) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(translator properties require "name" and "value" fields)");
-
-                                throw(InvalidParameter(
-                                    R"(translator properties require "name" and "value" fields)"));
-                            }
-                            logMessage(
-                                HELICS_LOG_LEVEL_WARNING,
-                                R"(translator properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (prop["value"].isDouble()) {
-                            translator.set(prop["name"].asString(), prop["value"].asDouble());
-                        } else {
-                            translator.setString(prop["name"].asString(), prop["value"].asString());
-                        }
-                    }
-                } else {
-                    if ((!props.isMember("name")) || (!props.isMember("value"))) {
-                        if (strictConfigChecking) {
-                            logMessage(
-                                HELICS_LOG_LEVEL_ERROR,
-                                R"(translator properties require "name" and "value" fields)");
-
-                            throw(InvalidParameter(
-                                R"(translator properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(translator properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (props["value"].isDouble()) {
-                        translator.set(props["name"].asString(), props["value"].asDouble());
-                    } else {
-                        translator.setString(props["name"].asString(), props["value"].asString());
-                    }
-                }
-            }
+            loadPropertiesJson(this,translator,trans,strictConfigChecking);
         }
     }
     arrayPairProcess(doc, "globals", [this](std::string_view key, std::string_view val) {
@@ -1510,6 +1474,72 @@ static void arrayPairProcess(toml::value doc,
             for (const auto& val : info.as_table()) {
                 pairOp(val.first, static_cast<std::string_view>(val.second.as_string()));
             }
+        }
+    }
+}
+
+
+template <class INTERFACE>
+static void loadPropertiesToml(Federate* fed, INTERFACE& iface, const toml::value& data, bool strict)
+{
+    static constexpr std::string_view errorMessage=R"(interface properties require "name" and "value" fields)";
+    if (fileops::isMember(data, "properties")) {
+        auto props = toml::find(data, "properties");
+        if (props.is_array()) {
+            auto& propArray = props.as_array();
+            for (const auto& prop : propArray) {
+                std::string propname;
+                propname = toml::find_or(prop, "name", propname);
+                const toml::value uVal;
+                auto propval = toml::find_or(prop, "value", uVal);
+
+                if ((propname.empty()) || (propval.is_uninitialized())) {
+                    if (strict) {
+                        fed->logMessage(
+                            HELICS_LOG_LEVEL_ERROR,
+                            errorMessage);
+
+                        throw(InvalidParameter(
+                            errorMessage));
+                    }
+                    fed->logMessage(HELICS_LOG_LEVEL_WARNING,
+                        errorMessage);
+                    continue;
+                }
+                if (propval.is_floating()) {
+                    iface.set(propname, propval.as_floating());
+                } else {
+                    iface.setString(propname,
+                        static_cast<std::string_view>(propval.as_string()));
+                }
+            }
+        } else {
+            std::string propname;
+            propname = toml::find_or(props, "name", propname);
+            toml::value uVal;
+            auto propval = toml::find_or(props, "value", uVal);
+
+            if ((propname.empty()) || (propval.is_uninitialized())) {
+                if (strict) {
+                    fed->logMessage(HELICS_LOG_LEVEL_ERROR,
+                        errorMessage);
+
+                    throw(InvalidParameter(
+                        errorMessage));
+                }
+                fed->logMessage(HELICS_LOG_LEVEL_WARNING,
+                    errorMessage);
+            }
+            else
+            {
+                if (propval.is_floating()) {
+                    iface.set(propname, propval.as_floating());
+                } else {
+                    iface.setString(propname,
+                        static_cast<std::string_view>(propval.as_string()));
+                }
+            }
+            
         }
     }
 }
@@ -1567,62 +1597,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                     static_cast<CloningFilter&>(filter).addDeliveryEndpoint(target);
                 });
             }
-            if (isMember(filt, "properties")) {
-                auto props = toml::find(filt, "properties");
-                if (props.is_array()) {
-                    auto& propArray = props.as_array();
-                    for (const auto& prop : propArray) {
-                        std::string propname;
-                        propname = toml::find_or(prop, "name", propname);
-                        const toml::value uVal;
-                        auto propval = toml::find_or(prop, "value", uVal);
-
-                        if ((propname.empty()) || (propval.is_uninitialized())) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(filter properties require "name" and "value" fields)");
-
-                                throw(InvalidParameter(
-                                    R"(filter properties require "name" and "value" fields)"));
-                            }
-                            logMessage(HELICS_LOG_LEVEL_WARNING,
-                                       R"(filter properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (propval.is_floating()) {
-                            filter.set(propname, propval.as_floating());
-                        } else {
-                            filter.setString(propname,
-                                             static_cast<std::string_view>(propval.as_string()));
-                        }
-                    }
-                } else {
-                    std::string propname;
-                    propname = toml::find_or(props, "name", propname);
-                    toml::value uVal;
-                    auto propval = toml::find_or(props, "value", uVal);
-
-                    if ((propname.empty()) || (propval.is_uninitialized())) {
-                        if (strictConfigChecking) {
-                            logMessage(HELICS_LOG_LEVEL_ERROR,
-                                       R"(filter properties require "name" and "value" fields)");
-
-                            throw(InvalidParameter(
-                                R"(filter properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(filter properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (propval.is_floating()) {
-                        filter.set(propname, propval.as_floating());
-                    } else {
-                        filter.setString(propname,
-                                         static_cast<std::string_view>(propval.as_string()));
-                    }
-                }
-            }
+            loadPropertiesToml(this,filter,filt,strictConfigChecking);
         }
     }
     if (isMember(doc, "translators")) {
@@ -1639,7 +1614,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             auto etype = fileops::getOrDefault(trans, "endpointtype", emptyStr);
             auto units = fileops::getOrDefault(trans, "unit", emptyStr);
             fileops::replaceIfMember(trans, "units", units);
-            bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(trans, "global", defaultGlobal);
 
             if (opType == TranslatorTypes::UNRECOGNIZED) {
                 if (strictConfigChecking) {
@@ -1691,66 +1666,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
                                 [&translator](const std::string& target) {
                                     translator.addDestinationFilter(target);
                                 });
-
-            if (isMember(trans, "properties")) {
-                auto props = toml::find(trans, "properties");
-                if (props.is_array()) {
-                    auto& propArray = props.as_array();
-                    for (const auto& prop : propArray) {
-                        std::string propname;
-                        propname = toml::find_or(prop, "name", propname);
-                        toml::value uVal;
-                        auto propval = toml::find_or(prop, "value", uVal);
-
-                        if ((propname.empty()) || (propval.is_uninitialized())) {
-                            if (strictConfigChecking) {
-                                logMessage(
-                                    HELICS_LOG_LEVEL_ERROR,
-                                    R"(translator properties require "name" and "value" fields)");
-
-                                throw(InvalidParameter(
-                                    R"(translator properties require "name" and "value" fields)"));
-                            }
-                            logMessage(
-                                HELICS_LOG_LEVEL_WARNING,
-                                R"(translator properties require "name" and "value" fields)");
-                            continue;
-                        }
-                        if (propval.is_floating()) {
-                            translator.set(propname, propval.as_floating());
-                        } else {
-                            translator.setString(propname,
-                                                 static_cast<std::string_view>(
-                                                     propval.as_string()));
-                        }
-                    }
-                } else {
-                    std::string propname;
-                    propname = toml::find_or(props, "name", propname);
-                    toml::value uVal;
-                    auto propval = toml::find_or(props, "value", uVal);
-
-                    if ((propname.empty()) || (propval.is_uninitialized())) {
-                        if (strictConfigChecking) {
-                            logMessage(
-                                HELICS_LOG_LEVEL_ERROR,
-                                R"(translator properties require "name" and "value" fields)");
-
-                            throw(InvalidParameter(
-                                R"(translator properties require "name" and "value" fields)"));
-                        }
-                        logMessage(HELICS_LOG_LEVEL_WARNING,
-                                   R"(translator properties require "name" and "value" fields)");
-                        continue;
-                    }
-                    if (propval.is_floating()) {
-                        translator.set(propname, propval.as_floating());
-                    } else {
-                        translator.setString(propname,
-                                             static_cast<std::string_view>(propval.as_string()));
-                    }
-                }
-            }
+            loadPropertiesToml(this,translator,trans,strictConfigChecking);
         }
     }
     if (isMember(doc, "globals")) {
@@ -2063,99 +1979,99 @@ Interface::Interface(Federate* federate, InterfaceHandle hid, std::string_view a
     if (federate != nullptr) {
         const auto& crp = federate->getCorePointer();
         if (crp) {
-            cr = crp.get();
+            mCore = crp.get();
         }
     }
 }
 
 const std::string& Interface::getName() const
 {
-    return cr->getHandleName(handle);
+    return mCore->getHandleName(handle);
 }
 
 const std::string& Interface::getTarget() const
 {
-    return cr->getSourceTargets(handle);
+    return mCore->getSourceTargets(handle);
 }
 
 void Interface::addSourceTarget(std::string_view newTarget, InterfaceType hint)
 {
-    cr->addSourceTarget(handle, newTarget, hint);
+    mCore->addSourceTarget(handle, newTarget, hint);
 }
 
 void Interface::addDestinationTarget(std::string_view newTarget, InterfaceType hint)
 {
-    cr->addDestinationTarget(handle, newTarget, hint);
+    mCore->addDestinationTarget(handle, newTarget, hint);
 }
 
 void Interface::removeTarget(std::string_view targetToRemove)
 {
-    cr->removeTarget(handle, targetToRemove);
+    mCore->removeTarget(handle, targetToRemove);
 }
 
 void Interface::addAlias(std::string_view alias)
 {
-    cr->addAlias(getName(), alias);
+    mCore->addAlias(getName(), alias);
 }
 
 const std::string& Interface::getInfo() const
 {
-    return cr->getInterfaceInfo(handle);
+    return mCore->getInterfaceInfo(handle);
 }
 
 void Interface::setInfo(std::string_view info)
 {
-    cr->setInterfaceInfo(handle, info);
+    mCore->setInterfaceInfo(handle, info);
 }
 
 const std::string& Interface::getTag(std::string_view tag) const
 {
-    return cr->getInterfaceTag(handle, tag);
+    return mCore->getInterfaceTag(handle, tag);
 }
 
 void Interface::setTag(std::string_view tag, std::string_view value)
 {
-    cr->setInterfaceTag(handle, tag, value);
+    mCore->setInterfaceTag(handle, tag, value);
 }
 
 void Interface::setOption(int32_t option, int32_t value)
 {
-    cr->setHandleOption(handle, option, value);
+    mCore->setHandleOption(handle, option, value);
 }
 
 int32_t Interface::getOption(int32_t option) const
 {
-    return cr->getHandleOption(handle, option);
+    return mCore->getHandleOption(handle, option);
 }
 
 const std::string& Interface::getInjectionType() const
 {
-    return cr->getInjectionType(handle);
+    return mCore->getInjectionType(handle);
 }
 
 const std::string& Interface::getExtractionType() const
 {
-    return cr->getExtractionType(handle);
+    return mCore->getExtractionType(handle);
 }
 
 const std::string& Interface::getInjectionUnits() const
 {
-    return cr->getInjectionUnits(handle);
+    return mCore->getInjectionUnits(handle);
 }
 
 const std::string& Interface::getExtractionUnits() const
 {
-    return cr->getExtractionUnits(handle);
+    return mCore->getExtractionUnits(handle);
 }
 
 const std::string& Interface::getSourceTargets() const
 {
-    return cr->getSourceTargets(handle);
+    return mCore->getSourceTargets(handle);
 }
 
 const std::string& Interface::getDestinationTargets() const
 {
-    return cr->getDestinationTargets(handle);
+    return mCore->getDestinationTargets(handle);
 }
 
 const std::string& Interface::getDisplayName() const
@@ -2165,13 +2081,13 @@ const std::string& Interface::getDisplayName() const
 
 void Interface::close()
 {
-    cr->closeHandle(handle);
-    cr = CoreFactory::getEmptyCorePtr();
+    mCore->closeHandle(handle);
+    mCore = CoreFactory::getEmptyCorePtr();
 }
 
 void Interface::disconnectFromCore()
 {
-    cr = CoreFactory::getEmptyCorePtr();
+    mCore = CoreFactory::getEmptyCorePtr();
 }
 
 }  // namespace helics

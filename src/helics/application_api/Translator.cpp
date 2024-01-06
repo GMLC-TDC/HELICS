@@ -66,8 +66,8 @@ Translator::Translator(Core* core, std::string_view translatorName, InterfaceHan
 Translator::Translator(Core* core, const std::string_view translatorName):
     Interface(core, InterfaceHandle(), translatorName)
 {
-    if (cr != nullptr) {
-        handle = cr->registerTranslator(translatorName, std::string_view{}, std::string_view{});
+    if (mCore != nullptr) {
+        handle = mCore->registerTranslator(translatorName, std::string_view{}, std::string_view{});
     }
 }
 
@@ -83,8 +83,8 @@ void Translator::setOperator(std::shared_ptr<TranslatorOperator> mo)
 void Translator::setTranslatorOperations(std::shared_ptr<TranslatorOperations> translatorOps)
 {
     transOp = std::move(translatorOps);
-    if (cr != nullptr) {
-        cr->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
+    if (mCore != nullptr) {
+        mCore->setTranslatorOperator(handle, (transOp) ? transOp->getOperator() : nullptr);
     }
 }
 

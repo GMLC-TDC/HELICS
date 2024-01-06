@@ -111,18 +111,18 @@ Filter::Filter(InterfaceVisibility locality, Federate* ffed, std::string_view fi
 
 Filter::Filter(Core* core, std::string_view filtName): Interface(core, InterfaceHandle(), filtName)
 {
-    handle = cr->registerFilter(filtName, std::string_view{}, std::string_view{});
+    handle = core->registerFilter(filtName, std::string_view{}, std::string_view{});
 }
 
 void Filter::setOperator(std::shared_ptr<FilterOperator> filterOp)
 {
-    cr->setFilterOperator(handle, std::move(filterOp));
+    mCore->setFilterOperator(handle, std::move(filterOp));
 }
 
 void Filter::setFilterOperations(std::shared_ptr<FilterOperations> filterOps)
 {
     filtOp = std::move(filterOps);
-    cr->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
+    mCore->setFilterOperator(handle, (filtOp) ? filtOp->getOperator() : nullptr);
 }
 
 void Filter::set(std::string_view property, double val)
@@ -142,7 +142,7 @@ void Filter::setString(std::string_view property, std::string_view val)
 CloningFilter::CloningFilter(Core* core, std::string_view filtName):
     Filter(core, filtName, InterfaceHandle())
 {
-    handle = cr->registerCloningFilter(filtName, std::string_view(), std::string_view());
+    handle = mCore->registerCloningFilter(filtName, std::string_view(), std::string_view());
     setFilterOperations(std::make_shared<CloneFilterOperation>());
 }
 
@@ -299,12 +299,12 @@ std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
 }
 
 std::unique_ptr<CloningFilter> make_cloning_filter(FilterTypes type,
-                                                   CoreApp& cr,
+                                                   CoreApp& core,
                                                    std::string_view delivery,
                                                    std::string_view name)
 
 {
-    return make_cloning_filter(type, cr.getCopyofCorePointer().get(), delivery, name);
+    return make_cloning_filter(type, core.getCopyofCorePointer().get(), delivery, name);
 }
 
 }  // namespace helics
