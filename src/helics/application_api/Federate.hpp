@@ -40,6 +40,7 @@ class Filter;
 class Translator;
 class CloningFilter;
 class Federate;
+enum class FilterTypes;
 
 /** base class for a federate in the application API
  */
@@ -852,6 +853,10 @@ received
     @param tomlString  the location of the file or config String to load to generate the interfaces
     */
     void registerConnectorInterfacesToml(const std::string& tomlString);
+    /** check if a filter type and operation is valid
+    if strict is true throw an error
+    */
+    bool checkValidFilterType(bool useTypes,FilterTypes opType, const std::string& operation);
 };
 
 /** base class for the interface objects*/

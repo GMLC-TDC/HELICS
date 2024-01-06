@@ -18,8 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <utility>
 
 namespace helics {
-MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fi):
-    Federate(fedName, fi)
+MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& fedInfo):
+    Federate(fedName, fedInfo)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
                                                          this,
@@ -28,8 +28,8 @@ MessageFederate::MessageFederate(std::string_view fedName, const FederateInfo& f
 }
 MessageFederate::MessageFederate(std::string_view fedName,
                                  const std::shared_ptr<Core>& core,
-                                 const FederateInfo& fi):
-    Federate(fedName, core, fi)
+                                 const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
                                                          this,
@@ -37,8 +37,8 @@ MessageFederate::MessageFederate(std::string_view fedName,
                                                          singleThreadFederate);
 }
 
-MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fi):
-    Federate(fedName, core, fi)
+MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo):
+    Federate(fedName, core, fedInfo)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),
                                                          this,
@@ -171,7 +171,7 @@ static void loadOptions(MessageFederate* fed, const Inp& data, Endpoint& ept)
     using fileops::getOrDefault;
     addTargets(data, "flags", [&ept, fed](const std::string& target) {
         auto oindex = getOptionIndex((target.front() != '-') ? target : target.substr(1));
-        int val = (target.front() != '-') ? 1 : 0;
+        const int val = (target.front() != '-') ? 1 : 0;
         if (oindex == HELICS_INVALID_OPTION_INDEX) {
             fed->logWarningMessage(target + " is not a recognized flag");
             return;
@@ -228,7 +228,7 @@ void MessageFederate::registerMessageInterfacesJson(const std::string& jsonStrin
         for (const auto& ept : doc["endpoints"]) {
             auto eptName = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
-            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(eptName, type) : registerEndpoint(eptName, type);
 
@@ -266,7 +266,7 @@ void MessageFederate::registerMessageInterfacesToml(const std::string& tomlStrin
         for (auto& ept : eptArray) {
             auto key = fileops::getName(ept);
             auto type = fileops::getOrDefault(ept, "type", emptyStr);
-            bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(ept, "global", defaultGlobal);
             Endpoint& epObj =
                 (global) ? registerGlobalEndpoint(key, type) : registerEndpoint(key, type);
 
@@ -343,11 +343,11 @@ std::unique_ptr<Message> MessageFederate::getMessage(const Endpoint& ept)
 
 Endpoint& MessageFederate::getEndpoint(std::string_view eptName) const
 {
-    auto& id = mfManager->getEndpoint(eptName);
-    if (!id.isValid()) {
+    auto& ept = mfManager->getEndpoint(eptName);
+    if (!ept.isValid()) {
         return mfManager->getEndpoint(localNameGenerator(eptName));
     }
-    return id;
+    return ept;
 }
 
 Endpoint& MessageFederate::getDataSink(std::string_view sinkName) const

@@ -1199,7 +1199,7 @@ static Filter& generateFilter(Federate* fed,
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
-    return filt;
+    return filt; // eslint-disable-line no-eval
 }
 
 static constexpr std::string_view emptyStr;
@@ -1256,6 +1256,36 @@ static void arrayPairProcess(Json::Value doc,
     }
 }
 
+bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std::string& operation)
+{
+    if ((useTypes) && (operation != "custom")) {
+        if (strictConfigChecking) {
+            logMessage(HELICS_LOG_LEVEL_ERROR,
+                "input and output types may only be specified for custom filters");
+            throw(InvalidParameter(
+                "input and output types may only be specified for custom filters"));
+        }
+        logMessage(HELICS_LOG_LEVEL_WARNING,
+            "input and output types may only be specified for custom filters");
+        return false;
+    }
+    if (!useTypes) {
+        if (opType == FilterTypes::UNRECOGNIZED) {
+            if (strictConfigChecking) {
+                const std::string emessage =
+                    fmt::format("unrecognized filter operation:{}", operation);
+                logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
+
+                throw(InvalidParameter(emessage));
+            }
+            logMessage(HELICS_LOG_LEVEL_WARNING,
+                fmt::format("unrecognized filter operation:{}", operation));
+            return false;
+        }
+    }
+    return true;
+}
+
 void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
 {
     using fileops::getOrDefault;
@@ -1271,34 +1301,13 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool cloningflag = getOrDefault(filt, "cloning", false);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
-            bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
+            const bool global = fileops::getOrDefault(filt, "global", defaultGlobal);
             const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if ((useTypes) && (operation != "custom")) {
-                if (strictConfigChecking) {
-                    logMessage(HELICS_LOG_LEVEL_ERROR,
-                               "input and output types may only be specified for custom filters");
-                    throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
-                }
-                logMessage(HELICS_LOG_LEVEL_WARNING,
-                           "input and output types may only be specified for custom filters");
+            if (!checkValidFilterType(useTypes, opType,operation))
+            {
                 continue;
-            }
-            if (!useTypes) {
-                if (opType == FilterTypes::UNRECOGNIZED) {
-                    if (strictConfigChecking) {
-                        const std::string emessage =
-                            fmt::format("unrecognized filter operation:{}", operation);
-                        logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
-
-                        throw(InvalidParameter(emessage));
-                    }
-                    logMessage(HELICS_LOG_LEVEL_WARNING,
-                               fmt::format("unrecognized filter operation:{}", operation));
-                    continue;
-                }
             }
             auto& filter =
                 generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
@@ -1367,7 +1376,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
     }
     if (doc.isMember("translators")) {
         for (const auto& trans : doc["translators"]) {
-            std::string key = getOrDefault(trans, "name", emptyStr);
+            const std::string key = getOrDefault(trans, "name", emptyStr);
 
             std::string ttype = getOrDefault(trans, "type", std::string("custom"));
             auto opType = translatorTypeFromString(ttype);
@@ -1534,32 +1543,13 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             const std::string inputType = getOrDefault(filt, "inputType", emptyStr);
             const std::string outputType = getOrDefault(filt, "outputType", emptyStr);
             const bool useTypes = !((inputType.empty()) && (outputType.empty()));
-            bool global = getOrDefault(filt, "global", defaultGlobal);
+            const bool global = getOrDefault(filt, "global", defaultGlobal);
             std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if ((useTypes) && (operation != "custom")) {
-                if (strictConfigChecking) {
-                    logMessage(HELICS_LOG_LEVEL_ERROR,
-                               "input and output types may only be specified for custom filters");
-                    throw(InvalidParameter(
-                        "input and output types may only be specified for custom filters"));
-                }
-                logMessage(HELICS_LOG_LEVEL_WARNING,
-                           "input and output types may only be specified for custom filters");
+            if (!checkValidFilterType(useTypes, opType,operation))
+            {
                 continue;
-            }
-            if (!useTypes) {
-                if (opType == FilterTypes::UNRECOGNIZED) {
-                    auto emessage = fmt::format("unrecognized filter operation:{}", operation);
-                    if (strictConfigChecking) {
-                        logMessage(HELICS_LOG_LEVEL_ERROR, emessage);
-
-                        throw(InvalidParameter(emessage));
-                    }
-                    logMessage(HELICS_LOG_LEVEL_WARNING, emessage);
-                    continue;
-                }
             }
             auto& filter =
                 generateFilter(this, global, cloningflag, key, opType, inputType, outputType);
