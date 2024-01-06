@@ -34,8 +34,8 @@ class HELICS_CXX_EXPORT ValueFederate:
     */
     ValueFederate(std::string_view fedName, const FederateInfo& fedInfo);
 
-    /**constructor taking a core and a federate information structure, core information in fedInfo is
-    ignored
+    /**constructor taking a core and a federate information structure, core information in fedInfo
+    is ignored
     @param fedName the name of the federate, can be empty to use the name from fedInfo or an auto
     generated one
     @param core a shared ptr to a core to join
@@ -50,7 +50,9 @@ class HELICS_CXX_EXPORT ValueFederate:
     @param core a CoreApp with the core to connect to.
     @param fedInfo  a federate information structure
     */
-    ValueFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo = FederateInfo{});
+    ValueFederate(std::string_view fedName,
+                  CoreApp& core,
+                  const FederateInfo& fedInfo = FederateInfo{});
 
     /**constructor taking a string with the required information
     @param configString can be either a JSON file a TOML file (with extension TOML) or a string

@@ -267,7 +267,8 @@ void TranslatorFederate::handleMessage(ActionMessage& command)
                 if (tranI != nullptr) {
                     auto locker = mGetAirLock(command.counter).try_unload();
                     if (locker) {
-                        auto operation = std::any_cast<std::shared_ptr<TranslatorOperator>>(std::move(*locker));
+                        auto operation =
+                            std::any_cast<std::shared_ptr<TranslatorOperator>>(std::move(*locker));
                         tranI->tranOp = std::move(operation);
                     }
                 }
@@ -292,7 +293,7 @@ TranslatorInfo* TranslatorFederate::createTranslator(GlobalBrokerId dest,
                                                      std::string_view units)
 {
     auto tran = std::make_unique<TranslatorInfo>(
-        GlobalHandle{ (dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId{mFedID} : dest,
+        GlobalHandle{(dest == parent_broker_id || dest == mCoreID) ? GlobalBrokerId{mFedID} : dest,
                      handle},
         key,
         endpointType,

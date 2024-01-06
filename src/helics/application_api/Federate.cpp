@@ -1199,7 +1199,7 @@ static Filter& generateFilter(Federate* fed,
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
-    return filt; // eslint-disable-line no-eval
+    return filt;  // eslint-disable-line no-eval
 }
 
 static constexpr std::string_view emptyStr;
@@ -1261,12 +1261,12 @@ bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std
     if ((useTypes) && (operation != "custom")) {
         if (strictConfigChecking) {
             logMessage(HELICS_LOG_LEVEL_ERROR,
-                "input and output types may only be specified for custom filters");
+                       "input and output types may only be specified for custom filters");
             throw(InvalidParameter(
                 "input and output types may only be specified for custom filters"));
         }
         logMessage(HELICS_LOG_LEVEL_WARNING,
-            "input and output types may only be specified for custom filters");
+                   "input and output types may only be specified for custom filters");
         return false;
     }
     if (!useTypes) {
@@ -1279,7 +1279,7 @@ bool Federate::checkValidFilterType(bool useTypes, FilterTypes opType, const std
                 throw(InvalidParameter(emessage));
             }
             logMessage(HELICS_LOG_LEVEL_WARNING,
-                fmt::format("unrecognized filter operation:{}", operation));
+                       fmt::format("unrecognized filter operation:{}", operation));
             return false;
         }
     }
@@ -1305,8 +1305,7 @@ void Federate::registerConnectorInterfacesJson(const std::string& jsonString)
             const std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if (!checkValidFilterType(useTypes, opType,operation))
-            {
+            if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
             auto& filter =
@@ -1547,8 +1546,7 @@ void Federate::registerConnectorInterfacesToml(const std::string& tomlString)
             std::string operation = getOrDefault(filt, "operation", std::string("custom"));
 
             auto opType = filterTypeFromString(operation);
-            if (!checkValidFilterType(useTypes, opType,operation))
-            {
+            if (!checkValidFilterType(useTypes, opType, operation)) {
                 continue;
             }
             auto& filter =

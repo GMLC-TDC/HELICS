@@ -37,7 +37,9 @@ MessageFederate::MessageFederate(std::string_view fedName,
                                                          singleThreadFederate);
 }
 
-MessageFederate::MessageFederate(std::string_view fedName, CoreApp& core, const FederateInfo& fedInfo):
+MessageFederate::MessageFederate(std::string_view fedName,
+                                 CoreApp& core,
+                                 const FederateInfo& fedInfo):
     Federate(fedName, core, fedInfo)
 {
     mfManager = std::make_unique<MessageFederateManager>(coreObject.get(),

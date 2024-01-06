@@ -270,9 +270,11 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
             }
 
             loadOptions(this, pub, *pubAct);
-            auto addDestTarget=[pubAct](const std::string& target) { pubAct->addDestinationTarget(target); };
-            addTargetVariations(pub,"destination","inputs",addDestTarget);
-            addTargetVariations(pub,"destination","targets",addDestTarget);
+            auto addDestTarget = [pubAct](const std::string& target) {
+                pubAct->addDestinationTarget(target);
+            };
+            addTargetVariations(pub, "destination", "inputs", addDestTarget);
+            addTargetVariations(pub, "destination", "targets", addDestTarget);
         }
     }
     if (doc.isMember("subscriptions")) {
@@ -300,9 +302,11 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 subAct->setDefault(defStr);
             }
             loadOptions(this, sub, *subAct);
-            auto addSourceTarget=[subAct](const std::string& target) { subAct->addSourceTarget(target); };
-            addTargetVariations(sub,"source","publications",addSourceTarget);
-            addTargetVariations(sub,"source","targets",addSourceTarget);
+            auto addSourceTarget = [subAct](const std::string& target) {
+                subAct->addSourceTarget(target);
+            };
+            addTargetVariations(sub, "source", "publications", addSourceTarget);
+            addTargetVariations(sub, "source", "targets", addSourceTarget);
         }
     }
     if (doc.isMember("inputs")) {
@@ -327,9 +331,11 @@ void ValueFederate::registerValueInterfacesJson(const std::string& jsonString)
                 inp->setDefault(defStr);
             }
             loadOptions(this, ipt, *inp);
-            auto addSourceTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
-            addTargetVariations(ipt,"source","publications",addSourceTarget);
-            addTargetVariations(ipt,"source","targets",addSourceTarget);
+            auto addSourceTarget = [inp](const std::string& target) {
+                inp->addSourceTarget(target);
+            };
+            addTargetVariations(ipt, "source", "publications", addSourceTarget);
+            addTargetVariations(ipt, "source", "targets", addSourceTarget);
         }
     }
 }
@@ -372,9 +378,11 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 }
             }
             loadOptions(this, pub, *pubObj);
-            auto addDestTarget=[pubObj](const std::string& target) { pubObj->addDestinationTarget(target); };
-            addTargetVariations(pub,"destination","inputs",addDestTarget);
-            addTargetVariations(pub,"destination","targets",addDestTarget);
+            auto addDestTarget = [pubObj](const std::string& target) {
+                pubObj->addDestinationTarget(target);
+            };
+            addTargetVariations(pub, "destination", "inputs", addDestTarget);
+            addTargetVariations(pub, "destination", "targets", addDestTarget);
         }
     }
     if (isMember(doc, "subscriptions")) {
@@ -410,9 +418,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 inp->setDefault(defStr);
             }
             loadOptions(this, sub, *inp);
-            auto addDestTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
-            addTargetVariations(sub,"source","publications",addDestTarget);
-            addTargetVariations(sub,"source","targets",addDestTarget);
+            auto addDestTarget = [inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(sub, "source", "publications", addDestTarget);
+            addTargetVariations(sub, "source", "targets", addDestTarget);
         }
     }
     if (isMember(doc, "inputs")) {
@@ -442,9 +450,9 @@ void ValueFederate::registerValueInterfacesToml(const std::string& tomlString)
                 inp->setDefault(defStr);
             }
             loadOptions(this, ipt, *inp);
-            auto addDestTarget=[inp](const std::string& target) { inp->addSourceTarget(target); };
-            addTargetVariations(ipt,"source","publications",addDestTarget);
-            addTargetVariations(ipt,"source","targets",addDestTarget);
+            auto addDestTarget = [inp](const std::string& target) { inp->addSourceTarget(target); };
+            addTargetVariations(ipt, "source", "publications", addDestTarget);
+            addTargetVariations(ipt, "source", "targets", addDestTarget);
         }
     }
 }
