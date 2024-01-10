@@ -1199,7 +1199,7 @@ static Filter& generateFilter(Federate* fed,
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
-    return filt;  
+    return filt;
 }
 
 static constexpr std::string_view emptyStr;
