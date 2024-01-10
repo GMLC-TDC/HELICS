@@ -78,7 +78,7 @@ HELICS differences
 </a>
 
 1. **Communication:** Both physical value exchanges and abstract information exchanges are modeled. The exchange of physical values takes place between the Battery and Charger federates (this was also introduced in a slimmed-down fashion in the [Fundamental Communication Example](../fundamental_examples/fundamental_communication.md)). The message exchange (control signals, in this case) takes place between the Charger and Controller federates. For a further look at the difference between these two messaging mechanisms see our User Guide page on [value federates](../../fundamental_topics/value_federates.md) and [message federates.](../../fundamental_topics/message_federates.md)
-2. **Timing:** The Controller federate has no regular update interval. The Controller works in pure abstract information and has no regular time steps to simulate. As such, it requests a maximum simulated time supported by HELICS (`HELICS_TIME_MAXTIME`) and makes sure it can be interrupted by setting `uninterruptable` to `false` in its configuration file. Any time a message comes in for the Controller, HELICS grants it a time, the Controller performs the required calculation, sends out a new control signal, and requests `HELICS_TIME_MAXTIME` again.
+2. **Timing:** The Controller federate has no regular update interval. The Controller works in pure abstract information and has no regular time steps to simulate. As such, it requests a maximum simulated time supported by HELICS (`HELICS_TIME_MAXTIME`) and makes sure it can be interrupted by setting `uninterruptible` to `false` in its configuration file. Any time a message comes in for the Controller, HELICS grants it a time, the Controller performs the required calculation, sends out a new control signal, and requests `HELICS_TIME_MAXTIME` again.
 
 <a name="reaserach-question-complexity-differences">
 <strong>
@@ -166,10 +166,14 @@ Examples Covered in Advanced Examples
 
 Using the [Advanced Default Example](./advanced_default.md) as the starting point, the following examples have also been constructed:
 
-- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value handle.
-- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- [**Iteration**](./advanced_iteration) - Setting up federates so that they can iterate without advancing simulation time to achieve a more consistent state.
+- [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.
 - **Multiple Brokers**
   - [**Connecting Multiple Core Types (Multi-Protocol Broker)**](./advanced_brokers_multibroker.md) - Demonstration of how to configure a multi-protocol broker
   - [**Broker Hierarchies**](./advanced_brokers_hierarchies.md) - Purpose of broker hierarchies and how to configure a HELICS co-simulation to implement one.
   - [**Simultaneous co-simulations**](./advanced_brokers_simultaneous.md) - Demonstration of how to run multiple independent federations simultaneously on a single compute node.
+  - [**Multi-Protocol Brokers (Multi-broker) for Multiple Core Types)**](advanced_brokers_multibroker) What to do when one type of communication isn't sufficient.
+  - [**Multi-compute-node Co-simulation**](advanced_brokers_multicomputer) - Executing a co-simulation across multiple compute nodes.
+- [**Queries**](./advanced_query.md) - Demonstration of the use of queries for dynamic federate configuration.
+- [**Multi-Source Inputs**](./advanced_multi_input.md) - Demonstration of use and configuration of a a multi-sourced input value interface.
 - [**Orchestration Tool (Merlin)**](./advanced_orchestration.md) Demonstration of using [Merlin](https://github.com/LLNL/merlin) to handle situations where a HELICS co-simulation is just one step in an automated analysis process (_e.g._ uncertainty quantification) or where assistance is needed deploying a large co-simulation in an HPC environment.

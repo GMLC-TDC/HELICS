@@ -34,7 +34,7 @@ jobs:
         echo "::set-output name=DEPTH::${DEPTH}"
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event.action == 'published' || github.event_name == 'workflow_dispatch'
@@ -65,7 +65,7 @@ jobs:
       run: ./.github/actions/upload-release-asset.sh "artifact/Helics-$(git rev-parse --abbrev-ref "${GITHUB_REF}")-source.tar.gz"
       
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: all-submodules-archive
         path: artifact
@@ -97,13 +97,13 @@ jobs:
         echo "::set-output name=DEPTH::${DEPTH}"
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
     
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -136,7 +136,7 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ runner.os }}-installers
         path: artifact
@@ -184,13 +184,13 @@ jobs:
         echo "::set-output name=DEPTH::${DEPTH}"
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -239,7 +239,7 @@ jobs:
 
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ runner.os }}-installers
         path: artifact
@@ -283,13 +283,13 @@ jobs:
         echo "::set-output name=DEPTH::${DEPTH}"
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: ${{ steps.determine_fd.outputs.DEPTH }}
       if: github.event_name != 'schedule'
 
     - name: Checkout develop branch
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: develop
       if: github.event_name == 'schedule'
@@ -337,7 +337,7 @@ jobs:
       
     # GitHub Actions combines artifacts uploaded with the same name
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ runner.os }}-installers
         path: artifact
@@ -351,28 +351,28 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.action == 'published'
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       
     - name: Get all submodules archive
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: all-submodules-archive
         path: artifacts
         
     - name: Get Windows installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Windows-installers
         path: artifacts
         
     - name: Get macOS installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: macOS-installers
         path: artifacts
         
     - name: Get Linux installers
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: Linux-installers
         path: artifacts

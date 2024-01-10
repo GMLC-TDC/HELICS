@@ -185,7 +185,7 @@ The following queries will be answered by a core:
 | ``data_flow_graph``      | a representation of the data connections from all interfaces in a core [structure]  |
 +--------------------------+-------------------------------------------------------------------------------------+
 |``filtered_endpoints``    | data structure containing the filters on endpoints for the core[structure]          |
-+-------------------------+--------------------------------------------------------------------------------------+
++--------------------------+-------------------------------------------------------------------------------------+
 | ``barriers``             | a data structure with current time barriers [structure]                             |
 +--------------------------+-------------------------------------------------------------------------------------+
 | ``queries``              | list of dependent objects [sv]                                                      |
@@ -253,10 +253,10 @@ The following queries will be answered by a broker:
 | ``dependencies``         | structure containing dependency information for the broker [structure]                            |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``dependents``           | list of dependent objects [sv]                                                                    |
-+-------------------------+----------------------------------------------------------------------------------------------------+
++--------------------------+---------------------------------------------------------------------------------------------------+
 | ``barriers``             | a data structure with current time barriers [structure]                                           |
 +--------------------------+---------------------------------------------------------------------------------------------------+
-| ``counts``               | a simple count of the number of brokers, federates, and handles [structure]                       |
+| ``counts``               | a simple count of the number of brokers, federates, and interfaces [structure]                    |
 +--------------------------+---------------------------------------------------------------------------------------------------+
 | ``current_state``        | a structure with the current known status of the brokers and federates [structure]                |
 +--------------------------+---------------------------------------------------------------------------------------------------+

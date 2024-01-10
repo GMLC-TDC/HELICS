@@ -39,19 +39,13 @@ When you have a co-simulation that you've vetted and feel comfortable will run w
 1. (optional) Load in a configuration file - If you just want to look at a few federates and/or publications to track the progress of the co-simulation, make a web interface configuration file that does so and load it up.
 2. Press the "Run" button (number 2 in the screenshot above).
 
-The helics_cli will launch the co-simulation and the web interface will update every xxxxxxx seconds (or as specified in the configuration file). This periodically updating view is helpful if only to see where the co-simulation is at (simulation time-wise) but also helps confirm that message values are as expected. When the co-simulation is done, xxxxxxx (as message will appear? How are we indicating this?). All messages from the co-simulation (or a subset as specified in the helic_cli configuration) have been stored in an SQLite database; the database can be directly queried or the data can be exported to file in a number of formats (CSV, JSON) and post-process by a tool of your choice.
+The helics_cli will launch the co-simulation and the web interface will update every five seconds (or as specified in the configuration file). This periodically updating view is helpful if only to see where the co-simulation is at (simulation time-wise) but also helps confirm that message values are as expected. When the co-simulation is done, xxxxxxx (as message will appear? How are we indicating this?). All messages from the co-simulation (or a subset as specified in the helic_cli configuration) have been stored in an SQLite database; the database can be directly queried or the data can be exported to file in a number of formats (CSV, JSON) and post-process by a tool of your choice.
 
 ### Debugging runs
 
-Just like writing code, it is not unusual for a co-simulation to not quite work write the first time it's constructed and the web interface provides tooling to help verify and trouble-shoot the construction co-simulation. [There's a whole section on trouble-shooting techniques](../troubleshooting.md) and we won't re-iterate the guidance here but here's how the web interface can be used try to get a diagnostic view of the federation's operation.
+Just like writing code, it is not unusual for a co-simulation to not quite work write the first time it's constructed and the web interface provides tooling to help verify and trouble-shoot the construction co-simulation. Here's how the web interface can be used try to get a diagnostic view of the federation's operation.
 
 1. (optional but highly recommended) Load in a configuration file - Limit the federates and publications to those of interest and most revealing of the state of the simulation.
 2. Enter a simulated time of interest and press the "Run to next grant" button (number 4 in the above diagram)
 3. Check the state of the federation - When the co-simulation stops at the indicated time, check that all federates of interest have been granted and are requesting expected times. Check the message table and verify that all messages of interest have published with reasonable/expected values.
 4. As necessary, proceed to subsequent or later time steps to hunt down the particular problem of interest.
-
-## Web interface demonstration
-
-Below is a demonstration of how the web interface is used to run Example xxxxxxx.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/7-THWaRNcQw" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

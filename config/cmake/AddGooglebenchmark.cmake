@@ -1,5 +1,5 @@
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Copyright (c) 2017-2020, Battelle Memorial Institute; Lawrence Livermore
+# Copyright (c) 2017-2024, Battelle Memorial Institute; Lawrence Livermore
 # National Security, LLC; Alliance for Sustainable Energy, LLC.
 # See the top-level NOTICE for additional details.
 # All rights reserved.
@@ -7,7 +7,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-set(gbenchmark_version v1.5.0)
+set(gbenchmark_version v1.8.3)
 
 string(TOLOWER "gbenchmark" gbName)
 
@@ -87,6 +87,11 @@ hide_variable(BENCHMARK_ENABLE_ASSEMBLY_TESTS)
 hide_variable(BENCHMARK_ENABLE_EXCEPTIONS)
 hide_variable(BENCHMARK_ENABLE_LTO)
 hide_variable(BENCHMARK_USE_LIBCXX)
+hide_variable(BENCHMARK_ENABLE_DOXYGEN)
+hide_variable(BENCHMARK_ENABLE_LIBPFM)
+hide_variable(BENCHMARK_ENABLE_WERROR)
+hide_variable(BENCHMARK_FORCE_WERROR)
+hide_variable(BENCHMARK_USE_BUNDLED_GTEST)
 hide_variable(LIBRT)
 
 set_target_properties(benchmark benchmark_main PROPERTIES FOLDER "Extern")

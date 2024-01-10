@@ -12,7 +12,6 @@
     stages
     logging
     helics_run
-    web_interface
     simulator_integration
 
 
@@ -27,7 +26,6 @@ The topics considered "fundamental" to building a co-simualtion with HELICS are:
   - [Value Federates](./value_federates.md)
   - [Message Federates](./message_federates.md)
   - [Filters](./filters.md)
-  - [Value Types](./value_types.md)
 - [**Federate Interface Configuration**](./interface_configuration.md) - How to connect an existing simulator with HELICS
   - [**With JSON config file**](./interface_configuration.md#json-configuration)
   - [**With HELICS APIs**](./interface_configuration.md#api-configuration)
@@ -37,5 +35,4 @@ The topics considered "fundamental" to building a co-simualtion with HELICS are:
 - [**Stages of the Co-simulation**](./stages.md)
 - [**Logging**](./logging.md) - Discussion of logging within HELICS and how to control it.
 - [**Execution with `helics run ...`**](./helics_run.md) - The HELICS team has developed a standardized means of running HELICS co-simulations.
-- [**Simulation Management**](./web_interface.md) - Using the webserver, HELICS also has a built-in web interface for running, monitoring, and diagnosing co-simulations.
 - [**Simulator Integration**](./simulator_integration.md) - A guide for integrating HELICS into simulators.

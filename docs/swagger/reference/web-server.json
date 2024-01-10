@@ -315,7 +315,7 @@
               }
             }
           },
-          "description": "This is supplying 2 parameters in the address,  the parameters can also be supplied as a qeury parameter or in the body"
+          "description": "This is supplying 2 parameters in the address,  the parameters can also be supplied as a query parameter or in the body"
         },
         "parameters": [
           {

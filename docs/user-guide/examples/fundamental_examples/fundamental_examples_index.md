@@ -224,9 +224,9 @@ Send/Receive Communication between Federates
 </strong>
 </a>
 
-Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the handles to which they have subscribed, and then send information from the handles from which they publish.
+Once inside the time loop, information is requested and sent between federates at each time step. In the Base Example, the federates first request information from the interfaces to which they have subscribed, and then send information from the interfaces from which they publish.
 
-The `Battery.py` federate first asks for voltage information from the handles to which it subscribes:
+The `Battery.py` federate first asks for voltage information from the interfaces to which it subscribes:
 
 ```python
 # Get the applied charging voltage from the EV
@@ -237,7 +237,7 @@ logger.debug(
 )
 ```
 
-And then (after doing some internal calculations) publishes the charging current of the battery at its publication handle:
+And then (after doing some internal calculations) publishes the charging current of the battery at its publication interface:
 
 ```python
 # Publish out charging current
@@ -245,7 +245,7 @@ h.helicsPublicationPublishDouble(pubid[j], charging_current)
 logger.debug(f"\tPublished {pub_name[j]} with value " f"{charging_current:.2f}")
 ```
 
-Meanwhile, the `Charger.py` federate asks for charging current from the handles to which it subscribes:
+Meanwhile, the `Charger.py` federate asks for charging current from the interfaces to which it subscribes:
 
 ```python
 charging_current[j] = h.helicsInputGetDouble((subid[j]))
@@ -255,7 +255,7 @@ logger.debug(
 )
 ```
 
-And publishes the charging voltage at its publication handle:
+And publishes the charging voltage at its publication interface:
 
 ```python
 # Publish updated charging voltage

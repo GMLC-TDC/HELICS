@@ -16,6 +16,8 @@ SPDX-License-Identifier: BSD-3-Clause
 #include "gmlc/utilities/stringOps.h"
 
 #include <algorithm>
+#include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <fstream>
 #include <iostream>
 #include <fmt/format.h>
@@ -39,25 +41,24 @@ static std::string encode(std::string_view str2encode)
         ']';
 }
 
-namespace helics {
-namespace apps {
-    Clone::Clone(std::string_view appName, FederateInfo& fi): App(appName, fi)
-    {
+namespace helics::apps {
+Clone::Clone(std::string_view appName, FederateInfo& fedInfo): App(appName, fedInfo)
+{
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    }
+}
 
-    Clone::Clone(std::vector<std::string> args): App("Clone", std::move(args))
-    {
+Clone::Clone(std::vector<std::string> args): App("Clone", std::move(args))
+{
         processArgs();
-    }
+}
 
-    Clone::Clone(int argc, char* argv[]): App("Clone", argc, argv)
-    {
+Clone::Clone(int argc, char* argv[]): App("Clone", argc, argv)
+{
         processArgs();
-    }
+}
 
-    void Clone::processArgs()
-    {
+void Clone::processArgs()
+{
         auto app = buildArgParserApp();
         if (!deactivated) {
             fed->setFlagOption(HELICS_FLAG_OBSERVER);
@@ -69,30 +70,30 @@ namespace apps {
             app->remove_helics_specifics();
             std::cout << app->help();
         }
-    }
+}
 
-    Clone::Clone(std::string_view appName,
+Clone::Clone(std::string_view appName,
                  const std::shared_ptr<Core>& core,
-                 const FederateInfo& fi):
-        App(appName, core, fi)
-    {
+             const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
+{
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    }
+}
 
-    Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fi):
-        App(appName, core, fi)
-    {
+Clone::Clone(std::string_view appName, CoreApp& core, const FederateInfo& fedInfo):
+    App(appName, core, fedInfo)
+{
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
-    }
+}
 
-    Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
-    {
+Clone::Clone(std::string_view appName, const std::string& jsonString): App(appName, jsonString)
+{
         fed->setFlagOption(HELICS_FLAG_OBSERVER);
         Clone::loadJsonFile(jsonString);
-    }
+}
 
-    Clone::~Clone()
-    {
+Clone::~Clone()
+{
         try {
             if (!fileSaved && !outFileName.empty()) {
                 saveFile(outFileName);
@@ -100,10 +101,10 @@ namespace apps {
         }
         catch (...) {
         }
-    }
+}
 
-    void Clone::saveFile(const std::string& filename)
-    {
+void Clone::saveFile(const std::string& filename)
+{
         if (filename.empty()) {
             if (!outFileName.empty()) {
                 saveFile(outFileName);
@@ -124,18 +125,18 @@ namespace apps {
         }
         if (!points.empty()) {
             doc["points"] = Json::Value(Json::arrayValue);
-            for (auto& v : points) {
-                Json::Value point;
-                point["key"] = subscriptions[v.index].getTarget();
-                point["value"] = v.value;
-                point["time"] = static_cast<double>(v.time);
-                if (v.iteration > 0) {
-                    point["iteration"] = v.iteration;
+        for (auto& point : points) {
+            Json::Value pointData;
+            pointData["key"] = subscriptions[point.index].getTarget();
+            pointData["value"] = point.value;
+            pointData["time"] = static_cast<double>(point.time);
+            if (point.iteration > 0) {
+                pointData["iteration"] = point.iteration;
                 }
-                if (v.first) {
-                    point["type"] = subscriptions[v.index].getPublicationType();
+            if (point.first) {
+                pointData["type"] = subscriptions[point.index].getPublicationType();
                 }
-                doc["points"].append(point);
+            doc["points"].append(pointData);
             }
         }
 
@@ -170,13 +171,13 @@ namespace apps {
             }
         }
 
-        std::ofstream o(filename);
-        o << doc << std::endl;
+    std::ofstream outfile(filename);
+    outfile << doc << std::endl;
         fileSaved = true;
-    }
+}
 
-    void Clone::initialize()
-    {
+void Clone::initialize()
+{
         generateInterfaces();
 
         pubPointCount.resize(subids.size(), 0);
@@ -186,10 +187,10 @@ namespace apps {
 
         fed->enterExecutingMode();
         captureForCurrentTime(0.0);
-    }
+}
 
-    void Clone::generateInterfaces()
-    {
+void Clone::generateInterfaces()
+{
         auto res = waitForInit(fed.get(), captureFederate);
         if (res) {
             fed->query("root", "global_flush", HELICS_SEQUENCING_MODE_ORDERED);
@@ -219,15 +220,15 @@ namespace apps {
 
             fedConfig = fed->query(captureFederate, "config", HELICS_SEQUENCING_MODE_ORDERED);
         }
-    }
+}
 
-    void Clone::captureForCurrentTime(Time currentTime, int iteration)
-    {
+void Clone::captureForCurrentTime(Time currentTime, int iteration)
+{
         for (auto& sub : subscriptions) {
             if (sub.isUpdated()) {
                 auto val = sub.getValue<std::string>();
-                int ii = subids[sub.getHandle()];
-                points.emplace_back(currentTime, ii, val);
+            const int subid = subids[sub.getHandle()];
+            points.emplace_back(currentTime, subid, val);
                 if (iteration > 0) {
                     points.back().iteration = iteration;
                 }
@@ -235,32 +236,37 @@ namespace apps {
                     std::string valstr;
                     if (val.size() < 150) {
                         if (iteration > 0) {
-                            valstr = fmt::format(
-                                "[{}:{}]value {}={}", static_cast<double>(currentTime), iteration, sub.getTarget(), val);
+                        valstr = fmt::format("[{}:{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             iteration,
+                                             sub.getTarget(),
+                                             val);
                         } else {
-                            valstr =
-                                fmt::format("[{}]value {}={}", static_cast<double>(currentTime), sub.getTarget(), val);
+                        valstr = fmt::format("[{}]value {}={}",
+                                             static_cast<double>(currentTime),
+                                             sub.getTarget(),
+                                             val);
                         }
                     } else {
                         if (iteration > 0) {
                             valstr = fmt::format("[{}:{}]value {}=block[{}]",
-                                static_cast<double>(currentTime),
+                                             static_cast<double>(currentTime),
                                                  iteration,
                                                  sub.getTarget(),
                                                  val.size());
                         } else {
                             valstr = fmt::format("[{}]value {}=block[{}]",
-                                static_cast<double>(currentTime),
+                                             static_cast<double>(currentTime),
                                                  sub.getTarget(),
                                                  val.size());
                         }
                     }
                     spdlog::info(valstr);
                 }
-                if (pubPointCount[ii] == 0) {
+            if (pubPointCount[subid] == 0) {
                     points.back().first = true;
                 }
-                ++pubPointCount[ii];
+            ++pubPointCount[subid];
             }
         }
 
@@ -270,92 +276,92 @@ namespace apps {
                 messages.push_back(cloneEndpoint->getMessage());
             }
         }
-    }
+}
 
-    /** run the Player until the specified time*/
-    void Clone::runTo(Time runToTime)
-    {
+/** run the Player until the specified time*/
+void Clone::runTo(Time runToTime)
+{
         initialize();
 
         Time nextPrintTime = (nextPrintTimeStep > timeZero) ? nextPrintTimeStep : Time::maxVal();
         try {
             int iteration = 0;
             while (true) {
-                helics::Time T;
+            helics::Time grantedTime;
                 if (allow_iteration) {
                     auto ItRes =
                         fed->requestTimeIterative(runToTime, IterationRequest::ITERATE_IF_NEEDED);
                     if (ItRes.state == IterationResult::NEXT_STEP) {
                         iteration = 0;
                     }
-                    T = ItRes.grantedTime;
-                    captureForCurrentTime(T, iteration);
+                grantedTime = ItRes.grantedTime;
+                captureForCurrentTime(grantedTime, iteration);
                     ++iteration;
                 } else {
-                    T = fed->requestTime(runToTime);
-                    captureForCurrentTime(T);
+                grantedTime = fed->requestTime(runToTime);
+                captureForCurrentTime(grantedTime);
                 }
 
-                if (T >= runToTime) {
+            if (grantedTime >= runToTime) {
                     break;
                 }
-                if ((T >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
-                    std::cout << "processed for time " << static_cast<double>(T) << "\n";
+            if ((grantedTime >= nextPrintTime) && (nextPrintTimeStep > timeZero)) {
+                std::cout << "processed for time " << static_cast<double>(grantedTime) << "\n";
                     nextPrintTime += nextPrintTimeStep;
                 }
             }
         }
         catch (...) {
         }
-    }
-    /** add a subscription to record*/
-    void Clone::addSubscription(std::string_view key)
-    {
+}
+/** add a subscription to record*/
+void Clone::addSubscription(std::string_view key)
+{
         auto res = subkeys.find(key);
         if ((res == subkeys.end()) || (res->second == -1)) {
             subscriptions.emplace_back(fed->registerSubscription(key));
             auto index = static_cast<int>(subscriptions.size()) - 1;
-            auto id = subscriptions.back().getHandle();
-            subids[id] = index;  // this is a new element
+        auto subid = subscriptions.back().getHandle();
+        subids[subid] = index;  // this is a new element
             subkeys[subscriptions.back().getTarget()] = index;  // this is a potential replacement
         }
-    }
+}
 
-    void Clone::addSourceEndpointClone(std::string_view sourceEndpoint)
-    {
+void Clone::addSourceEndpointClone(std::string_view sourceEndpoint)
+{
         if (!cFilt) {
             cFilt = std::make_unique<CloningFilter>(fed.get());
             cloneEndpoint = std::make_unique<Endpoint>(fed.get(), "cloneE");
             cFilt->addDeliveryEndpoint(cloneEndpoint->getName());
         }
         cFilt->addSourceTarget(sourceEndpoint);
-    }
+}
 
-    void Clone::setFederateToClone(std::string_view federateName)
-    {
+void Clone::setFederateToClone(std::string_view federateName)
+{
         captureFederate = federateName;
-    }
+}
 
-    std::tuple<Time, std::string, std::string> Clone::getValue(int index) const
-    {
+std::tuple<Time, std::string, std::string> Clone::getValue(int index) const
+{
         if (isValidIndex(index, points)) {
             return {points[index].time,
                     subscriptions[points[index].index].getTarget(),
                     points[index].value};
         }
         return {Time(), std::string(), std::string()};
-    }
+}
 
-    std::unique_ptr<Message> Clone::getMessage(int index) const
-    {
+std::unique_ptr<Message> Clone::getMessage(int index) const
+{
         if (isValidIndex(index, messages)) {
             return std::make_unique<Message>(*messages[index]);
         }
         return nullptr;
-    }
+}
 
-    std::shared_ptr<helicsCLI11App> Clone::buildArgParserApp()
-    {
+std::shared_ptr<helicsCLI11App> Clone::buildArgParserApp()
+{
         auto app = std::make_shared<helicsCLI11App>("Command line options for the Clone App");
         if (!app) {
             throw(FunctionExecutionFailure("unable to allocate application CLI"));
@@ -368,7 +374,6 @@ namespace apps {
         app->add_option("capture", captureFederate, "name of the federate to clone");
 
         return app;
-    }
+}
 
-}  // namespace apps
-}  // namespace helics
+}  // namespace helics::apps

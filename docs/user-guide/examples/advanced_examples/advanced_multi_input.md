@@ -17,7 +17,7 @@ This example on [multi-inputs can be found here](https://github.com/GMLC-TDC/HEL
 
 ## What is this co-simulation doing?
 
-This example shows how to use inputs, allowing multiple publications to arrive at the same input handle (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
+This example shows how to use inputs, allowing multiple publications to arrive at the same input interface (similar to a subscription, as you'll see) and a demonstration on one method of managing data conflicts that can arise.
 
 ### Differences compared to the Advanced Default example
 
@@ -69,7 +69,7 @@ With a single charger being used to charge five batteries, each battery still pu
 }
 ```
 
-The Charger federate configuration is also altered, using an `input` rather than a `subscription` handle to allow all publications from the Battery federates to be received on one handle. The input has been configured to allow multiple inputs and lists the publications that should be targeted toward it and to handle these multiple inputs by summing them.
+The Charger federate configuration is also altered, using an `input` rather than a `subscription` interface to allow all publications from the Battery federates to be received on one interface. The input has been configured to allow multiple inputs and lists the publications that should be targeted toward it and to handle these multiple inputs by summing them.
 
 ```json
 {
