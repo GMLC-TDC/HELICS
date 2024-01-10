@@ -18,9 +18,8 @@ SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>
 #include <complex>
-#include <fmt/format.h>
 #include <cstring>
-
+#include <fmt/format.h>
 #include <frozen/string.h>
 #include <frozen/unordered_map.h>
 #include <ostream>

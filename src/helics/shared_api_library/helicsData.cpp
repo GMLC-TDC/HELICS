@@ -47,9 +47,8 @@ helics::SmallBuffer* getBuffer(HelicsDataBuffer data)
     if (ptr != nullptr && ptr->userKey == gBufferValidationIdentifier) {
         return ptr;
     }
-    auto *message= getMessageObj(data, nullptr);
-    if (message != nullptr)
-    {
+    auto* message = getMessageObj(data, nullptr);
+    if (message != nullptr) {
         return &message->data;
     }
     return nullptr;

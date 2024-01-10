@@ -20,8 +20,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/ostream.h>
 #include <fstream>
 #include <iostream>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
 #include <map>
 #include <regex>
 #include <set>

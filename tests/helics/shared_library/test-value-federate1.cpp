@@ -1185,8 +1185,7 @@ TEST_P(vfed_simple_type_tests, test_info_field)
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_simple_type_tests, ::testing::ValuesIn(CoreTypes_simple));
 INSTANTIATE_TEST_SUITE_P(vfed_tests, vfed_type_tests, ::testing::ValuesIn(CoreTypes));
 
-
-TEST_F(vfed_single_tests,buffer_tests)
+TEST_F(vfed_single_tests, buffer_tests)
 {
     HelicsTime gtime;
     double val1 = 0;
@@ -1214,8 +1213,8 @@ TEST_F(vfed_single_tests,buffer_tests)
     EXPECT_EQ(*val, testValue1);
 
     // publish a second value
-    auto buf1=helicsCreateDataBuffer(20);
-    helicsDataBufferFillFromDouble(buf1,testValue2);
+    auto buf1 = helicsCreateDataBuffer(20);
+    helicsDataBufferFillFromDouble(buf1, testValue2);
 
     CE(helicsPublicationPublishDataBuffer(pubid, buf1, &err));
 
@@ -1224,10 +1223,10 @@ TEST_F(vfed_single_tests,buffer_tests)
     CE(*val = helicsInputGetDouble(subid, &err));
     EXPECT_EQ(*val, testValue1);
 
-    auto buffer=helicsInputGetDataBuffer(subid,nullptr);
-    EXPECT_EQ(helicsDataBufferIsValid(buffer),HELICS_TRUE);
-    EXPECT_EQ(helicsDataBufferType(buffer),HELICS_DATA_TYPE_DOUBLE);
-    EXPECT_EQ(helicsDataBufferToDouble(buffer),testValue1);
+    auto buffer = helicsInputGetDataBuffer(subid, nullptr);
+    EXPECT_EQ(helicsDataBufferIsValid(buffer), HELICS_TRUE);
+    EXPECT_EQ(helicsDataBufferType(buffer), HELICS_DATA_TYPE_DOUBLE);
+    EXPECT_EQ(helicsDataBufferToDouble(buffer), testValue1);
 
     helicsDataBufferFree(buffer);
     // advance time

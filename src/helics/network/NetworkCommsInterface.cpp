@@ -15,7 +15,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <fmt/format.h>
 #include <memory>
 #include <string>
-#include <fmt/format.h>
 
 namespace helics {
 static constexpr char localHostString[] = "localhost";

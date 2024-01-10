@@ -538,24 +538,21 @@ TEST(message_object, dataBuffer)
 
     auto err = helicsErrorInitialize();
 
-
     EXPECT_EQ(helicsDataBufferIsValid(m1), HELICS_TRUE);
 
     char data[20];
-    int actSize{ 10 };
+    int actSize{10};
 
-    EXPECT_EQ(helicsDataBufferSize(m1),8);
+    EXPECT_EQ(helicsDataBufferSize(m1), 8);
     helicsDataBufferToRawString(m1, data, 20, &actSize);
     EXPECT_EQ(actSize, 8);
     EXPECT_EQ(std::string(data, data + actSize), "raw data");
 
     helicsMessageClear(m2, &err);
-    //test the connection between the buffer and message
-    EXPECT_EQ(helicsDataBufferSize(m2),0);
+    // test the connection between the buffer and message
+    EXPECT_EQ(helicsDataBufferSize(m2), 0);
     EXPECT_EQ(helicsMessageIsValid(m2), HELICS_FALSE);
     EXPECT_EQ(helicsDataBufferIsValid(m2), HELICS_TRUE);
-
-    
 
     helicsFederateEnterExecutingMode(fed, nullptr);
     helicsFederateFinalize(fed, nullptr);

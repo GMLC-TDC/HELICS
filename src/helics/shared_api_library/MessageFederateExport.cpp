@@ -1109,8 +1109,7 @@ void helicsMessageSetDataBuffer(HelicsMessage message, HelicsDataBuffer data, He
         return;
     }
     auto* ptr = getBuffer(data);
-    if (ptr == nullptr)
-    {
+    if (ptr == nullptr) {
         mess->data.clear();
         return;
     }

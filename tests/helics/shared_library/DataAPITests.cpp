@@ -177,8 +177,9 @@ TEST(data, toFromComplexVector)
                        cv{0, 0},
                        cv{43.7e231, -19.3e-88},
                        cv{std::nan("0"), 0}};
-    auto cnt = helicsDataBufferFillFromComplexVector(buff, reinterpret_cast<double*>(v1.data()),
-                                          static_cast<int>(v1.size()));
+    auto cnt = helicsDataBufferFillFromComplexVector(buff,
+                                                     reinterpret_cast<double*>(v1.data()),
+                                                     static_cast<int>(v1.size()));
     EXPECT_GT(cnt, 0);
     std::vector<double> v2;
     v2.resize(10);
@@ -227,7 +228,7 @@ TEST(data, converter)
     auto buff = helicsCreateDataBuffer(500);
 
     double v1 = 35.7;
-    auto cnt = helicsDataBufferFillFromDouble(buff,v1);
+    auto cnt = helicsDataBufferFillFromDouble(buff, v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
     bool res = helicsDataBufferConvertToType(buff, HELICS_DATA_TYPE_INT) != HELICS_FALSE;
@@ -244,7 +245,7 @@ TEST(data, clone)
     auto buff = helicsCreateDataBuffer(500);
 
     double v1 = 35.7;
-    auto cnt = helicsDataBufferFillFromDouble(buff,v1);
+    auto cnt = helicsDataBufferFillFromDouble(buff, v1);
     EXPECT_EQ(helicsDataBufferType(buff), HELICS_DATA_TYPE_DOUBLE);
     EXPECT_GT(cnt, 0);
     auto newbuff = helicsDataBufferClone(buff);
@@ -262,4 +263,3 @@ TEST(data, clone)
     EXPECT_EQ(v1, v2);
     helicsDataBufferFree(newbuff);
 }
-

@@ -460,7 +460,6 @@ HELICS_EXPORT void helicsPublicationPublishNamedPoint(HelicsPublication pub, con
 */
 HELICS_EXPORT void helicsPublicationPublishDataBuffer(HelicsPublication pub, HelicsDataBuffer buffer, HelicsError* err);
 
-
 /**
  * Add a named input to the list of targets a publication publishes to.
  *
@@ -521,13 +520,13 @@ HELICS_EXPORT int helicsInputGetByteCount(HelicsInput ipt);
 HELICS_EXPORT void helicsInputGetBytes(HelicsInput ipt, void* data, int maxDataLength, int* actualSize, HelicsError* err);
 
 /**
-* Get a copy of the raw data in a HelicsDataBuffer
-*
-* @param inp The input to get the data for.
-*
-* @param[in,out] err A pointer to an error object for catching errors.
-* @return A HelicsDataBuffer object containg the data
-*/
+ * Get a copy of the raw data in a HelicsDataBuffer
+ *
+ * @param inp The input to get the data for.
+ *
+ * @param[in,out] err A pointer to an error object for catching errors.
+ * @return A HelicsDataBuffer object containing the data
+ */
 HELICS_EXPORT HelicsDataBuffer helicsInputGetDataBuffer(HelicsInput inp, HelicsError* err);
 
 /**

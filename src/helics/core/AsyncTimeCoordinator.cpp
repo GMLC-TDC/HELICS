@@ -18,7 +18,6 @@ SPDX-License-Identifier: BSD-3-Clause
 #include <string>
 #include <vector>
 
-
 namespace helics {
 
 bool AsyncTimeCoordinator::updateTimeFactors()
