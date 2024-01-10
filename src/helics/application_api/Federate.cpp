@@ -1199,7 +1199,7 @@ static Filter& generateFilter(Federate* fed,
     if (operation != FilterTypes::CUSTOM) {
         filt.setFilterType(static_cast<std::int32_t>(operation));
     }
-    return filt;  // eslint-disable-line no-eval
+    return filt;  
 }
 
 static constexpr std::string_view emptyStr;
